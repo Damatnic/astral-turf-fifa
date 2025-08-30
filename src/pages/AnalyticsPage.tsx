@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useFranchiseContext, useTacticsContext, useUIContext } from '../hooks';
-import { Team } from '../../types';
+import type { Team } from '../types';
 
 const AnalyticsPage: React.FC = () => {
     const { franchiseState } = useFranchiseContext();

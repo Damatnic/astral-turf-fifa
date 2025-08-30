@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useFranchiseContext, useUIContext } from '../hooks';
-import { Team, HeadCoach, HeadScout, HeadOfMedicine, AssistantManager, GKCoach, FitnessCoach, LoanManager } from '../../types';
+import type { Team, HeadCoach, HeadScout, HeadOfMedicine, AssistantManager, GKCoach, FitnessCoach, LoanManager } from '../types';
 
 const StaffPage: React.FC = () => {
     const { franchiseState, dispatch } = useFranchiseContext();

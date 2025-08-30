@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useFranchiseContext, useTacticsContext } from '../hooks';
-import { Team, Player } from '../../types';
+import type { Team, Player } from '../types';
 
 const MedicalCenterPage: React.FC = () => {
     const { franchiseState } = useFranchiseContext();

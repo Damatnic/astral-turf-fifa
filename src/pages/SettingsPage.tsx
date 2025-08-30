@@ -1,6 +1,6 @@
 import React from 'react';
 import { useUIContext } from '../hooks';
-import { AIPersonality } from '../../types';
+import type { AIPersonality } from '../types';
 
 const SettingsPage: React.FC = () => {
     const { uiState, dispatch } = useUIContext();

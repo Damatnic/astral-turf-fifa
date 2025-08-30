@@ -29,7 +29,34 @@
       "Read(H:\\Astral-Turf-Lite/**)",
       "Read(H:\\Astral-Turf-Lite/**)",
       "Read(H:\\Astral-Turf-Lite/**)",
+<<<<<<< Updated upstream
       "Bash(git stash:*)"
+=======
+      "Bash(find:*)",
+      "Bash(timeout 10 npm run dev)",
+      "Bash(timeout 10 npm run vite:dev)",
+      "Bash(sed:*)",
+      "Bash(npx tsc:*)",
+      "Bash(grep:*)",
+      "Bash(taskkill:*)",
+      "Bash(cmd /c:*)",
+      "Bash(for file in src/context/reducers/*.ts src/context/*.ts)",
+      "Bash(do if [ -f \"$file\" ])",
+      "Bash(then sed -i 's/^import { \\([^}]*\\) } from \\(.*types.*\\)/import type { \\1 } from \\2/' \"$file\")",
+      "Bash(fi)",
+      "Bash(done)",
+      "Bash(npm run:*)",
+      "Bash(tar:*)",
+      "Bash(node:*)",
+      "Bash(npx browserslist:*)",
+      "Bash(for:*)",
+      "Bash(do sed -i 's|from.*services/aiService.*|from \"\"../../services/aiServiceLoader\"\";|g' \"$file\")",
+      "Bash(echo:*)",
+      "Bash(npm install:*)",
+      "Bash(npm test:*)",
+      "Bash(npx husky init:*)",
+      "Bash(npx playwright:*)"
+>>>>>>> Stashed changes
     ],
     "deny": [],
     "ask": []

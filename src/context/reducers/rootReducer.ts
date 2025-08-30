@@ -1,10 +1,12 @@
+
+
 import { produce } from 'immer';
-import { RootState, Action, NewsItem, InboxItem, Player, TransferPlayer, LeagueTableEntry, PlaybookStep, PlaybookItem, DailySchedule, WeeklySchedule, PlayerAttributes, MatchCommentary, MatchEvent } from '../../../types';
-import { tacticsReducer } from '../../../context/reducers/tacticsReducer';
-import { franchiseReducer } from '../../../context/reducers/franchiseReducer';
-import { uiReducer } from '../../../context/reducers/uiReducer';
-import { authReducer } from '../../../context/reducers/authReducer';
-import { INITIAL_STATE, PLAYER_ROLES, TRAINING_DRILLS } from '../../../constants';
+import type { RootState, Action, NewsItem, InboxItem, Player, TransferPlayer, LeagueTableEntry, PlaybookStep, PlaybookItem, DailySchedule, WeeklySchedule, PlayerAttributes, MatchCommentary, MatchEvent } from '../../types';
+import { tacticsReducer } from './tacticsReducer';
+import { franchiseReducer } from './franchiseReducer';
+import { uiReducer } from './uiReducer';
+import { authReducer } from './authReducer';
+import { INITIAL_STATE, PLAYER_ROLES, TRAINING_DRILLS } from '../../constants';
 
 const getModifier = (value: Player['form'] | Player['morale']): number => {
     const scale = { 'Excellent': 1.1, 'Good': 1.05, 'Okay': 1.0, 'Average': 1.0, 'Poor': 0.95, 'Very Poor': 0.9 };

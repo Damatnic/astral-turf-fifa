@@ -1,0 +1,38 @@
+# Dependencies
+node_modules
+
+# Build outputs
+dist
+build
+coverage
+
+# Config files that shouldn't be formatted
+package.json
+package-lock.json
+*.min.js
+*.min.css
+
+# Documentation
+*.md
+CHANGELOG*
+LICENSE*
+
+# Tauri
+src-tauri
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+
+# Logs
+*.log
+logs
+
+# Temporary files
+*.tmp
+*.temp
+backup_*

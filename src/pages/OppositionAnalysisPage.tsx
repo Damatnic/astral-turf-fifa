@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useFranchiseContext, useUIContext } from '../hooks';
-import { AIOppositionReport } from '../../types';
+import type { AIOppositionReport } from '../types';
 
 const OppositionAnalysisPage: React.FC = () => {
     const { franchiseState, dispatch } = useFranchiseContext();

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTacticsContext, useFranchiseContext, useUIContext } from '../hooks';
-import { Player, ChatMessage } from '../../types';
+import type { Player, ChatMessage } from '../types';
 
 const PlayerProfilePage: React.FC = () => {
     const { playerId } = useParams<{ playerId: string }>();

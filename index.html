@@ -2,15 +2,49 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/u1456619756_please_make_me_a_spooky_logo_for_a_soccer_trainin_3ad845fd-65f0-4e20-b5c4-4578018b5fc4_2.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="description" content="AI-powered soccer tactical planner for professional team management">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- Additional Mobile Icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icon-16.png">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#2dd4bf">
+    <meta name="msapplication-TileColor" content="#0f172a">
+    <meta name="msapplication-config" content="/browserconfig.xml">
+    
+    <!-- Security Headers -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://api.gemini.google.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    
     <title>Astral Turf</title>
+    
+    <!-- Performance optimizations -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    
+    <!-- Critical CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
       
-      /* Light & Dark Theme Variables */
+      /* MOBILE-FIRST RESPONSIVE DESIGN VARIABLES */
       :root {
+        /* Color Variables */
         --bg-primary: #0f172a; /* slate-900 */
         --bg-secondary: #1e293b; /* slate-800 */
         --bg-tertiary: #334155; /* slate-700 */
@@ -20,6 +54,37 @@
         --accent-primary: #2dd4bf; /* teal-400 */
         --accent-secondary: #14b8a6; /* teal-500 */
         --accent-tertiary: #0d9488; /* teal-600 */
+        
+        /* RESPONSIVE SPACING VARIABLES - Mobile First */
+        --spacing-xs: 0.25rem; /* 4px */
+        --spacing-sm: 0.5rem;  /* 8px */
+        --spacing-md: 1rem;    /* 16px - Base mobile spacing */
+        --spacing-lg: 1.5rem;  /* 24px */
+        --spacing-xl: 2rem;    /* 32px */
+        --spacing-2xl: 3rem;   /* 48px */
+        
+        /* MOBILE TOUCH TARGET SIZES */
+        --touch-target-sm: 40px; /* Minimum touch target */
+        --touch-target-md: 44px; /* Recommended touch target */
+        --touch-target-lg: 48px; /* Large touch target */
+        
+        /* MOBILE TYPOGRAPHY SCALE */
+        --text-xs: 0.75rem;   /* 12px */
+        --text-sm: 0.875rem;  /* 14px */
+        --text-base: 1rem;    /* 16px - Mobile base */
+        --text-lg: 1.125rem;  /* 18px */
+        --text-xl: 1.25rem;   /* 20px */
+        --text-2xl: 1.5rem;   /* 24px */
+        --text-3xl: 1.875rem; /* 30px */
+        --text-4xl: 2.25rem;  /* 36px - Mobile large */
+        
+        /* MOBILE LAYOUT DIMENSIONS */
+        --header-height-mobile: 56px; /* 3.5rem */
+        --header-height-tablet: 64px;  /* 4rem */
+        --sidebar-width-mobile: 280px; /* Mobile drawer width */
+        --sidebar-width-tablet: 320px; /* Tablet sidebar width */
+        --modal-padding-mobile: var(--spacing-md);
+        --modal-padding-tablet: var(--spacing-lg);
       }
       .light {
         --bg-primary: #f8fafc; /* slate-50 */
@@ -150,6 +215,256 @@
         background: linear-gradient(-45deg, #0f172a, #1e293b, #334155, #0f172a);
         background-size: 400% 400%;
         animation: gradient-animation 15s ease infinite;
+      }
+
+      /* ===== MOBILE-FIRST RESPONSIVE DESIGN SYSTEM ===== */
+      
+      /* MOBILE BASE STYLES (320px+) */
+      .mobile-container {
+        width: 100%;
+        max-width: 100%;
+        padding: var(--spacing-md);
+      }
+      
+      /* MOBILE TOUCH-FRIENDLY BUTTONS */
+      .btn-mobile {
+        min-height: var(--touch-target-md);
+        min-width: var(--touch-target-md);
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: var(--text-sm);
+        border-radius: 0.5rem;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+      }
+      
+      .btn-mobile:active {
+        transform: scale(0.98);
+        transition: transform 0.1s ease-in-out;
+      }
+      
+      /* MOBILE TYPOGRAPHY */
+      .text-mobile-sm { font-size: var(--text-xs); line-height: 1.4; }
+      .text-mobile-base { font-size: var(--text-sm); line-height: 1.5; }
+      .text-mobile-lg { font-size: var(--text-base); line-height: 1.6; }
+      .text-mobile-xl { font-size: var(--text-lg); line-height: 1.4; }
+      .text-mobile-2xl { font-size: var(--text-xl); line-height: 1.3; }
+      .text-mobile-3xl { font-size: var(--text-2xl); line-height: 1.2; }
+      .text-mobile-4xl { font-size: var(--text-3xl); line-height: 1.1; }
+      
+      /* MOBILE LAYOUT HELPERS */
+      .mobile-full-height { height: 100vh; height: 100dvh; }
+      .mobile-safe-area { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+      
+      /* MOBILE NAVIGATION DRAWER */
+      .mobile-drawer {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        width: var(--sidebar-width-mobile);
+        height: 100vh;
+        height: 100dvh;
+        background: var(--bg-secondary);
+        border-right: 1px solid var(--border-primary);
+        transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 50;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      
+      .mobile-drawer.open {
+        left: 0;
+      }
+      
+      .mobile-drawer-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(4px);
+        z-index: 40;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+      }
+      
+      .mobile-drawer-overlay.visible {
+        opacity: 1;
+        visibility: visible;
+      }
+      
+      /* MOBILE MODAL SYSTEM */
+      .mobile-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: var(--bg-primary);
+        z-index: 60;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: var(--modal-padding-mobile);
+        transform: translateY(100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      
+      .mobile-modal.open {
+        transform: translateY(0);
+      }
+      
+      /* MOBILE FORM ELEMENTS */
+      .input-mobile {
+        min-height: var(--touch-target-md);
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: var(--text-base);
+        border-radius: 0.5rem;
+        border: 1px solid var(--border-primary);
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        width: 100%;
+      }
+      
+      .input-mobile:focus {
+        outline: 2px solid var(--accent-primary);
+        outline-offset: 2px;
+        border-color: var(--accent-primary);
+      }
+      
+      /* MOBILE GRID SYSTEM */
+      .mobile-grid {
+        display: grid;
+        gap: var(--spacing-md);
+      }
+      
+      .mobile-grid-1 { grid-template-columns: 1fr; }
+      .mobile-grid-2 { grid-template-columns: 1fr 1fr; }
+      
+      /* MOBILE SPACING UTILITIES */
+      .mobile-p-1 { padding: var(--spacing-xs); }
+      .mobile-p-2 { padding: var(--spacing-sm); }
+      .mobile-p-3 { padding: var(--spacing-md); }
+      .mobile-p-4 { padding: var(--spacing-lg); }
+      
+      .mobile-m-1 { margin: var(--spacing-xs); }
+      .mobile-m-2 { margin: var(--spacing-sm); }
+      .mobile-m-3 { margin: var(--spacing-md); }
+      .mobile-m-4 { margin: var(--spacing-lg); }
+      
+      /* ===== RESPONSIVE BREAKPOINTS ===== */
+      
+      /* TABLET (768px+) */
+      @media (min-width: 768px) {
+        :root {
+          --modal-padding-mobile: var(--modal-padding-tablet);
+        }
+        
+        .mobile-drawer {
+          width: var(--sidebar-width-tablet);
+        }
+        
+        .tablet-grid-2 { grid-template-columns: 1fr 1fr; }
+        .tablet-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+        
+        .tablet-text-lg { font-size: var(--text-lg); }
+        .tablet-text-xl { font-size: var(--text-xl); }
+        .tablet-text-2xl { font-size: var(--text-2xl); }
+        .tablet-text-3xl { font-size: var(--text-3xl); }
+        .tablet-text-4xl { font-size: var(--text-4xl); }
+        
+        /* Tablet-specific modal can be smaller */
+        .mobile-modal {
+          top: 10%;
+          bottom: 10%;
+          left: 10%;
+          right: 10%;
+          border-radius: 1rem;
+          transform: translateY(100%) scale(0.95);
+        }
+        
+        .mobile-modal.open {
+          transform: translateY(0) scale(1);
+        }
+      }
+      
+      /* DESKTOP (1024px+) */
+      @media (min-width: 1024px) {
+        .desktop-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+        .desktop-grid-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+        
+        .desktop-text-lg { font-size: var(--text-lg); }
+        .desktop-text-xl { font-size: var(--text-xl); }
+        .desktop-text-2xl { font-size: var(--text-2xl); }
+        .desktop-text-3xl { font-size: var(--text-3xl); }
+        .desktop-text-4xl { font-size: var(--text-4xl); }
+        
+        /* Desktop modals are more traditional */
+        .mobile-modal {
+          top: 5%;
+          bottom: 5%;
+          left: 15%;
+          right: 15%;
+        }
+      }
+      
+      /* LARGE DESKTOP (1440px+) */
+      @media (min-width: 1440px) {
+        .xl-grid-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+        .xl-grid-5 { grid-template-columns: 1fr 1fr 1fr 1fr 1fr; }
+        
+        .mobile-modal {
+          left: 20%;
+          right: 20%;
+        }
+      }
+      
+      /* ===== MOBILE TOUCH INTERACTIONS ===== */
+      
+      /* Remove default touch callouts and highlights */
+      * {
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+      
+      /* Allow text selection for specific elements */
+      input, textarea, [contenteditable], .selectable-text {
+        -webkit-user-select: text;
+        -khtml-user-select: text;
+        -moz-user-select: text;
+        -ms-user-select: text;
+        user-select: text;
+      }
+      
+      /* Touch feedback for interactive elements */
+      button, .btn, [role="button"], a, .clickable {
+        cursor: pointer;
+        -webkit-user-select: none;
+        user-select: none;
+      }
+      
+      button:active, .btn:active, [role="button"]:active, a:active, .clickable:active {
+        transform: scale(0.98);
+        opacity: 0.8;
+      }
+      
+      /* Smooth scrolling for mobile */
+      html {
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+      }
+      
+      /* Hide scrollbars on mobile for cleaner look */
+      @media (max-width: 767px) {
+        ::-webkit-scrollbar {
+          display: none;
+        }
+        * {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
       }
 
     </style>

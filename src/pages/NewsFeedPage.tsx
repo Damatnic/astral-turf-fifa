@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useFranchiseContext } from '../hooks';
-import { NewsItem } from '../../types';
+import type { NewsItem } from '../types';
 
 const NewsFeedPage: React.FC = () => {
     const { franchiseState } = useFranchiseContext();

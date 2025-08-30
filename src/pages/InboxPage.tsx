@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useFranchiseContext, useUIContext } from '../hooks';
-import { InboxItem } from '../../types';
+import type { InboxItem } from '../types';
 
 const InboxPage: React.FC = () => {
     const { franchiseState, dispatch } = useFranchiseContext();

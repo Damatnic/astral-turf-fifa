@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useFranchiseContext, useTacticsContext, useUIContext } from '../hooks';
-import { Team, MentoringGroup } from '../../types';
+import type { Team, MentoringGroup } from '../types';
 
 const MentoringPage: React.FC = () => {
     const { franchiseState, dispatch } = useFranchiseContext();

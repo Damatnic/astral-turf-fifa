@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useFranchiseContext, useUIContext } from '../hooks';
-import { AIPressConferenceResponse } from '../../types';
+import type { AIPressConferenceResponse } from '../types';
 
 const PressConferencePage: React.FC = () => {
     const { franchiseState } = useFranchiseContext();

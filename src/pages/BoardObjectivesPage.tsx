@@ -1,6 +1,6 @@
 import React from 'react';
 import { useFranchiseContext } from '../hooks';
-import { BoardObjective } from '../../types';
+import type { BoardObjective } from '../types';
 
 const BoardObjectivesPage: React.FC = () => {
     const { franchiseState } = useFranchiseContext();

@@ -2,8 +2,61 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
-import { AppProvider } from './context/AppProvider';
+import { AppProvider } from './src/context/AppProvider';
 import { HashRouter } from 'react-router-dom';
+import SecurityProvider from './src/components/security/SecurityProvider';
+import SecurityErrorBoundary from './src/components/security/SecurityErrorBoundary';
+
+// Import enhanced UI styles
+import './src/styles/enhanced-ui.css';
+
+// Performance optimizations
+function registerServiceWorker() {
+  if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
+    window.addEventListener('load', async () => {
+      try {
+        const registration = await navigator.serviceWorker.register('/sw.js');
+        console.log('Service Worker registered successfully:', registration);
+        
+        // Handle service worker updates
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing;
+          if (newWorker) {
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                console.log('New service worker available, page will refresh');
+                window.location.reload();
+              }
+            });
+          }
+        });
+      } catch (error) {
+        console.error('Service Worker registration failed:', error);
+      }
+    });
+  }
+}
+
+// Resource preloading for critical assets
+function preloadCriticalResources() {
+  const criticalResources = [
+    // Critical CSS and JS will be handled by Vite automatically
+    // We can preload specific assets if needed
+  ];
+
+  criticalResources.forEach(resource => {
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.href = resource.href;
+    link.as = resource.as;
+    if (resource.crossorigin) link.crossOrigin = resource.crossorigin;
+    document.head.appendChild(link);
+  });
+}
+
+// Initialize performance optimizations
+registerServiceWorker();
+preloadCriticalResources();
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -13,10 +66,14 @@ if (!rootElement) {
 const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
-    <HashRouter>
-      <AppProvider>
-        <App />
-      </AppProvider>
-    </HashRouter>
+    <SecurityErrorBoundary>
+      <SecurityProvider>
+        <HashRouter>
+          <AppProvider>
+            <App />
+          </AppProvider>
+        </HashRouter>
+      </SecurityProvider>
+    </SecurityErrorBoundary>
   </React.StrictMode>
 );

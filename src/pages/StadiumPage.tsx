@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useFranchiseContext, useUIContext } from '../hooks';
-import { Team } from '../../types';
+import type { Team } from '../types';
 
 const StadiumPage: React.FC = () => {
     const { franchiseState, dispatch } = useFranchiseContext();

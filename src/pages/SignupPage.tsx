@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuthContext } from '../../hooks/useAuthContext';
-import { authService } from '../../services/authService';
-import { LoadingSpinner, LogoIcon } from '../../components/ui/icons';
+import { useAuthContext } from '../hooks/useAuthContext';
+import { useResponsive } from '../hooks';
+import { authService } from '../services/authService';
+import { LoadingSpinner, LogoIcon } from '../components/ui/icons';
 
 interface SignupFormData {
   email: string;
@@ -29,6 +30,10 @@ const SignupPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { dispatch, authState } = useAuthContext();
   const navigate = useNavigate();
+  
+  // Mobile-First Responsive
+  const responsive = useResponsive();
+  const { isMobile, isTablet } = responsive;
 
   useEffect(() => {
     document.body.classList.add('auth-bg');
@@ -109,30 +114,55 @@ const SignupPage: React.FC = () => {
   };
 
   return (
-    <div className="h-screen w-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <LogoIcon className="w-16 h-16 mx-auto text-teal-400" />
-          <h1 className="text-3xl font-bold mt-2 tracking-wider text-white">
-            Create Your Account
+    <div className={`
+      mobile-full-height mobile-safe-area w-screen 
+      flex items-center justify-center
+      ${isMobile ? 'mobile-p-3' : 'p-4'}
+    `}>
+      <div className={`
+        w-full 
+        ${isMobile ? 'max-w-sm' : 'max-w-md'}
+      `}>
+        {/* Mobile-Optimized Header */}
+        <div className={`
+          text-center 
+          ${isMobile ? 'mb-6' : 'mb-8'}
+        `}>
+          <LogoIcon className={`
+            mx-auto text-teal-400
+            ${isMobile ? 'w-12 h-12' : 'w-16 h-16'}
+          `} />
+          <h1 className={`
+            font-bold mt-2 tracking-wider text-white
+            ${isMobile ? 'text-2xl' : 'text-3xl'}
+          `}>
+            {isMobile ? 'Create Account' : 'Create Your Account'}
           </h1>
         </div>
         
-        <div className="bg-slate-800/80 backdrop-blur-sm p-8 rounded-lg shadow-2xl border border-slate-700/50">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Mobile-First Form Container */}
+        <div className={`
+          bg-slate-800/80 backdrop-blur-sm rounded-lg shadow-2xl border border-slate-700/50
+          ${isMobile ? 'mobile-p-3' : 'p-8'}
+        `}>
+          <form onSubmit={handleSubmit} className={`${isMobile ? 'space-y-4' : 'space-y-6'}`}>
+            {/* Mobile-Optimized Role Selection */}
             <div>
-              <label className="block text-sm font-medium text-slate-400 mb-2">
+              <label className={`block font-medium text-slate-400 ${isMobile ? 'text-sm mb-2' : 'text-sm mb-2'}`}>
                 I am a...
               </label>
-              <div className="flex rounded-md bg-slate-700 border border-slate-600 p-1">
+              <div className={`flex rounded-lg bg-slate-700 border border-slate-600 ${isMobile ? 'p-1' : 'p-1'}`}>
                 <button 
                   type="button" 
                   onClick={() => handleRoleChange('coach')} 
-                  className={`w-1/2 py-2 text-sm font-semibold rounded transition-colors ${
-                    formData.role === 'coach' 
+                  className={`
+                    w-1/2 font-semibold rounded transition-colors
+                    ${isMobile ? 'py-3 text-sm' : 'py-2 text-sm'}
+                    ${formData.role === 'coach' 
                       ? 'bg-teal-600 text-white' 
-                      : 'text-slate-300 hover:text-white'
-                  }`}
+                      : 'text-slate-300 hover:text-white active:bg-slate-600'
+                    }
+                  `}
                   disabled={isLoading}
                 >
                   Coach
@@ -140,11 +170,14 @@ const SignupPage: React.FC = () => {
                 <button 
                   type="button" 
                   onClick={() => handleRoleChange('player')} 
-                  className={`w-1/2 py-2 text-sm font-semibold rounded transition-colors ${
-                    formData.role === 'player' 
+                  className={`
+                    w-1/2 font-semibold rounded transition-colors
+                    ${isMobile ? 'py-3 text-sm' : 'py-2 text-sm'}
+                    ${formData.role === 'player' 
                       ? 'bg-teal-600 text-white' 
-                      : 'text-slate-300 hover:text-white'
-                  }`}
+                      : 'text-slate-300 hover:text-white active:bg-slate-600'
+                    }
+                  `}
                   disabled={isLoading}
                 >
                   Player
@@ -152,8 +185,9 @@ const SignupPage: React.FC = () => {
               </div>
             </div>
             
+            {/* Mobile-Optimized Form Fields */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-400">
+              <label htmlFor="email" className={`block font-medium text-slate-400 ${isMobile ? 'text-sm mb-2' : 'text-sm'}`}>
                 Email
               </label>
               <input
@@ -162,12 +196,14 @@ const SignupPage: React.FC = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className={`w-full mt-1 p-3 bg-slate-700 border rounded-md text-white focus:outline-none focus:ring-2 focus:ring-teal-500 ${
-                  errors.email ? 'border-red-500' : 'border-slate-600'
-                }`}
+                className={`
+                  input-mobile bg-slate-700 text-white focus:ring-2 focus:ring-teal-500
+                  ${errors.email ? 'border-red-500' : 'border-slate-600'}
+                  ${isMobile ? 'text-base' : 'text-sm'}
+                `}
                 required
                 disabled={isLoading}
-                placeholder="Enter your email"
+                placeholder={isMobile ? "Your email" : "Enter your email"}
               />
               {errors.email && (
                 <p className="mt-1 text-sm text-red-400">{errors.email}</p>
@@ -175,7 +211,7 @@ const SignupPage: React.FC = () => {
             </div>
             
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-slate-400">
+              <label htmlFor="password" className={`block font-medium text-slate-400 ${isMobile ? 'text-sm mb-2' : 'text-sm'}`}>
                 Password
               </label>
               <input
@@ -184,12 +220,14 @@ const SignupPage: React.FC = () => {
                 name="password"
                 value={formData.password}
                 onChange={handleInputChange}
-                className={`w-full mt-1 p-3 bg-slate-700 border rounded-md text-white focus:outline-none focus:ring-2 focus:ring-teal-500 ${
-                  errors.password ? 'border-red-500' : 'border-slate-600'
-                }`}
+                className={`
+                  input-mobile bg-slate-700 text-white focus:ring-2 focus:ring-teal-500
+                  ${errors.password ? 'border-red-500' : 'border-slate-600'}
+                  ${isMobile ? 'text-base' : 'text-sm'}
+                `}
                 required
                 disabled={isLoading}
-                placeholder="Enter your password"
+                placeholder={isMobile ? "Your password" : "Enter your password"}
               />
               {errors.password && (
                 <p className="mt-1 text-sm text-red-400">{errors.password}</p>
@@ -197,7 +235,7 @@ const SignupPage: React.FC = () => {
             </div>
             
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-slate-400">
+              <label htmlFor="confirmPassword" className={`block font-medium text-slate-400 ${isMobile ? 'text-sm mb-2' : 'text-sm'}`}>
                 Confirm Password
               </label>
               <input
@@ -206,43 +244,54 @@ const SignupPage: React.FC = () => {
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleInputChange}
-                className={`w-full mt-1 p-3 bg-slate-700 border rounded-md text-white focus:outline-none focus:ring-2 focus:ring-teal-500 ${
-                  errors.confirmPassword ? 'border-red-500' : 'border-slate-600'
-                }`}
+                className={`
+                  input-mobile bg-slate-700 text-white focus:ring-2 focus:ring-teal-500
+                  ${errors.confirmPassword ? 'border-red-500' : 'border-slate-600'}
+                  ${isMobile ? 'text-base' : 'text-sm'}
+                `}
                 required
                 disabled={isLoading}
-                placeholder="Confirm your password"
+                placeholder={isMobile ? "Confirm password" : "Confirm your password"}
               />
               {errors.confirmPassword && (
                 <p className="mt-1 text-sm text-red-400">{errors.confirmPassword}</p>
               )}
             </div>
             
+            {/* Mobile-Optimized Error Display */}
             {(errors.general || authState.error) && (
-              <div className="p-3 bg-red-900/20 border border-red-500/20 rounded-md">
-                <p className="text-red-400 text-sm">{errors.general || authState.error}</p>
+              <div className={`bg-red-900/20 border border-red-500/20 rounded-md ${isMobile ? 'mobile-p-2' : 'p-3'}`}>
+                <p className={`text-red-400 ${isMobile ? 'text-sm' : 'text-sm'}`}>{errors.general || authState.error}</p>
               </div>
             )}
             
+            {/* Mobile-Friendly Submit Button */}
             <div>
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full flex justify-center py-3 px-4 bg-teal-600 hover:bg-teal-500 text-white font-bold rounded-md transition-colors disabled:bg-slate-600 disabled:cursor-not-allowed"
+                className={`
+                  btn-mobile w-full bg-teal-600 hover:bg-teal-500 active:bg-teal-700
+                  text-white font-bold rounded-lg transition-colors
+                  disabled:bg-slate-600 disabled:cursor-not-allowed
+                  flex justify-center items-center
+                  ${isMobile ? 'py-4 text-base' : 'py-3 px-4'}
+                `}
               >
                 {isLoading ? <LoadingSpinner /> : 'Sign Up'}
               </button>
             </div>
           </form>
 
-          <div className="mt-6 text-center text-sm text-slate-400">
+          {/* Mobile-Optimized Footer Links */}
+          <div className={`text-center text-slate-400 ${isMobile ? 'mt-4 text-sm' : 'mt-6 text-sm'}`}>
             <p>
               Already have an account?{' '}
               <Link to="/login" className="font-semibold text-teal-400 hover:text-teal-300">
                 Login
               </Link>
             </p>
-            <p className="mt-1">
+            <p className={`${isMobile ? 'mt-2' : 'mt-1'}`}>
               <Link to="/" className="hover:text-teal-300">
                 Back to Home
               </Link>
