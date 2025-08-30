@@ -28,7 +28,8 @@
       "Read(H:\\Astral-Turf-Lite/**)",
       "Read(H:\\Astral-Turf-Lite/**)",
       "Read(H:\\Astral-Turf-Lite/**)",
-      "Read(H:\\Astral-Turf-Lite/**)"
+      "Read(H:\\Astral-Turf-Lite/**)",
+      "Bash(git stash:*)"
     ],
     "deny": [],
     "ask": []
