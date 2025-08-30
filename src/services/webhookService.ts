@@ -5,7 +5,8 @@
  * external system integration, and automated workflow triggers
  */
 
-import axios, { AxiosInstance } from 'axios';
+import axios from 'axios';
+import type { AxiosInstance } from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import crypto from 'crypto-js';
 

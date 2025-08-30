@@ -1,5 +1,8 @@
 import React from 'react';
-import { motion, AnimatePresence, Variants, HTMLMotionProps } from 'framer-motion';
+import { motion, AnimatePresence, type Variants } from 'framer-motion';
+
+// Define our own HTMLMotionProps equivalent since it's not exported in v12
+type HTMLMotionProps<T extends keyof React.JSX.IntrinsicElements> = React.ComponentProps<typeof motion[T]>;
 
 // Animation variants for common patterns
 export const slideInVariants: Variants = {

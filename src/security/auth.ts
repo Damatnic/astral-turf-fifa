@@ -5,7 +5,7 @@
  * password hashing, token validation, and session control.
  */
 
-import jwt from 'jsonwebtoken';
+import * as jose from 'jose';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto-js';
 import { JWT_CONFIG, PASSWORD_CONFIG, SESSION_CONFIG, ENVIRONMENT_CONFIG } from './config';
@@ -165,8 +165,8 @@ export function isPasswordPreviouslyUsed(password: string, passwordHistory: stri
  */
 
 // Generate JWT token pair
-export function generateTokenPair(user: SecureUser, sessionId: string): TokenPair {
-  const payload: Omit<JWTPayload, 'iat' | 'exp'> = {
+export async function generateTokenPair(user: SecureUser, sessionId: string): Promise<TokenPair> {
+  const payload = {
     userId: user.id,
     email: user.email,
     role: user.role,
@@ -176,19 +176,27 @@ export function generateTokenPair(user: SecureUser, sessionId: string): TokenPai
   };
   
   try {
-    const accessToken = jwt.sign(payload, JWT_CONFIG.SECRET, {
-      expiresIn: JWT_CONFIG.ACCESS_TOKEN_EXPIRES_IN,
-      algorithm: JWT_CONFIG.ALGORITHM,
-    });
+    const secret = new TextEncoder().encode(JWT_CONFIG.SECRET);
+    const refreshSecret = new TextEncoder().encode(JWT_CONFIG.REFRESH_SECRET);
     
-    const refreshToken = jwt.sign(
-      { ...payload, type: 'refresh' },
-      JWT_CONFIG.REFRESH_SECRET,
-      {
-        expiresIn: JWT_CONFIG.REFRESH_TOKEN_EXPIRES_IN,
-        algorithm: JWT_CONFIG.ALGORITHM,
-      }
-    );
+    const accessToken = await new jose.SignJWT(payload)
+      .setProtectedHeader({ alg: 'HS256' })
+      .setIssuedAt()
+      .setExpirationTime('15m')
+      .setIssuer(JWT_CONFIG.ISSUER)
+      .setAudience(JWT_CONFIG.AUDIENCE)
+      .sign(secret);
+    
+    const refreshToken = await new jose.SignJWT({
+      ...payload,
+      type: 'refresh'
+    })
+      .setProtectedHeader({ alg: 'HS256' })
+      .setIssuedAt()
+      .setExpirationTime('7d')
+      .setIssuer(JWT_CONFIG.ISSUER)
+      .setAudience(JWT_CONFIG.AUDIENCE)
+      .sign(refreshSecret);
     
     // Calculate expiration time in seconds
     const expiresIn = 15 * 60; // 15 minutes in seconds
@@ -215,7 +223,7 @@ export function generateTokenPair(user: SecureUser, sessionId: string): TokenPai
 }
 
 // Verify JWT token
-export function verifyToken(token: string, isRefreshToken = false): JWTPayload | null {
+export async function verifyToken(token: string, isRefreshToken = false): Promise<JWTPayload | null> {
   try {
     // Check if token is blacklisted
     if (blacklistedTokens.has(token)) {
@@ -223,18 +231,20 @@ export function verifyToken(token: string, isRefreshToken = false): JWTPayload |
       return null;
     }
     
-    const secret = isRefreshToken ? JWT_CONFIG.REFRESH_SECRET : JWT_CONFIG.SECRET;
-    const decoded = jwt.verify(token, secret, {
+    const secret = new TextEncoder().encode(
+      isRefreshToken ? JWT_CONFIG.REFRESH_SECRET : JWT_CONFIG.SECRET
+    );
+    
+    const { payload } = await jose.jwtVerify(token, secret, {
       issuer: JWT_CONFIG.ISSUER,
       audience: JWT_CONFIG.AUDIENCE,
-      algorithms: [JWT_CONFIG.ALGORITHM],
-    }) as JWTPayload;
+    });
     
-    return decoded;
+    return payload as JWTPayload;
   } catch (error) {
-    if (error instanceof jwt.TokenExpiredError) {
+    if (error instanceof jose.errors.JWTExpired) {
       securityLogger.info('Token expired', { error: error.message });
-    } else if (error instanceof jwt.JsonWebTokenError) {
+    } else if (error instanceof jose.errors.JWTInvalid) {
       securityLogger.warn('Invalid token', { error: error.message });
     } else {
       securityLogger.error('Token verification failed', {
@@ -246,8 +256,8 @@ export function verifyToken(token: string, isRefreshToken = false): JWTPayload |
 }
 
 // Refresh access token using refresh token
-export function refreshAccessToken(refreshToken: string): TokenPair | null {
-  const payload = verifyToken(refreshToken, true);
+export async function refreshAccessToken(refreshToken: string): Promise<TokenPair | null> {
+  const payload = await verifyToken(refreshToken, true);
   if (!payload) {
     return null;
   }
@@ -259,7 +269,7 @@ export function refreshAccessToken(refreshToken: string): TokenPair | null {
   }
   
   // Generate new token pair
-  const newTokenPair = generateTokenPair(user, payload.sessionId);
+  const newTokenPair = await generateTokenPair(user, payload.sessionId);
   
   // Remove old refresh token and add new one
   user.refreshTokens = user.refreshTokens.filter(token => token !== refreshToken);
@@ -277,8 +287,8 @@ export function refreshAccessToken(refreshToken: string): TokenPair | null {
 }
 
 // Revoke token (logout)
-export function revokeToken(token: string): void {
-  const payload = verifyToken(token);
+export async function revokeToken(token: string): Promise<void> {
+  const payload = await verifyToken(token);
   if (payload) {
     blacklistedTokens.add(token);
     

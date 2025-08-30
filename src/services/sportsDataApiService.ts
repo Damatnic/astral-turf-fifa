@@ -5,7 +5,8 @@
  * performance analytics, and industry-standard statistics for benchmarking
  */
 
-import axios, { AxiosInstance } from 'axios';
+import axios from 'axios';
+import type { AxiosInstance } from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 
 export interface SportsDataProvider {
@@ -178,7 +179,7 @@ class SportsDataApiService {
       name: config.name || '',
       type: config.type || 'football_api',
       baseUrl: config.baseUrl || '',
-      apiKey: config.apiKey,
+      apiKey: config.apiKey ?? undefined,
       isActive: config.isActive || false,
       rateLimitPerMinute: config.rateLimitPerMinute || 100,
       currentUsage: 0,

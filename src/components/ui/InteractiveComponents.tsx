@@ -1,5 +1,8 @@
 import React, { useState, useRef } from 'react';
-import { motion, HTMLMotionProps, useMotionValue, useTransform, useSpring } from 'framer-motion';
+import { motion, useMotionValue, useTransform, useSpring } from 'framer-motion';
+
+// Define our own HTMLMotionProps equivalent since it's not exported in v12+
+type HTMLMotionProps<T extends keyof React.JSX.IntrinsicElements> = React.ComponentProps<typeof motion[T]>;
 import { useTheme } from '../../context/ThemeContext';
 
 // Enhanced Button Component

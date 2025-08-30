@@ -4,12 +4,11 @@ export const authReducer = (draft: AuthState, action: Action): AuthState | void 
   switch (action.type) {
     case 'LOGIN_SUCCESS':
       draft.isAuthenticated = true;
-      draft.user = action.payload;
+      draft.user = {
+        ...action.payload,
+        lastLoginAt: new Date().toISOString()
+      };
       draft.error = null;
-      // Update last login timestamp
-      if (draft.user) {
-        draft.user.lastLoginAt = new Date().toISOString();
-      }
       break;
     case 'LOGIN_FAILURE':
       draft.isAuthenticated = false;

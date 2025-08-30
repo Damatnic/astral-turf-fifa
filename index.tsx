@@ -39,7 +39,7 @@ function registerServiceWorker() {
 
 // Resource preloading for critical assets
 function preloadCriticalResources() {
-  const criticalResources = [
+  const criticalResources: Array<{ href: string; as?: string }> = [
     // Critical CSS and JS will be handled by Vite automatically
     // We can preload specific assets if needed
   ];
