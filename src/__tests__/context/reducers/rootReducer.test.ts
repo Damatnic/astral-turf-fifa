@@ -110,7 +110,7 @@ describe('rootReducer', () => {
         tactics: {
           ...createMockTacticsState(),
           drawings: [
-            { id: '1', type: 'line', points: [{ x: 0, y: 0 }, { x: 10, y: 10 }], color: 'red' }
+            { id: '1', type: 'line', points: [{ x: 0, y: 0 }, { x: 10, y: 10 }], color: 'red' },
           ],
         },
       };
@@ -129,7 +129,7 @@ describe('rootReducer', () => {
 
       // Should increment game week
       expect(newState.franchise.gameWeek).toBe(initialState.franchise.gameWeek + 1);
-      
+
       // Should add attribute history for players
       expect(newState.tactics.players).toBeDefined();
     });
@@ -200,11 +200,11 @@ describe('rootReducer', () => {
       // Should create new playbook item
       const playbookItems = Object.values(newState.tactics.playbook);
       const newItem = playbookItems.find(item => item.name === 'Test Play');
-      
+
       expect(newItem).toBeDefined();
       expect(newItem?.category).toBe('Attack');
       expect(newItem?.steps).toHaveLength(1);
-      
+
       // Should set as active
       expect(newState.ui.activePlaybookItemId).toBe(newItem?.id);
       expect(newState.ui.activeStepIndex).toBe(0);
@@ -271,14 +271,14 @@ describe('rootReducer', () => {
       // Should add library play to playbook
       const playbookItems = Object.values(newState.tactics.playbook);
       const addedPlay = playbookItems.find(item => item.name === 'Library Play');
-      
+
       expect(addedPlay).toBeDefined();
       expect(addedPlay?.category).toBe('Defense');
-      
+
       // Should set as active
       expect(newState.ui.activePlaybookItemId).toBe(addedPlay?.id);
       expect(newState.ui.activeStepIndex).toBe(0);
-      
+
       // Should clear drawings and reset animation state
       expect(newState.tactics.drawings).toEqual([]);
       expect(newState.ui.isAnimating).toBe(false);
@@ -360,7 +360,7 @@ describe('rootReducer', () => {
               thursday: { isRestDay: false, morning: { warmup: 'drill1', main: 'drill2', cooldown: 'drill3' }, afternoon: { warmup: null, main: null, cooldown: null } },
               friday: { isRestDay: false, morning: { warmup: 'drill1', main: 'drill2', cooldown: 'drill3' }, afternoon: { warmup: null, main: null, cooldown: null } },
               saturday: { isRestDay: false, morning: { warmup: 'drill1', main: 'drill2', cooldown: 'drill3' }, afternoon: { warmup: null, main: null, cooldown: null } },
-              sunday: { isRestDay: true, morning: { warmup: null, main: null, cooldown: null }, afternoon: { warmup: null, main: null, cooldown: null } }
+              sunday: { isRestDay: true, morning: { warmup: null, main: null, cooldown: null }, afternoon: { warmup: null, main: null, cooldown: null } },
             },
             away: {
               monday: { isRestDay: false, morning: { warmup: 'drill1', main: 'drill2', cooldown: 'drill3' }, afternoon: { warmup: null, main: null, cooldown: null } },
@@ -369,8 +369,8 @@ describe('rootReducer', () => {
               thursday: { isRestDay: false, morning: { warmup: 'drill1', main: 'drill2', cooldown: 'drill3' }, afternoon: { warmup: null, main: null, cooldown: null } },
               friday: { isRestDay: false, morning: { warmup: 'drill1', main: 'drill2', cooldown: 'drill3' }, afternoon: { warmup: null, main: null, cooldown: null } },
               saturday: { isRestDay: false, morning: { warmup: 'drill1', main: 'drill2', cooldown: 'drill3' }, afternoon: { warmup: null, main: null, cooldown: null } },
-              sunday: { isRestDay: true, morning: { warmup: null, main: null, cooldown: null }, afternoon: { warmup: null, main: null, cooldown: null } }
-            }
+              sunday: { isRestDay: true, morning: { warmup: null, main: null, cooldown: null }, afternoon: { warmup: null, main: null, cooldown: null } },
+            },
           },
         },
       };
@@ -379,7 +379,7 @@ describe('rootReducer', () => {
       const newState = rootReducer(stateWithPlayers, action);
 
       expect(newState.franchise.gameWeek).toBe(stateWithPlayers.franchise.gameWeek + 1);
-      
+
       // Should add attribute history
       const player = newState.tactics.players.find(p => p.id === 'player1');
       expect(player?.attributeHistory).toBeDefined();
@@ -423,7 +423,7 @@ describe('rootReducer', () => {
 
       expect(newState.franchise.lastMatchResult).toEqual(matchResult);
       expect(newState.ui.activeModal).toBe('postMatchReport');
-      
+
       // Should potentially create friendships (random chance, so we check structure)
       expect(newState.franchise.relationships).toBeDefined();
     });

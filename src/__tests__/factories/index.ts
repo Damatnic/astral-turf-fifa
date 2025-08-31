@@ -1,13 +1,13 @@
-import type { 
-  User, 
-  Player, 
-  Formation, 
-  PlayerAttributes, 
+import type {
+  User,
+  Player,
+  Formation,
+  PlayerAttributes,
   AuthState,
   TacticsState,
   UIState,
   UserRole,
-  PositionRole 
+  PositionRole,
 } from '../../types';
 
 // Factory function to create consistent test data
@@ -42,7 +42,7 @@ export const createMockPlayer = (overrides: Partial<Player> = {}): Player => ({
     name: 'Central Midfielder',
     abbreviation: 'CM',
     category: 'MF' as PositionRole,
-    description: 'Central midfielder'
+    description: 'Central midfielder',
   },
   attributes: {
     speed: 80,
@@ -85,7 +85,7 @@ export const createMockPlayer = (overrides: Partial<Player> = {}): Player => ({
   personalityTags: ['professional'],
   strengthsWeaknesses: {
     strengths: ['Passing'],
-    weaknesses: ['Heading']
+    weaknesses: ['Heading'],
   },
   notes: 'Test player notes',
   ...overrides,
@@ -167,31 +167,31 @@ export const createMockUIState = (overrides: Partial<UIState> = {}): UIState => 
 
 // Helper functions for creating multiple instances
 export const createMockPlayers = (count: number): Player[] => {
-  return Array.from({ length: count }, (_, index) => 
-    createMockPlayer({ 
-      id: `test-player-${index + 1}`, 
+  return Array.from({ length: count }, (_, index) =>
+    createMockPlayer({
+      id: `test-player-${index + 1}`,
       name: `Test Player ${index + 1}`,
-      number: index + 1 
-    })
+      number: index + 1,
+    }),
   );
 };
 
 export const createMockUsers = (count: number): User[] => {
-  return Array.from({ length: count }, (_, index) => 
-    createMockUser({ 
-      id: `test-user-${index + 1}`, 
+  return Array.from({ length: count }, (_, index) =>
+    createMockUser({
+      id: `test-user-${index + 1}`,
       email: `test${index + 1}@example.com`,
       firstName: `Test${index + 1}`,
-    })
+    }),
   );
 };
 
 export const createMockFormations = (count: number): Formation[] => {
   const formationNames = ['4-4-2', '4-3-3', '3-5-2', '4-2-3-1', '5-3-2'];
-  return Array.from({ length: count }, (_, index) => 
-    createMockFormation({ 
-      id: `test-formation-${index + 1}`, 
+  return Array.from({ length: count }, (_, index) =>
+    createMockFormation({
+      id: `test-formation-${index + 1}`,
       name: `Test Formation ${formationNames[index] || '4-4-2'}`,
-    })
+    }),
   );
 };

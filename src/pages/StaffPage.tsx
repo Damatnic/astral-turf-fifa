@@ -16,33 +16,33 @@ const StaffPage: React.FC = () => {
         coaches: [
             { id: 'coach1', name: 'Marco Silva', specialty: 'attacking', bonus: 15, cost: 25000 },
             { id: 'coach2', name: 'Antonio Conte', specialty: 'defending', bonus: 18, cost: 35000 },
-            { id: 'coach3', name: 'Pep Guardiola', specialty: 'balanced', bonus: 20, cost: 50000 }
+            { id: 'coach3', name: 'Pep Guardiola', specialty: 'balanced', bonus: 20, cost: 50000 },
         ] as HeadCoach[],
         scouts: [
             { id: 'scout1', name: 'John Morrison', rating: 3, cost: 15000 },
             { id: 'scout2', name: 'Maria Santos', rating: 4, cost: 22000 },
-            { id: 'scout3', name: 'David Fletcher', rating: 5, cost: 30000 }
+            { id: 'scout3', name: 'David Fletcher', rating: 5, cost: 30000 },
         ] as HeadScout[],
         medical: [
             { id: 'med1', name: 'Dr. Smith', injuryPreventionBonus: 15, rehabBonus: 20, cost: 20000 },
-            { id: 'med2', name: 'Dr. Johnson', injuryPreventionBonus: 25, rehabBonus: 30, cost: 35000 }
+            { id: 'med2', name: 'Dr. Johnson', injuryPreventionBonus: 25, rehabBonus: 30, cost: 35000 },
         ] as HeadOfMedicine[],
         assistants: [
             { id: 'ass1', name: 'Roberto Martinez', tacticalKnowledge: 75, manManagement: 80, cost: 18000 },
-            { id: 'ass2', name: 'Thierry Henry', tacticalKnowledge: 85, manManagement: 70, cost: 28000 }
+            { id: 'ass2', name: 'Thierry Henry', tacticalKnowledge: 85, manManagement: 70, cost: 28000 },
         ] as AssistantManager[],
         gkCoaches: [
             { id: 'gk1', name: 'Gianluigi Buffon', goalkeepingCoaching: 85, cost: 15000 },
-            { id: 'gk2', name: 'Petr Cech', goalkeepingCoaching: 90, cost: 25000 }
+            { id: 'gk2', name: 'Petr Cech', goalkeepingCoaching: 90, cost: 25000 },
         ] as GKCoach[],
         fitnessCoaches: [
             { id: 'fit1', name: 'Carlos Rodriguez', fitnessCoaching: 80, cost: 12000 },
-            { id: 'fit2', name: 'Andrea Berta', fitnessCoaching: 85, cost: 18000 }
+            { id: 'fit2', name: 'Andrea Berta', fitnessCoaching: 85, cost: 18000 },
         ] as FitnessCoach[],
         loanManagers: [
             { id: 'loan1', name: 'Jorge Mendes', negotiation: 85, judgingPlayerAbility: 80, cost: 20000 },
-            { id: 'loan2', name: 'Mino Raiola', negotiation: 90, judgingPlayerAbility: 75, cost: 30000 }
-        ] as LoanManager[]
+            { id: 'loan2', name: 'Mino Raiola', negotiation: 90, judgingPlayerAbility: 75, cost: 30000 },
+        ] as LoanManager[],
     };
 
     const handleHireStaff = (staffMember: any, type: keyof typeof availableStaff) => {
@@ -58,23 +58,23 @@ const StaffPage: React.FC = () => {
 
             dispatch({
                 type: 'HIRE_STAFF',
-                payload: { staff: staffMember, team: selectedTeam, type: staffType }
+                payload: { staff: staffMember, team: selectedTeam, type: staffType },
             });
-            
+
             uiDispatch({
                 type: 'ADD_NOTIFICATION',
                 payload: {
                     message: `Successfully hired ${staffMember.name} as ${staffType}!`,
-                    type: 'success'
-                }
+                    type: 'success',
+                },
             });
         } else {
             uiDispatch({
                 type: 'ADD_NOTIFICATION',
                 payload: {
                     message: `Insufficient budget to hire ${staffMember.name}`,
-                    type: 'error'
-                }
+                    type: 'error',
+                },
             });
         }
     };
@@ -136,8 +136,8 @@ const StaffPage: React.FC = () => {
                             <button
                                 onClick={() => setSelectedTeam('home')}
                                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                                    selectedTeam === 'home' 
-                                        ? 'bg-teal-600 text-white' 
+                                    selectedTeam === 'home'
+                                        ? 'bg-teal-600 text-white'
                                         : 'text-gray-400 hover:text-white hover:bg-gray-700'
                                 }`}
                             >
@@ -146,8 +146,8 @@ const StaffPage: React.FC = () => {
                             <button
                                 onClick={() => setSelectedTeam('away')}
                                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                                    selectedTeam === 'away' 
-                                        ? 'bg-teal-600 text-white' 
+                                    selectedTeam === 'away'
+                                        ? 'bg-teal-600 text-white'
                                         : 'text-gray-400 hover:text-white hover:bg-gray-700'
                                 }`}
                             >

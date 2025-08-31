@@ -31,7 +31,7 @@ const LandingPage: React.FC = () => {
           mx-auto text-teal-400
           ${isMobile ? 'w-16 h-16' : isTablet ? 'w-20 h-20' : 'w-24 h-24'}
         `} />
-        
+
         {/* Mobile-First Typography */}
         <h1 className={`
           font-bold tracking-wider text-white mt-4
@@ -39,13 +39,13 @@ const LandingPage: React.FC = () => {
         `}>
             <span className="text-teal-400">Astral</span>Turf
         </h1>
-        
+
         {/* Responsive Description */}
         <p className={`
           text-slate-400 mt-3 mx-auto leading-relaxed
           ${isMobile ? 'text-base px-2' : isTablet ? 'text-lg' : 'text-lg max-w-xl'}
         `}>
-          {isMobile 
+          {isMobile
             ? "AI-powered soccer tactical planner. Create formations, manage players, and get intelligent insights."
             : "Your AI-powered soccer tactical planner and franchise simulator. Visualize formations, manage players, and get AI-driven insights."
           }
@@ -109,7 +109,7 @@ const LandingPage: React.FC = () => {
           </div>
         </div>
       )}
-      
+
       {/* Mobile-Only Quick Features */}
       {isMobile && (
         <div className="mt-8 w-full max-w-sm">

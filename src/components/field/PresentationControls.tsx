@@ -6,7 +6,7 @@ import { getAISubstitutionSuggestion } from "../../services/aiServiceLoader";
 import type { Player, PlaybookEvent } from '../../types';
 
 const EventDisplay: React.FC<{event: PlaybookEvent}> = ({ event }) => {
-    if (!event?.type) return null;
+    if (!event?.type) {return null;}
     const Icon = event.type === 'Goal' ? GoalIcon : CardIcon;
     const color = event.type === 'Goal' ? 'text-green-400' : event.type === 'Yellow Card' ? 'text-yellow-400' : 'text-red-500';
 
@@ -17,7 +17,7 @@ const EventDisplay: React.FC<{event: PlaybookEvent}> = ({ event }) => {
             <span className="text-gray-300 ml-1.5 truncate" title={event?.description ?? ''}>{event?.description ?? 'No description'}</span>
         </div>
     );
-}
+};
 
 const PresentationControls: React.FC = () => {
     const { uiState, dispatch } = useUIContext();
@@ -26,11 +26,11 @@ const PresentationControls: React.FC = () => {
     const { playbook } = tacticsState;
 
 
-    if (!activePlaybookItemId || activeStepIndex === null) return null;
+    if (!activePlaybookItemId || activeStepIndex === null) {return null;}
 
     const activeItem = playbook?.[activePlaybookItemId];
-    if (!activeItem) return null;
-    
+    if (!activeItem) {return null;}
+
     const currentStep = activeItem?.steps?.[activeStepIndex];
     const event = currentStep?.event;
 
@@ -38,7 +38,7 @@ const PresentationControls: React.FC = () => {
     const canPlay = totalSteps > 1;
 
     const handlePlayPause = () => {
-        if (!canPlay) return;
+        if (!canPlay) {return;}
         if (isAnimating) {
             dispatch({ type: 'PAUSE_ANIMATION' });
         } else {
@@ -61,11 +61,11 @@ const PresentationControls: React.FC = () => {
             dispatch({ type: 'SET_ACTIVE_STEP', payload: activeStepIndex - 1 });
         }
     };
-    
+
     const handleExit = () => {
         dispatch({ type: 'EXIT_PRESENTATION_MODE' });
     };
-    
+
     const handleAISub = () => {
         dispatch({ type: 'GET_AI_SUB_SUGGESTION_START' });
     };
@@ -79,7 +79,7 @@ const PresentationControls: React.FC = () => {
             <button onClick={handlePlayPause} disabled={!canPlay} title={isAnimating ? "Pause" : "Play"} className="p-3 rounded-full text-white bg-teal-600 hover:bg-teal-500 disabled:bg-gray-700 disabled:cursor-not-allowed transition-colors">
                 {isAnimating ? <PauseIcon className="w-6 h-6" /> : <PlayIcon className="w-6 h-6" />}
             </button>
-            
+
             <button onClick={handleReset} title="Restart" className="p-2 rounded-md text-gray-300 hover:bg-gray-700">
                 <ResetIcon className="w-6 h-6" />
             </button>
@@ -87,9 +87,9 @@ const PresentationControls: React.FC = () => {
             <button onClick={handleNextStep} disabled={isAnimating || activeStepIndex === totalSteps - 1} title="Next Step" className="p-2 rounded-md text-gray-300 hover:bg-gray-700 disabled:text-gray-600 disabled:cursor-not-allowed">
                 <StepForwardIcon className="w-6 h-6" />
             </button>
-            
+
             <div className="w-px h-8 bg-slate-700 mx-2" />
-            
+
             <div className="flex flex-col items-center justify-center w-48">
                 <div className="text-lg font-bold text-center">
                     <span className="text-white">{activeStepIndex + 1}</span>
@@ -101,7 +101,7 @@ const PresentationControls: React.FC = () => {
             </div>
 
             <div className="w-px h-8 bg-slate-700 mx-2" />
-            
+
             <button onClick={handleAISub} title="Ask AI for Substitution" className="p-2 rounded-md text-teal-400 hover:bg-gray-700">
                 <BrainCircuitIcon className="w-6 h-6" />
             </button>

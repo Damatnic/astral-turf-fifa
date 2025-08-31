@@ -98,7 +98,7 @@ describe('Tactics Board Integration', () => {
 
     it('should apply correct CSS classes for desktop layout', () => {
       const { container } = render(<TacticsBoardPage />);
-      
+
       const mainContainer = container.firstChild as HTMLElement;
       expect(mainContainer).toHaveClass('flex-row', 'h-screen');
       expect(mainContainer).not.toHaveClass('flex-col', 'mobile-full-height');
@@ -131,7 +131,7 @@ describe('Tactics Board Integration', () => {
 
       // Sidebars should not be visible in mobile layout when using drawer
       expect(screen.queryByTestId('left-sidebar')).not.toBeInTheDocument();
-      
+
       // Main components should still be present
       expect(screen.getByTestId('soccer-field')).toBeInTheDocument();
       expect(screen.getByTestId('dugout')).toBeInTheDocument();
@@ -141,7 +141,7 @@ describe('Tactics Board Integration', () => {
 
     it('should apply mobile-specific CSS classes', () => {
       const { container } = render(<TacticsBoardPage />);
-      
+
       const mainContainer = container.firstChild as HTMLElement;
       expect(mainContainer).toHaveClass('flex-col', 'mobile-full-height');
       expect(mainContainer).not.toHaveClass('flex-row', 'h-screen');
@@ -149,7 +149,7 @@ describe('Tactics Board Integration', () => {
 
     it('should apply mobile padding to field container', () => {
       const { container } = render(<TacticsBoardPage />);
-      
+
       // Look for mobile padding classes
       const fieldContainer = container.querySelector('.mobile-p-2');
       expect(fieldContainer).toBeInTheDocument();
@@ -171,7 +171,7 @@ describe('Tactics Board Integration', () => {
 
       expect(screen.getByTestId('soccer-field')).toBeInTheDocument();
       expect(screen.getByTestId('tactical-toolbar')).toBeInTheDocument();
-      
+
       // Tablet might show some sidebars depending on shouldUseDrawer
       if (!mockResponsiveNavigation.shouldUseDrawer) {
         expect(screen.getByTestId('left-sidebar')).toBeInTheDocument();
@@ -199,7 +199,7 @@ describe('Tactics Board Integration', () => {
 
     it('should apply presentation mode styling', () => {
       const { container } = render(<TacticsBoardPage />);
-      
+
       // Should have no padding in presentation mode
       const fieldContainer = container.querySelector('[class*="p-0"]');
       expect(fieldContainer).toBeInTheDocument();
@@ -298,24 +298,24 @@ describe('Tactics Board Integration', () => {
   describe('Background and Styling', () => {
     it('should apply gradient backgrounds', () => {
       const { container } = render(<TacticsBoardPage />);
-      
+
       const mainContainer = container.firstChild as HTMLElement;
       expect(mainContainer).toHaveClass('bg-gradient-to-br');
-      
+
       const fieldArea = container.querySelector('.bg-gradient-to-b');
       expect(fieldArea).toBeInTheDocument();
     });
 
     it('should apply backdrop blur effects', () => {
       const { container } = render(<TacticsBoardPage />);
-      
+
       const backdropElement = container.querySelector('.backdrop-blur-sm');
       expect(backdropElement).toBeInTheDocument();
     });
 
     it('should use appropriate border styling', () => {
       const { container } = render(<TacticsBoardPage />);
-      
+
       const borderedElement = container.querySelector('.border-slate-700\\/50');
       expect(borderedElement).toBeInTheDocument();
     });
@@ -346,7 +346,7 @@ describe('Tactics Board Integration', () => {
 
       // Tab navigation should work through components
       await user.tab();
-      
+
       // At least one focusable element should be available
       const focusedElement = document.activeElement;
       expect(focusedElement).not.toBe(document.body);
@@ -361,13 +361,13 @@ describe('Tactics Board Integration', () => {
 
     it('should not re-render unnecessarily', () => {
       const { rerender } = render(<TacticsBoardPage />);
-      
+
       // Mock context values should not change
       const initialRenderCount = mockTacticsContext.dispatch.mock.calls.length;
-      
+
       // Rerender with same props
       rerender(<TacticsBoardPage />);
-      
+
       // No additional dispatches should have been made
       expect(mockTacticsContext.dispatch.mock.calls.length).toBe(initialRenderCount);
     });

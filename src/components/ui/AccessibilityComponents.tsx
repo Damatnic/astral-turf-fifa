@@ -1,12 +1,12 @@
-import React, { 
-  useRef, 
-  useEffect, 
-  useState, 
-  KeyboardEvent, 
-  FocusEvent, 
+import React, {
+  useRef,
+  useEffect,
+  useState,
+  KeyboardEvent,
+  FocusEvent,
   ReactNode,
   createContext,
-  useContext
+  useContext,
 } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../../context/ThemeContext';
@@ -25,7 +25,7 @@ export const AccessibilityProvider: React.FC<{ children: ReactNode }> = ({ child
 
   const announceToScreenReader = (message: string, priority: 'polite' | 'assertive' = 'polite') => {
     setAnnouncementQueue(prev => [...prev, { message, priority }]);
-    
+
     // Clear the message after a short delay to reset screen reader state
     setTimeout(() => {
       setAnnouncementQueue(prev => prev.slice(1));
@@ -39,13 +39,13 @@ export const AccessibilityProvider: React.FC<{ children: ReactNode }> = ({ child
 
   const trapFocus = (container: HTMLElement) => {
     const focusableElements = container.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
     );
     const firstElement = focusableElements[0] as HTMLElement;
     const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
 
     const handleTabKey = (e: KeyboardEvent) => {
-      if (e.key !== 'Tab') return;
+      if (e.key !== 'Tab') {return;}
 
       if (e.shiftKey) {
         if (document.activeElement === firstElement) {
@@ -71,7 +71,7 @@ export const AccessibilityProvider: React.FC<{ children: ReactNode }> = ({ child
   return (
     <AccessibilityContext.Provider value={{ announceToScreenReader, focusElement, trapFocus }}>
       {children}
-      
+
       {/* Screen Reader Announcements */}
       <div aria-live="polite" className="sr-only">
         {announcementQueue
@@ -81,7 +81,7 @@ export const AccessibilityProvider: React.FC<{ children: ReactNode }> = ({ child
           ))
         }
       </div>
-      
+
       <div aria-live="assertive" className="sr-only">
         {announcementQueue
           .filter(item => item.priority === 'assertive')
@@ -110,7 +110,7 @@ interface SkipLinkProps {
 
 export const SkipLink: React.FC<SkipLinkProps> = ({ targetId, children }) => {
   const { theme, tokens } = useTheme();
-  
+
   const handleSkip = (e: React.MouseEvent) => {
     e.preventDefault();
     const target = document.getElementById(targetId);
@@ -133,11 +133,11 @@ export const SkipLink: React.FC<SkipLinkProps> = ({ targetId, children }) => {
         textDecoration: 'none',
         fontSize: tokens.typography.fontSizes.sm,
         fontWeight: tokens.typography.fontWeights.medium,
-        zIndex: tokens.zIndex.skipLink
+        zIndex: tokens.zIndex.skipLink,
       }}
       whileFocus={{
         scale: 1.05,
-        boxShadow: `0 0 0 3px ${theme.colors.accent.primary}40`
+        boxShadow: `0 0 0 3px ${theme.colors.accent.primary}40`,
       }}
     >
       {children}
@@ -153,18 +153,18 @@ interface FocusTrapProps {
   className?: string;
 }
 
-export const FocusTrap: React.FC<FocusTrapProps> = ({ 
-  children, 
-  active, 
+export const FocusTrap: React.FC<FocusTrapProps> = ({
+  children,
+  active,
   restoreFocus = true,
-  className = ''
+  className = '',
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const previouslyFocusedElement = useRef<HTMLElement | null>(null);
   const { trapFocus } = useAccessibility();
 
   useEffect(() => {
-    if (!active || !containerRef.current) return;
+    if (!active || !containerRef.current) {return;}
 
     // Store the currently focused element
     if (restoreFocus) {
@@ -176,7 +176,7 @@ export const FocusTrap: React.FC<FocusTrapProps> = ({
 
     return () => {
       cleanup();
-      
+
       // Restore focus when trap is deactivated
       if (restoreFocus && previouslyFocusedElement.current) {
         previouslyFocusedElement.current.focus();
@@ -185,8 +185,8 @@ export const FocusTrap: React.FC<FocusTrapProps> = ({
   }, [active, trapFocus, restoreFocus]);
 
   return (
-    <div 
-      ref={containerRef} 
+    <div
+      ref={containerRef}
       className={className}
       tabIndex={-1}
     >
@@ -215,7 +215,7 @@ export const AccessibleModal: React.FC<AccessibleModalProps> = ({
   children,
   size = 'md',
   closeOnEscape = true,
-  closeOnOverlayClick = true
+  closeOnOverlayClick = true,
 }) => {
   const { theme, tokens } = useTheme();
   const { announceToScreenReader } = useAccessibility();
@@ -225,7 +225,7 @@ export const AccessibleModal: React.FC<AccessibleModalProps> = ({
     sm: { maxWidth: '400px' },
     md: { maxWidth: '500px' },
     lg: { maxWidth: '700px' },
-    xl: { maxWidth: '900px' }
+    xl: { maxWidth: '900px' },
   };
 
   useEffect(() => {
@@ -279,7 +279,7 @@ export const AccessibleModal: React.FC<AccessibleModalProps> = ({
             onClick={handleOverlayClick}
             aria-hidden="true"
           />
-          
+
           {/* Modal */}
           <div
             className="fixed inset-0 flex items-center justify-center p-4"
@@ -299,7 +299,7 @@ export const AccessibleModal: React.FC<AccessibleModalProps> = ({
                   borderRadius: tokens.borderRadius['2xl'],
                   boxShadow: tokens.shadows['2xl'],
                   border: `1px solid ${theme.colors.border.primary}`,
-                  padding: tokens.spacing[6]
+                  padding: tokens.spacing[6],
                 }}
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -308,8 +308,8 @@ export const AccessibleModal: React.FC<AccessibleModalProps> = ({
               >
                 {/* Header */}
                 <div className="flex items-center justify-between mb-4">
-                  <h2 
-                    id="modal-title" 
+                  <h2
+                    id="modal-title"
                     className="text-xl font-semibold"
                     style={{ color: theme.colors.text.primary }}
                   >
@@ -321,7 +321,7 @@ export const AccessibleModal: React.FC<AccessibleModalProps> = ({
                     className="p-2 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2"
                     style={{
                       color: theme.colors.text.secondary,
-                      focusRingColor: theme.colors.accent.primary
+                      focusRingColor: theme.colors.accent.primary,
                     }}
                   >
                     <svg
@@ -341,8 +341,8 @@ export const AccessibleModal: React.FC<AccessibleModalProps> = ({
                 </div>
 
                 {description && (
-                  <p 
-                    id="modal-description" 
+                  <p
+                    id="modal-description"
                     className="text-sm mb-4"
                     style={{ color: theme.colors.text.secondary }}
                   >
@@ -387,8 +387,8 @@ export const AccessibleButton: React.FC<AccessibleButtonProps> = ({
   const [isFocused, setIsFocused] = useState(false);
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (loading || disabled) return;
-    
+    if (loading || disabled) {return;}
+
     announceToScreenReader(`Button activated: ${typeof children === 'string' ? children : 'Button'}`);
     props.onClick?.(e);
   };
@@ -404,7 +404,7 @@ export const AccessibleButton: React.FC<AccessibleButtonProps> = ({
   const sizeStyles = {
     sm: { padding: `${tokens.spacing[2]} ${tokens.spacing[3]}`, fontSize: tokens.typography.fontSizes.sm },
     md: { padding: `${tokens.spacing[3]} ${tokens.spacing[4]}`, fontSize: tokens.typography.fontSizes.base },
-    lg: { padding: `${tokens.spacing[4]} ${tokens.spacing[6]}`, fontSize: tokens.typography.fontSizes.lg }
+    lg: { padding: `${tokens.spacing[4]} ${tokens.spacing[6]}`, fontSize: tokens.typography.fontSizes.lg },
   };
 
   const variantStyles = {
@@ -427,7 +427,7 @@ export const AccessibleButton: React.FC<AccessibleButtonProps> = ({
       backgroundColor: 'transparent',
       color: theme.colors.text.secondary,
       border: 'none',
-    }
+    },
   };
 
   return (
@@ -474,14 +474,14 @@ export const AccessibleButton: React.FC<AccessibleButtonProps> = ({
           {children}
         </>
       )}
-      
+
       {/* Focus indicator */}
       {isFocused && (
         <motion.div
           className="absolute inset-0 pointer-events-none"
           style={{
             borderRadius: tokens.borderRadius.lg,
-            boxShadow: `0 0 0 3px ${theme.colors.accent.primary}40`
+            boxShadow: `0 0 0 3px ${theme.colors.accent.primary}40`,
           }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -508,7 +508,7 @@ export const AccessibleField: React.FC<AccessibleFieldProps> = ({
   error,
   help,
   required = false,
-  className = ''
+  className = '',
 }) => {
   const { theme, tokens } = useTheme();
   const fieldId = `field-${Math.random().toString(36).substr(2, 9)}`;
@@ -517,33 +517,33 @@ export const AccessibleField: React.FC<AccessibleFieldProps> = ({
 
   return (
     <div className={`space-y-2 ${className}`}>
-      <label 
+      <label
         htmlFor={fieldId}
         className="block text-sm font-medium"
         style={{ color: theme.colors.text.primary }}
       >
         {label}
         {required && (
-          <span 
-            className="ml-1 text-red-500" 
+          <span
+            className="ml-1 text-red-500"
             aria-label="required"
           >
             *
           </span>
         )}
       </label>
-      
+
       <div>
         {React.cloneElement(children as React.ReactElement, {
           id: fieldId,
           'aria-describedby': [errorId, helpId].filter(Boolean).join(' ') || undefined,
           'aria-invalid': error ? 'true' : 'false',
-          required
+          required,
         })}
       </div>
-      
+
       {help && (
-        <p 
+        <p
           id={helpId}
           className="text-sm"
           style={{ color: theme.colors.text.secondary }}
@@ -551,9 +551,9 @@ export const AccessibleField: React.FC<AccessibleFieldProps> = ({
           {help}
         </p>
       )}
-      
+
       {error && (
-        <motion.p 
+        <motion.p
           id={errorId}
           role="alert"
           className="text-sm"
@@ -585,15 +585,15 @@ export const AccessibleProgress: React.FC<AccessibleProgressProps> = ({
   label,
   showPercentage = true,
   color,
-  size = 'md'
+  size = 'md',
 }) => {
   const { theme, tokens } = useTheme();
   const percentage = Math.round((value / max) * 100);
-  
+
   const sizeStyles = {
     sm: { height: '4px' },
     md: { height: '8px' },
-    lg: { height: '12px' }
+    lg: { height: '12px' },
   };
 
   const progressColor = color || theme.colors.accent.primary;
@@ -601,14 +601,14 @@ export const AccessibleProgress: React.FC<AccessibleProgressProps> = ({
   return (
     <div className="space-y-2">
       <div className="flex justify-between items-center">
-        <span 
+        <span
           className="text-sm font-medium"
           style={{ color: theme.colors.text.primary }}
         >
           {label}
         </span>
         {showPercentage && (
-          <span 
+          <span
             className="text-sm"
             style={{ color: theme.colors.text.secondary }}
           >
@@ -616,7 +616,7 @@ export const AccessibleProgress: React.FC<AccessibleProgressProps> = ({
           </span>
         )}
       </div>
-      
+
       <div
         role="progressbar"
         aria-valuemin={0}
@@ -627,14 +627,14 @@ export const AccessibleProgress: React.FC<AccessibleProgressProps> = ({
         style={{
           ...sizeStyles[size],
           backgroundColor: theme.colors.background.tertiary,
-          borderRadius: tokens.borderRadius.full
+          borderRadius: tokens.borderRadius.full,
         }}
       >
         <motion.div
           className="h-full"
           style={{
             backgroundColor: progressColor,
-            borderRadius: tokens.borderRadius.full
+            borderRadius: tokens.borderRadius.full,
           }}
           initial={{ width: 0 }}
           animate={{ width: `${percentage}%` }}
@@ -653,5 +653,5 @@ export default {
   AccessibleModal,
   AccessibleButton,
   AccessibleField,
-  AccessibleProgress
+  AccessibleProgress,
 };

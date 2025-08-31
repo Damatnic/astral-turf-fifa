@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import type { 
-  Player, 
+import type {
+  Player,
   AIPersonality,
   Formation,
   TeamTactics,
-  MatchResult
+  MatchResult,
 } from '../../types';
-import { 
-  PlayerDevelopmentPrediction, 
+import {
+  PlayerDevelopmentPrediction,
   FormationEffectivenessAnalysis,
   MatchPrediction,
   TacticalHeatMap,
   PlayerPerformanceMetrics,
-  advancedAiService 
+  advancedAiService,
 } from '../../services/advancedAiService';
 import TacticalHeatMapCanvas from '../analytics/TacticalHeatMapCanvas';
 import AdvancedMetricsRadar from '../analytics/AdvancedMetricsRadar';
@@ -34,7 +34,7 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
   matchHistory,
   activeFormationIds,
   aiPersonality,
-  className = ''
+  className = '',
 }) => {
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [developmentPrediction, setDevelopmentPrediction] = useState<PlayerDevelopmentPrediction | null>(null);
@@ -49,14 +49,14 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
   const awayPlayers = players.filter(p => p.team === 'away');
 
   const generateDevelopmentPrediction = async (player: Player) => {
-    if (!advancedAiService.isAIAvailable()) return;
-    
+    if (!advancedAiService.isAIAvailable()) {return;}
+
     setLoading(true);
     try {
       const prediction = await advancedAiService.generatePlayerDevelopmentPrediction(
         player,
         {} as any, // Would need to pass actual training schedule
-        aiPersonality
+        aiPersonality,
       );
       setDevelopmentPrediction(prediction);
     } catch (error) {
@@ -67,8 +67,8 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
   };
 
   const generateFormationAnalysis = async () => {
-    if (!advancedAiService.isAIAvailable()) return;
-    
+    if (!advancedAiService.isAIAvailable()) {return;}
+
     setLoading(true);
     try {
       const homeFormation = formations[activeFormationIds.home];
@@ -76,7 +76,7 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
         homeFormation,
         homePlayers,
         ['4-3-3', '3-5-2', '4-4-2'],
-        aiPersonality
+        aiPersonality,
       );
       setFormationAnalysis(analysis);
     } catch (error) {
@@ -87,26 +87,26 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
   };
 
   const generateMatchPrediction = async () => {
-    if (!advancedAiService.isAIAvailable()) return;
-    
+    if (!advancedAiService.isAIAvailable()) {return;}
+
     setLoading(true);
     try {
       const prediction = await advancedAiService.generateMatchPrediction(
         {
           players: homePlayers,
           formation: formations[activeFormationIds.home],
-          tactics: teamTactics.home
+          tactics: teamTactics.home,
         },
         {
           players: awayPlayers,
           formation: formations[activeFormationIds.away],
-          tactics: teamTactics.away
+          tactics: teamTactics.away,
         },
         {
           venue: 'home',
-          importance: 'medium'
+          importance: 'medium',
         },
-        aiPersonality
+        aiPersonality,
       );
       setMatchPrediction(prediction);
     } catch (error) {
@@ -117,15 +117,15 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
   };
 
   const generateHeatMap = async (player: Player) => {
-    if (!advancedAiService.isAIAvailable()) return;
-    
+    if (!advancedAiService.isAIAvailable()) {return;}
+
     setLoading(true);
     try {
       const heatMap = await advancedAiService.generateTacticalHeatMap(
         player,
         matchHistory,
         formations[activeFormationIds.home],
-        aiPersonality
+        aiPersonality,
       );
       setTacticalHeatMap(heatMap);
     } catch (error) {
@@ -136,14 +136,14 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
   };
 
   const generatePlayerMetrics = async (player: Player) => {
-    if (!advancedAiService.isAIAvailable()) return;
-    
+    if (!advancedAiService.isAIAvailable()) {return;}
+
     setLoading(true);
     try {
       const metrics = await advancedAiService.generateAdvancedPlayerMetrics(
         player,
         matchHistory,
-        aiPersonality
+        aiPersonality,
       );
       setPlayerMetrics(metrics);
     } catch (error) {
@@ -157,7 +157,7 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
     <div className="space-y-6">
       <div className="bg-gray-800 rounded-lg p-4">
         <h3 className="text-lg font-semibold mb-4 text-blue-400">Player Development Prediction</h3>
-        
+
         <div className="mb-4">
           <label className="block text-sm font-medium mb-2">Select Player:</label>
           <select
@@ -165,7 +165,7 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
             onChange={(e) => {
               const player = players.find(p => p.id === e.target.value);
               setSelectedPlayer(player || null);
-              if (player) generateDevelopmentPrediction(player);
+              if (player) {generateDevelopmentPrediction(player);}
             }}
             className="bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white"
           >
@@ -194,14 +194,14 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
                 </div>
                 <div className="text-sm text-gray-300">Projected Rating (1 Year)</div>
               </div>
-              
+
               <div className="bg-gray-700 p-3 rounded">
                 <div className="text-2xl font-bold text-blue-400">
                   {developmentPrediction.peakPotentialAge}
                 </div>
                 <div className="text-sm text-gray-300">Peak Age</div>
               </div>
-              
+
               <div className="bg-gray-700 p-3 rounded">
                 <div className={`text-2xl font-bold ${
                   developmentPrediction.developmentTrajectory === 'rapid' ? 'text-green-400' :
@@ -213,7 +213,7 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
                 </div>
                 <div className="text-sm text-gray-300">Development Path</div>
               </div>
-              
+
               <div className="bg-gray-700 p-3 rounded">
                 <div className="text-2xl font-bold text-purple-400">
                   {developmentPrediction.optimalPlayingTime}min
@@ -231,7 +231,7 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
                   ))}
                 </ul>
               </div>
-              
+
               <div className="bg-gray-700 p-4 rounded">
                 <h4 className="font-semibold mb-2 text-red-400">Development Bottlenecks</h4>
                 <ul className="space-y-1">
@@ -315,7 +315,7 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
                   ))}
                 </ul>
               </div>
-              
+
               <div className="bg-gray-700 p-4 rounded">
                 <h4 className="font-semibold mb-2 text-red-400">Defensive Vulnerabilities</h4>
                 <ul className="space-y-1">
@@ -437,7 +437,7 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
     <div className="space-y-6">
       <div className="bg-gray-800 rounded-lg p-4">
         <h3 className="text-lg font-semibold mb-4 text-red-400">Tactical Heat Map Analysis</h3>
-        
+
         <div className="mb-4">
           <label className="block text-sm font-medium mb-2">Select Player:</label>
           <select
@@ -445,7 +445,7 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
             onChange={(e) => {
               const player = players.find(p => p.id === e.target.value);
               setSelectedPlayer(player || null);
-              if (player) generateHeatMap(player);
+              if (player) {generateHeatMap(player);}
             }}
             className="bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white"
           >
@@ -466,7 +466,7 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
         )}
 
         {tacticalHeatMap && (
-          <TacticalHeatMapCanvas 
+          <TacticalHeatMapCanvas
             heatMapData={tacticalHeatMap}
             width={400}
             height={600}
@@ -480,7 +480,7 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
     <div className="space-y-6">
       <div className="bg-gray-800 rounded-lg p-4">
         <h3 className="text-lg font-semibold mb-4 text-yellow-400">Advanced Performance Metrics</h3>
-        
+
         <div className="mb-4">
           <label className="block text-sm font-medium mb-2">Select Player:</label>
           <select
@@ -488,7 +488,7 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
             onChange={(e) => {
               const player = players.find(p => p.id === e.target.value);
               setSelectedPlayer(player || null);
-              if (player) generatePlayerMetrics(player);
+              if (player) {generatePlayerMetrics(player);}
             }}
             className="bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white"
           >
@@ -509,7 +509,7 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
         )}
 
         {playerMetrics && (
-          <AdvancedMetricsRadar 
+          <AdvancedMetricsRadar
             playerMetrics={playerMetrics}
             width={400}
             height={400}
@@ -529,7 +529,7 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
               { key: 'formation', label: '⚡ Formation Analysis', color: 'text-blue-400' },
               { key: 'match', label: '🔮 Match Prediction', color: 'text-purple-400' },
               { key: 'heatmap', label: '🗺️ Heat Maps', color: 'text-red-400' },
-              { key: 'metrics', label: '📊 Advanced Metrics', color: 'text-yellow-400' }
+              { key: 'metrics', label: '📊 Advanced Metrics', color: 'text-yellow-400' },
             ].map(tab => (
               <button
                 key={tab.key}
@@ -552,7 +552,7 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
               <div className="text-6xl mb-4">🤖</div>
               <h3 className="text-xl font-semibold mb-2">AI Analytics Offline</h3>
               <p className="text-gray-400 max-w-md mx-auto">
-                Advanced AI analytics require an API key to be configured. 
+                Advanced AI analytics require an API key to be configured.
                 Enable AI features to unlock predictive analytics, formation analysis, and intelligent insights.
               </p>
             </div>

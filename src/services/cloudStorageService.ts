@@ -1,6 +1,6 @@
 /**
  * Cloud Storage Service with Offline-First Architecture
- * 
+ *
  * Provides robust cloud data storage, synchronization, and offline capabilities
  * with automatic conflict resolution and version management
  */
@@ -48,11 +48,11 @@ class CloudStorageDatabase extends Dexie {
 
   constructor() {
     super('AstralTurfCloudStorage');
-    
+
     this.version(1).stores({
       states: '++id, userId, deviceId, timestamp, isUploaded',
       syncLogs: '++id, timestamp, success',
-      backups: '++id, userId, timestamp, version'
+      backups: '++id, userId, timestamp, version',
     });
   }
 }
@@ -115,7 +115,7 @@ class CloudStorageService {
         timestamp: Date.now(),
         checksum,
         isUploaded: false,
-        conflictResolved: false
+        conflictResolved: false,
       };
 
       // Save locally first (offline-first)
@@ -149,7 +149,7 @@ class CloudStorageService {
       // If online, check for newer cloud state
       if (this.isOnline && this.config) {
         const cloudState = await this.loadCloudState();
-        
+
         if (cloudState && (!localState || cloudState.version > localState.version)) {
           // Cloud state is newer
           if (localState && localState.version !== cloudState.version) {
@@ -199,11 +199,11 @@ class CloudStorageService {
 
     } catch (error) {
       await this.logSync('SYNC_TO_CLOUD', false, 0, error.message);
-      
+
       if (this.onSyncCompleteCallback) {
         this.onSyncCompleteCallback(false, error.message);
       }
-      
+
       console.error('❌ Cloud sync failed:', error);
     } finally {
       this.syncInProgress = false;
@@ -232,8 +232,8 @@ class CloudStorageService {
           userId: this.currentUserId,
           deviceId: this.deviceId,
           timestamp: Date.now(),
-          version: latestState.version
-        }
+          version: latestState.version,
+        },
       };
 
       // Save backup metadata locally
@@ -244,7 +244,7 @@ class CloudStorageService {
         version: latestState.version,
         size: JSON.stringify(backupData).length,
         description,
-        isAutomatic: description === 'Automatic backup'
+        isAutomatic: description === 'Automatic backup',
       };
 
       await this.db.backups.add(backupMetadata);
@@ -270,7 +270,7 @@ class CloudStorageService {
     try {
       // Try local backup first
       const localBackup = await this.db.backups.get(backupId);
-      
+
       if (!localBackup) {
         throw new Error('Backup not found');
       }
@@ -293,7 +293,7 @@ class CloudStorageService {
    * Get backup history
    */
   async getBackupHistory(): Promise<BackupMetadata[]> {
-    if (!this.currentUserId) return [];
+    if (!this.currentUserId) {return [];}
 
     return this.db.backups
       .where({ userId: this.currentUserId })
@@ -318,7 +318,7 @@ class CloudStorageService {
       successRate: totalSyncs > 0 ? (successfulSyncs / totalSyncs) * 100 : 0,
       lastSync,
       isOnline: this.isOnline,
-      syncInProgress: this.syncInProgress
+      syncInProgress: this.syncInProgress,
     };
   }
 
@@ -351,7 +351,7 @@ class CloudStorageService {
   // Private methods
 
   private async loadLocalState(): Promise<{ state: RootState; version: number } | null> {
-    if (!this.currentUserId) return null;
+    if (!this.currentUserId) {return null;}
 
     const latestState = await this.db.states
       .where({ userId: this.currentUserId })
@@ -359,7 +359,7 @@ class CloudStorageService {
       .sortBy('timestamp')
       .then(states => states[0]);
 
-    if (!latestState) return null;
+    if (!latestState) {return null;}
 
     try {
       const decryptedState = await decrypt(latestState.state);
@@ -372,14 +372,14 @@ class CloudStorageService {
   }
 
   private async loadCloudState(): Promise<{ state: RootState; version: number } | null> {
-    if (!this.config || !this.currentUserId) return null;
+    if (!this.config || !this.currentUserId) {return null;}
 
     try {
       const response = await fetch(`${this.config.endpoint}/states/${this.currentUserId}/latest`, {
         headers: {
           'Authorization': `Bearer ${this.config.apiKey}`,
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       });
 
       if (!response.ok) {
@@ -399,13 +399,13 @@ class CloudStorageService {
   }
 
   private async uploadStateToCloud(storedState: StoredState): Promise<void> {
-    if (!this.config) return;
+    if (!this.config) {return;}
 
     const response = await fetch(`${this.config.endpoint}/states`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${this.config.apiKey}`,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         id: storedState.id,
@@ -414,8 +414,8 @@ class CloudStorageService {
         state: storedState.state,
         version: storedState.version,
         timestamp: storedState.timestamp,
-        checksum: storedState.checksum
-      })
+        checksum: storedState.checksum,
+      }),
     });
 
     if (!response.ok) {
@@ -427,18 +427,18 @@ class CloudStorageService {
   }
 
   private async uploadBackupToCloud(backupId: string, backupData: any): Promise<void> {
-    if (!this.config) return;
+    if (!this.config) {return;}
 
     const response = await fetch(`${this.config.endpoint}/backups`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${this.config.apiKey}`,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         id: backupId,
-        data: await encrypt(JSON.stringify(backupData))
-      })
+        data: await encrypt(JSON.stringify(backupData)),
+      }),
     });
 
     if (!response.ok) {
@@ -447,13 +447,13 @@ class CloudStorageService {
   }
 
   private async downloadBackupFromCloud(backupId: string): Promise<any> {
-    if (!this.config) throw new Error('Cloud config not available');
+    if (!this.config) {throw new Error('Cloud config not available');}
 
     const response = await fetch(`${this.config.endpoint}/backups/${backupId}`, {
       headers: {
         'Authorization': `Bearer ${this.config.apiKey}`,
-        'Content-Type': 'application/json'
-      }
+        'Content-Type': 'application/json',
+      },
     });
 
     if (!response.ok) {
@@ -474,7 +474,7 @@ class CloudStorageService {
   }
 
   private async getNextVersion(): Promise<number> {
-    if (!this.currentUserId) return 1;
+    if (!this.currentUserId) {return 1;}
 
     const latestState = await this.db.states
       .where({ userId: this.currentUserId })
@@ -492,7 +492,7 @@ class CloudStorageService {
       timestamp: Date.now(),
       success,
       error,
-      dataSize
+      dataSize,
     };
 
     await this.db.syncLogs.add(log);
@@ -513,12 +513,12 @@ class CloudStorageService {
 
   private getOrCreateDeviceId(): string {
     let deviceId = localStorage.getItem('astral_turf_device_id');
-    
+
     if (!deviceId) {
       deviceId = uuidv4();
       localStorage.setItem('astral_turf_device_id', deviceId);
     }
-    
+
     return deviceId;
   }
 }

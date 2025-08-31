@@ -1,6 +1,6 @@
 /**
  * Integration Manager - Central Hub for All External Integrations
- * 
+ *
  * Manages and coordinates all external integrations, providing a unified interface
  * for connectivity, monitoring, and configuration across all integration services
  */
@@ -220,7 +220,7 @@ class IntegrationManager {
     statuses.forEach(status => {
       totalOperations += status.metrics.totalOperations;
       successfulOperations += status.metrics.successfulOperations;
-      
+
       if (status.metrics.avgResponseTime > 0) {
         totalResponseTime += status.metrics.avgResponseTime;
         responseTimeCount++;
@@ -228,11 +228,11 @@ class IntegrationManager {
 
       services[status.service] = {
         operationsPerHour: this.calculateOperationsPerHour(status),
-        successRate: status.metrics.totalOperations > 0 ? 
+        successRate: status.metrics.totalOperations > 0 ?
           (status.metrics.successfulOperations / status.metrics.totalOperations) * 100 : 0,
         avgResponseTime: status.metrics.avgResponseTime,
         dataVolume: this.calculateDataVolume(status),
-        lastActivity: status.lastSync || 0
+        lastActivity: status.lastSync || 0,
       };
     });
 
@@ -246,14 +246,14 @@ class IntegrationManager {
         totalDataSynced: this.calculateTotalDataSynced(),
         totalApiCalls: totalOperations,
         avgResponseTime,
-        errorRate
+        errorRate,
       },
       services,
       trends: {
         hourly: this.getTrend('hourly'),
         daily: this.getTrend('daily'),
-        weekly: this.getTrend('weekly')
-      }
+        weekly: this.getTrend('weekly'),
+      },
     };
   }
 
@@ -267,7 +267,7 @@ class IntegrationManager {
     try {
       await this.saveConfiguration();
       await this.applyConfigurationChanges(oldConfig, this.config);
-      
+
       this.logEvent('integration_manager', 'config_change', 'Configuration updated successfully', 'info');
       console.log('⚙️ Integration configuration updated');
 
@@ -283,7 +283,7 @@ class IntegrationManager {
    */
   async testConnection(serviceName: string): Promise<{ success: boolean; message: string; responseTime: number }> {
     const startTime = Date.now();
-    
+
     try {
       let testResult: boolean = false;
 
@@ -291,32 +291,32 @@ class IntegrationManager {
         case 'sync':
           testResult = syncService.isSyncAvailable();
           break;
-        
+
         case 'cloudStorage':
           // Test cloud storage connection
           testResult = true; // Simplified for demo
           break;
-        
+
         case 'calendar':
           const providers = calendarIntegrationService.getConnectedProviders();
           testResult = providers.length > 0;
           break;
-        
+
         case 'notifications':
           const notificationStats = await notificationService.getDeliveryStats();
           testResult = true; // Service is always available
           break;
-        
+
         case 'socialMedia':
           const connectedPlatforms = socialMediaIntegrationService.getConnectedPlatforms();
           testResult = connectedPlatforms.length > 0;
           break;
-        
+
         case 'sportsData':
           // Test sports data API connections
           testResult = true; // Simplified for demo
           break;
-        
+
         default:
           throw new Error(`Unknown service: ${serviceName}`);
       }
@@ -333,11 +333,11 @@ class IntegrationManager {
 
     } catch (error) {
       const responseTime = Date.now() - startTime;
-      this.updateServiceStatus(serviceName, { 
-        status: 'error', 
-        errorMessage: error.message 
+      this.updateServiceStatus(serviceName, {
+        status: 'error',
+        errorMessage: error.message,
       });
-      
+
       return { success: false, message: error.message, responseTime };
     }
   }
@@ -353,34 +353,34 @@ class IntegrationManager {
         case 'sync':
           // Force state sync across all devices
           break;
-        
+
         case 'cloudStorage':
           await cloudStorageService.syncToCloud();
           break;
-        
+
         case 'calendar':
           await calendarIntegrationService.syncCalendars();
           break;
-        
+
         case 'sportsData':
           // Force sync of sports data
           break;
-        
+
         default:
           throw new Error(`Sync not supported for service: ${serviceName}`);
       }
 
-      this.updateServiceStatus(serviceName, { 
+      this.updateServiceStatus(serviceName, {
         status: 'connected',
-        lastSync: Date.now()
+        lastSync: Date.now(),
       });
 
       this.logEvent(serviceName, 'sync', 'Manual sync completed successfully', 'info');
 
     } catch (error) {
-      this.updateServiceStatus(serviceName, { 
+      this.updateServiceStatus(serviceName, {
         status: 'error',
-        errorMessage: error.message
+        errorMessage: error.message,
       });
 
       this.logEvent(serviceName, 'error', `Manual sync failed: ${error.message}`, 'error');
@@ -417,11 +417,11 @@ class IntegrationManager {
     const serviceReports: any = {};
 
     let healthyServices = 0;
-    let totalServices = statuses.length;
+    const totalServices = statuses.length;
 
     statuses.forEach(status => {
       const serviceIssues: string[] = [];
-      
+
       if (status.status === 'error' || status.status === 'disconnected') {
         serviceIssues.push(`Service is ${status.status}`);
         if (status.errorMessage) {
@@ -443,7 +443,7 @@ class IntegrationManager {
 
       serviceReports[status.service] = {
         status: status.status,
-        issues: serviceIssues
+        issues: serviceIssues,
       };
     });
 
@@ -463,7 +463,7 @@ class IntegrationManager {
     return {
       overall,
       services: serviceReports,
-      recommendations
+      recommendations,
     };
   }
 
@@ -490,17 +490,17 @@ class IntegrationManager {
         region: 'us-east-1',
         encryptionEnabled: true,
         autoBackup: true,
-        backupInterval: 24 * 60 * 60 * 1000 // 24 hours
+        backupInterval: 24 * 60 * 60 * 1000, // 24 hours
       },
       calendar: {
         enabled: false,
         providers: {
           google: { enabled: false },
           outlook: { enabled: false },
-          apple: { enabled: false }
+          apple: { enabled: false },
         },
         autoCreateEvents: true,
-        reminderDefaults: [60, 15] // 1 hour, 15 minutes
+        reminderDefaults: [60, 15], // 1 hour, 15 minutes
       },
       notifications: {
         enabled: true,
@@ -508,10 +508,10 @@ class IntegrationManager {
           email: { enabled: true },
           sms: { enabled: false },
           push: { enabled: true },
-          webhook: { enabled: false }
+          webhook: { enabled: false },
         },
         quietHours: { start: '22:00', end: '07:00' },
-        frequency: 'immediate'
+        frequency: 'immediate',
       },
       socialMedia: {
         enabled: false,
@@ -519,10 +519,10 @@ class IntegrationManager {
           twitter: { enabled: false },
           facebook: { enabled: false },
           instagram: { enabled: false },
-          linkedin: { enabled: false }
+          linkedin: { enabled: false },
         },
         autoShare: false,
-        privacyMode: true
+        privacyMode: true,
       },
       sportsData: {
         enabled: false,
@@ -530,10 +530,10 @@ class IntegrationManager {
           footballApi: { enabled: false },
           sportsRadar: { enabled: false },
           catapult: { enabled: false },
-          statsports: { enabled: false }
+          statsports: { enabled: false },
         },
         syncInterval: 60 * 60 * 1000, // 1 hour
-        benchmarkingEnabled: false
+        benchmarkingEnabled: false,
       },
       api: {
         enabled: true,
@@ -541,11 +541,11 @@ class IntegrationManager {
         graphqlEnabled: true,
         rateLimits: {
           authenticated: 1000,
-          anonymous: 100
+          anonymous: 100,
         },
         webhooksEnabled: false,
-        documentationEnabled: true
-      }
+        documentationEnabled: true,
+      },
     };
   }
 
@@ -554,19 +554,19 @@ class IntegrationManager {
     if (this.config.cloudSync.enabled) {
       try {
         await syncService.initialize(userId, userApiKey);
-        this.updateServiceStatus('sync', { 
+        this.updateServiceStatus('sync', {
           service: 'sync',
           name: 'Real-time Sync',
           status: 'connected',
-          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 0, avgResponseTime: 0, uptime: 100 }
+          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 0, avgResponseTime: 0, uptime: 100 },
         });
       } catch (error) {
-        this.updateServiceStatus('sync', { 
+        this.updateServiceStatus('sync', {
           service: 'sync',
           name: 'Real-time Sync',
           status: 'error',
           errorMessage: error.message,
-          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 1, avgResponseTime: 0, uptime: 0 }
+          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 1, avgResponseTime: 0, uptime: 0 },
         });
       }
     }
@@ -578,13 +578,13 @@ class IntegrationManager {
           endpoint: this.config.cloudSync.endpoint,
           apiKey: userApiKey,
           region: this.config.cloudSync.region,
-          bucket: 'astral-turf-data'
+          bucket: 'astral-turf-data',
         });
         this.updateServiceStatus('cloudStorage', {
           service: 'cloudStorage',
           name: 'Cloud Storage',
           status: 'connected',
-          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 0, avgResponseTime: 0, uptime: 100 }
+          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 0, avgResponseTime: 0, uptime: 100 },
         });
       } catch (error) {
         this.updateServiceStatus('cloudStorage', {
@@ -592,7 +592,7 @@ class IntegrationManager {
           name: 'Cloud Storage',
           status: 'error',
           errorMessage: error.message,
-          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 1, avgResponseTime: 0, uptime: 0 }
+          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 1, avgResponseTime: 0, uptime: 0 },
         });
       }
     }
@@ -604,7 +604,7 @@ class IntegrationManager {
         service: 'deviceContinuity',
         name: 'Device Continuity',
         status: 'connected',
-        metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 0, avgResponseTime: 0, uptime: 100 }
+        metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 0, avgResponseTime: 0, uptime: 100 },
       });
     } catch (error) {
       this.updateServiceStatus('deviceContinuity', {
@@ -612,7 +612,7 @@ class IntegrationManager {
         name: 'Device Continuity',
         status: 'error',
         errorMessage: error.message,
-        metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 1, avgResponseTime: 0, uptime: 0 }
+        metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 1, avgResponseTime: 0, uptime: 0 },
       });
     }
   }
@@ -626,7 +626,7 @@ class IntegrationManager {
           service: 'calendar',
           name: 'Calendar Integration',
           status: 'connected',
-          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 0, avgResponseTime: 0, uptime: 100 }
+          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 0, avgResponseTime: 0, uptime: 100 },
         });
       } catch (error) {
         this.updateServiceStatus('calendar', {
@@ -634,7 +634,7 @@ class IntegrationManager {
           name: 'Calendar Integration',
           status: 'error',
           errorMessage: error.message,
-          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 1, avgResponseTime: 0, uptime: 0 }
+          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 1, avgResponseTime: 0, uptime: 0 },
         });
       }
     }
@@ -647,7 +647,7 @@ class IntegrationManager {
           service: 'notifications',
           name: 'Notifications',
           status: 'connected',
-          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 0, avgResponseTime: 0, uptime: 100 }
+          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 0, avgResponseTime: 0, uptime: 100 },
         });
       } catch (error) {
         this.updateServiceStatus('notifications', {
@@ -655,7 +655,7 @@ class IntegrationManager {
           name: 'Notifications',
           status: 'error',
           errorMessage: error.message,
-          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 1, avgResponseTime: 0, uptime: 0 }
+          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 1, avgResponseTime: 0, uptime: 0 },
         });
       }
     }
@@ -668,7 +668,7 @@ class IntegrationManager {
           service: 'socialMedia',
           name: 'Social Media',
           status: 'connected',
-          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 0, avgResponseTime: 0, uptime: 100 }
+          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 0, avgResponseTime: 0, uptime: 100 },
         });
       } catch (error) {
         this.updateServiceStatus('socialMedia', {
@@ -676,7 +676,7 @@ class IntegrationManager {
           name: 'Social Media',
           status: 'error',
           errorMessage: error.message,
-          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 1, avgResponseTime: 0, uptime: 0 }
+          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 1, avgResponseTime: 0, uptime: 0 },
         });
       }
     }
@@ -691,7 +691,7 @@ class IntegrationManager {
           service: 'sportsData',
           name: 'Sports Data APIs',
           status: 'connected',
-          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 0, avgResponseTime: 0, uptime: 100 }
+          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 0, avgResponseTime: 0, uptime: 100 },
         });
       } catch (error) {
         this.updateServiceStatus('sportsData', {
@@ -699,7 +699,7 @@ class IntegrationManager {
           name: 'Sports Data APIs',
           status: 'error',
           errorMessage: error.message,
-          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 1, avgResponseTime: 0, uptime: 0 }
+          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 1, avgResponseTime: 0, uptime: 0 },
         });
       }
     }
@@ -714,7 +714,7 @@ class IntegrationManager {
           service: 'api',
           name: 'Public API',
           status: 'connected',
-          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 0, avgResponseTime: 0, uptime: 100 }
+          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 0, avgResponseTime: 0, uptime: 100 },
         });
       } catch (error) {
         this.updateServiceStatus('api', {
@@ -722,7 +722,7 @@ class IntegrationManager {
           name: 'Public API',
           status: 'error',
           errorMessage: error.message,
-          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 1, avgResponseTime: 0, uptime: 0 }
+          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 1, avgResponseTime: 0, uptime: 0 },
         });
       }
     }
@@ -735,7 +735,7 @@ class IntegrationManager {
           service: 'webhooks',
           name: 'Webhooks',
           status: 'connected',
-          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 0, avgResponseTime: 0, uptime: 100 }
+          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 0, avgResponseTime: 0, uptime: 100 },
         });
       } catch (error) {
         this.updateServiceStatus('webhooks', {
@@ -743,7 +743,7 @@ class IntegrationManager {
           name: 'Webhooks',
           status: 'error',
           errorMessage: error.message,
-          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 1, avgResponseTime: 0, uptime: 0 }
+          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 1, avgResponseTime: 0, uptime: 0 },
         });
       }
     }
@@ -821,7 +821,7 @@ class IntegrationManager {
 
   private async checkServiceHealth(): Promise<void> {
     const services = Array.from(this.serviceStatuses.keys());
-    
+
     for (const service of services) {
       try {
         const { success } = await this.testConnection(service);
@@ -837,7 +837,7 @@ class IntegrationManager {
   private updateServiceStatus(serviceName: string, updates: Partial<IntegrationStatus>): void {
     const current = this.serviceStatuses.get(serviceName);
     const updated = { ...current, ...updates } as IntegrationStatus;
-    
+
     this.serviceStatuses.set(serviceName, updated);
 
     if (this.onStatusChangeCallback) {
@@ -847,7 +847,7 @@ class IntegrationManager {
 
   private updateServiceMetrics(serviceName: string, operation: 'success' | 'failure'): void {
     const status = this.serviceStatuses.get(serviceName);
-    if (!status) return;
+    if (!status) {return;}
 
     status.metrics.totalOperations++;
     if (operation === 'success') {
@@ -866,7 +866,7 @@ class IntegrationManager {
       service,
       type,
       data,
-      severity
+      severity,
     };
 
     this.eventLog.push(event);
@@ -883,7 +883,7 @@ class IntegrationManager {
 
   private updateMetrics(): void {
     const metrics = this.getIntegrationMetrics();
-    
+
     if (this.onMetricsUpdateCallback) {
       this.onMetricsUpdateCallback(metrics);
     }
@@ -896,16 +896,16 @@ class IntegrationManager {
 
   private setupPeriodicTasks(): void {
     // Setup periodic tasks that run regardless of initialization status
-    
+
     // Save metrics history every hour
     setInterval(() => {
       if (this.isInitialized) {
         const metrics = this.getIntegrationMetrics();
         const timestamp = Date.now();
-        
+
         this.metricsHistory.set(timestamp.toString(), {
           timestamp,
-          metrics
+          metrics,
         });
 
         // Keep only last 168 hours (1 week)
@@ -942,11 +942,11 @@ class IntegrationManager {
     // Simplified trend calculation - would use actual historical data
     const length = period === 'hourly' ? 24 : period === 'daily' ? 30 : 52;
     const trend = [];
-    
+
     for (let i = 0; i < length; i++) {
       trend.push(Math.floor(Math.random() * 100));
     }
-    
+
     return trend;
   }
 

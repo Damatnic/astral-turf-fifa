@@ -39,18 +39,18 @@ export interface User {
   firstName: string;
   lastName: string;
   profileImage?: string;
-  
+
   // Role-specific associations
   playerId?: string;        // For players and family members
   coachId?: string;         // For coach associations
   familyMemberIds?: string[]; // For players - their family members
   playerIds?: string[];     // For family members - their associated players
-  
+
   // Settings and preferences
   notifications: NotificationSettings;
   timezone: string;
   language: string;
-  
+
   // Account metadata
   createdAt: string;
   lastLoginAt?: string;

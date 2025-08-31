@@ -3,31 +3,30 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import Layout from '../../components/Layout';
-import { renderWithProviders } from '../utils/test-utils';
 import { createMockUIState, createMockTacticsState } from '../factories';
 import '../mocks/modules'; // Import module mocks
 
 // Mock the lazy-loaded components
 vi.mock('../../components/popups/PlayerEditPopup', () => ({
-  default: () => <div data-testid="player-edit-popup">Player Edit Popup</div>
+  default: () => <div data-testid="player-edit-popup">Player Edit Popup</div>,
 }));
 
 vi.mock('../../components/popups/AIChatPopup', () => ({
-  default: () => <div data-testid="ai-chat-popup">AI Chat Popup</div>
+  default: () => <div data-testid="ai-chat-popup">AI Chat Popup</div>,
 }));
 
 vi.mock('../../components/ui/Header', () => ({
-  Header: () => <div data-testid="header">Header</div>
+  Header: () => <div data-testid="header">Header</div>,
 }));
 
 vi.mock('../../components/ui/NotificationContainer', () => ({
-  default: () => <div data-testid="notification-container">Notifications</div>
+  default: () => <div data-testid="notification-container">Notifications</div>,
 }));
 
 vi.mock('../../components/export/PrintableLineup', () => ({
   default: vi.fn().forwardRef((props, ref) => (
     <div data-testid="printable-lineup" ref={ref}>Printable Lineup</div>
-  ))
+  )),
 }));
 
 // Mock hooks
@@ -81,7 +80,7 @@ describe('Layout Component', () => {
         <Layout>
           <div data-testid="test-content">Test Content</div>
         </Layout>
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     expect(screen.getByTestId('header')).toBeInTheDocument();
@@ -97,7 +96,7 @@ describe('Layout Component', () => {
         <Layout>
           <div>Content</div>
         </Layout>
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     const layoutDiv = container.firstChild as HTMLElement;
@@ -112,7 +111,7 @@ describe('Layout Component', () => {
         <Layout>
           <div>Content</div>
         </Layout>
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     const layoutDiv = container.firstChild as HTMLElement;
@@ -132,7 +131,7 @@ describe('Layout Component', () => {
         <Layout>
           <div>Content</div>
         </Layout>
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     const layoutDiv = container.firstChild as HTMLElement;
@@ -152,7 +151,7 @@ describe('Layout Component', () => {
         <Layout>
           <div>Content</div>
         </Layout>
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     const layoutDiv = container.firstChild as HTMLElement;
@@ -167,7 +166,7 @@ describe('Layout Component', () => {
         <Layout>
           <div>Content</div>
         </Layout>
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     expect(screen.queryByTestId('header')).not.toBeInTheDocument();
@@ -181,7 +180,7 @@ describe('Layout Component', () => {
         <Layout>
           <div>Content</div>
         </Layout>
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     expect(screen.getByTestId('header')).toBeInTheDocument();
@@ -195,7 +194,7 @@ describe('Layout Component', () => {
         <Layout>
           <div>Content</div>
         </Layout>
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     // Wait for Suspense to resolve
@@ -212,7 +211,7 @@ describe('Layout Component', () => {
         <Layout>
           <div>Content</div>
         </Layout>
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     await waitFor(() => {
@@ -228,7 +227,7 @@ describe('Layout Component', () => {
         <Layout>
           <div>Content</div>
         </Layout>
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     expect(screen.queryByTestId('player-edit-popup')).not.toBeInTheDocument();
@@ -243,7 +242,7 @@ describe('Layout Component', () => {
         <Layout>
           <div>Content</div>
         </Layout>
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     // Initially should show loading
@@ -259,7 +258,7 @@ describe('Layout Component', () => {
         <Layout>
           <div>Content</div>
         </Layout>
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     expect(screen.getByTestId('printable-lineup')).toBeInTheDocument();
@@ -273,7 +272,7 @@ describe('Layout Component', () => {
         <Layout>
           <div>Content</div>
         </Layout>
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     expect(screen.queryByTestId('printable-lineup')).not.toBeInTheDocument();
@@ -287,21 +286,21 @@ describe('Layout Component', () => {
         <Layout>
           <div>Content</div>
         </Layout>
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     // Simulate pressing 'v' for select tool
     fireEvent.keyDown(document, { key: 'v', ctrlKey: false });
     expect(mockUIContext.dispatch).toHaveBeenCalledWith({
       type: 'SET_DRAWING_TOOL',
-      payload: 'select'
+      payload: 'select',
     });
 
     // Simulate pressing 'a' for arrow tool
     fireEvent.keyDown(document, { key: 'a', ctrlKey: false });
     expect(mockUIContext.dispatch).toHaveBeenCalledWith({
       type: 'SET_DRAWING_TOOL',
-      payload: 'arrow'
+      payload: 'arrow',
     });
   });
 
@@ -311,13 +310,13 @@ describe('Layout Component', () => {
         <Layout>
           <div>Content</div>
         </Layout>
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     // Simulate pressing Ctrl+R
     fireEvent.keyDown(document, { key: 'r', ctrlKey: true });
     expect(mockUIContext.dispatch).toHaveBeenCalledWith({
-      type: 'SOFT_RESET_APP'
+      type: 'SOFT_RESET_APP',
     });
   });
 
@@ -327,7 +326,7 @@ describe('Layout Component', () => {
         <Layout>
           <input data-testid="test-input" />
         </Layout>
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     const input = screen.getByTestId('test-input');
@@ -339,7 +338,7 @@ describe('Layout Component', () => {
     // Should not dispatch drawing tool action
     expect(mockUIContext.dispatch).not.toHaveBeenCalledWith({
       type: 'SET_DRAWING_TOOL',
-      payload: 'select'
+      payload: 'select',
     });
   });
 
@@ -351,14 +350,14 @@ describe('Layout Component', () => {
         <Layout>
           <div>Content</div>
         </Layout>
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     fireEvent.keyDown(document, { key: 'v', ctrlKey: false });
 
     expect(mockUIContext.dispatch).not.toHaveBeenCalledWith({
       type: 'SET_DRAWING_TOOL',
-      payload: 'select'
+      payload: 'select',
     });
   });
 
@@ -373,7 +372,7 @@ describe('Layout Component', () => {
         <Layout>
           <div>Content</div>
         </Layout>
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     const layoutDiv = container.firstChild as HTMLElement;
@@ -395,7 +394,7 @@ describe('Layout Component', () => {
         <Layout>
           <div>Content</div>
         </Layout>
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     const main = container.querySelector('main');

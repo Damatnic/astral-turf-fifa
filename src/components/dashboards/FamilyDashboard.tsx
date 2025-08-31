@@ -7,10 +7,10 @@ const FamilyDashboard: React.FC = () => {
   const { authState } = useAuthContext();
   const { tacticsState } = useTacticsContext();
   const { franchiseState } = useFranchiseContext();
-  
+
   // Get the family member's associated players
   const associatedPlayers = tacticsState.players.filter(player =>
-    authState.user?.playerIds?.includes(player.id)
+    authState.user?.playerIds?.includes(player.id),
   );
 
   // For demo purposes, get the first associated player
@@ -53,9 +53,9 @@ const FamilyDashboard: React.FC = () => {
   };
 
   const getAttributeColor = (value: number): string => {
-    if (value >= 85) return 'text-green-400';
-    if (value >= 70) return 'text-yellow-400';
-    if (value >= 55) return 'text-orange-400';
+    if (value >= 85) {return 'text-green-400';}
+    if (value >= 70) {return 'text-yellow-400';}
+    if (value >= 55) {return 'text-orange-400';}
     return 'text-red-400';
   };
 
@@ -149,11 +149,11 @@ const FamilyDashboard: React.FC = () => {
                   <span className="text-[var(--text-secondary)]">Overall Potential</span>
                   <div className="flex items-center space-x-2">
                     <div className="w-32 bg-gray-700 rounded-full h-2">
-                      <div 
+                      <div
                         className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full"
-                        style={{ 
-                          width: `${((mainPlayer.currentPotential - mainPlayer.potential[0]) / 
-                            (mainPlayer.potential[1] - mainPlayer.potential[0])) * 100}%` 
+                        style={{
+                          width: `${((mainPlayer.currentPotential - mainPlayer.potential[0]) /
+                            (mainPlayer.potential[1] - mainPlayer.potential[0])) * 100}%`,
                         }}
                       />
                     </div>
@@ -162,7 +162,7 @@ const FamilyDashboard: React.FC = () => {
                     </span>
                   </div>
                 </div>
-                
+
                 {/* Top 3 Attributes */}
                 <div className="grid grid-cols-3 gap-4">
                   {Object.entries(mainPlayer.attributes)

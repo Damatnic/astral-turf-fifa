@@ -22,7 +22,7 @@ const InteractiveTutorialPopup: React.FC = () => {
 
     useLayoutEffect(() => {
         const calculateStyle = () => {
-            if (!currentStep) return;
+            if (!currentStep) {return;}
             const element = document.querySelector(currentStep.selector);
             if (element) {
                 const rect = element.getBoundingClientRect();
@@ -31,12 +31,12 @@ const InteractiveTutorialPopup: React.FC = () => {
                     left: rect.left,
                     width: rect.width,
                     height: rect.height,
-                    transition: prevStepRef.current !== step ? 'all 0.3s ease-in-out' : 'none'
+                    transition: prevStepRef.current !== step ? 'all 0.3s ease-in-out' : 'none',
                 });
             } else {
                  setHighlightStyle({ display: 'none' });
             }
-        }
+        };
         calculateStyle();
         window.addEventListener('resize', calculateStyle);
         prevStepRef.current = step;
@@ -51,7 +51,7 @@ const InteractiveTutorialPopup: React.FC = () => {
             dispatch({ type: 'END_TUTORIAL' });
         }
     };
-    
+
     const handlePrev = () => {
          if (step > 0) {
             dispatch({ type: 'SET_TUTORIAL_STEP', payload: step - 1 });
@@ -67,7 +67,7 @@ const InteractiveTutorialPopup: React.FC = () => {
             {/* Backdrop */}
             <div className="absolute inset-0 bg-black/70 animate-fade-in-scale" style={{animationDuration: '0.3s'}}></div>
             {/* Highlight Box */}
-            <div 
+            <div
                 className="absolute border-4 border-teal-400 rounded-lg shadow-2xl"
                 style={{ ...highlightStyle, boxShadow: '0 0 0 9999px rgba(0,0,0,0.7)', pointerEvents: 'none' }}
             ></div>

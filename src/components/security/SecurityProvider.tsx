@@ -1,6 +1,6 @@
 /**
  * Security Provider Component
- * 
+ *
  * Provides comprehensive security context and monitoring for the entire application,
  * including CSP injection, security headers, and real-time threat monitoring.
  */
@@ -117,17 +117,17 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
   const injectSecurityHeaders = useCallback(() => {
     // Inject security meta tags if not already present
     const metaTags = cspUtils.generateSecurityMetaTags();
-    
+
     metaTags.forEach((metaTag) => {
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = metaTag;
       const metaElement = tempDiv.firstChild as HTMLMetaElement;
-      
+
       if (metaElement) {
         const existingMeta = document.querySelector(
-          `meta[http-equiv="${metaElement.getAttribute('http-equiv')}"], meta[name="${metaElement.getAttribute('name')}"]`
+          `meta[http-equiv="${metaElement.getAttribute('http-equiv')}"], meta[name="${metaElement.getAttribute('name')}"]`,
         );
-        
+
         if (!existingMeta) {
           document.head.appendChild(metaElement);
         }
@@ -139,7 +139,7 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
     // Global unhandled error handler
     const handleError = (event: ErrorEvent) => {
       const error = event.error || new Error(event.message);
-      
+
       securityLogger.logSecurityEvent(
         SecurityEventType.SYSTEM_ERROR,
         'Unhandled global error',
@@ -151,14 +151,14 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
             colno: event.colno,
             stack: ENVIRONMENT_CONFIG.isDevelopment ? error.stack : '[REDACTED]',
           },
-        }
+        },
       );
     };
 
     // Global unhandled promise rejection handler
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
       const reason = event.reason instanceof Error ? event.reason : new Error(String(event.reason));
-      
+
       securityLogger.logSecurityEvent(
         SecurityEventType.SYSTEM_ERROR,
         'Unhandled promise rejection',
@@ -167,7 +167,7 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
             reason: sanitizeUserInput(reason.message || ''),
             stack: ENVIRONMENT_CONFIG.isDevelopment ? reason.stack : '[REDACTED]',
           },
-        }
+        },
       );
     };
 
@@ -199,7 +199,7 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
       };
 
       cspUtils.processCSpViolation(violation);
-      
+
       // Also report through security monitoring
       monitorSecurityEvent(SecurityEventType.SECURITY_POLICY_VIOLATION, {
         type: 'csp_violation',
@@ -233,11 +233,11 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
   const getSecurityStatus = useCallback((): SecurityStatus => {
     const incidents = getActiveSecurityIncidents();
     const activeThreats = incidents.filter(i => i.riskScore > 70).length;
-    
+
     let securityLevel: SecurityStatus['securityLevel'] = 'low';
-    if (activeThreats > 5) securityLevel = 'critical';
-    else if (activeThreats > 2) securityLevel = 'high';
-    else if (activeThreats > 0) securityLevel = 'medium';
+    if (activeThreats > 5) {securityLevel = 'critical';}
+    else if (activeThreats > 2) {securityLevel = 'high';}
+    else if (activeThreats > 0) {securityLevel = 'medium';}
 
     return {
       activeThreats,
@@ -256,7 +256,7 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
     };
 
     const eventType = eventTypeMap[violation.type] || SecurityEventType.SUSPICIOUS_ACTIVITY;
-    
+
     reportSecurityEvent(eventType, {
       violationType: violation.type,
       description: violation.description,

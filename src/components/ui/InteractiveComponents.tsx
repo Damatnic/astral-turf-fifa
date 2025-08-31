@@ -29,16 +29,16 @@ export const EnhancedButton: React.FC<EnhancedButtonProps> = ({
 }) => {
   const { theme, tokens } = useTheme();
   const [isPressed, setIsPressed] = useState(false);
-  
+
   const scale = useMotionValue(1);
   const shadowScale = useTransform(scale, [1, 0.95], [1, 0.8]);
-  
+
   const sizeStyles = {
     xs: { padding: `${tokens.spacing[1]} ${tokens.spacing[2]}`, fontSize: tokens.typography.fontSizes.xs },
     sm: { padding: `${tokens.spacing[2]} ${tokens.spacing[3]}`, fontSize: tokens.typography.fontSizes.sm },
     md: { padding: `${tokens.spacing[3]} ${tokens.spacing[4]}`, fontSize: tokens.typography.fontSizes.sm },
     lg: { padding: `${tokens.spacing[4]} ${tokens.spacing[6]}`, fontSize: tokens.typography.fontSizes.base },
-    xl: { padding: `${tokens.spacing[5]} ${tokens.spacing[8]}`, fontSize: tokens.typography.fontSizes.lg }
+    xl: { padding: `${tokens.spacing[5]} ${tokens.spacing[8]}`, fontSize: tokens.typography.fontSizes.lg },
   };
 
   const variantStyles = {
@@ -66,7 +66,7 @@ export const EnhancedButton: React.FC<EnhancedButtonProps> = ({
       backgroundColor: theme.colors.status.error,
       color: theme.colors.text.inverse,
       border: 'none',
-    }
+    },
   };
 
   return (
@@ -87,14 +87,14 @@ export const EnhancedButton: React.FC<EnhancedButtonProps> = ({
         width: fullWidth ? '100%' : 'auto',
         position: 'relative',
         overflow: 'hidden',
-        ...props.style
+        ...props.style,
       }}
-      whileHover={!disabled && !loading ? { 
+      whileHover={!disabled && !loading ? {
         scale: 1.02,
-        boxShadow: tokens.shadows.lg 
+        boxShadow: tokens.shadows.lg,
       } : {}}
-      whileTap={!disabled && !loading ? { 
-        scale: 0.98 
+      whileTap={!disabled && !loading ? {
+        scale: 0.98,
       } : {}}
       onTapStart={() => setIsPressed(true)}
       onTap={() => setIsPressed(false)}
@@ -102,7 +102,7 @@ export const EnhancedButton: React.FC<EnhancedButtonProps> = ({
       transition={{
         type: "spring",
         stiffness: 400,
-        damping: 25
+        damping: 25,
       }}
     >
       {/* Ripple effect */}
@@ -115,7 +115,7 @@ export const EnhancedButton: React.FC<EnhancedButtonProps> = ({
           style={{ pointerEvents: 'none' }}
         />
       )}
-      
+
       {loading && (
         <motion.div
           animate={{ rotate: 360 }}
@@ -123,7 +123,7 @@ export const EnhancedButton: React.FC<EnhancedButtonProps> = ({
           className="w-4 h-4 border-2 border-current border-t-transparent rounded-full"
         />
       )}
-      
+
       {!loading && icon && iconPosition === 'left' && icon}
       {!loading && children}
       {!loading && icon && iconPosition === 'right' && icon}
@@ -148,13 +148,13 @@ export const EnhancedCard: React.FC<EnhancedCardProps> = ({
 }) => {
   const { theme, tokens } = useTheme();
   const [isHovered, setIsHovered] = useState(false);
-  
+
   const paddingStyles = {
     none: { padding: 0 },
     sm: { padding: tokens.spacing[3] },
     md: { padding: tokens.spacing[4] },
     lg: { padding: tokens.spacing[6] },
-    xl: { padding: tokens.spacing[8] }
+    xl: { padding: tokens.spacing[8] },
   };
 
   const variantStyles = {
@@ -174,13 +174,13 @@ export const EnhancedCard: React.FC<EnhancedCardProps> = ({
       boxShadow: 'none',
     },
     glass: {
-      backgroundColor: theme.isDark 
-        ? 'rgba(255, 255, 255, 0.05)' 
+      backgroundColor: theme.isDark
+        ? 'rgba(255, 255, 255, 0.05)'
         : 'rgba(255, 255, 255, 0.7)',
       border: `1px solid ${theme.colors.border.secondary}`,
       backdropFilter: 'blur(10px)',
       boxShadow: tokens.shadows.sm,
-    }
+    },
   };
 
   return (
@@ -192,22 +192,22 @@ export const EnhancedCard: React.FC<EnhancedCardProps> = ({
         borderRadius: tokens.borderRadius.xl,
         transition: `all ${tokens.transitions.normal} ease-in-out`,
         cursor: interactive ? 'pointer' : 'default',
-        ...props.style
+        ...props.style,
       }}
       whileHover={interactive ? {
         y: -2,
         boxShadow: tokens.shadows.xl,
-        transition: { duration: 0.2 }
+        transition: { duration: 0.2 },
       } : {}}
       whileTap={interactive ? {
         scale: 0.98,
-        transition: { duration: 0.1 }
+        transition: { duration: 0.1 },
       } : {}}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
     >
       {children}
-      
+
       {/* Subtle glow effect on hover */}
       {interactive && isHovered && (
         <motion.div
@@ -248,11 +248,11 @@ export const EnhancedInput: React.FC<EnhancedInputProps> = ({
   const { theme, tokens } = useTheme();
   const [isFocused, setIsFocused] = useState(false);
   const [hasValue, setHasValue] = useState(false);
-  
+
   const sizeStyles = {
     sm: { padding: `${tokens.spacing[2]} ${tokens.spacing[3]}`, fontSize: tokens.typography.fontSizes.sm },
     md: { padding: `${tokens.spacing[3]} ${tokens.spacing[4]}`, fontSize: tokens.typography.fontSizes.base },
-    lg: { padding: `${tokens.spacing[4]} ${tokens.spacing[5]}`, fontSize: tokens.typography.fontSizes.lg }
+    lg: { padding: `${tokens.spacing[4]} ${tokens.spacing[5]}`, fontSize: tokens.typography.fontSizes.lg },
   };
 
   const variantStyles = {
@@ -267,7 +267,7 @@ export const EnhancedInput: React.FC<EnhancedInputProps> = ({
     filled: {
       backgroundColor: theme.colors.background.tertiary,
       border: `1px solid transparent`,
-    }
+    },
   };
 
   return (
@@ -285,17 +285,17 @@ export const EnhancedInput: React.FC<EnhancedInputProps> = ({
           {label}
         </motion.label>
       )}
-      
+
       <div className="relative">
         {icon && iconPosition === 'left' && (
-          <div 
+          <div
             className="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none"
             style={{ color: theme.colors.text.tertiary }}
           >
             {icon}
           </div>
         )}
-        
+
         <motion.input
           {...props}
           style={{
@@ -326,9 +326,9 @@ export const EnhancedInput: React.FC<EnhancedInputProps> = ({
             boxShadow: `0 0 0 3px ${error ? theme.colors.status.error : theme.colors.accent.primary}20`,
           }}
         />
-        
+
         {icon && iconPosition === 'right' && (
-          <div 
+          <div
             className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none"
             style={{ color: theme.colors.text.tertiary }}
           >
@@ -336,7 +336,7 @@ export const EnhancedInput: React.FC<EnhancedInputProps> = ({
           </div>
         )}
       </div>
-      
+
       {error && (
         <motion.p
           className="mt-1 text-sm"
@@ -368,21 +368,21 @@ export const EnhancedSwitch: React.FC<EnhancedSwitchProps> = ({
   label,
   size = 'md',
   disabled = false,
-  color = 'primary'
+  color = 'primary',
 }) => {
   const { theme, tokens } = useTheme();
-  
+
   const sizeStyles = {
     sm: { width: '32px', height: '18px', thumbSize: '14px' },
     md: { width: '44px', height: '24px', thumbSize: '20px' },
-    lg: { width: '56px', height: '32px', thumbSize: '28px' }
+    lg: { width: '56px', height: '32px', thumbSize: '28px' },
   };
 
   const colorStyles = {
     primary: theme.colors.accent.primary,
     success: theme.colors.status.success,
     warning: theme.colors.status.warning,
-    error: theme.colors.status.error
+    error: theme.colors.status.error,
   };
 
   const { width, height, thumbSize } = sizeStyles[size];
@@ -404,7 +404,7 @@ export const EnhancedSwitch: React.FC<EnhancedSwitchProps> = ({
           border: `1px solid ${theme.colors.border.primary}`,
           cursor: disabled ? 'not-allowed' : 'pointer',
           opacity: disabled ? 0.6 : 1,
-          transition: `background-color ${tokens.transitions.normal} ease-in-out`
+          transition: `background-color ${tokens.transitions.normal} ease-in-out`,
         }}
         whileHover={!disabled ? { scale: 1.05 } : {}}
         whileTap={!disabled ? { scale: 0.95 } : {}}
@@ -421,10 +421,10 @@ export const EnhancedSwitch: React.FC<EnhancedSwitchProps> = ({
           transition={{
             type: "spring",
             stiffness: 500,
-            damping: 30
+            damping: 30,
           }}
         />
-        
+
         {/* Focus ring */}
         <motion.div
           className="absolute inset-0 rounded-full"
@@ -435,14 +435,14 @@ export const EnhancedSwitch: React.FC<EnhancedSwitchProps> = ({
           whileFocus={{ opacity: 1 }}
         />
       </motion.button>
-      
+
       {label && (
-        <label 
+        <label
           className="text-sm font-medium cursor-pointer"
-          style={{ 
+          style={{
             color: theme.colors.text.primary,
             cursor: disabled ? 'not-allowed' : 'pointer',
-            opacity: disabled ? 0.6 : 1
+            opacity: disabled ? 0.6 : 1,
           }}
           onClick={() => !disabled && onChange(!checked)}
         >
@@ -467,7 +467,7 @@ export const EnhancedTooltip: React.FC<EnhancedTooltipProps> = ({
   children,
   placement = 'top',
   delay = 500,
-  arrow = true
+  arrow = true,
 }) => {
   const { theme, tokens } = useTheme();
   const [isVisible, setIsVisible] = useState(false);
@@ -490,17 +490,17 @@ export const EnhancedTooltip: React.FC<EnhancedTooltipProps> = ({
     top: { bottom: '100%', left: '50%', transform: 'translateX(-50%)', marginBottom: tokens.spacing[2] },
     bottom: { top: '100%', left: '50%', transform: 'translateX(-50%)', marginTop: tokens.spacing[2] },
     left: { right: '100%', top: '50%', transform: 'translateY(-50%)', marginRight: tokens.spacing[2] },
-    right: { left: '100%', top: '50%', transform: 'translateY(-50%)', marginLeft: tokens.spacing[2] }
+    right: { left: '100%', top: '50%', transform: 'translateY(-50%)', marginLeft: tokens.spacing[2] },
   };
 
   return (
-    <div 
+    <div
       className="relative inline-block"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
       {children}
-      
+
       {isVisible && (
         <motion.div
           className="absolute z-50 px-3 py-2 text-sm font-medium rounded-lg shadow-lg pointer-events-none"
@@ -510,7 +510,7 @@ export const EnhancedTooltip: React.FC<EnhancedTooltipProps> = ({
             color: theme.colors.text.primary,
             border: `1px solid ${theme.colors.border.primary}`,
             maxWidth: '200px',
-            zIndex: tokens.zIndex.tooltip
+            zIndex: tokens.zIndex.tooltip,
           }}
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -518,7 +518,7 @@ export const EnhancedTooltip: React.FC<EnhancedTooltipProps> = ({
           transition={{ duration: 0.2 }}
         >
           {content}
-          
+
           {/* Arrow */}
           {arrow && (
             <div
@@ -531,10 +531,10 @@ export const EnhancedTooltip: React.FC<EnhancedTooltipProps> = ({
                   bottom: placement === 'top' ? '-4px' : 'auto',
                   left: placement === 'right' ? '-4px' : placement === 'left' ? 'auto' : '50%',
                   right: placement === 'left' ? '-4px' : 'auto',
-                  transform: placement === 'left' || placement === 'right' 
-                    ? 'translateY(-50%) rotate(45deg)' 
-                    : 'translateX(-50%) rotate(45deg)'
-                }
+                  transform: placement === 'left' || placement === 'right'
+                    ? 'translateY(-50%) rotate(45deg)'
+                    : 'translateX(-50%) rotate(45deg)',
+                },
               }}
             />
           )}
@@ -549,5 +549,5 @@ export default {
   EnhancedCard,
   EnhancedInput,
   EnhancedSwitch,
-  EnhancedTooltip
+  EnhancedTooltip,
 };

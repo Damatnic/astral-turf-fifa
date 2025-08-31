@@ -21,16 +21,16 @@ const AdvancedMetricsRadar: React.FC<AdvancedMetricsRadarProps> = ({
   comparisonMetrics,
   width = 400,
   height = 400,
-  className = ''
+  className = '',
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) {return;}
 
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {return;}
 
     // Set canvas size
     canvas.width = width;
@@ -45,50 +45,50 @@ const AdvancedMetricsRadar: React.FC<AdvancedMetricsRadarProps> = ({
         label: 'Expected Goals',
         value: playerMetrics.expectedGoals * 10, // Scale for visualization
         maxValue: 100,
-        color: '#ef4444'
+        color: '#ef4444',
       },
       {
         label: 'Expected Assists',
         value: playerMetrics.expectedAssists * 10,
         maxValue: 100,
-        color: '#f97316'
+        color: '#f97316',
       },
       {
         label: 'Pass Completion',
         value: playerMetrics.passCompletionRate,
         maxValue: 100,
-        color: '#eab308'
+        color: '#eab308',
       },
       {
         label: 'Progressive Passes',
         value: Math.min(playerMetrics.progressivePasses, 100),
         maxValue: 100,
-        color: '#22c55e'
+        color: '#22c55e',
       },
       {
         label: 'Defensive Actions',
         value: Math.min(playerMetrics.defensiveActions, 100),
         maxValue: 100,
-        color: '#06b6d4'
+        color: '#06b6d4',
       },
       {
         label: 'Aerial Duels',
         value: playerMetrics.aerialDuelsWon,
         maxValue: 100,
-        color: '#3b82f6'
+        color: '#3b82f6',
       },
       {
         label: 'Pressure Resistance',
         value: playerMetrics.pressureResistance,
         maxValue: 100,
-        color: '#8b5cf6'
+        color: '#8b5cf6',
       },
       {
         label: 'Creative Index',
         value: playerMetrics.creativeIndex,
         maxValue: 100,
-        color: '#ec4899'
-      }
+        color: '#ec4899',
+      },
     ];
 
     // Draw radar chart
@@ -101,50 +101,50 @@ const AdvancedMetricsRadar: React.FC<AdvancedMetricsRadarProps> = ({
           label: 'Expected Goals',
           value: comparisonMetrics.expectedGoals * 10,
           maxValue: 100,
-          color: '#64748b'
+          color: '#64748b',
         },
         {
           label: 'Expected Assists',
           value: comparisonMetrics.expectedAssists * 10,
           maxValue: 100,
-          color: '#64748b'
+          color: '#64748b',
         },
         {
           label: 'Pass Completion',
           value: comparisonMetrics.passCompletionRate,
           maxValue: 100,
-          color: '#64748b'
+          color: '#64748b',
         },
         {
           label: 'Progressive Passes',
           value: Math.min(comparisonMetrics.progressivePasses, 100),
           maxValue: 100,
-          color: '#64748b'
+          color: '#64748b',
         },
         {
           label: 'Defensive Actions',
           value: Math.min(comparisonMetrics.defensiveActions, 100),
           maxValue: 100,
-          color: '#64748b'
+          color: '#64748b',
         },
         {
           label: 'Aerial Duels',
           value: comparisonMetrics.aerialDuelsWon,
           maxValue: 100,
-          color: '#64748b'
+          color: '#64748b',
         },
         {
           label: 'Pressure Resistance',
           value: comparisonMetrics.pressureResistance,
           maxValue: 100,
-          color: '#64748b'
+          color: '#64748b',
         },
         {
           label: 'Creative Index',
           value: comparisonMetrics.creativeIndex,
           maxValue: 100,
-          color: '#64748b'
-        }
+          color: '#64748b',
+        },
       ];
 
       drawRadarChart(ctx, comparisonData, width, height, true);
@@ -157,7 +157,7 @@ const AdvancedMetricsRadar: React.FC<AdvancedMetricsRadarProps> = ({
     data: RadarDataPoint[],
     w: number,
     h: number,
-    isComparison: boolean = false
+    isComparison: boolean = false,
   ) => {
     const centerX = w / 2;
     const centerY = h / 2;
@@ -181,7 +181,7 @@ const AdvancedMetricsRadar: React.FC<AdvancedMetricsRadarProps> = ({
         const angle = (i * 2 * Math.PI) / numPoints - Math.PI / 2;
         const x = centerX + radius * Math.cos(angle);
         const y = centerY + radius * Math.sin(angle);
-        
+
         ctx.beginPath();
         ctx.moveTo(centerX, centerY);
         ctx.lineTo(x, y);
@@ -197,7 +197,7 @@ const AdvancedMetricsRadar: React.FC<AdvancedMetricsRadarProps> = ({
       const distance = (value / 100) * radius;
       const x = centerX + distance * Math.cos(angle);
       const y = centerY + distance * Math.sin(angle);
-      
+
       if (i === 0) {
         ctx.moveTo(x, y);
       } else {
@@ -217,7 +217,7 @@ const AdvancedMetricsRadar: React.FC<AdvancedMetricsRadarProps> = ({
       ctx.strokeStyle = '#3b82f6';
       ctx.lineWidth = 3;
     }
-    
+
     ctx.fill();
     ctx.stroke();
     ctx.setLineDash([]);
@@ -227,28 +227,28 @@ const AdvancedMetricsRadar: React.FC<AdvancedMetricsRadarProps> = ({
       ctx.font = '12px sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      
+
       for (let i = 0; i < numPoints; i++) {
         const angle = (i * 2 * Math.PI) / numPoints - Math.PI / 2;
         const value = data[i].value;
         const distance = (value / 100) * radius;
         const pointX = centerX + distance * Math.cos(angle);
         const pointY = centerY + distance * Math.sin(angle);
-        
+
         // Draw point
         ctx.fillStyle = data[i].color;
         ctx.beginPath();
         ctx.arc(pointX, pointY, 4, 0, Math.PI * 2);
         ctx.fill();
-        
+
         // Draw label
         const labelDistance = radius + 20;
         const labelX = centerX + labelDistance * Math.cos(angle);
         const labelY = centerY + labelDistance * Math.sin(angle);
-        
+
         ctx.fillStyle = '#d1d5db';
         ctx.fillText(data[i].label, labelX, labelY);
-        
+
         // Draw value
         ctx.fillStyle = data[i].color;
         ctx.font = 'bold 10px sans-serif';
@@ -287,7 +287,7 @@ const AdvancedMetricsRadar: React.FC<AdvancedMetricsRadarProps> = ({
                 </div>
                 <div className="text-sm text-gray-300">Consistency Rating</div>
               </div>
-              
+
               <div className="bg-gray-700 p-3 rounded">
                 <div className="text-lg font-bold text-blue-400">
                   {playerMetrics.workRateIndex.toFixed(1)}
@@ -303,8 +303,8 @@ const AdvancedMetricsRadar: React.FC<AdvancedMetricsRadarProps> = ({
                   <span className="text-sm text-gray-300">Expected Goals (xG)</span>
                   <div className="flex items-center">
                     <div className="w-20 bg-gray-600 rounded-full h-2 mr-2">
-                      <div 
-                        className="bg-red-500 h-2 rounded-full" 
+                      <div
+                        className="bg-red-500 h-2 rounded-full"
                         style={{ width: `${Math.min(playerMetrics.expectedGoals * 50, 100)}%` }}
                       ></div>
                     </div>
@@ -318,8 +318,8 @@ const AdvancedMetricsRadar: React.FC<AdvancedMetricsRadarProps> = ({
                   <span className="text-sm text-gray-300">Expected Assists (xA)</span>
                   <div className="flex items-center">
                     <div className="w-20 bg-gray-600 rounded-full h-2 mr-2">
-                      <div 
-                        className="bg-orange-500 h-2 rounded-full" 
+                      <div
+                        className="bg-orange-500 h-2 rounded-full"
                         style={{ width: `${Math.min(playerMetrics.expectedAssists * 50, 100)}%` }}
                       ></div>
                     </div>
@@ -333,8 +333,8 @@ const AdvancedMetricsRadar: React.FC<AdvancedMetricsRadarProps> = ({
                   <span className="text-sm text-gray-300">Pass Completion %</span>
                   <div className="flex items-center">
                     <div className="w-20 bg-gray-600 rounded-full h-2 mr-2">
-                      <div 
-                        className="bg-yellow-500 h-2 rounded-full" 
+                      <div
+                        className="bg-yellow-500 h-2 rounded-full"
                         style={{ width: `${playerMetrics.passCompletionRate}%` }}
                       ></div>
                     </div>
@@ -348,8 +348,8 @@ const AdvancedMetricsRadar: React.FC<AdvancedMetricsRadarProps> = ({
                   <span className="text-sm text-gray-300">Creative Index</span>
                   <div className="flex items-center">
                     <div className="w-20 bg-gray-600 rounded-full h-2 mr-2">
-                      <div 
-                        className="bg-pink-500 h-2 rounded-full" 
+                      <div
+                        className="bg-pink-500 h-2 rounded-full"
                         style={{ width: `${playerMetrics.creativeIndex}%` }}
                       ></div>
                     </div>

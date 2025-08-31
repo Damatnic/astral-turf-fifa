@@ -6,63 +6,63 @@ type HTMLMotionProps<T extends keyof React.JSX.IntrinsicElements> = React.Compon
 
 // Animation variants for common patterns
 export const slideInVariants: Variants = {
-  hidden: { 
-    opacity: 0, 
+  hidden: {
+    opacity: 0,
     x: -30,
-    transition: { duration: 0.2 }
+    transition: { duration: 0.2 },
   },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     x: 0,
-    transition: { 
+    transition: {
       duration: 0.3,
-      ease: [0.25, 0.46, 0.45, 0.94]
-    }
+      ease: [0.25, 0.46, 0.45, 0.94],
+    },
   },
-  exit: { 
-    opacity: 0, 
+  exit: {
+    opacity: 0,
     x: 30,
-    transition: { duration: 0.2 }
-  }
+    transition: { duration: 0.2 },
+  },
 };
 
 export const fadeInVariants: Variants = {
-  hidden: { 
+  hidden: {
     opacity: 0,
-    transition: { duration: 0.2 }
+    transition: { duration: 0.2 },
   },
-  visible: { 
+  visible: {
     opacity: 1,
-    transition: { 
+    transition: {
       duration: 0.3,
-      ease: 'easeOut'
-    }
+      ease: 'easeOut',
+    },
   },
-  exit: { 
+  exit: {
     opacity: 0,
-    transition: { duration: 0.2 }
-  }
+    transition: { duration: 0.2 },
+  },
 };
 
 export const scaleInVariants: Variants = {
-  hidden: { 
-    opacity: 0, 
+  hidden: {
+    opacity: 0,
     scale: 0.8,
-    transition: { duration: 0.2 }
+    transition: { duration: 0.2 },
   },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     scale: 1,
-    transition: { 
+    transition: {
       duration: 0.4,
-      ease: [0.34, 1.56, 0.64, 1]
-    }
+      ease: [0.34, 1.56, 0.64, 1],
+    },
   },
-  exit: { 
-    opacity: 0, 
+  exit: {
+    opacity: 0,
     scale: 0.8,
-    transition: { duration: 0.2 }
-  }
+    transition: { duration: 0.2 },
+  },
 };
 
 export const staggerChildrenVariants: Variants = {
@@ -70,83 +70,83 @@ export const staggerChildrenVariants: Variants = {
   visible: {
     transition: {
       staggerChildren: 0.1,
-      delayChildren: 0.1
-    }
+      delayChildren: 0.1,
+    },
   },
   exit: {
     transition: {
       staggerChildren: 0.05,
-      staggerDirection: -1
-    }
-  }
+      staggerDirection: -1,
+    },
+  },
 };
 
 export const springVariants: Variants = {
-  hidden: { 
-    opacity: 0, 
+  hidden: {
+    opacity: 0,
     y: 20,
-    transition: { duration: 0.2 }
+    transition: { duration: 0.2 },
   },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     y: 0,
     transition: {
       type: "spring",
       stiffness: 400,
-      damping: 30
-    }
+      damping: 30,
+    },
   },
-  exit: { 
-    opacity: 0, 
+  exit: {
+    opacity: 0,
     y: -20,
-    transition: { duration: 0.2 }
-  }
+    transition: { duration: 0.2 },
+  },
 };
 
 // Button animation variants
 export const buttonVariants: Variants = {
-  idle: { 
-    scale: 1, 
-    boxShadow: "0 0 0 0 rgba(255, 255, 255, 0)" 
+  idle: {
+    scale: 1,
+    boxShadow: "0 0 0 0 rgba(255, 255, 255, 0)",
   },
-  hover: { 
+  hover: {
     scale: 1.02,
     boxShadow: "0 4px 20px 0 rgba(255, 255, 255, 0.1)",
     transition: {
       duration: 0.2,
-      ease: "easeOut"
-    }
+      ease: "easeOut",
+    },
   },
-  tap: { 
+  tap: {
     scale: 0.98,
     transition: {
       duration: 0.1,
-      ease: "easeInOut"
-    }
-  }
+      ease: "easeInOut",
+    },
+  },
 };
 
 export const cardVariants: Variants = {
-  idle: { 
-    scale: 1, 
+  idle: {
+    scale: 1,
     rotateY: 0,
-    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)"
+    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
   },
-  hover: { 
+  hover: {
     scale: 1.02,
     rotateY: 1,
     boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.25)",
     transition: {
       duration: 0.3,
-      ease: "easeOut"
-    }
+      ease: "easeOut",
+    },
   },
-  tap: { 
+  tap: {
     scale: 0.98,
     transition: {
-      duration: 0.1
-    }
-  }
+      duration: 0.1,
+    },
+  },
 };
 
 // High-level animation components
@@ -155,14 +155,14 @@ interface AnimatedContainerProps extends HTMLMotionProps<"div"> {
   stagger?: boolean;
 }
 
-export const AnimatedContainer: React.FC<AnimatedContainerProps> = ({ 
-  variant = 'fade', 
+export const AnimatedContainer: React.FC<AnimatedContainerProps> = ({
+  variant = 'fade',
   stagger = false,
-  children, 
-  ...props 
+  children,
+  ...props
 }) => {
   let variants = fadeInVariants;
-  
+
   switch (variant) {
     case 'slide':
       variants = slideInVariants;
@@ -196,13 +196,13 @@ interface AnimatedButtonProps extends HTMLMotionProps<"button"> {
   variant?: 'default' | 'card';
 }
 
-export const AnimatedButton: React.FC<AnimatedButtonProps> = ({ 
+export const AnimatedButton: React.FC<AnimatedButtonProps> = ({
   variant = 'default',
-  children, 
-  ...props 
+  children,
+  ...props
 }) => {
   const variants = variant === 'card' ? cardVariants : buttonVariants;
-  
+
   return (
     <motion.button
       variants={variants}
@@ -247,9 +247,9 @@ interface PageTransitionProps {
   mode?: 'wait' | 'sync' | 'popLayout';
 }
 
-export const PageTransition: React.FC<PageTransitionProps> = ({ 
-  children, 
-  mode = 'wait' 
+export const PageTransition: React.FC<PageTransitionProps> = ({
+  children,
+  mode = 'wait',
 }) => {
   return (
     <AnimatePresence mode={mode}>
@@ -273,15 +273,15 @@ interface LoadingAnimationProps {
   className?: string;
 }
 
-export const LoadingAnimation: React.FC<LoadingAnimationProps> = ({ 
+export const LoadingAnimation: React.FC<LoadingAnimationProps> = ({
   type = 'spinner',
   size = 'md',
-  className = ""
+  className = "",
 }) => {
   const sizeClasses = {
     sm: 'w-4 h-4',
     md: 'w-8 h-8',
-    lg: 'w-12 h-12'
+    lg: 'w-12 h-12',
   };
 
   if (type === 'spinner') {
@@ -292,7 +292,7 @@ export const LoadingAnimation: React.FC<LoadingAnimationProps> = ({
         transition={{
           duration: 1,
           repeat: Infinity,
-          ease: "linear"
+          ease: "linear",
         }}
       />
     );
@@ -307,12 +307,12 @@ export const LoadingAnimation: React.FC<LoadingAnimationProps> = ({
             className={`${size === 'sm' ? 'w-1 h-1' : size === 'lg' ? 'w-3 h-3' : 'w-2 h-2'} bg-blue-500 rounded-full`}
             animate={{
               scale: [1, 1.2, 1],
-              opacity: [0.5, 1, 0.5]
+              opacity: [0.5, 1, 0.5],
             }}
             transition={{
               duration: 0.8,
               repeat: Infinity,
-              delay: i * 0.2
+              delay: i * 0.2,
             }}
           />
         ))}
@@ -325,12 +325,12 @@ export const LoadingAnimation: React.FC<LoadingAnimationProps> = ({
       className={`${sizeClasses[size]} bg-blue-500 rounded-full ${className}`}
       animate={{
         scale: [1, 1.1, 1],
-        opacity: [0.7, 1, 0.7]
+        opacity: [0.7, 1, 0.7],
       }}
       transition={{
         duration: 1.5,
         repeat: Infinity,
-        ease: "easeInOut"
+        ease: "easeInOut",
       }}
     />
   );
@@ -342,28 +342,28 @@ interface SuccessAnimationProps {
   onComplete?: () => void;
 }
 
-export const SuccessAnimation: React.FC<SuccessAnimationProps> = ({ 
+export const SuccessAnimation: React.FC<SuccessAnimationProps> = ({
   size = 'md',
   className = "",
-  onComplete
+  onComplete,
 }) => {
   const sizeClasses = {
     sm: 'w-6 h-6',
     md: 'w-12 h-12',
-    lg: 'w-16 h-16'
+    lg: 'w-16 h-16',
   };
 
   return (
     <motion.div
       className={`${sizeClasses[size]} ${className}`}
       initial={{ scale: 0, rotate: 0 }}
-      animate={{ 
-        scale: [0, 1.2, 1], 
-        rotate: [0, 10, 0]
+      animate={{
+        scale: [0, 1.2, 1],
+        rotate: [0, 10, 0],
       }}
       transition={{
         duration: 0.6,
-        ease: [0.34, 1.56, 0.64, 1]
+        ease: [0.34, 1.56, 0.64, 1],
       }}
       onAnimationComplete={onComplete}
     >
@@ -399,28 +399,28 @@ interface ErrorAnimationProps {
   onComplete?: () => void;
 }
 
-export const ErrorAnimation: React.FC<ErrorAnimationProps> = ({ 
+export const ErrorAnimation: React.FC<ErrorAnimationProps> = ({
   size = 'md',
   className = "",
-  onComplete
+  onComplete,
 }) => {
   const sizeClasses = {
     sm: 'w-6 h-6',
     md: 'w-12 h-12',
-    lg: 'w-16 h-16'
+    lg: 'w-16 h-16',
   };
 
   return (
     <motion.div
       className={`${sizeClasses[size]} ${className}`}
       initial={{ scale: 0, rotate: 0 }}
-      animate={{ 
-        scale: [0, 1.1, 1], 
-        rotate: [0, -5, 5, 0]
+      animate={{
+        scale: [0, 1.1, 1],
+        rotate: [0, -5, 5, 0],
       }}
       transition={{
         duration: 0.6,
-        ease: [0.34, 1.56, 0.64, 1]
+        ease: [0.34, 1.56, 0.64, 1],
       }}
       onAnimationComplete={onComplete}
     >
@@ -472,5 +472,5 @@ export default {
   staggerChildrenVariants,
   springVariants,
   buttonVariants,
-  cardVariants
+  cardVariants,
 };

@@ -43,30 +43,30 @@ const BoardObjectivesPage: React.FC = () => {
     };
 
     const getObjectiveColor = (objective: BoardObjective) => {
-        if (objective.isMet) return 'text-green-400';
-        if (objective.isCritical) return 'text-red-400';
+        if (objective.isMet) {return 'text-green-400';}
+        if (objective.isCritical) {return 'text-red-400';}
         return 'text-yellow-400';
     };
 
     const getObjectiveBackground = (objective: BoardObjective) => {
-        if (objective.isMet) return 'bg-green-600/10 border-green-400';
-        if (objective.isCritical) return 'bg-red-600/10 border-red-400';
+        if (objective.isMet) {return 'bg-green-600/10 border-green-400';}
+        if (objective.isCritical) {return 'bg-red-600/10 border-red-400';}
         return 'bg-yellow-600/10 border-yellow-400';
     };
 
     const getJobSecurityStatus = () => {
-        if (jobSecurity >= 80) return { text: 'Excellent', color: 'text-green-400', bg: 'bg-green-600/20' };
-        if (jobSecurity >= 60) return { text: 'Good', color: 'text-blue-400', bg: 'bg-blue-600/20' };
-        if (jobSecurity >= 40) return { text: 'Unstable', color: 'text-yellow-400', bg: 'bg-yellow-600/20' };
-        if (jobSecurity >= 20) return { text: 'At Risk', color: 'text-orange-400', bg: 'bg-orange-600/20' };
+        if (jobSecurity >= 80) {return { text: 'Excellent', color: 'text-green-400', bg: 'bg-green-600/20' };}
+        if (jobSecurity >= 60) {return { text: 'Good', color: 'text-blue-400', bg: 'bg-blue-600/20' };}
+        if (jobSecurity >= 40) {return { text: 'Unstable', color: 'text-yellow-400', bg: 'bg-yellow-600/20' };}
+        if (jobSecurity >= 20) {return { text: 'At Risk', color: 'text-orange-400', bg: 'bg-orange-600/20' };}
         return { text: 'Critical', color: 'text-red-400', bg: 'bg-red-600/20' };
     };
 
     const getFanConfidenceStatus = () => {
-        if (fanConfidence >= 80) return { text: 'Delighted', color: 'text-green-400' };
-        if (fanConfidence >= 60) return { text: 'Happy', color: 'text-blue-400' };
-        if (fanConfidence >= 40) return { text: 'Neutral', color: 'text-yellow-400' };
-        if (fanConfidence >= 20) return { text: 'Unhappy', color: 'text-orange-400' };
+        if (fanConfidence >= 80) {return { text: 'Delighted', color: 'text-green-400' };}
+        if (fanConfidence >= 60) {return { text: 'Happy', color: 'text-blue-400' };}
+        if (fanConfidence >= 40) {return { text: 'Neutral', color: 'text-yellow-400' };}
+        if (fanConfidence >= 20) {return { text: 'Unhappy', color: 'text-orange-400' };}
         return { text: 'Angry', color: 'text-red-400' };
     };
 
@@ -151,7 +151,7 @@ const BoardObjectivesPage: React.FC = () => {
                 {/* Objectives List */}
                 <div className="bg-gray-800 rounded-lg p-6 border border-gray-700 mb-8">
                     <h3 className="text-xl font-semibold text-teal-400 mb-6">Season {season.year} Objectives</h3>
-                    
+
                     <div className="space-y-4">
                         {boardObjectives.map((objective) => (
                             <div
@@ -167,10 +167,10 @@ const BoardObjectivesPage: React.FC = () => {
                                             <p className="text-white font-medium text-lg">{objective.description}</p>
                                             <div className="flex items-center space-x-4 mt-2">
                                                 <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                                                    objective.isMet 
-                                                        ? 'bg-green-600 text-white' 
-                                                        : objective.isCritical 
-                                                            ? 'bg-red-600 text-white' 
+                                                    objective.isMet
+                                                        ? 'bg-green-600 text-white'
+                                                        : objective.isCritical
+                                                            ? 'bg-red-600 text-white'
                                                             : 'bg-yellow-600 text-white'
                                                 }`}>
                                                     {objective.isMet ? 'Completed' : objective.isCritical ? 'Critical' : 'In Progress'}
@@ -181,7 +181,7 @@ const BoardObjectivesPage: React.FC = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     <div className={`text-2xl ${getObjectiveColor(objective)}`}>
                                         {objective.isMet ? (
                                             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -208,7 +208,7 @@ const BoardObjectivesPage: React.FC = () => {
                     {/* Performance Indicators */}
                     <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
                         <h3 className="text-lg font-semibold text-teal-400 mb-4">Performance Indicators</h3>
-                        
+
                         <div className="space-y-4">
                             <div>
                                 <div className="flex justify-between items-center mb-2">
@@ -216,9 +216,9 @@ const BoardObjectivesPage: React.FC = () => {
                                     <span className={`font-bold ${jobSecurityStatus.color}`}>{jobSecurity}%</span>
                                 </div>
                                 <div className="w-full bg-gray-700 rounded-full h-2">
-                                    <div 
+                                    <div
                                         className={`h-2 rounded-full transition-all duration-500 ${
-                                            jobSecurity >= 60 ? 'bg-green-400' : 
+                                            jobSecurity >= 60 ? 'bg-green-400' :
                                             jobSecurity >= 30 ? 'bg-yellow-400' : 'bg-red-400'
                                         }`}
                                         style={{ width: `${jobSecurity}%` }}
@@ -232,9 +232,9 @@ const BoardObjectivesPage: React.FC = () => {
                                     <span className={`font-bold ${fanConfidenceStatus.color}`}>{fanConfidence}%</span>
                                 </div>
                                 <div className="w-full bg-gray-700 rounded-full h-2">
-                                    <div 
+                                    <div
                                         className={`h-2 rounded-full transition-all duration-500 ${
-                                            fanConfidence >= 60 ? 'bg-blue-400' : 
+                                            fanConfidence >= 60 ? 'bg-blue-400' :
                                             fanConfidence >= 30 ? 'bg-yellow-400' : 'bg-red-400'
                                         }`}
                                         style={{ width: `${fanConfidence}%` }}
@@ -250,7 +250,7 @@ const BoardObjectivesPage: React.FC = () => {
                                     </span>
                                 </div>
                                 <div className="w-full bg-gray-700 rounded-full h-2">
-                                    <div 
+                                    <div
                                         className="bg-green-400 h-2 rounded-full transition-all duration-500"
                                         style={{ width: `${(completedObjectives / boardObjectives.length) * 100}%` }}
                                     ></div>
@@ -262,20 +262,20 @@ const BoardObjectivesPage: React.FC = () => {
                     {/* Season Timeline */}
                     <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
                         <h3 className="text-lg font-semibold text-teal-400 mb-4">Season Progress</h3>
-                        
+
                         <div className="space-y-4">
                             <div className="flex justify-between items-center">
                                 <span className="text-gray-300">Current Week</span>
                                 <span className="text-white font-bold">{gameWeek} / 38</span>
                             </div>
-                            
+
                             <div className="w-full bg-gray-700 rounded-full h-3">
-                                <div 
+                                <div
                                     className="bg-teal-400 h-3 rounded-full transition-all duration-500"
                                     style={{ width: `${(gameWeek / 38) * 100}%` }}
                                 ></div>
                             </div>
-                            
+
                             <div className="grid grid-cols-3 gap-4 pt-4">
                                 <div className="text-center">
                                     <div className="text-2xl font-bold text-green-400">{completedObjectives}</div>
@@ -311,7 +311,7 @@ const BoardObjectivesPage: React.FC = () => {
                                 Complete objectives to maintain board confidence and job security
                             </p>
                         </div>
-                        
+
                         <div className="text-center">
                             <div className="text-blue-400 mb-3">
                                 <svg className="w-10 h-10 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -323,7 +323,7 @@ const BoardObjectivesPage: React.FC = () => {
                                 Deliver consistent performances and avoid prolonged poor form
                             </p>
                         </div>
-                        
+
                         <div className="text-center">
                             <div className="text-purple-400 mb-3">
                                 <svg className="w-10 h-10 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">

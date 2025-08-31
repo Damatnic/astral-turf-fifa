@@ -61,7 +61,7 @@ const ClubHistoryPage: React.FC = () => {
                                 <h4 className="text-white font-medium">Champion</h4>
                                 <p className="text-gray-300 text-sm">{lastSeasonAwards.champion}</p>
                             </div>
-                            
+
                             <div className="text-center p-4 bg-gray-700 rounded-lg">
                                 <div className="text-green-400 mb-2">
                                     <svg className="w-8 h-8 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">

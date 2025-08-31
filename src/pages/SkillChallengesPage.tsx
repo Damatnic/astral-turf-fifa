@@ -19,43 +19,43 @@ const SkillChallengesPage: React.FC = () => {
             name: 'Shooting Master',
             description: 'Score 10 goals in a shooting accuracy mini-game',
             icon: '⚽',
-            color: 'text-red-400'
+            color: 'text-red-400',
         },
         {
             id: 'passing_wizard',
             name: 'Passing Wizard',
             description: 'Complete 15 consecutive accurate passes in the passing challenge',
             icon: '🎯',
-            color: 'text-blue-400'
+            color: 'text-blue-400',
         },
         {
             id: 'dribble_king',
             name: 'Dribble King',
             description: 'Navigate through 20 cones without touching any in the dribbling course',
             icon: '🏃',
-            color: 'text-yellow-400'
+            color: 'text-yellow-400',
         },
         {
             id: 'defending_wall',
             name: 'Defending Wall',
             description: 'Successfully tackle 12 attackers in the defensive challenge',
             icon: '🛡️',
-            color: 'text-green-400'
+            color: 'text-green-400',
         },
         {
             id: 'keeper_hero',
             name: 'Goalkeeper Hero',
             description: 'Save 8 out of 10 penalty shots',
             icon: '🥅',
-            color: 'text-purple-400'
+            color: 'text-purple-400',
         },
         {
             id: 'stamina_beast',
             name: 'Stamina Beast',
             description: 'Complete the endurance run in under 12 minutes',
             icon: '💨',
-            color: 'text-orange-400'
-        }
+            color: 'text-orange-400',
+        },
     ];
 
     const handleStartChallenge = (challenge: SkillChallenge) => {
@@ -65,23 +65,23 @@ const SkillChallengesPage: React.FC = () => {
             type: 'ADD_NOTIFICATION',
             payload: {
                 message: `Starting ${challenge.name} challenge!`,
-                type: 'info'
-            }
+                type: 'info',
+            },
         });
     };
 
     const handleCompleteChallenge = (challengeId: string, playerId: string) => {
         dispatch({
             type: 'UPDATE_PLAYER_CHALLENGE_COMPLETION',
-            payload: { playerId, challengeId }
+            payload: { playerId, challengeId },
         });
 
         uiDispatch({
             type: 'ADD_NOTIFICATION',
             payload: {
                 message: 'Challenge completed! Player gained experience.',
-                type: 'success'
-            }
+                type: 'success',
+            },
         });
 
         setSelectedChallenge(null);
@@ -112,8 +112,8 @@ const SkillChallengesPage: React.FC = () => {
                         <button
                             onClick={() => setSelectedTeam('home')}
                             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                                selectedTeam === 'home' 
-                                    ? 'bg-teal-600 text-white' 
+                                selectedTeam === 'home'
+                                    ? 'bg-teal-600 text-white'
                                     : 'text-gray-400 hover:text-white hover:bg-gray-700'
                             }`}
                         >
@@ -122,8 +122,8 @@ const SkillChallengesPage: React.FC = () => {
                         <button
                             onClick={() => setSelectedTeam('away')}
                             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                                selectedTeam === 'away' 
-                                    ? 'bg-teal-600 text-white' 
+                                selectedTeam === 'away'
+                                    ? 'bg-teal-600 text-white'
                                     : 'text-gray-400 hover:text-white hover:bg-gray-700'
                             }`}
                         >
@@ -150,7 +150,7 @@ const SkillChallengesPage: React.FC = () => {
                                                 {challenge.name}
                                             </h4>
                                         </div>
-                                        
+
                                         <p className="text-gray-300 text-sm text-center mb-4">
                                             {challenge.description}
                                         </p>
@@ -189,10 +189,10 @@ const SkillChallengesPage: React.FC = () => {
                                                 </span>
                                             </div>
                                             <div className="w-full bg-gray-600 rounded-full h-2">
-                                                <div 
+                                                <div
                                                     className="bg-teal-400 h-2 rounded-full transition-all duration-300"
-                                                    style={{ 
-                                                        width: `${(getPlayerChallengesCompleted(player.id) / availableChallenges.length) * 100}%` 
+                                                    style={{
+                                                        width: `${(getPlayerChallengesCompleted(player.id) / availableChallenges.length) * 100}%`,
                                                     }}
                                                 ></div>
                                             </div>
@@ -240,7 +240,7 @@ const SkillChallengesPage: React.FC = () => {
                                 </div>
                                 <h3 className="text-xl font-semibold text-white mb-2">Challenge in Progress...</h3>
                                 <p className="text-gray-400 mb-6">This is where the actual mini-game would be displayed</p>
-                                
+
                                 {/* Mock progress */}
                                 <div className="mb-6">
                                     <div className="flex justify-between items-center mb-2">
@@ -248,7 +248,7 @@ const SkillChallengesPage: React.FC = () => {
                                         <span className="text-teal-400">75%</span>
                                     </div>
                                     <div className="w-full bg-gray-600 rounded-full h-3">
-                                        <div 
+                                        <div
                                             className="bg-teal-400 h-3 rounded-full transition-all duration-300"
                                             style={{ width: '75%' }}
                                         ></div>

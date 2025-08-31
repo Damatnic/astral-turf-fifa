@@ -1,6 +1,6 @@
 /**
  * Automated Notification Service
- * 
+ *
  * Provides comprehensive multi-channel notifications including email, SMS, push notifications,
  * and smart scheduling with user preference management
  */
@@ -111,7 +111,7 @@ class NotificationService {
       priority: channelConfig.priority || 1,
       rateLimitPerHour: channelConfig.rateLimitPerHour || 60,
       currentUsage: 0,
-      lastReset: Date.now()
+      lastReset: Date.now(),
     };
 
     this.channels.set(channel.id, channel);
@@ -123,15 +123,15 @@ class NotificationService {
    */
   async createTemplate(template: Omit<NotificationTemplate, 'id'>): Promise<string> {
     const templateId = uuidv4();
-    
+
     const fullTemplate: NotificationTemplate = {
       id: templateId,
-      ...template
+      ...template,
     };
 
     this.templates.set(templateId, fullTemplate);
     console.log(`📝 Notification template created: ${template.name}`);
-    
+
     return templateId;
   }
 
@@ -145,22 +145,22 @@ class NotificationService {
         email: true,
         sms: false,
         push: true,
-        inApp: true
+        inApp: true,
       },
       timing: {
         quietHours: { start: '22:00', end: '07:00' },
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        frequency: 'immediate' as const
+        frequency: 'immediate' as const,
       },
-      categories: {}
+      categories: {},
     };
 
     const updatedPrefs = { ...currentPrefs, ...preferences };
     this.preferences.set(userId, updatedPrefs);
-    
+
     // Save to localStorage for persistence
     localStorage.setItem(`notification_prefs_${userId}`, JSON.stringify(updatedPrefs));
-    
+
     console.log(`⚙️ Notification preferences updated for user: ${userId}`);
   }
 
@@ -172,11 +172,11 @@ class NotificationService {
     templateId: string,
     data: Record<string, any>,
     priority: ScheduledNotification['priority'] = 'medium',
-    customChannels?: string[]
+    customChannels?: string[],
   ): Promise<string> {
     const notificationId = uuidv4();
     const template = this.templates.get(templateId);
-    
+
     if (!template) {
       throw new Error(`Template not found: ${templateId}`);
     }
@@ -194,7 +194,7 @@ class NotificationService {
       priority,
       status: 'pending',
       attempts: 0,
-      maxAttempts: 3
+      maxAttempts: 3,
     };
 
     this.scheduledNotifications.set(notificationId, notification);
@@ -215,11 +215,11 @@ class NotificationService {
     templateId: string,
     scheduledTime: Date,
     data: Record<string, any>,
-    priority: ScheduledNotification['priority'] = 'medium'
+    priority: ScheduledNotification['priority'] = 'medium',
   ): Promise<string> {
     const notificationId = uuidv4();
     const template = this.templates.get(templateId);
-    
+
     if (!template) {
       throw new Error(`Template not found: ${templateId}`);
     }
@@ -236,12 +236,12 @@ class NotificationService {
       priority,
       status: 'pending',
       attempts: 0,
-      maxAttempts: 3
+      maxAttempts: 3,
     };
 
     this.scheduledNotifications.set(notificationId, notification);
     console.log(`⏰ Notification scheduled for ${scheduledTime.toISOString()}`);
-    
+
     return notificationId;
   }
 
@@ -256,11 +256,11 @@ class NotificationService {
       location: string;
       type: string;
     },
-    reminderMinutes: number = 60
+    reminderMinutes: number = 60,
   ): Promise<void> {
     const scheduledTime = new Date(
-      new Date(`${trainingDetails.date} ${trainingDetails.time}`).getTime() - 
-      (reminderMinutes * 60 * 1000)
+      new Date(`${trainingDetails.date} ${trainingDetails.time}`).getTime() -
+      (reminderMinutes * 60 * 1000),
     );
 
     await this.scheduleNotification(
@@ -273,9 +273,9 @@ class NotificationService {
         trainingDate: trainingDetails.date,
         trainingTime: trainingDetails.time,
         trainingLocation: trainingDetails.location,
-        minutesUntil: reminderMinutes
+        minutesUntil: reminderMinutes,
       },
-      'medium'
+      'medium',
     );
   }
 
@@ -292,7 +292,7 @@ class NotificationService {
       isHome: boolean;
     },
     playerIds: string[],
-    notificationTimes: number[] = [180, 60, 30] // 3 hours, 1 hour, 30 minutes
+    notificationTimes: number[] = [180, 60, 30], // 3 hours, 1 hour, 30 minutes
   ): Promise<void> {
     const matchDateTime = new Date(`${matchDetails.date} ${matchDetails.time}`);
 
@@ -310,9 +310,9 @@ class NotificationService {
             matchTime: matchDetails.time,
             venue: matchDetails.venue,
             homeAway: matchDetails.isHome ? 'Home' : 'Away',
-            minutesUntil: minutes
+            minutesUntil: minutes,
           },
-          'high'
+          'high',
         );
       }
     }
@@ -328,7 +328,7 @@ class NotificationService {
       severity: string;
       expectedReturn?: string;
       treatment: string;
-    }
+    },
   ): Promise<void> {
     await this.sendNotification(
       playerId,
@@ -337,9 +337,9 @@ class NotificationService {
         injuryType: injuryUpdate.type,
         severity: injuryUpdate.severity,
         expectedReturn: injuryUpdate.expectedReturn,
-        treatment: injuryUpdate.treatment
+        treatment: injuryUpdate.treatment,
       },
-      'high'
+      'high',
     );
 
     // Also notify coaches and medical staff
@@ -353,7 +353,7 @@ class NotificationService {
     userIds: string[],
     templateId: string,
     data: Record<string, any>,
-    staggerMinutes: number = 0
+    staggerMinutes: number = 0,
   ): Promise<string[]> {
     const notificationIds: string[] = [];
 
@@ -367,7 +367,7 @@ class NotificationService {
         templateId,
         scheduledTime,
         data,
-        'medium'
+        'medium',
       );
 
       notificationIds.push(notificationId);
@@ -385,9 +385,9 @@ class NotificationService {
     const timeframes = {
       day: 24 * 60 * 60 * 1000,
       week: 7 * 24 * 60 * 60 * 1000,
-      month: 30 * 24 * 60 * 60 * 1000
+      month: 30 * 24 * 60 * 60 * 1000,
     };
-    
+
     const cutoff = now - timeframes[timeframe];
     let totalSent = 0;
     let totalDelivered = 0;
@@ -398,7 +398,7 @@ class NotificationService {
       for (const delivery of deliveries) {
         if (delivery.timestamp >= cutoff) {
           totalSent++;
-          
+
           switch (delivery.status) {
             case 'delivered':
             case 'opened':
@@ -409,7 +409,7 @@ class NotificationService {
               totalFailed++;
               break;
           }
-          
+
           if (delivery.status === 'opened' || delivery.status === 'clicked') {
             totalOpened++;
           }
@@ -423,7 +423,7 @@ class NotificationService {
       opened: totalOpened,
       failed: totalFailed,
       deliveryRate: totalSent > 0 ? (totalDelivered / totalSent) * 100 : 0,
-      openRate: totalDelivered > 0 ? (totalOpened / totalDelivered) * 100 : 0
+      openRate: totalDelivered > 0 ? (totalOpened / totalDelivered) * 100 : 0,
     };
   }
 
@@ -440,7 +440,7 @@ class NotificationService {
 
   private async processNotification(notification: ScheduledNotification): Promise<void> {
     notification.attempts++;
-    
+
     try {
       const template = this.templates.get(notification.templateId);
       if (!template) {
@@ -448,13 +448,13 @@ class NotificationService {
       }
 
       const processedContent = this.processTemplate(template, notification.data);
-      
+
       for (const channelId of notification.channels) {
         await this.sendToChannel(channelId, notification.userId, processedContent);
       }
 
       notification.status = 'sent';
-      
+
       if (this.onNotificationSentCallback) {
         this.onNotificationSentCallback(notification, true);
       }
@@ -463,7 +463,7 @@ class NotificationService {
 
     } catch (error) {
       console.error(`❌ Failed to send notification ${notification.id}:`, error);
-      
+
       if (notification.attempts < notification.maxAttempts) {
         // Retry with exponential backoff
         setTimeout(() => {
@@ -471,7 +471,7 @@ class NotificationService {
         }, Math.pow(2, notification.attempts) * 1000);
       } else {
         notification.status = 'failed';
-        
+
         if (this.onNotificationSentCallback) {
           this.onNotificationSentCallback(notification, false);
         }
@@ -482,7 +482,7 @@ class NotificationService {
   private async sendToChannel(
     channelId: string,
     userId: string,
-    content: { subject: string; content: string }
+    content: { subject: string; content: string },
   ): Promise<void> {
     const channel = this.channels.get(channelId);
     if (!channel || !channel.isEnabled) {
@@ -495,21 +495,21 @@ class NotificationService {
     }
 
     const deliveryId = uuidv4();
-    
+
     try {
       switch (channel.type) {
         case 'email':
           await this.sendEmail(channel, userId, content);
           break;
-        
+
         case 'sms':
           await this.sendSMS(channel, userId, content);
           break;
-        
+
         case 'push':
           await this.sendPushNotification(channel, userId, content);
           break;
-        
+
         case 'webhook':
           await this.sendWebhook(channel, userId, content);
           break;
@@ -527,11 +527,11 @@ class NotificationService {
   private async sendEmail(
     channel: NotificationChannel,
     userId: string,
-    content: { subject: string; content: string }
+    content: { subject: string; content: string },
   ): Promise<void> {
     // Implementation would use actual email service (SendGrid, AWS SES, etc.)
     console.log(`📧 Sending email to ${userId}: ${content.subject}`);
-    
+
     // Simulate email sending
     await new Promise(resolve => setTimeout(resolve, 100));
   }
@@ -539,11 +539,11 @@ class NotificationService {
   private async sendSMS(
     channel: NotificationChannel,
     userId: string,
-    content: { subject: string; content: string }
+    content: { subject: string; content: string },
   ): Promise<void> {
     // Implementation would use SMS service (Twilio, AWS SNS, etc.)
     console.log(`📱 Sending SMS to ${userId}: ${content.content}`);
-    
+
     // Simulate SMS sending
     await new Promise(resolve => setTimeout(resolve, 100));
   }
@@ -551,11 +551,11 @@ class NotificationService {
   private async sendPushNotification(
     channel: NotificationChannel,
     userId: string,
-    content: { subject: string; content: string }
+    content: { subject: string; content: string },
   ): Promise<void> {
     // Implementation would use push service (FCM, APNs, etc.)
     console.log(`🔔 Sending push notification to ${userId}: ${content.subject}`);
-    
+
     // Simulate push notification
     await new Promise(resolve => setTimeout(resolve, 50));
   }
@@ -563,18 +563,18 @@ class NotificationService {
   private async sendWebhook(
     channel: NotificationChannel,
     userId: string,
-    content: { subject: string; content: string }
+    content: { subject: string; content: string },
   ): Promise<void> {
     await axios.post(channel.config.url, {
       userId,
       subject: content.subject,
       content: content.content,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     }, {
       headers: {
         'Content-Type': 'application/json',
-        ...(channel.config.headers || {})
-      }
+        ...(channel.config.headers || {}),
+      },
     });
   }
 
@@ -594,11 +594,11 @@ class NotificationService {
 
   private determineChannels(userId: string, templateChannels: string[]): string[] {
     const userPrefs = this.preferences.get(userId);
-    if (!userPrefs) return templateChannels;
+    if (!userPrefs) {return templateChannels;}
 
     return templateChannels.filter(channelId => {
       const channel = this.channels.get(channelId);
-      if (!channel) return false;
+      if (!channel) {return false;}
 
       switch (channel.type) {
         case 'email':
@@ -617,7 +617,7 @@ class NotificationService {
 
   private canSendNow(userId: string): boolean {
     const userPrefs = this.preferences.get(userId);
-    if (!userPrefs || userPrefs.timing.frequency !== 'immediate') return false;
+    if (!userPrefs || userPrefs.timing.frequency !== 'immediate') {return false;}
 
     // Check quiet hours
     const now = new Date();
@@ -650,7 +650,7 @@ class NotificationService {
     deliveryId: string,
     channelId: string,
     status: NotificationDelivery['status'],
-    metadata: Record<string, any>
+    metadata: Record<string, any>,
   ): void {
     const delivery: NotificationDelivery = {
       id: deliveryId,
@@ -658,13 +658,13 @@ class NotificationService {
       channel: channelId,
       status,
       timestamp: Date.now(),
-      metadata
+      metadata,
     };
 
     if (!this.deliveryLog.has(channelId)) {
       this.deliveryLog.set(channelId, []);
     }
-    
+
     this.deliveryLog.get(channelId)!.push(delivery);
 
     if (this.onDeliveryStatusCallback) {
@@ -678,7 +678,7 @@ class NotificationService {
       { id: 'email_primary', type: 'email' as const, name: 'Email' },
       { id: 'sms_primary', type: 'sms' as const, name: 'SMS' },
       { id: 'push_primary', type: 'push' as const, name: 'Push Notifications' },
-      { id: 'webhook_primary', type: 'webhook' as const, name: 'Webhook' }
+      { id: 'webhook_primary', type: 'webhook' as const, name: 'Webhook' },
     ];
 
     defaultChannels.forEach(channel => {
@@ -686,7 +686,7 @@ class NotificationService {
         ...channel,
         isEnabled: true,
         priority: 1,
-        config: {}
+        config: {},
       });
     });
   }
@@ -701,7 +701,7 @@ class NotificationService {
         content: 'Hi {{playerName}}, you have {{trainingType}} training in {{minutesUntil}} minutes at {{trainingLocation}}.',
         channels: ['email_primary', 'push_primary'],
         variables: ['playerName', 'trainingType', 'minutesUntil', 'trainingLocation'],
-        isActive: true
+        isActive: true,
       },
       {
         name: 'Match Notification',
@@ -710,7 +710,7 @@ class NotificationService {
         content: '{{homeAway}} match against {{opponent}} in {{minutesUntil}} minutes at {{venue}}.',
         channels: ['email_primary', 'sms_primary', 'push_primary'],
         variables: ['opponent', 'homeAway', 'minutesUntil', 'venue'],
-        isActive: true
+        isActive: true,
       },
       {
         name: 'Injury Update',
@@ -719,8 +719,8 @@ class NotificationService {
         content: 'Update on your {{injuryType}} injury: {{severity}}. Treatment: {{treatment}}. Expected return: {{expectedReturn}}',
         channels: ['email_primary', 'push_primary'],
         variables: ['injuryType', 'severity', 'treatment', 'expectedReturn'],
-        isActive: true
-      }
+        isActive: true,
+      },
     ];
 
     defaultTemplates.forEach(template => {
@@ -742,7 +742,7 @@ class NotificationService {
 
   private processScheduledNotifications(): void {
     const now = Date.now();
-    
+
     for (const [id, notification] of this.scheduledNotifications.entries()) {
       if (notification.status === 'pending' && notification.scheduledTime <= now) {
         if (this.canSendNow(notification.userId)) {
@@ -754,7 +754,7 @@ class NotificationService {
 
   private resetRateLimits(): void {
     const now = Date.now();
-    
+
     for (const channel of this.channels.values()) {
       channel.currentUsage = 0;
       channel.lastReset = now;

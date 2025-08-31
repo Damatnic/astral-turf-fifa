@@ -1,7 +1,6 @@
 // Match and simulation related types
 
-import type { Team } from './player';
-import type { PlayerStats } from './player';
+import type { Team, PlayerStats } from './player';
 
 export interface MatchEvent {
   minute: number;

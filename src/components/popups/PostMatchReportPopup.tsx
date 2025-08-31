@@ -23,7 +23,7 @@ const PostMatchReportPopup: React.FC = () => {
 
     const handleClose = () => dispatch({ type: 'CLOSE_MODAL' });
 
-    if (!lastMatchResult) return null;
+    if (!lastMatchResult) {return null;}
 
     return (
         <div className="fixed inset-0 bg-black/60 z-50 backdrop-blur-sm flex items-center justify-center p-4" onClick={handleClose}>

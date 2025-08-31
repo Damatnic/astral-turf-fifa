@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import type { 
-  Player, 
-  Formation, 
+import type {
+  Player,
+  Formation,
   DrawingShape,
-  User
+  User,
 } from '../../types';
 
 interface CollaborationState {
@@ -51,7 +51,7 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
   sessionId,
   onPositionChange,
   onDrawingAdd,
-  className = ''
+  className = '',
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [collaborationState, setCollaborationState] = useState<CollaborationState>({
@@ -61,13 +61,13 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
         name: `${currentUser.firstName} ${currentUser.lastName}`,
         color: '#3b82f6',
         cursor: null,
-        isActive: true
-      }
+        isActive: true,
+      },
     ],
     drawings: [],
     playerPositions: {},
     comments: [],
-    version: 1
+    version: 1,
   });
 
   const [selectedTool, setSelectedTool] = useState<'select' | 'arrow' | 'zone' | 'comment'>('select');
@@ -80,7 +80,7 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
   // Mock WebSocket connection (in real implementation, this would be a proper WebSocket)
   const [mockConnectedUsers] = useState([
     { id: 'user2', name: 'Assistant Coach', color: '#ef4444', cursor: { x: 200, y: 150 }, isActive: true },
-    { id: 'user3', name: 'Analyst', color: '#10b981', cursor: { x: 300, y: 250 }, isActive: true }
+    { id: 'user3', name: 'Analyst', color: '#10b981', cursor: { x: 300, y: 250 }, isActive: true },
   ]);
 
   useEffect(() => {
@@ -94,10 +94,10 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
             ...user,
             cursor: {
               x: user.cursor.x + (Math.random() - 0.5) * 20,
-              y: user.cursor.y + (Math.random() - 0.5) * 20
-            }
-          }))
-        ]
+              y: user.cursor.y + (Math.random() - 0.5) * 20,
+            },
+          })),
+        ],
       }));
     }, 2000);
 
@@ -106,10 +106,10 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) {return;}
 
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {return;}
 
     // Set canvas size
     canvas.width = 800;
@@ -133,16 +133,16 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
     // Field lines
     ctx.strokeStyle = '#ffffff';
     ctx.lineWidth = 2;
-    
+
     // Outer boundary
     ctx.strokeRect(20, 20, w - 40, h - 40);
-    
+
     // Center line
     ctx.beginPath();
     ctx.moveTo(20, h / 2);
     ctx.lineTo(w - 20, h / 2);
     ctx.stroke();
-    
+
     // Center circle
     ctx.beginPath();
     ctx.arc(w / 2, h / 2, 60, 0, Math.PI * 2);
@@ -152,17 +152,17 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
   const drawPlayers = (ctx: CanvasRenderingContext2D) => {
     players.forEach(player => {
       const slot = formation.slots.find(s => s.playerId === player.id);
-      if (!slot) return;
+      if (!slot) {return;}
 
       // Use collaborative position or default
-      const position = collaborationState.playerPositions[player.id] || 
+      const position = collaborationState.playerPositions[player.id] ||
                      { x: slot.defaultPosition.x * 8, y: slot.defaultPosition.y * 6 }; // Scale to canvas
 
       // Draw player circle
       ctx.fillStyle = player.teamColor || '#3b82f6';
       ctx.strokeStyle = '#ffffff';
       ctx.lineWidth = 2;
-      
+
       ctx.beginPath();
       ctx.arc(position.x, position.y, 20, 0, Math.PI * 2);
       ctx.fill();
@@ -186,12 +186,12 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
     collaborationState.drawings.forEach(drawing => {
       ctx.strokeStyle = drawing.color;
       ctx.lineWidth = 3;
-      
+
       if (drawing.tool === 'arrow' && drawing.points.length >= 2) {
         // Draw arrow
         const start = drawing.points[0];
         const end = drawing.points[drawing.points.length - 1];
-        
+
         ctx.beginPath();
         ctx.moveTo(start.x, start.y);
         ctx.lineTo(end.x, end.y);
@@ -200,33 +200,33 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
         // Draw arrowhead
         const angle = Math.atan2(end.y - start.y, end.x - start.x);
         const headLen = 15;
-        
+
         ctx.beginPath();
         ctx.moveTo(end.x, end.y);
         ctx.lineTo(
           end.x - headLen * Math.cos(angle - Math.PI / 6),
-          end.y - headLen * Math.sin(angle - Math.PI / 6)
+          end.y - headLen * Math.sin(angle - Math.PI / 6),
         );
         ctx.moveTo(end.x, end.y);
         ctx.lineTo(
           end.x - headLen * Math.cos(angle + Math.PI / 6),
-          end.y - headLen * Math.sin(angle + Math.PI / 6)
+          end.y - headLen * Math.sin(angle + Math.PI / 6),
         );
         ctx.stroke();
       }
-      
+
       if (drawing.tool === 'zone' && drawing.points.length >= 2) {
         // Draw zone rectangle
         const start = drawing.points[0];
         const end = drawing.points[drawing.points.length - 1];
-        
+
         ctx.fillStyle = drawing.color + '30'; // Semi-transparent
         ctx.strokeStyle = drawing.color;
         ctx.lineWidth = 2;
-        
+
         const width = end.x - start.x;
         const height = end.y - start.y;
-        
+
         ctx.fillRect(start.x, start.y, width, height);
         ctx.strokeRect(start.x, start.y, width, height);
       }
@@ -235,15 +235,15 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
 
   const drawCursors = (ctx: CanvasRenderingContext2D) => {
     collaborationState.users.forEach(user => {
-      if (user.id === currentUser.id || !user.cursor || !user.isActive) return;
+      if (user.id === currentUser.id || !user.cursor || !user.isActive) {return;}
 
       const { x, y } = user.cursor;
-      
+
       // Draw cursor
       ctx.fillStyle = user.color;
       ctx.strokeStyle = '#ffffff';
       ctx.lineWidth = 2;
-      
+
       // Cursor pointer shape
       ctx.beginPath();
       ctx.moveTo(x, y);
@@ -258,44 +258,44 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
       ctx.font = '12px sans-serif';
       ctx.textAlign = 'left';
       ctx.fillRect(x + 15, y - 5, ctx.measureText(user.name).width + 8, 20);
-      
+
       ctx.fillStyle = '#ffffff';
       ctx.fillText(user.name, x + 19, y + 8);
     });
   };
 
   const drawComments = (ctx: CanvasRenderingContext2D) => {
-    if (!showComments) return;
+    if (!showComments) {return;}
 
     collaborationState.comments.forEach(comment => {
       const { x, y } = comment.position;
-      
+
       // Comment bubble
       ctx.fillStyle = '#1f2937';
       ctx.strokeStyle = '#6b7280';
       ctx.lineWidth = 1;
-      
+
       const bubbleWidth = 200;
       const bubbleHeight = 60;
-      
+
       // Draw bubble background
       ctx.fillRect(x, y, bubbleWidth, bubbleHeight);
       ctx.strokeRect(x, y, bubbleWidth, bubbleHeight);
-      
+
       // Comment text
       ctx.fillStyle = '#ffffff';
       ctx.font = '10px sans-serif';
       ctx.textAlign = 'left';
-      
+
       // Wrap text
       const words = comment.text.split(' ');
       let line = '';
       let lineY = y + 15;
-      
+
       words.forEach(word => {
         const testLine = line + word + ' ';
         const metrics = ctx.measureText(testLine);
-        
+
         if (metrics.width > bubbleWidth - 10 && line !== '') {
           ctx.fillText(line, x + 5, lineY);
           line = word + ' ';
@@ -304,18 +304,18 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
           line = testLine;
         }
       });
-      
+
       ctx.fillText(line, x + 5, lineY);
-      
+
       // User name and timestamp
       ctx.fillStyle = '#9ca3af';
       ctx.font = '8px sans-serif';
       ctx.fillText(
         `${comment.userName} - ${new Date(comment.timestamp).toLocaleTimeString()}`,
         x + 5,
-        y + bubbleHeight - 5
+        y + bubbleHeight - 5,
       );
-      
+
       // Comment indicator dot
       ctx.fillStyle = '#3b82f6';
       ctx.beginPath();
@@ -326,7 +326,7 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
 
   const handleCanvasClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) {return;}
 
     const rect = canvas.getBoundingClientRect();
     const x = event.clientX - rect.left;
@@ -338,7 +338,7 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
   };
 
   const addComment = () => {
-    if (!newComment.trim() || !commentPosition) return;
+    if (!newComment.trim() || !commentPosition) {return;}
 
     const comment = {
       id: `comment_${Date.now()}`,
@@ -347,13 +347,13 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
       text: newComment,
       position: commentPosition,
       timestamp: Date.now(),
-      replies: []
+      replies: [],
     };
 
     setCollaborationState(prev => ({
       ...prev,
       comments: [...prev.comments, comment],
-      version: prev.version + 1
+      version: prev.version + 1,
     }));
 
     setNewComment('');
@@ -364,7 +364,7 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
     setCollaborationState(prev => ({
       ...prev,
       drawings: [],
-      version: prev.version + 1
+      version: prev.version + 1,
     }));
   };
 
@@ -382,7 +382,7 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
                 Real-time tactical planning with your coaching staff
               </p>
             </div>
-            
+
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
                 {collaborationState.users.map(user => (
@@ -399,7 +399,7 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
                   </div>
                 ))}
               </div>
-              
+
               <div className="text-sm text-gray-400">
                 Session: {sessionId.substring(0, 8)}...
               </div>
@@ -416,7 +416,7 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
                   { tool: 'select', icon: '👆', label: 'Select' },
                   { tool: 'arrow', icon: '➡️', label: 'Arrow' },
                   { tool: 'zone', icon: '⬜', label: 'Zone' },
-                  { tool: 'comment', icon: '💬', label: 'Comment' }
+                  { tool: 'comment', icon: '💬', label: 'Comment' },
                 ].map(({ tool, icon, label }) => (
                   <button
                     key={tool}
@@ -444,7 +444,7 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
                 >
                   {showComments ? '🔍 Hide Comments' : '💭 Show Comments'}
                 </button>
-                
+
                 <button
                   onClick={clearDrawings}
                   className="px-3 py-2 rounded text-sm font-medium bg-red-600 text-white hover:bg-red-700"
@@ -511,7 +511,7 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
                 <li>• Version control</li>
               </ul>
             </div>
-            
+
             <div className="bg-gray-700 rounded-lg p-4">
               <h4 className="font-semibold text-green-400 mb-2">Session Status</h4>
               <div className="text-sm text-gray-300 space-y-1">
@@ -521,7 +521,7 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
                 <div>Auto-save: Enabled</div>
               </div>
             </div>
-            
+
             <div className="bg-gray-700 rounded-lg p-4">
               <h4 className="font-semibold text-purple-400 mb-2">Quick Actions</h4>
               <div className="space-y-2">

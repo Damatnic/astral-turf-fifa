@@ -22,8 +22,8 @@ const YouthAcademyPage: React.FC = () => {
                 type: 'ADD_NOTIFICATION',
                 payload: {
                     message: `Youth Academy upgraded to level ${youthAcademy.level + 1}!`,
-                    type: 'success'
-                }
+                    type: 'success',
+                },
             });
         }
     };
@@ -34,8 +34,8 @@ const YouthAcademyPage: React.FC = () => {
             type: 'ADD_NOTIFICATION',
             payload: {
                 message: 'Youth prospect signed to the senior squad!',
-                type: 'success'
-            }
+                type: 'success',
+            },
         });
         setSelectedProspect(null);
     };
@@ -68,8 +68,8 @@ const YouthAcademyPage: React.FC = () => {
                         <button
                             onClick={() => setSelectedTeam('home')}
                             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                                selectedTeam === 'home' 
-                                    ? 'bg-teal-600 text-white' 
+                                selectedTeam === 'home'
+                                    ? 'bg-teal-600 text-white'
                                     : 'text-gray-400 hover:text-white hover:bg-gray-700'
                             }`}
                         >
@@ -78,8 +78,8 @@ const YouthAcademyPage: React.FC = () => {
                         <button
                             onClick={() => setSelectedTeam('away')}
                             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                                selectedTeam === 'away' 
-                                    ? 'bg-teal-600 text-white' 
+                                selectedTeam === 'away'
+                                    ? 'bg-teal-600 text-white'
                                     : 'text-gray-400 hover:text-white hover:bg-gray-700'
                             }`}
                         >
@@ -151,7 +151,7 @@ const YouthAcademyPage: React.FC = () => {
                     <div className="lg:col-span-2">
                         <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
                             <h3 className="text-xl font-semibold text-teal-400 mb-4">Youth Prospects</h3>
-                            
+
                             {youthAcademy.prospects.length === 0 ? (
                                 <div className="text-center py-12">
                                     <div className="text-gray-400 mb-4">
@@ -236,7 +236,7 @@ const YouthAcademyPage: React.FC = () => {
                                                         {getAttributeRange(range)}
                                                     </span>
                                                     <div className="w-24 bg-gray-600 rounded-full h-2">
-                                                        <div 
+                                                        <div
                                                             className="bg-teal-400 h-2 rounded-full transition-all duration-300"
                                                             style={{ width: `${getAttributeAverage(range)}%` }}
                                                         ></div>
@@ -303,7 +303,7 @@ const YouthAcademyPage: React.FC = () => {
                             <h4 className="font-semibold text-white mb-2">Higher Potential</h4>
                             <p className="text-sm text-gray-400">Level {youthAcademy.level} academy produces prospects with {40 + youthAcademy.level * 10}+ potential</p>
                         </div>
-                        
+
                         <div className="text-center">
                             <div className="text-blue-400 mb-2">
                                 <svg className="w-8 h-8 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -313,7 +313,7 @@ const YouthAcademyPage: React.FC = () => {
                             <h4 className="font-semibold text-white mb-2">Faster Development</h4>
                             <p className="text-sm text-gray-400">Youth prospects develop {youthAcademy.level * 15}% faster in training</p>
                         </div>
-                        
+
                         <div className="text-center">
                             <div className="text-purple-400 mb-2">
                                 <svg className="w-8 h-8 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">

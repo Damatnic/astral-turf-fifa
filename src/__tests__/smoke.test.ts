@@ -52,7 +52,7 @@ describe('Application Smoke Tests', () => {
   it('should have valid formation data', () => {
     expect(INITIAL_STATE.tactics.formations).toBeDefined();
     expect(Object.keys(INITIAL_STATE.tactics.formations).length).toBeGreaterThan(0);
-    
+
     const firstFormation = Object.values(INITIAL_STATE.tactics.formations)[0];
     expect(firstFormation).toHaveProperty('id');
     expect(firstFormation).toHaveProperty('name');
@@ -68,7 +68,7 @@ describe('Application Smoke Tests', () => {
       expect(firstPlayer).toHaveProperty('attributes');
       // Players might have different property name for role
       expect(firstPlayer).toBeDefined();
-      
+
       // Check attributes structure
       expect(firstPlayer.attributes).toHaveProperty('speed');
       expect(firstPlayer.attributes).toHaveProperty('passing');

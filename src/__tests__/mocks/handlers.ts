@@ -8,7 +8,7 @@ export const handlers = [
   // Mock authentication endpoints
   http.post(`${API_BASE_URL}/auth/login`, async ({ request }) => {
     const { email, password } = await request.json() as any;
-    
+
     if (email === 'test@example.com' && password === 'password123') {
       return HttpResponse.json({
         id: 'user1',
@@ -16,36 +16,36 @@ export const handlers = [
         role: 'coach',
         firstName: 'Test',
         lastName: 'User',
-        token: 'mock-jwt-token'
+        token: 'mock-jwt-token',
       });
     }
-    
+
     return HttpResponse.json(
       { error: 'Invalid credentials' },
-      { status: 401 }
+      { status: 401 },
     );
   }),
 
   // Mock AI service endpoints
   http.post(`${API_BASE_URL}/ai/chat`, async ({ request }) => {
     const { prompt } = await request.json() as any;
-    
+
     return HttpResponse.json({
       response: `Mock AI response to: ${prompt}`,
       confidence: 0.95,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }),
 
   // Mock tactical analysis endpoint
   http.post(`${API_BASE_URL}/ai/tactics`, async ({ request }) => {
     const { formation, players } = await request.json() as any;
-    
+
     return HttpResponse.json({
       analysis: 'Mock tactical analysis',
       strengths: ['Strong midfield', 'Good attacking options'],
       weaknesses: ['Weak defense', 'Lack of pace on wings'],
-      suggestions: ['Consider 4-3-3 formation', 'Add defensive midfielder']
+      suggestions: ['Consider 4-3-3 formation', 'Add defensive midfielder'],
     });
   }),
 
@@ -63,9 +63,9 @@ export const handlers = [
           shooting: 75,
           dribbling: 80,
           positioning: 85,
-          stamina: 90
-        }
-      }
+          stamina: 90,
+        },
+      },
     ]);
   }),
 
@@ -86,9 +86,9 @@ export const handlers = [
           { x: 60, y: 60, role: 'MF' },
           { x: 80, y: 60, role: 'MF' },
           { x: 30, y: 85, role: 'FW' },
-          { x: 70, y: 85, role: 'FW' }
-        ]
-      }
+          { x: 70, y: 85, role: 'FW' },
+        ],
+      },
     ]);
   }),
 
@@ -96,7 +96,7 @@ export const handlers = [
   http.post(`${API_BASE_URL}/upload`, () => {
     return HttpResponse.json({
       url: 'https://example.com/uploaded-file.jpg',
-      filename: 'test-file.jpg'
+      filename: 'test-file.jpg',
     });
   }),
 
@@ -105,7 +105,7 @@ export const handlers = [
     console.warn(`Unhandled GET request: ${request.url}`);
     return HttpResponse.json(
       { error: 'Not found' },
-      { status: 404 }
+      { status: 404 },
     );
   }),
 
@@ -113,7 +113,7 @@ export const handlers = [
     console.warn(`Unhandled POST request: ${request.url}`);
     return HttpResponse.json(
       { error: 'Not found' },
-      { status: 404 }
+      { status: 404 },
     );
   }),
 ];
@@ -123,14 +123,14 @@ export const errorHandlers = [
   http.post(`${API_BASE_URL}/auth/login`, () => {
     return HttpResponse.json(
       { error: 'Internal server error' },
-      { status: 500 }
+      { status: 500 },
     );
   }),
 
   http.post(`${API_BASE_URL}/ai/chat`, () => {
     return HttpResponse.json(
       { error: 'AI service unavailable' },
-      { status: 503 }
+      { status: 503 },
     );
   }),
 ];

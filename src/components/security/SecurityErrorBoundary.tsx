@@ -1,6 +1,6 @@
 /**
  * Security-Focused Error Boundary Component
- * 
+ *
  * Catches and handles errors with security considerations, preventing
  * sensitive information leakage while maintaining audit trails.
  */
@@ -50,7 +50,7 @@ const SENSITIVE_PATTERNS = [
 export class SecurityErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    
+
     this.state = {
       hasError: false,
       errorId: null,
@@ -60,8 +60,8 @@ export class SecurityErrorBoundary extends Component<Props, State> {
 
   static getDerivedStateFromError(error: Error): Partial<State> {
     const errorId = `error_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    const isSecurityRelated = SECURITY_ERROR_PATTERNS.some(pattern => 
-      pattern.test(error.message) || pattern.test(error.name)
+    const isSecurityRelated = SECURITY_ERROR_PATTERNS.some(pattern =>
+      pattern.test(error.message) || pattern.test(error.name),
     );
 
     return {
@@ -78,8 +78,8 @@ export class SecurityErrorBoundary extends Component<Props, State> {
       const sanitizedErrorInfo = this.sanitizeErrorInfo(errorInfo);
 
       // Determine security event type
-      const eventType = this.state.isSecurityRelated 
-        ? SecurityEventType.SECURITY_POLICY_VIOLATION 
+      const eventType = this.state.isSecurityRelated
+        ? SecurityEventType.SECURITY_POLICY_VIOLATION
         : SecurityEventType.SYSTEM_ERROR;
 
       // Log the error with security considerations
@@ -101,7 +101,7 @@ export class SecurityErrorBoundary extends Component<Props, State> {
               stackTrace: sanitizedError.stack,
             }),
           },
-        }
+        },
       );
 
       // Call custom error handler if provided
@@ -216,17 +216,17 @@ export class SecurityErrorBoundary extends Component<Props, State> {
             <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
               <div className="flex items-center mb-4">
                 <div className="flex-shrink-0">
-                  <svg 
-                    className="h-8 w-8 text-red-500" 
-                    fill="none" 
-                    viewBox="0 0 24 24" 
+                  <svg
+                    className="h-8 w-8 text-red-500"
+                    fill="none"
+                    viewBox="0 0 24 24"
                     stroke="currentColor"
                   >
-                    <path 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round" 
-                      strokeWidth={2} 
-                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" 
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
                     />
                   </svg>
                 </div>
@@ -244,7 +244,7 @@ export class SecurityErrorBoundary extends Component<Props, State> {
                     : 'An unexpected error has occurred. We apologize for the inconvenience.'
                   }
                 </p>
-                
+
                 {ENVIRONMENT_CONFIG.isDevelopment && (
                   <p className="text-xs text-gray-500 mt-2">
                     Error ID: {this.state.errorId}
@@ -259,7 +259,7 @@ export class SecurityErrorBoundary extends Component<Props, State> {
                 >
                   Try Again
                 </button>
-                
+
                 <button
                   onClick={this.handleReportError}
                   className="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
@@ -271,22 +271,22 @@ export class SecurityErrorBoundary extends Component<Props, State> {
               {this.state.isSecurityRelated && (
                 <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-md">
                   <div className="flex">
-                    <svg 
-                      className="h-5 w-5 text-yellow-400 flex-shrink-0 mt-0.5" 
-                      fill="none" 
-                      viewBox="0 0 24 24" 
+                    <svg
+                      className="h-5 w-5 text-yellow-400 flex-shrink-0 mt-0.5"
+                      fill="none"
+                      viewBox="0 0 24 24"
                       stroke="currentColor"
                     >
-                      <path 
-                        strokeLinecap="round" 
-                        strokeLinejoin="round" 
-                        strokeWidth={2} 
-                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" 
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
                       />
                     </svg>
                     <div className="ml-3">
                       <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                        <strong>Security Notice:</strong> This incident has been logged for security review. 
+                        <strong>Security Notice:</strong> This incident has been logged for security review.
                         If you believe this error is related to suspicious activity, please contact support immediately.
                       </p>
                     </div>

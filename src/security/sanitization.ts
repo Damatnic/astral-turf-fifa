@@ -1,6 +1,6 @@
 /**
  * Data Sanitization Security Module
- * 
+ *
  * Provides comprehensive data sanitization to prevent XSS attacks,
  * HTML injection, and other client-side security vulnerabilities.
  */
@@ -19,7 +19,7 @@ const PURIFY_CONFIGS = {
     FORBID_TAGS: ['script', 'object', 'embed', 'form', 'input', 'button'],
     FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur'],
   },
-  
+
   // Basic HTML configuration - allows safe formatting tags
   basic: {
     ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'p', 'br'],
@@ -28,7 +28,7 @@ const PURIFY_CONFIGS = {
     FORBID_TAGS: ['script', 'object', 'embed', 'form', 'input', 'button', 'iframe'],
     FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur', 'style'],
   },
-  
+
   // Rich text configuration - allows more formatting but still secure
   rich: {
     ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'p', 'br', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote'],
@@ -36,7 +36,7 @@ const PURIFY_CONFIGS = {
     ALLOW_DATA_ATTR: false,
     FORBID_TAGS: ['script', 'object', 'embed', 'form', 'input', 'button', 'iframe', 'svg'],
     FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur', 'style', 'class', 'id'],
-  }
+  },
 } as const;
 
 type SanitizationLevel = keyof typeof PURIFY_CONFIGS;
@@ -50,11 +50,11 @@ export function sanitizeHtml(html: string, level: SanitizationLevel = 'strict'):
   if (!html || typeof html !== 'string') {
     return '';
   }
-  
+
   try {
     const config = PURIFY_CONFIGS[level];
     const sanitized = DOMPurify.sanitize(html, config);
-    
+
     // Log if significant changes were made
     if (sanitized !== html && sanitized.length < html.length * 0.8) {
       securityLogger.info('HTML sanitization removed significant content', {
@@ -63,14 +63,14 @@ export function sanitizeHtml(html: string, level: SanitizationLevel = 'strict'):
         level,
       });
     }
-    
+
     return sanitized;
   } catch (error) {
     securityLogger.error('HTML sanitization failed', {
       error: error instanceof Error ? error.message : 'Unknown error',
       inputLength: html.length,
     });
-    
+
     // Fallback to strict text-only sanitization
     return sanitizeText(html);
   }
@@ -81,19 +81,19 @@ export function sanitizeText(text: string): string {
   if (!text || typeof text !== 'string') {
     return '';
   }
-  
+
   // Remove all HTML tags and decode entities
   let sanitized = text.replace(/<[^>]*>/g, '');
-  
+
   // Decode HTML entities
   sanitized = validator.unescape(sanitized);
-  
+
   // Remove control characters except newlines and tabs
   sanitized = sanitized.replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/g, '');
-  
+
   // Normalize whitespace
   sanitized = sanitized.replace(/\s+/g, ' ').trim();
-  
+
   return sanitized;
 }
 
@@ -102,13 +102,13 @@ export function sanitizeUserInput(input: string): string {
   if (!input || typeof input !== 'string') {
     return '';
   }
-  
+
   // First, sanitize as text to remove any HTML
   let sanitized = sanitizeText(input);
-  
+
   // Then escape any remaining special characters
   sanitized = validator.escape(sanitized);
-  
+
   return sanitized;
 }
 
@@ -117,7 +117,7 @@ export function sanitizeAiPrompt(prompt: string): string {
   if (!prompt || typeof prompt !== 'string') {
     return '';
   }
-  
+
   // Remove potentially dangerous instructions
   const dangerousPatterns = [
     /ignore\s+previous\s+instructions?/gi,
@@ -134,17 +134,17 @@ export function sanitizeAiPrompt(prompt: string): string {
     /human\s*:/gi,
     /ai\s*:/gi,
   ];
-  
+
   let sanitized = prompt;
   let removedPatterns = 0;
-  
+
   dangerousPatterns.forEach(pattern => {
     if (pattern.test(sanitized)) {
       sanitized = sanitized.replace(pattern, '');
       removedPatterns++;
     }
   });
-  
+
   if (removedPatterns > 0) {
     securityLogger.warn('AI prompt injection attempt detected and sanitized', {
       originalLength: prompt.length,
@@ -152,10 +152,10 @@ export function sanitizeAiPrompt(prompt: string): string {
       removedPatterns,
     });
   }
-  
+
   // Clean up extra whitespace
   sanitized = sanitized.replace(/\s+/g, ' ').trim();
-  
+
   // Limit length to prevent resource exhaustion
   if (sanitized.length > 2000) {
     sanitized = sanitized.substring(0, 2000) + '...';
@@ -163,7 +163,7 @@ export function sanitizeAiPrompt(prompt: string): string {
       originalLength: prompt.length,
     });
   }
-  
+
   return sanitized;
 }
 
@@ -176,11 +176,11 @@ export function sanitizeUrl(url: string): string {
   if (!url || typeof url !== 'string') {
     return '';
   }
-  
+
   try {
     // Remove leading/trailing whitespace
-    let sanitized = url.trim();
-    
+    const sanitized = url.trim();
+
     // Check for dangerous protocols
     const dangerousProtocols = [
       'javascript:',
@@ -190,21 +190,21 @@ export function sanitizeUrl(url: string): string {
       'ftp:',
       'about:',
     ];
-    
+
     const lowerUrl = sanitized.toLowerCase();
     if (dangerousProtocols.some(protocol => lowerUrl.startsWith(protocol))) {
       securityLogger.warn('Dangerous URL protocol detected', { url: sanitized });
       return '';
     }
-    
+
     // Validate URL format
     const urlObj = new URL(sanitized);
-    
+
     // Only allow HTTP and HTTPS
     if (!['http:', 'https:'].includes(urlObj.protocol)) {
       return '';
     }
-    
+
     // Return the cleaned URL
     return urlObj.toString();
   } catch (error) {
@@ -218,20 +218,20 @@ export function sanitizeFilePath(path: string): string {
   if (!path || typeof path !== 'string') {
     return '';
   }
-  
+
   // Remove dangerous path components
   let sanitized = path
     .replace(/\.\./g, '') // Remove parent directory references
     .replace(/\/+/g, '/') // Normalize multiple slashes
     .replace(/^\/+/, '') // Remove leading slashes
     .replace(/\/+$/, ''); // Remove trailing slashes
-  
+
   // Remove null bytes and control characters
   sanitized = sanitized.replace(/[\x00-\x1F\x7F]/g, '');
-  
+
   // Only allow safe characters
   sanitized = sanitized.replace(/[^a-zA-Z0-9._\/-]/g, '');
-  
+
   return sanitized;
 }
 
@@ -244,22 +244,22 @@ export function sanitizeJson(data: any, level: SanitizationLevel = 'strict'): an
   if (data === null || data === undefined) {
     return data;
   }
-  
+
   if (typeof data === 'string') {
     return sanitizeHtml(data, level);
   }
-  
+
   if (typeof data === 'number' || typeof data === 'boolean') {
     return data;
   }
-  
+
   if (Array.isArray(data)) {
     return data.map(item => sanitizeJson(item, level));
   }
-  
+
   if (typeof data === 'object') {
     const sanitized: Record<string, any> = {};
-    
+
     for (const [key, value] of Object.entries(data)) {
       // Sanitize keys to prevent prototype pollution
       const sanitizedKey = sanitizeText(key);
@@ -267,20 +267,20 @@ export function sanitizeJson(data: any, level: SanitizationLevel = 'strict'): an
         sanitized[sanitizedKey] = sanitizeJson(value, level);
       }
     }
-    
+
     return sanitized;
   }
-  
+
   return data;
 }
 
 // Sanitize form data
 export function sanitizeFormData(formData: FormData): FormData {
   const sanitized = new FormData();
-  
+
   for (const [key, value] of formData.entries()) {
     const sanitizedKey = sanitizeText(key);
-    
+
     if (typeof value === 'string') {
       sanitized.append(sanitizedKey, sanitizeUserInput(value));
     } else if (value instanceof File) {
@@ -292,23 +292,23 @@ export function sanitizeFormData(formData: FormData): FormData {
       sanitized.append(sanitizedKey, value);
     }
   }
-  
+
   return sanitized;
 }
 
 // Sanitize query parameters
 export function sanitizeQueryParams(params: URLSearchParams): URLSearchParams {
   const sanitized = new URLSearchParams();
-  
+
   for (const [key, value] of params.entries()) {
     const sanitizedKey = sanitizeText(key);
     const sanitizedValue = sanitizeUserInput(value);
-    
+
     if (sanitizedKey && sanitizedValue) {
       sanitized.append(sanitizedKey, sanitizedValue);
     }
   }
-  
+
   return sanitized;
 }
 
@@ -321,9 +321,9 @@ export function sanitizePlayerData(playerData: any): any {
   if (!playerData || typeof playerData !== 'object') {
     return playerData;
   }
-  
+
   const sanitized = { ...playerData };
-  
+
   // Sanitize text fields
   const textFields = ['name', 'notes', 'nationality'];
   textFields.forEach(field => {
@@ -331,7 +331,7 @@ export function sanitizePlayerData(playerData: any): any {
       sanitized[field] = sanitizeUserInput(sanitized[field]);
     }
   });
-  
+
   // Sanitize communication history
   if (Array.isArray(sanitized.conversationHistory)) {
     sanitized.conversationHistory = sanitized.conversationHistory.map((message: any) => ({
@@ -339,7 +339,7 @@ export function sanitizePlayerData(playerData: any): any {
       text: typeof message.text === 'string' ? sanitizeHtml(message.text, 'basic') : message.text,
     }));
   }
-  
+
   // Sanitize development log
   if (Array.isArray(sanitized.developmentLog)) {
     sanitized.developmentLog = sanitized.developmentLog.map((log: any) => ({
@@ -347,7 +347,7 @@ export function sanitizePlayerData(playerData: any): any {
       note: typeof log.note === 'string' ? sanitizeHtml(log.note, 'basic') : log.note,
     }));
   }
-  
+
   return sanitized;
 }
 
@@ -360,10 +360,10 @@ export function sanitizeChatMessage(message: string): string {
   if (!message || typeof message !== 'string') {
     return '';
   }
-  
+
   // Use basic HTML sanitization to allow some formatting
   let sanitized = sanitizeHtml(message, 'basic');
-  
+
   // Additional checks for chat-specific threats
   const chatThreats = [
     /@everyone/gi,
@@ -372,14 +372,14 @@ export function sanitizeChatMessage(message: string): string {
     /bit\.ly\/\w+/gi,
     /tinyurl\.com\/\w+/gi,
   ];
-  
+
   chatThreats.forEach(threat => {
     if (threat.test(sanitized)) {
       sanitized = sanitized.replace(threat, '[REMOVED]');
       securityLogger.info('Chat threat pattern removed', { pattern: threat.source });
     }
   });
-  
+
   return sanitized;
 }
 
@@ -392,25 +392,25 @@ export function sanitizeFileName(filename: string): string {
   if (!filename || typeof filename !== 'string') {
     return 'file';
   }
-  
+
   // Remove path separators and dangerous characters
   let sanitized = filename
     .replace(/[<>:"/\\|?*]/g, '')
     .replace(/\s+/g, '_')
     .replace(/\.+/g, '.');
-  
+
   // Limit length
   if (sanitized.length > 255) {
     const extension = sanitized.substring(sanitized.lastIndexOf('.'));
     const name = sanitized.substring(0, 255 - extension.length);
     sanitized = name + extension;
   }
-  
+
   // Ensure it doesn't start with a dot
   if (sanitized.startsWith('.')) {
     sanitized = 'file' + sanitized;
   }
-  
+
   return sanitized || 'file';
 }
 
@@ -423,7 +423,7 @@ export function sanitizeHeaderValue(value: string): string {
   if (!value || typeof value !== 'string') {
     return '';
   }
-  
+
   // Remove line breaks that could be used for header injection
   return value.replace(/[\r\n]/g, '').trim();
 }

@@ -17,22 +17,22 @@ const TransfersPage: React.FC = () => {
         if (budget >= player.askingPrice) {
             dispatch({
                 type: 'SIGN_TRANSFER_PLAYER',
-                payload: { player, team: selectedTeam }
+                payload: { player, team: selectedTeam },
             });
             uiDispatch({
                 type: 'ADD_NOTIFICATION',
                 payload: {
                     message: `Successfully signed ${player.name} for $${player.askingPrice.toLocaleString()}`,
-                    type: 'success'
-                }
+                    type: 'success',
+                },
             });
         } else {
             uiDispatch({
                 type: 'ADD_NOTIFICATION',
                 payload: {
                     message: `Insufficient transfer budget to sign ${player.name}`,
-                    type: 'error'
-                }
+                    type: 'error',
+                },
             });
         }
     };
@@ -40,14 +40,14 @@ const TransfersPage: React.FC = () => {
     const handleScoutPlayer = (playerId: string) => {
         uiDispatch({
             type: 'GET_PLAYER_SCOUT_REPORT_START',
-            payload: { playerId }
+            payload: { playerId },
         });
     };
 
     const handleFilterChange = (filter: keyof typeof transferMarketFilters, value: any) => {
         uiDispatch({
             type: 'SET_TRANSFER_MARKET_FILTER',
-            payload: { filter, value }
+            payload: { filter, value },
         });
     };
 
@@ -55,9 +55,9 @@ const TransfersPage: React.FC = () => {
         const nameMatch = player.name.toLowerCase().includes(transferMarketFilters.name.toLowerCase());
         const positionMatch = transferMarketFilters.position === 'All' || player.roleId.includes(transferMarketFilters.position);
         const ageMatch = player.age >= transferMarketFilters.age.min && player.age <= transferMarketFilters.age.max;
-        const potentialMatch = player.currentPotential >= transferMarketFilters.potential.min && 
+        const potentialMatch = player.currentPotential >= transferMarketFilters.potential.min &&
                              player.currentPotential <= transferMarketFilters.potential.max;
-        const priceMatch = player.askingPrice >= transferMarketFilters.price.min && 
+        const priceMatch = player.askingPrice >= transferMarketFilters.price.min &&
                           player.askingPrice <= transferMarketFilters.price.max;
 
         return nameMatch && positionMatch && ageMatch && potentialMatch && priceMatch;
@@ -80,8 +80,8 @@ const TransfersPage: React.FC = () => {
                         <button
                             onClick={() => setSelectedTeam('home')}
                             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                                selectedTeam === 'home' 
-                                    ? 'bg-teal-600 text-white' 
+                                selectedTeam === 'home'
+                                    ? 'bg-teal-600 text-white'
                                     : 'text-gray-400 hover:text-white hover:bg-gray-700'
                             }`}
                         >
@@ -90,8 +90,8 @@ const TransfersPage: React.FC = () => {
                         <button
                             onClick={() => setSelectedTeam('away')}
                             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                                selectedTeam === 'away' 
-                                    ? 'bg-teal-600 text-white' 
+                                selectedTeam === 'away'
+                                    ? 'bg-teal-600 text-white'
                                     : 'text-gray-400 hover:text-white hover:bg-gray-700'
                             }`}
                         >

@@ -26,7 +26,7 @@ const SeasonEndSummaryPopup = lazy(() => import('./popups/SeasonEndSummaryPopup'
 const PlaybookLibraryPopup = lazy(() => import('./popups/PlaybookLibraryPopup'));
 const PressConferencePopup = lazy(() => import('./popups/PressConferencePopup'));
 
-const MODAL_MAP: Record<ModalType, React.LazyExoticComponent<ComponentType<any>>> = {
+const MODAL_MAP: Record<ModalType, React.LazyExoticComponent<ComponentType<Record<string, unknown>>>> = {
     editPlayer: PlayerEditPopup,
     comparePlayer: PlayerComparePopup,
     slotActionMenu: SlotActionMenu,
@@ -36,7 +36,7 @@ const MODAL_MAP: Record<ModalType, React.LazyExoticComponent<ComponentType<any>>
     matchSimulator: MatchSimulatorPopup,
     postMatchReport: PostMatchReportPopup,
     contractNegotiation: ContractNegotiationPopup,
-    pressConference: PressConferencePopup, 
+    pressConference: PressConferencePopup,
     aiSubSuggestion: AISubstitutionSuggestionPopup,
     playerConversation: PlayerConversationPopup,
     interactiveTutorial: InteractiveTutorialPopup,
@@ -59,12 +59,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     const { uiState, dispatch } = useUIContext();
     const { tacticsState } = useTacticsContext();
     const responsive = useResponsive();
-    const { shouldUseFullScreenModal, modalSize } = useResponsiveModal();
+    const { shouldUseFullScreenModal } = useResponsiveModal();
     const lineupRef = useRef<HTMLDivElement>(null);
     const { theme, isExportingLineup, isPresentationMode, activeModal } = uiState;
     const { players, formations, activeFormationIds, captainIds } = tacticsState;
     const { isMobile, isTablet, currentBreakpoint } = responsive;
-    
+
     // Handle theme changes
     useEffect(() => {
         const root = document.documentElement;
@@ -76,7 +76,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             const target = e?.target as HTMLElement;
-            if (target?.closest('input, textarea, select')) return;
+            if (target?.closest('input, textarea, select')) {return;}
 
             // Ctrl/Cmd + R for soft reset
             if ((e?.ctrlKey || e?.metaKey) && e?.key?.toLowerCase() === 'r') {
@@ -86,13 +86,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             }
 
             // Drawing tool shortcuts
-            const keyMap: Record<string, DrawingTool> = { 
-                v: 'select', 
-                a: 'arrow', 
-                l: 'line', 
-                r: 'zone', 
-                p: 'pen', 
-                t: 'text' 
+            const keyMap: Record<string, DrawingTool> = {
+                v: 'select',
+                a: 'arrow',
+                l: 'line',
+                r: 'zone',
+                p: 'pen',
+                t: 'text',
             };
             const tool = keyMap[e?.key?.toLowerCase() ?? ''];
             if (tool && !isPresentationMode) {
@@ -108,25 +108,25 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     // Handle lineup export
     useEffect(() => {
         const exportLineup = async () => {
-            if (!isExportingLineup || !lineupRef?.current) return;
+            if (!isExportingLineup || !lineupRef?.current) {return;}
             try {
-                const dataUrl = await toPng(lineupRef.current, { 
-                    cacheBust: true, 
-                    backgroundColor: (theme ?? 'dark') === 'light' ? '#f1f5f9' : '#1e293b' 
+                const dataUrl = await toPng(lineupRef.current, {
+                    cacheBust: true,
+                    backgroundColor: (theme ?? 'dark') === 'light' ? '#f1f5f9' : '#1e293b',
                 });
                 const link = document.createElement('a');
                 link.download = 'astral-turf-tactic-sheet.png';
                 link.href = dataUrl;
                 link.click();
-                dispatch({ type: 'ADD_NOTIFICATION', payload: { 
-                    message: 'Tactic Sheet exported successfully!', 
-                    type: 'success' 
+                dispatch({ type: 'ADD_NOTIFICATION', payload: {
+                    message: 'Tactic Sheet exported successfully!',
+                    type: 'success',
                 }});
-            } catch (error) {
-                console.error('Failed to export tactic sheet:', error);
-                dispatch({ type: 'ADD_NOTIFICATION', payload: { 
-                    message: 'An error occurred while exporting.', 
-                    type: 'error' 
+            } catch {
+                // Error logged to user notification instead
+                dispatch({ type: 'ADD_NOTIFICATION', payload: {
+                    message: 'An error occurred while exporting.',
+                    type: 'error',
                 }});
             } finally {
                 dispatch({ type: 'EXPORT_LINEUP_FINISH' });
@@ -148,7 +148,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         `}>
             {/* Mobile-Responsive Header */}
             {!isPresentationMode && <Header />}
-            
+
             {/* Mobile-First Main Content Area */}
             <main className={`
                 flex-grow flex 
@@ -158,12 +158,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             `}>
                 {children ? children : <Outlet />}
             </main>
-            
+
             {/* Footer (mobile-friendly) */}
             <footer className="sr-only">
                 {/* Footer content can be added here if needed */}
             </footer>
-            
+
             {/* Mobile-First Modal Rendering */}
             {ActiveModalComponent && (
                 <Suspense fallback={
@@ -191,13 +191,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     </div>
                 </Suspense>
             )}
-            
+
             {/* Mobile-Optimized Global Notifications */}
             <NotificationContainer />
-            
+
             {/* Mobile-Friendly Interactive Tutorial */}
             {uiState?.tutorial?.isActive && <InteractiveTutorialPopup />}
-            
+
             {/* Hidden Export Component */}
             {isExportingLineup && (
                 <div style={{ position: 'absolute', left: '-9999px', top: 0 }}>

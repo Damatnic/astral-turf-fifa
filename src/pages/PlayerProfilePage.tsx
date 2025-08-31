@@ -31,7 +31,7 @@ const PlayerProfilePage: React.FC = () => {
     const handleStartConversation = () => {
         uiDispatch({
             type: 'START_PLAYER_CONVERSATION',
-            payload: { playerId: player.id }
+            payload: { playerId: player.id },
         });
     };
 
@@ -85,7 +85,7 @@ const PlayerProfilePage: React.FC = () => {
                             <div className="bg-gray-700 rounded-full w-20 h-20 flex items-center justify-center">
                                 <span className="text-2xl font-bold text-white">{player.jerseyNumber}</span>
                             </div>
-                            
+
                             {/* Player Info */}
                             <div>
                                 <h1 className="text-3xl font-bold text-white mb-2">{player.name}</h1>
@@ -98,8 +98,8 @@ const PlayerProfilePage: React.FC = () => {
                                 </div>
                                 <div className="flex items-center space-x-4">
                                     <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                                        player.availability.status === 'Available' 
-                                            ? 'bg-green-600/20 text-green-400' 
+                                        player.availability.status === 'Available'
+                                            ? 'bg-green-600/20 text-green-400'
                                             : 'bg-red-600/20 text-red-400'
                                     }`}>
                                         {player.availability.status}
@@ -138,7 +138,7 @@ const PlayerProfilePage: React.FC = () => {
                                 { key: 'stats' as const, label: 'Statistics' },
                                 { key: 'development' as const, label: 'Development' },
                                 { key: 'contract' as const, label: 'Contract' },
-                                { key: 'history' as const, label: 'History' }
+                                { key: 'history' as const, label: 'History' },
                             ].map(({ key, label }) => (
                                 <button
                                     key={key}
@@ -201,7 +201,7 @@ const PlayerProfilePage: React.FC = () => {
                                             <span className="text-gray-300 capitalize">{attr}</span>
                                             <div className="flex items-center space-x-3">
                                                 <div className="w-24 bg-gray-700 rounded-full h-2">
-                                                    <div 
+                                                    <div
                                                         className="bg-teal-400 h-2 rounded-full transition-all duration-300"
                                                         style={{ width: `${value}%` }}
                                                     ></div>
@@ -223,7 +223,7 @@ const PlayerProfilePage: React.FC = () => {
                                             <span className="text-white font-bold">{player.stamina}%</span>
                                         </div>
                                         <div className="w-full bg-gray-700 rounded-full h-2">
-                                            <div 
+                                            <div
                                                 className={`h-2 rounded-full transition-all duration-300 ${
                                                     player.stamina >= 80 ? 'bg-green-400' :
                                                     player.stamina >= 60 ? 'bg-yellow-400' : 'bg-red-400'
@@ -239,7 +239,7 @@ const PlayerProfilePage: React.FC = () => {
                                             <span className="text-white font-bold">{player.fatigue}%</span>
                                         </div>
                                         <div className="w-full bg-gray-700 rounded-full h-2">
-                                            <div 
+                                            <div
                                                 className={`h-2 rounded-full transition-all duration-300 ${
                                                     player.fatigue >= 80 ? 'bg-red-400' :
                                                     player.fatigue >= 60 ? 'bg-yellow-400' : 'bg-green-400'
@@ -255,7 +255,7 @@ const PlayerProfilePage: React.FC = () => {
                                             <span className="text-white font-bold">{player.injuryRisk}%</span>
                                         </div>
                                         <div className="w-full bg-gray-700 rounded-full h-2">
-                                            <div 
+                                            <div
                                                 className={`h-2 rounded-full transition-all duration-300 ${
                                                     player.injuryRisk >= 80 ? 'bg-red-400' :
                                                     player.injuryRisk >= 60 ? 'bg-yellow-400' : 'bg-green-400'
@@ -290,7 +290,7 @@ const PlayerProfilePage: React.FC = () => {
                                     </div>
                                     <div className="text-center">
                                         <div className="text-2xl font-bold text-yellow-400">
-                                            {player.stats.passesAttempted > 0 
+                                            {player.stats.passesAttempted > 0
                                                 ? ((player.stats.passesCompleted / player.stats.passesAttempted) * 100).toFixed(1)
                                                 : '0.0'
                                             }%
@@ -333,7 +333,7 @@ const PlayerProfilePage: React.FC = () => {
                                             <span className="text-gray-300 capitalize">{attr}</span>
                                             <div className="flex items-center space-x-3">
                                                 <div className="w-24 bg-gray-700 rounded-full h-2">
-                                                    <div 
+                                                    <div
                                                         className="bg-teal-400 h-2 rounded-full transition-all duration-300"
                                                         style={{ width: `${progress}%` }}
                                                     ></div>
@@ -360,7 +360,7 @@ const PlayerProfilePage: React.FC = () => {
                                                 </p>
                                             </div>
                                             <div className={`px-3 py-1 rounded-full text-sm ${
-                                                player.individualTrainingFocus.intensity === 'high' 
+                                                player.individualTrainingFocus.intensity === 'high'
                                                     ? 'bg-red-600/20 text-red-400'
                                                     : 'bg-green-600/20 text-green-400'
                                             }`}>

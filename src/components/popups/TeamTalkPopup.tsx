@@ -10,7 +10,7 @@ const TeamTalkPopup: React.FC = () => {
     const { franchiseState } = useFranchiseContext();
     const { isLoadingTeamTalk, teamTalkData, settings, activeTeamContext } = uiState;
     const { players } = tacticsState;
-    
+
     const activeTeam = activeTeamContext === 'away' ? 'away' : 'home';
     const isHalftime = franchiseState.lastMatchResult === null && uiState.simulationTimeline.some(e => e.minute >= 45);
     const homeScore = uiState.simulationTimeline.filter(e => 'type' in e && e.type === 'Goal' && e.team === 'home').length;
@@ -34,7 +34,7 @@ const TeamTalkPopup: React.FC = () => {
     }, [teamTalkData, isLoadingTeamTalk, dispatch, players, activeTeam, isHalftime, settings.aiPersonality, homeScore, awayScore]);
 
     const closeModal = () => dispatch({ type: 'CLOSE_MODAL' });
-    
+
     const handleSelectTalk = (option: TeamTalkOption) => {
         tacticsDispatch({ type: 'APPLY_TEAM_TALK_EFFECT', payload: { team: activeTeam, effect: option.moraleEffect } });
         dispatch({ type: 'ADD_NOTIFICATION', payload: { message: 'Team talk delivered!', type: 'success' } });
@@ -43,7 +43,7 @@ const TeamTalkPopup: React.FC = () => {
 
     return (
         <div className="fixed inset-0 bg-black/60 z-50 backdrop-blur-sm flex items-center justify-center p-4" onClick={closeModal}>
-            <div 
+            <div
                 onClick={(e) => e.stopPropagation()}
                 className="relative bg-gray-800 rounded-lg shadow-2xl w-full max-w-lg border border-gray-700/50 flex flex-col animate-fade-in-scale"
             >

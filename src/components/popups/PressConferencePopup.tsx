@@ -26,8 +26,8 @@ const PressConferencePopup: React.FC = () => {
     const handleCloseAndReset = () => {
         dispatch({ type: 'GET_PRESS_CONFERENCE_QUESTIONS_FAILURE' }); // Resets data
         dispatch({ type: 'CLOSE_MODAL' });
-    }
-    
+    };
+
     const handleSelectOption = (option: AIPressConferenceResponse['options'][0]) => {
         const payload: {
             fanConfidenceEffect: number;
@@ -35,16 +35,16 @@ const PressConferencePopup: React.FC = () => {
             narrativeId?: string;
         } = {
             fanConfidenceEffect: option.fanConfidenceEffect,
-            teamMoraleEffect: option.teamMoraleEffect
+            teamMoraleEffect: option.teamMoraleEffect,
         };
-        
+
         if (pressConferenceData?.narrativeId) {
             payload.narrativeId = pressConferenceData.narrativeId;
         }
-        
+
         dispatch({
             type: 'RESOLVE_PRESS_CONFERENCE_OPTION',
-            payload
+            payload,
         });
         setResult({ outcome: option.outcome, isGood: (option.fanConfidenceEffect + option.teamMoraleEffect) >= 0 });
     };
@@ -56,7 +56,7 @@ const PressConferencePopup: React.FC = () => {
                     <h2 className="text-xl font-bold text-teal-400 flex items-center"><MessageSquareIcon className="w-5 h-5 mr-3" />Press Conference</h2>
                     <button onClick={handleCloseAndReset} className="p-1 rounded-full text-gray-400 hover:bg-gray-700"><CloseIcon className="w-5 h-5" /></button>
                 </div>
-                
+
                 <div className="p-6 overflow-y-auto min-h-[250px] flex flex-col justify-center">
                     {(isLoadingPressConference || !pressConferenceData) && !result && (
                         <div className="flex justify-center"><LoadingSpinner className="w-8 h-8"/></div>
@@ -74,7 +74,7 @@ const PressConferencePopup: React.FC = () => {
                             </div>
                         </div>
                     )}
-                    
+
                     {result && (
                          <div className="text-center space-y-4 animate-fade-in-scale">
                              <p className={`text-lg font-semibold ${result.isGood ? 'text-green-400' : 'text-red-400'}`}>{result.outcome}</p>

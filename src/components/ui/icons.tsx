@@ -17,10 +17,10 @@ export const LogoIcon: React.FC<{ className?: string }> = ({ className }) => (
       >
         {/* Soccer Ball */}
         <circle cx="50" cy="50" r="45" fill="currentColor" stroke="none" />
-        
+
         {/* Pentagon in center */}
         <path d="M50 25 L62 35 L58 50 L42 50 L38 35 Z" fill="white" />
-        
+
         {/* Hexagons around pentagon */}
         <path d="M50 25 L38 35 L32 22 L44 12 L56 12 L62 22 Z" fill="white" />
         <path d="M62 35 L74 32 L80 45 L74 58 L62 55 L58 50 Z" fill="white" />

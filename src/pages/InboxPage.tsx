@@ -11,8 +11,8 @@ const InboxPage: React.FC = () => {
     const { inbox } = franchiseState;
 
     const filteredItems = inbox.filter(item => {
-        if (selectedFilter === 'all') return true;
-        if (selectedFilter === 'unread') return !item.isRead;
+        if (selectedFilter === 'all') {return true;}
+        if (selectedFilter === 'unread') {return !item.isRead;}
         return item.type === selectedFilter;
     });
 
@@ -38,8 +38,8 @@ const InboxPage: React.FC = () => {
             type: 'ADD_NOTIFICATION',
             payload: {
                 message: 'Transfer offer accepted successfully!',
-                type: 'success'
-            }
+                type: 'success',
+            },
         });
     };
 
@@ -49,8 +49,8 @@ const InboxPage: React.FC = () => {
             type: 'ADD_NOTIFICATION',
             payload: {
                 message: 'Loan offer accepted successfully!',
-                type: 'success'
-            }
+                type: 'success',
+            },
         });
     };
 
@@ -109,7 +109,7 @@ const InboxPage: React.FC = () => {
                 <div className="mb-6">
                     <h1 className="text-3xl font-bold text-teal-400 mb-2">Inbox</h1>
                     <p className="text-gray-400">
-                        Manage notifications and communications 
+                        Manage notifications and communications
                         {unreadCount > 0 && (
                             <span className="ml-2 bg-red-600 text-white px-2 py-1 rounded-full text-xs">
                                 {unreadCount} unread
@@ -249,14 +249,14 @@ const InboxPage: React.FC = () => {
                                                         handleAcceptTransferOffer(
                                                             selectedItem.id,
                                                             selectedItem.payload!.offer!.playerId,
-                                                            selectedItem.payload!.offer!.value
+                                                            selectedItem.payload!.offer!.value,
                                                         );
                                                     } else {
                                                         handleAcceptLoanOffer(
                                                             selectedItem.id,
                                                             selectedItem.payload!.offer!.playerId,
                                                             selectedItem.payload!.offer!.value,
-                                                            selectedItem.payload!.offer!.wageContribution || 0
+                                                            selectedItem.payload!.offer!.wageContribution || 0,
                                                         );
                                                     }
                                                 }}
@@ -285,7 +285,7 @@ const InboxPage: React.FC = () => {
                                             onClick={() => {
                                                 uiDispatch({
                                                     type: 'START_PLAYER_CONVERSATION',
-                                                    payload: { playerId: selectedItem.payload!.conversationRequest!.playerId }
+                                                    payload: { playerId: selectedItem.payload!.conversationRequest!.playerId },
                                                 });
                                             }}
                                             className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-md font-medium transition-colors"

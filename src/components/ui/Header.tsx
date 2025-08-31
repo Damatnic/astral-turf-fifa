@@ -19,8 +19,8 @@ const TeamToggleButton: React.FC<{
     <button
         onClick={() => onClick(view)}
         className={`px-3 py-1 rounded-md text-sm font-semibold transition-all duration-200 ${
-            activeContext === view 
-            ? `shadow-md text-white ${className}` 
+            activeContext === view
+            ? `shadow-md text-white ${className}`
             : 'text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)]'
         }`}
     >
@@ -47,13 +47,13 @@ export const Header: React.FC = React.memo(() => {
     const { uiState, dispatch: uiDispatch } = useUIContext();
     const { franchiseState } = useFranchiseContext();
     const { dispatch: authDispatch } = useAuthContext();
-    
+
     // Mobile-First Responsive State
     const responsive = useResponsive();
     const { shouldUseDrawer, shouldCollapse } = useResponsiveNavigation();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const { isMobile, isTablet, currentBreakpoint } = responsive;
-    
+
     const { players, formations, activeFormationIds } = tacticsState;
     const { activeTeamContext, isSimulatingMatch, activePlaybookItemId } = uiState;
     const { gameWeek } = franchiseState;
@@ -62,7 +62,7 @@ export const Header: React.FC = React.memo(() => {
     const handleTeamContextChange = (view: TeamView) => {
         uiDispatch({ type: 'SET_ACTIVE_TEAM_CONTEXT', payload: view });
     };
-    
+
     const handlePresentationMode = () => {
         if (!activePlaybookItemId) {
             uiDispatch({ type: 'ADD_NOTIFICATION', payload: { message: 'Select a play from the playbook to enter presentation mode.', type: 'info' } });
@@ -70,20 +70,20 @@ export const Header: React.FC = React.memo(() => {
         }
         uiDispatch({ type: 'ENTER_PRESENTATION_MODE' });
     };
-    
+
     const handleSimulateMatch = async () => {
         const homeFormation = formations[activeFormationIds.home];
         const awayFormation = formations[activeFormationIds.away];
         const homePlayerIds = new Set(homeFormation.slots.map(s => s.playerId).filter(Boolean));
         const awayPlayerIds = new Set(awayFormation.slots.map(s => s.playerId).filter(Boolean));
-        
+
         if (homePlayerIds.size !== 11 || awayPlayerIds.size !== 11) {
             uiDispatch({ type: 'ADD_NOTIFICATION', payload: { message: 'Both teams must have 11 players on the field to start a simulation.', type: 'error' } });
             return;
         }
 
         uiDispatch({ type: 'OPEN_MODAL', payload: 'matchSimulator' });
-    }
+    };
 
     const isTacticsPage = location.pathname === '/tactics';
 
@@ -115,7 +115,7 @@ export const Header: React.FC = React.memo(() => {
                             {mobileMenuOpen ? <CloseIcon className="w-5 h-5" /> : <HamburgerIcon className="w-5 h-5" />}
                         </button>
                     )}
-                    
+
                     {/* Logo - Responsive Size */}
                     <LogoIcon className={`${isMobile ? 'w-6 h-6' : 'w-8 h-8'} text-[var(--accent-primary)]`} />
                     <h1 className={`
@@ -124,7 +124,7 @@ export const Header: React.FC = React.memo(() => {
                     `}>
                         <span className="text-[var(--accent-primary)]">Astral</span>Turf
                     </h1>
-                    
+
                     {/* Desktop Navigation - Hidden on Mobile */}
                     {!shouldUseDrawer && (
                         <div className="flex items-center space-x-2 ml-4">
@@ -169,7 +169,7 @@ export const Header: React.FC = React.memo(() => {
                         </div>
                     )}
                 </div>
-                
+
                 {/* Tactics Team Toggle - Responsive */}
                 {isTacticsPage && !shouldUseDrawer && (
                     <div className="flex items-center bg-[var(--bg-secondary)] p-1 rounded-lg">
@@ -189,16 +189,16 @@ export const Header: React.FC = React.memo(() => {
                 <div className="flex items-center space-x-1">
                     {/* Mobile-Only Essential Actions */}
                     {isMobile && isTacticsPage && (
-                        <button 
-                            onClick={handleSimulateMatch} 
-                            disabled={isSimulatingMatch} 
-                            className="btn-mobile bg-green-600 hover:bg-green-500 text-white disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors" 
+                        <button
+                            onClick={handleSimulateMatch}
+                            disabled={isSimulatingMatch}
+                            className="btn-mobile bg-green-600 hover:bg-green-500 text-white disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors"
                             title="Simulate Match"
                         >
                             <PlayIcon className="w-4 h-4" />
                         </button>
                     )}
-                    
+
                     {/* Desktop Actions - Hidden on Mobile */}
                     {!shouldUseDrawer && isTacticsPage && (
                         <>
@@ -212,42 +212,42 @@ export const Header: React.FC = React.memo(() => {
                             </button>
                         </>
                     )}
-                    
+
                     {/* Always Visible Actions - Mobile Optimized */}
-                    <button 
-                        onClick={() => uiDispatch({type: 'TOGGLE_THEME'})} 
+                    <button
+                        onClick={() => uiDispatch({type: 'TOGGLE_THEME'})}
                         className={`
                             btn-mobile text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] transition-colors
                             ${isMobile ? 'p-2' : 'px-3 py-2'}
-                        `} 
+                        `}
                         title="Toggle Theme"
                     >
                         {uiState.theme === 'dark' ? <SunIcon className="w-4 h-4" /> : <MoonIcon className="w-4 h-4" />}
                     </button>
-                    
+
                     {!shouldUseDrawer && (
                         <>
-                            <Link 
-                                to="/settings" 
-                                className="flex items-center px-3 py-2 text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] rounded-md transition-colors" 
+                            <Link
+                                to="/settings"
+                                className="flex items-center px-3 py-2 text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] rounded-md transition-colors"
                                 title="Settings"
                             >
                                 <CogIcon className="w-5 h-5" />
                             </Link>
-                            <button 
-                                onClick={handleLogout} 
+                            <button
+                                onClick={handleLogout}
                                 className="px-3 py-2 text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] rounded-md transition-colors"
                             >
                                 Logout
                             </button>
                         </>
                     )}
-                    
+
                     {/* Mobile Settings Icon */}
                     {shouldUseDrawer && (
-                        <Link 
-                            to="/settings" 
-                            className="btn-mobile p-2 text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] transition-colors" 
+                        <Link
+                            to="/settings"
+                            className="btn-mobile p-2 text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] transition-colors"
                             title="Settings"
                         >
                             <CogIcon className="w-5 h-5" />
@@ -261,12 +261,12 @@ export const Header: React.FC = React.memo(() => {
                 <>
                     {/* Mobile Drawer Overlay */}
                     {mobileMenuOpen && (
-                        <div 
+                        <div
                             className="mobile-drawer-overlay visible"
                             onClick={() => setMobileMenuOpen(false)}
                         />
                     )}
-                    
+
                     {/* Mobile Navigation Drawer */}
                     <nav className={`mobile-drawer ${mobileMenuOpen ? 'open' : ''}`}>
                         <div className="mobile-safe-area p-4">
@@ -285,7 +285,7 @@ export const Header: React.FC = React.memo(() => {
                                     <CloseIcon className="w-5 h-5" />
                                 </button>
                             </div>
-                            
+
                             {/* Mobile Navigation Links */}
                             <div className="space-y-2">
                                 <Link
@@ -303,12 +303,12 @@ export const Header: React.FC = React.memo(() => {
                                     <GridIcon className="w-5 h-5 mr-3" />
                                     Tactics Board
                                 </Link>
-                                
+
                                 {/* Mobile-Only Actions */}
                                 {isTacticsPage && (
                                     <>
                                         <div className="border-t border-[var(--border-primary)] my-4"></div>
-                                        
+
                                         {/* Team Context Toggle for Mobile */}
                                         <div className="px-3 py-2">
                                             <p className="text-sm font-medium text-[var(--text-secondary)] mb-2">Team View</p>
@@ -324,7 +324,7 @@ export const Header: React.FC = React.memo(() => {
                                                 </TeamToggleButton>
                                             </div>
                                         </div>
-                                        
+
                                         <button
                                             onClick={() => {
                                                 if (confirm('Are you sure you want to reset the current tactic board? This will reset player positions and drawings.')) {
@@ -337,7 +337,7 @@ export const Header: React.FC = React.memo(() => {
                                             <ResetIcon className="w-5 h-5 mr-3" />
                                             Reset Board
                                         </button>
-                                        
+
                                         <button
                                             onClick={() => {
                                                 handlePresentationMode();
@@ -348,7 +348,7 @@ export const Header: React.FC = React.memo(() => {
                                             <PresentationIcon className="w-5 h-5 mr-3" />
                                             Presentation Mode
                                         </button>
-                                        
+
                                         <button
                                             onClick={() => {
                                                 handleSimulateMatch();
@@ -362,9 +362,9 @@ export const Header: React.FC = React.memo(() => {
                                         </button>
                                     </>
                                 )}
-                                
+
                                 <div className="border-t border-[var(--border-primary)] my-4"></div>
-                                
+
                                 <button
                                     onClick={() => {
                                         dispatch({type: 'ADVANCE_WEEK'});
@@ -376,7 +376,7 @@ export const Header: React.FC = React.memo(() => {
                                     <PlayIcon className="w-5 h-5 mr-3" />
                                     Advance to Week {gameWeek + 1}
                                 </button>
-                                
+
                                 <Link
                                     to="/settings"
                                     className="flex items-center px-3 py-3 text-base font-medium text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] rounded-lg transition-colors w-full"
@@ -385,7 +385,7 @@ export const Header: React.FC = React.memo(() => {
                                     <CogIcon className="w-5 h-5 mr-3" />
                                     Settings
                                 </Link>
-                                
+
                                 <button
                                     onClick={() => {
                                         handleLogout();

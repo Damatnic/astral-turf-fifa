@@ -1,6 +1,6 @@
 /**
  * Calendar Integration Service
- * 
+ *
  * Provides comprehensive calendar integration with Google Calendar, Outlook, and Apple Calendar
  * for training schedules, matches, meetings, and automated event management
  */
@@ -83,13 +83,13 @@ class CalendarIntegrationService {
       const oauth2Client = new google.auth.OAuth2(
         clientId,
         clientSecret,
-        'http://localhost:3000/auth/google/callback'
+        'http://localhost:3000/auth/google/callback',
       );
 
       // Generate auth URL
       const scopes = [
         'https://www.googleapis.com/auth/calendar',
-        'https://www.googleapis.com/auth/calendar.events'
+        'https://www.googleapis.com/auth/calendar.events',
       ];
 
       const authUrl = oauth2Client.generateAuthUrl({
@@ -98,7 +98,7 @@ class CalendarIntegrationService {
       });
 
       console.log('🔐 Google Calendar auth URL generated:', authUrl);
-      
+
       // In a real app, this would open a browser window
       // For now, we'll simulate the connection
       this.simulateOAuthFlow('google', oauth2Client);
@@ -119,7 +119,7 @@ class CalendarIntegrationService {
         `scope=https://graph.microsoft.com/calendars.readwrite&state=${uuidv4()}`;
 
       console.log('🔐 Outlook Calendar auth URL generated:', authUrl);
-      
+
       // Simulate OAuth flow for demonstration
       this.simulateOutlookConnection(clientId, clientSecret);
 
@@ -137,19 +137,19 @@ class CalendarIntegrationService {
 
     try {
       for (const provider of this.providers.values()) {
-        if (!provider.isConnected || !provider.syncEnabled) continue;
+        if (!provider.isConnected || !provider.syncEnabled) {continue;}
 
         switch (provider.type) {
           case 'google':
             await this.createGoogleEvent(event);
             createdEvents.push('Google');
             break;
-          
+
           case 'outlook':
             await this.createOutlookEvent(event);
             createdEvents.push('Outlook');
             break;
-          
+
           case 'apple':
             await this.createAppleEvent(event);
             createdEvents.push('Apple');
@@ -185,7 +185,7 @@ class CalendarIntegrationService {
       attendees: string[];
       recurrence?: 'daily' | 'weekly' | 'monthly';
       endDate?: string;
-    }
+    },
   ): Promise<void> {
     const event: CalendarEvent = {
       id: uuidv4(),
@@ -198,7 +198,7 @@ class CalendarIntegrationService {
       isAllDay: false,
       type: 'training',
       teamId,
-      reminderMinutes: [60, 15] // 1 hour and 15 minutes before
+      reminderMinutes: [60, 15], // 1 hour and 15 minutes before
     };
 
     await this.createEvent(event);
@@ -217,7 +217,7 @@ class CalendarIntegrationService {
     opponent: string,
     dateTime: string,
     venue: string,
-    isHome: boolean
+    isHome: boolean,
   ): Promise<void> {
     const event: CalendarEvent = {
       id: uuidv4(),
@@ -229,7 +229,7 @@ class CalendarIntegrationService {
       isAllDay: false,
       type: 'match',
       teamId,
-      reminderMinutes: [180, 60, 30] // 3 hours, 1 hour, 30 minutes before
+      reminderMinutes: [180, 60, 30], // 3 hours, 1 hour, 30 minutes before
     };
 
     await this.createEvent(event);
@@ -240,12 +240,12 @@ class CalendarIntegrationService {
    */
   async syncCalendars(): Promise<void> {
     for (const provider of this.providers.values()) {
-      if (!provider.isConnected || !provider.syncEnabled) continue;
+      if (!provider.isConnected || !provider.syncEnabled) {continue;}
 
       try {
         const events = await this.fetchEventsFromProvider(provider);
         this.eventCache.set(provider.id, events);
-        
+
         provider.lastSync = Date.now();
 
         if (this.onSyncCompleteCallback) {
@@ -279,12 +279,12 @@ class CalendarIntegrationService {
         // Check for overlap
         if (newEventStart < existingEnd && newEventEnd > existingStart) {
           const conflictId = uuidv4();
-          
+
           const conflict: CalendarConflict = {
             id: conflictId,
             eventId: newEvent.id,
             conflictingEvents: [existingEvent],
-            suggestedAlternatives: this.generateAlternativeTimes(newEvent, existingEvent)
+            suggestedAlternatives: this.generateAlternativeTimes(newEvent, existingEvent),
           };
 
           conflicts.push(conflict);
@@ -307,7 +307,7 @@ class CalendarIntegrationService {
     duration: number,
     attendees: string[],
     preferredTimes: string[],
-    dateRange: { start: string; end: string }
+    dateRange: { start: string; end: string },
   ): Promise<{ time: string; score: number; reasoning: string }[]> {
     const suggestions: { time: string; score: number; reasoning: string }[] = [];
 
@@ -318,7 +318,7 @@ class CalendarIntegrationService {
     for (const preferredTime of preferredTimes) {
       const score = this.scoreTimeSlot(preferredTime, duration, availabilityPattern);
       const reasoning = this.generateSchedulingReasoning(preferredTime, score);
-      
+
       suggestions.push({ time: preferredTime, score, reasoning });
     }
 
@@ -394,7 +394,7 @@ class CalendarIntegrationService {
     const defaultProviders = [
       { id: 'google', name: 'Google Calendar', type: 'google' as const },
       { id: 'outlook', name: 'Microsoft Outlook', type: 'outlook' as const },
-      { id: 'apple', name: 'Apple Calendar', type: 'apple' as const }
+      { id: 'apple', name: 'Apple Calendar', type: 'apple' as const },
     ];
 
     defaultProviders.forEach(provider => {
@@ -403,7 +403,7 @@ class CalendarIntegrationService {
         isConnected: false,
         accountEmail: '',
         lastSync: 0,
-        syncEnabled: false
+        syncEnabled: false,
       });
     });
   }
@@ -420,7 +420,7 @@ class CalendarIntegrationService {
   }
 
   private async createGoogleEvent(event: CalendarEvent): Promise<void> {
-    if (!this.googleAuth) return;
+    if (!this.googleAuth) {return;}
 
     const calendar = google.calendar({ version: 'v3', auth: this.googleAuth });
 
@@ -441,9 +441,9 @@ class CalendarIntegrationService {
         useDefault: false,
         overrides: event.reminderMinutes?.map(minutes => ({
           method: 'popup',
-          minutes
-        })) || []
-      }
+          minutes,
+        })) || [],
+      },
     };
 
     await calendar.events.insert({
@@ -453,36 +453,36 @@ class CalendarIntegrationService {
   }
 
   private async createOutlookEvent(event: CalendarEvent): Promise<void> {
-    if (!this.outlookAuth) return;
+    if (!this.outlookAuth) {return;}
 
     const outlookEvent = {
       subject: event.title,
       body: {
         contentType: 'text',
-        content: event.description || ''
+        content: event.description || '',
       },
       start: {
         dateTime: event.startTime,
-        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       },
       end: {
         dateTime: event.endTime,
-        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       },
       location: {
-        displayName: event.location || ''
+        displayName: event.location || '',
       },
       attendees: event.attendees?.map(email => ({
-        emailAddress: { address: email, name: email }
+        emailAddress: { address: email, name: email },
       })),
-      reminderMinutesBeforeStart: event.reminderMinutes?.[0] || 15
+      reminderMinutesBeforeStart: event.reminderMinutes?.[0] || 15,
     };
 
     await axios.post('https://graph.microsoft.com/v1.0/me/events', outlookEvent, {
       headers: {
         'Authorization': `Bearer ${this.outlookAuth}`,
-        'Content-Type': 'application/json'
-      }
+        'Content-Type': 'application/json',
+      },
     });
   }
 
@@ -518,7 +518,7 @@ class CalendarIntegrationService {
                 location: item.location,
                 isAllDay: !item.start.dateTime,
                 type: this.determineEventType(item.summary || ''),
-                attendees: item.attendees?.map(a => a.email || '') || []
+                attendees: item.attendees?.map(a => a.email || '') || [],
               });
             }
           });
@@ -529,8 +529,8 @@ class CalendarIntegrationService {
         if (this.outlookAuth) {
           const response = await axios.get('https://graph.microsoft.com/v1.0/me/events', {
             headers: {
-              'Authorization': `Bearer ${this.outlookAuth}`
-            }
+              'Authorization': `Bearer ${this.outlookAuth}`,
+            },
           });
 
           response.data.value?.forEach((item: any) => {
@@ -543,7 +543,7 @@ class CalendarIntegrationService {
               location: item.location?.displayName,
               isAllDay: item.isAllDay,
               type: this.determineEventType(item.subject),
-              attendees: item.attendees?.map((a: any) => a.emailAddress.address) || []
+              attendees: item.attendees?.map((a: any) => a.emailAddress.address) || [],
             });
           });
         }
@@ -555,18 +555,18 @@ class CalendarIntegrationService {
 
   private determineEventType(title: string): CalendarEvent['type'] {
     const lowerTitle = title.toLowerCase();
-    
-    if (lowerTitle.includes('training') || lowerTitle.includes('practice')) return 'training';
-    if (lowerTitle.includes('match') || lowerTitle.includes('game')) return 'match';
-    if (lowerTitle.includes('meeting')) return 'meeting';
-    if (lowerTitle.includes('medical') || lowerTitle.includes('physio')) return 'medical';
-    
+
+    if (lowerTitle.includes('training') || lowerTitle.includes('practice')) {return 'training';}
+    if (lowerTitle.includes('match') || lowerTitle.includes('game')) {return 'match';}
+    if (lowerTitle.includes('meeting')) {return 'meeting';}
+    if (lowerTitle.includes('medical') || lowerTitle.includes('physio')) {return 'medical';}
+
     return 'other';
   }
 
   private generateAlternativeTimes(
     newEvent: CalendarEvent,
-    conflictingEvent: CalendarEvent
+    conflictingEvent: CalendarEvent,
   ): { time: string; reason: string }[] {
     const alternatives: { time: string; reason: string }[] = [];
     const newStart = new Date(newEvent.startTime);
@@ -576,15 +576,15 @@ class CalendarIntegrationService {
     const afterConflict = new Date(conflictEnd.getTime() + 30 * 60 * 1000); // 30 minutes buffer
     alternatives.push({
       time: afterConflict.toISOString(),
-      reason: `Scheduled after ${conflictingEvent.title} ends`
+      reason: `Scheduled after ${conflictingEvent.title} ends`,
     });
 
     // Suggest earlier time
-    const beforeConflict = new Date(new Date(conflictingEvent.startTime).getTime() - 
+    const beforeConflict = new Date(new Date(conflictingEvent.startTime).getTime() -
       (new Date(newEvent.endTime).getTime() - newStart.getTime()) - 30 * 60 * 1000);
     alternatives.push({
       time: beforeConflict.toISOString(),
-      reason: `Scheduled before ${conflictingEvent.title} starts`
+      reason: `Scheduled before ${conflictingEvent.title} starts`,
     });
 
     return alternatives;
@@ -597,7 +597,7 @@ class CalendarIntegrationService {
 
   private async analyzeAvailabilityPatterns(
     attendees: string[],
-    dateRange: { start: string; end: string }
+    dateRange: { start: string; end: string },
   ): Promise<any> {
     // Analyze historical availability patterns
     return { patterns: 'analyzed' };
@@ -609,8 +609,8 @@ class CalendarIntegrationService {
   }
 
   private generateSchedulingReasoning(timeSlot: string, score: number): string {
-    if (score > 80) return 'Optimal time with high availability';
-    if (score > 60) return 'Good time with some conflicts possible';
+    if (score > 80) {return 'Optimal time with high availability';}
+    if (score > 60) {return 'Good time with some conflicts possible';}
     return 'Suboptimal time with potential scheduling issues';
   }
 
@@ -621,7 +621,7 @@ class CalendarIntegrationService {
   private async createRecurringEvents(
     event: CalendarEvent,
     recurrence: 'daily' | 'weekly' | 'monthly',
-    endDate: string
+    endDate: string,
   ): Promise<void> {
     console.log(`🔄 Creating recurring ${recurrence} events until ${endDate}`);
   }

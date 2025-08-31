@@ -1,6 +1,6 @@
 /**
  * Authentication Security Module
- * 
+ *
  * Provides comprehensive JWT-based authentication with secure session management,
  * password hashing, token validation, and session control.
  */
@@ -19,7 +19,7 @@ export interface SecureUser extends Omit<User, 'id'> {
   role: UserRole;
   firstName?: string;
   lastName?: string;
-  
+
   // Security fields
   passwordHash: string;
   passwordHistory: string[]; // Hashed previous passwords
@@ -28,15 +28,15 @@ export interface SecureUser extends Omit<User, 'id'> {
   accountLocked: boolean;
   lockoutUntil?: string;
   failedLoginAttempts: number;
-  
+
   // Session management
   activeSessions: SessionInfo[];
   refreshTokens: string[];
-  
+
   // Security preferences
   twoFactorEnabled: boolean;
   securityQuestions?: SecurityQuestion[];
-  
+
   // Audit fields
   createdAt: string;
   updatedAt: string;
@@ -99,34 +99,34 @@ const activeSessions = new Map<string, SessionInfo>();
 // Validate password strength
 export function validatePasswordStrength(password: string): { isValid: boolean; errors: string[] } {
   const errors: string[] = [];
-  
+
   if (password.length < PASSWORD_CONFIG.MIN_LENGTH) {
     errors.push(`Password must be at least ${PASSWORD_CONFIG.MIN_LENGTH} characters long`);
   }
-  
+
   if (password.length > PASSWORD_CONFIG.MAX_LENGTH) {
     errors.push(`Password must be no more than ${PASSWORD_CONFIG.MAX_LENGTH} characters long`);
   }
-  
+
   if (PASSWORD_CONFIG.REQUIRE_UPPERCASE && !/[A-Z]/.test(password)) {
     errors.push('Password must contain at least one uppercase letter');
   }
-  
+
   if (PASSWORD_CONFIG.REQUIRE_LOWERCASE && !/[a-z]/.test(password)) {
     errors.push('Password must contain at least one lowercase letter');
   }
-  
+
   if (PASSWORD_CONFIG.REQUIRE_NUMBERS && !/\d/.test(password)) {
     errors.push('Password must contain at least one number');
   }
-  
+
   if (PASSWORD_CONFIG.REQUIRE_SPECIAL_CHARS) {
     const specialCharsRegex = new RegExp(`[${PASSWORD_CONFIG.SPECIAL_CHARS.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}]`);
     if (!specialCharsRegex.test(password)) {
       errors.push('Password must contain at least one special character');
     }
   }
-  
+
   return {
     isValid: errors.length === 0,
     errors,
@@ -156,7 +156,7 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
 // Check if password was used before
 export function isPasswordPreviouslyUsed(password: string, passwordHistory: string[]): Promise<boolean> {
   return Promise.all(
-    passwordHistory.map(hash => verifyPassword(password, hash))
+    passwordHistory.map(hash => verifyPassword(password, hash)),
   ).then(results => results.some(Boolean));
 }
 
@@ -174,11 +174,11 @@ export async function generateTokenPair(user: SecureUser, sessionId: string): Pr
     iss: JWT_CONFIG.ISSUER,
     aud: JWT_CONFIG.AUDIENCE,
   };
-  
+
   try {
     const secret = new TextEncoder().encode(JWT_CONFIG.SECRET);
     const refreshSecret = new TextEncoder().encode(JWT_CONFIG.REFRESH_SECRET);
-    
+
     const accessToken = await new jose.SignJWT(payload)
       .setProtectedHeader({ alg: 'HS256' })
       .setIssuedAt()
@@ -186,10 +186,10 @@ export async function generateTokenPair(user: SecureUser, sessionId: string): Pr
       .setIssuer(JWT_CONFIG.ISSUER)
       .setAudience(JWT_CONFIG.AUDIENCE)
       .sign(secret);
-    
+
     const refreshToken = await new jose.SignJWT({
       ...payload,
-      type: 'refresh'
+      type: 'refresh',
     })
       .setProtectedHeader({ alg: 'HS256' })
       .setIssuedAt()
@@ -197,16 +197,16 @@ export async function generateTokenPair(user: SecureUser, sessionId: string): Pr
       .setIssuer(JWT_CONFIG.ISSUER)
       .setAudience(JWT_CONFIG.AUDIENCE)
       .sign(refreshSecret);
-    
+
     // Calculate expiration time in seconds
     const expiresIn = 15 * 60; // 15 minutes in seconds
-    
+
     securityLogger.info('Token pair generated', {
       userId: user.id,
       sessionId,
       expiresIn,
     });
-    
+
     return {
       accessToken,
       refreshToken,
@@ -230,16 +230,16 @@ export async function verifyToken(token: string, isRefreshToken = false): Promis
       securityLogger.warn('Attempted use of blacklisted token', { token: token.substring(0, 20) + '...' });
       return null;
     }
-    
+
     const secret = new TextEncoder().encode(
-      isRefreshToken ? JWT_CONFIG.REFRESH_SECRET : JWT_CONFIG.SECRET
+      isRefreshToken ? JWT_CONFIG.REFRESH_SECRET : JWT_CONFIG.SECRET,
     );
-    
+
     const { payload } = await jose.jwtVerify(token, secret, {
       issuer: JWT_CONFIG.ISSUER,
       audience: JWT_CONFIG.AUDIENCE,
     });
-    
+
     return payload as JWTPayload;
   } catch (error) {
     if (error instanceof jose.errors.JWTExpired) {
@@ -261,28 +261,28 @@ export async function refreshAccessToken(refreshToken: string): Promise<TokenPai
   if (!payload) {
     return null;
   }
-  
+
   const user = users.get(payload.userId);
   if (!user || !user.refreshTokens.includes(refreshToken)) {
     securityLogger.warn('Invalid refresh token used', { userId: payload.userId });
     return null;
   }
-  
+
   // Generate new token pair
   const newTokenPair = await generateTokenPair(user, payload.sessionId);
-  
+
   // Remove old refresh token and add new one
   user.refreshTokens = user.refreshTokens.filter(token => token !== refreshToken);
   user.refreshTokens.push(newTokenPair.refreshToken);
-  
+
   // Blacklist old refresh token
   blacklistedTokens.add(refreshToken);
-  
+
   securityLogger.info('Access token refreshed', {
     userId: payload.userId,
     sessionId: payload.sessionId,
   });
-  
+
   return newTokenPair;
 }
 
@@ -291,19 +291,19 @@ export async function revokeToken(token: string): Promise<void> {
   const payload = await verifyToken(token);
   if (payload) {
     blacklistedTokens.add(token);
-    
+
     // Remove from user's refresh tokens
     const user = users.get(payload.userId);
     if (user) {
       user.refreshTokens = user.refreshTokens.filter(t => t !== token);
     }
-    
+
     // Deactivate session
     const session = activeSessions.get(payload.sessionId);
     if (session) {
       session.isActive = false;
     }
-    
+
     securityLogger.info('Token revoked', {
       userId: payload.userId,
       sessionId: payload.sessionId,
@@ -318,7 +318,7 @@ export async function revokeToken(token: string): Promise<void> {
 // Create new session
 export function createSession(user: SecureUser, deviceInfo: string, ipAddress: string, userAgent: string): SessionInfo {
   const sessionId = crypto.lib.WordArray.random(16).toString();
-  
+
   const session: SessionInfo = {
     id: sessionId,
     deviceInfo,
@@ -328,29 +328,29 @@ export function createSession(user: SecureUser, deviceInfo: string, ipAddress: s
     lastAccessAt: new Date().toISOString(),
     isActive: true,
   };
-  
+
   // Limit concurrent sessions
   if (user.activeSessions.length >= SESSION_CONFIG.MAX_CONCURRENT_SESSIONS) {
     // Remove oldest session
     const oldestSession = user.activeSessions
       .filter(s => s.isActive)
       .sort((a, b) => new Date(a.lastAccessAt).getTime() - new Date(b.lastAccessAt).getTime())[0];
-    
+
     if (oldestSession) {
       terminateSession(user.id, oldestSession.id);
     }
   }
-  
+
   user.activeSessions.push(session);
   activeSessions.set(sessionId, session);
-  
+
   securityLogger.info('Session created', {
     userId: user.id,
     sessionId,
     deviceInfo,
     ipAddress,
   });
-  
+
   return session;
 }
 
@@ -366,16 +366,16 @@ export function updateSessionActivity(sessionId: string): void {
 export function terminateSession(userId: string, sessionId: string): void {
   const user = users.get(userId);
   if (user) {
-    user.activeSessions = user.activeSessions.map(session => 
-      session.id === sessionId ? { ...session, isActive: false } : session
+    user.activeSessions = user.activeSessions.map(session =>
+      session.id === sessionId ? { ...session, isActive: false } : session,
     );
   }
-  
+
   const session = activeSessions.get(sessionId);
   if (session) {
     session.isActive = false;
   }
-  
+
   securityLogger.info('Session terminated', { userId, sessionId });
 }
 
@@ -383,7 +383,7 @@ export function terminateSession(userId: string, sessionId: string): void {
 export function cleanupExpiredSessions(): void {
   const now = Date.now();
   const expiredSessions: string[] = [];
-  
+
   activeSessions.forEach((session, sessionId) => {
     const lastAccess = new Date(session.lastAccessAt).getTime();
     if (now - lastAccess > SESSION_CONFIG.TIMEOUT) {
@@ -391,7 +391,7 @@ export function cleanupExpiredSessions(): void {
       expiredSessions.push(sessionId);
     }
   });
-  
+
   if (expiredSessions.length > 0) {
     securityLogger.info('Expired sessions cleaned up', { count: expiredSessions.length });
   }
@@ -411,17 +411,17 @@ export function recordLoginAttempt(email: string, ipAddress: string, userAgent: 
     success,
     failureReason,
   };
-  
+
   const key = `${email}:${ipAddress}`;
   const attempts = loginAttempts.get(key) || [];
   attempts.push(attempt);
-  
+
   // Keep only recent attempts
   const cutoff = Date.now() - (24 * 60 * 60 * 1000); // 24 hours
   const recentAttempts = attempts.filter(a => new Date(a.timestamp).getTime() > cutoff);
-  
+
   loginAttempts.set(key, recentAttempts);
-  
+
   securityLogger.info('Login attempt recorded', {
     email,
     ipAddress,
@@ -434,13 +434,13 @@ export function recordLoginAttempt(email: string, ipAddress: string, userAgent: 
 export function shouldLockAccount(email: string, ipAddress: string): boolean {
   const key = `${email}:${ipAddress}`;
   const attempts = loginAttempts.get(key) || [];
-  
+
   // Count failed attempts in the last window
   const windowStart = Date.now() - (15 * 60 * 1000); // 15 minutes
   const recentFailures = attempts.filter(
-    a => !a.success && new Date(a.timestamp).getTime() > windowStart
+    a => !a.success && new Date(a.timestamp).getTime() > windowStart,
   );
-  
+
   return recentFailures.length >= 5; // Max 5 failed attempts
 }
 
@@ -450,14 +450,14 @@ export function lockAccount(userId: string, durationMs: number = 30 * 60 * 1000)
   if (user) {
     user.accountLocked = true;
     user.lockoutUntil = new Date(Date.now() + durationMs).toISOString();
-    
+
     // Terminate all active sessions
     user.activeSessions.forEach(session => {
       if (session.isActive) {
         terminateSession(userId, session.id);
       }
     });
-    
+
     securityLogger.warn('Account locked', {
       userId,
       lockoutUntil: user.lockoutUntil,
@@ -470,7 +470,7 @@ export function isAccountLocked(user: SecureUser): boolean {
   if (!user.accountLocked) {
     return false;
   }
-  
+
   if (user.lockoutUntil && new Date(user.lockoutUntil).getTime() < Date.now()) {
     // Lock expired, unlock account
     user.accountLocked = false;
@@ -478,7 +478,7 @@ export function isAccountLocked(user: SecureUser): boolean {
     user.failedLoginAttempts = 0;
     return false;
   }
-  
+
   return true;
 }
 
@@ -486,7 +486,7 @@ export function isAccountLocked(user: SecureUser): boolean {
 export function initializeSecurity(): void {
   // Start session cleanup interval
   setInterval(cleanupExpiredSessions, 5 * 60 * 1000); // Every 5 minutes
-  
+
   securityLogger.info('Security module initialized', {
     jwtExpiration: JWT_CONFIG.ACCESS_TOKEN_EXPIRES_IN,
     sessionTimeout: SESSION_CONFIG.TIMEOUT / 1000 / 60, // in minutes
@@ -500,7 +500,7 @@ export { users };
 // Export types for use in services
 export type {
   SecureUser,
-  TokenPair, 
+  TokenPair,
   JWTPayload,
   SessionInfo,
   SecurityQuestion,

@@ -1,9 +1,9 @@
-import { 
-  Player, 
-  PlayerAttributes, 
-  PlayerMorale, 
-  PlayerForm, 
-  PlayerTrait, 
+import {
+  Player,
+  PlayerAttributes,
+  PlayerMorale,
+  PlayerForm,
+  PlayerTrait,
   IndividualTrainingFocus,
   TransferPlayer,
   YouthProspect,
@@ -12,7 +12,7 @@ import {
   ContractClause,
   PlayerContract,
   WeeklySchedule,
-  TrainingDrill
+  TrainingDrill,
 } from '../types';
 
 export const generateRandomPlayer = (
@@ -23,7 +23,7 @@ export const generateRandomPlayer = (
   roleId: string,
   team: 'home' | 'away',
   teamColor: string,
-  baseAttributes?: Partial<PlayerAttributes>
+  baseAttributes?: Partial<PlayerAttributes>,
 ): Player => {
   const attributes: PlayerAttributes = {
     speed: baseAttributes?.speed || Math.floor(Math.random() * 40) + 50,
@@ -32,7 +32,7 @@ export const generateRandomPlayer = (
     shooting: baseAttributes?.shooting || Math.floor(Math.random() * 40) + 50,
     dribbling: baseAttributes?.dribbling || Math.floor(Math.random() * 40) + 50,
     positioning: baseAttributes?.positioning || Math.floor(Math.random() * 40) + 50,
-    stamina: baseAttributes?.stamina || Math.floor(Math.random() * 20) + 80
+    stamina: baseAttributes?.stamina || Math.floor(Math.random() * 20) + 80,
   };
 
   const potentialMin = Math.max(...Object.values(attributes)) + Math.floor(Math.random() * 10);
@@ -41,7 +41,7 @@ export const generateRandomPlayer = (
   const traits: PlayerTrait[] = [];
   const traitPool: PlayerTrait[] = ['Leader', 'Ambitious', 'Loyal', 'Injury Prone', 'Consistent', 'Temperamental'];
   const numTraits = Math.floor(Math.random() * 3); // 0-2 traits
-  
+
   for (let i = 0; i < numTraits; i++) {
     const randomTrait = traitPool[Math.floor(Math.random() * traitPool.length)];
     if (!traits.includes(randomTrait)) {
@@ -74,7 +74,7 @@ export const generateRandomPlayer = (
     contract: {
       wage: Math.floor(Math.random() * 50000) + 10000,
       expires: new Date().getFullYear() + Math.floor(Math.random() * 4) + 1,
-      clauses: []
+      clauses: [],
     },
     stats: {
       goals: 0,
@@ -85,7 +85,7 @@ export const generateRandomPlayer = (
       saves: 0,
       passesCompleted: 0,
       passesAttempted: 0,
-      careerHistory: []
+      careerHistory: [],
     },
     loan: { isLoaned: false },
     traits,
@@ -98,7 +98,7 @@ export const generateRandomPlayer = (
     injuryRisk: Math.floor(Math.random() * 10) + 1,
     lastConversationInitiatedWeek: 0,
     moraleBoost: null,
-    completedChallenges: []
+    completedChallenges: [],
   };
 };
 
@@ -113,11 +113,11 @@ export const calculatePlayerOverall = (attributes: PlayerAttributes, roleId: str
     'wm': { speed: 0.25, dribbling: 0.2, passing: 0.2, positioning: 0.15, shooting: 0.1, tackling: 0.1 },
     'am': { passing: 0.25, dribbling: 0.25, shooting: 0.2, positioning: 0.15, speed: 0.1, tackling: 0.05 },
     'w': { speed: 0.3, dribbling: 0.25, shooting: 0.2, passing: 0.15, positioning: 0.05, tackling: 0.05 },
-    'st': { shooting: 0.35, positioning: 0.25, speed: 0.15, dribbling: 0.15, passing: 0.05, tackling: 0.05 }
+    'st': { shooting: 0.35, positioning: 0.25, speed: 0.15, dribbling: 0.15, passing: 0.05, tackling: 0.05 },
   };
 
   const weights = roleWeights[roleId] || {
-    speed: 1/6, passing: 1/6, tackling: 1/6, shooting: 1/6, dribbling: 1/6, positioning: 1/6
+    speed: 1/6, passing: 1/6, tackling: 1/6, shooting: 1/6, dribbling: 1/6, positioning: 1/6,
   };
 
   let overall = 0;
@@ -132,31 +132,31 @@ export const calculatePlayerValue = (player: Player): number => {
   const overall = calculatePlayerOverall(player.attributes, player.roleId);
   const potential = player.currentPotential;
   const age = player.age;
-  
+
   // Base value from overall rating
   let value = overall * 50000;
-  
+
   // Age adjustments
   if (age < 23) {
     value *= 1.5; // Young players are more valuable
   } else if (age > 30) {
     value *= 0.7; // Older players depreciate
   }
-  
+
   // Potential adjustments
   const potentialBonus = (potential - overall) / 10;
   value *= (1 + potentialBonus);
-  
+
   // Contract situation
   const contractYearsLeft = (player.contract.expires || 2025) - new Date().getFullYear();
   if (contractYearsLeft <= 1) {
     value *= 0.5; // Players with expiring contracts are cheaper
   }
-  
+
   // Morale and form adjustments
   const moraleMultipliers = { 'Excellent': 1.1, 'Good': 1.0, 'Okay': 0.95, 'Poor': 0.9, 'Very Poor': 0.8 };
   value *= moraleMultipliers[player.morale];
-  
+
   // Trait adjustments
   player.traits.forEach(trait => {
     switch (trait) {
@@ -168,14 +168,14 @@ export const calculatePlayerValue = (player: Player): number => {
       case 'Temperamental': value *= 0.9; break;
     }
   });
-  
+
   return Math.max(50000, Math.round(value));
 };
 
 export const suggestTrainingFocus = (player: Player): IndividualTrainingFocus | null => {
   const attributes = player.attributes;
   const roleId = player.roleId;
-  
+
   // Find the weakest relevant attribute for the player's role
   const roleImportance: Record<string, (keyof PlayerAttributes)[]> = {
     'gk': ['positioning'],
@@ -186,40 +186,40 @@ export const suggestTrainingFocus = (player: Player): IndividualTrainingFocus | 
     'wm': ['speed', 'dribbling', 'passing', 'positioning'],
     'am': ['passing', 'dribbling', 'shooting', 'positioning'],
     'w': ['speed', 'dribbling', 'shooting'],
-    'st': ['shooting', 'positioning', 'speed', 'dribbling']
+    'st': ['shooting', 'positioning', 'speed', 'dribbling'],
   };
-  
+
   const relevantAttributes = roleImportance[roleId] || Object.keys(attributes) as (keyof PlayerAttributes)[];
-  
+
   // Find the attribute with the most room for improvement
   let lowestAttribute: keyof PlayerAttributes | null = null;
   let lowestValue = 100;
-  
+
   relevantAttributes.forEach(attr => {
     if (attr !== 'stamina' && attributes[attr] < lowestValue && attributes[attr] < player.currentPotential - 5) {
       lowestValue = attributes[attr];
       lowestAttribute = attr;
     }
   });
-  
+
   if (lowestAttribute && player.currentPotential - attributes[lowestAttribute] > 10) {
     return {
       attribute: lowestAttribute,
-      intensity: player.age < 25 ? 'high' : 'normal'
+      intensity: player.age < 25 ? 'high' : 'normal',
     };
   }
-  
+
   return null;
 };
 
 export const generateTransferPlayers = (count: number): TransferPlayer[] => {
   const players: TransferPlayer[] = [];
-  
+
   const firstNames = ['Alex', 'Carlos', 'David', 'Erik', 'Franco', 'Gabriel', 'Hassan', 'Ivan', 'Jorge', 'Kevin'];
   const lastNames = ['Silva', 'Rodriguez', 'Johnson', 'Anderson', 'Martinez', 'Wilson', 'Brown', 'Davis', 'Miller', 'Garcia'];
   const nationalities = ['Brazil', 'Argentina', 'Spain', 'England', 'France', 'Germany', 'Italy', 'Portugal', 'Netherlands', 'Belgium'];
   const roles = ['gk', 'cb', 'fb', 'dm', 'cm', 'wm', 'am', 'w', 'st'];
-  
+
   for (let i = 0; i < count; i++) {
     const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
     const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
@@ -227,7 +227,7 @@ export const generateTransferPlayers = (count: number): TransferPlayer[] => {
     const age = Math.floor(Math.random() * 15) + 18; // 18-32
     const nationality = nationalities[Math.floor(Math.random() * nationalities.length)];
     const roleId = roles[Math.floor(Math.random() * roles.length)];
-    
+
     const basePlayer = generateRandomPlayer(
       `transfer_${Date.now()}_${i}`,
       name,
@@ -235,25 +235,25 @@ export const generateTransferPlayers = (count: number): TransferPlayer[] => {
       nationality,
       roleId,
       'home',
-      '#FF0000'
+      '#FF0000',
     );
-    
+
     const { position, teamColor, ...transferPlayer } = basePlayer;
     const playerWithValue = {
       ...transferPlayer,
-      askingPrice: calculatePlayerValue(basePlayer)
+      askingPrice: calculatePlayerValue(basePlayer),
     };
-    
+
     players.push(playerWithValue);
   }
-  
+
   return players;
 };
 
 export const simulateTrainingSession = (
   player: Player,
   drill: TrainingDrill,
-  facilityLevel: number = 1
+  facilityLevel: number = 1,
 ): {
   attributeGains: Partial<PlayerAttributes>;
   fatigueIncrease: number;
@@ -261,26 +261,26 @@ export const simulateTrainingSession = (
   moraleChange: number;
 } => {
   const attributeGains: Partial<PlayerAttributes> = {};
-  
+
   // Calculate base gains
   let baseGain = drill.intensity === 'high' ? 2 : drill.intensity === 'medium' ? 1.5 : 1;
-  
+
   // Age factor - younger players develop faster
   const ageFactor = Math.max(0.3, (32 - player.age) / 10);
   baseGain *= ageFactor;
-  
+
   // Potential factor - players closer to potential develop slower
   const currentOverall = calculatePlayerOverall(player.attributes, player.roleId);
   const potentialFactor = Math.max(0.5, (player.currentPotential - currentOverall) / 20);
   baseGain *= potentialFactor;
-  
+
   // Facility bonus
   baseGain *= (1 + (facilityLevel - 1) * 0.1);
-  
+
   // Individual training focus bonus
-  const focusBonus = player.individualTrainingFocus?.intensity === 'high' ? 2.5 : 
+  const focusBonus = player.individualTrainingFocus?.intensity === 'high' ? 2.5 :
                     player.individualTrainingFocus?.intensity === 'normal' ? 1.5 : 1;
-  
+
   // Apply gains to primary attributes
   drill.primaryAttributes.forEach(attr => {
     if (attr !== 'stamina' && player.attributes[attr] < player.currentPotential) {
@@ -291,7 +291,7 @@ export const simulateTrainingSession = (
       attributeGains[attr] = Math.min(3, gain); // Cap at 3 points per session
     }
   });
-  
+
   // Apply gains to secondary attributes
   drill.secondaryAttributes.forEach(attr => {
     if (attr !== 'stamina' && player.attributes[attr] < player.currentPotential) {
@@ -302,16 +302,16 @@ export const simulateTrainingSession = (
       attributeGains[attr] = Math.min(2, gain); // Cap at 2 points per session
     }
   });
-  
+
   const fatigueIncrease = drill.fatigueEffect * (drill.intensity === 'high' ? 1.5 : drill.intensity === 'medium' ? 1.2 : 1);
   const injuryRisk = drill.injuryRisk * (player.traits.includes('Injury Prone') ? 1.5 : 1);
   const moraleChange = drill.moraleEffect;
-  
+
   return {
     attributeGains,
     fatigueIncrease,
     injuryRisk,
-    moraleChange
+    moraleChange,
   };
 };
 
@@ -321,5 +321,5 @@ export const playerService = {
   calculatePlayerValue,
   suggestTrainingFocus,
   generateTransferPlayers,
-  simulateTrainingSession
+  simulateTrainingSession,
 };

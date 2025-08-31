@@ -1,11 +1,11 @@
 import type { User, UserRole, FamilyMemberAssociation, NotificationSettings } from '../types';
 import { DEMO_USERS } from '../constants';
-import { 
-  secureAuthService, 
-  type SecureSignupData, 
-  type SecureLoginResponse, 
+import {
+  secureAuthService,
+  type SecureSignupData,
+  type SecureLoginResponse,
   type LoginContext,
-  type PasswordChangeData 
+  type PasswordChangeData,
 } from './secureAuthService';
 
 const FAKE_USERS: User[] = [...DEMO_USERS];
@@ -110,12 +110,12 @@ export const authService = {
     try {
       const context = getLoginContext();
       const response: SecureLoginResponse = await secureAuthService.login(email, password, context);
-      
+
       // Store tokens securely
       localStorage.setItem('accessToken', response.tokens.accessToken);
       localStorage.setItem('refreshToken', response.tokens.refreshToken);
       localStorage.setItem('authUser', JSON.stringify(response.user));
-      
+
       return response.user;
     } catch (error) {
       throw error;
@@ -130,14 +130,14 @@ export const authService = {
         acceptedTerms: signupData.acceptedTerms || false,
         acceptedPrivacyPolicy: signupData.acceptedPrivacyPolicy || false,
       };
-      
+
       const response: SecureLoginResponse = await secureAuthService.signup(secureSignupData, context);
-      
+
       // Store tokens securely
       localStorage.setItem('accessToken', response.tokens.accessToken);
       localStorage.setItem('refreshToken', response.tokens.refreshToken);
       localStorage.setItem('authUser', JSON.stringify(response.user));
-      
+
       return response.user;
     } catch (error) {
       throw error;
@@ -168,14 +168,14 @@ export const authService = {
       if (!token) {
         return null;
       }
-      
+
       const context = getLoginContext();
       const user = await secureAuthService.getCurrentUser(token, context);
-      
+
       if (user) {
         localStorage.setItem('authUser', JSON.stringify(user));
       }
-      
+
       return user;
     } catch (error) {
       // Token might be expired, try to refresh
@@ -186,7 +186,7 @@ export const authService = {
           const newTokens = await secureAuthService.refreshToken(refreshToken, context);
           localStorage.setItem('accessToken', newTokens.accessToken);
           localStorage.setItem('refreshToken', newTokens.refreshToken);
-          
+
           // Try again with new token
           return await secureAuthService.getCurrentUser(newTokens.accessToken, context);
         }
@@ -196,7 +196,7 @@ export const authService = {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
       }
-      
+
       return null;
     }
   },
@@ -217,7 +217,7 @@ export const authService = {
   getFamilyAssociations: (userId: string): FamilyMemberAssociation[] => {
     // Return associations where user is either family member or player
     return DEMO_FAMILY_ASSOCIATIONS.filter(
-      assoc => assoc.familyMemberId === userId || assoc.playerId === userId
+      assoc => assoc.familyMemberId === userId || assoc.playerId === userId,
     );
   },
 
@@ -232,7 +232,7 @@ export const authService = {
 
         FAKE_USERS[userIndex] = { ...FAKE_USERS[userIndex], ...updates };
         const updatedUser = FAKE_USERS[userIndex];
-        
+
         // Update localStorage if this is the current user
         const currentUser = JSON.parse(localStorage.getItem('authUser') || '{}');
         if (currentUser.id === userId) {
@@ -275,7 +275,7 @@ export const authService = {
   createFamilyAssociation: async (
     familyMemberId: string,
     playerId: string,
-    relationship: string
+    relationship: string,
   ): Promise<FamilyMemberAssociation> => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
@@ -325,8 +325,8 @@ export const authService = {
   },
 
   updateNotificationSettings: async (
-    userId: string, 
-    settings: Partial<NotificationSettings>
+    userId: string,
+    settings: Partial<NotificationSettings>,
   ): Promise<NotificationSettings> => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
@@ -338,7 +338,7 @@ export const authService = {
 
         FAKE_USERS[userIndex].notifications = {
           ...FAKE_USERS[userIndex].notifications,
-          ...settings
+          ...settings,
         };
 
         resolve(FAKE_USERS[userIndex].notifications);
@@ -391,14 +391,14 @@ export const authService = {
     try {
       const token = localStorage.getItem('accessToken');
       const user = authService.getCurrentUserSync();
-      
+
       if (!token || !user) {
         throw new Error('User not authenticated');
       }
-      
+
       const context = getLoginContext();
       await secureAuthService.changePassword(user.id, passwordData, context);
-      
+
       // Password change will clear all tokens, so remove them
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
@@ -412,8 +412,8 @@ export const authService = {
   validateToken: async (): Promise<boolean> => {
     try {
       const token = localStorage.getItem('accessToken');
-      if (!token) return false;
-      
+      if (!token) {return false;}
+
       const context = getLoginContext();
       const user = await secureAuthService.getCurrentUser(token, context);
       return !!user;
@@ -426,8 +426,8 @@ export const authService = {
   checkPermission: async (permission: string, resource: string, targetUserId?: string): Promise<boolean> => {
     try {
       const token = localStorage.getItem('accessToken');
-      if (!token) return false;
-      
+      if (!token) {return false;}
+
       const context = getLoginContext();
       return await secureAuthService.checkPermission(token, permission as any, resource as any, context, targetUserId);
     } catch (error) {

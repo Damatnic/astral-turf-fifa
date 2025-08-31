@@ -1,6 +1,6 @@
 /**
  * Input Validation Security Module
- * 
+ *
  * Provides comprehensive input validation using Zod schemas to prevent
  * injection attacks, validate data integrity, and ensure type safety.
  */
@@ -19,7 +19,7 @@ export const emailSchema = z
   .email('Invalid email format')
   .refine(
     (email) => VALIDATION_CONFIG.EMAIL_REGEX.test(email),
-    'Invalid email format'
+    'Invalid email format',
   )
   .transform((email) => email.toLowerCase().trim());
 
@@ -29,18 +29,18 @@ export const passwordSchema = z
   .max(PASSWORD_CONFIG.MAX_LENGTH, `Password must be less than ${PASSWORD_CONFIG.MAX_LENGTH} characters`)
   .refine(
     (password) => {
-      if (PASSWORD_CONFIG.REQUIRE_UPPERCASE && !/[A-Z]/.test(password)) return false;
-      if (PASSWORD_CONFIG.REQUIRE_LOWERCASE && !/[a-z]/.test(password)) return false;
-      if (PASSWORD_CONFIG.REQUIRE_NUMBERS && !/\d/.test(password)) return false;
+      if (PASSWORD_CONFIG.REQUIRE_UPPERCASE && !/[A-Z]/.test(password)) {return false;}
+      if (PASSWORD_CONFIG.REQUIRE_LOWERCASE && !/[a-z]/.test(password)) {return false;}
+      if (PASSWORD_CONFIG.REQUIRE_NUMBERS && !/\d/.test(password)) {return false;}
       if (PASSWORD_CONFIG.REQUIRE_SPECIAL_CHARS) {
         const specialCharsRegex = new RegExp(`[${PASSWORD_CONFIG.SPECIAL_CHARS.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}]`);
-        if (!specialCharsRegex.test(password)) return false;
+        if (!specialCharsRegex.test(password)) {return false;}
       }
       return true;
     },
     {
       message: `Password must contain ${PASSWORD_CONFIG.REQUIRE_UPPERCASE ? 'uppercase, ' : ''}${PASSWORD_CONFIG.REQUIRE_LOWERCASE ? 'lowercase, ' : ''}${PASSWORD_CONFIG.REQUIRE_NUMBERS ? 'numbers, ' : ''}${PASSWORD_CONFIG.REQUIRE_SPECIAL_CHARS ? 'special characters' : ''}`,
-    }
+    },
   );
 
 export const nameSchema = z
@@ -49,7 +49,7 @@ export const nameSchema = z
   .max(VALIDATION_CONFIG.MAX_NAME_LENGTH, `Name must be less than ${VALIDATION_CONFIG.MAX_NAME_LENGTH} characters`)
   .refine(
     (name) => VALIDATION_CONFIG.NAME_REGEX.test(name),
-    'Name contains invalid characters'
+    'Name contains invalid characters',
   )
   .transform((name) => name.trim());
 
@@ -58,7 +58,7 @@ export const phoneSchema = z
   .optional()
   .refine(
     (phone) => !phone || VALIDATION_CONFIG.PHONE_REGEX.test(phone),
-    'Invalid phone number format'
+    'Invalid phone number format',
   )
   .transform((phone) => phone?.trim());
 
@@ -95,7 +95,7 @@ export const signupSchema = z.object({
   {
     message: "Passwords don't match",
     path: ["confirmPassword"],
-  }
+  },
 );
 
 export const passwordResetRequestSchema = z.object({
@@ -111,7 +111,7 @@ export const passwordResetSchema = z.object({
   {
     message: "Passwords don't match",
     path: ["confirmPassword"],
-  }
+  },
 );
 
 export const changePasswordSchema = z.object({
@@ -123,7 +123,7 @@ export const changePasswordSchema = z.object({
   {
     message: "Passwords don't match",
     path: ["confirmPassword"],
-  }
+  },
 );
 
 // Player-related schemas
@@ -184,10 +184,10 @@ export const formationSchema = z.object({
 export const fileUploadSchema = z.object({
   file: z.instanceof(File).refine(
     (file) => file.size <= VALIDATION_CONFIG.MAX_FILE_SIZE,
-    `File size must be less than ${VALIDATION_CONFIG.MAX_FILE_SIZE / 1024 / 1024}MB`
+    `File size must be less than ${VALIDATION_CONFIG.MAX_FILE_SIZE / 1024 / 1024}MB`,
   ).refine(
     (file) => VALIDATION_CONFIG.ALLOWED_FILE_TYPES.includes(file.type),
-    'Invalid file type'
+    'Invalid file type',
   ),
 });
 
@@ -198,7 +198,7 @@ export const searchQuerySchema = z
   .transform((query) => query.trim())
   .refine(
     (query) => !/[<>"]/.test(query), // Prevent basic XSS attempts
-    'Search query contains invalid characters'
+    'Search query contains invalid characters',
   );
 
 // ID validation schemas
@@ -218,33 +218,33 @@ export function validateInput<T>(schema: z.ZodSchema<T>, data: unknown): { succe
   } catch (error) {
     if (error instanceof z.ZodError) {
       const errors = error.errors.map((err) => `${err.path.join('.')}: ${err.message}`);
-      
+
       securityLogger.warn('Input validation failed', {
         errors,
         input: typeof data === 'object' ? Object.keys(data as object) : typeof data,
       });
-      
+
       return { success: false, errors };
     }
-    
+
     securityLogger.error('Unexpected validation error', {
       error: error instanceof Error ? error.message : 'Unknown error',
     });
-    
+
     return { success: false, errors: ['Validation error occurred'] };
   }
 }
 
 // Validate email format with additional security checks
 export function validateEmail(email: string): boolean {
-  if (!email || typeof email !== 'string') return false;
-  
+  if (!email || typeof email !== 'string') {return false;}
+
   // Use validator.js for robust email validation
-  if (!validator.isEmail(email)) return false;
-  
+  if (!validator.isEmail(email)) {return false;}
+
   // Additional checks for security
   const trimmedEmail = email.trim().toLowerCase();
-  
+
   // Check for common malicious patterns
   const maliciousPatterns = [
     /<script/i,
@@ -254,27 +254,27 @@ export function validateEmail(email: string): boolean {
     /onclick/i,
     /onerror/i,
   ];
-  
+
   if (maliciousPatterns.some(pattern => pattern.test(trimmedEmail))) {
     securityLogger.warn('Potentially malicious email detected', { email: trimmedEmail });
     return false;
   }
-  
+
   return VALIDATION_CONFIG.EMAIL_REGEX.test(trimmedEmail);
 }
 
 // Validate URL format
 export function validateUrl(url: string): boolean {
-  if (!url || typeof url !== 'string') return false;
-  
+  if (!url || typeof url !== 'string') {return false;}
+
   try {
     const urlObj = new URL(url);
-    
+
     // Only allow HTTP and HTTPS protocols
     if (!['http:', 'https:'].includes(urlObj.protocol)) {
       return false;
     }
-    
+
     // Validate using validator.js
     return validator.isURL(url, {
       protocols: ['http', 'https'],
@@ -291,21 +291,21 @@ export function validateJson(jsonString: string): { valid: boolean; data?: any; 
   if (!jsonString || typeof jsonString !== 'string') {
     return { valid: false, error: 'Invalid JSON input' };
   }
-  
+
   try {
     const data = JSON.parse(jsonString);
-    
+
     // Check for dangerous properties
     if (typeof data === 'object' && data !== null) {
       const dangerousKeys = ['__proto__', 'constructor', 'prototype'];
       const hassDangerousKeys = dangerousKeys.some(key => key in data);
-      
+
       if (hassDangerousKeys) {
         securityLogger.warn('JSON with dangerous keys detected', { keys: Object.keys(data) });
         return { valid: false, error: 'JSON contains dangerous properties' };
       }
     }
-    
+
     return { valid: true, data };
   } catch (error) {
     return { valid: false, error: 'Invalid JSON format' };
@@ -319,17 +319,17 @@ export function generateRateLimitKey(identifier: string, action: string): string
 
 // Validate rate limiting parameters
 export function validateRateLimit(key: string, maxRequests: number, windowMs: number): boolean {
-  if (!key || typeof key !== 'string') return false;
-  if (!Number.isInteger(maxRequests) || maxRequests <= 0) return false;
-  if (!Number.isInteger(windowMs) || windowMs <= 0) return false;
-  
+  if (!key || typeof key !== 'string') {return false;}
+  if (!Number.isInteger(maxRequests) || maxRequests <= 0) {return false;}
+  if (!Number.isInteger(windowMs) || windowMs <= 0) {return false;}
+
   return true;
 }
 
 // SQL injection detection (basic patterns)
 export function detectSqlInjection(input: string): boolean {
-  if (!input || typeof input !== 'string') return false;
-  
+  if (!input || typeof input !== 'string') {return false;}
+
   const sqlPatterns = [
     /(\bunion\b|\bselect\b|\binsert\b|\bdelete\b|\bupdate\b|\bdrop\b|\btruncate\b|\balter\b)/i,
     /(\bor\b|\band\b)\s*\d+\s*=\s*\d+/i,
@@ -338,22 +338,22 @@ export function detectSqlInjection(input: string): boolean {
     /\bxp_\w+/i,
     /\bsp_\w+/i,
   ];
-  
+
   const detected = sqlPatterns.some(pattern => pattern.test(input));
-  
+
   if (detected) {
     securityLogger.warn('Potential SQL injection attempt detected', {
       input: input.substring(0, 100) + (input.length > 100 ? '...' : ''),
     });
   }
-  
+
   return detected;
 }
 
 // XSS detection (basic patterns)
 export function detectXss(input: string): boolean {
-  if (!input || typeof input !== 'string') return false;
-  
+  if (!input || typeof input !== 'string') {return false;}
+
   const xssPatterns = [
     /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
     /<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi,
@@ -363,31 +363,31 @@ export function detectXss(input: string): boolean {
     /<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi,
     /<embed\b[^<]*(?:(?!<\/embed>)<[^<]*)*<\/embed>/gi,
   ];
-  
+
   const detected = xssPatterns.some(pattern => pattern.test(input));
-  
+
   if (detected) {
     securityLogger.warn('Potential XSS attempt detected', {
       input: input.substring(0, 100) + (input.length > 100 ? '...' : ''),
     });
   }
-  
+
   return detected;
 }
 
 // Comprehensive input sanitization
 export function sanitizeInput(input: string): string {
-  if (!input || typeof input !== 'string') return '';
-  
+  if (!input || typeof input !== 'string') {return '';}
+
   // Remove null bytes
   let sanitized = input.replace(/\0/g, '');
-  
+
   // Trim whitespace
   sanitized = sanitized.trim();
-  
+
   // Escape HTML entities
   sanitized = validator.escape(sanitized);
-  
+
   return sanitized;
 }
 

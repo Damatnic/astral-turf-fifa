@@ -37,7 +37,7 @@ const AnalyticsPage: React.FC = () => {
             winPercentage: totalMatches > 0 ? (wins / totalMatches) * 100 : 0,
             goalsScored: goalStats.scored,
             goalsConceded: goalStats.conceded,
-            goalDifference: goalStats.scored - goalStats.conceded
+            goalDifference: goalStats.scored - goalStats.conceded,
         };
     };
 
@@ -63,7 +63,7 @@ const AnalyticsPage: React.FC = () => {
             totalWages,
             topScorers,
             topAssists,
-            squadValue: teamPlayers.length * 500000 // Simplified calculation
+            squadValue: teamPlayers.length * 500000, // Simplified calculation
         };
     };
 
@@ -73,7 +73,7 @@ const AnalyticsPage: React.FC = () => {
     const financialTrends = {
         weeklyIncome: [120000, 125000, 130000, 118000, 135000, 140000],
         weeklyExpenses: [95000, 98000, 92000, 105000, 100000, 97000],
-        weeks: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6']
+        weeks: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
     };
 
     return (
@@ -91,8 +91,8 @@ const AnalyticsPage: React.FC = () => {
                         <button
                             onClick={() => setSelectedTeam('home')}
                             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                                selectedTeam === 'home' 
-                                    ? 'bg-teal-600 text-white' 
+                                selectedTeam === 'home'
+                                    ? 'bg-teal-600 text-white'
                                     : 'text-gray-400 hover:text-white hover:bg-gray-700'
                             }`}
                         >
@@ -101,8 +101,8 @@ const AnalyticsPage: React.FC = () => {
                         <button
                             onClick={() => setSelectedTeam('away')}
                             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                                selectedTeam === 'away' 
-                                    ? 'bg-teal-600 text-white' 
+                                selectedTeam === 'away'
+                                    ? 'bg-teal-600 text-white'
                                     : 'text-gray-400 hover:text-white hover:bg-gray-700'
                             }`}
                         >
@@ -119,7 +119,7 @@ const AnalyticsPage: React.FC = () => {
                                 { key: 'performance' as const, label: 'Performance' },
                                 { key: 'financials' as const, label: 'Financials' },
                                 { key: 'transfers' as const, label: 'Transfers' },
-                                { key: 'development' as const, label: 'Development' }
+                                { key: 'development' as const, label: 'Development' },
                             ].map(({ key, label }) => (
                                 <button
                                     key={key}
@@ -205,7 +205,7 @@ const AnalyticsPage: React.FC = () => {
                                     </div>
                                     <div className={performanceMetrics.goalDifference >= 0 ? 'text-green-400' : 'text-red-400'}>
                                         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                                                   d={performanceMetrics.goalDifference >= 0 ? "M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" : "M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"} />
                                         </svg>
                                     </div>
@@ -264,7 +264,7 @@ const AnalyticsPage: React.FC = () => {
                             <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
                                 <h4 className="text-lg font-semibold text-red-400 mb-2">Total Expenses</h4>
                                 <p className="text-2xl font-bold text-white">
-                                    ${(teamFinances.expenses.playerWages + teamFinances.expenses.staffWages + 
+                                    ${(teamFinances.expenses.playerWages + teamFinances.expenses.staffWages +
                                         teamFinances.expenses.stadiumMaintenance + teamFinances.expenses.travel).toLocaleString()}
                                 </p>
                             </div>
@@ -335,7 +335,7 @@ const AnalyticsPage: React.FC = () => {
                                                     <span className="text-xs text-gray-300 capitalize">{attr}</span>
                                                     <div className="flex items-center space-x-2">
                                                         <div className="w-12 bg-gray-600 rounded-full h-1">
-                                                            <div 
+                                                            <div
                                                                 className="bg-teal-400 h-1 rounded-full transition-all duration-300"
                                                                 style={{ width: `${progress}%` }}
                                                             ></div>

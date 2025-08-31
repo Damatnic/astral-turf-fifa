@@ -8,9 +8,9 @@ const InternationalManagementPage: React.FC = () => {
     const [selectedTeam, setSelectedTeam] = useState<Team>('home');
 
     const teamPlayers = tacticsState.players.filter(p => p.team === selectedTeam);
-    const internationalPlayers = teamPlayers.filter(p => 
-        p.availability.status === 'International Duty' || 
-        Math.random() > 0.7 // Mock: some players are eligible for international duty
+    const internationalPlayers = teamPlayers.filter(p =>
+        p.availability.status === 'International Duty' ||
+        Math.random() > 0.7, // Mock: some players are eligible for international duty
     );
 
     // Mock international competitions
@@ -21,7 +21,7 @@ const InternationalManagementPage: React.FC = () => {
             date: '2024-11-20',
             status: 'upcoming',
             duration: '4 weeks',
-            type: 'tournament'
+            type: 'tournament',
         },
         {
             id: 'euro_cup',
@@ -29,7 +29,7 @@ const InternationalManagementPage: React.FC = () => {
             date: '2024-06-15',
             status: 'completed',
             duration: '3 weeks',
-            type: 'tournament'
+            type: 'tournament',
         },
         {
             id: 'copa_america',
@@ -37,8 +37,8 @@ const InternationalManagementPage: React.FC = () => {
             date: '2024-07-10',
             status: 'in_progress',
             duration: '3 weeks',
-            type: 'tournament'
-        }
+            type: 'tournament',
+        },
     ];
 
     const getStatusColor = (status: string) => {
@@ -74,8 +74,8 @@ const InternationalManagementPage: React.FC = () => {
                         <button
                             onClick={() => setSelectedTeam('home')}
                             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                                selectedTeam === 'home' 
-                                    ? 'bg-teal-600 text-white' 
+                                selectedTeam === 'home'
+                                    ? 'bg-teal-600 text-white'
                                     : 'text-gray-400 hover:text-white hover:bg-gray-700'
                             }`}
                         >
@@ -84,8 +84,8 @@ const InternationalManagementPage: React.FC = () => {
                         <button
                             onClick={() => setSelectedTeam('away')}
                             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                                selectedTeam === 'away' 
-                                    ? 'bg-teal-600 text-white' 
+                                selectedTeam === 'away'
+                                    ? 'bg-teal-600 text-white'
                                     : 'text-gray-400 hover:text-white hover:bg-gray-700'
                             }`}
                         >
@@ -150,7 +150,7 @@ const InternationalManagementPage: React.FC = () => {
                     {/* International Players */}
                     <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
                         <h3 className="text-xl font-semibold text-teal-400 mb-4">International Players</h3>
-                        
+
                         {internationalPlayers.length > 0 ? (
                             <div className="space-y-4">
                                 {internationalPlayers.map((player) => (
@@ -167,7 +167,7 @@ const InternationalManagementPage: React.FC = () => {
                                                     </p>
                                                 </div>
                                             </div>
-                                            
+
                                             <div className="text-right">
                                                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                                                     player.availability.status === 'International Duty'
@@ -227,7 +227,7 @@ const InternationalManagementPage: React.FC = () => {
                     {/* International Competitions */}
                     <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
                         <h3 className="text-xl font-semibold text-teal-400 mb-4">International Competitions</h3>
-                        
+
                         <div className="space-y-4">
                             {internationalCompetitions.map((competition) => (
                                 <div key={competition.id} className={`p-4 rounded-lg border-l-4 ${getStatusBackground(competition.status)} ${
@@ -288,7 +288,7 @@ const InternationalManagementPage: React.FC = () => {
                                 Monitor international fixtures and plan your squad rotation accordingly
                             </p>
                         </div>
-                        
+
                         <div className="text-center">
                             <div className="text-green-400 mb-3">
                                 <svg className="w-10 h-10 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -300,7 +300,7 @@ const InternationalManagementPage: React.FC = () => {
                                 Maintain adequate squad depth to cope with international absences
                             </p>
                         </div>
-                        
+
                         <div className="text-center">
                             <div className="text-yellow-400 mb-3">
                                 <svg className="w-10 h-10 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">

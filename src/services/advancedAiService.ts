@@ -1,13 +1,13 @@
 import { GoogleGenAI, Type } from "@google/genai";
-import type { 
-  Player, 
-  PlayerAttributes, 
-  TrainingDrill, 
-  Formation, 
-  TeamTactics, 
+import type {
+  Player,
+  PlayerAttributes,
+  TrainingDrill,
+  Formation,
+  TeamTactics,
   AIPersonality,
   MatchResult,
-  WeeklySchedule
+  WeeklySchedule,
 } from '../types';
 
 // Enhanced AI Types for Advanced Features
@@ -122,8 +122,8 @@ try {
 
 async function generateJson(prompt: string, schema: any, systemInstruction: string) {
   const ai = aiInstance;
-  if (!ai) throw new Error("AI is offline.");
-  
+  if (!ai) {throw new Error("AI is offline.");}
+
   try {
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
@@ -132,10 +132,10 @@ async function generateJson(prompt: string, schema: any, systemInstruction: stri
         systemInstruction,
         responseMimeType: "application/json",
         responseSchema: schema,
-        temperature: 0.7
+        temperature: 0.7,
       },
     });
-    
+
     const jsonText = response.text.trim();
     if (!jsonText) {
       throw new Error("AI returned an empty response.");
@@ -157,7 +157,7 @@ function formatPlayerHistory(player: Player): string {
   if (!player.attributeHistory || player.attributeHistory.length === 0) {
     return 'No historical data available.';
   }
-  
+
   return player.attributeHistory
     .slice(-6) // Last 6 weeks
     .map(entry => `Week ${entry.week}: ${formatPlayerAttributes(entry.attributes)}`)
@@ -171,9 +171,9 @@ function formatPlayerHistory(player: Player): string {
 export const generatePlayerDevelopmentPrediction = async (
   player: Player,
   trainingSchedule: WeeklySchedule,
-  personality: AIPersonality = 'balanced'
+  personality: AIPersonality = 'balanced',
 ): Promise<PlayerDevelopmentPrediction> => {
-  if (!aiInstance) throw new Error("AI is offline.");
+  if (!aiInstance) {throw new Error("AI is offline.");}
 
   const prompt = `Analyze this player's development trajectory and provide detailed predictions:
 
@@ -192,8 +192,8 @@ DEVELOPMENT HISTORY:
 ${formatPlayerHistory(player)}
 
 CURRENT TRAINING FOCUS:
-${player.individualTrainingFocus ? 
-  `${player.individualTrainingFocus.attribute} (${player.individualTrainingFocus.intensity})` : 
+${player.individualTrainingFocus ?
+  `${player.individualTrainingFocus.attribute} (${player.individualTrainingFocus.intensity})` :
   'No specific focus'
 }
 
@@ -221,25 +221,25 @@ Provide comprehensive development predictions with personalized training recomme
         properties: {
           phase1: { type: Type.STRING },
           phase2: { type: Type.STRING },
-          phase3: { type: Type.STRING }
+          phase3: { type: Type.STRING },
         },
-        required: ['phase1', 'phase2', 'phase3']
+        required: ['phase1', 'phase2', 'phase3'],
       },
       riskFactors: { type: Type.ARRAY, items: { type: Type.STRING } },
-      optimalPlayingTime: { type: Type.NUMBER }
+      optimalPlayingTime: { type: Type.NUMBER },
     },
     required: [
       'playerId', 'currentRating', 'projectedRatingIn6Months', 'projectedRatingIn1Year',
       'projectedRatingIn2Years', 'peakPotentialAge', 'developmentTrajectory',
       'keyStrengths', 'developmentBottlenecks', 'recommendedTrainingFocus',
-      'personalizedTrainingPlan', 'riskFactors', 'optimalPlayingTime'
-    ]
+      'personalizedTrainingPlan', 'riskFactors', 'optimalPlayingTime',
+    ],
   };
 
   const result = await generateJson(prompt, schema, systemInstruction);
   return {
     ...result,
-    playerId: player.id
+    playerId: player.id,
   };
 };
 
@@ -247,24 +247,24 @@ export const generateFormationEffectivenessAnalysis = async (
   formation: Formation,
   players: Player[],
   opponentFormations: string[],
-  personality: AIPersonality = 'balanced'
+  personality: AIPersonality = 'balanced',
 ): Promise<FormationEffectivenessAnalysis> => {
-  if (!aiInstance) throw new Error("AI is offline.");
+  if (!aiInstance) {throw new Error("AI is offline.");}
 
-  const assignedPlayers = players.filter(p => 
-    formation.slots.some(slot => slot.playerId === p.id)
+  const assignedPlayers = players.filter(p =>
+    formation.slots.some(slot => slot.playerId === p.id),
   );
 
   const prompt = `Analyze the effectiveness of this formation with the assigned players:
 
 FORMATION: ${formation.name}
-FORMATION SLOTS: ${formation.slots.map(slot => 
-  `${slot.role} (${slot.defaultPosition.x}, ${slot.defaultPosition.y})${slot.playerId ? ` - ${players.find(p => p.id === slot.playerId)?.name}` : ' - Empty'}`
+FORMATION SLOTS: ${formation.slots.map(slot =>
+  `${slot.role} (${slot.defaultPosition.x}, ${slot.defaultPosition.y})${slot.playerId ? ` - ${players.find(p => p.id === slot.playerId)?.name}` : ' - Empty'}`,
 ).join('\n')}
 
 ASSIGNED PLAYERS:
-${assignedPlayers.map(player => 
-  `${player.name} (${player.roleId}): ${formatPlayerAttributes(player.attributes)}`
+${assignedPlayers.map(player =>
+  `${player.name} (${player.roleId}): ${formatPlayerAttributes(player.attributes)}`,
 ).join('\n')}
 
 OPPONENT FORMATIONS TO ANALYZE: ${opponentFormations.join(', ')}
@@ -288,9 +288,9 @@ Provide comprehensive tactical analysis including strengths, weaknesses, and opt
           properties: {
             slotId: { type: Type.STRING },
             recommendedAttributes: { type: Type.OBJECT },
-            criticalTraits: { type: Type.ARRAY, items: { type: Type.STRING } }
-          }
-        }
+            criticalTraits: { type: Type.ARRAY, items: { type: Type.STRING } },
+          },
+        },
       },
       tacticalInsights: {
         type: Type.OBJECT,
@@ -298,20 +298,20 @@ Provide comprehensive tactical analysis including strengths, weaknesses, and opt
           attackingStrengths: { type: Type.ARRAY, items: { type: Type.STRING } },
           defensiveVulnerabilities: { type: Type.ARRAY, items: { type: Type.STRING } },
           transitionEffectiveness: { type: Type.STRING },
-          setPieceAdvantages: { type: Type.ARRAY, items: { type: Type.STRING } }
-        }
-      }
+          setPieceAdvantages: { type: Type.ARRAY, items: { type: Type.STRING } },
+        },
+      },
     },
     required: [
       'formationId', 'effectivenessScore', 'strengthsAgainstFormations',
-      'weaknessesAgainstFormations', 'optimalPlayerRoles', 'tacticalInsights'
-    ]
+      'weaknessesAgainstFormations', 'optimalPlayerRoles', 'tacticalInsights',
+    ],
   };
 
   const result = await generateJson(prompt, schema, systemInstruction);
   return {
     ...result,
-    formationId: formation.id
+    formationId: formation.id,
   };
 };
 
@@ -331,24 +331,24 @@ export const generateMatchPrediction = async (
     weather?: string;
     importance: 'low' | 'medium' | 'high';
   },
-  personality: AIPersonality = 'balanced'
+  personality: AIPersonality = 'balanced',
 ): Promise<MatchPrediction> => {
-  if (!aiInstance) throw new Error("AI is offline.");
+  if (!aiInstance) {throw new Error("AI is offline.");}
 
   const prompt = `Predict the outcome of this match with detailed analysis:
 
 HOME TEAM:
 Formation: ${homeTeam.formation.name}
 Tactics: Mentality ${homeTeam.tactics.mentality}, Pressing ${homeTeam.tactics.pressing}
-Players: ${homeTeam.players.map(p => 
-  `${p.name} (${p.roleId}) - ${p.currentPotential} rating, Form: ${p.form}`
+Players: ${homeTeam.players.map(p =>
+  `${p.name} (${p.roleId}) - ${p.currentPotential} rating, Form: ${p.form}`,
 ).join('\n')}
 
 AWAY TEAM:
 Formation: ${awayTeam.formation.name}
 Tactics: Mentality ${awayTeam.tactics.mentality}, Pressing ${awayTeam.tactics.pressing}
-Players: ${awayTeam.players.map(p => 
-  `${p.name} (${p.roleId}) - ${p.currentPotential} rating, Form: ${p.form}`
+Players: ${awayTeam.players.map(p =>
+  `${p.name} (${p.roleId}) - ${p.currentPotential} rating, Form: ${p.form}`,
 ).join('\n')}
 
 MATCH CONTEXT:
@@ -371,8 +371,8 @@ Provide detailed match prediction with probabilities, expected goals, key matchu
         type: Type.OBJECT,
         properties: {
           home: { type: Type.NUMBER },
-          away: { type: Type.NUMBER }
-        }
+          away: { type: Type.NUMBER },
+        },
       },
       keyMatchups: {
         type: Type.ARRAY,
@@ -382,9 +382,9 @@ Provide detailed match prediction with probabilities, expected goals, key matchu
             homePlayer: { type: Type.STRING },
             awayPlayer: { type: Type.STRING },
             advantage: { type: Type.STRING, enum: ['home', 'away', 'neutral'] },
-            impactLevel: { type: Type.STRING, enum: ['high', 'medium', 'low'] }
-          }
-        }
+            impactLevel: { type: Type.STRING, enum: ['high', 'medium', 'low'] },
+          },
+        },
       },
       tacticalRecommendations: {
         type: Type.OBJECT,
@@ -392,14 +392,14 @@ Provide detailed match prediction with probabilities, expected goals, key matchu
           formation: { type: Type.STRING },
           mentality: { type: Type.STRING },
           keyInstructions: { type: Type.ARRAY, items: { type: Type.STRING } },
-          substitutionWindows: { type: Type.ARRAY, items: { type: Type.NUMBER } }
-        }
-      }
+          substitutionWindows: { type: Type.ARRAY, items: { type: Type.NUMBER } },
+        },
+      },
     },
     required: [
       'homeWinProbability', 'drawProbability', 'awayWinProbability',
-      'expectedGoals', 'keyMatchups', 'tacticalRecommendations'
-    ]
+      'expectedGoals', 'keyMatchups', 'tacticalRecommendations',
+    ],
   };
 
   return await generateJson(prompt, schema, systemInstruction);
@@ -409,9 +409,9 @@ export const generateTacticalHeatMap = async (
   player: Player,
   recentMatches: MatchResult[],
   formation: Formation,
-  personality: AIPersonality = 'balanced'
+  personality: AIPersonality = 'balanced',
 ): Promise<TacticalHeatMap> => {
-  if (!aiInstance) throw new Error("AI is offline.");
+  if (!aiInstance) {throw new Error("AI is offline.");}
 
   const prompt = `Generate a tactical heat map analysis for this player:
 
@@ -442,9 +442,9 @@ positioning frequency, and areas of influence on the field.`;
             x: { type: Type.NUMBER },
             y: { type: Type.NUMBER },
             frequency: { type: Type.NUMBER },
-            effectiveness: { type: Type.NUMBER }
-          }
-        }
+            effectiveness: { type: Type.NUMBER },
+          },
+        },
       },
       movementPatterns: {
         type: Type.ARRAY,
@@ -455,20 +455,20 @@ positioning frequency, and areas of influence on the field.`;
               type: Type.OBJECT,
               properties: {
                 x: { type: Type.NUMBER },
-                y: { type: Type.NUMBER }
-              }
+                y: { type: Type.NUMBER },
+              },
             },
             to: {
               type: Type.OBJECT,
               properties: {
                 x: { type: Type.NUMBER },
-                y: { type: Type.NUMBER }
-              }
+                y: { type: Type.NUMBER },
+              },
             },
             frequency: { type: Type.NUMBER },
-            successRate: { type: Type.NUMBER }
-          }
-        }
+            successRate: { type: Type.NUMBER },
+          },
+        },
       },
       influenceZones: {
         type: Type.ARRAY,
@@ -478,27 +478,27 @@ positioning frequency, and areas of influence on the field.`;
             centerX: { type: Type.NUMBER },
             centerY: { type: Type.NUMBER },
             radius: { type: Type.NUMBER },
-            influence: { type: Type.NUMBER }
-          }
-        }
-      }
+            influence: { type: Type.NUMBER },
+          },
+        },
+      },
     },
-    required: ['playerId', 'positions', 'movementPatterns', 'influenceZones']
+    required: ['playerId', 'positions', 'movementPatterns', 'influenceZones'],
   };
 
   const result = await generateJson(prompt, schema, systemInstruction);
   return {
     ...result,
-    playerId: player.id
+    playerId: player.id,
   };
 };
 
 export const generateAdvancedPlayerMetrics = async (
   player: Player,
   recentMatches: MatchResult[],
-  personality: AIPersonality = 'balanced'
+  personality: AIPersonality = 'balanced',
 ): Promise<PlayerPerformanceMetrics> => {
-  if (!aiInstance) throw new Error("AI is offline.");
+  if (!aiInstance) {throw new Error("AI is offline.");}
 
   const prompt = `Calculate advanced performance metrics for this player:
 
@@ -528,19 +528,19 @@ based on the player's role, attributes, and current performance level.`;
       pressureResistance: { type: Type.NUMBER },
       creativeIndex: { type: Type.NUMBER },
       workRateIndex: { type: Type.NUMBER },
-      consistencyRating: { type: Type.NUMBER }
+      consistencyRating: { type: Type.NUMBER },
     },
     required: [
       'playerId', 'expectedGoals', 'expectedAssists', 'passCompletionRate',
       'progressivePasses', 'defensiveActions', 'aerialDuelsWon',
-      'pressureResistance', 'creativeIndex', 'workRateIndex', 'consistencyRating'
-    ]
+      'pressureResistance', 'creativeIndex', 'workRateIndex', 'consistencyRating',
+    ],
   };
 
   const result = await generateJson(prompt, schema, systemInstruction);
   return {
     ...result,
-    playerId: player.id
+    playerId: player.id,
   };
 };
 
@@ -551,5 +551,5 @@ export const advancedAiService = {
   generateMatchPrediction,
   generateTacticalHeatMap,
   generateAdvancedPlayerMetrics,
-  isAIAvailable: () => aiInstance !== null
+  isAIAvailable: () => aiInstance !== null,
 };

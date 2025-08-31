@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { BanknoteIcon, RepeatIcon, UsersIcon, NewspaperIcon, ChartLineIcon, MicroscopeIcon, GraduationCap, Briefcase, Building, Globe, ShieldCheck, HeartPulseIcon, MessageSquareIcon, TargetIcon, TableIcon, TrophyIcon, GridIcon, AwardIcon } from '../icons';
+import { BanknoteIcon, RepeatIcon, UsersIcon, NewspaperIcon, ChartLineIcon, MicroscopeIcon, GraduationCap, Briefcase, Building, Globe, ShieldCheck, HeartPulseIcon, MessageSquareIcon, TargetIcon, TableIcon, TrophyIcon, GridIcon, AwardIcon, SparklesIcon } from '../icons';
 
 const MenuItem: React.FC<{ to: string, children: React.ReactNode, onClick: () => void }> = ({ to, children, onClick }) => (
     <Link to={to} onClick={onClick} className="w-full text-left px-4 py-2 text-sm flex items-center hover:bg-[var(--bg-tertiary)]">
@@ -47,6 +47,9 @@ export const FranchiseMenu: React.FC = () => {
                     <MenuItem to="/mentoring" onClick={closeMenu}><UsersIcon className="w-4 h-4 mr-2" />Mentoring</MenuItem>
                     <MenuItem to="/youth-academy" onClick={closeMenu}><GraduationCap className="w-4 h-4 mr-2" />Youth Academy</MenuItem>
                     <MenuItem to="/skill-challenges" onClick={closeMenu}><AwardIcon className="w-4 h-4 mr-2" />Skill Challenges</MenuItem>
+                    <MenuItem to="/player-ranking" onClick={closeMenu}><SparklesIcon className="w-4 h-4 mr-2" />My Player Ranking</MenuItem>
+                    <MenuItem to="/challenge-hub" onClick={closeMenu}><AwardIcon className="w-4 h-4 mr-2" />Challenge Hub</MenuItem>
+                    <MenuItem to="/challenge-manager" onClick={closeMenu}><Briefcase className="w-4 h-4 mr-2" />Challenge Manager</MenuItem>
                     <MenuItem to="/medical-center" onClick={closeMenu}><HeartPulseIcon className="w-4 h-4 mr-2" />Medical Center</MenuItem>
                     <div className="border-t border-[var(--border-primary)] my-1" />
                     <MenuItem to="/club-history" onClick={closeMenu}><TrophyIcon className="w-4 h-4 mr-2" />Club History</MenuItem>

@@ -1,6 +1,6 @@
 /**
  * Multi-Device Continuity Service
- * 
+ *
  * Provides seamless experience continuation across desktop, tablet, and mobile devices
  * with real-time session synchronization and device-specific optimization
  */
@@ -89,9 +89,9 @@ class DeviceContinuityService {
     page: string,
     formationId?: string,
     playerId?: string,
-    features: string[] = []
+    features: string[] = [],
   ): Promise<void> {
-    if (!this.currentSession) return;
+    if (!this.currentSession) {return;}
 
     this.currentSession.lastActivity = Date.now();
     this.currentSession.currentPage = page;
@@ -110,7 +110,7 @@ class DeviceContinuityService {
       scrollPosition: window.scrollY || 0,
       formState: this.captureFormState(),
       selectedItems: [formationId, playerId].filter(Boolean) as string[],
-      viewState: this.captureViewState()
+      viewState: this.captureViewState(),
     });
   }
 
@@ -125,7 +125,7 @@ class DeviceContinuityService {
       scrollPosition: window.scrollY || 0,
       formState: this.captureFormState(),
       selectedItems: this.captureSelectedItems(),
-      viewState: this.captureViewState()
+      viewState: this.captureViewState(),
     };
   }
 
@@ -166,7 +166,7 @@ class DeviceContinuityService {
    * Request handoff to another device
    */
   async requestHandoff(targetDeviceId: string): Promise<void> {
-    if (!this.currentSession) return;
+    if (!this.currentSession) {return;}
 
     const handoffRequest: HandoffRequest = {
       id: `handoff_${Date.now()}`,
@@ -174,7 +174,7 @@ class DeviceContinuityService {
       toDeviceId: targetDeviceId,
       sessionData: this.captureApplicationState(),
       timestamp: Date.now(),
-      isAccepted: false
+      isAccepted: false,
     };
 
     this.handoffRequests.set(handoffRequest.id, handoffRequest);
@@ -182,7 +182,7 @@ class DeviceContinuityService {
     // Send handoff request through sync service
     await syncService.syncState(
       { type: 'HANDOFF_REQUEST', payload: handoffRequest } as any,
-      {} as RootState
+      {} as RootState,
     );
 
     console.log(`📲 Handoff requested to device: ${targetDeviceId}`);
@@ -193,7 +193,7 @@ class DeviceContinuityService {
    */
   async acceptHandoff(requestId: string): Promise<void> {
     const request = this.handoffRequests.get(requestId);
-    if (!request) return;
+    if (!request) {return;}
 
     request.isAccepted = true;
 
@@ -203,7 +203,7 @@ class DeviceContinuityService {
     // Notify other device of acceptance
     await syncService.syncState(
       { type: 'HANDOFF_ACCEPTED', payload: { requestId } } as any,
-      {} as RootState
+      {} as RootState,
     );
 
     // Clean up
@@ -240,7 +240,7 @@ class DeviceContinuityService {
    * Optimize state for current device type
    */
   optimizeStateForDevice(state: RootState): RootState {
-    if (!this.currentSession) return state;
+    if (!this.currentSession) {return state;}
 
     const optimizedState = { ...state };
 
@@ -252,7 +252,7 @@ class DeviceContinuityService {
           isGridVisible: false,
           drawingTool: 'select',
           // Hide complex UI elements on mobile
-          isFormationStrengthVisible: false
+          isFormationStrengthVisible: false,
         };
         break;
 
@@ -290,7 +290,7 @@ class DeviceContinuityService {
 
   private initializeSession(): void {
     const deviceInfo = this.getDeviceInfo();
-    
+
     this.currentSession = {
       id: `session_${Date.now()}_${deviceInfo.id}`,
       userId: '',
@@ -300,19 +300,19 @@ class DeviceContinuityService {
       lastActivity: Date.now(),
       currentPage: window.location.pathname,
       activeFeatures: [],
-      isActive: true
+      isActive: true,
     };
 
     this.activeSessions.set(this.currentSession.deviceId, this.currentSession);
   }
 
   private async broadcastSessionUpdate(): Promise<void> {
-    if (!this.currentSession) return;
+    if (!this.currentSession) {return;}
 
     try {
       await syncService.syncState(
         { type: 'SESSION_UPDATE', payload: this.currentSession } as any,
-        {} as RootState
+        {} as RootState,
       );
     } catch (error) {
       console.error('❌ Failed to broadcast session update:', error);
@@ -328,7 +328,7 @@ class DeviceContinuityService {
 
   private captureFormState(): Record<string, any> {
     const formState: Record<string, any> = {};
-    
+
     // Capture form inputs
     document.querySelectorAll('input, select, textarea').forEach((element, index) => {
       const input = element as HTMLInputElement;
@@ -347,7 +347,7 @@ class DeviceContinuityService {
     // Capture selected players, formations, etc.
     document.querySelectorAll('[data-selected="true"]').forEach(element => {
       const id = element.getAttribute('data-id');
-      if (id) selected.push(id);
+      if (id) {selected.push(id);}
     });
 
     return selected;
@@ -357,15 +357,15 @@ class DeviceContinuityService {
     return {
       zoom: 1, // Would capture actual zoom level from UI
       pan: { x: 0, y: 0 }, // Would capture actual pan position
-      activeFilters: {} // Would capture active filters
+      activeFilters: {}, // Would capture active filters
     };
   }
 
   private restoreFormState(formState: Record<string, any>): void {
     Object.entries(formState).forEach(([key, value]) => {
-      const element = document.getElementById(key) || 
+      const element = document.getElementById(key) ||
                     document.querySelector(`[name="${key}"]`) as HTMLInputElement;
-      
+
       if (element && 'value' in element) {
         element.value = value;
       }
@@ -382,7 +382,7 @@ class DeviceContinuityService {
     if (action.type === 'SESSION_UPDATE') {
       const session = action.payload as DeviceSession;
       this.activeSessions.set(session.deviceId, session);
-      
+
       if (this.onSessionUpdateCallback) {
         this.onSessionUpdateCallback(this.getActiveSessions());
       }
@@ -392,7 +392,7 @@ class DeviceContinuityService {
       const request = action.payload as HandoffRequest;
       if (request.toDeviceId === this.currentSession?.deviceId) {
         this.handoffRequests.set(request.id, request);
-        
+
         if (this.onHandoffRequestCallback) {
           this.onHandoffRequestCallback(request);
         }
@@ -442,7 +442,7 @@ class DeviceContinuityService {
         // Quick sync before unload
         navigator.sendBeacon('/api/session/close', JSON.stringify({
           sessionId: this.currentSession.id,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         }));
       }
     });
@@ -450,9 +450,9 @@ class DeviceContinuityService {
 
   private getDeviceInfo() {
     const userAgent = navigator.userAgent;
-    const deviceId = localStorage.getItem('astral_turf_device_id') || 
+    const deviceId = localStorage.getItem('astral_turf_device_id') ||
                     `device_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
+
     let deviceType: 'desktop' | 'tablet' | 'mobile' = 'desktop';
     let deviceName = 'Unknown Device';
 

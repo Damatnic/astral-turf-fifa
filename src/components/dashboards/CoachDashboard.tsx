@@ -27,7 +27,7 @@ const Gauge: React.FC<{ label: string; value: number }> = ({ label, value }) => 
                 <div className={`${colorClass} h-2.5 rounded-full transition-all duration-500`} style={{ width: `${value}%` }}></div>
             </div>
         </div>
-    )
+    );
 };
 
 const CoachDashboard: React.FC = () => {
@@ -37,7 +37,7 @@ const CoachDashboard: React.FC = () => {
 
     const { finances, season, gameWeek, inbox, jobSecurity, fanConfidence, boardObjectives } = franchiseState;
     const { players } = tacticsState;
-    
+
     const nextFixture = season.fixtures.find(f => f.week === gameWeek && (f.homeTeam === 'Astral FC' || f.awayTeam === 'Astral FC'));
     const unreadMessages = inbox.filter(i => !i.isRead).length;
     const injuredPlayers = players.filter(p => p.availability.status.includes('Injury')).length;
@@ -45,7 +45,7 @@ const CoachDashboard: React.FC = () => {
 
     return (
         <div className="w-full h-full flex items-center justify-center p-4 bg-gray-900 overflow-hidden">
-            <div 
+            <div
                 className="bg-gray-800 rounded-lg shadow-2xl w-full max-w-5xl border border-gray-700/50 flex flex-col animate-fade-in-scale max-h-[90vh]"
             >
                 <div className="flex justify-between items-center p-4 border-b border-gray-700 flex-shrink-0">
@@ -54,7 +54,7 @@ const CoachDashboard: React.FC = () => {
                         <p className="text-sm text-gray-400">Week {gameWeek} | Season {season.year}</p>
                     </div>
                 </div>
-                
+
                 <div className="p-6 overflow-y-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Left Column */}
                     <div className="lg:col-span-2 space-y-6">
@@ -71,7 +71,7 @@ const CoachDashboard: React.FC = () => {
                             </InfoCard>
                             <InfoCard title="Inbox" icon={<NewspaperIcon className="w-5 h-5 text-blue-400"/>} onClick={() => navigate('/inbox')}>
                                 <p>{inbox.length} total messages</p>
-                                {unreadMessages > 0 ? 
+                                {unreadMessages > 0 ?
                                     <p className="font-bold text-teal-400 animate-pulse">{unreadMessages} unread messages require attention.</p>
                                     : <p className="text-gray-400">You are all caught up.</p>
                                 }

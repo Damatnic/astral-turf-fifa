@@ -6,7 +6,7 @@ const PressConferencePage: React.FC = () => {
     const { franchiseState } = useFranchiseContext();
     const { uiState, dispatch: uiDispatch } = useUIContext();
     const [selectedQuestion, setSelectedQuestion] = useState<AIPressConferenceResponse | null>(null);
-    
+
     const { manager, fanConfidence, jobSecurity, gameWeek, season, pressNarratives } = franchiseState;
 
     // Mock press conference questions
@@ -18,21 +18,21 @@ const PressConferencePage: React.FC = () => {
                     text: "I'm very pleased with how the players are developing.",
                     outcome: "Positive response boosts team morale",
                     fanConfidenceEffect: 5,
-                    teamMoraleEffect: 10
+                    teamMoraleEffect: 10,
                 },
                 {
                     text: "We still have work to do, but I see improvement.",
                     outcome: "Balanced response maintains stability",
                     fanConfidenceEffect: 0,
-                    teamMoraleEffect: 0
+                    teamMoraleEffect: 0,
                 },
                 {
                     text: "The performance has been disappointing lately.",
                     outcome: "Critical response may demotivate players",
                     fanConfidenceEffect: -10,
-                    teamMoraleEffect: -15
-                }
-            ]
+                    teamMoraleEffect: -15,
+                },
+            ],
         },
         {
             question: "What are your thoughts on the upcoming transfer window?",
@@ -41,21 +41,21 @@ const PressConferencePage: React.FC = () => {
                     text: "We're always looking to strengthen the squad where possible.",
                     outcome: "Fans appreciate ambition",
                     fanConfidenceEffect: 8,
-                    teamMoraleEffect: 5
+                    teamMoraleEffect: 5,
                 },
                 {
                     text: "I'm happy with the current squad and their potential.",
                     outcome: "Shows faith in current players",
                     fanConfidenceEffect: -2,
-                    teamMoraleEffect: 12
+                    teamMoraleEffect: 12,
                 },
                 {
                     text: "The board will make decisions about transfers.",
                     outcome: "Diplomatic but uninspiring response",
                     fanConfidenceEffect: -5,
-                    teamMoraleEffect: -3
-                }
-            ]
+                    teamMoraleEffect: -3,
+                },
+            ],
         },
         {
             question: "How do you respond to criticism from fans about your tactics?",
@@ -64,22 +64,22 @@ const PressConferencePage: React.FC = () => {
                     text: "I understand the fans' passion and we're working to improve.",
                     outcome: "Humble response that acknowledges concerns",
                     fanConfidenceEffect: 3,
-                    teamMoraleEffect: 8
+                    teamMoraleEffect: 8,
                 },
                 {
                     text: "My tactics are based on what I think gives us the best chance to win.",
                     outcome: "Confident but potentially divisive",
                     fanConfidenceEffect: -3,
-                    teamMoraleEffect: 10
+                    teamMoraleEffect: 10,
                 },
                 {
                     text: "Results will speak for themselves in time.",
                     outcome: "Evasive response that may frustrate fans",
                     fanConfidenceEffect: -8,
-                    teamMoraleEffect: 2
-                }
-            ]
-        }
+                    teamMoraleEffect: 2,
+                },
+            ],
+        },
     ];
 
     const handleAnswerQuestion = (option: AIPressConferenceResponse['options'][0]) => {
@@ -89,16 +89,16 @@ const PressConferencePage: React.FC = () => {
             payload: {
                 fanConfidenceEffect: option.fanConfidenceEffect,
                 teamMoraleEffect: option.teamMoraleEffect,
-                narrativeId: option.narrativeId
-            }
+                narrativeId: option.narrativeId,
+            },
         });
 
         uiDispatch({
             type: 'ADD_NOTIFICATION',
             payload: {
                 message: `Press conference completed: ${option.outcome}`,
-                type: 'info'
-            }
+                type: 'info',
+            },
         });
 
         setSelectedQuestion(null);
@@ -169,7 +169,7 @@ const PressConferencePage: React.FC = () => {
                                 <p className="text-gray-400">Fan Confidence</p>
                             </div>
                             <div className="w-full bg-gray-700 rounded-full h-2">
-                                <div 
+                                <div
                                     className={`h-2 rounded-full transition-all duration-500 ${
                                         fanConfidence >= 70 ? 'bg-green-400' :
                                         fanConfidence >= 40 ? 'bg-yellow-400' : 'bg-red-400'
@@ -229,7 +229,7 @@ const PressConferencePage: React.FC = () => {
                         {/* Recent Media Coverage */}
                         <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
                             <h3 className="text-xl font-semibold text-teal-400 mb-6">Recent Media Coverage</h3>
-                            
+
                             {getRecentNarratives().length > 0 ? (
                                 <div className="space-y-4">
                                     {getRecentNarratives().map((narrative) => (
@@ -353,7 +353,7 @@ const PressConferencePage: React.FC = () => {
                                 Positive responses can boost fan confidence and team morale
                             </p>
                         </div>
-                        
+
                         <div className="text-center">
                             <div className="text-blue-400 mb-3">
                                 <svg className="w-10 h-10 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -365,7 +365,7 @@ const PressConferencePage: React.FC = () => {
                                 Diplomatic answers maintain stability during difficult periods
                             </p>
                         </div>
-                        
+
                         <div className="text-center">
                             <div className="text-yellow-400 mb-3">
                                 <svg className="w-10 h-10 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">

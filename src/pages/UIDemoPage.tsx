@@ -2,28 +2,28 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 import { usePersonalization } from '../components/ui/PersonalizationSystem';
-import { 
-  EnhancedButton, 
-  EnhancedCard, 
-  EnhancedInput, 
-  EnhancedSwitch 
+import {
+  EnhancedButton,
+  EnhancedCard,
+  EnhancedInput,
+  EnhancedSwitch,
 } from '../components/ui/InteractiveComponents';
 import {
   EnhancedLineChart,
   EnhancedBarChart,
   EnhancedDoughnutChart,
-  EnhancedRadarChart
+  EnhancedRadarChart,
 } from '../components/charts/EnhancedCharts';
 import {
   SwipeArea,
   Draggable,
-  SortableList
+  SortableList,
 } from '../components/ui/GestureSystem';
 import {
   ThemeCustomizer,
   LayoutPreferences,
   AccessibilityPreferences,
-  PreferencesBackup
+  PreferencesBackup,
 } from '../components/ui/PersonalizationSystem';
 import { AnimatedContainer, LoadingAnimation, SuccessAnimation } from '../components/ui/AnimationSystem';
 
@@ -36,7 +36,7 @@ const UIDemoPage: React.FC = () => {
     loading: false,
     success: false,
     inputValue: '',
-    error: ''
+    error: '',
   });
 
   // Demo data for charts
@@ -47,15 +47,15 @@ const UIDemoPage: React.FC = () => {
         label: 'Goals Scored',
         data: [12, 19, 3, 5, 2, 3],
         color: theme.colors.accent.primary,
-        gradient: true
+        gradient: true,
       },
       {
         label: 'Goals Conceded',
         data: [2, 3, 20, 5, 1, 4],
         color: theme.colors.status.error,
-        gradient: true
-      }
-    ]
+        gradient: true,
+      },
+    ],
   };
 
   const barChartData = {
@@ -65,14 +65,14 @@ const UIDemoPage: React.FC = () => {
         label: 'Player Count',
         data: [8, 6, 4, 2],
         color: theme.colors.status.success,
-        gradient: true
-      }
-    ]
+        gradient: true,
+      },
+    ],
   };
 
   const doughnutData = {
     labels: ['Wins', 'Draws', 'Losses'],
-    values: [15, 8, 5]
+    values: [15, 8, 5],
   };
 
   const radarData = {
@@ -81,16 +81,16 @@ const UIDemoPage: React.FC = () => {
       {
         label: 'Team Stats',
         data: [85, 78, 92, 80, 88, 90],
-        color: theme.colors.accent.primary
-      }
-    ]
+        color: theme.colors.accent.primary,
+      },
+    ],
   };
 
   const [sortableItems, setSortableItems] = useState([
     { id: '1', content: <div className="p-3">🥇 First Place Team</div> },
     { id: '2', content: <div className="p-3">🥈 Second Place Team</div> },
     { id: '3', content: <div className="p-3">🥉 Third Place Team</div> },
-    { id: '4', content: <div className="p-3">⚽ Fourth Place Team</div> }
+    { id: '4', content: <div className="p-3">⚽ Fourth Place Team</div> },
   ]);
 
   const handleSwipe = (event: any) => {
@@ -116,13 +116,13 @@ const UIDemoPage: React.FC = () => {
       {/* Header */}
       <AnimatedContainer variant="fade">
         <div className="text-center mb-12">
-          <h1 
+          <h1
             className="text-4xl font-bold mb-4 gradient-text"
-            style={{ 
+            style={{
               background: theme.gradients.primary,
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent'
+              WebkitTextFillColor: 'transparent',
             }}
           >
             🎨 Enhanced UI Showcase
@@ -140,29 +140,29 @@ const UIDemoPage: React.FC = () => {
             🎛️ Personalization Controls
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <EnhancedButton 
-              variant="primary" 
+            <EnhancedButton
+              variant="primary"
               onClick={() => setActiveModal('theme')}
               fullWidth
             >
               🎨 Theme Customizer
             </EnhancedButton>
-            <EnhancedButton 
-              variant="secondary" 
+            <EnhancedButton
+              variant="secondary"
               onClick={() => setActiveModal('layout')}
               fullWidth
             >
               📐 Layout Preferences
             </EnhancedButton>
-            <EnhancedButton 
-              variant="tertiary" 
+            <EnhancedButton
+              variant="tertiary"
               onClick={() => setActiveModal('accessibility')}
               fullWidth
             >
               ♿ Accessibility
             </EnhancedButton>
-            <EnhancedButton 
-              variant="ghost" 
+            <EnhancedButton
+              variant="ghost"
               onClick={() => setActiveModal('backup')}
               fullWidth
             >
@@ -178,7 +178,7 @@ const UIDemoPage: React.FC = () => {
           <h2 className="text-2xl font-semibold mb-6" style={{ color: theme.colors.text.primary }}>
             🔘 Interactive Components
           </h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Buttons */}
             <div className="space-y-4">
@@ -189,9 +189,9 @@ const UIDemoPage: React.FC = () => {
                 <EnhancedButton variant="tertiary" fullWidth>Tertiary Button</EnhancedButton>
                 <EnhancedButton variant="ghost" fullWidth>Ghost Button</EnhancedButton>
                 <EnhancedButton variant="danger" fullWidth>Danger Button</EnhancedButton>
-                <EnhancedButton 
-                  variant="primary" 
-                  loading={demoStates.loading} 
+                <EnhancedButton
+                  variant="primary"
+                  loading={demoStates.loading}
                   onClick={simulateLoading}
                   fullWidth
                 >
@@ -284,7 +284,7 @@ const UIDemoPage: React.FC = () => {
           <h2 className="text-2xl font-semibold mb-6" style={{ color: theme.colors.text.primary }}>
             📊 Data Visualization
           </h2>
-          
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <EnhancedLineChart
               data={lineChartData}
@@ -294,14 +294,14 @@ const UIDemoPage: React.FC = () => {
               showPoints
               smooth
             />
-            
+
             <EnhancedBarChart
               data={barChartData}
               title="Squad Composition"
               subtitle="Players by position"
               height={300}
             />
-            
+
             <EnhancedDoughnutChart
               data={doughnutData}
               title="Season Results"
@@ -309,7 +309,7 @@ const UIDemoPage: React.FC = () => {
               height={300}
               showPercentage
             />
-            
+
             <EnhancedRadarChart
               data={radarData}
               title="Team Attributes"
@@ -327,7 +327,7 @@ const UIDemoPage: React.FC = () => {
           <h2 className="text-2xl font-semibold mb-6" style={{ color: theme.colors.text.primary }}>
             👆 Gesture Interactions
           </h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Swipe Area */}
             <div>
@@ -337,9 +337,9 @@ const UIDemoPage: React.FC = () => {
               <SwipeArea
                 config={{ onSwipe: handleSwipe, threshold: 50 }}
                 className="p-6 border-2 border-dashed rounded-lg text-center"
-                style={{ 
+                style={{
                   borderColor: theme.colors.border.primary,
-                  backgroundColor: theme.colors.background.secondary
+                  backgroundColor: theme.colors.background.secondary,
                 }}
               >
                 <p style={{ color: theme.colors.text.secondary }}>
@@ -353,7 +353,7 @@ const UIDemoPage: React.FC = () => {
               <h3 className="text-lg font-medium mb-3" style={{ color: theme.colors.text.primary }}>
                 Draggable Element
               </h3>
-              <div 
+              <div
                 className="relative h-32 border-2 border-dashed rounded-lg"
                 style={{ borderColor: theme.colors.border.primary }}
               >
@@ -361,7 +361,7 @@ const UIDemoPage: React.FC = () => {
                   config={{ onDrag: handleDrag }}
                   className="absolute top-4 left-4"
                 >
-                  <div 
+                  <div
                     className="w-16 h-16 rounded-lg flex items-center justify-center text-2xl cursor-grab"
                     style={{ backgroundColor: theme.colors.accent.primary }}
                   >
@@ -391,7 +391,7 @@ const UIDemoPage: React.FC = () => {
           <h2 className="text-2xl font-semibold mb-6" style={{ color: theme.colors.text.primary }}>
             🎴 Card Variants
           </h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <EnhancedCard variant="default" padding="md">
               <h3 className="font-semibold mb-2" style={{ color: theme.colors.text.primary }}>
@@ -435,13 +435,13 @@ const UIDemoPage: React.FC = () => {
       {/* Interactive Cards */}
       <AnimatedContainer variant="fade">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <EnhancedCard 
-            interactive 
+          <EnhancedCard
+            interactive
             padding="lg"
             onClick={() => alert('Player card clicked!')}
           >
             <div className="text-center">
-              <div 
+              <div
                 className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center text-2xl"
                 style={{ backgroundColor: theme.colors.accent.primary }}
               >
@@ -456,13 +456,13 @@ const UIDemoPage: React.FC = () => {
             </div>
           </EnhancedCard>
 
-          <EnhancedCard 
-            interactive 
+          <EnhancedCard
+            interactive
             padding="lg"
             onClick={() => alert('Match card clicked!')}
           >
             <div className="text-center">
-              <div 
+              <div
                 className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center text-2xl"
                 style={{ backgroundColor: theme.colors.status.success }}
               >
@@ -477,13 +477,13 @@ const UIDemoPage: React.FC = () => {
             </div>
           </EnhancedCard>
 
-          <EnhancedCard 
-            interactive 
+          <EnhancedCard
+            interactive
             padding="lg"
             onClick={() => alert('Training card clicked!')}
           >
             <div className="text-center">
-              <div 
+              <div
                 className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center text-2xl"
                 style={{ backgroundColor: theme.colors.status.warning }}
               >
@@ -501,21 +501,21 @@ const UIDemoPage: React.FC = () => {
       </AnimatedContainer>
 
       {/* Personalization Modals */}
-      <ThemeCustomizer 
-        isOpen={activeModal === 'theme'} 
-        onClose={() => setActiveModal(null)} 
+      <ThemeCustomizer
+        isOpen={activeModal === 'theme'}
+        onClose={() => setActiveModal(null)}
       />
-      <LayoutPreferences 
-        isOpen={activeModal === 'layout'} 
-        onClose={() => setActiveModal(null)} 
+      <LayoutPreferences
+        isOpen={activeModal === 'layout'}
+        onClose={() => setActiveModal(null)}
       />
-      <AccessibilityPreferences 
-        isOpen={activeModal === 'accessibility'} 
-        onClose={() => setActiveModal(null)} 
+      <AccessibilityPreferences
+        isOpen={activeModal === 'accessibility'}
+        onClose={() => setActiveModal(null)}
       />
-      <PreferencesBackup 
-        isOpen={activeModal === 'backup'} 
-        onClose={() => setActiveModal(null)} 
+      <PreferencesBackup
+        isOpen={activeModal === 'backup'}
+        onClose={() => setActiveModal(null)}
       />
     </div>
   );

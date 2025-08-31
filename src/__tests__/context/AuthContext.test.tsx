@@ -1,9 +1,10 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import React from 'react';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { AuthContext } from '../../context/AuthContext';
 import { useAuthContext } from '../../hooks/useAuthContext';
 import { createMockAuthState } from '../factories';
-import type { AuthState, Action } from '../../types';
+import type { AuthState } from '../../types';
 import { INITIAL_STATE } from '../../constants';
 
 // Mock dispatch function
@@ -46,7 +47,7 @@ describe('AuthContext', () => {
           language: 'en',
           createdAt: '2024-01-01T00:00:00Z',
           isActive: true,
-        }
+        },
       });
 
       const wrapper = createWrapper(mockAuthState);
@@ -115,7 +116,7 @@ describe('AuthContext', () => {
           language: 'en',
           createdAt: '2024-01-01T00:00:00Z',
           isActive: true,
-        }
+        },
       });
 
       const wrapper = createWrapper(coachState);
@@ -147,7 +148,7 @@ describe('AuthContext', () => {
           language: 'en',
           createdAt: '2024-01-01T00:00:00Z',
           isActive: true,
-        }
+        },
       });
 
       const wrapper = createWrapper(playerState);
@@ -179,7 +180,7 @@ describe('AuthContext', () => {
           createdAt: '2024-01-01T00:00:00Z',
           isActive: true,
           playerIds: ['player1'], // Family members have associated players
-        }
+        },
       });
 
       const wrapper = createWrapper(familyState);

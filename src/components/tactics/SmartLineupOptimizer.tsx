@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import type { 
-  Player, 
-  Formation, 
+import type {
+  Player,
+  Formation,
   TeamTactics,
-  AIPersonality
+  AIPersonality,
 } from '../../types';
-import { 
+import {
   matchStrategyService,
   MatchStrategyPlan,
-  OppositionAnalysisReport 
+  OppositionAnalysisReport,
 } from '../../services/matchStrategyService';
 
 interface SmartLineupOptimizerProps {
@@ -31,7 +31,7 @@ const SmartLineupOptimizer: React.FC<SmartLineupOptimizerProps> = ({
   currentTactics,
   aiPersonality,
   onLineupOptimized,
-  className = ''
+  className = '',
 }) => {
   const [opponent, setOpponent] = useState('');
   const [venue, setVenue] = useState<'home' | 'away' | 'neutral'>('home');
@@ -52,7 +52,7 @@ const SmartLineupOptimizer: React.FC<SmartLineupOptimizerProps> = ({
     availablePlayers.reduce((acc, player) => {
       acc[player.id] = Math.max(100 - player.fatigue, 20); // Convert fatigue to fitness
       return acc;
-    }, {} as Record<string, number>)
+    }, {} as Record<string, number>),
   );
 
   const optimizeLineup = async () => {
@@ -76,7 +76,7 @@ const SmartLineupOptimizer: React.FC<SmartLineupOptimizerProps> = ({
           // You could populate this with real data from your database
           playingStyle: 'Unknown',
         },
-        aiPersonality
+        aiPersonality,
       );
 
       // Step 2: Generate match strategy
@@ -84,21 +84,21 @@ const SmartLineupOptimizer: React.FC<SmartLineupOptimizerProps> = ({
         {
           players: availablePlayers,
           availableFormations,
-          currentTactics
+          currentTactics,
         },
         oppositionReport,
         {
           venue,
           importance,
           weather,
-          playerFitness
+          playerFitness,
         },
-        aiPersonality
+        aiPersonality,
       );
 
       // Step 3: Find recommended formation
       const recommendedFormation = availableFormations.find(
-        f => f.name === strategy.recommendedFormation
+        f => f.name === strategy.recommendedFormation,
       ) || availableFormations[0];
 
       // Step 4: Select best players for each position
@@ -106,7 +106,7 @@ const SmartLineupOptimizer: React.FC<SmartLineupOptimizerProps> = ({
         availablePlayers,
         recommendedFormation,
         strategy,
-        oppositionReport
+        oppositionReport,
       );
 
       const result = {
@@ -115,8 +115,8 @@ const SmartLineupOptimizer: React.FC<SmartLineupOptimizerProps> = ({
         recommendedLineup: {
           formation: recommendedFormation,
           players: selectedPlayers,
-          tactics: strategy.recommendedTactics
-        }
+          tactics: strategy.recommendedTactics,
+        },
       };
 
       setOptimizationResult(result);
@@ -127,7 +127,7 @@ const SmartLineupOptimizer: React.FC<SmartLineupOptimizerProps> = ({
           formation: recommendedFormation,
           selectedPlayers,
           tactics: strategy.recommendedTactics,
-          strategy
+          strategy,
         });
       }
 
@@ -143,14 +143,14 @@ const SmartLineupOptimizer: React.FC<SmartLineupOptimizerProps> = ({
     players: Player[],
     formation: Formation,
     strategy: MatchStrategyPlan,
-    opposition: OppositionAnalysisReport
+    opposition: OppositionAnalysisReport,
   ): Player[] => {
     const selectedPlayers: Player[] = [];
-    
+
     // Sort players by role compatibility and current form
     const playersByRole = players.reduce((acc, player) => {
       const role = getPlayerPositionCategory(player.roleId);
-      if (!acc[role]) acc[role] = [];
+      if (!acc[role]) {acc[role] = [];}
       acc[role].push(player);
       return acc;
     }, {} as Record<string, Player[]>);
@@ -168,11 +168,11 @@ const SmartLineupOptimizer: React.FC<SmartLineupOptimizerProps> = ({
     formation.slots.forEach(slot => {
       const roleCategory = slot.role;
       const availablePlayers = playersByRole[roleCategory] || [];
-      
+
       // Find best available player for this position
-      const selectedPlayer = availablePlayers.find(player => 
-        !selectedPlayers.includes(player) && 
-        playerFitness[player.id] > 30 // Minimum fitness threshold
+      const selectedPlayer = availablePlayers.find(player =>
+        !selectedPlayers.includes(player) &&
+        playerFitness[player.id] > 30, // Minimum fitness threshold
       );
 
       if (selectedPlayer) {
@@ -184,17 +184,17 @@ const SmartLineupOptimizer: React.FC<SmartLineupOptimizerProps> = ({
   };
 
   const getPlayerPositionCategory = (roleId: string): string => {
-    if (['gk', 'sk'].includes(roleId)) return 'GK';
-    if (['cb', 'bpd', 'ncb', 'fb', 'wb'].includes(roleId)) return 'DF';
-    if (['dm', 'dlp', 'cm', 'b2b', 'ap', 'wm'].includes(roleId)) return 'MF';
-    if (['w', 'iw', 'p', 'tf', 'cf'].includes(roleId)) return 'FW';
+    if (['gk', 'sk'].includes(roleId)) {return 'GK';}
+    if (['cb', 'bpd', 'ncb', 'fb', 'wb'].includes(roleId)) {return 'DF';}
+    if (['dm', 'dlp', 'cm', 'b2b', 'ap', 'wm'].includes(roleId)) {return 'MF';}
+    if (['w', 'iw', 'p', 'tf', 'cf'].includes(roleId)) {return 'FW';}
     return 'MF'; // Default
   };
 
   const calculatePlayerScore = (
     player: Player,
     strategy: MatchStrategyPlan,
-    opposition: OppositionAnalysisReport
+    opposition: OppositionAnalysisReport,
   ): number => {
     let score = player.currentPotential; // Base rating
 
@@ -204,7 +204,7 @@ const SmartLineupOptimizer: React.FC<SmartLineupOptimizerProps> = ({
       'Good': 1.1,
       'Average': 1.0,
       'Poor': 0.9,
-      'Very Poor': 0.8
+      'Very Poor': 0.8,
     }[player.form] || 1.0;
 
     score *= formMultiplier;
@@ -218,7 +218,7 @@ const SmartLineupOptimizer: React.FC<SmartLineupOptimizerProps> = ({
       'Good': 2,
       'Okay': 0,
       'Poor': -3,
-      'Very Poor': -6
+      'Very Poor': -6,
     }[player.morale] || 0;
 
     score += moraleBonus;
@@ -226,10 +226,10 @@ const SmartLineupOptimizer: React.FC<SmartLineupOptimizerProps> = ({
     // Role-specific bonuses based on strategy
     if (strategy.difficulty === 'hard' || strategy.difficulty === 'very_hard') {
       // Favor experienced players for difficult matches
-      if (player.age >= 25) score += 5;
-      
+      if (player.age >= 25) {score += 5;}
+
       // Favor players with leadership traits
-      if (player.traits.includes('Leader')) score += 8;
+      if (player.traits.includes('Leader')) {score += 8;}
     }
 
     // Tactical fit bonus
@@ -237,12 +237,12 @@ const SmartLineupOptimizer: React.FC<SmartLineupOptimizerProps> = ({
       score += 5;
     }
 
-    if (strategy.recommendedTactics.mentality === 'attacking' && 
+    if (strategy.recommendedTactics.mentality === 'attacking' &&
         ['w', 'iw', 'cf', 'ap'].includes(player.roleId)) {
       score += 5;
     }
 
-    if (strategy.recommendedTactics.mentality === 'defensive' && 
+    if (strategy.recommendedTactics.mentality === 'defensive' &&
         ['cb', 'dm', 'ncb'].includes(player.roleId)) {
       score += 5;
     }
@@ -370,8 +370,8 @@ const SmartLineupOptimizer: React.FC<SmartLineupOptimizerProps> = ({
                     <h4 className="font-medium text-white mb-2">Threat Level</h4>
                     <div className="flex items-center">
                       <div className="flex-1 bg-gray-600 rounded-full h-2 mr-3">
-                        <div 
-                          className="bg-red-500 h-2 rounded-full" 
+                        <div
+                          className="bg-red-500 h-2 rounded-full"
                           style={{ width: `${optimizationResult.oppositionReport.overallThreatLevel * 10}%` }}
                         ></div>
                       </div>

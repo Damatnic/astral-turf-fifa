@@ -15,14 +15,14 @@ interface ScatterPlotProps {
     yAxisLabel?: string;
 }
 
-const ScatterPlot: React.FC<ScatterPlotProps> = ({ 
-    data, 
-    width = 500, 
-    height = 500, 
-    xAxisLabel = 'X-Axis', 
-    yAxisLabel = 'Y-Axis' 
+const ScatterPlot: React.FC<ScatterPlotProps> = ({
+    data,
+    width = 500,
+    height = 500,
+    xAxisLabel = 'X-Axis',
+    yAxisLabel = 'Y-Axis',
 }) => {
-    const padding = { top: 20, right: 20, bottom: 50, left: 50 };
+    const padding = useMemo(() => ({ top: 20, right: 20, bottom: 50, left: 50 }), []);
     const [tooltip, setTooltip] = useState<{ x: number; y: number; point: ScatterPoint } | null>(null);
 
     const { xScale, yScale, points } = useMemo(() => {
@@ -42,7 +42,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
 
         return { xScale, yScale, points };
     }, [data, width, height, padding]);
-    
+
     const axisTicks = useMemo(() => {
         const xMin = Math.min(...data.map(d => d.x), 0);
         const xMax = Math.max(...data.map(d => d.x));
@@ -88,9 +88,9 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
 
                 {/* Points */}
                 <g>
-                    {points.map((p, i) => (
+                    {points.map((p) => (
                         <circle
-                            key={i}
+                            key={`${p.cx}-${p.cy}-${p.label || 'point'}`}
                             cx={p.cx}
                             cy={p.cy}
                             r="5"
@@ -105,7 +105,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
                 </g>
             </svg>
              {tooltip && (
-                <div 
+                <div
                     className="absolute p-2 text-xs text-white bg-gray-900/80 rounded-md shadow-lg pointer-events-none"
                     style={{ left: tooltip.x + 10, top: tooltip.y + 10 }}
                 >

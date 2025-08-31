@@ -51,7 +51,7 @@ export const useResponsive = (): ResponsiveState => {
 
     const width = window.innerWidth;
     const height = window.innerHeight;
-    
+
     return {
       width,
       height,
@@ -115,9 +115,9 @@ export const useResponsive = (): ResponsiveState => {
  * Get current breakpoint based on width
  */
 function getCurrentBreakpoint(width: number): BreakpointKey {
-  if (width >= BREAKPOINTS.xl) return 'xl';
-  if (width >= BREAKPOINTS.desktop) return 'desktop';
-  if (width >= BREAKPOINTS.tablet) return 'tablet';
+  if (width >= BREAKPOINTS.xl) {return 'xl';}
+  if (width >= BREAKPOINTS.desktop) {return 'desktop';}
+  if (width >= BREAKPOINTS.tablet) {return 'tablet';}
   return 'mobile';
 }
 
@@ -126,7 +126,7 @@ function getCurrentBreakpoint(width: number): BreakpointKey {
  */
 export const useMobileDetection = () => {
   const { isMobile, isTablet, isTouchDevice } = useResponsive();
-  
+
   return {
     isMobile,
     isTabletOrMobile: isMobile || isTablet,
@@ -140,7 +140,7 @@ export const useMobileDetection = () => {
  */
 export const useResponsiveModal = () => {
   const { isMobile, isTablet } = useResponsive();
-  
+
   return {
     shouldUseFullScreenModal: isMobile,
     shouldUseBottomSheet: isMobile,
@@ -149,11 +149,11 @@ export const useResponsiveModal = () => {
 };
 
 /**
- * Hook for responsive navigation behavior  
+ * Hook for responsive navigation behavior
  */
 export const useResponsiveNavigation = () => {
   const { isMobile, isTablet } = useResponsive();
-  
+
   return {
     shouldUseDrawer: isMobile || isTablet,
     shouldCollapse: isMobile,

@@ -17,7 +17,7 @@ const ChemistryView: React.FC<ChemistryViewProps> = ({ team }) => {
 
     const formation = formations[activeFormationIds[team]];
     const teamPlayers = useMemo(() => {
-        if (!formation) return [];
+        if (!formation) {return [];}
         const playerIdsOnField = new Set(formation.slots.map(s => s.playerId).filter(Boolean));
         return players.filter(p => playerIdsOnField.has(p.id));
     }, [formation, players]);
@@ -28,21 +28,21 @@ const ChemistryView: React.FC<ChemistryViewProps> = ({ team }) => {
             for (let j = i + 1; j < teamPlayers.length; j++) {
                 const p1 = teamPlayers[i];
                 const p2 = teamPlayers[j];
-                if (!p1 || !p2) continue;
-                
+                if (!p1 || !p2) {continue;}
+
                 const score = calculateChemistryScore(p1, p2, chemistry, relationships, mentoringGroups[team]);
                 const relationship = relationships[p1.id]?.[p2.id] || relationships[p2.id]?.[p1.id];
-                
+
                 const payload: { p1: string, p2: string, score: number, relationship?: string } = {
                     p1: p1.name,
                     p2: p2.name,
-                    score
+                    score,
                 };
-                
+
                 if (relationship) {
                     payload.relationship = relationship;
                 }
-                
+
                 pairs.push(payload);
             }
         }
@@ -53,10 +53,10 @@ const ChemistryView: React.FC<ChemistryViewProps> = ({ team }) => {
     const bottom5 = chemistryPairs.slice(-5).reverse();
 
     const RelationshipIcon: React.FC<{type?: string}> = ({type}) => {
-        if (type === 'friendship') return <HeartIcon className="w-3 h-3 text-pink-400" />;
-        if (type === 'rivalry') return <SwordsIcon className="w-3 h-3 text-red-500" />;
+        if (type === 'friendship') {return <HeartIcon className="w-3 h-3 text-pink-400" />;}
+        if (type === 'rivalry') {return <SwordsIcon className="w-3 h-3 text-red-500" />;}
         return null;
-    }
+    };
 
     return (
         <div className="p-2 space-y-4">

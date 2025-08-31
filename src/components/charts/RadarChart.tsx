@@ -41,7 +41,7 @@ const RadarChart: React.FC<RadarChartProps> = ({ datasets, labels, size = 300 })
             const angle = angleSlice * i - Math.PI / 2;
             const x = center + radius * Math.cos(angle);
             const y = center + radius * Math.sin(angle);
-            return <line key={`axis-${i}`} x1={center} y1={center} x2={x} y2={y} stroke="var(--border-primary)" strokeWidth="0.5" />;
+            return <line key={`axis-${angle}`} x1={center} y1={center} x2={x} y2={y} stroke="var(--border-primary)" strokeWidth="0.5" />;
         });
     }, [center, labels, angleSlice]);
 
@@ -53,11 +53,11 @@ const RadarChart: React.FC<RadarChartProps> = ({ datasets, labels, size = 300 })
             const x = center + radius * Math.cos(angle);
             const y = center + radius * Math.sin(angle);
             let textAnchor: "start" | "middle" | "end" = "middle";
-            if (x < center - 5) textAnchor = "end";
-            if (x > center + 5) textAnchor = "start";
+            if (x < center - 5) {textAnchor = "end";}
+            if (x > center + 5) {textAnchor = "start";}
 
             return (
-                <text key={`label-${i}`} x={x} y={y} fill="var(--text-secondary)" fontSize="10" textAnchor={textAnchor} dy="0.3em" className="font-semibold uppercase">
+                <text key={`label-${label}`} x={x} y={y} fill="var(--text-secondary)" fontSize="10" textAnchor={textAnchor} dy="0.3em" className="font-semibold uppercase">
                     {label.substring(0, 3)}
                 </text>
             );

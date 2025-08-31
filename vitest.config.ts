@@ -31,7 +31,7 @@ export default defineConfig({
         'index.html',
         // Exclude type-only files
         'src/types.ts',
-        'src/constants.ts'
+        'src/constants.ts',
       ],
       thresholds: {
         global: {
@@ -58,8 +58,8 @@ export default defineConfig({
           functions: 85,
           lines: 85,
           statements: 85,
-        }
-      }
+        },
+      },
     },
     // Configure test timeouts
     testTimeout: 10000,
@@ -69,9 +69,9 @@ export default defineConfig({
       inline: [
         // Inline dependencies that need to be processed by Vitest
         '@google/genai',
-        'html-to-image'
-      ]
-    }
+        'html-to-image',
+      ],
+    },
   },
   resolve: {
     alias: {
@@ -83,11 +83,11 @@ export default defineConfig({
       '@/pages': resolve(__dirname, 'src/pages'),
       '@/types': resolve(__dirname, 'src/types'),
       '@/assets': resolve(__dirname, 'assets'),
-    }
+    },
   },
   define: {
     // Mock environment variables for testing
     'process.env.API_KEY': JSON.stringify('test-api-key'),
-    'process.env.GEMINI_API_KEY': JSON.stringify('test-gemini-api-key')
-  }
+    'process.env.GEMINI_API_KEY': JSON.stringify('test-gemini-api-key'),
+  },
 });

@@ -41,7 +41,7 @@ const PlayerEditPopup: React.FC = React.memo(() => {
     const handleClose = () => uiDispatch({ type: 'CLOSE_MODAL' });
 
     const handleSave = () => {
-        if (!playerData) return;
+        if (!playerData) {return;}
         if (editingPlayerId) {
             tacticsDispatch({ type: 'UPDATE_PLAYER', payload: playerData });
             uiDispatch({ type: 'ADD_NOTIFICATION', payload: { message: `${playerData.name} updated successfully.`, type: 'success' } });
@@ -63,7 +63,7 @@ const PlayerEditPopup: React.FC = React.memo(() => {
 
     const handleInstructionChange = (instruction: string, option: string) => {
         setPlayerData(p => {
-            if (!p) return null;
+            if (!p) {return null;}
             const newInstructions = { ...p.instructions };
             if (option === 'default') {
                 delete newInstructions[instruction];
@@ -75,15 +75,15 @@ const PlayerEditPopup: React.FC = React.memo(() => {
     };
 
     const handleChallengeToggle = (challengeId: string) => {
-        if (!playerData) return;
+        if (!playerData) {return;}
         const isCompleted = playerData.completedChallenges.includes(challengeId);
-        const newChallenges = isCompleted 
+        const newChallenges = isCompleted
             ? playerData.completedChallenges.filter(id => id !== challengeId)
             : [...playerData.completedChallenges, challengeId];
         setPlayerData({ ...playerData, completedChallenges: newChallenges });
     };
 
-    if (!playerData) return null;
+    if (!playerData) {return null;}
 
     return (
         <div className="fixed inset-0 bg-black/60 z-40 backdrop-blur-sm flex items-center justify-center p-4" onClick={handleClose}>

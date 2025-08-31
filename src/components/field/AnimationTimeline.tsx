@@ -54,22 +54,22 @@ const StepButton: React.FC<{ index: number }> = ({ index }) => {
     const { playbook } = tacticsState;
     const { activePlaybookItemId, activeStepIndex } = uiState;
     const [isEditingEvent, setIsEditingEvent] = useState(false);
-    
-    if (!activePlaybookItemId || activeStepIndex === null) return null;
+
+    if (!activePlaybookItemId || activeStepIndex === null) {return null;}
 
     const activeItem = playbook?.[activePlaybookItemId];
-    if (!activeItem) return null;
-    
+    if (!activeItem) {return null;}
+
     const step = activeItem?.steps?.[index];
-    if (!step) return null;
-    
+    if (!step) {return null;}
+
     const event = step?.event;
-    
+
     const eventIcon = () => {
-        if (!event?.type) return null;
-        if (event.type === 'Goal') return <GoalIcon className="w-3 h-3 text-green-400" />;
-        if (event.type === 'Yellow Card') return <CardIcon className="w-3 h-3 text-yellow-400" />;
-        if (event.type === 'Red Card') return <CardIcon className="w-3 h-3 text-red-500" />;
+        if (!event?.type) {return null;}
+        if (event.type === 'Goal') {return <GoalIcon className="w-3 h-3 text-green-400" />;}
+        if (event.type === 'Yellow Card') {return <CardIcon className="w-3 h-3 text-yellow-400" />;}
+        if (event.type === 'Red Card') {return <CardIcon className="w-3 h-3 text-red-500" />;}
         return null;
     };
 
@@ -80,11 +80,11 @@ const StepButton: React.FC<{ index: number }> = ({ index }) => {
     const handleDeleteStep = (e: React.MouseEvent) => {
         e?.stopPropagation();
         if ((activeItem?.steps?.length ?? 0) > 1) {
-            if (confirm(`Are you sure you want to delete Step ${index + 1}?`)) {
+            if (window.confirm(`Are you sure you want to delete Step ${index + 1}?`)) {
                 dispatch({ type: 'DELETE_PLAYBOOK_STEP', payload: index });
             }
         } else {
-            alert("You cannot delete the only step in a play.");
+            window.alert("You cannot delete the only step in a play.");
         }
     };
 
@@ -98,8 +98,8 @@ const StepButton: React.FC<{ index: number }> = ({ index }) => {
             <button
                 onClick={handleSelectStep}
                 className={`group relative w-10 h-10 rounded-md text-xs font-bold flex items-center justify-center transition-all duration-200
-                    ${activeStepIndex === index 
-                        ? 'bg-teal-500 text-white ring-2 ring-offset-2 ring-offset-slate-800 ring-teal-400' 
+                    ${activeStepIndex === index
+                        ? 'bg-teal-500 text-white ring-2 ring-offset-2 ring-offset-slate-800 ring-teal-400'
                         : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
                     }`
                 }
@@ -107,7 +107,7 @@ const StepButton: React.FC<{ index: number }> = ({ index }) => {
                 {event && <div className="absolute top-0.5 left-0.5">{eventIcon()}</div>}
                 <span>{index + 1}</span>
                 {(activeItem?.steps?.length ?? 0) > 1 && (
-                     <div 
+                     <div
                          onClick={handleDeleteStep}
                          className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-600 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:scale-110"
                          title={`Delete Step ${index + 1}`}
@@ -115,7 +115,7 @@ const StepButton: React.FC<{ index: number }> = ({ index }) => {
                         <TrashIcon className="w-2.5 h-2.5 text-white" />
                     </div>
                 )}
-                 <div 
+                 <div
                      onClick={handleToggleEventEditor}
                      className="absolute -bottom-1.5 -right-1.5 w-4 h-4 bg-slate-600 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:scale-110 hover:bg-teal-600"
                      title="Edit Event"
@@ -140,7 +140,7 @@ const AnimationTimeline: React.FC = () => {
     }
 
     const activeItem = playbook?.[activePlaybookItemId];
-    if (!activeItem) return null;
+    if (!activeItem) {return null;}
 
     const handleAddStep = () => {
         dispatch({ type: 'ADD_PLAYBOOK_STEP' });

@@ -21,7 +21,7 @@ const TACTIC_MODIFIERS = {
         'deep': { opponentShotQuality: 0.85, offsideChance: 0.8 },
         'medium': { opponentShotQuality: 1.0, offsideChance: 1.0 },
         'high': { opponentShotQuality: 1.15, offsideChance: 1.2 },
-    }
+    },
 };
 
 const getModifier = (value: Player['form'] | Player['morale']): number => {
@@ -30,14 +30,14 @@ const getModifier = (value: Player['form'] | Player['morale']): number => {
 };
 
 const getTeamStrengths = (
-    players: Player[], 
+    players: Player[],
     tacticalFamiliarity: number,
     chemistryMatrix: RootState['tactics']['chemistry'],
     relationships: RootState['franchise']['relationships'],
-    mentoringGroups: MentoringGroup[]
+    mentoringGroups: MentoringGroup[],
 ) => {
-    if (players.length === 0) return { attack: 0, defense: 0, midfield: 0, overallChemistry: 0 };
-    
+    if (players.length === 0) {return { attack: 0, defense: 0, midfield: 0, overallChemistry: 0 };}
+
     let attackSum = 0, defenseSum = 0, midfieldSum = 0;
     let attackCount = 0, defenseCount = 0, midfieldCount = 0;
     let totalChemistry = 0;
@@ -47,8 +47,8 @@ const getTeamStrengths = (
 
     players.forEach(p => {
         const role = PLAYER_ROLES.find(r => r.id === p.roleId);
-        if (!role) return;
-        
+        if (!role) {return;}
+
         const moraleBoostEffect = p.moraleBoost ? (p.moraleBoost.effect / 10) : 0; // e.g., 3 becomes 0.3
         const formMoraleMod = (getModifier(p.form) + getModifier(p.morale)) / 2 + moraleBoostEffect;
         const staminaMod = 0.7 + (p.stamina / 100) * 0.3; // 70% effectiveness at 0 stamina, 100% at 100 stamina
@@ -99,16 +99,16 @@ const getTeamStrengths = (
 
 
 export const simulateMatch = (
-    homePlayers: Player[], 
-    awayPlayers: Player[], 
-    homeTactics: TeamTactics, 
+    homePlayers: Player[],
+    awayPlayers: Player[],
+    homeTactics: TeamTactics,
     awayTactics: TeamTactics,
     homeFamiliarity: number,
     awayFamiliarity: number,
     chemistry: RootState['tactics']['chemistry'],
     relationships: RootState['franchise']['relationships'],
     mentoring: RootState['franchise']['mentoringGroups'],
-    onUpdate: (event: MatchEvent | MatchCommentary) => void
+    onUpdate: (event: MatchEvent | MatchCommentary) => void,
 ): MatchResult => {
     const events: MatchEvent[] = [];
     const commentaryLog: MatchCommentary[] = [];
@@ -116,12 +116,12 @@ export const simulateMatch = (
     let awayScore = 0;
 
     // Create mutable copies for simulation
-    let simHomePlayers = JSON.parse(JSON.stringify(homePlayers)) as Player[];
-    let simAwayPlayers = JSON.parse(JSON.stringify(awayPlayers)) as Player[];
+    const simHomePlayers = JSON.parse(JSON.stringify(homePlayers)) as Player[];
+    const simAwayPlayers = JSON.parse(JSON.stringify(awayPlayers)) as Player[];
 
-    const midfieldFactorInitial = getTeamStrengths(simHomePlayers, homeFamiliarity, chemistry, relationships, mentoring.home).midfield / 
+    const midfieldFactorInitial = getTeamStrengths(simHomePlayers, homeFamiliarity, chemistry, relationships, mentoring.home).midfield /
                              (getTeamStrengths(simHomePlayers, homeFamiliarity, chemistry, relationships, mentoring.home).midfield + getTeamStrengths(simAwayPlayers, awayFamiliarity, chemistry, relationships, mentoring.away).midfield || 1);
-    
+
     let possession: Team = midfieldFactorInitial > 0.5 ? 'home' : 'away';
 
     for (let minute = 1; minute <= 90; minute++) {
@@ -134,7 +134,7 @@ export const simulateMatch = (
                 p.moraleBoost = null;
             }
         });
-        
+
         const homeStrengths = getTeamStrengths(simHomePlayers, homeFamiliarity, chemistry, relationships, mentoring.home);
         const awayStrengths = getTeamStrengths(simAwayPlayers, awayFamiliarity, chemistry, relationships, mentoring.away);
 
@@ -151,7 +151,7 @@ export const simulateMatch = (
 
         const midfieldFactor = homeStrengths.midfield / (homeStrengths.midfield + awayStrengths.midfield || 1);
         const homePossessionAdvantage = Math.pow(midfieldFactor, 1.5);
-        
+
         const possessionChangeChance = 0.3;
         if (Math.random() < possessionChangeChance) {
             possession = possession === 'home' ? 'away' : 'home';
@@ -173,14 +173,14 @@ export const simulateMatch = (
             const attackRating = strengths.attack * tacticMods.goalChance;
             const defenseRating = defendingStrengths.defense * defendingTacticMods.defensiveAction;
             const goalProbability = 0.1 * Math.pow(attackRating / (defenseRating || 1), 2);
-            
+
             const attacker = attackers.filter(p => ['MF', 'FW'].includes(PLAYER_ROLES.find(r=>r.id===p.roleId)?.category ?? '')).sort((a,b) => b.attributes.positioning - a.attributes.positioning)[0] || attackers[0];
-            if (!attacker) continue;
+            if (!attacker) {continue;}
 
             if (Math.random() < goalProbability) {
                 const scorers = attackers.filter(p => ['FW', 'MF'].includes(PLAYER_ROLES.find(r=>r.id===p.roleId)?.category ?? ''));
                 const scorer = scorers.length > 0 ? scorers[Math.floor(Math.random() * scorers.length)] : (attackers[0] ?? null);
-                if (!scorer) continue;
+                if (!scorer) {continue;}
                 let assister: Player | null = null;
                 const potentialAssisters = attackers.filter(p => p.id !== scorer.id && ['MF', 'FW', 'DF'].includes(PLAYER_ROLES.find(r=>r.id===p.roleId)?.category ?? ''));
                 if (potentialAssisters.length > 0 && Math.random() < 0.7) {
@@ -195,7 +195,7 @@ export const simulateMatch = (
                     type: 'Goal',
                     team: possession,
                     playerName: scorer.name,
-                    description: assister ? `scored a goal, assisted by ${assister.name}.` : 'scored a goal.'
+                    description: assister ? `scored a goal, assisted by ${assister.name}.` : 'scored a goal.',
                 };
                 if (assister) {
                     (payload as any).assisterName = assister.name;
@@ -203,22 +203,22 @@ export const simulateMatch = (
                 const event: MatchEvent = payload;
                 events.push(event);
                 onUpdate(event);
-                if (possession === 'home') homeScore++; else awayScore++;
+                if (possession === 'home') {homeScore++;} else {awayScore++;}
             } else {
                  const defender = defenders.filter(p => ['DF', 'MF'].includes(PLAYER_ROLES.find(r=>r.id===p.roleId)?.category ?? '')).sort((a,b) => b.attributes.tackling - a.attributes.tackling)[0] || defenders[0];
-                 if (!defender) continue;
+                 if (!defender) {continue;}
                  const commentary = { minute, text: `${attacker.name} goes on a run, but is stopped by a great tackle from ${defender.name}.` };
                  commentaryLog.push(commentary);
                  onUpdate(commentary);
             }
         }
-        
+
         const allPlayers = [...simHomePlayers, ...simAwayPlayers];
         allPlayers.forEach(player => {
             const baseFoulChance = 0.001;
             const tacticMod = player.team === 'home' ? homeTacticMods.foulChance : awayTacticMods.foulChance;
             let playerFoulChance = baseFoulChance * tacticMod;
-            if(player.traits.includes('Temperamental')) playerFoulChance *= 1.5;
+            if(player.traits.includes('Temperamental')) {playerFoulChance *= 1.5;}
             if (Math.random() < playerFoulChance) {
                  const commentary: MatchCommentary = { minute, text: `A late challenge from ${player.name} earns him a yellow card.` };
                  commentaryLog.push(commentary);
@@ -246,30 +246,30 @@ export const calculateMatchOutcome = (
     homeStrength: number,
     awayStrength: number,
     homeTactics: TeamTactics,
-    awayTactics: TeamTactics
+    awayTactics: TeamTactics,
 ): { homeWinProbability: number; drawProbability: number; awayWinProbability: number } => {
     const strengthDiff = homeStrength - awayStrength;
-    
+
     // Tactical modifiers
     const homeMentality = (TACTIC_MODIFIERS.mentality as any)[homeTactics.mentality] ?? { goalChance: 1.0, defensiveAction: 1.0 };
     const awayMentality = (TACTIC_MODIFIERS.mentality as any)[awayTactics.mentality] ?? { goalChance: 1.0, defensiveAction: 1.0 };
-    
-    const tacticalBalance = (homeMentality.goalChance / awayMentality.defensiveAction) / 
+
+    const tacticalBalance = (homeMentality.goalChance / awayMentality.defensiveAction) /
                            (awayMentality.goalChance / homeMentality.defensiveAction);
-    
+
     const adjustedDiff = strengthDiff * tacticalBalance;
-    
+
     // Convert to probabilities
     let homeWin = 0.5 + (adjustedDiff / 200); // Base 50% for even teams
     homeWin = Math.max(0.1, Math.min(0.9, homeWin)); // Clamp between 10% and 90%
-    
+
     const draw = Math.max(0.1, 0.4 - Math.abs(adjustedDiff) / 100); // More draws for closer matches
     const awayWin = 1 - homeWin - draw;
-    
+
     return {
         homeWinProbability: Math.round(homeWin * 100) / 100,
         drawProbability: Math.round(draw * 100) / 100,
-        awayWinProbability: Math.round(awayWin * 100) / 100
+        awayWinProbability: Math.round(awayWin * 100) / 100,
     };
 };
 
@@ -282,7 +282,7 @@ export const generateMatchPreview = (
     awayFamiliarity: number,
     chemistry: RootState['tactics']['chemistry'],
     relationships: RootState['franchise']['relationships'],
-    mentoring: RootState['franchise']['mentoringGroups']
+    mentoring: RootState['franchise']['mentoringGroups'],
 ): {
     homeStrengths: ReturnType<typeof getTeamStrengths>;
     awayStrengths: ReturnType<typeof getTeamStrengths>;
@@ -292,14 +292,14 @@ export const generateMatchPreview = (
 } => {
     const homeStrengths = getTeamStrengths(homePlayers, homeFamiliarity, chemistry, relationships, mentoring.home);
     const awayStrengths = getTeamStrengths(awayPlayers, awayFamiliarity, chemistry, relationships, mentoring.away);
-    
+
     const outcome = calculateMatchOutcome(
         (homeStrengths.attack + homeStrengths.defense + homeStrengths.midfield) / 3,
         (awayStrengths.attack + awayStrengths.defense + awayStrengths.midfield) / 3,
         homeTactics,
-        awayTactics
+        awayTactics,
     );
-    
+
     // Identify key players
     const homeKeyPlayers = homePlayers
         .sort((a, b) => {
@@ -308,7 +308,7 @@ export const generateMatchPreview = (
             return bOverall - aOverall;
         })
         .slice(0, 3);
-        
+
     const awayKeyPlayers = awayPlayers
         .sort((a, b) => {
             const aOverall = (a.attributes.shooting + a.attributes.passing + a.attributes.tackling + a.attributes.positioning) / 4;
@@ -316,32 +316,32 @@ export const generateMatchPreview = (
             return bOverall - aOverall;
         })
         .slice(0, 3);
-    
+
     // Analyze tactical mismatches
     const tacticalMismatch: string[] = [];
-    
+
     if (homeTactics.mentality === 'very-attacking' && awayTactics.defensiveLine === 'deep') {
         tacticalMismatch.push("Home team's attacking mentality may struggle against away team's deep defense");
     }
-    
+
     if (awayTactics.pressing === 'high' && homeTactics.mentality === 'very-attacking') {
         tacticalMismatch.push("Away team's high pressing could exploit home team's aggressive approach");
     }
-    
+
     if (homeStrengths.overallChemistry < 30) {
         tacticalMismatch.push("Home team's poor chemistry could be a deciding factor");
     }
-    
+
     if (awayStrengths.overallChemistry < 30) {
         tacticalMismatch.push("Away team's poor chemistry could be exploited");
     }
-    
+
     return {
         homeStrengths,
         awayStrengths,
         outcome,
         keyPlayers: { home: homeKeyPlayers, away: awayKeyPlayers },
-        tacticalMismatch
+        tacticalMismatch,
     };
 };
 
@@ -349,5 +349,5 @@ export const simulationService = {
     simulateMatch,
     calculateMatchOutcome,
     generateMatchPreview,
-    getTeamStrengths
+    getTeamStrengths,
 };

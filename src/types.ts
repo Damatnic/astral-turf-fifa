@@ -729,7 +729,7 @@ export interface UIState {
   teamKits: { home: TeamKit, away: TeamKit };
   notifications: Notification[];
   activeTeamContext: TeamView;
-  
+
   // Modals & UI State
   activeModal: null | ModalType;
   editingPlayerId: string | null;
@@ -742,7 +742,7 @@ export interface UIState {
   playerConversationData: {
       playerId: string;
   } | null;
-  
+
   // Drawing & Animation
   drawingTool: DrawingTool;
   drawingColor: string;

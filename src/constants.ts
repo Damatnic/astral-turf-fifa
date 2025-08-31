@@ -103,7 +103,7 @@ const defaultContract: PlayerContract = {
         { id: 'c1', text: 'Maintain good standing in the Code of Conduct', status: 'Met', isCustom: false },
         { id: 'c2', text: 'Remain academically eligible throughout the season', status: 'Met', isCustom: false },
         { id: 'c3', text: 'Team fees are paid in full', status: 'Unmet', isCustom: false },
-    ]
+    ],
 };
 
 const demoPlayer1: Player = { id: 'player1_demo', name: 'Alex Hunter', jerseyNumber: 7, age: 18, nationality: 'GB-ENG', potential: [85, 92], currentPotential: 86, roleId: 'iw', instructions: { width: 'cut_inside' }, team: 'home', teamColor: '#3b82f6', attributes: { speed: 88, passing: 82, tackling: 65, shooting: 85, dribbling: 90, positioning: 84, stamina: 88 }, position: { x: 0, y: 0 }, availability: { status: 'Available' }, morale: 'Excellent', form: 'Good', developmentLog: [], contract: defaultContract, stats: { goals: 0, assists: 0, matchesPlayed: 0, careerHistory: [], shotsOnTarget: 0, tacklesWon: 0, saves: 0, passesCompleted: 0, passesAttempted: 0 }, loan: { isLoaned: false }, traits: ['Ambitious'], conversationHistory: [], stamina: 100, attributeHistory: [], attributeDevelopmentProgress: {}, communicationLog: [], customTrainingSchedule: null, fatigue: 0, injuryRisk: 1, lastConversationInitiatedWeek: 0, moraleBoost: null, completedChallenges: [] };
@@ -123,9 +123,9 @@ const defaultNotifications = {
 };
 
 export const DEMO_USERS: User[] = [
-    { 
-      id: 'coach1', 
-      email: 'coach@astralfc.com', 
+    {
+      id: 'coach1',
+      email: 'coach@astralfc.com',
       role: 'coach',
       firstName: 'Mike',
       lastName: 'Anderson',
@@ -135,10 +135,10 @@ export const DEMO_USERS: User[] = [
       createdAt: '2024-01-01T00:00:00Z',
       isActive: true,
     },
-    { 
-      id: 'player1', 
-      email: 'player1@astralfc.com', 
-      role: 'player', 
+    {
+      id: 'player1',
+      email: 'player1@astralfc.com',
+      role: 'player',
       playerId: demoPlayer1.id,
       firstName: 'Alex',
       lastName: 'Hunter',
@@ -149,10 +149,10 @@ export const DEMO_USERS: User[] = [
       isActive: true,
       familyMemberIds: ['family1'],
     },
-    { 
-      id: 'player2', 
-      email: 'player2@astralfc.com', 
-      role: 'player', 
+    {
+      id: 'player2',
+      email: 'player2@astralfc.com',
+      role: 'player',
       playerId: demoPlayer2.id,
       firstName: 'Ben',
       lastName: 'Carter',
@@ -163,10 +163,10 @@ export const DEMO_USERS: User[] = [
       isActive: true,
       familyMemberIds: ['family2'],
     },
-    { 
-      id: 'player3', 
-      email: 'player3@astralfc.com', 
-      role: 'player', 
+    {
+      id: 'player3',
+      email: 'player3@astralfc.com',
+      role: 'player',
       playerId: demoPlayer3.id,
       firstName: 'Carlos',
       lastName: 'Diaz',
@@ -177,10 +177,10 @@ export const DEMO_USERS: User[] = [
       isActive: true,
       familyMemberIds: ['family3'],
     },
-    { 
-      id: 'player4', 
-      email: 'player4@astralfc.com', 
-      role: 'player', 
+    {
+      id: 'player4',
+      email: 'player4@astralfc.com',
+      role: 'player',
       playerId: demoPlayer4.id,
       firstName: 'David',
       lastName: 'Chen',
@@ -259,7 +259,7 @@ const defaultPlayers: Player[] = [
   { id: 'p9', name: 'L. Díaz', jerseyNumber: 23, age: 27, nationality: 'CO', potential: [87, 90], currentPotential: 88, roleId: 'w', instructions: {dribbling_style: 'dribble_more'}, team: 'home', teamColor: '#3b82f6', attributes: { speed: 92, passing: 80, tackling: 60, shooting: 85, dribbling: 93, positioning: 88, stamina: 91 }, position: { x: 55, y: 80 }, availability: {status: 'Available'}, morale: 'Okay', form: 'Average', developmentLog: [], contract: defaultContract, stats: { goals: 0, assists: 0, matchesPlayed: 0, careerHistory: [], shotsOnTarget: 0, tacklesWon: 0, saves: 0, passesCompleted: 0, passesAttempted: 0 }, loan: { isLoaned: false }, traits: [], conversationHistory: [], stamina: 100, attributeHistory: [], attributeDevelopmentProgress: {}, communicationLog: [], customTrainingSchedule: null, fatigue: 0, injuryRisk: 1, lastConversationInitiatedWeek: 0, moraleBoost: null, completedChallenges: [] }, // LM
   { id: 'p10', name: 'D. Núñez', jerseyNumber: 27, age: 24, nationality: 'UY', potential: [88, 92], currentPotential: 89, roleId: 'p', instructions: {}, team: 'home', teamColor: '#3b82f6', attributes: { speed: 91, passing: 75, tackling: 45, shooting: 89, dribbling: 82, positioning: 90, stamina: 87 }, position: { x: 80, y: 60 }, availability: {status: 'Available'}, morale: 'Good', form: 'Good', developmentLog: [], contract: defaultContract, stats: { goals: 0, assists: 0, matchesPlayed: 0, careerHistory: [], shotsOnTarget: 0, tacklesWon: 0, saves: 0, passesCompleted: 0, passesAttempted: 0 }, loan: { isLoaned: false }, traits: ['Temperamental'], conversationHistory: [], stamina: 100, attributeHistory: [], attributeDevelopmentProgress: {}, communicationLog: [], customTrainingSchedule: null, fatigue: 0, injuryRisk: 1, lastConversationInitiatedWeek: 0, moraleBoost: null, completedChallenges: [] }, // L-ST
   { id: 'p11', name: 'I. Konaté', jerseyNumber: 5, age: 24, nationality: 'FR', potential: [88, 91], currentPotential: 89, roleId: 'ncb', instructions: {}, team: 'home', teamColor: '#3b82f6', attributes: { speed: 85, passing: 70, tackling: 88, shooting: 50, dribbling: 65, positioning: 86, stamina: 86 }, position: { x: 25, y: 40 }, availability: {status: 'Available'}, morale: 'Good', form: 'Average', developmentLog: [], contract: defaultContract, stats: { goals: 0, assists: 0, matchesPlayed: 0, careerHistory: [], shotsOnTarget: 0, tacklesWon: 0, saves: 0, passesCompleted: 0, passesAttempted: 0 }, loan: { isLoaned: false }, traits: [], conversationHistory: [], stamina: 100, attributeHistory: [], attributeDevelopmentProgress: {}, communicationLog: [], customTrainingSchedule: null, fatigue: 0, injuryRisk: 1, lastConversationInitiatedWeek: 0, moraleBoost: null, completedChallenges: [] }, // RCB
-  
+
   // AWAY TEAM
   { id: 'p12', name: 'C. Jones', jerseyNumber: 17, age: 23, nationality: 'GB-ENG', potential: [86, 89], currentPotential: 87, roleId: 'cm', instructions: {}, team: 'away', teamColor: '#ef4444', attributes: { speed: 80, passing: 85, tackling: 75, shooting: 78, dribbling: 88, positioning: 84, stamina: 89 }, position: { x: -100, y: -100 }, availability: {status: 'Available'}, morale: 'Good', form: 'Average', developmentLog: [], contract: defaultContract, stats: { goals: 0, assists: 0, matchesPlayed: 0, careerHistory: [], shotsOnTarget: 0, tacklesWon: 0, saves: 0, passesCompleted: 0, passesAttempted: 0 }, loan: { isLoaned: false }, traits: [], conversationHistory: [], stamina: 100, attributeHistory: [], attributeDevelopmentProgress: {}, communicationLog: [], customTrainingSchedule: null, fatigue: 0, injuryRisk: 1, lastConversationInitiatedWeek: 0, moraleBoost: null, completedChallenges: [] },
   { id: 'p13', name: 'H. Elliott', jerseyNumber: 19, age: 21, nationality: 'GB-ENG', potential: [87, 91], currentPotential: 88, roleId: 'ap', instructions: {}, team: 'away', teamColor: '#ef4444', attributes: { speed: 79, passing: 86, tackling: 70, shooting: 77, dribbling: 89, positioning: 83, stamina: 85 }, position: { x: -100, y: -100 }, availability: {status: 'Available'}, morale: 'Good', form: 'Good', developmentLog: [], contract: defaultContract, stats: { goals: 0, assists: 0, matchesPlayed: 0, careerHistory: [], shotsOnTarget: 0, tacklesWon: 0, saves: 0, passesCompleted: 0, passesAttempted: 0 }, loan: { isLoaned: false }, traits: [], conversationHistory: [], stamina: 100, attributeHistory: [], attributeDevelopmentProgress: {}, communicationLog: [], customTrainingSchedule: null, fatigue: 0, injuryRisk: 1, lastConversationInitiatedWeek: 0, moraleBoost: null, completedChallenges: [] },
@@ -334,13 +334,13 @@ const defaultSchedule: WeeklySchedule = {
 };
 
 const defaultFinances = {
-  transferBudget: 50000, 
-  wageBudget: 2500, 
-  sponsorshipIncome: 500, 
+  transferBudget: 50000,
+  wageBudget: 2500,
+  sponsorshipIncome: 500,
   matchdayIncome: 1000,
   seasonalFees: [],
   expenses: { playerWages: 0, staffWages: 0, stadiumMaintenance: 500, travel: 100 },
-  income: { ticketSales: 1000, sponsorship: 500, prizeMoney: 0 }
+  income: { ticketSales: 1000, sponsorship: 500, prizeMoney: 0 },
 };
 
 export const DEFAULT_PLAYBOOK_LIBRARY: readonly PlaybookItem[] = [
@@ -365,9 +365,9 @@ export const DEFAULT_PLAYBOOK_LIBRARY: readonly PlaybookItem[] = [
                 drawings: [
                      { id: 'd1', tool: 'arrow', color: '#FBBF24', points: [{x: 70, y: 35}, {x: 85, y: 30}] },
                      { id: 'd2', tool: 'arrow', color: '#60A5FA', points: [{x: 55, y: 15}, {x: 75, y: 18}] },
-                ]
-            }
-        ]
+                ],
+            },
+        ],
     },
     {
         id: 'lib_high_press_442',
@@ -383,9 +383,9 @@ export const DEFAULT_PLAYBOOK_LIBRARY: readonly PlaybookItem[] = [
                     { id: 'd2', tool: 'arrow', color: '#FBBF24', points: [{x: 80, y: 60}, {x: 70, y: 70}] },
                     { id: 'd3', tool: 'arrow', color: '#60A5FA', points: [{x: 55, y: 20}, {x: 65, y: 25}] },
                      { id: 'd4', tool: 'zone', color: '#EF4444', points: [{x: 60, y: 40}, {x: 80, y: 60}] },
-                ]
-            }
-        ]
+                ],
+            },
+        ],
     },
     {
         id: 'lib_corner_defense',
@@ -396,10 +396,10 @@ export const DEFAULT_PLAYBOOK_LIBRARY: readonly PlaybookItem[] = [
             {
                 id: 's1',
                 playerPositions: { 'p1': {x: 8, y: 40}, 'p2': {x: 12, y: 45}, 'p11': {x:12, y: 55}, 'p4': {x: 18, y: 60} },
-                drawings: []
-            }
-        ]
-    }
+                drawings: [],
+            },
+        ],
+    },
 ];
 
 const defaultTemplates: Record<string, TrainingPlanTemplate> = {
@@ -415,7 +415,7 @@ const defaultTemplates: Record<string, TrainingPlanTemplate> = {
             friday: { morning: { warmup: 'warmup_jog', main: 'tact_possession', cooldown: 'cooldown_stretch' }, afternoon: { warmup: null, main: null, cooldown: null }, isRestDay: false },
             saturday: { ...defaultDailySchedule, isRestDay: true },
             sunday: { ...defaultDailySchedule, isRestDay: true },
-        }
+        },
     },
     'default_tactical_prep': {
         id: 'default_tactical_prep',
@@ -429,8 +429,8 @@ const defaultTemplates: Record<string, TrainingPlanTemplate> = {
             friday: { morning: { warmup: 'warmup_jog', main: 'set_corners', cooldown: 'cooldown_stretch' }, afternoon: { warmup: null, main: 'att_counter', cooldown: null }, isRestDay: false },
             saturday: { ...defaultDailySchedule, isRestDay: true },
             sunday: { ...defaultDailySchedule, isRestDay: true },
-        }
-    }
+        },
+    },
 };
 
 export const INITIAL_STATE: RootState = {
@@ -462,18 +462,18 @@ export const INITIAL_STATE: RootState = {
     ],
     jobSecurity: 75,
     fanConfidence: 70,
-    finances: { 
+    finances: {
       home: defaultFinances,
-      away: { ...defaultFinances, transferBudget: 25000000, wageBudget: 1500000 }
+      away: { ...defaultFinances, transferBudget: 25000000, wageBudget: 1500000 },
     },
     trainingSchedule: { home: { ...defaultSchedule }, away: { ...defaultSchedule } },
     inbox: [],
     transferMarket: { forSale: [], forLoan: [], freeAgents: [] },
     matchHistory: [],
     youthAcademy: { home: { level: 1, prospects: [], lastGeneratedWeek: 0 }, away: { level: 1, prospects: [], lastGeneratedWeek: 0 } },
-    staff: { 
+    staff: {
         home: { coach: { id: 'coach1', name: 'John Smith', specialty: 'balanced', bonus: 5, cost: 25000 }, scout: { id: 's1', name: 'Juni Calafat', rating: 5, cost: 50000 }, medicine: null, assistantManager: null, gkCoach: null, fitnessCoach: null, loanManager: null },
-        away: { coach: { id: 'coach2', name: 'Jane Doe', specialty: 'defending', bonus: 5, cost: 20000 }, scout: null, medicine: null, assistantManager: null, gkCoach: null, fitnessCoach: null, loanManager: null }
+        away: { coach: { id: 'coach2', name: 'Jane Doe', specialty: 'defending', bonus: 5, cost: 20000 }, scout: null, medicine: null, assistantManager: null, gkCoach: null, fitnessCoach: null, loanManager: null },
     },
     stadium: { home: { capacity: 50000, trainingFacilitiesLevel: 3, youthFacilitiesLevel: 2 }, away: { capacity: 30000, trainingFacilitiesLevel: 2, youthFacilitiesLevel: 1 } },
     sponsorships: { home: null, away: null },
@@ -560,5 +560,5 @@ export const INITIAL_STATE: RootState = {
     isLoadingTeamTalk: false,
     teamTalkData: null,
     pendingPromiseRequest: null,
-  }
+  },
 };

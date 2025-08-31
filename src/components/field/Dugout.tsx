@@ -14,14 +14,14 @@ interface DugoutSectionProps {
 }
 
 const DugoutSection: React.FC<DugoutSectionProps> = ({ title, players, team, selectedPlayerId, highlightedPlayerIds, onDrop }) => {
-    
+
     const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
         e?.preventDefault();
-        if (e?.dataTransfer) e.dataTransfer.dropEffect = 'move';
+        if (e?.dataTransfer) {e.dataTransfer.dropEffect = 'move';}
     };
 
     return (
-        <div 
+        <div
             className="flex-1 h-full bg-black/20 rounded-lg p-2 flex flex-col"
             onDrop={(e) => onDrop(e, team)}
             onDragOver={handleDragOver}
@@ -62,19 +62,19 @@ const Dugout: React.FC = () => {
                 }));
             }
         }
-        
+
         const onFieldIds = new Set<string>();
         const homeFormation = formations?.[activeFormationIds?.home];
         if (homeFormation?.slots) {
             homeFormation.slots.forEach(slot => {
-                if (slot?.playerId) onFieldIds.add(slot.playerId);
+                if (slot?.playerId) {onFieldIds.add(slot.playerId);}
             });
         }
-        
+
         const awayFormation = formations?.[activeFormationIds?.away];
         if (awayFormation?.slots) {
             awayFormation.slots.forEach(slot => {
-                if (slot?.playerId) onFieldIds.add(slot.playerId);
+                if (slot?.playerId) {onFieldIds.add(slot.playerId);}
             });
         }
 
@@ -87,10 +87,10 @@ const Dugout: React.FC = () => {
     const handleDrop = (e: React.DragEvent<HTMLDivElement>, team: 'home' | 'away') => {
         e?.preventDefault();
         const playerId = e?.dataTransfer?.getData('text/plain');
-        if (!playerId) return;
+        if (!playerId) {return;}
 
         const droppedPlayer = players?.find(p => p?.id === playerId);
-        if (!droppedPlayer) return;
+        if (!droppedPlayer) {return;}
 
         // If player is already on the bench, we might just be reassigning their team.
         if (!playersOnFieldIds.has(playerId)) {
@@ -105,25 +105,25 @@ const Dugout: React.FC = () => {
             }
         }
     };
-    
+
     return (
         <div className="w-full h-32 mt-4 flex-shrink-0 bg-slate-800/50 border-t-2 border-slate-700 rounded-lg p-2 flex gap-2">
-            <DugoutSection 
-                title="Home Bench" 
-                players={homeBenched} 
-                team="home" 
+            <DugoutSection
+                title="Home Bench"
+                players={homeBenched}
+                team="home"
                 selectedPlayerId={selectedPlayerId}
                 highlightedPlayerIds={highlightedByAIPlayerIds}
-                onDrop={handleDrop} 
+                onDrop={handleDrop}
             />
             <div className="w-px bg-slate-700 h-full flex-shrink-0" />
-            <DugoutSection 
-                title="Away Bench" 
-                players={awayBenched} 
-                team="away" 
+            <DugoutSection
+                title="Away Bench"
+                players={awayBenched}
+                team="away"
                 selectedPlayerId={selectedPlayerId}
                 highlightedPlayerIds={highlightedByAIPlayerIds}
-                onDrop={handleDrop} 
+                onDrop={handleDrop}
             />
         </div>
     );

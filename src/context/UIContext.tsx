@@ -1,11 +1,11 @@
 
 import React, { createContext, useReducer, useContext, type ReactNode, type Dispatch, useCallback } from 'react';
-import type { 
-  UIState, 
-  Action, 
-  ModalType, 
-  Notification, 
-  DrawingTool, 
+import type {
+  UIState,
+  Action,
+  ModalType,
+  Notification,
+  DrawingTool,
   AppTheme,
   AIPersonality,
   SlotActionMenuData,
@@ -13,7 +13,7 @@ import type {
   AdvancedRosterFilters,
   PositionRole,
   TeamKit,
-  TeamView
+  TeamView,
 } from '../types';
 import { INITIAL_STATE } from '../constants';
 import { uiReducer } from './reducers/uiReducer';
@@ -21,72 +21,72 @@ import { uiReducer } from './reducers/uiReducer';
 interface UIContextType {
   uiState: UIState;
   dispatch: Dispatch<Action>;
-  
+
   // Modal management
   openModal: (modal: ModalType) => void;
   closeModal: () => void;
-  
+
   // Notification management
   addNotification: (notification: Omit<Notification, 'id'>) => void;
   removeNotification: (id: string) => void;
-  
+
   // Theme management
   toggleTheme: () => void;
   setTheme: (theme: AppTheme) => void;
-  
+
   // Drawing management
   setDrawingTool: (tool: DrawingTool) => void;
   setDrawingColor: (color: string) => void;
   toggleGridVisibility: () => void;
   toggleFormationStrengthVisibility: () => void;
   setPositioningMode: (mode: 'free' | 'snap') => void;
-  
+
   // Player management UI
   setEditingPlayerId: (playerId: string | null) => void;
   setComparePlayerId: (playerId: string | null) => void;
   setSelectedPlayerId: (playerId: string | null) => void;
-  
+
   // Slot action menu
   openSlotActionMenu: (data: SlotActionMenuData) => void;
   closeSlotActionMenu: () => void;
-  
+
   // Team context
   setActiveTeamContext: (context: TeamView) => void;
-  
+
   // Kit management
   setTeamKit: (team: 'home' | 'away', kit: Partial<TeamKit>) => void;
-  
+
   // Filtering
   setRosterSearchQuery: (query: string) => void;
   toggleRosterRoleFilter: (role: PositionRole) => void;
   setAdvancedRosterFilters: (filters: Partial<AdvancedRosterFilters>) => void;
   clearRosterFilters: () => void;
   setTransferMarketFilter: (filter: keyof TransferMarketFilters, value: any) => void;
-  
+
   // AI settings
   setAIPersonality: (personality: AIPersonality) => void;
-  
+
   // Animation controls
   enterPresentationMode: () => void;
   exitPresentationMode: () => void;
   startAnimation: () => void;
   pauseAnimation: () => void;
   resetAnimation: () => void;
-  
+
   // Tutorial
   startTutorial: () => void;
   endTutorial: () => void;
   setTutorialStep: (step: number) => void;
-  
+
   // Save management
   setActiveSaveSlot: (slotId: string | null) => void;
   createSaveSlot: (id: string, name: string) => void;
   deleteSaveSlot: (slotId: string) => void;
-  
+
   // Export
   startExportLineup: () => void;
   finishExportLineup: () => void;
-  
+
   isLoading: boolean;
   error: string | null;
 }
@@ -313,7 +313,7 @@ export const UIProvider: React.FC<UIProviderProps> = ({ children }) => {
     startExportLineup,
     finishExportLineup,
     isLoading,
-    error
+    error,
   };
 
   return (

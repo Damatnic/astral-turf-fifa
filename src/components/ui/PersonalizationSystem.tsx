@@ -52,32 +52,32 @@ const defaultPreferences: UserPreferences = {
   theme: {
     mode: 'system',
     primaryColor: '#0ea5e9',
-    accentColor: '#22c55e'
+    accentColor: '#22c55e',
   },
   layout: {
     density: 'comfortable',
     sidebarPosition: 'left',
     sidebarCollapsed: false,
     showAnimations: true,
-    reduceMotion: false
+    reduceMotion: false,
   },
   accessibility: {
     fontSize: 'medium',
     highContrast: false,
     focusIndicators: true,
     screenReaderOptimizations: false,
-    keyboardNavigation: true
+    keyboardNavigation: true,
   },
   dashboard: {
     widgets: [],
-    layout: 'grid'
+    layout: 'grid',
   },
   shortcuts: {},
   notifications: {
     desktop: true,
     sound: false,
-    frequency: 'important'
-  }
+    frequency: 'important',
+  },
 };
 
 // Personalization Context
@@ -136,7 +136,7 @@ export const PersonalizationProvider: React.FC<{ children: ReactNode }> = ({ chi
 
   const getPreferenceValue = <T extends keyof UserPreferences>(
     category: T,
-    key: keyof UserPreferences[T]
+    key: keyof UserPreferences[T],
   ) => {
     return preferences[category][key];
   };
@@ -148,7 +148,7 @@ export const PersonalizationProvider: React.FC<{ children: ReactNode }> = ({ chi
       resetPreferences,
       exportPreferences,
       importPreferences,
-      getPreferenceValue
+      getPreferenceValue,
     }}>
       {children}
     </PersonalizationContext.Provider>
@@ -174,13 +174,13 @@ export const ThemeCustomizer: React.FC<ThemeCustomizerProps> = ({ isOpen, onClos
   const { preferences, updatePreferences } = usePersonalization();
   const [customColors, setCustomColors] = useState({
     primary: preferences.theme.primaryColor,
-    accent: preferences.theme.accentColor
+    accent: preferences.theme.accentColor,
   });
 
   const handleThemeModeChange = (mode: ThemeMode) => {
     setThemeMode(mode);
     updatePreferences({
-      theme: { ...preferences.theme, mode }
+      theme: { ...preferences.theme, mode },
     });
   };
 
@@ -189,8 +189,8 @@ export const ThemeCustomizer: React.FC<ThemeCustomizerProps> = ({ isOpen, onClos
     updatePreferences({
       theme: {
         ...preferences.theme,
-        [colorType === 'primary' ? 'primaryColor' : 'accentColor']: color
-      }
+        [colorType === 'primary' ? 'primaryColor' : 'accentColor']: color,
+      },
     });
   };
 
@@ -202,7 +202,7 @@ export const ThemeCustomizer: React.FC<ThemeCustomizerProps> = ({ isOpen, onClos
     { name: 'Orange', value: '#f97316' },
     { name: 'Red', value: '#ef4444' },
     { name: 'Indigo', value: '#6366f1' },
-    { name: 'Teal', value: '#14b8a6' }
+    { name: 'Teal', value: '#14b8a6' },
   ];
 
   return (
@@ -246,7 +246,7 @@ export const ThemeCustomizer: React.FC<ThemeCustomizerProps> = ({ isOpen, onClos
                 style={{
                   backgroundColor: color.value,
                   borderColor: customColors.primary === color.value ? theme.colors.text.primary : 'transparent',
-                  focusRingColor: theme.colors.accent.primary
+                  focusRingColor: theme.colors.accent.primary,
                 }}
                 onClick={() => handleColorChange('primary', color.value)}
                 aria-label={`Set primary color to ${color.name}`}
@@ -283,7 +283,7 @@ export const ThemeCustomizer: React.FC<ThemeCustomizerProps> = ({ isOpen, onClos
                 style={{
                   backgroundColor: color.value,
                   borderColor: customColors.accent === color.value ? theme.colors.text.primary : 'transparent',
-                  focusRingColor: theme.colors.accent.primary
+                  focusRingColor: theme.colors.accent.primary,
                 }}
                 onClick={() => handleColorChange('accent', color.value)}
                 aria-label={`Set accent color to ${color.name}`}
@@ -330,14 +330,14 @@ export const LayoutPreferences: React.FC<LayoutPreferencesProps> = ({ isOpen, on
 
   const handleLayoutChange = (key: keyof UserPreferences['layout'], value: any) => {
     updatePreferences({
-      layout: { ...preferences.layout, [key]: value }
+      layout: { ...preferences.layout, [key]: value },
     });
   };
 
   const densityOptions = [
     { value: 'compact', label: 'Compact', description: 'More content, less spacing' },
     { value: 'comfortable', label: 'Comfortable', description: 'Balanced spacing and content' },
-    { value: 'spacious', label: 'Spacious', description: 'More spacing, less content' }
+    { value: 'spacious', label: 'Spacious', description: 'More spacing, less content' },
   ];
 
   return (
@@ -360,12 +360,12 @@ export const LayoutPreferences: React.FC<LayoutPreferencesProps> = ({ isOpen, on
                 key={option.value}
                 className="flex items-center space-x-3 cursor-pointer p-3 rounded-lg border"
                 style={{
-                  borderColor: preferences.layout.density === option.value 
-                    ? theme.colors.accent.primary 
+                  borderColor: preferences.layout.density === option.value
+                    ? theme.colors.accent.primary
                     : theme.colors.border.primary,
                   backgroundColor: preferences.layout.density === option.value
                     ? `${theme.colors.accent.primary}10`
-                    : 'transparent'
+                    : 'transparent',
                 }}
               >
                 <input
@@ -424,13 +424,13 @@ export const LayoutPreferences: React.FC<LayoutPreferencesProps> = ({ isOpen, on
           <h4 className="text-lg font-medium" style={{ color: theme.colors.text.primary }}>
             Animations & Motion
           </h4>
-          
+
           <EnhancedSwitch
             checked={preferences.layout.showAnimations}
             onChange={(checked) => handleLayoutChange('showAnimations', checked)}
             label="Enable Animations"
           />
-          
+
           <EnhancedSwitch
             checked={preferences.layout.reduceMotion}
             onChange={(checked) => handleLayoutChange('reduceMotion', checked)}
@@ -461,7 +461,7 @@ export const AccessibilityPreferences: React.FC<AccessibilityPreferencesProps> =
 
   const handleAccessibilityChange = (key: keyof UserPreferences['accessibility'], value: any) => {
     updatePreferences({
-      accessibility: { ...preferences.accessibility, [key]: value }
+      accessibility: { ...preferences.accessibility, [key]: value },
     });
   };
 
@@ -469,7 +469,7 @@ export const AccessibilityPreferences: React.FC<AccessibilityPreferencesProps> =
     { value: 'small', label: 'Small', size: '14px' },
     { value: 'medium', label: 'Medium', size: '16px' },
     { value: 'large', label: 'Large', size: '18px' },
-    { value: 'extra-large', label: 'Extra Large', size: '20px' }
+    { value: 'extra-large', label: 'Extra Large', size: '20px' },
   ];
 
   return (
@@ -492,13 +492,13 @@ export const AccessibilityPreferences: React.FC<AccessibilityPreferencesProps> =
                 key={option.value}
                 className="p-3 rounded-lg border text-left focus:outline-none focus:ring-2 focus:ring-offset-2"
                 style={{
-                  borderColor: preferences.accessibility.fontSize === option.value 
-                    ? theme.colors.accent.primary 
+                  borderColor: preferences.accessibility.fontSize === option.value
+                    ? theme.colors.accent.primary
                     : theme.colors.border.primary,
                   backgroundColor: preferences.accessibility.fontSize === option.value
                     ? `${theme.colors.accent.primary}10`
                     : theme.colors.background.secondary,
-                  focusRingColor: theme.colors.accent.primary
+                  focusRingColor: theme.colors.accent.primary,
                 }}
                 onClick={() => handleAccessibilityChange('fontSize', option.value)}
               >
@@ -518,25 +518,25 @@ export const AccessibilityPreferences: React.FC<AccessibilityPreferencesProps> =
           <h4 className="text-lg font-medium" style={{ color: theme.colors.text.primary }}>
             Accessibility Features
           </h4>
-          
+
           <EnhancedSwitch
             checked={preferences.accessibility.highContrast}
             onChange={(checked) => handleAccessibilityChange('highContrast', checked)}
             label="High Contrast Mode"
           />
-          
+
           <EnhancedSwitch
             checked={preferences.accessibility.focusIndicators}
             onChange={(checked) => handleAccessibilityChange('focusIndicators', checked)}
             label="Enhanced Focus Indicators"
           />
-          
+
           <EnhancedSwitch
             checked={preferences.accessibility.screenReaderOptimizations}
             onChange={(checked) => handleAccessibilityChange('screenReaderOptimizations', checked)}
             label="Screen Reader Optimizations"
           />
-          
+
           <EnhancedSwitch
             checked={preferences.accessibility.keyboardNavigation}
             onChange={(checked) => handleAccessibilityChange('keyboardNavigation', checked)}
@@ -570,7 +570,7 @@ export const PreferencesBackup: React.FC<PreferencesBackupProps> = ({ isOpen, on
   const handleExport = () => {
     const data = exportPreferences();
     setExportedData(data);
-    
+
     // Copy to clipboard
     navigator.clipboard.writeText(data);
   };
@@ -618,7 +618,7 @@ export const PreferencesBackup: React.FC<PreferencesBackupProps> = ({ isOpen, on
               style={{
                 backgroundColor: theme.colors.background.secondary,
                 borderColor: theme.colors.border.primary,
-                color: theme.colors.text.primary
+                color: theme.colors.text.primary,
               }}
             />
           )}
@@ -640,11 +640,11 @@ export const PreferencesBackup: React.FC<PreferencesBackupProps> = ({ isOpen, on
             style={{
               backgroundColor: theme.colors.background.primary,
               borderColor: theme.colors.border.primary,
-              color: theme.colors.text.primary
+              color: theme.colors.text.primary,
             }}
           />
-          <EnhancedButton 
-            onClick={handleImport} 
+          <EnhancedButton
+            onClick={handleImport}
             disabled={!importData.trim()}
             variant="primary"
           >
@@ -682,5 +682,5 @@ export default {
   ThemeCustomizer,
   LayoutPreferences,
   AccessibilityPreferences,
-  PreferencesBackup
+  PreferencesBackup,
 };

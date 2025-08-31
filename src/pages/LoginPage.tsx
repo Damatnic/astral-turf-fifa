@@ -20,7 +20,7 @@ interface FormErrors {
 const LoginPage: React.FC = () => {
   const [formData, setFormData] = useState<LoginFormData>({
     email: 'coach@astralfc.com',
-    password: 'password123'
+    password: 'password123',
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -28,7 +28,7 @@ const LoginPage: React.FC = () => {
   const { dispatch, authState } = useAuthContext();
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   // Mobile-First Responsive
   const responsive = useResponsive();
   const { isMobile, isTablet } = responsive;
@@ -63,38 +63,38 @@ const LoginPage: React.FC = () => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
-    
+
     // Clear field-specific error when user starts typing
     if (errors[name as keyof FormErrors]) {
       setErrors(prev => ({
         ...prev,
-        [name]: undefined
+        [name]: undefined,
       }));
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
 
     setIsLoading(true);
     setErrors({});
-    
+
     try {
       const user = await authService.login(formData.email, formData.password);
       dispatch({ type: 'LOGIN_SUCCESS', payload: user });
-      
+
       // Load family associations if user is family member
       if (user.role === 'family') {
         const associations = authService.getFamilyAssociations(user.id);
         dispatch({ type: 'LOAD_FAMILY_ASSOCIATIONS', payload: associations });
       }
-      
+
       // Navigate to the intended destination or dashboard
       const from = (location.state as any)?.from?.pathname || '/dashboard';
       navigate(from);
@@ -115,14 +115,14 @@ const LoginPage: React.FC = () => {
     const demoAccounts = {
       coach: { email: 'coach@astralfc.com', name: 'Coach Mike Anderson' },
       player: { email: 'player1@astralfc.com', name: 'Player Alex Hunter' },
-      family: { email: 'linda.smith@astralfc.com', name: 'Family Linda Smith' }
+      family: { email: 'linda.smith@astralfc.com', name: 'Family Linda Smith' },
     };
 
     const selectedAccount = demoAccounts[role];
-    
+
     setFormData({
       email: selectedAccount.email,
-      password: 'password123'
+      password: 'password123',
     });
 
     // Auto-login after brief delay
@@ -130,13 +130,13 @@ const LoginPage: React.FC = () => {
       try {
         const user = await authService.login(selectedAccount.email, 'password123');
         dispatch({ type: 'LOGIN_SUCCESS', payload: user });
-        
+
         // Load family associations if user is family member
         if (user.role === 'family') {
           const associations = authService.getFamilyAssociations(user.id);
           dispatch({ type: 'LOAD_FAMILY_ASSOCIATIONS', payload: associations });
         }
-        
+
         const from = (location.state as any)?.from?.pathname || '/dashboard';
         navigate(from);
       } catch (error) {
@@ -148,7 +148,7 @@ const LoginPage: React.FC = () => {
       }
     }, 800);
   };
-  
+
   const handleAdminLogin = () => {
     handleRoleBasedLogin('coach');
   };
@@ -179,7 +179,7 @@ const LoginPage: React.FC = () => {
             Welcome Back
           </h1>
         </div>
-        
+
         {/* Mobile-First Form Container */}
         <div className={`
           bg-slate-800/80 backdrop-blur-sm rounded-lg shadow-2xl border border-slate-700/50
@@ -210,7 +210,7 @@ const LoginPage: React.FC = () => {
                 <p className="mt-1 text-sm text-red-400">{errors.email}</p>
               )}
             </div>
-            
+
             {/* Mobile-Optimized Password Field */}
             <div>
               <label htmlFor="password" className={`block font-medium text-slate-400 ${isMobile ? 'text-sm mb-2' : 'text-sm'}`}>
@@ -235,14 +235,14 @@ const LoginPage: React.FC = () => {
                 <p className="mt-1 text-sm text-red-400">{errors.password}</p>
               )}
             </div>
-            
+
             {/* Mobile-Optimized Error Display */}
             {(errors.general || authState.error) && (
               <div className={`bg-red-900/20 border border-red-500/20 rounded-md ${isMobile ? 'mobile-p-2' : 'p-3'}`}>
                 <p className={`text-red-400 ${isMobile ? 'text-sm' : 'text-sm'}`}>{errors.general || authState.error}</p>
               </div>
             )}
-            
+
             {/* Mobile-Friendly Submit Button */}
             <div>
               <button
@@ -260,7 +260,7 @@ const LoginPage: React.FC = () => {
               </button>
             </div>
           </form>
-          
+
           {/* Mobile-Optimized Divider */}
           <div className={`relative ${isMobile ? 'my-4' : 'my-6'}`}>
             <div className="absolute inset-0 flex items-center">
@@ -272,7 +272,7 @@ const LoginPage: React.FC = () => {
               </span>
             </div>
           </div>
-            
+
           {/* Mobile-First Demo Buttons */}
           <div className={`${isMobile ? 'space-y-2' : 'space-y-3'}`}>
             <button
@@ -290,7 +290,7 @@ const LoginPage: React.FC = () => {
               <ShieldCheck className={`${isMobile ? 'w-4 h-4 mr-2' : 'w-5 h-5 mr-2'}`} />
               {isMobile ? 'Coach' : 'Login as Coach'}
             </button>
-            
+
             <button
               type="button"
               onClick={() => handleRoleBasedLogin('player')}
@@ -306,7 +306,7 @@ const LoginPage: React.FC = () => {
               <UserIcon className={`${isMobile ? 'w-4 h-4 mr-2' : 'w-5 h-5 mr-2'}`} />
               {isMobile ? 'Player' : 'Login as Player'}
             </button>
-            
+
             <button
               type="button"
               onClick={() => handleRoleBasedLogin('family')}

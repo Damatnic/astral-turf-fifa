@@ -23,7 +23,7 @@ async function loadAndFormatPrompt(promptFile: string, replacements: Record<stri
     if (!template) {
         try {
             const response = await fetch(`/prompts/${promptFile}`);
-            if (!response.ok) throw new Error(`Failed to fetch prompt: ${response.statusText}`);
+            if (!response.ok) {throw new Error(`Failed to fetch prompt: ${response.statusText}`);}
             template = await response.text();
             promptCache.set(promptFile, template);
         } catch (error) {
@@ -58,7 +58,7 @@ const getOfflineResponse = (feature: string) => ({
 });
 
 async function getSystemInstruction(personality: AIPersonality): Promise<string> {
-    if (personality === 'balanced') return "You are a helpful and balanced soccer tactician.";
+    if (personality === 'balanced') {return "You are a helpful and balanced soccer tactician.";}
     const promptFile = `ai_personality_${personality}.md`;
     let template = promptCache.get(promptFile);
     if (!template) {
@@ -77,11 +77,11 @@ function formatPlayerForPrompt(player: Player | TransferPlayer): string {
   const { id, name, jerseyNumber, roleId, instructions, attributes, morale, form, traits, currentPotential } = player;
   const role = getPlayerRole(roleId);
   const roleName = role ? role.name : 'Unknown Role';
-  
+
   const instructionNames = Object.entries(instructions)
     .map(([instrId, optionId]) => {
         const instruction = DETAILED_PLAYER_INSTRUCTIONS[instrId];
-        if (!instruction || optionId === 'default') return null;
+        if (!instruction || optionId === 'default') {return null;}
         const option = instruction.options.find(o => o.id === optionId);
         return option ? option.name : null;
     })
@@ -89,12 +89,12 @@ function formatPlayerForPrompt(player: Player | TransferPlayer): string {
     .join(', ');
 
   const atts = Object.entries(attributes).map(([key, value]) => `${key}: ${value}`).join(', ');
-  
+
   let details = `Role: ${roleName}, Current Ability: ${currentPotential}, Morale: ${morale}, Form: ${form}`;
-  if (traits.length > 0) details += `, Traits: ${traits.join(', ')}`;
-  if (instructionNames) details += `, Instructions: ${instructionNames}`;
+  if (traits.length > 0) {details += `, Traits: ${traits.join(', ')}`;}
+  if (instructionNames) {details += `, Instructions: ${instructionNames}`;}
   details += `, Attributes: ${atts}`;
-  
+
   let baseString = `- Player ID: ${id}, #${jerseyNumber} ${name} (${details})`;
   if ('askingPrice' in player) {
       baseString += `, Asking Price: $${player.askingPrice.toLocaleString()}`;
@@ -108,7 +108,7 @@ function formatTacticsForPrompt(tactics: TeamTactics): string {
 
 const generateJson = async (prompt: string, schema: any, systemInstruction: string) => {
     const ai = aiInstance;
-    if (!ai) throw new Error("AI is offline.");
+    if (!ai) {throw new Error("AI is offline.");}
     try {
         const response: GenerateContentResponse = await ai.models.generateContent({
             model: "gemini-2.5-flash",
@@ -117,7 +117,7 @@ const generateJson = async (prompt: string, schema: any, systemInstruction: stri
                 systemInstruction,
                 responseMimeType: "application/json",
                 responseSchema: schema,
-                temperature: 0.8
+                temperature: 0.8,
             },
         });
         const jsonText = response.text.trim();
@@ -132,13 +132,13 @@ const generateJson = async (prompt: string, schema: any, systemInstruction: stri
 };
 
 export const getTeamTalkOptions = async (
-    teamPlayers: Player[], 
+    teamPlayers: Player[],
     opponentName: string,
     isHalftime: boolean,
     currentScore: string,
-    personality: AIPersonality
+    personality: AIPersonality,
 ): Promise<AITeamTalkResponse> => {
-    if (!aiInstance) throw new Error("AI is offline.");
+    if (!aiInstance) {throw new Error("AI is offline.");}
 
     const prompt = await loadAndFormatPrompt('team_talk_options.md', {
         '{{YOUR_TEAM_ROSTER}}': teamPlayers.map(formatPlayerForPrompt).join('\n'),
@@ -159,11 +159,11 @@ export const getTeamTalkOptions = async (
                         message: { type: Type.STRING },
                         moraleEffect: { type: Type.INTEGER },
                     },
-                    required: ["tone", "message", "moraleEffect"]
+                    required: ["tone", "message", "moraleEffect"],
                 },
             },
         },
-        required: ["options"]
+        required: ["options"],
     };
 
     return generateJson(prompt, schema, systemInstruction);
@@ -171,17 +171,17 @@ export const getTeamTalkOptions = async (
 
 
 export const getAIDevelopmentSummary = async (player: Player): Promise<AIDevelopmentSummary> => {
-    if (!aiInstance) throw new Error("AI is offline.");
-    
+    if (!aiInstance) {throw new Error("AI is offline.");}
+
     const attributeHistoryText = player.attributeHistory
         .map(log => `Week ${log.week}: ${JSON.stringify(log.attributes)}`)
         .join('\n');
-    
+
     const prompt = await loadAndFormatPrompt('player_development_summary.md', {
         '{{PLAYER_DATA}}': formatPlayerForPrompt(player),
         '{{ATTRIBUTE_HISTORY}}': attributeHistoryText || 'No history recorded yet.',
     });
-    
+
     const systemInstruction = "You are an expert youth development coach providing a summary of a player's progress.";
     const schema = {
         type: Type.OBJECT,
@@ -190,14 +190,14 @@ export const getAIDevelopmentSummary = async (player: Player): Promise<AIDevelop
             strengths: { type: Type.ARRAY, items: { type: Type.STRING } },
             areasForImprovement: { type: Type.ARRAY, items: { type: Type.STRING } },
         },
-        required: ["summary", "strengths", "areasForImprovement"]
+        required: ["summary", "strengths", "areasForImprovement"],
     };
 
     return generateJson(prompt, schema, systemInstruction);
 };
 
 export const generatePlayerBio = async (player: Player): Promise<string> => {
-    if (!aiInstance) return "AI is offline. Bio cannot be generated.";
+    if (!aiInstance) {return "AI is offline. Bio cannot be generated.";}
 
     const prompt = await loadAndFormatPrompt('player_bio.md', {
         '{{PLAYER_NAME}}': player.name,
@@ -232,9 +232,9 @@ export const generatePlayerBio = async (player: Player): Promise<string> => {
 
 export const getTacticalAdvice = async (
     homePlayers: Player[], awayPlayers: Player[], homeFormation: Formation, awayFormation: Formation,
-    homeTactics: TeamTactics, awayTactics: TeamTactics, personality: AIPersonality, coach: HeadCoach | null
+    homeTactics: TeamTactics, awayTactics: TeamTactics, personality: AIPersonality, coach: HeadCoach | null,
 ): Promise<AIInsight> => {
-  if (!aiInstance) return getOfflineResponse('Tactical Analysis') as AIInsight;
+  if (!aiInstance) {return getOfflineResponse('Tactical Analysis') as AIInsight;}
   const prompt = await loadAndFormatPrompt('tactical_analysis.md', {
     '{{HOME_FORMATION_NAME}}': homeFormation.name,
     '{{AWAY_FORMATION_NAME}}': awayFormation.name,
@@ -242,7 +242,7 @@ export const getTacticalAdvice = async (
     '{{AWAY_TEAM_ROSTER}}': awayPlayers.map(formatPlayerForPrompt).join('\n') || 'No players.',
     '{{HOME_TEAM_TACTICS}}': formatTacticsForPrompt(homeTactics),
     '{{AWAY_TEAM_TACTICS}}': formatTacticsForPrompt(awayTactics),
-    '{{COACH_SPECIALTY}}': coach?.specialty || 'None'
+    '{{COACH_SPECIALTY}}': coach?.specialty || 'None',
   });
   const systemInstruction = await getSystemInstruction(personality);
   const schema = {
@@ -250,13 +250,13 @@ export const getTacticalAdvice = async (
         advantages: { type: Type.STRING },
         vulnerabilities: { type: Type.STRING },
         recommendation: { type: Type.STRING },
-    }, required: ["advantages", "vulnerabilities", "recommendation"]
+    }, required: ["advantages", "vulnerabilities", "recommendation"],
   };
   return generateJson(prompt, schema, systemInstruction);
 };
 
 export const getAIPlayerComparison = async (player1: Player, player2: Player, formation: Formation, personality: AIPersonality): Promise<AIComparison> => {
-    if (!aiInstance) return getOfflineResponse('Player Comparison') as AIComparison;
+    if (!aiInstance) {return getOfflineResponse('Player Comparison') as AIComparison;}
     const prompt = await loadAndFormatPrompt('player_comparison.md', {
         '{{FORMATION_NAME}}': formation.name,
         '{{PLAYER_1_ROLE}}': getPlayerRole(player1.roleId)?.name || player1.roleId,
@@ -269,13 +269,13 @@ export const getAIPlayerComparison = async (player1: Player, player2: Player, fo
         type: Type.OBJECT, properties: {
             comparison: { type: Type.STRING },
             recommendation: { type: Type.STRING },
-        }, required: ["comparison", "recommendation"]
+        }, required: ["comparison", "recommendation"],
     };
     return generateJson(prompt, schema, systemInstruction);
-}
+};
 
 export const getAIFormationSuggestion = async (allPlayers: Player[], personality: AIPersonality): Promise<AISuggestedFormation> => {
-    if (!aiInstance) return getOfflineResponse('Formation Suggestion') as AISuggestedFormation;
+    if (!aiInstance) {return getOfflineResponse('Formation Suggestion') as AISuggestedFormation;}
     const prompt = await loadAndFormatPrompt('formation_suggestion.md', {
         '{{PLAYER_ROSTER}}': allPlayers.map(formatPlayerForPrompt).join('\n'),
     });
@@ -285,7 +285,7 @@ export const getAIFormationSuggestion = async (allPlayers: Player[], personality
             formationName: { type: Type.STRING },
             playerIds: { type: Type.ARRAY, items: { type: Type.STRING } },
             reasoning: { type: Type.STRING },
-        }, required: ["formationName", "playerIds", "reasoning"]
+        }, required: ["formationName", "playerIds", "reasoning"],
     };
     const parsedData = await generateJson(prompt, schema, systemInstruction) as AISuggestedFormation;
     if (!['4-4-2', '4-3-3', '3-5-2'].includes(parsedData.formationName) || parsedData.playerIds.length !== 11) {
@@ -295,9 +295,9 @@ export const getAIFormationSuggestion = async (allPlayers: Player[], personality
 };
 
 export const getAIChatResponse = async (
-  chatHistory: ChatMessage[], playersInFormation: Player[], formation: Formation, personality: AIPersonality
+  chatHistory: ChatMessage[], playersInFormation: Player[], formation: Formation, personality: AIPersonality,
 ): Promise<{ text: string, playerIdsToHighlight: string[] }> => {
-  if (!aiInstance) return getOfflineResponse('AI Chat') as { text: string, playerIdsToHighlight: string[] };
+  if (!aiInstance) {return getOfflineResponse('AI Chat') as { text: string, playerIdsToHighlight: string[] };}
   const prompt = await loadAndFormatPrompt('chat_response.md', {
       '{{FORMATION_NAME}}': formation.name,
       '{{PLAYER_ROSTER}}': playersInFormation.map(formatPlayerForPrompt).join('\n'),
@@ -308,7 +308,7 @@ export const getAIChatResponse = async (
     type: Type.OBJECT, properties: {
         response: { type: Type.STRING },
         highlightedPlayerIds: { type: Type.ARRAY, items: { type: Type.STRING } },
-    }, required: ["response", "highlightedPlayerIds"]
+    }, required: ["response", "highlightedPlayerIds"],
   };
   const parsedData = await generateJson(prompt, schema, systemInstruction);
   return { text: parsedData.response, playerIdsToHighlight: parsedData.highlightedPlayerIds || [] };
@@ -317,16 +317,16 @@ export const getAIChatResponse = async (
 export const getAIPlayerConversationResponse = async (
     player: Player,
     userMessage: string,
-    personality: AIPersonality // manager personality
+    personality: AIPersonality, // manager personality
 ): Promise<{ response: string; moraleEffect: number, promiseRequest?: PromiseRequest }> => {
-    if (!aiInstance) return { response: 'AI is offline. Player is unavailable to talk.', moraleEffect: 0 };
-    
+    if (!aiInstance) {return { response: 'AI is offline. Player is unavailable to talk.', moraleEffect: 0 };}
+
     const prompt = await loadAndFormatPrompt('player_conversation.md', {
         '{{PLAYER_DATA}}': formatPlayerForPrompt(player),
         '{{CONVERSATION_HISTORY}}': player.conversationHistory.map(m => `${m.sender === 'user' ? 'Manager' : player.name}: ${m.text}`).join('\n'),
         '{{USER_MESSAGE}}': userMessage,
     });
-    
+
     const systemInstruction = `You are a professional soccer player with a distinct personality based on your traits and morale. Your manager's personality is ${personality}. Respond accordingly.`;
 
     const schema = {
@@ -343,15 +343,15 @@ export const getAIPlayerConversationResponse = async (
                 nullable: true,
             },
         },
-        required: ["response", "moraleEffect"]
+        required: ["response", "moraleEffect"],
     };
 
     return generateJson(prompt, schema, systemInstruction);
-}
+};
 
 
 export const getOppositionAnalysis = async (opponentName: string, formation: string, keyPlayers: string, personality: AIPersonality, scoutRating: number): Promise<AIOppositionReport> => {
-    if (!aiInstance) return getOfflineResponse('Opposition Scouting') as AIOppositionReport;
+    if (!aiInstance) {return getOfflineResponse('Opposition Scouting') as AIOppositionReport;}
     const prompt = await loadAndFormatPrompt('opposition_analysis.md', {
         '{{OPPONENT_NAME}}': opponentName,
         '{{OPPONENT_FORMATION}}': formation,
@@ -364,13 +364,13 @@ export const getOppositionAnalysis = async (opponentName: string, formation: str
             keyPlayers: { type: Type.STRING },
             tacticalApproach: { type: Type.STRING },
             weaknesses: { type: Type.STRING },
-        }, required: ["keyPlayers", "tacticalApproach", "weaknesses"]
+        }, required: ["keyPlayers", "tacticalApproach", "weaknesses"],
     };
     return generateJson(prompt, schema, systemInstruction);
 };
 
 export const getAISubstitutionSuggestion = async (onFieldPlayers: Player[], benchedPlayers: Player[], personality: AIPersonality): Promise<AISubstitutionSuggestion> => {
-    if (!aiInstance) return { playerInId: '', playerOutId: '', reasoning: 'AI is offline.' };
+    if (!aiInstance) {return { playerInId: '', playerOutId: '', reasoning: 'AI is offline.' };}
     const prompt = await loadAndFormatPrompt('substitution_suggestion.md', {
         '{{ON_FIELD_ROSTER}}': onFieldPlayers.map(formatPlayerForPrompt).join('\n'),
         '{{BENCHED_ROSTER}}': benchedPlayers.map(formatPlayerForPrompt).join('\n'),
@@ -381,13 +381,13 @@ export const getAISubstitutionSuggestion = async (onFieldPlayers: Player[], benc
             playerOutId: { type: Type.STRING },
             playerInId: { type: Type.STRING },
             reasoning: { type: Type.STRING },
-        }, required: ["playerOutId", "playerInId", "reasoning"]
+        }, required: ["playerOutId", "playerInId", "reasoning"],
     };
     return generateJson(prompt, schema, systemInstruction);
-}
+};
 
 export const getPostMatchAnalysis = async (result: MatchResult, homeTeamName: string, awayTeamName: string, personality: AIPersonality): Promise<AIPostMatchAnalysis> => {
-    if (!aiInstance) return getOfflineResponse('Post-Match Analysis') as AIPostMatchAnalysis;
+    if (!aiInstance) {return getOfflineResponse('Post-Match Analysis') as AIPostMatchAnalysis;}
     const prompt = await loadAndFormatPrompt('post_match_analysis.md', {
         '{{HOME_TEAM_NAME}}': homeTeamName,
         '{{AWAY_TEAM_NAME}}': awayTeamName,
@@ -400,13 +400,13 @@ export const getPostMatchAnalysis = async (result: MatchResult, homeTeamName: st
             summary: { type: Type.STRING },
             keyMoment: { type: Type.STRING },
             advice: { type: Type.STRING },
-        }, required: ["summary", "keyMoment", "advice"]
+        }, required: ["summary", "keyMoment", "advice"],
     };
     return generateJson(prompt, schema, systemInstruction);
-}
+};
 
 export const getAgentNegotiationResponse = async (playerName: string, playerValue: number, agentPersonality: string, userOffer: string, conversationHistory: string): Promise<AIAgentResponse> => {
-    if (!aiInstance) return getOfflineResponse('Agent Negotiation') as AIAgentResponse;
+    if (!aiInstance) {return getOfflineResponse('Agent Negotiation') as AIAgentResponse;}
     const prompt = await loadAndFormatPrompt('agent_negotiation.md', {
         '{{PLAYER_NAME}}': playerName,
         '{{PLAYER_VALUE}}': playerValue.toString(),
@@ -419,14 +419,14 @@ export const getAgentNegotiationResponse = async (playerName: string, playerValu
         type: Type.OBJECT, properties: {
             response: { type: Type.STRING },
             isDealAccepted: { type: Type.BOOLEAN },
-        }, required: ["response", "isDealAccepted"]
+        }, required: ["response", "isDealAccepted"],
     };
     return generateJson(prompt, schema, systemInstruction);
-}
+};
 
 export const getPressConferenceQuestions = async (personality: AIPersonality, narratives: PressNarrative[]): Promise<AIPressConferenceResponse> => {
-    if (!aiInstance) return getOfflineResponse('Press Conference') as AIPressConferenceResponse;
-    
+    if (!aiInstance) {return getOfflineResponse('Press Conference') as AIPressConferenceResponse;}
+
     const narrativeText = narratives.length > 0
         ? narratives.map(n => `- ID: ${n.id}, Tone: (${n.tone.toUpperCase()}) ${n.title}: ${n.content}`).join('\n')
         : 'No specific narratives are currently surrounding the club.';
@@ -462,14 +462,14 @@ export const getPressConferenceQuestions = async (personality: AIPersonality, na
 };
 
 export const getPlayerScoutingReport = async (player: TransferPlayer, formation: Formation, tactics: TeamTactics, personality: AIPersonality): Promise<AIScoutReport> => {
-    if (!aiInstance) throw new Error("AI is offline.");
-    
+    if (!aiInstance) {throw new Error("AI is offline.");}
+
     const prompt = await loadAndFormatPrompt('scout_report.md', {
         '{{PLAYER_DATA}}': formatPlayerForPrompt(player),
         '{{TEAM_FORMATION}}': formation.name,
         '{{TEAM_TACTICS}}': formatTacticsForPrompt(tactics),
     });
-    
+
     const systemInstruction = "You are a professional soccer scout providing a detailed player report.";
     const schema = {
         type: Type.OBJECT,
@@ -480,7 +480,7 @@ export const getPlayerScoutingReport = async (player: TransferPlayer, formation:
             potentialFit: { type: Type.STRING },
             estimatedValue: { type: Type.NUMBER },
         },
-        required: ["strengths", "weaknesses", "summary", "potentialFit", "estimatedValue"]
+        required: ["strengths", "weaknesses", "summary", "potentialFit", "estimatedValue"],
     };
 
     return generateJson(prompt, schema, systemInstruction);
@@ -492,9 +492,9 @@ export const generatePressNarratives = async (
   upcomingOpponent: string,
   leaguePosition: number,
   topScorer: { name: string; goals: number } | null,
-  playerInPoorForm: Player | null
+  playerInPoorForm: Player | null,
 ): Promise<PressNarrative[]> => {
-  if (!aiInstance) return [];
+  if (!aiInstance) {return [];}
 
   const prompt = await loadAndFormatPrompt('media_narrative_generation.md', {
     '{{MANAGER_NAME}}': managerName,
@@ -521,7 +521,7 @@ export const generatePressNarratives = async (
   };
 
   const generatedNarratives = await generateJson(prompt, schema, systemInstruction);
-  
+
   // Add unique IDs to the narratives
   return generatedNarratives.map((narrative: any) => ({
     ...narrative,
@@ -533,22 +533,22 @@ export const generateSocialMediaReactions = async (
   matchResult: MatchResult,
   homeTeam: string,
   awayTeam: string,
-  keyPlayers: Player[]
+  keyPlayers: Player[],
 ): Promise<string[]> => {
-  if (!aiInstance) return ['AI is offline - cannot generate social media reactions'];
+  if (!aiInstance) {return ['AI is offline - cannot generate social media reactions'];}
 
   const prompt = await loadAndFormatPrompt('social_media_reaction.md', {
     '{{HOME_TEAM}}': homeTeam,
     '{{AWAY_TEAM}}': awayTeam,
     '{{FINAL_SCORE}}': `${matchResult.homeScore}-${matchResult.awayScore}`,
     '{{KEY_EVENTS}}': matchResult.events.slice(0, 3).map(e => `${e.minute}': ${e.playerName} ${e.type}`).join(', '),
-    '{{KEY_PLAYERS}}': keyPlayers.map(p => p.name).join(', ')
+    '{{KEY_PLAYERS}}': keyPlayers.map(p => p.name).join(', '),
   });
 
   const systemInstruction = "Generate realistic social media reactions from fans about a soccer match. Make them varied in tone and emotion.";
   const schema = {
     type: Type.ARRAY,
-    items: { type: Type.STRING }
+    items: { type: Type.STRING },
   };
 
   return generateJson(prompt, schema, systemInstruction);
@@ -556,17 +556,17 @@ export const generateSocialMediaReactions = async (
 
 export const generateInjuryReport = async (
   player: Player,
-  injuryType: 'Minor Injury' | 'Major Injury'
+  injuryType: 'Minor Injury' | 'Major Injury',
 ): Promise<{
   description: string;
   estimatedRecovery: string;
   treatmentPlan: string[];
 }> => {
-  if (!aiInstance) return {
+  if (!aiInstance) {return {
     description: 'AI is offline - cannot generate injury report',
     estimatedRecovery: 'Unknown',
-    treatmentPlan: ['Rest']
-  };
+    treatmentPlan: ['Rest'],
+  };}
 
   const prompt = `Generate a realistic injury report for soccer player ${player.name} (${player.roleId}) who has sustained a ${injuryType}. 
   Consider the player's traits: ${player.traits.join(', ') || 'None'}.
@@ -578,9 +578,9 @@ export const generateInjuryReport = async (
     properties: {
       description: { type: Type.STRING },
       estimatedRecovery: { type: Type.STRING },
-      treatmentPlan: { type: Type.ARRAY, items: { type: Type.STRING } }
+      treatmentPlan: { type: Type.ARRAY, items: { type: Type.STRING } },
     },
-    required: ['description', 'estimatedRecovery', 'treatmentPlan']
+    required: ['description', 'estimatedRecovery', 'treatmentPlan'],
   };
 
   return generateJson(prompt, schema, systemInstruction);
@@ -591,19 +591,19 @@ export const generateSeasonReview = async (
   totalTeams: number,
   topScorer: { name: string; goals: number },
   seasonHighlights: string[],
-  personality: AIPersonality
+  personality: AIPersonality,
 ): Promise<{
   overallAssessment: string;
   keyAchievements: string[];
   areasForImprovement: string[];
   nextSeasonGoals: string[];
 }> => {
-  if (!aiInstance) return {
+  if (!aiInstance) {return {
     overallAssessment: 'AI is offline',
     keyAchievements: ['Season completed'],
     areasForImprovement: ['Enable AI features'],
-    nextSeasonGoals: ['Try again next season']
-  };
+    nextSeasonGoals: ['Try again next season'],
+  };}
 
   const prompt = `Provide a comprehensive season review:
   - Final League Position: ${finalPosition} out of ${totalTeams}
@@ -619,9 +619,9 @@ export const generateSeasonReview = async (
       overallAssessment: { type: Type.STRING },
       keyAchievements: { type: Type.ARRAY, items: { type: Type.STRING } },
       areasForImprovement: { type: Type.ARRAY, items: { type: Type.STRING } },
-      nextSeasonGoals: { type: Type.ARRAY, items: { type: Type.STRING } }
+      nextSeasonGoals: { type: Type.ARRAY, items: { type: Type.STRING } },
     },
-    required: ['overallAssessment', 'keyAchievements', 'areasForImprovement', 'nextSeasonGoals']
+    required: ['overallAssessment', 'keyAchievements', 'areasForImprovement', 'nextSeasonGoals'],
   };
 
   return generateJson(prompt, schema, systemInstruction);
@@ -631,17 +631,17 @@ export const analyzePlayerCompatibility = async (
   player1: Player,
   player2: Player,
   relationshipType: 'potential_signing' | 'formation_pairing' | 'mentorship',
-  personality: AIPersonality
+  personality: AIPersonality,
 ): Promise<{
   compatibilityScore: number;
   reasoning: string;
   recommendations: string[];
 }> => {
-  if (!aiInstance) return {
+  if (!aiInstance) {return {
     compatibilityScore: 50,
     reasoning: 'AI is offline',
-    recommendations: ['Enable AI features for detailed analysis']
-  };
+    recommendations: ['Enable AI features for detailed analysis'],
+  };}
 
   const prompt = `Analyze the compatibility between these two players for ${relationshipType}:
   
@@ -656,9 +656,9 @@ export const analyzePlayerCompatibility = async (
     properties: {
       compatibilityScore: { type: Type.INTEGER, minimum: 0, maximum: 100 },
       reasoning: { type: Type.STRING },
-      recommendations: { type: Type.ARRAY, items: { type: Type.STRING } }
+      recommendations: { type: Type.ARRAY, items: { type: Type.STRING } },
     },
-    required: ['compatibilityScore', 'reasoning', 'recommendations']
+    required: ['compatibilityScore', 'reasoning', 'recommendations'],
   };
 
   return generateJson(prompt, schema, systemInstruction);
@@ -669,31 +669,31 @@ export const aiService = {
   getTacticalAdvice,
   getAIFormationSuggestion,
   getAISubstitutionSuggestion,
-  
+
   // Player Analysis
   getAIPlayerComparison,
   getAIDevelopmentSummary,
   generatePlayerBio,
   getPlayerScoutingReport,
   analyzePlayerCompatibility,
-  
+
   // Match Analysis
   getPostMatchAnalysis,
   getOppositionAnalysis,
   generateSocialMediaReactions,
   generateSeasonReview,
-  
+
   // Communication
   getAIChatResponse,
   getAIPlayerConversationResponse,
   getTeamTalkOptions,
   getPressConferenceQuestions,
   getAgentNegotiationResponse,
-  
+
   // Narrative Generation
   generatePressNarratives,
   generateInjuryReport,
-  
+
   // Utility
-  isAIAvailable: () => aiInstance !== null
+  isAIAvailable: () => aiInstance !== null,
 };

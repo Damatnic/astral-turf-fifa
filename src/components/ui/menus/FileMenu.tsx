@@ -14,7 +14,7 @@ export const FileMenu: React.FC = () => {
     const { uiState, dispatch: uiDispatch } = useUIContext();
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
-    
+
     const VALID_TRAITS: PlayerTrait[] = ['Leader', 'Ambitious', 'Loyal', 'Injury Prone', 'Consistent', 'Temperamental'];
 
     useEffect(() => {
@@ -56,7 +56,7 @@ export const FileMenu: React.FC = () => {
         try {
             const selected = await open({
                 multiple: false,
-                filters: [{ name: 'CSV Roster File', extensions: ['csv'] }]
+                filters: [{ name: 'CSV Roster File', extensions: ['csv'] }],
             });
 
             if (typeof selected === 'string') {
@@ -81,17 +81,17 @@ export const FileMenu: React.FC = () => {
                                     status: (['Available', 'Minor Injury', 'Major Injury', 'Suspended', 'International Duty'].includes(row.availabilityStatus) ? row.availabilityStatus : 'Available') as PlayerAvailabilityStatus,
                                     returnDate: row.returnDate || undefined,
                                 };
-                                
+
                                 const contract: PlayerContract = {
                                     clauses: [],
-                                }
+                                };
 
                                 const loan: LoanStatus = { isLoaned: false };
-                                
+
                                 const team = row.team === 'home' || row.team === 'away' ? row.team : 'home';
-                                
+
                                 const traits = (row.traits?.split(',') || []).map((t:string) => t.trim()).filter((t:string): t is PlayerTrait => VALID_TRAITS.includes(t as PlayerTrait));
-                                
+
                                 const potentialParts = (row.potential || '70-80').split('-').map((s: string) => parseInt(s.trim(), 10));
                                 const potential: [number, number] = potentialParts.length === 2 && !isNaN(potentialParts[0]) && !isNaN(potentialParts[1])
                                     ? [potentialParts[0], potentialParts[1]]
@@ -143,7 +143,7 @@ export const FileMenu: React.FC = () => {
                     },
                     error: (err) => {
                          uiDispatch({ type: 'ADD_NOTIFICATION', payload: { message: `CSV parsing error: ${err.message}`, type: 'error' } });
-                    }
+                    },
                 });
             }
         } catch (err) {
@@ -176,7 +176,7 @@ export const FileMenu: React.FC = () => {
             const filePath = await save({
                 title: 'Export Roster CSV',
                 defaultPath: 'astral-turf-roster.csv',
-                filters: [{ name: 'CSV File', extensions: ['csv'] }]
+                filters: [{ name: 'CSV File', extensions: ['csv'] }],
             });
             if (filePath) {
                 await writeTextFile(filePath, csv);
@@ -186,14 +186,14 @@ export const FileMenu: React.FC = () => {
             uiDispatch({ type: 'ADD_NOTIFICATION', payload: { message: `Error exporting roster. ${err instanceof Error ? err.message : ''}`, type: 'error' } });
         }
     };
-    
+
     const handleExportPlaybook = async () => {
         setIsOpen(false);
         try {
             const filePath = await save({
                 title: 'Export Playbook',
                 defaultPath: 'astral-turf-playbook.json',
-                filters: [{ name: 'JSON File', extensions: ['json'] }]
+                filters: [{ name: 'JSON File', extensions: ['json'] }],
             });
             if (filePath) {
                 await writeTextFile(filePath, JSON.stringify(tacticsState.playbook, null, 2));
@@ -210,7 +210,7 @@ export const FileMenu: React.FC = () => {
         try {
             const selected = await open({
                 multiple: false,
-                filters: [{ name: 'JSON File', extensions: ['json'] }]
+                filters: [{ name: 'JSON File', extensions: ['json'] }],
             });
             if (typeof selected === 'string') {
                 const fileContents = await readTextFile(selected);

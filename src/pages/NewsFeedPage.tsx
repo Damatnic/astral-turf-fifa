@@ -7,8 +7,8 @@ const NewsFeedPage: React.FC = () => {
     const { newsFeed, gameWeek, season } = franchiseState;
     const [selectedFilter, setSelectedFilter] = useState<'all' | NewsItem['type']>('all');
 
-    const filteredNews = newsFeed.filter(item => 
-        selectedFilter === 'all' || item.type === selectedFilter
+    const filteredNews = newsFeed.filter(item =>
+        selectedFilter === 'all' || item.type === selectedFilter,
     );
 
     const getNewsIcon = (type: NewsItem['type']) => {
@@ -79,10 +79,10 @@ const NewsFeedPage: React.FC = () => {
         const now = new Date();
         const diffTime = Math.abs(now.getTime() - date.getTime());
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        
-        if (diffDays === 1) return 'Today';
-        if (diffDays === 2) return 'Yesterday';
-        if (diffDays <= 7) return `${diffDays - 1} days ago`;
+
+        if (diffDays === 1) {return 'Today';}
+        if (diffDays === 2) {return 'Yesterday';}
+        if (diffDays <= 7) {return `${diffDays - 1} days ago`;}
         return date.toLocaleDateString();
     };
 
@@ -162,7 +162,7 @@ const NewsFeedPage: React.FC = () => {
                                             <div className={`flex-shrink-0 p-2 rounded-full ${getNewsTypeBackground(newsItem.type)} ${getNewsTypeColor(newsItem.type)}`}>
                                                 {getNewsIcon(newsItem.type)}
                                             </div>
-                                            
+
                                             <div className="flex-grow">
                                                 <div className="flex items-start justify-between mb-2">
                                                     <div>
@@ -179,7 +179,7 @@ const NewsFeedPage: React.FC = () => {
                                                         </div>
                                                     </div>
                                                 </div>
-                                                
+
                                                 <p className="text-gray-300 leading-relaxed">
                                                     {newsItem.content}
                                                 </p>
@@ -237,7 +237,7 @@ const NewsFeedPage: React.FC = () => {
                                 </div>
                                 <h3 className="text-lg font-semibold text-gray-300 mb-2">No News Available</h3>
                                 <p className="text-gray-500">
-                                    {selectedFilter === 'all' 
+                                    {selectedFilter === 'all'
                                         ? 'No news stories are currently available.'
                                         : `No ${selectedFilter.replace('_', ' ')} news available.`
                                     }

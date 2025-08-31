@@ -21,11 +21,11 @@ const TrainingPage: React.FC = () => {
         { key: 'thursday', label: 'Thursday' },
         { key: 'friday', label: 'Friday' },
         { key: 'saturday', label: 'Saturday' },
-        { key: 'sunday', label: 'Sunday' }
+        { key: 'sunday', label: 'Sunday' },
     ];
 
     const drillCategories = [
-        'attacking', 'defending', 'physical', 'technical', 'tactical', 'set_pieces', 'warmup', 'cooldown'
+        'attacking', 'defending', 'physical', 'technical', 'tactical', 'set_pieces', 'warmup', 'cooldown',
     ];
 
     const mockDrills: Record<string, TrainingDrill> = {
@@ -39,7 +39,7 @@ const TrainingPage: React.FC = () => {
             intensity: 'low',
             fatigueEffect: 2,
             moraleEffect: 0,
-            injuryRisk: 0.01
+            injuryRisk: 0.01,
         },
         'shooting_1': {
             id: 'shooting_1',
@@ -51,7 +51,7 @@ const TrainingPage: React.FC = () => {
             intensity: 'medium',
             fatigueEffect: 8,
             moraleEffect: 1,
-            injuryRisk: 0.05
+            injuryRisk: 0.05,
         },
         'passing_1': {
             id: 'passing_1',
@@ -63,28 +63,28 @@ const TrainingPage: React.FC = () => {
             intensity: 'medium',
             fatigueEffect: 6,
             moraleEffect: 0,
-            injuryRisk: 0.03
-        }
+            injuryRisk: 0.03,
+        },
     };
 
     const handleSetDayAsRest = () => {
         dispatch({
             type: 'SET_DAY_AS_REST',
-            payload: { team: selectedTeam, day: selectedDay }
+            payload: { team: selectedTeam, day: selectedDay },
         });
     };
 
     const handleSetDayAsTraining = () => {
         dispatch({
             type: 'SET_DAY_AS_TRAINING',
-            payload: { team: selectedTeam, day: selectedDay }
+            payload: { team: selectedTeam, day: selectedDay },
         });
     };
 
     const handleSetSessionDrill = (session: 'morning' | 'afternoon', sessionPart: 'warmup' | 'main' | 'cooldown', drillId: string | null) => {
         dispatch({
             type: 'SET_SESSION_DRILL',
-            payload: { team: selectedTeam, day: selectedDay, session, sessionPart, drillId }
+            payload: { team: selectedTeam, day: selectedDay, session, sessionPart, drillId },
         });
     };
 
@@ -92,7 +92,7 @@ const TrainingPage: React.FC = () => {
         if (newTemplateName.trim()) {
             dispatch({
                 type: 'SAVE_TRAINING_TEMPLATE',
-                payload: { team: selectedTeam, name: newTemplateName.trim() }
+                payload: { team: selectedTeam, name: newTemplateName.trim() },
             });
             setNewTemplateName('');
         }
@@ -101,7 +101,7 @@ const TrainingPage: React.FC = () => {
     const handleLoadTemplate = (templateId: string) => {
         dispatch({
             type: 'LOAD_TRAINING_TEMPLATE',
-            payload: { team: selectedTeam, templateId }
+            payload: { team: selectedTeam, templateId },
         });
     };
 
@@ -120,8 +120,8 @@ const TrainingPage: React.FC = () => {
                         <button
                             onClick={() => setSelectedTeam('home')}
                             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                                selectedTeam === 'home' 
-                                    ? 'bg-teal-600 text-white' 
+                                selectedTeam === 'home'
+                                    ? 'bg-teal-600 text-white'
                                     : 'text-gray-400 hover:text-white hover:bg-gray-700'
                             }`}
                         >
@@ -130,8 +130,8 @@ const TrainingPage: React.FC = () => {
                         <button
                             onClick={() => setSelectedTeam('away')}
                             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                                selectedTeam === 'away' 
-                                    ? 'bg-teal-600 text-white' 
+                                selectedTeam === 'away'
+                                    ? 'bg-teal-600 text-white'
                                     : 'text-gray-400 hover:text-white hover:bg-gray-700'
                             }`}
                         >
@@ -257,10 +257,10 @@ const TrainingPage: React.FC = () => {
                                                 >
                                                     <option value="">No drill selected</option>
                                                     {Object.values(mockDrills)
-                                                        .filter(drill => 
+                                                        .filter(drill =>
                                                             (part === 'warmup' && drill.category === 'warmup') ||
                                                             (part === 'cooldown' && drill.category === 'cooldown') ||
-                                                            (part === 'main' && !['warmup', 'cooldown'].includes(drill.category))
+                                                            (part === 'main' && !['warmup', 'cooldown'].includes(drill.category)),
                                                         )
                                                         .map(drill => (
                                                             <option key={drill.id} value={drill.id}>
@@ -294,10 +294,10 @@ const TrainingPage: React.FC = () => {
                                                 >
                                                     <option value="">No drill selected</option>
                                                     {Object.values(mockDrills)
-                                                        .filter(drill => 
+                                                        .filter(drill =>
                                                             (part === 'warmup' && drill.category === 'warmup') ||
                                                             (part === 'cooldown' && drill.category === 'cooldown') ||
-                                                            (part === 'main' && !['warmup', 'cooldown'].includes(drill.category))
+                                                            (part === 'main' && !['warmup', 'cooldown'].includes(drill.category)),
                                                         )
                                                         .map(drill => (
                                                             <option key={drill.id} value={drill.id}>
@@ -342,7 +342,7 @@ const TrainingPage: React.FC = () => {
                                             <span className="text-sm text-gray-300 capitalize">{attr}</span>
                                             <div className="flex items-center space-x-2">
                                                 <div className="w-16 bg-gray-600 rounded-full h-2">
-                                                    <div 
+                                                    <div
                                                         className="bg-teal-400 h-2 rounded-full transition-all duration-300"
                                                         style={{ width: `${progress}%` }}
                                                     ></div>

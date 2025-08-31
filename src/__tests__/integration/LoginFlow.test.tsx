@@ -47,7 +47,7 @@ describe('Login Integration Flow', () => {
     vi.clearAllMocks();
     mockAuthService.login.mockClear();
     mockNavigate.mockClear();
-    
+
     // Mock document.body.classList methods
     document.body.classList = {
       add: vi.fn(),
@@ -153,7 +153,7 @@ describe('Login Integration Flow', () => {
         email: 'coach@astralfc.com',
         role: 'coach',
       });
-      
+
       mockAuthService.login.mockResolvedValue(mockUser);
 
       renderWithProviders(<LoginPage />);
@@ -164,7 +164,7 @@ describe('Login Integration Flow', () => {
       await waitFor(() => {
         expect(mockAuthService.login).toHaveBeenCalledWith(
           'coach@astralfc.com',
-          'password123'
+          'password123',
         );
       });
 
@@ -179,7 +179,7 @@ describe('Login Integration Flow', () => {
       const loginPromise = new Promise((resolve) => {
         resolveLogin = resolve;
       });
-      
+
       mockAuthService.login.mockReturnValue(loginPromise);
 
       renderWithProviders(<LoginPage />);
@@ -235,7 +235,7 @@ describe('Login Integration Flow', () => {
         email: 'coach@astralfc.com',
         role: 'coach',
       });
-      
+
       mockAuthService.login.mockResolvedValue(mockCoach);
 
       renderWithProviders(<LoginPage />);
@@ -257,7 +257,7 @@ describe('Login Integration Flow', () => {
         email: 'player@astralfc.com',
         role: 'player',
       });
-      
+
       mockAuthService.login.mockResolvedValue(mockPlayer);
 
       renderWithProviders(<LoginPage />);
@@ -282,7 +282,7 @@ describe('Login Integration Flow', () => {
         role: 'family',
         playerIds: ['player1'],
       });
-      
+
       mockAuthService.login.mockResolvedValue(mockFamilyMember);
 
       renderWithProviders(<LoginPage />);

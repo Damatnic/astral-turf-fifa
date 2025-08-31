@@ -26,7 +26,7 @@ const getHealthColor = (status: PlayerAvailabilityStatus) => {
         case 'Suspended': return 'bg-gray-400';
         default: return 'bg-gray-500';
     }
-}
+};
 
 const PlayerListItem: React.FC<PlayerListItemProps> = React.memo(({ player, isSelected, isCaptain, onSelect, onEdit, onDoubleClick, onDragStart, onAssignTeam }) => {
     const handleTeamClick = (e: React.MouseEvent, team: Team) => {
@@ -54,7 +54,7 @@ const PlayerListItem: React.FC<PlayerListItemProps> = React.memo(({ player, isSe
             <div className="flex-grow">
                 <div className="flex items-center">
                     {player.nationality && (
-                        <img 
+                        <img
                             src={`https://flagcdn.com/w20/${player.nationality.toLowerCase()}.png`}
                             alt={player.nationality}
                             className="w-5 h-auto mr-1.5 rounded-sm"
@@ -128,22 +128,22 @@ export const LeftSidebar: React.FC = () => {
     const { tacticsState, dispatch } = useTacticsContext();
     const { uiState, dispatch: uiDispatch } = useUIContext();
     const navigate = useNavigate();
-    
+
     const { players, formations, activeFormationIds, playbook, captainIds, tacticalFamiliarity } = tacticsState;
     const { activePlaybookItemId, selectedPlayerId, isSuggestingFormation, activeTeamContext, rosterSearchQuery, rosterRoleFilters, playbookCategories, settings, activeStepIndex } = uiState;
-    
+
     const activeTeam = activeTeamContext === 'away' ? 'away' : 'home';
     const activeFormationId = activeFormationIds[activeTeam];
     const familiarity = tacticalFamiliarity[activeFormationId] || 0;
-    
+
     const [isCreating, setIsCreating] = useState(false);
     const [sortCriteria, setSortCriteria] = useState<'name' | 'jerseyNumber' | 'overall'>('name');
-    
+
     const playersInContext = useMemo(() =>
         players.filter(p => activeTeamContext === 'both' || p.team === activeTeamContext),
-        [players, activeTeamContext]
+        [players, activeTeamContext],
     );
-    
+
     const sortedPlayers = useMemo(() => {
         const filtered = playersInContext.filter(player => {
             const queryMatch = rosterSearchQuery
@@ -154,7 +154,7 @@ export const LeftSidebar: React.FC = () => {
             const roleMatch = rosterRoleFilters.length > 0
                 ? playerRoleInfo && rosterRoleFilters.includes(playerRoleInfo.category)
                 : true;
-            
+
             return queryMatch && roleMatch;
         });
 
@@ -180,7 +180,7 @@ export const LeftSidebar: React.FC = () => {
         }
         const homeFormation = formations[activeFormationIds.home];
         const awayFormation = formations[activeFormationIds.away];
-        
+
         const onField = new Set<string | null>();
         if(activeTeamContext === 'home' || activeTeamContext === 'both') {
             homeFormation.slots.forEach(s => onField.add(s.playerId));
@@ -205,8 +205,8 @@ export const LeftSidebar: React.FC = () => {
         if(confirm(`Are you sure you want to bench all players for the ${activeTeam} team?`)) {
             dispatch({ type: 'BENCH_ALL_PLAYERS', payload: { team: activeTeam } });
         }
-    }
-    
+    };
+
     const handleAddNewPlayer = () => {
         uiDispatch({ type: 'SET_EDITING_PLAYER_ID', payload: null });
         uiDispatch({ type: 'OPEN_MODAL', payload: 'editPlayer' });
@@ -312,7 +312,7 @@ export const LeftSidebar: React.FC = () => {
                     </div>
                 </div>
             </div>
-            
+
             <button
                 onClick={handleSuggestFormation}
                 disabled={isSuggestingFormation || !!activePlaybookItemId}
@@ -342,11 +342,11 @@ export const LeftSidebar: React.FC = () => {
                      </div>
                 </div>
                 {isCreating && <CreatePlaybookItemForm onSave={handleSaveNewItem} onCancel={() => setIsCreating(false)} />}
-                
+
                 <div className="space-y-2">
                     {(Object.keys(playbookByCategory) as PlayCategory[]).sort().map(category => (
                          <div key={category}>
-                             <button 
+                             <button
                                 onClick={() => uiDispatch({ type: 'TOGGLE_PLAYBOOK_CATEGORY', payload: category })}
                                 className="w-full flex justify-between items-center text-left text-xs font-bold uppercase text-gray-400 hover:bg-gray-700/50 px-2 py-1 rounded-md"
                             >
@@ -359,8 +359,8 @@ export const LeftSidebar: React.FC = () => {
                                         <li key={item.id} className={`group flex items-center justify-between text-sm p-1.5 rounded-md cursor-pointer ${activePlaybookItemId === item.id ? 'bg-teal-600/30 font-semibold' : 'hover:bg-gray-700'}`} onClick={() => handleLoadItem(item.id)}>
                                             <span className="truncate">{item.name}</span>
                                             <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <button onClick={(e) => { e.stopPropagation(); handleDuplicateItem(item.id) }} className="p-1 hover:text-teal-400" title="Duplicate"><CopyIcon className="w-3 h-3" /></button>
-                                                <button onClick={(e) => { e.stopPropagation(); handleDeleteItem(item.id) }} className="p-1 hover:text-red-500" title="Delete"><TrashIcon className="w-3 h-3" /></button>
+                                                <button onClick={(e) => { e.stopPropagation(); handleDuplicateItem(item.id); }} className="p-1 hover:text-teal-400" title="Duplicate"><CopyIcon className="w-3 h-3" /></button>
+                                                <button onClick={(e) => { e.stopPropagation(); handleDeleteItem(item.id); }} className="p-1 hover:text-red-500" title="Delete"><TrashIcon className="w-3 h-3" /></button>
                                             </div>
                                         </li>
                                     ))}
@@ -382,10 +382,10 @@ export const LeftSidebar: React.FC = () => {
                         + Add Player
                     </button>
                 </div>
-                
+
                 <div className="flex items-center space-x-2 mb-2">
                     <div className="relative flex-grow">
-                        <input 
+                        <input
                             type="text"
                             placeholder="Search roster..."
                             value={rosterSearchQuery}
@@ -409,11 +409,11 @@ export const LeftSidebar: React.FC = () => {
 
                 <div className="flex space-x-1 mb-2">
                     {(['GK', 'DF', 'MF', 'FW'] as PositionRole[]).map(role => (
-                        <button 
+                        <button
                             key={role}
                             onClick={() => uiDispatch({ type: 'TOGGLE_ROSTER_ROLE_FILTER', payload: role })}
                             className={`px-2 py-0.5 text-xs font-semibold rounded-full border ${
-                                rosterRoleFilters.includes(role) 
+                                rosterRoleFilters.includes(role)
                                     ? 'bg-teal-500 border-teal-400 text-white'
                                     : 'bg-gray-600 border-gray-500 text-gray-300 hover:bg-teal-600/50'
                             }`}
@@ -423,7 +423,7 @@ export const LeftSidebar: React.FC = () => {
                     ))}
                     {rosterRoleFilters.length > 0 && <button onClick={() => uiDispatch({type: 'CLEAR_ROSTER_FILTERS'})} className="text-xs text-gray-400 hover:text-white">Clear</button>}
                 </div>
-                
+
                 <div className="flex-grow overflow-y-auto space-y-3 pr-1">
                     <div>
                         <h4 className="text-xs font-bold uppercase text-gray-500 px-2 mb-1">On Field ({onFieldPlayers.length})</h4>

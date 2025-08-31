@@ -23,7 +23,7 @@ const AdvancedAnalyticsPage: React.FC = () => {
               Advanced AI Analytics
             </h1>
             <p className="text-gray-400 mt-2 max-w-2xl">
-              Unlock the power of artificial intelligence to analyze player development, 
+              Unlock the power of artificial intelligence to analyze player development,
               predict match outcomes, and optimize your tactical approach with cutting-edge analytics.
             </p>
           </div>
@@ -54,7 +54,7 @@ const AdvancedAnalyticsPage: React.FC = () => {
               <h3 className="text-lg font-semibold text-white">Predictive Development</h3>
             </div>
             <p className="text-gray-400 text-sm mb-4">
-              AI analyzes player attributes, training patterns, and performance trends to predict 
+              AI analyzes player attributes, training patterns, and performance trends to predict
               future development trajectories and recommend personalized training programs.
             </p>
             <div className="space-y-2">
@@ -75,7 +75,7 @@ const AdvancedAnalyticsPage: React.FC = () => {
               <h3 className="text-lg font-semibold text-white">Tactical Intelligence</h3>
             </div>
             <p className="text-gray-400 text-sm mb-4">
-              Advanced formation analysis reveals strengths, vulnerabilities, and optimal player 
+              Advanced formation analysis reveals strengths, vulnerabilities, and optimal player
               positioning based on opponent tactics and team chemistry.
             </p>
             <div className="space-y-2">
@@ -96,7 +96,7 @@ const AdvancedAnalyticsPage: React.FC = () => {
               <h3 className="text-lg font-semibold text-white">Match Prediction</h3>
             </div>
             <p className="text-gray-400 text-sm mb-4">
-              Sophisticated algorithms analyze team strength, player form, tactical setups, 
+              Sophisticated algorithms analyze team strength, player form, tactical setups,
               and historical data to predict match outcomes with remarkable accuracy.
             </p>
             <div className="space-y-2">
@@ -120,7 +120,7 @@ const AdvancedAnalyticsPage: React.FC = () => {
               <p className="text-blue-200">Next-generation analytics for professional soccer management</p>
             </div>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
             <div className="text-center">
               <div className="text-2xl font-bold text-blue-400 mb-1">15+</div>

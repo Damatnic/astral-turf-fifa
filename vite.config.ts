@@ -12,21 +12,21 @@ export default defineConfig(({ mode }) => {
       server: {
         port: 8081,
         strictPort: true,
-        host: true // This allows external connections
+        host: true, // This allows external connections
       },
       define: {
         'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY || env.API_KEY),
-        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY || env.API_KEY)
+        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY || env.API_KEY),
       },
       resolve: {
         alias: {
           '@': resolve(__dirname, '.'),
-        }
+        },
       },
       esbuild: {
         loader: 'tsx',
         include: /\.(tsx?|jsx?)$/,
-        exclude: []
+        exclude: [],
       },
       build: {
         rollupOptions: {
@@ -43,9 +43,9 @@ export default defineConfig(({ mode }) => {
               // Chart related components (can be lazy loaded)
               'charts': [
                 'src/components/charts/BarChart.tsx',
-                'src/components/charts/LineChart.tsx', 
+                'src/components/charts/LineChart.tsx',
                 'src/components/charts/RadarChart.tsx',
-                'src/components/charts/ScatterPlot.tsx'
+                'src/components/charts/ScatterPlot.tsx',
               ],
               // Large popup components that are conditionally rendered
               'popups': [
@@ -53,15 +53,15 @@ export default defineConfig(({ mode }) => {
                 'src/components/popups/CustomFormationEditorPopup.tsx',
                 'src/components/popups/PlayerComparePopup.tsx',
                 'src/components/popups/TransferMarketPopup.tsx',
-                'src/components/popups/ScoutingPopup.tsx'
+                'src/components/popups/ScoutingPopup.tsx',
               ],
               // Dashboard components (heavy components)
               'dashboards': [
                 'src/components/dashboards/CoachDashboard.tsx',
-                'src/components/dashboards/PlayerDashboard.tsx'
-              ]
-            }
-          }
+                'src/components/dashboards/PlayerDashboard.tsx',
+              ],
+            },
+          },
         },
         // Optimize chunk size warning limit to be more aggressive
         chunkSizeWarningLimit: 300,
@@ -71,8 +71,8 @@ export default defineConfig(({ mode }) => {
         minify: 'esbuild',
         // Optimize dependencies
         commonjsOptions: {
-          transformMixedEsModules: true
-        }
-      }
+          transformMixedEsModules: true,
+        },
+      },
     };
 });

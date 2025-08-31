@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef } from 'react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -14,10 +14,9 @@ import {
   Filler,
   ScriptableContext,
   TooltipItem,
-  ChartConfiguration,
-  ChartOptions
+  ChartOptions,
 } from 'chart.js';
-import { Line, Bar, Doughnut, Radar, Scatter } from 'react-chartjs-2';
+import { Line, Bar, Doughnut, Radar } from 'react-chartjs-2';
 import { motion } from 'framer-motion';
 import { useTheme } from '../../context/ThemeContext';
 import { AnimatedContainer } from '../ui/AnimationSystem';
@@ -34,20 +33,20 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  Filler
+  Filler,
 );
 
 // Chart animation variants
 const chartVariants = {
   hidden: { opacity: 0, scale: 0.8 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     scale: 1,
     transition: {
       duration: 0.6,
-      ease: [0.25, 0.46, 0.45, 0.94]
-    }
-  }
+      ease: [0.25, 0.46, 0.45, 0.94],
+    },
+  },
 };
 
 interface BaseChartProps {
@@ -88,11 +87,11 @@ export const EnhancedLineChart: React.FC<EnhancedLineChartProps> = ({
   animated = true,
   showPoints = true,
   smooth = true,
-  stacked = false
+  stacked = false,
 }) => {
-  const { theme, tokens, isDark } = useTheme();
+  const { theme, tokens } = useTheme();
   const chartRef = useRef<ChartJS>(null);
-  const [isAnimated, setIsAnimated] = useState(false);
+  // Animation handled by AnimatedContainer
 
   // Create gradient backgrounds
   const createGradient = (ctx: CanvasRenderingContext2D, color: string, alpha = 0.1) => {
@@ -102,21 +101,17 @@ export const EnhancedLineChart: React.FC<EnhancedLineChartProps> = ({
     return gradient;
   };
 
-  useEffect(() => {
-    if (animated && chartRef.current) {
-      setTimeout(() => setIsAnimated(true), 100);
-    }
-  }, [animated]);
+  // Animation handled by AnimatedContainer wrapper
 
   const chartData = {
     labels: data.labels,
-    datasets: data.datasets.map((dataset, index) => {
+    datasets: data.datasets.map((dataset) => {
       const color = dataset.color || theme.colors.accent.primary;
       return {
         label: dataset.label,
         data: dataset.data,
         borderColor: color,
-        backgroundColor: dataset.fill || dataset.gradient 
+        backgroundColor: dataset.fill || dataset.gradient
           ? (context: ScriptableContext<"line">) => {
               const ctx = context.chart.ctx;
               return createGradient(ctx, color, 0.1);
@@ -132,7 +127,7 @@ export const EnhancedLineChart: React.FC<EnhancedLineChartProps> = ({
         tension: smooth ? 0.4 : 0,
         cubicInterpolationMode: smooth ? 'monotone' : 'default',
       };
-    })
+    }),
   };
 
   const options: ChartOptions<'line'> = {
@@ -141,7 +136,7 @@ export const EnhancedLineChart: React.FC<EnhancedLineChartProps> = ({
     animation: animated ? {
       duration: 1500,
       easing: 'easeInOutQuart',
-      delay: (context) => context.dataIndex * 50
+      delay: (context) => context.dataIndex * 50,
     } : false,
     plugins: {
       legend: {
@@ -151,11 +146,11 @@ export const EnhancedLineChart: React.FC<EnhancedLineChartProps> = ({
           font: {
             family: tokens.typography.fontFamilies.sans.join(', '),
             size: 12,
-            weight: 500
+            weight: 500,
           },
           usePointStyle: true,
-          padding: 20
-        }
+          padding: 20,
+        },
       },
       tooltip: {
         backgroundColor: theme.colors.background.secondary,
@@ -170,46 +165,46 @@ export const EnhancedLineChart: React.FC<EnhancedLineChartProps> = ({
         callbacks: {
           label: (context: TooltipItem<'line'>) => {
             return `${context.dataset.label}: ${context.parsed.y.toFixed(1)}`;
-          }
-        }
-      }
+          },
+        },
+      },
     },
     scales: {
       x: {
         stacked,
         grid: {
           color: theme.colors.border.primary,
-          display: true
+          display: true,
         },
         ticks: {
           color: theme.colors.text.tertiary,
           font: {
             family: tokens.typography.fontFamilies.sans.join(', '),
-            size: 11
-          }
-        }
+            size: 11,
+          },
+        },
       },
       y: {
         stacked,
         grid: {
           color: theme.colors.border.primary,
-          display: true
+          display: true,
         },
         ticks: {
           color: theme.colors.text.tertiary,
           font: {
             family: tokens.typography.fontFamilies.sans.join(', '),
-            size: 11
-          }
-        }
-      }
+            size: 11,
+          },
+        },
+      },
     },
     elements: {
       point: {
         hoverBackgroundColor: theme.colors.accent.primary,
-        hoverBorderColor: theme.colors.background.primary
-      }
-    }
+        hoverBorderColor: theme.colors.background.primary,
+      },
+    },
   };
 
   if (loading) {
@@ -254,16 +249,16 @@ export const EnhancedLineChart: React.FC<EnhancedLineChartProps> = ({
           )}
         </div>
       )}
-      
+
       <motion.div
         variants={chartVariants}
         initial="hidden"
         animate="visible"
         style={{ height }}
       >
-        <Line 
+        <Line
           ref={chartRef}
-          data={chartData} 
+          data={chartData}
           options={options}
         />
       </motion.div>
@@ -296,14 +291,14 @@ export const EnhancedBarChart: React.FC<EnhancedBarChartProps> = ({
   className = '',
   animated = true,
   horizontal = false,
-  stacked = false
+  stacked = false,
 }) => {
   const { theme, tokens } = useTheme();
   const chartRef = useRef<ChartJS>(null);
 
   const chartData = {
     labels: data.labels,
-    datasets: data.datasets.map((dataset, index) => {
+    datasets: data.datasets.map((dataset) => {
       const color = dataset.color || theme.colors.accent.primary;
       return {
         label: dataset.label,
@@ -322,7 +317,7 @@ export const EnhancedBarChart: React.FC<EnhancedBarChartProps> = ({
         borderRadius: parseInt(tokens.borderRadius.md),
         borderSkipped: false,
       };
-    })
+    }),
   };
 
   const options: ChartOptions<'bar'> = {
@@ -332,7 +327,7 @@ export const EnhancedBarChart: React.FC<EnhancedBarChartProps> = ({
     animation: animated ? {
       duration: 1200,
       easing: 'easeOutQuart',
-      delay: (context) => context.dataIndex * 80
+      delay: (context) => context.dataIndex * 80,
     } : false,
     plugins: {
       legend: {
@@ -342,11 +337,11 @@ export const EnhancedBarChart: React.FC<EnhancedBarChartProps> = ({
           font: {
             family: tokens.typography.fontFamilies.sans.join(', '),
             size: 12,
-            weight: 500
+            weight: 500,
           },
           usePointStyle: true,
-          padding: 20
-        }
+          padding: 20,
+        },
       },
       tooltip: {
         backgroundColor: theme.colors.background.secondary,
@@ -355,38 +350,38 @@ export const EnhancedBarChart: React.FC<EnhancedBarChartProps> = ({
         borderColor: theme.colors.border.primary,
         borderWidth: 1,
         cornerRadius: parseInt(tokens.borderRadius.lg),
-      }
+      },
     },
     scales: {
       x: {
         stacked,
         grid: {
           color: theme.colors.border.primary,
-          display: !horizontal
+          display: !horizontal,
         },
         ticks: {
           color: theme.colors.text.tertiary,
           font: {
             family: tokens.typography.fontFamilies.sans.join(', '),
-            size: 11
-          }
-        }
+            size: 11,
+          },
+        },
       },
       y: {
         stacked,
         grid: {
           color: theme.colors.border.primary,
-          display: horizontal
+          display: horizontal,
         },
         ticks: {
           color: theme.colors.text.tertiary,
           font: {
             family: tokens.typography.fontFamilies.sans.join(', '),
-            size: 11
-          }
-        }
-      }
-    }
+            size: 11,
+          },
+        },
+      },
+    },
   };
 
   if (loading) {
@@ -418,16 +413,16 @@ export const EnhancedBarChart: React.FC<EnhancedBarChartProps> = ({
           )}
         </div>
       )}
-      
+
       <motion.div
         variants={chartVariants}
         initial="hidden"
         animate="visible"
         style={{ height }}
       >
-        <Bar 
+        <Bar
           ref={chartRef}
-          data={chartData} 
+          data={chartData}
           options={options}
         />
       </motion.div>
@@ -456,7 +451,7 @@ export const EnhancedDoughnutChart: React.FC<EnhancedDoughnutChartProps> = ({
   className = '',
   animated = true,
   showPercentage = true,
-  cutout = '60%'
+  cutout = '60%',
 }) => {
   const { theme, tokens } = useTheme();
   const chartRef = useRef<ChartJS>(null);
@@ -468,7 +463,7 @@ export const EnhancedDoughnutChart: React.FC<EnhancedDoughnutChartProps> = ({
     theme.colors.status.warning,
     theme.colors.status.error,
     theme.colors.secondary[400],
-    theme.colors.secondary[600]
+    theme.colors.secondary[600],
   ];
 
   const chartData = {
@@ -480,9 +475,9 @@ export const EnhancedDoughnutChart: React.FC<EnhancedDoughnutChartProps> = ({
         borderColor: colors.map(color => color),
         borderWidth: 2,
         hoverBorderWidth: 4,
-        hoverOffset: 8
-      }
-    ]
+        hoverOffset: 8,
+      },
+    ],
   };
 
   const options: ChartOptions<'doughnut'> = {
@@ -493,7 +488,7 @@ export const EnhancedDoughnutChart: React.FC<EnhancedDoughnutChartProps> = ({
       animateRotate: true,
       animateScale: true,
       duration: 1000,
-      easing: 'easeOutQuart'
+      easing: 'easeOutQuart',
     } : false,
     plugins: {
       legend: {
@@ -503,7 +498,7 @@ export const EnhancedDoughnutChart: React.FC<EnhancedDoughnutChartProps> = ({
           font: {
             family: tokens.typography.fontFamilies.sans.join(', '),
             size: 12,
-            weight: 500
+            weight: 500,
           },
           usePointStyle: true,
           padding: 15,
@@ -517,11 +512,11 @@ export const EnhancedDoughnutChart: React.FC<EnhancedDoughnutChartProps> = ({
                 fillStyle: colors[index],
                 strokeStyle: colors[index],
                 hidden: false,
-                index
+                index,
               };
             });
-          }
-        }
+          },
+        },
       },
       tooltip: {
         backgroundColor: theme.colors.background.secondary,
@@ -535,10 +530,10 @@ export const EnhancedDoughnutChart: React.FC<EnhancedDoughnutChartProps> = ({
             const value = context.parsed;
             const percentage = ((value / total) * 100).toFixed(1);
             return `${context.label}: ${value} (${percentage}%)`;
-          }
-        }
-      }
-    }
+          },
+        },
+      },
+    },
   };
 
   if (loading) {
@@ -570,16 +565,16 @@ export const EnhancedDoughnutChart: React.FC<EnhancedDoughnutChartProps> = ({
           )}
         </div>
       )}
-      
+
       <motion.div
         variants={chartVariants}
         initial="hidden"
         animate="visible"
         style={{ height }}
       >
-        <Doughnut 
+        <Doughnut
           ref={chartRef}
-          data={chartData} 
+          data={chartData}
           options={options}
         />
       </motion.div>
@@ -610,14 +605,14 @@ export const EnhancedRadarChart: React.FC<EnhancedRadarChartProps> = ({
   error,
   className = '',
   animated = true,
-  scale
+  scale,
 }) => {
   const { theme, tokens } = useTheme();
   const chartRef = useRef<ChartJS>(null);
 
   const chartData = {
     labels: data.labels,
-    datasets: data.datasets.map((dataset, index) => {
+    datasets: data.datasets.map((dataset) => {
       const color = dataset.color || theme.colors.accent.primary;
       return {
         label: dataset.label,
@@ -630,9 +625,9 @@ export const EnhancedRadarChart: React.FC<EnhancedRadarChartProps> = ({
         pointRadius: 4,
         pointHoverRadius: 6,
         borderWidth: 2,
-        fill: dataset.fill !== false
+        fill: dataset.fill !== false,
       };
-    })
+    }),
   };
 
   const options: ChartOptions<'radar'> = {
@@ -640,7 +635,7 @@ export const EnhancedRadarChart: React.FC<EnhancedRadarChartProps> = ({
     maintainAspectRatio: false,
     animation: animated ? {
       duration: 1000,
-      easing: 'easeOutQuart'
+      easing: 'easeOutQuart',
     } : false,
     plugins: {
       legend: {
@@ -650,11 +645,11 @@ export const EnhancedRadarChart: React.FC<EnhancedRadarChartProps> = ({
           font: {
             family: tokens.typography.fontFamilies.sans.join(', '),
             size: 12,
-            weight: 500
+            weight: 500,
           },
           usePointStyle: true,
-          padding: 20
-        }
+          padding: 20,
+        },
       },
       tooltip: {
         backgroundColor: theme.colors.background.secondary,
@@ -663,7 +658,7 @@ export const EnhancedRadarChart: React.FC<EnhancedRadarChartProps> = ({
         borderColor: theme.colors.border.primary,
         borderWidth: 1,
         cornerRadius: parseInt(tokens.borderRadius.lg),
-      }
+      },
     },
     scales: {
       r: {
@@ -671,31 +666,31 @@ export const EnhancedRadarChart: React.FC<EnhancedRadarChartProps> = ({
         min: scale?.min,
         max: scale?.max,
         angleLines: {
-          color: theme.colors.border.primary
+          color: theme.colors.border.primary,
         },
         grid: {
-          color: theme.colors.border.primary
+          color: theme.colors.border.primary,
         },
         pointLabels: {
           color: theme.colors.text.secondary,
           font: {
             family: tokens.typography.fontFamilies.sans.join(', '),
             size: 11,
-            weight: 500
-          }
+            weight: 500,
+          },
         },
         ticks: {
           color: theme.colors.text.tertiary,
           backdrop: {
-            color: 'transparent'
+            color: 'transparent',
           },
           font: {
             family: tokens.typography.fontFamilies.sans.join(', '),
-            size: 10
-          }
-        }
-      }
-    }
+            size: 10,
+          },
+        },
+      },
+    },
   };
 
   if (loading) {
@@ -727,16 +722,16 @@ export const EnhancedRadarChart: React.FC<EnhancedRadarChartProps> = ({
           )}
         </div>
       )}
-      
+
       <motion.div
         variants={chartVariants}
         initial="hidden"
         animate="visible"
         style={{ height }}
       >
-        <Radar 
+        <Radar
           ref={chartRef}
-          data={chartData} 
+          data={chartData}
           options={options}
         />
       </motion.div>
@@ -748,5 +743,5 @@ export default {
   EnhancedLineChart,
   EnhancedBarChart,
   EnhancedDoughnutChart,
-  EnhancedRadarChart
+  EnhancedRadarChart,
 };

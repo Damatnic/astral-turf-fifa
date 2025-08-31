@@ -21,79 +21,79 @@ export const ROUTE_PERMISSIONS: RoutePermission[] = [
   {
     path: '/player/:playerId',
     allowedRoles: ['coach', 'player', 'family'],
-    requiredPermissions: ['canViewPlayer']
+    requiredPermissions: ['canViewPlayer'],
   },
 
   // Coach-only routes
   {
     path: '/tactics',
     allowedRoles: ['coach'],
-    fallbackPath: '/dashboard'
+    fallbackPath: '/dashboard',
   },
   {
     path: '/training',
     allowedRoles: ['coach'],
-    fallbackPath: '/dashboard'
+    fallbackPath: '/dashboard',
   },
   {
     path: '/transfers',
     allowedRoles: ['coach'],
-    fallbackPath: '/dashboard'
+    fallbackPath: '/dashboard',
   },
   {
     path: '/staff',
     allowedRoles: ['coach'],
-    fallbackPath: '/dashboard'
+    fallbackPath: '/dashboard',
   },
   {
     path: '/finances',
     allowedRoles: ['coach'],
-    fallbackPath: '/dashboard'
+    fallbackPath: '/dashboard',
   },
   {
     path: '/youth-academy',
     allowedRoles: ['coach'],
-    fallbackPath: '/dashboard'
+    fallbackPath: '/dashboard',
   },
   {
     path: '/stadium',
     allowedRoles: ['coach'],
-    fallbackPath: '/dashboard'
+    fallbackPath: '/dashboard',
   },
   {
     path: '/sponsorships',
     allowedRoles: ['coach'],
-    fallbackPath: '/dashboard'
+    fallbackPath: '/dashboard',
   },
   {
     path: '/board-objectives',
     allowedRoles: ['coach'],
-    fallbackPath: '/dashboard'
+    fallbackPath: '/dashboard',
   },
   {
     path: '/job-security',
     allowedRoles: ['coach'],
-    fallbackPath: '/dashboard'
+    fallbackPath: '/dashboard',
   },
   {
     path: '/international-management',
     allowedRoles: ['coach'],
-    fallbackPath: '/dashboard'
+    fallbackPath: '/dashboard',
   },
   {
     path: '/opposition-analysis',
     allowedRoles: ['coach'],
-    fallbackPath: '/dashboard'
+    fallbackPath: '/dashboard',
   },
   {
     path: '/press-conference',
     allowedRoles: ['coach'],
-    fallbackPath: '/dashboard'
+    fallbackPath: '/dashboard',
   },
   {
     path: '/mentoring',
     allowedRoles: ['coach'],
-    fallbackPath: '/dashboard'
+    fallbackPath: '/dashboard',
   },
 
   // Shared routes with different access levels
@@ -116,60 +116,60 @@ export const ROUTE_PERMISSIONS: RoutePermission[] = [
   {
     path: '/medical-center',
     allowedRoles: ['coach', 'player', 'family'],
-    requiredPermissions: ['canViewMedical']
+    requiredPermissions: ['canViewMedical'],
   },
   {
     path: '/skill-challenges',
     allowedRoles: ['coach', 'player'],
-    fallbackPath: '/dashboard'
+    fallbackPath: '/dashboard',
   },
 
   // Player-specific routes
   {
     path: '/my-training',
     allowedRoles: ['player'],
-    fallbackPath: '/dashboard'
+    fallbackPath: '/dashboard',
   },
   {
     path: '/my-development',
     allowedRoles: ['player'],
-    fallbackPath: '/dashboard'
+    fallbackPath: '/dashboard',
   },
   {
     path: '/my-schedule',
     allowedRoles: ['player'],
-    fallbackPath: '/dashboard'
+    fallbackPath: '/dashboard',
   },
 
   // Family-specific routes
   {
     path: '/child-overview',
     allowedRoles: ['family'],
-    fallbackPath: '/dashboard'
+    fallbackPath: '/dashboard',
   },
   {
     path: '/family-communication',
     allowedRoles: ['family'],
-    fallbackPath: '/dashboard'
+    fallbackPath: '/dashboard',
   },
   {
     path: '/fee-management',
     allowedRoles: ['family'],
-    fallbackPath: '/dashboard'
-  }
+    fallbackPath: '/dashboard',
+  },
 ];
 
 /**
  * Check if a user role can access a specific route
  */
 export const canAccessRoute = (
-  path: string, 
-  userRole: UserRole, 
-  userPermissions?: string[]
+  path: string,
+  userRole: UserRole,
+  userPermissions?: string[],
 ): { canAccess: boolean; fallbackPath?: string } => {
   // Find matching route permission (exact match first, then pattern match)
   const permission = ROUTE_PERMISSIONS.find(p => {
-    if (p.path === path) return true;
+    if (p.path === path) {return true;}
     // Handle dynamic routes like /player/:playerId
     const pattern = p.path.replace(/:[^/]+/g, '[^/]+');
     const regex = new RegExp(`^${pattern}$`);
@@ -185,19 +185,19 @@ export const canAccessRoute = (
   if (!permission.allowedRoles.includes(userRole)) {
     return {
       canAccess: false,
-      fallbackPath: permission.fallbackPath || '/dashboard'
+      fallbackPath: permission.fallbackPath || '/dashboard',
     };
   }
 
   // Check required permissions if specified
   if (permission.requiredPermissions && userPermissions) {
     const hasRequiredPermissions = permission.requiredPermissions.every(
-      perm => userPermissions.includes(perm)
+      perm => userPermissions.includes(perm),
     );
     if (!hasRequiredPermissions) {
       return {
         canAccess: false,
-        fallbackPath: permission.fallbackPath || '/dashboard'
+        fallbackPath: permission.fallbackPath || '/dashboard',
       };
     }
   }
@@ -265,5 +265,5 @@ export const ROLE_NAVIGATION: Record<UserRole, Array<{
     { path: '/news-feed', label: 'Team News', icon: 'news', group: 'team' },
     { path: '/club-history', label: 'Club History', icon: 'history', group: 'team' },
     { path: '/inbox', label: 'Messages', icon: 'inbox', group: 'communication' },
-  ]
+  ],
 };

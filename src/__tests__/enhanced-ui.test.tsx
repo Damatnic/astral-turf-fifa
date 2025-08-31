@@ -8,22 +8,22 @@ import userEvent from '@testing-library/user-event';
 import { ThemeProvider, useTheme } from '../context/ThemeContext';
 import { PersonalizationProvider, usePersonalization } from '../components/ui/PersonalizationSystem';
 import { AccessibilityProvider } from '../components/ui/AccessibilityComponents';
-import { 
-  EnhancedButton, 
-  EnhancedCard, 
-  EnhancedInput, 
-  EnhancedSwitch 
+import {
+  EnhancedButton,
+  EnhancedCard,
+  EnhancedInput,
+  EnhancedSwitch,
 } from '../components/ui/InteractiveComponents';
 import {
   EnhancedLineChart,
   EnhancedBarChart,
   EnhancedDoughnutChart,
-  EnhancedRadarChart
+  EnhancedRadarChart,
 } from '../components/charts/EnhancedCharts';
 import {
   SwipeArea,
   Draggable,
-  SortableList
+  SortableList,
 } from '../components/ui/GestureSystem';
 
 // Test wrapper component
@@ -54,7 +54,7 @@ describe('Enhanced UI Components', () => {
       render(
         <TestWrapper>
           <TestComponent />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       expect(screen.getByTestId('theme-mode')).toHaveTextContent('light');
@@ -68,7 +68,7 @@ describe('Enhanced UI Components', () => {
         return (
           <div>
             <span data-testid="current-mode">{themeMode}</span>
-            <button 
+            <button
               data-testid="switch-dark"
               onClick={() => setThemeMode('dark')}
             >
@@ -81,13 +81,13 @@ describe('Enhanced UI Components', () => {
       render(
         <TestWrapper>
           <TestComponent />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       expect(screen.getByTestId('current-mode')).toHaveTextContent('light');
-      
+
       fireEvent.click(screen.getByTestId('switch-dark'));
-      
+
       await waitFor(() => {
         expect(screen.getByTestId('current-mode')).toHaveTextContent('dark');
       });
@@ -109,7 +109,7 @@ describe('Enhanced UI Components', () => {
       render(
         <TestWrapper>
           <TestComponent />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       expect(screen.getByTestId('theme-mode')).toHaveTextContent('system');
@@ -119,10 +119,10 @@ describe('Enhanced UI Components', () => {
     it('should update preferences correctly', async () => {
       const TestComponent = () => {
         const { preferences, updatePreferences } = usePersonalization();
-        
+
         const handleUpdate = () => {
           updatePreferences({
-            layout: { ...preferences.layout, density: 'compact' }
+            layout: { ...preferences.layout, density: 'compact' },
           });
         };
 
@@ -139,13 +139,13 @@ describe('Enhanced UI Components', () => {
       render(
         <TestWrapper>
           <TestComponent />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       expect(screen.getByTestId('density')).toHaveTextContent('comfortable');
-      
+
       fireEvent.click(screen.getByTestId('update-density'));
-      
+
       await waitFor(() => {
         expect(screen.getByTestId('density')).toHaveTextContent('compact');
       });
@@ -157,7 +157,7 @@ describe('Enhanced UI Components', () => {
       render(
         <TestWrapper>
           <EnhancedButton variant="primary">Test Button</EnhancedButton>
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       const button = screen.getByRole('button', { name: 'Test Button' });
@@ -167,11 +167,11 @@ describe('Enhanced UI Components', () => {
 
     it('should handle click events', async () => {
       const handleClick = jest.fn();
-      
+
       render(
         <TestWrapper>
           <EnhancedButton onClick={handleClick}>Click Me</EnhancedButton>
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       const button = screen.getByRole('button', { name: 'Click Me' });
@@ -184,7 +184,7 @@ describe('Enhanced UI Components', () => {
       render(
         <TestWrapper>
           <EnhancedButton loading>Loading Button</EnhancedButton>
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       const button = screen.getByRole('button');
@@ -196,7 +196,7 @@ describe('Enhanced UI Components', () => {
       render(
         <TestWrapper>
           <EnhancedButton disabled>Disabled Button</EnhancedButton>
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       const button = screen.getByRole('button');
@@ -211,7 +211,7 @@ describe('Enhanced UI Components', () => {
           <EnhancedCard data-testid="test-card">
             <p>Card Content</p>
           </EnhancedCard>
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       const card = screen.getByTestId('test-card');
@@ -221,17 +221,17 @@ describe('Enhanced UI Components', () => {
 
     it('should handle interactive state', async () => {
       const handleClick = jest.fn();
-      
+
       render(
         <TestWrapper>
-          <EnhancedCard 
-            interactive 
+          <EnhancedCard
+            interactive
             onClick={handleClick}
             data-testid="interactive-card"
           >
             Interactive Card
           </EnhancedCard>
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       const card = screen.getByTestId('interactive-card');
@@ -245,12 +245,12 @@ describe('Enhanced UI Components', () => {
     it('should render correctly', () => {
       render(
         <TestWrapper>
-          <EnhancedInput 
-            label="Test Input" 
+          <EnhancedInput
+            label="Test Input"
             placeholder="Enter text..."
             data-testid="test-input"
           />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       expect(screen.getByLabelText('Test Input')).toBeInTheDocument();
@@ -259,15 +259,15 @@ describe('Enhanced UI Components', () => {
 
     it('should handle input changes', async () => {
       const handleChange = jest.fn();
-      
+
       render(
         <TestWrapper>
-          <EnhancedInput 
+          <EnhancedInput
             label="Test Input"
             onChange={handleChange}
             data-testid="test-input"
           />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       const input = screen.getByLabelText('Test Input');
@@ -280,12 +280,12 @@ describe('Enhanced UI Components', () => {
     it('should show error state', () => {
       render(
         <TestWrapper>
-          <EnhancedInput 
+          <EnhancedInput
             label="Test Input"
             error="This field is required"
             data-testid="test-input"
           />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       expect(screen.getByText('This field is required')).toBeInTheDocument();
@@ -298,12 +298,12 @@ describe('Enhanced UI Components', () => {
     it('should render correctly', () => {
       render(
         <TestWrapper>
-          <EnhancedSwitch 
+          <EnhancedSwitch
             checked={false}
             onChange={jest.fn()}
             label="Test Switch"
           />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       const switchElement = screen.getByRole('switch');
@@ -314,15 +314,15 @@ describe('Enhanced UI Components', () => {
 
     it('should handle toggle', async () => {
       const handleChange = jest.fn();
-      
+
       render(
         <TestWrapper>
-          <EnhancedSwitch 
+          <EnhancedSwitch
             checked={false}
             onChange={handleChange}
             label="Test Switch"
           />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       const switchElement = screen.getByRole('switch');
@@ -337,24 +337,24 @@ describe('Enhanced UI Components', () => {
       labels: ['Jan', 'Feb', 'Mar', 'Apr'],
       datasets: [{
         label: 'Test Data',
-        data: [10, 20, 30, 40]
-      }]
+        data: [10, 20, 30, 40],
+      }],
     };
 
     const mockDoughnutData = {
       labels: ['A', 'B', 'C'],
-      values: [30, 40, 30]
+      values: [30, 40, 30],
     };
 
     it('should render EnhancedLineChart with loading state', () => {
       render(
         <TestWrapper>
-          <EnhancedLineChart 
+          <EnhancedLineChart
             data={mockChartData}
             loading={true}
             title="Test Chart"
           />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       expect(screen.getByText('Test Chart')).toBeInTheDocument();
@@ -363,12 +363,12 @@ describe('Enhanced UI Components', () => {
     it('should render EnhancedBarChart with error state', () => {
       render(
         <TestWrapper>
-          <EnhancedBarChart 
+          <EnhancedBarChart
             data={mockChartData}
             error="Failed to load data"
             title="Bar Chart"
           />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       expect(screen.getByText('Bar Chart')).toBeInTheDocument();
@@ -378,11 +378,11 @@ describe('Enhanced UI Components', () => {
     it('should render EnhancedDoughnutChart', () => {
       render(
         <TestWrapper>
-          <EnhancedDoughnutChart 
+          <EnhancedDoughnutChart
             data={mockDoughnutData}
             title="Doughnut Chart"
           />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       expect(screen.getByText('Doughnut Chart')).toBeInTheDocument();
@@ -392,13 +392,13 @@ describe('Enhanced UI Components', () => {
   describe('Gesture Components', () => {
     it('should render SwipeArea', () => {
       const handleSwipe = jest.fn();
-      
+
       render(
         <TestWrapper>
           <SwipeArea config={{ onSwipe: handleSwipe }} data-testid="swipe-area">
             <div>Swipeable Content</div>
           </SwipeArea>
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       expect(screen.getByTestId('swipe-area')).toBeInTheDocument();
@@ -407,16 +407,16 @@ describe('Enhanced UI Components', () => {
 
     it('should render Draggable', () => {
       const handleDrag = jest.fn();
-      
+
       render(
         <TestWrapper>
-          <Draggable 
-            config={{ onDrag: handleDrag }} 
+          <Draggable
+            config={{ onDrag: handleDrag }}
             data-testid="draggable"
           >
             <div>Draggable Content</div>
           </Draggable>
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       expect(screen.getByTestId('draggable')).toBeInTheDocument();
@@ -427,17 +427,17 @@ describe('Enhanced UI Components', () => {
       const items = [
         { id: '1', content: <div>Item 1</div> },
         { id: '2', content: <div>Item 2</div> },
-        { id: '3', content: <div>Item 3</div> }
+        { id: '3', content: <div>Item 3</div> },
       ];
       const handleReorder = jest.fn();
-      
+
       render(
         <TestWrapper>
-          <SortableList 
+          <SortableList
             items={items}
             onReorder={handleReorder}
           />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       expect(screen.getByText('Item 1')).toBeInTheDocument();
@@ -454,7 +454,7 @@ describe('Enhanced UI Components', () => {
             <a href="#main" className="sr-only focus:not-sr-only">Skip to main content</a>
             <div id="main">Main Content</div>
           </div>
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       const skipLink = screen.getByText('Skip to main content');
@@ -469,7 +469,7 @@ describe('Enhanced UI Components', () => {
             <EnhancedButton data-testid="button1">Button 1</EnhancedButton>
             <EnhancedButton data-testid="button2">Button 2</EnhancedButton>
           </div>
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       const button1 = screen.getByTestId('button1');
@@ -487,10 +487,10 @@ describe('Enhanced UI Components', () => {
 
   describe('Performance', () => {
     it('should lazy load components', async () => {
-      const LazyComponent = React.lazy(() => 
+      const LazyComponent = React.lazy(() =>
         Promise.resolve({
-          default: () => <div>Lazy Loaded Component</div>
-        })
+          default: () => <div>Lazy Loaded Component</div>,
+        }),
       );
 
       render(
@@ -498,11 +498,11 @@ describe('Enhanced UI Components', () => {
           <React.Suspense fallback={<div>Loading...</div>}>
             <LazyComponent />
           </React.Suspense>
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       expect(screen.getByText('Loading...')).toBeInTheDocument();
-      
+
       await waitFor(() => {
         expect(screen.getByText('Lazy Loaded Component')).toBeInTheDocument();
       });
@@ -536,7 +536,7 @@ describe('Enhanced UI Components', () => {
       render(
         <TestWrapper>
           <TestComponent />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       const motionState = screen.getByTestId('motion-state');
@@ -558,7 +558,7 @@ describe('Enhanced UI Components', () => {
           <div className="responsive-test">
             <EnhancedCard>Responsive Card</EnhancedCard>
           </div>
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       const card = screen.getByText('Responsive Card');
@@ -572,11 +572,11 @@ describe('Integration Tests', () => {
     const TestApp = () => {
       const { setThemeMode } = useTheme();
       const { updatePreferences } = usePersonalization();
-      
+
       const handleThemeChange = () => {
         setThemeMode('dark');
         updatePreferences({
-          theme: { mode: 'dark', primaryColor: '#ff0000', accentColor: '#00ff00' }
+          theme: { mode: 'dark', primaryColor: '#ff0000', accentColor: '#00ff00' },
         });
       };
 
@@ -595,7 +595,7 @@ describe('Integration Tests', () => {
     render(
       <TestWrapper>
         <TestApp />
-      </TestWrapper>
+      </TestWrapper>,
     );
 
     const themeButton = screen.getByTestId('theme-button');

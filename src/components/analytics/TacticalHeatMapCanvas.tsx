@@ -12,7 +12,7 @@ const TacticalHeatMapCanvas: React.FC<TacticalHeatMapCanvasProps> = ({
   heatMapData,
   width = 400,
   height = 600,
-  className = ''
+  className = '',
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [showMovementPatterns, setShowMovementPatterns] = useState(true);
@@ -20,10 +20,10 @@ const TacticalHeatMapCanvas: React.FC<TacticalHeatMapCanvasProps> = ({
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) {return;}
 
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {return;}
 
     // Set canvas size
     canvas.width = width;
@@ -60,77 +60,77 @@ const TacticalHeatMapCanvas: React.FC<TacticalHeatMapCanvasProps> = ({
     // Field lines
     ctx.strokeStyle = '#ffffff';
     ctx.lineWidth = 2;
-    
+
     // Outer boundary
     ctx.strokeRect(10, 10, w - 20, h - 20);
-    
+
     // Center line
     ctx.beginPath();
     ctx.moveTo(10, h / 2);
     ctx.lineTo(w - 10, h / 2);
     ctx.stroke();
-    
+
     // Center circle
     ctx.beginPath();
     ctx.arc(w / 2, h / 2, 50, 0, Math.PI * 2);
     ctx.stroke();
-    
+
     // Penalty areas
     const penaltyWidth = 80;
     const penaltyHeight = 160;
     const goalAreaWidth = 30;
     const goalAreaHeight = 80;
-    
+
     // Top penalty area
     ctx.strokeRect(
-      (w - penaltyWidth) / 2, 
-      10, 
-      penaltyWidth, 
-      penaltyHeight
+      (w - penaltyWidth) / 2,
+      10,
+      penaltyWidth,
+      penaltyHeight,
     );
-    
+
     // Top goal area
     ctx.strokeRect(
-      (w - goalAreaWidth) / 2, 
-      10, 
-      goalAreaWidth, 
-      goalAreaHeight
+      (w - goalAreaWidth) / 2,
+      10,
+      goalAreaWidth,
+      goalAreaHeight,
     );
-    
+
     // Bottom penalty area
     ctx.strokeRect(
-      (w - penaltyWidth) / 2, 
-      h - 10 - penaltyHeight, 
-      penaltyWidth, 
-      penaltyHeight
+      (w - penaltyWidth) / 2,
+      h - 10 - penaltyHeight,
+      penaltyWidth,
+      penaltyHeight,
     );
-    
+
     // Bottom goal area
     ctx.strokeRect(
-      (w - goalAreaWidth) / 2, 
-      h - 10 - goalAreaHeight, 
-      goalAreaWidth, 
-      goalAreaHeight
+      (w - goalAreaWidth) / 2,
+      h - 10 - goalAreaHeight,
+      goalAreaWidth,
+      goalAreaHeight,
     );
   };
 
   const drawPositionHeatMap = (
-    ctx: CanvasRenderingContext2D, 
-    positions: TacticalHeatMap['positions'], 
-    w: number, 
-    h: number
+    ctx: CanvasRenderingContext2D,
+    positions: TacticalHeatMap['positions'],
+    w: number,
+    h: number,
   ) => {
     positions.forEach(pos => {
       const x = (pos.x / 100) * (w - 20) + 10;
       const y = (pos.y / 100) * (h - 20) + 10;
-      
+
       // Create gradient for heat effect
       const gradient = ctx.createRadialGradient(x, y, 0, x, y, 20);
-      
+
       // Color intensity based on frequency and effectiveness
       const intensity = (pos.frequency * pos.effectiveness) / 100;
       const alpha = Math.min(intensity / 100, 0.8);
-      
+
       if (intensity > 70) {
         gradient.addColorStop(0, `rgba(255, 0, 0, ${alpha})`); // Red - Hot zone
         gradient.addColorStop(1, 'rgba(255, 0, 0, 0)');
@@ -141,7 +141,7 @@ const TacticalHeatMapCanvas: React.FC<TacticalHeatMapCanvasProps> = ({
         gradient.addColorStop(0, `rgba(0, 255, 0, ${alpha})`); // Green - Cool zone
         gradient.addColorStop(1, 'rgba(0, 255, 0, 0)');
       }
-      
+
       ctx.fillStyle = gradient;
       ctx.beginPath();
       ctx.arc(x, y, 20, 0, Math.PI * 2);
@@ -150,20 +150,20 @@ const TacticalHeatMapCanvas: React.FC<TacticalHeatMapCanvasProps> = ({
   };
 
   const drawMovementPatterns = (
-    ctx: CanvasRenderingContext2D, 
-    patterns: TacticalHeatMap['movementPatterns'], 
-    w: number, 
-    h: number
+    ctx: CanvasRenderingContext2D,
+    patterns: TacticalHeatMap['movementPatterns'],
+    w: number,
+    h: number,
   ) => {
     patterns.forEach(pattern => {
       const fromX = (pattern.from.x / 100) * (w - 20) + 10;
       const fromY = (pattern.from.y / 100) * (h - 20) + 10;
       const toX = (pattern.to.x / 100) * (w - 20) + 10;
       const toY = (pattern.to.y / 100) * (h - 20) + 10;
-      
+
       // Line thickness based on frequency
       ctx.lineWidth = Math.max(pattern.frequency / 20, 1);
-      
+
       // Color based on success rate
       if (pattern.successRate > 70) {
         ctx.strokeStyle = `rgba(0, 255, 0, 0.7)`; // Green for high success
@@ -172,36 +172,36 @@ const TacticalHeatMapCanvas: React.FC<TacticalHeatMapCanvasProps> = ({
       } else {
         ctx.strokeStyle = `rgba(255, 0, 0, 0.7)`; // Red for low success
       }
-      
+
       // Draw arrow
       drawArrow(ctx, fromX, fromY, toX, toY);
     });
   };
 
   const drawInfluenceZones = (
-    ctx: CanvasRenderingContext2D, 
-    zones: TacticalHeatMap['influenceZones'], 
-    w: number, 
-    h: number
+    ctx: CanvasRenderingContext2D,
+    zones: TacticalHeatMap['influenceZones'],
+    w: number,
+    h: number,
   ) => {
     zones.forEach(zone => {
       const x = (zone.centerX / 100) * (w - 20) + 10;
       const y = (zone.centerY / 100) * (h - 20) + 10;
       const radius = zone.radius * 2; // Scale radius for display
-      
+
       // Create gradient for influence visualization
       const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
       const alpha = zone.influence / 200; // Normalize influence to alpha
-      
+
       gradient.addColorStop(0, `rgba(138, 43, 226, ${alpha})`); // Purple center
       gradient.addColorStop(0.5, `rgba(138, 43, 226, ${alpha * 0.5})`);
       gradient.addColorStop(1, 'rgba(138, 43, 226, 0)'); // Fade out
-      
+
       ctx.fillStyle = gradient;
       ctx.beginPath();
       ctx.arc(x, y, radius, 0, Math.PI * 2);
       ctx.fill();
-      
+
       // Draw influence circle outline
       ctx.strokeStyle = `rgba(138, 43, 226, 0.8)`;
       ctx.lineWidth = 2;
@@ -212,23 +212,23 @@ const TacticalHeatMapCanvas: React.FC<TacticalHeatMapCanvasProps> = ({
   };
 
   const drawArrow = (
-    ctx: CanvasRenderingContext2D, 
-    fromX: number, 
-    fromY: number, 
-    toX: number, 
-    toY: number
+    ctx: CanvasRenderingContext2D,
+    fromX: number,
+    fromY: number,
+    toX: number,
+    toY: number,
   ) => {
     const headlen = 10; // Length of head in pixels
     const dx = toX - fromX;
     const dy = toY - fromY;
     const angle = Math.atan2(dy, dx);
-    
+
     // Draw line
     ctx.beginPath();
     ctx.moveTo(fromX, fromY);
     ctx.lineTo(toX, toY);
     ctx.stroke();
-    
+
     // Draw arrowhead
     ctx.beginPath();
     ctx.moveTo(toX, toY);

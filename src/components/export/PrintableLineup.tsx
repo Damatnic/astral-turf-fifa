@@ -25,7 +25,7 @@ const PlayerList: React.FC<{ title: string, players: Player[], captainId: string
 );
 
 const PrintableLineup = forwardRef<HTMLDivElement, PrintableLineupProps>(({ players, formations, activeFormationIds, captainIds }, ref) => {
-    
+
     const homeFormation = formations?.[activeFormationIds?.home];
     const awayFormation = formations?.[activeFormationIds?.away];
 

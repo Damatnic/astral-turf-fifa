@@ -14,27 +14,27 @@ const StadiumPage: React.FC = () => {
 
     const handleUpgradeFacility = (facility: 'trainingFacilitiesLevel' | 'youthFacilitiesLevel') => {
         const cost = getUpgradeCost(stadium[facility]);
-        
+
         if (finances.transferBudget >= cost) {
             dispatch({
                 type: 'UPGRADE_STADIUM_FACILITY',
-                payload: { facility, team: selectedTeam }
+                payload: { facility, team: selectedTeam },
             });
-            
+
             uiDispatch({
                 type: 'ADD_NOTIFICATION',
                 payload: {
                     message: `${facility === 'trainingFacilitiesLevel' ? 'Training facilities' : 'Youth facilities'} upgraded successfully!`,
-                    type: 'success'
-                }
+                    type: 'success',
+                },
             });
         } else {
             uiDispatch({
                 type: 'ADD_NOTIFICATION',
                 payload: {
                     message: 'Insufficient funds for facility upgrade',
-                    type: 'error'
-                }
+                    type: 'error',
+                },
             });
         }
     };
@@ -73,7 +73,7 @@ const StadiumPage: React.FC = () => {
                 `-${level * 2}% fatigue accumulation`,
                 level >= 3 ? 'Advanced recovery methods' : null,
                 level >= 4 ? 'Performance analysis tools' : null,
-                level === 5 ? 'World-class medical staff' : null
+                level === 5 ? 'World-class medical staff' : null,
             ].filter(Boolean);
         } else {
             return [
@@ -82,7 +82,7 @@ const StadiumPage: React.FC = () => {
                 `Higher potential prospects (${40 + level * 10}+ potential)`,
                 level >= 3 ? 'Specialized position training' : null,
                 level >= 4 ? 'Elite coaching staff' : null,
-                level === 5 ? 'International scouting network' : null
+                level === 5 ? 'International scouting network' : null,
             ].filter(Boolean);
         }
     };
@@ -102,8 +102,8 @@ const StadiumPage: React.FC = () => {
                         <button
                             onClick={() => setSelectedTeam('home')}
                             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                                selectedTeam === 'home' 
-                                    ? 'bg-teal-600 text-white' 
+                                selectedTeam === 'home'
+                                    ? 'bg-teal-600 text-white'
                                     : 'text-gray-400 hover:text-white hover:bg-gray-700'
                             }`}
                         >
@@ -112,8 +112,8 @@ const StadiumPage: React.FC = () => {
                         <button
                             onClick={() => setSelectedTeam('away')}
                             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                                selectedTeam === 'away' 
-                                    ? 'bg-teal-600 text-white' 
+                                selectedTeam === 'away'
+                                    ? 'bg-teal-600 text-white'
                                     : 'text-gray-400 hover:text-white hover:bg-gray-700'
                             }`}
                         >

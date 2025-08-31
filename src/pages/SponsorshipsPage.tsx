@@ -15,67 +15,67 @@ const SponsorshipsPage: React.FC = () => {
             id: 'nike',
             name: 'Nike',
             weeklyIncome: 25000,
-            perWinBonus: 5000
+            perWinBonus: 5000,
         },
         {
             id: 'adidas',
             name: 'Adidas',
             weeklyIncome: 28000,
-            perWinBonus: 4500
+            perWinBonus: 4500,
         },
         {
             id: 'puma',
             name: 'Puma',
             weeklyIncome: 22000,
-            perWinBonus: 6000
+            perWinBonus: 6000,
         },
         {
             id: 'under_armour',
             name: 'Under Armour',
             weeklyIncome: 20000,
-            perWinBonus: 7000
+            perWinBonus: 7000,
         },
         {
             id: 'umbro',
             name: 'Umbro',
             weeklyIncome: 18000,
-            perWinBonus: 5500
+            perWinBonus: 5500,
         },
         {
             id: 'new_balance',
             name: 'New Balance',
             weeklyIncome: 24000,
-            perWinBonus: 4000
-        }
+            perWinBonus: 4000,
+        },
     ];
 
     const handleSignDeal = (deal: SponsorshipDeal) => {
         dispatch({
             type: 'SET_SPONSORSHIP_DEAL',
-            payload: { deal, team: selectedTeam }
+            payload: { deal, team: selectedTeam },
         });
-        
+
         uiDispatch({
             type: 'ADD_NOTIFICATION',
             payload: {
                 message: `Successfully signed sponsorship deal with ${deal.name}!`,
-                type: 'success'
-            }
+                type: 'success',
+            },
         });
     };
 
     const handleTerminateDeal = () => {
         dispatch({
             type: 'SET_SPONSORSHIP_DEAL',
-            payload: { deal: null, team: selectedTeam }
+            payload: { deal: null, team: selectedTeam },
         });
-        
+
         uiDispatch({
             type: 'ADD_NOTIFICATION',
             payload: {
                 message: 'Sponsorship deal terminated',
-                type: 'info'
-            }
+                type: 'info',
+            },
         });
     };
 
@@ -93,7 +93,7 @@ const SponsorshipsPage: React.FC = () => {
             'Puma': 'text-yellow-400',
             'Under Armour': 'text-red-400',
             'Umbro': 'text-green-400',
-            'New Balance': 'text-purple-400'
+            'New Balance': 'text-purple-400',
         };
         return colors[sponsorName as keyof typeof colors] || 'text-gray-400';
     };
@@ -113,8 +113,8 @@ const SponsorshipsPage: React.FC = () => {
                         <button
                             onClick={() => setSelectedTeam('home')}
                             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                                selectedTeam === 'home' 
-                                    ? 'bg-teal-600 text-white' 
+                                selectedTeam === 'home'
+                                    ? 'bg-teal-600 text-white'
                                     : 'text-gray-400 hover:text-white hover:bg-gray-700'
                             }`}
                         >
@@ -123,8 +123,8 @@ const SponsorshipsPage: React.FC = () => {
                         <button
                             onClick={() => setSelectedTeam('away')}
                             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                                selectedTeam === 'away' 
-                                    ? 'bg-teal-600 text-white' 
+                                selectedTeam === 'away'
+                                    ? 'bg-teal-600 text-white'
                                     : 'text-gray-400 hover:text-white hover:bg-gray-700'
                             }`}
                         >
@@ -136,7 +136,7 @@ const SponsorshipsPage: React.FC = () => {
                 {/* Current Sponsorship Deal */}
                 <div className="bg-gray-800 rounded-lg p-6 mb-8 border border-gray-700">
                     <h3 className="text-xl font-semibold text-teal-400 mb-4">Current Sponsorship</h3>
-                    
+
                     {currentDeal ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
@@ -149,7 +149,7 @@ const SponsorshipsPage: React.FC = () => {
                                         <p className="text-gray-400">Official Kit Partner</p>
                                     </div>
                                 </div>
-                                
+
                                 <div className="space-y-3">
                                     <div className="flex justify-between items-center p-3 bg-gray-700 rounded">
                                         <span className="text-gray-300">Weekly Income</span>
@@ -208,7 +208,7 @@ const SponsorshipsPage: React.FC = () => {
                 {/* Available Sponsorship Deals */}
                 <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
                     <h3 className="text-xl font-semibold text-teal-400 mb-6">Available Sponsorship Deals</h3>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {availableDeals.map((deal) => (
                             <div key={deal.id} className="bg-gray-700 rounded-lg p-6 border border-gray-600 hover:border-teal-500 transition-colors">
@@ -308,7 +308,7 @@ const SponsorshipsPage: React.FC = () => {
                                 Receive consistent weekly payments regardless of performance
                             </p>
                         </div>
-                        
+
                         <div className="text-center">
                             <div className="text-blue-400 mb-3">
                                 <svg className="w-10 h-10 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -320,7 +320,7 @@ const SponsorshipsPage: React.FC = () => {
                                 Earn additional revenue for each match victory
                             </p>
                         </div>
-                        
+
                         <div className="text-center">
                             <div className="text-purple-400 mb-3">
                                 <svg className="w-10 h-10 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">

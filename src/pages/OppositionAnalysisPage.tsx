@@ -18,22 +18,22 @@ const OppositionAnalysisPage: React.FC = () => {
         'Tottenham Hotspur',
         'Manchester City',
         'Newcastle United',
-        'Brighton & Hove Albion'
+        'Brighton & Hove Albion',
     ];
 
     const handleDispatchScout = () => {
         if (selectedOpponent) {
             dispatch({
                 type: 'DISPATCH_SCOUT',
-                payload: { opponentName: selectedOpponent }
+                payload: { opponentName: selectedOpponent },
             });
 
             uiDispatch({
                 type: 'ADD_NOTIFICATION',
                 payload: {
                     message: `Scout dispatched to analyze ${selectedOpponent}`,
-                    type: 'success'
-                }
+                    type: 'success',
+                },
             });
 
             setSelectedOpponent('');
@@ -41,8 +41,8 @@ const OppositionAnalysisPage: React.FC = () => {
     };
 
     const getAssignmentStatus = (assignment: any) => {
-        if (assignment.report) return 'completed';
-        if (assignment.dueWeek <= franchiseState.gameWeek) return 'overdue';
+        if (assignment.report) {return 'completed';}
+        if (assignment.dueWeek <= franchiseState.gameWeek) {return 'overdue';}
         return 'in_progress';
     };
 
@@ -129,7 +129,7 @@ const OppositionAnalysisPage: React.FC = () => {
                     {/* Dispatch Scout */}
                     <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
                         <h3 className="text-lg font-semibold text-teal-400 mb-4">Dispatch Scout</h3>
-                        
+
                         <div className="mb-4">
                             <label className="block text-sm font-medium text-gray-300 mb-2">Select Opponent</label>
                             <select
@@ -172,12 +172,12 @@ const OppositionAnalysisPage: React.FC = () => {
                     {/* Active Assignments */}
                     <div className="lg:col-span-2 bg-gray-800 rounded-lg p-6 border border-gray-700">
                         <h3 className="text-lg font-semibold text-teal-400 mb-4">Scouting Assignments</h3>
-                        
+
                         {scoutingAssignments.length > 0 ? (
                             <div className="space-y-4">
                                 {scoutingAssignments.map((assignment, index) => {
                                     const status = getAssignmentStatus(assignment);
-                                    
+
                                     return (
                                         <div
                                             key={index}
@@ -257,7 +257,7 @@ const OppositionAnalysisPage: React.FC = () => {
                                 Identify their star players and neutralize threats
                             </p>
                         </div>
-                        
+
                         <div className="text-center">
                             <div className="text-green-400 mb-3">
                                 <svg className="w-10 h-10 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -269,7 +269,7 @@ const OppositionAnalysisPage: React.FC = () => {
                                 Understand their tactical setup and adapt accordingly
                             </p>
                         </div>
-                        
+
                         <div className="text-center">
                             <div className="text-yellow-400 mb-3">
                                 <svg className="w-10 h-10 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -281,7 +281,7 @@ const OppositionAnalysisPage: React.FC = () => {
                                 Exploit vulnerable areas in their defensive structure
                             </p>
                         </div>
-                        
+
                         <div className="text-center">
                             <div className="text-purple-400 mb-3">
                                 <svg className="w-10 h-10 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">

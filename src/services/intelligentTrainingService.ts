@@ -1,13 +1,13 @@
 import { GoogleGenAI, Type } from "@google/genai";
-import type { 
-  Player, 
+import type {
+  Player,
   WeeklySchedule,
   TrainingDrill,
   DailySchedule,
   PlayerAttributes,
   AIPersonality,
   TeamTactics,
-  Formation
+  Formation,
 } from '../types';
 
 // AI Service Instance
@@ -92,8 +92,8 @@ export interface TrainingSessionAnalytics {
 
 async function generateJson(prompt: string, schema: any, systemInstruction: string) {
   const ai = aiInstance;
-  if (!ai) throw new Error("AI is offline.");
-  
+  if (!ai) {throw new Error("AI is offline.");}
+
   try {
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
@@ -102,10 +102,10 @@ async function generateJson(prompt: string, schema: any, systemInstruction: stri
         systemInstruction,
         responseMimeType: "application/json",
         responseSchema: schema,
-        temperature: 0.6
+        temperature: 0.6,
       },
     });
-    
+
     const jsonText = response.text.trim();
     if (!jsonText) {
       throw new Error("AI returned an empty response.");
@@ -137,9 +137,9 @@ export const generateIntelligentTrainingPlan = async (
   duration: number,
   currentFormation: Formation,
   teamTactics: TeamTactics,
-  personality: AIPersonality = 'balanced'
+  personality: AIPersonality = 'balanced',
 ): Promise<IntelligentTrainingPlan> => {
-  if (!aiInstance) throw new Error("AI is offline.");
+  if (!aiInstance) {throw new Error("AI is offline.");}
 
   const prompt = `Create a comprehensive, intelligent training plan for this player:
 
@@ -188,16 +188,16 @@ Focus on evidence-based training methods and modern sports science principles.`;
           thursday: { type: Type.OBJECT },
           friday: { type: Type.OBJECT },
           saturday: { type: Type.OBJECT },
-          sunday: { type: Type.OBJECT }
-        }
+          sunday: { type: Type.OBJECT },
+        },
       },
       adaptiveModifications: {
         type: Type.OBJECT,
         properties: {
           fatigueThreshold: { type: Type.NUMBER },
           performanceBasedAdjustments: { type: Type.BOOLEAN },
-          injuryPreventionFocus: { type: Type.BOOLEAN }
-        }
+          injuryPreventionFocus: { type: Type.BOOLEAN },
+        },
       },
       expectedOutcomes: {
         type: Type.OBJECT,
@@ -205,30 +205,30 @@ Focus on evidence-based training methods and modern sports science principles.`;
           attributeImprovements: { type: Type.OBJECT },
           fitnessImprovement: { type: Type.NUMBER },
           injuryRiskReduction: { type: Type.NUMBER },
-          estimatedTimeToGoals: { type: Type.NUMBER }
-        }
+          estimatedTimeToGoals: { type: Type.NUMBER },
+        },
       },
       alternativeScenarios: {
         type: Type.OBJECT,
         properties: {
           lightWorkload: { type: Type.OBJECT },
-          intensiveWorkload: { type: Type.OBJECT }
-        }
+          intensiveWorkload: { type: Type.OBJECT },
+        },
       },
-      keyPerformanceIndicators: { type: Type.ARRAY, items: { type: Type.STRING } }
+      keyPerformanceIndicators: { type: Type.ARRAY, items: { type: Type.STRING } },
     },
     required: [
       'playerId', 'playerName', 'planName', 'duration', 'objectives', 'schedule',
-      'adaptiveModifications', 'expectedOutcomes', 'alternativeScenarios', 
-      'keyPerformanceIndicators'
-    ]
+      'adaptiveModifications', 'expectedOutcomes', 'alternativeScenarios',
+      'keyPerformanceIndicators',
+    ],
   };
 
   const result = await generateJson(prompt, schema, systemInstruction);
   return {
     ...result,
     playerId: player.id,
-    playerName: player.name
+    playerName: player.name,
   };
 };
 
@@ -238,9 +238,9 @@ export const optimizeTeamTraining = async (
   teamTactics: TeamTactics,
   upcomingOpponents: string[],
   seasonPhase: 'preseason' | 'inseason' | 'postseason',
-  personality: AIPersonality = 'balanced'
+  personality: AIPersonality = 'balanced',
 ): Promise<TeamTrainingOptimization> => {
-  if (!aiInstance) throw new Error("AI is offline.");
+  if (!aiInstance) {throw new Error("AI is offline.");}
 
   const prompt = `Design comprehensive team training optimization:
 
@@ -280,29 +280,29 @@ Focus on creating synergy between individual development and collective performa
           tacticalSessions: { type: Type.ARRAY, items: { type: Type.STRING } },
           physicalConditioning: { type: Type.ARRAY, items: { type: Type.STRING } },
           technicalSkills: { type: Type.ARRAY, items: { type: Type.STRING } },
-          mentalPreparation: { type: Type.ARRAY, items: { type: Type.STRING } }
-        }
+          mentalPreparation: { type: Type.ARRAY, items: { type: Type.STRING } },
+        },
       },
       periodization: {
         type: Type.OBJECT,
         properties: {
           preseason: { type: Type.OBJECT },
           inseason: { type: Type.OBJECT },
-          postseason: { type: Type.OBJECT }
-        }
+          postseason: { type: Type.OBJECT },
+        },
       },
       loadManagement: {
         type: Type.OBJECT,
         properties: {
           rotationRecommendations: { type: Type.ARRAY },
-          recoveryProtocols: { type: Type.ARRAY, items: { type: Type.STRING } }
-        }
-      }
+          recoveryProtocols: { type: Type.ARRAY, items: { type: Type.STRING } },
+        },
+      },
     },
     required: [
       'teamName', 'formation', 'tacticalFocus', 'playerSpecificPlans',
-      'teamWidePlans', 'periodization', 'loadManagement'
-    ]
+      'teamWidePlans', 'periodization', 'loadManagement',
+    ],
   };
 
   const result = await generateJson(prompt, schema, systemInstruction);
@@ -314,9 +314,9 @@ export const analyzeTrainingSession = async (
   participants: Player[],
   drillsPerformed: string[],
   coachObservations: string[],
-  personality: AIPersonality = 'balanced'
+  personality: AIPersonality = 'balanced',
 ): Promise<TrainingSessionAnalytics> => {
-  if (!aiInstance) throw new Error("AI is offline.");
+  if (!aiInstance) {throw new Error("AI is offline.");}
 
   const prompt = `Analyze this training session and provide comprehensive feedback:
 
@@ -355,13 +355,13 @@ Focus on actionable insights that improve both performance and wellbeing.`;
       playerFeedback: { type: Type.OBJECT },
       coachObservations: { type: Type.ARRAY, items: { type: Type.STRING } },
       suggestedAdjustments: { type: Type.ARRAY, items: { type: Type.STRING } },
-      nextSessionRecommendations: { type: Type.ARRAY, items: { type: Type.STRING } }
+      nextSessionRecommendations: { type: Type.ARRAY, items: { type: Type.STRING } },
     },
     required: [
       'sessionId', 'date', 'participants', 'drillsPerformed', 'intensityLevel',
-      'playerFeedback', 'coachObservations', 'suggestedAdjustments', 
-      'nextSessionRecommendations'
-    ]
+      'playerFeedback', 'coachObservations', 'suggestedAdjustments',
+      'nextSessionRecommendations',
+    ],
   };
 
   const result = await generateJson(prompt, schema, systemInstruction);
@@ -370,7 +370,7 @@ Focus on actionable insights that improve both performance and wellbeing.`;
     date: sessionDate,
     participants: participants.map(p => p.id),
     drillsPerformed,
-    coachObservations
+    coachObservations,
   };
 };
 
@@ -384,9 +384,9 @@ export const adaptTrainingPlan = async (
     fatigueLevel: number;
     injuryIncidents: number;
   },
-  personality: AIPersonality = 'balanced'
+  personality: AIPersonality = 'balanced',
 ): Promise<IntelligentTrainingPlan> => {
-  if (!aiInstance) throw new Error("AI is offline.");
+  if (!aiInstance) {throw new Error("AI is offline.");}
 
   const prompt = `Adapt and optimize this training plan based on recent performance data:
 
@@ -428,20 +428,20 @@ Provide an updated, adaptive training plan that responds to the player's current
       adaptiveModifications: { type: Type.OBJECT },
       expectedOutcomes: { type: Type.OBJECT },
       alternativeScenarios: { type: Type.OBJECT },
-      keyPerformanceIndicators: { type: Type.ARRAY, items: { type: Type.STRING } }
+      keyPerformanceIndicators: { type: Type.ARRAY, items: { type: Type.STRING } },
     },
     required: [
       'playerId', 'playerName', 'planName', 'duration', 'objectives', 'schedule',
-      'adaptiveModifications', 'expectedOutcomes', 'alternativeScenarios', 
-      'keyPerformanceIndicators'
-    ]
+      'adaptiveModifications', 'expectedOutcomes', 'alternativeScenarios',
+      'keyPerformanceIndicators',
+    ],
   };
 
   const result = await generateJson(prompt, schema, systemInstruction);
   return {
     ...result,
     playerId: player.id,
-    playerName: player.name
+    playerName: player.name,
   };
 };
 
@@ -450,5 +450,5 @@ export const intelligentTrainingService = {
   optimizeTeamTraining,
   analyzeTrainingSession,
   adaptTrainingPlan,
-  isAIAvailable: () => aiInstance !== null
+  isAIAvailable: () => aiInstance !== null,
 };

@@ -14,15 +14,15 @@ const MentoringPage: React.FC = () => {
     const mentoringGroups = franchiseState.mentoringGroups[selectedTeam];
 
     // Potential mentors (experienced players)
-    const potentialMentors = teamPlayers.filter(p => 
-        p.age >= 28 && 
-        !mentoringGroups.some(group => group.mentorId === p.id)
+    const potentialMentors = teamPlayers.filter(p =>
+        p.age >= 28 &&
+        !mentoringGroups.some(group => group.mentorId === p.id),
     );
 
     // Potential mentees (younger players)
-    const potentialMentees = teamPlayers.filter(p => 
-        p.age <= 23 && 
-        !mentoringGroups.some(group => group.menteeIds.includes(p.id))
+    const potentialMentees = teamPlayers.filter(p =>
+        p.age <= 23 &&
+        !mentoringGroups.some(group => group.menteeIds.includes(p.id)),
     );
 
     const handleCreateGroup = () => {
@@ -32,16 +32,16 @@ const MentoringPage: React.FC = () => {
                 payload: {
                     team: selectedTeam,
                     mentorId: selectedMentor,
-                    menteeIds: selectedMentees
-                }
+                    menteeIds: selectedMentees,
+                },
             });
 
             uiDispatch({
                 type: 'ADD_NOTIFICATION',
                 payload: {
                     message: 'Mentoring group created successfully!',
-                    type: 'success'
-                }
+                    type: 'success',
+                },
             });
 
             setSelectedMentor('');
@@ -52,15 +52,15 @@ const MentoringPage: React.FC = () => {
     const handleDissolveGroup = (mentorId: string) => {
         dispatch({
             type: 'DISSOLVE_MENTORING_GROUP',
-            payload: { team: selectedTeam, mentorId }
+            payload: { team: selectedTeam, mentorId },
         });
 
         uiDispatch({
             type: 'ADD_NOTIFICATION',
             payload: {
                 message: 'Mentoring group dissolved',
-                type: 'info'
-            }
+                type: 'info',
+            },
         });
     };
 
@@ -90,8 +90,8 @@ const MentoringPage: React.FC = () => {
                         <button
                             onClick={() => setSelectedTeam('home')}
                             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                                selectedTeam === 'home' 
-                                    ? 'bg-teal-600 text-white' 
+                                selectedTeam === 'home'
+                                    ? 'bg-teal-600 text-white'
                                     : 'text-gray-400 hover:text-white hover:bg-gray-700'
                             }`}
                         >
@@ -100,8 +100,8 @@ const MentoringPage: React.FC = () => {
                         <button
                             onClick={() => setSelectedTeam('away')}
                             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                                selectedTeam === 'away' 
-                                    ? 'bg-teal-600 text-white' 
+                                selectedTeam === 'away'
+                                    ? 'bg-teal-600 text-white'
                                     : 'text-gray-400 hover:text-white hover:bg-gray-700'
                             }`}
                         >
@@ -162,12 +162,12 @@ const MentoringPage: React.FC = () => {
                     <div className="lg:col-span-2">
                         <div className="bg-gray-800 rounded-lg p-6 border border-gray-700 mb-6">
                             <h3 className="text-xl font-semibold text-teal-400 mb-4">Active Mentoring Groups</h3>
-                            
+
                             {mentoringGroups.length > 0 ? (
                                 <div className="space-y-4">
                                     {mentoringGroups.map((group) => {
                                         const mentor = getMentorPlayer(group.mentorId);
-                                        if (!mentor) return null;
+                                        if (!mentor) {return null;}
 
                                         return (
                                             <div key={group.mentorId} className="bg-gray-700 rounded-lg p-4">
@@ -198,7 +198,7 @@ const MentoringPage: React.FC = () => {
                                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                                         {group.menteeIds.map(menteeId => {
                                                             const mentee = getMenteePlayer(menteeId);
-                                                            if (!mentee) return null;
+                                                            if (!mentee) {return null;}
 
                                                             return (
                                                                 <div key={menteeId} className="flex items-center space-x-2">
@@ -236,7 +236,7 @@ const MentoringPage: React.FC = () => {
                     <div>
                         <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
                             <h3 className="text-lg font-semibold text-teal-400 mb-4">Create Mentoring Group</h3>
-                            
+
                             {/* Select Mentor */}
                             <div className="mb-4">
                                 <label className="block text-sm font-medium text-gray-300 mb-2">Select Mentor</label>

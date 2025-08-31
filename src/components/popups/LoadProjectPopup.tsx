@@ -19,10 +19,10 @@ const LoadProjectPopup: React.FC = () => {
     const handleCreateSlot = (e: React.FormEvent) => {
         e.preventDefault();
         const name = newSlotName.trim();
-        if (!name) return;
+        if (!name) {return;}
         const id = `slot_${Date.now()}`;
         const newSlot: SaveSlot = { id, name, lastSaved: new Date().toISOString(), appVersion: '8.0.0' };
-        
+
         const updatedSlots = { ...saveSlots, [id]: newSlot };
         localStorage.setItem('astralTurfSaveSlots', JSON.stringify(updatedSlots));
         setSaveSlots(updatedSlots);
@@ -32,7 +32,7 @@ const LoadProjectPopup: React.FC = () => {
         rootDispatch({ type: 'SET_ACTIVE_SAVE_SLOT', payload: id });
         // Reset state for the new slot
         rootDispatch({ type: 'RESET_STATE' });
-        
+
         handleClose();
     };
 

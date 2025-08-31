@@ -11,6 +11,7 @@ export * from './finance';
 export * from './ai';
 export * from './communication';
 export * from './auth';
+export * from './challenges';
 
 // Import what we need for main state interfaces
 import type { Player, Team, MentoringGroup, PlayerRelationshipType, Promise, TransferPlayer } from './player';
@@ -18,13 +19,12 @@ import type { Formation, TeamTactics, SetPieceAssignments } from './match';
 import type { DrawingShape, PlaybookItem } from './ui';
 import type { Season, BoardObjective, Manager, HistoricalSeasonRecord, ScoutingAssignment, PressNarrative, SeasonAwards, NewsItem } from './league';
 import type { WeeklySchedule, TrainingPlanTemplate, SkillChallenge, YouthAcademy } from './training';
-import type { Staff } from './staff';
+import type { Staff, AgentPersonality } from './staff';
 import type { TeamFinances, Stadium, SponsorshipDeal } from './finance';
 import type { InboxItem } from './communication';
 import type { UIState } from './ui';
 import type { AuthState } from './auth';
 import type { AIAgentResponse } from './ai';
-import type { AgentPersonality } from './staff';
 
 // Main application state interfaces
 export interface TacticsState {
@@ -107,7 +107,7 @@ export type Action =
   | { type: 'LOAD_STATE'; payload: RootState }
   | { type: 'RESET_STATE' }
   | { type: 'SOFT_RESET_APP' }
-  
+
   // Player Actions
   | { type: 'ADD_PLAYER'; payload: Player }
   | { type: 'UPDATE_PLAYER'; payload: Player }
@@ -125,7 +125,7 @@ export type Action =
   | { type: 'TERMINATE_PLAYER_CONTRACT'; payload: string }
   | { type: 'ADD_COMMUNICATION_LOG'; payload: { playerId: string; entry: any } } // CommunicationLogEntry
   | { type: 'UPDATE_PLAYER_CHALLENGE_COMPLETION'; payload: { playerId: string, challengeId: string } }
-  
+
   // Formation & Tactics Actions
   | { type: 'SET_ACTIVE_FORMATION'; payload: { formationId: string; team: Team } }
   | { type: 'CLEAR_FORMATION' }
@@ -138,7 +138,7 @@ export type Action =
   | { type: 'SET_SET_PIECE_TAKER'; payload: { team: Team, type: any, playerId: string | null } } // SetPieceType
   | { type: 'APPLY_TEAM_TALK_EFFECT'; payload: { team: Team, effect: number } }
   | { type: 'CLEAR_MORALE_BOOSTS'; payload: { team: Team } }
-  
+
   // UI Actions (extensive set)
   | { type: 'SET_ACTIVE_TEAM_CONTEXT'; payload: any } // TeamView
   | { type: 'OPEN_MODAL'; payload: any } // ModalType
@@ -158,7 +158,7 @@ export type Action =
   | { type: 'START_TUTORIAL' }
   | { type: 'END_TUTORIAL' }
   | { type: 'SET_TUTORIAL_STEP'; payload: number }
-  
+
   // Drawing & Playbook Actions
   | { type: 'SET_DRAWING_TOOL'; payload: any } // DrawingTool
   | { type: 'SET_DRAWING_COLOR'; payload: string }
@@ -181,7 +181,7 @@ export type Action =
   | { type: 'START_ANIMATION' }
   | { type: 'PAUSE_ANIMATION' }
   | { type: 'RESET_ANIMATION' }
-  
+
   // AI Actions (extensive AI integration)
   | { type: 'SET_AI_PERSONALITY'; payload: any } // AIPersonality
   | { type: 'GENERATE_AI_INSIGHT_START' }
@@ -196,7 +196,7 @@ export type Action =
   | { type: 'SEND_CHAT_MESSAGE_START'; payload: any } // ChatMessage
   | { type: 'SEND_CHAT_MESSAGE_SUCCESS'; payload: { response: any, playerIdsToHighlight: readonly string[] } }
   | { type: 'SEND_CHAT_MESSAGE_FAILURE' }
-  
+
   // Match and simulation Actions
   | { type: 'SIMULATE_MATCH_START' }
   | { type: 'SIMULATE_MATCH_UPDATE'; payload: any } // MatchEvent | MatchCommentary
@@ -205,7 +205,7 @@ export type Action =
   | { type: 'GET_POST_MATCH_REPORT_START' }
   | { type: 'GET_POST_MATCH_REPORT_SUCCESS'; payload: any } // AIPostMatchAnalysis
   | { type: 'GET_POST_MATCH_REPORT_FAILURE' }
-  
+
   // Franchise Management Actions
   | { type: 'ADVANCE_WEEK' }
   | { type: 'ADVANCE_SEASON' }
@@ -215,13 +215,13 @@ export type Action =
   | { type: 'ADD_INBOX_ITEM'; payload: any } // InboxItem without id, week, isRead
   | { type: 'MARK_INBOX_ITEM_READ'; payload: string }
   | { type: 'REMOVE_INBOX_ITEM', payload: string }
-  
+
   // Save/Load Actions
   | { type: 'SET_ACTIVE_SAVE_SLOT'; payload: string | null }
   | { type: 'DELETE_SAVE_SLOT'; payload: string }
   | { type: 'CREATE_SAVE_SLOT'; payload: { id: string; name: string } }
   | { type: 'LOAD_PLAYBOOK'; payload: Record<string, PlaybookItem> }
-  
+
   // Misc Actions
   | { type: 'EXPORT_LINEUP_START' }
   | { type: 'EXPORT_LINEUP_FINISH' };

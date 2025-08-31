@@ -14,7 +14,7 @@ const TacticsBoardPage: React.FC = React.memo(() => {
   const { tacticsState, dispatch } = useTacticsContext();
   const { uiState } = useUIContext();
   const { isPresentationMode } = uiState;
-  
+
   // Mobile-First Responsive State
   const responsive = useResponsive();
   const { shouldUseDrawer } = useResponsiveNavigation();
@@ -36,14 +36,14 @@ const TacticsBoardPage: React.FC = React.memo(() => {
           </div>
         </>
       )}
-      
+
       {/* Mobile-First Main Field Area */}
       <main className={`
         flex-grow flex flex-col min-h-0 relative
         ${isMobile ? 'flex-1' : ''}
       `}>
         <div className="absolute inset-0 bg-gradient-to-b from-emerald-950/20 via-slate-900/40 to-slate-950/20"></div>
-        
+
         {/* Mobile-Optimized Field Container */}
         <div className={`
           flex-grow flex items-center justify-center relative z-10
@@ -58,13 +58,13 @@ const TacticsBoardPage: React.FC = React.memo(() => {
               absolute inset-0 shadow-2xl bg-gradient-to-br from-emerald-900/10 to-slate-900/20 backdrop-blur-sm border border-emerald-500/10
               ${isMobile ? 'rounded-lg' : 'rounded-lg'}
             `}></div>
-            
+
             {/* Soccer Field Component */}
             <div className="relative z-10 w-full h-full">
               <SoccerField />
             </div>
           </div>
-          
+
           {/* Tactical Toolbar - Mobile Positioned */}
           {!isPresentationMode && (
             <div className={`
@@ -74,7 +74,7 @@ const TacticsBoardPage: React.FC = React.memo(() => {
             </div>
           )}
         </div>
-        
+
         {/* Mobile-First Dugout Area */}
         {!isPresentationMode && (
           <div className={`
@@ -84,11 +84,11 @@ const TacticsBoardPage: React.FC = React.memo(() => {
             <Dugout />
           </div>
         )}
-        
+
         {/* Presentation Controls */}
         {isPresentationMode && <PresentationControls />}
       </main>
-      
+
       {/* Right Sidebar - Desktop Only */}
       {!isPresentationMode && !shouldUseDrawer && (
         <div className="flex-shrink-0 w-80 transition-all duration-300 ease-in-out backdrop-blur-sm">
@@ -97,7 +97,7 @@ const TacticsBoardPage: React.FC = React.memo(() => {
           </div>
         </div>
       )}
-      
+
       {/* Mobile Sidebar Access - Bottom Sheet Style */}
       {!isPresentationMode && isMobile && (
         <div className="flex-shrink-0 bg-slate-900/90 border-t border-slate-700/50">
@@ -115,7 +115,7 @@ const TacticsBoardPage: React.FC = React.memo(() => {
           </div>
         </div>
       )}
-      
+
       {/* Mobile-Optimized Chat Button */}
       {!isPresentationMode && (
         <div className={`

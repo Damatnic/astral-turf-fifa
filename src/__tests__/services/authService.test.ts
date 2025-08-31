@@ -27,7 +27,7 @@ describe('AuthService', () => {
   describe('login', () => {
     it('should successfully login with valid credentials', async () => {
       const user = await authService.login('coach@example.com', 'password123');
-      
+
       expect(user).toBeDefined();
       expect(user.email).toBe('coach@example.com');
       expect(user.role).toBe('coach');
@@ -51,7 +51,7 @@ describe('AuthService', () => {
       const beforeLogin = new Date().toISOString();
       const user = await authService.login('coach@example.com', 'password123');
       const afterLogin = new Date().toISOString();
-      
+
       expect(user.lastLoginAt).toBeDefined();
       expect(new Date(user.lastLoginAt!)).toBeInstanceOf(Date);
       expect(user.lastLoginAt!).toBeGreaterThanOrEqual(beforeLogin);
@@ -60,10 +60,10 @@ describe('AuthService', () => {
 
     it('should store user in localStorage on successful login', async () => {
       const user = await authService.login('coach@example.com', 'password123');
-      
+
       expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
-        'authUser', 
-        JSON.stringify(user)
+        'authUser',
+        JSON.stringify(user),
       );
     });
   });
@@ -80,7 +80,7 @@ describe('AuthService', () => {
 
     it('should successfully create new user with valid data', async () => {
       const user = await authService.signup(validSignupData);
-      
+
       expect(user).toBeDefined();
       expect(user.email).toBe(validSignupData.email);
       expect(user.firstName).toBe(validSignupData.firstName);
@@ -93,7 +93,7 @@ describe('AuthService', () => {
 
     it('should reject signup with duplicate email', async () => {
       const signupData = { ...validSignupData, email: 'coach@example.com' };
-      
+
       await expect(authService.signup(signupData))
         .rejects
         .toThrow('User with this email already exists');
@@ -101,7 +101,7 @@ describe('AuthService', () => {
 
     it('should reject signup with mismatched passwords', async () => {
       const signupData = { ...validSignupData, confirmPassword: 'differentpassword' };
-      
+
       await expect(authService.signup(signupData))
         .rejects
         .toThrow('Passwords do not match');
@@ -109,7 +109,7 @@ describe('AuthService', () => {
 
     it('should reject signup with short password', async () => {
       const signupData = { ...validSignupData, password: '123', confirmPassword: '123' };
-      
+
       await expect(authService.signup(signupData))
         .rejects
         .toThrow('Password must be at least 8 characters long');
@@ -117,7 +117,7 @@ describe('AuthService', () => {
 
     it('should set default notification settings for new user', async () => {
       const user = await authService.signup(validSignupData);
-      
+
       expect(user.notifications).toEqual({
         email: true,
         sms: false,
@@ -132,16 +132,16 @@ describe('AuthService', () => {
     it('should set paymentReminders to true for family role', async () => {
       const familySignupData = { ...validSignupData, role: 'family' as UserRole };
       const user = await authService.signup(familySignupData);
-      
+
       expect(user.notifications.paymentReminders).toBe(true);
     });
 
     it('should store new user in localStorage', async () => {
       const user = await authService.signup(validSignupData);
-      
+
       expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
-        'authUser', 
-        JSON.stringify(user)
+        'authUser',
+        JSON.stringify(user),
       );
     });
   });
@@ -149,7 +149,7 @@ describe('AuthService', () => {
   describe('logout', () => {
     it('should remove user and family associations from localStorage', () => {
       authService.logout();
-      
+
       expect(mockLocalStorage.removeItem).toHaveBeenCalledWith('authUser');
       expect(mockLocalStorage.removeItem).toHaveBeenCalledWith('familyAssociations');
     });
@@ -159,26 +159,26 @@ describe('AuthService', () => {
     it('should return user from localStorage if exists', () => {
       const mockUser = createMockUser();
       mockLocalStorage.getItem.mockReturnValue(JSON.stringify(mockUser));
-      
+
       const user = authService.getCurrentUser();
-      
+
       expect(user).toEqual(mockUser);
       expect(mockLocalStorage.getItem).toHaveBeenCalledWith('authUser');
     });
 
     it('should return null if no user in localStorage', () => {
       mockLocalStorage.getItem.mockReturnValue(null);
-      
+
       const user = authService.getCurrentUser();
-      
+
       expect(user).toBeNull();
     });
 
     it('should return null if localStorage data is corrupted', () => {
       mockLocalStorage.getItem.mockReturnValue('invalid-json');
-      
+
       const user = authService.getCurrentUser();
-      
+
       expect(user).toBeNull();
     });
   });
@@ -187,7 +187,7 @@ describe('AuthService', () => {
     it('should successfully update user profile', async () => {
       const updates = { firstName: 'Updated', lastName: 'Name' };
       const updatedUser = await authService.updateUserProfile('coach1', updates);
-      
+
       expect(updatedUser.firstName).toBe('Updated');
       expect(updatedUser.lastName).toBe('Name');
     });
@@ -201,13 +201,13 @@ describe('AuthService', () => {
     it('should update localStorage if updating current user', async () => {
       const mockUser = createMockUser({ id: 'coach1' });
       mockLocalStorage.getItem.mockReturnValue(JSON.stringify(mockUser));
-      
+
       const updates = { firstName: 'Updated' };
       await authService.updateUserProfile('coach1', updates);
-      
+
       expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
         'authUser',
-        expect.stringContaining('"firstName":"Updated"')
+        expect.stringContaining('"firstName":"Updated"'),
       );
     });
   });
@@ -215,11 +215,11 @@ describe('AuthService', () => {
   describe('requestPasswordReset', () => {
     it('should successfully request password reset for existing user', async () => {
       const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-      
+
       await expect(authService.requestPasswordReset('coach@example.com'))
         .resolves
         .toBeUndefined();
-      
+
       expect(consoleSpy).toHaveBeenCalledWith('Password reset email sent to coach@example.com');
       consoleSpy.mockRestore();
     });
@@ -248,7 +248,7 @@ describe('AuthService', () => {
   describe('createFamilyAssociation', () => {
     it('should successfully create family association', async () => {
       const association = await authService.createFamilyAssociation('family1', 'player1', 'father');
-      
+
       expect(association).toBeDefined();
       expect(association.familyMemberId).toBe('family1');
       expect(association.playerId).toBe('player1');
@@ -265,7 +265,7 @@ describe('AuthService', () => {
 
     it('should set default permissions for new association', async () => {
       const association = await authService.createFamilyAssociation('family1', 'player1', 'mother');
-      
+
       expect(association.permissions).toEqual({
         canViewStats: true,
         canViewSchedule: true,
@@ -281,7 +281,7 @@ describe('AuthService', () => {
     it('should successfully update notification settings', async () => {
       const settings = { email: false, sms: true };
       const updatedSettings = await authService.updateNotificationSettings('coach1', settings);
-      
+
       expect(updatedSettings.email).toBe(false);
       expect(updatedSettings.sms).toBe(true);
       // Other settings should remain unchanged
@@ -326,7 +326,7 @@ describe('AuthService', () => {
   describe('getAllUsers', () => {
     it('should return array of all users', async () => {
       const users = await authService.getAllUsers();
-      
+
       expect(Array.isArray(users)).toBe(true);
       expect(users.length).toBeGreaterThan(0);
       expect(users[0]).toHaveProperty('id');

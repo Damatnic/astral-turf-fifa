@@ -25,7 +25,7 @@ const PlayerConversationPopup: React.FC = () => {
 
     const handleSendMessage = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!message.trim() || isLoadingConversation || !player) return;
+        if (!message.trim() || isLoadingConversation || !player) {return;}
 
         const userMessage: ChatMessage = {
             id: `msg_${Date.now()}`,
@@ -49,16 +49,16 @@ const PlayerConversationPopup: React.FC = () => {
             dispatch({ type: 'SEND_PLAYER_MESSAGE_FAILURE', payload: { playerId: player.id } });
         }
     };
-    
+
     const handleClose = () => {
       uiDispatch({ type: 'CLOSE_MODAL' });
-    }
-    
-    if (!player) return null;
+    };
+
+    if (!player) {return null;}
 
     return (
         <div className="fixed inset-0 bg-black/60 z-50 backdrop-blur-sm flex items-center justify-center p-4" onClick={handleClose}>
-            <div 
+            <div
                 onClick={(e) => e.stopPropagation()}
                 className="relative bg-slate-800 rounded-lg shadow-2xl w-full max-w-lg border border-gray-700/50 flex flex-col animate-fade-in-scale max-h-[70vh]"
             >

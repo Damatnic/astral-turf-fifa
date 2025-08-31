@@ -40,7 +40,7 @@ const SettingsPage: React.FC = () => {
                             </svg>
                             AI Assistant
                         </h2>
-                        
+
                         <div className="space-y-6">
                             <div>
                                 <h3 className="text-lg font-semibold mb-3 text-gray-200">AI Personality</h3>
@@ -53,8 +53,8 @@ const SettingsPage: React.FC = () => {
                                             key={personality}
                                             onClick={() => handlePersonalityChange(personality)}
                                             className={`p-4 rounded-lg border-2 transition-all ${
-                                                settings.aiPersonality === personality 
-                                                    ? 'border-teal-500 bg-teal-500/20 text-teal-400' 
+                                                settings.aiPersonality === personality
+                                                    ? 'border-teal-500 bg-teal-500/20 text-teal-400'
                                                     : 'border-gray-600 bg-gray-700 text-gray-300 hover:border-gray-500 hover:bg-gray-600'
                                             }`}
                                         >
@@ -226,8 +226,8 @@ const SettingsPage: React.FC = () => {
                             </div>
                             <div className="pt-4 border-t border-gray-700">
                                 <p className="text-sm text-gray-400 leading-relaxed">
-                                    Astral Turf is a comprehensive soccer management application designed to help coaches 
-                                    and analysts create, visualize, and analyze tactical formations and plays. Built with 
+                                    Astral Turf is a comprehensive soccer management application designed to help coaches
+                                    and analysts create, visualize, and analyze tactical formations and plays. Built with
                                     modern web technologies and powered by AI insights.
                                 </p>
                             </div>
@@ -256,7 +256,7 @@ const SettingsPage: React.FC = () => {
                                     Reset App
                                 </button>
                             </div>
-                            
+
                             <div className="flex items-center justify-between">
                                 <div>
                                     <h3 className="text-lg font-medium text-gray-200">Soft Reset</h3>

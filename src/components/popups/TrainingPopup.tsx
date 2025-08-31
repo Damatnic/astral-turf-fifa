@@ -5,11 +5,11 @@ import type { TrainingDrill, TrainingDrillCategory, TrainingIntensity, DailySche
 import { TRAINING_DRILLS } from '../../constants';
 
 const TabButton: React.FC<{ active: boolean; onClick: () => void; children: React.ReactNode }> = ({ active, onClick, children }) => (
-    <button 
-        onClick={onClick} 
+    <button
+        onClick={onClick}
         className={`px-4 py-2 text-sm font-semibold rounded-t-md transition-colors ${
-            active 
-                ? 'bg-gray-700 text-teal-300 border-b-2 border-teal-400' 
+            active
+                ? 'bg-gray-700 text-teal-300 border-b-2 border-teal-400'
                 : 'bg-gray-800 text-gray-400 hover:bg-gray-700/50'
         }`}
     >
@@ -18,10 +18,10 @@ const TabButton: React.FC<{ active: boolean; onClick: () => void; children: Reac
 );
 
 const DrillCard: React.FC<{ drill: TrainingDrill; onSelect: (drill: TrainingDrill) => void; isSelected: boolean }> = ({ drill, onSelect, isSelected }) => (
-    <div 
+    <div
         onClick={() => onSelect(drill)}
         className={`p-3 rounded-md border cursor-pointer transition-colors ${
-            isSelected 
+            isSelected
                 ? 'bg-teal-600 border-teal-500 text-white'
                 : 'bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600'
         }`}
@@ -73,10 +73,10 @@ const TrainingPopup: React.FC = () => {
 
     const handleClose = () => dispatch({ type: 'CLOSE_MODAL' });
 
-    const filteredDrills = TRAINING_DRILLS.filter(drill => 
+    const filteredDrills = TRAINING_DRILLS.filter(drill =>
         selectedDrillType === 'warmup' ? drill.category === 'warmup' :
         selectedDrillType === 'cooldown' ? drill.category === 'cooldown' :
-        drill.category === selectedCategory
+        drill.category === selectedCategory,
     );
 
     const handleDrillSelect = (drill: TrainingDrill) => {
@@ -86,9 +86,9 @@ const TrainingPopup: React.FC = () => {
                 ...prev[selectedDay],
                 [selectedSession]: {
                     ...prev[selectedDay][selectedSession],
-                    [selectedDrillType]: drill.id
-                }
-            }
+                    [selectedDrillType]: drill.id,
+                },
+            },
         }));
     };
 
@@ -97,8 +97,8 @@ const TrainingPopup: React.FC = () => {
             ...prev,
             [day]: {
                 ...prev[day],
-                isRestDay: !prev[day].isRestDay
-            }
+                isRestDay: !prev[day].isRestDay,
+            },
         }));
     };
 
@@ -163,8 +163,8 @@ const TrainingPopup: React.FC = () => {
                                             <button
                                                 onClick={() => setSelectedDay(day as keyof WeeklySchedule)}
                                                 className={`flex-grow text-left px-3 py-2 rounded-md transition-colors ${
-                                                    selectedDay === day 
-                                                        ? 'bg-teal-600 text-white' 
+                                                    selectedDay === day
+                                                        ? 'bg-teal-600 text-white'
                                                         : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                                                 } ${weeklySchedule[day as keyof WeeklySchedule].isRestDay ? 'opacity-50' : ''}`}
                                             >
@@ -193,7 +193,7 @@ const TrainingPopup: React.FC = () => {
                                 <h3 className="font-semibold text-lg text-gray-200 mb-3">
                                     {selectedDay.charAt(0).toUpperCase() + selectedDay.slice(1)} Sessions
                                 </h3>
-                                
+
                                 {!weeklySchedule[selectedDay].isRestDay ? (
                                     <div className="space-y-4">
                                         {/* Morning Session */}
@@ -215,24 +215,24 @@ const TrainingPopup: React.FC = () => {
                                                 <div className="flex justify-between">
                                                     <span>Warmup:</span>
                                                     <span className="text-teal-400">
-                                                        {weeklySchedule[selectedDay].morning.warmup 
-                                                            ? getDrillById(weeklySchedule[selectedDay].morning.warmup)?.name 
+                                                        {weeklySchedule[selectedDay].morning.warmup
+                                                            ? getDrillById(weeklySchedule[selectedDay].morning.warmup)?.name
                                                             : 'Not Set'}
                                                     </span>
                                                 </div>
                                                 <div className="flex justify-between">
                                                     <span>Main:</span>
                                                     <span className="text-teal-400">
-                                                        {weeklySchedule[selectedDay].morning.main 
-                                                            ? getDrillById(weeklySchedule[selectedDay].morning.main)?.name 
+                                                        {weeklySchedule[selectedDay].morning.main
+                                                            ? getDrillById(weeklySchedule[selectedDay].morning.main)?.name
                                                             : 'Not Set'}
                                                     </span>
                                                 </div>
                                                 <div className="flex justify-between">
                                                     <span>Cooldown:</span>
                                                     <span className="text-teal-400">
-                                                        {weeklySchedule[selectedDay].morning.cooldown 
-                                                            ? getDrillById(weeklySchedule[selectedDay].morning.cooldown)?.name 
+                                                        {weeklySchedule[selectedDay].morning.cooldown
+                                                            ? getDrillById(weeklySchedule[selectedDay].morning.cooldown)?.name
                                                             : 'Not Set'}
                                                     </span>
                                                 </div>
@@ -258,24 +258,24 @@ const TrainingPopup: React.FC = () => {
                                                 <div className="flex justify-between">
                                                     <span>Warmup:</span>
                                                     <span className="text-teal-400">
-                                                        {weeklySchedule[selectedDay].afternoon.warmup 
-                                                            ? getDrillById(weeklySchedule[selectedDay].afternoon.warmup)?.name 
+                                                        {weeklySchedule[selectedDay].afternoon.warmup
+                                                            ? getDrillById(weeklySchedule[selectedDay].afternoon.warmup)?.name
                                                             : 'Not Set'}
                                                     </span>
                                                 </div>
                                                 <div className="flex justify-between">
                                                     <span>Main:</span>
                                                     <span className="text-teal-400">
-                                                        {weeklySchedule[selectedDay].afternoon.main 
-                                                            ? getDrillById(weeklySchedule[selectedDay].afternoon.main)?.name 
+                                                        {weeklySchedule[selectedDay].afternoon.main
+                                                            ? getDrillById(weeklySchedule[selectedDay].afternoon.main)?.name
                                                             : 'Not Set'}
                                                     </span>
                                                 </div>
                                                 <div className="flex justify-between">
                                                     <span>Cooldown:</span>
                                                     <span className="text-teal-400">
-                                                        {weeklySchedule[selectedDay].afternoon.cooldown 
-                                                            ? getDrillById(weeklySchedule[selectedDay].afternoon.cooldown)?.name 
+                                                        {weeklySchedule[selectedDay].afternoon.cooldown
+                                                            ? getDrillById(weeklySchedule[selectedDay].afternoon.cooldown)?.name
                                                             : 'Not Set'}
                                                     </span>
                                                 </div>
@@ -293,7 +293,7 @@ const TrainingPopup: React.FC = () => {
                             {/* Drill Selection */}
                             <div>
                                 <h3 className="font-semibold text-lg text-gray-200 mb-3">Select Drill</h3>
-                                
+
                                 {/* Drill Type Selection */}
                                 <div className="flex space-x-2 mb-4">
                                     {(['warmup', 'main', 'cooldown'] as const).map(type => (
@@ -314,7 +314,7 @@ const TrainingPopup: React.FC = () => {
                                 {/* Category Selection for Main Drills */}
                                 {selectedDrillType === 'main' && (
                                     <div className="mb-4">
-                                        <select 
+                                        <select
                                             value={selectedCategory}
                                             onChange={e => setSelectedCategory(e.target.value as TrainingDrillCategory)}
                                             className="w-full p-2 bg-gray-700 border border-gray-600 rounded-md text-white"
@@ -348,7 +348,7 @@ const TrainingPopup: React.FC = () => {
                         <div className="space-y-6">
                             <div>
                                 <h3 className="font-semibold text-lg text-gray-200 mb-4">Drill Library</h3>
-                                
+
                                 {/* Category Filter */}
                                 <div className="flex flex-wrap gap-2 mb-4">
                                     {(['warmup', 'attacking', 'defending', 'physical', 'technical', 'tactical', 'set_pieces', 'cooldown'] as TrainingDrillCategory[]).map(category => (
@@ -386,7 +386,7 @@ const TrainingPopup: React.FC = () => {
                             <div>
                                 <h3 className="font-semibold text-lg text-gray-200 mb-4">Individual Training Focus</h3>
                                 <p className="text-gray-400 mb-4">Assign specific training focus areas to individual players to enhance their development.</p>
-                                
+
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                     <div>
                                         <h4 className="font-medium text-gray-200 mb-3">Player List</h4>
@@ -394,7 +394,7 @@ const TrainingPopup: React.FC = () => {
                                             {homeTeamPlayers.map(player => (
                                                 <div key={player.id} className="flex items-center justify-between p-3 bg-gray-700/50 rounded-md">
                                                     <div className="flex items-center">
-                                                        <div 
+                                                        <div
                                                             className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold mr-3"
                                                             style={{ backgroundColor: player.teamColor }}
                                                         >
@@ -441,7 +441,7 @@ const TrainingPopup: React.FC = () => {
                             <div>
                                 <h3 className="font-semibold text-lg text-gray-200 mb-4">Training Templates</h3>
                                 <p className="text-gray-400 mb-4">Pre-built weekly training schedules for different focus areas.</p>
-                                
+
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {[
                                         { name: 'Attacking Focus', description: 'Emphasis on goalscoring and creative play', color: 'bg-red-600' },
@@ -471,7 +471,7 @@ const TrainingPopup: React.FC = () => {
                 {/* Footer */}
                 <div className="p-4 border-t border-gray-700 flex justify-between">
                     <div className="flex space-x-3">
-                        <button 
+                        <button
                             className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white font-medium rounded-md transition-colors flex items-center"
                         >
                             <PlayIcon className="w-4 h-4 mr-2" />
@@ -481,7 +481,7 @@ const TrainingPopup: React.FC = () => {
                             Save as Template
                         </button>
                     </div>
-                    <button 
+                    <button
                         onClick={handleClose}
                         className="px-6 py-2 bg-teal-600 hover:bg-teal-500 text-white font-bold rounded-md transition-colors"
                     >

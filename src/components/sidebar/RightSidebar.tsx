@@ -28,7 +28,7 @@ const PlayerDetails: React.FC<{ player: Player }> = ({ player }) => {
   const playerInstructions = Object.entries(player.instructions)
     .map(([instrId, optionId]) => {
       const instruction = DETAILED_PLAYER_INSTRUCTIONS[instrId];
-      if (!instruction || optionId === 'default') return null;
+      if (!instruction || optionId === 'default') {return null;}
       const option = instruction.options.find(o => o.id === optionId);
       return option ? option.name : null;
     })
@@ -38,7 +38,7 @@ const PlayerDetails: React.FC<{ player: Player }> = ({ player }) => {
   const handleEditPlayer = () => {
     dispatch({ type: 'SET_EDITING_PLAYER_ID', payload: player.id });
     dispatch({ type: 'OPEN_MODAL', payload: 'editPlayer'});
-  }
+  };
 
   return (
     <div>
@@ -118,12 +118,12 @@ const AIInsights: React.FC = () => {
 
 
   const handleGenerateInsights = useCallback(async () => {
-    if (!homeFormation || !awayFormation) return;
+    if (!homeFormation || !awayFormation) {return;}
     dispatch({ type: 'GENERATE_AI_INSIGHT_START' });
     try {
       const homePlayerIds = new Set(homeFormation.slots.map(s => s.playerId).filter(Boolean));
       const awayPlayerIds = new Set(awayFormation.slots.map(s => s.playerId).filter(Boolean));
-      
+
       const homePlayers = players.filter(p => homePlayerIds.has(p.id));
       const awayPlayers = players.filter(p => awayPlayerIds.has(p.id));
 
@@ -225,7 +225,7 @@ const TeamKitEditor: React.FC = () => {
     const handleColorChange = (colorType: 'primaryColor' | 'secondaryColor', value: string) => {
         dispatch({ type: 'SET_TEAM_KIT', payload: { team: activeTeam, kit: { [colorType]: value } } });
     };
-    
+
     const handlePatternChange = (pattern: TeamKitPattern) => {
         dispatch({ type: 'SET_TEAM_KIT', payload: { team: activeTeam, kit: { pattern } } });
     };
@@ -267,7 +267,7 @@ const TabButton: React.FC<{ active: boolean, onClick: () => void, icon: React.Re
     <button onClick={onClick} title={label} className={`flex-1 flex justify-center items-center p-2 transition-colors ${active ? 'bg-[var(--bg-secondary)] text-[var(--accent-primary)]' : 'text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)]'}`}>
         {icon}
     </button>
-)
+);
 
 export const RightSidebar: React.FC = () => {
     const { tacticsState } = useTacticsContext();
@@ -294,7 +294,7 @@ export const RightSidebar: React.FC = () => {
                     </>
                 )}
             </div>
-            
+
             {!selectedPlayerId && (
                 <div className="flex-shrink-0 border-t border-[var(--border-primary)] flex bg-[var(--bg-primary)]">
                     <TabButton label="AI Insights" icon={<BrainCircuitIcon className="w-5 h-5" />} active={activeTab === 'ai'} onClick={() => setActiveTab('ai')} />

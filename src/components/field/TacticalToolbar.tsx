@@ -16,8 +16,8 @@ const ToolButton: React.FC<{
         title={label}
         onClick={() => onClick(tool)}
         className={`p-2 rounded-md transition-colors ${
-            isActive 
-                ? 'bg-teal-500 text-white shadow-lg shadow-teal-500/25' 
+            isActive
+                ? 'bg-teal-500 text-white shadow-lg shadow-teal-500/25'
                 : 'text-slate-400 hover:bg-slate-700 hover:text-slate-200'
         }`}
     >
@@ -32,8 +32,8 @@ const TacticalToolbar: React.FC = () => {
     const { drawings, playbook } = tacticsState;
 
     const setTool = (tool?: DrawingTool) => {
-        if(tool) dispatch({ type: 'SET_DRAWING_TOOL', payload: tool });
-    }
+        if(tool) {dispatch({ type: 'SET_DRAWING_TOOL', payload: tool });}
+    };
     const setColor = (color: string) => dispatch({ type: 'SET_DRAWING_COLOR', payload: color });
     const undo = () => tacticsDispatch({ type: 'UNDO_LAST_DRAWING' });
     const clear = () => {
@@ -41,7 +41,7 @@ const TacticalToolbar: React.FC = () => {
             tacticsDispatch({ type: 'CLEAR_DRAWINGS' });
         }
     };
-    
+
     const handlePlay = () => dispatch({ type: 'START_ANIMATION' });
     const handleReset = () => dispatch({ type: 'RESET_ANIMATION' });
     const toggleGrid = () => dispatch({ type: 'TOGGLE_GRID_VISIBILITY' });
@@ -73,7 +73,7 @@ const TacticalToolbar: React.FC = () => {
                     <TextIcon className="w-5 h-5" />
                 </ToolButton>
             </div>
-            
+
             <div className="w-px h-6 bg-slate-600"></div>
 
             <div className="flex items-center space-x-1">
@@ -83,9 +83,9 @@ const TacticalToolbar: React.FC = () => {
                  <ToolButton label="Toggle Formation Strength" isActive={isFormationStrengthVisible} onClick={toggleStrength}>
                     <RadarChartIcon className="w-5 h-5" />
                 </ToolButton>
-                <ToolButton 
-                    label={`Positioning Mode: ${positioningMode === 'snap' ? 'Snap to Position' : 'Free Movement'}`} 
-                    isActive={positioningMode === 'free'} 
+                <ToolButton
+                    label={`Positioning Mode: ${positioningMode === 'snap' ? 'Snap to Position' : 'Free Movement'}`}
+                    isActive={positioningMode === 'free'}
                     onClick={togglePositioningMode}
                 >
                     <TargetIcon className="w-5 h-5" />
@@ -115,7 +115,7 @@ const TacticalToolbar: React.FC = () => {
                     </button>
                 )}
             </div>
-            
+
             <div className="w-px h-6 bg-slate-600"></div>
 
              <div className="flex items-center space-x-1">

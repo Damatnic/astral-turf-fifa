@@ -20,7 +20,7 @@ const AIChatPopup: React.FC = () => {
 
     const handleSendMessage = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!message.trim() || isChatProcessing) return;
+        if (!message.trim() || isChatProcessing) {return;}
 
         const userMessage: ChatMessage = {
             id: `msg_${Date.now()}`,
@@ -41,7 +41,7 @@ const AIChatPopup: React.FC = () => {
             const onFieldPlayers = players.filter(p => onFieldIds.has(p.id));
 
             const result = await getAIChatResponse([...chatHistory, userMessage], onFieldPlayers, formation, settings.aiPersonality);
-            
+
             const aiResponse: ChatMessage = {
                 id: `msg_${Date.now() + 1}`,
                 sender: 'ai',
@@ -58,7 +58,7 @@ const AIChatPopup: React.FC = () => {
 
     return (
         <div className="fixed bottom-28 right-8 z-40">
-            <div 
+            <div
                 className="bg-slate-800/90 backdrop-blur-md rounded-lg shadow-2xl w-96 border border-gray-700/50 flex flex-col animate-fade-in-scale h-[60vh]"
             >
                 {/* Header */}

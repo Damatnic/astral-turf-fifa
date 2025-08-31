@@ -20,41 +20,41 @@ const BarChart: React.FC<BarChartProps> = ({ data, color = 'var(--accent-seconda
                 const x = i * (barWidth + gap);
                 return (
                     <g key={d.label}>
-                        <rect 
-                            x={x} 
-                            y={chartHeight - barHeight} 
-                            width={barWidth} 
-                            height={barHeight} 
-                            fill={color} 
+                        <rect
+                            x={x}
+                            y={chartHeight - barHeight}
+                            width={barWidth}
+                            height={barHeight}
+                            fill={color}
                             rx="3"
                         >
                              <title>{`${d.label}: ${d.value}`}</title>
                         </rect>
-                        <text 
-                            x={x + barWidth / 2} 
+                        <text
+                            x={x + barWidth / 2}
                             y={chartHeight - barHeight - 8}
-                            textAnchor="middle" 
-                            fontSize="14" 
+                            textAnchor="middle"
+                            fontSize="14"
                             fill="var(--text-primary)"
                             className="font-bold"
                         >
                             {d.value}
                         </text>
                         <text
-                            x={x + barWidth / 2} 
+                            x={x + barWidth / 2}
                             y={chartHeight + 20}
-                            textAnchor="middle" 
-                            fontSize="12" 
+                            textAnchor="middle"
+                            fontSize="12"
                             fill="var(--text-secondary)"
                             className="font-semibold"
                         >
                             {d.label}
                         </text>
                     </g>
-                )
+                );
             })}
         </svg>
-    )
+    );
 };
 
 export default BarChart;

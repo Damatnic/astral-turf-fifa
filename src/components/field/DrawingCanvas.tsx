@@ -18,41 +18,41 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({ fieldRef }) => {
     const [textInput, setTextInput] = useState<{ position: { x: number; y: number }, value: string } | null>(null);
 
     const getPointerPosition = (e: ReactMouseEvent): { x: number, y: number } | null => {
-        if (!fieldRef?.current) return null;
+        if (!fieldRef?.current) {return null;}
         const fieldRect = fieldRef.current.getBoundingClientRect();
-        if (!fieldRect) return null;
+        if (!fieldRect) {return null;}
         return {
             x: ((e.clientX - fieldRect.left) / fieldRect.width) * 100,
             y: ((e.clientY - fieldRect.top) / fieldRect.height) * 100,
         };
     };
-    
+
     const getSvgPointerPosition = (e: ReactMouseEvent<SVGSVGElement>): { x: number, y: number } | null => {
         const svg = e.currentTarget;
-        if (!svg) return getPointerPosition(e);
+        if (!svg) {return getPointerPosition(e);}
         const CTM = svg.getScreenCTM();
-        if (!CTM) return getPointerPosition(e); // Fallback
+        if (!CTM) {return getPointerPosition(e);} // Fallback
         const pt = svg.createSVGPoint();
-        if (!pt) return getPointerPosition(e);
+        if (!pt) {return getPointerPosition(e);}
         pt.x = e.clientX;
         pt.y = e.clientY;
         const inverse = CTM.inverse();
-        if (!inverse) return getPointerPosition(e);
+        if (!inverse) {return getPointerPosition(e);}
         const transformedPt = pt.matrixTransform(inverse);
-        if (!transformedPt) return getPointerPosition(e);
+        if (!transformedPt) {return getPointerPosition(e);}
         const { x, y } = transformedPt;
         return { x, y };
     };
 
     const handleMouseDown = (e: ReactMouseEvent<SVGSVGElement>) => {
-        if (drawingTool === 'select' || e?.button !== 0 || isPresentationMode) return;
-        
+        if (drawingTool === 'select' || e?.button !== 0 || isPresentationMode) {return;}
+
         const startPoint = getSvgPointerPosition(e);
-        if (!startPoint) return;
+        if (!startPoint) {return;}
 
         if (drawingTool === 'text') {
             const htmlPos = getPointerPosition(e);
-            if (htmlPos) setTextInput({ position: htmlPos, value: '' });
+            if (htmlPos) {setTextInput({ position: htmlPos, value: '' });}
             return;
         }
 
@@ -67,23 +67,23 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({ fieldRef }) => {
     };
 
     const handleMouseMove = (e: ReactMouseEvent<SVGSVGElement>) => {
-        if (!isDrawing || !currentDrawing) return;
-        
-        const currentPoint = getSvgPointerPosition(e);
-        if (!currentPoint) return;
+        if (!isDrawing || !currentDrawing) {return;}
 
-        let updatedPoints = [...(currentDrawing?.points ?? [])];
+        const currentPoint = getSvgPointerPosition(e);
+        if (!currentPoint) {return;}
+
+        const updatedPoints = [...(currentDrawing?.points ?? [])];
         if (drawingTool === 'arrow' || drawingTool === 'zone' || drawingTool === 'line') {
             updatedPoints[1] = currentPoint;
         } else if (drawingTool === 'pen') {
             updatedPoints.push(currentPoint);
         }
-        
+
         setCurrentDrawing({ ...currentDrawing, points: updatedPoints });
     };
 
     const handleMouseUp = () => {
-        if (!isDrawing || !currentDrawing) return;
+        if (!isDrawing || !currentDrawing) {return;}
 
         setIsDrawing(false);
         const points = currentDrawing?.points ?? [];
@@ -92,13 +92,13 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({ fieldRef }) => {
         }
         setCurrentDrawing(null);
     };
-    
+
     const finalizeText = () => {
         if (textInput?.value?.trim() !== '') {
             // Text position is already in percentage coordinates
             const svgPos = {
                 x: textInput?.position?.x ?? 0,
-                y: textInput?.position?.y ?? 0
+                y: textInput?.position?.y ?? 0,
             };
 
             if (svgPos && typeof svgPos.x === 'number' && typeof svgPos.y === 'number') {
@@ -125,25 +125,25 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({ fieldRef }) => {
     };
 
     const renderShape = (shape: DrawingShape) => {
-        if (!shape) return null;
+        if (!shape) {return null;}
         const { id, tool, color, points = [], text } = shape;
         const strokeWidth = 0.5;
-        
+
         switch (tool) {
             case 'arrow': {
-                if (points.length < 2 || !points[0] || !points[1]) return null;
+                if (points.length < 2 || !points[0] || !points[1]) {return null;}
                 const p0 = points[0];
                 const p1 = points[1];
                 return <line key={id} x1={p0.x} y1={p0.y} x2={p1.x} y2={p1.y} stroke={color ?? '#ffffff'} strokeWidth={strokeWidth} markerEnd={`url(#arrowhead-${(color ?? '#ffffff').replace('#','')})`} />;
             }
             case 'line': {
-                if (points.length < 2 || !points[0] || !points[1]) return null;
+                if (points.length < 2 || !points[0] || !points[1]) {return null;}
                 const p0 = points[0];
                 const p1 = points[1];
                 return <line key={id} x1={p0.x} y1={p0.y} x2={p1.x} y2={p1.y} stroke={color ?? '#ffffff'} strokeWidth={strokeWidth} />;
             }
             case 'zone': {
-                if (points.length < 2 || !points[0] || !points[1]) return null;
+                if (points.length < 2 || !points[0] || !points[1]) {return null;}
                 const p0 = points[0];
                 const p1 = points[1];
                 const x = Math.min(p0.x, p1.x);
@@ -153,11 +153,11 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({ fieldRef }) => {
                 return <rect key={id} x={x} y={y} width={width} height={height} fill={`${color ?? '#ffffff'}33`} stroke={color ?? '#ffffff'} strokeWidth={strokeWidth/2} />;
             }
             case 'pen':
-                if (points.length < 2) return null;
+                if (points.length < 2) {return null;}
                 const pathData = "M " + points.filter(p => p).map(p => `${p!.x} ${p!.y}`).join(" L ");
                 return <path key={id} d={pathData} stroke={color ?? '#ffffff'} strokeWidth={strokeWidth} fill="none" strokeLinecap="round" strokeLinejoin="round" />;
             case 'text':
-                if (!text || points.length < 1 || !points[0]) return null;
+                if (!text || points.length < 1 || !points[0]) {return null;}
                 return (
                     <text
                         key={id}
@@ -177,7 +177,7 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({ fieldRef }) => {
                 return null;
         }
     };
-    
+
     const uniqueColors = [...new Set((drawings ?? []).map(d => d?.color).filter(Boolean).concat(drawingColor ?? '#ffffff'))];
     const eventsToHandle = drawingTool !== 'select' && !textInput ? {
         onMouseDown: handleMouseDown,
@@ -206,15 +206,15 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({ fieldRef }) => {
                 );
               })}
             </defs>
-            
+
             <g>
                 {(drawings ?? []).map(shape => renderShape(shape))}
             </g>
-            
+
             {currentDrawing && renderShape(currentDrawing)}
         </svg>
         {textInput && (
-            <div 
+            <div
                 style={{
                     position: 'absolute',
                     left: `${textInput?.position?.x ?? 0}%`,
@@ -239,7 +239,7 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({ fieldRef }) => {
                         borderRadius: '6px',
                         outline: 'none',
                         textAlign: 'center',
-                        width: `${Math.max(100, (textInput?.value?.length ?? 0) * 10)}px`
+                        width: `${Math.max(100, (textInput?.value?.length ?? 0) * 10)}px`,
                     }}
                 />
             </div>

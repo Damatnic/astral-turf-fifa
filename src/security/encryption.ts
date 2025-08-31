@@ -1,6 +1,6 @@
 /**
  * Data Encryption and Protection Module
- * 
+ *
  * Provides comprehensive data encryption, hashing, and protection utilities
  * for sensitive information including PII, medical data, and financial records.
  */
@@ -72,7 +72,7 @@ export function deriveKey(password: string, salt?: CryptoJS.lib.WordArray): Deri
     iterations: 10000,
     hasher: CryptoJS.algo.SHA256,
   });
-  
+
   return { key, salt: saltArray };
 }
 
@@ -85,7 +85,7 @@ function getEncryptionKey(classification: DataClassification): string {
     [DataClassification.CONFIDENTIAL]: MASTER_KEY + '-confidential',
     [DataClassification.RESTRICTED]: MASTER_KEY + '-restricted',
   };
-  
+
   return keys[classification] || MASTER_KEY;
 }
 
@@ -98,29 +98,29 @@ export function encryptData(
   data: string,
   classification: DataClassification = DataClassification.INTERNAL,
   algorithm: EncryptionAlgorithm = EncryptionAlgorithm.AES_256_GCM,
-  context?: EncryptionContext
+  context?: EncryptionContext,
 ): EncryptedData {
   try {
     if (!data) {
       throw new Error('Data cannot be empty');
     }
-    
+
     const key = getEncryptionKey(classification);
     const { key: derivedKey, salt } = deriveKey(key);
-    
+
     // Generate random IV
     const iv = CryptoJS.lib.WordArray.random(16);
-    
+
     // Encrypt data using AES-256-CBC (CryptoJS doesn't support GCM directly)
     const encrypted = CryptoJS.AES.encrypt(data, derivedKey, {
       iv: iv,
       mode: CryptoJS.mode.CBC,
       padding: CryptoJS.pad.Pkcs7,
     });
-    
+
     // Generate checksum for integrity verification
     const checksum = CryptoJS.SHA256(data).toString();
-    
+
     const encryptedData: EncryptedData = {
       data: encrypted.toString(),
       iv: iv.toString(CryptoJS.enc.Base64),
@@ -130,7 +130,7 @@ export function encryptData(
       keyVersion: 1,
       checksum,
     };
-    
+
     // Log encryption operation
     if (context) {
       securityLogger.logSecurityEvent(
@@ -145,10 +145,10 @@ export function encryptData(
             algorithm,
             dataLength: data.length,
           },
-        }
+        },
       );
     }
-    
+
     return encryptedData;
   } catch (error) {
     securityLogger.error('Data encryption failed', {
@@ -157,7 +157,7 @@ export function encryptData(
       algorithm,
       dataLength: data?.length || 0,
     });
-    
+
     throw new Error('Data encryption failed');
   }
 }
@@ -165,28 +165,28 @@ export function encryptData(
 // Decrypt data
 export function decryptData(
   encryptedData: EncryptedData,
-  context?: EncryptionContext
+  context?: EncryptionContext,
 ): string {
   try {
     const key = getEncryptionKey(encryptedData.classification);
     const { key: derivedKey } = deriveKey(key);
-    
+
     // Convert IV from base64
     const iv = CryptoJS.enc.Base64.parse(encryptedData.iv);
-    
+
     // Decrypt data
     const decrypted = CryptoJS.AES.decrypt(encryptedData.data, derivedKey, {
       iv: iv,
       mode: CryptoJS.mode.CBC,
       padding: CryptoJS.pad.Pkcs7,
     });
-    
+
     const decryptedText = decrypted.toString(CryptoJS.enc.Utf8);
-    
+
     if (!decryptedText) {
       throw new Error('Decryption failed - invalid key or corrupted data');
     }
-    
+
     // Verify integrity if checksum exists
     if (encryptedData.checksum) {
       const computedChecksum = CryptoJS.SHA256(decryptedText).toString();
@@ -194,7 +194,7 @@ export function decryptData(
         throw new Error('Data integrity check failed');
       }
     }
-    
+
     // Log decryption operation
     if (context) {
       securityLogger.logSecurityEvent(
@@ -209,10 +209,10 @@ export function decryptData(
             algorithm: encryptedData.algorithm,
             timestamp: encryptedData.timestamp,
           },
-        }
+        },
       );
     }
-    
+
     return decryptedText;
   } catch (error) {
     securityLogger.error('Data decryption failed', {
@@ -221,7 +221,7 @@ export function decryptData(
       algorithm: encryptedData.algorithm,
       timestamp: encryptedData.timestamp,
     });
-    
+
     throw new Error('Data decryption failed');
   }
 }
@@ -238,7 +238,7 @@ export function encryptPersonalInfo(personalInfo: any, userId?: string): Encrypt
     dataType: 'personal_info',
     classification: DataClassification.CONFIDENTIAL,
   };
-  
+
   return encryptData(JSON.stringify(personalInfo), DataClassification.CONFIDENTIAL, EncryptionAlgorithm.AES_256_GCM, context);
 }
 
@@ -250,7 +250,7 @@ export function decryptPersonalInfo(encryptedData: EncryptedData, userId?: strin
     dataType: 'personal_info',
     classification: encryptedData.classification,
   };
-  
+
   const decryptedText = decryptData(encryptedData, context);
   return JSON.parse(decryptedText);
 }
@@ -263,7 +263,7 @@ export function encryptMedicalData(medicalData: any, userId?: string): Encrypted
     dataType: 'medical_data',
     classification: DataClassification.RESTRICTED,
   };
-  
+
   return encryptData(JSON.stringify(medicalData), DataClassification.RESTRICTED, EncryptionAlgorithm.AES_256_GCM, context);
 }
 
@@ -275,7 +275,7 @@ export function decryptMedicalData(encryptedData: EncryptedData, userId?: string
     dataType: 'medical_data',
     classification: encryptedData.classification,
   };
-  
+
   const decryptedText = decryptData(encryptedData, context);
   return JSON.parse(decryptedText);
 }
@@ -288,7 +288,7 @@ export function encryptFinancialData(financialData: any, userId?: string): Encry
     dataType: 'financial_data',
     classification: DataClassification.CONFIDENTIAL,
   };
-  
+
   return encryptData(JSON.stringify(financialData), DataClassification.CONFIDENTIAL, EncryptionAlgorithm.AES_256_GCM, context);
 }
 
@@ -300,7 +300,7 @@ export function decryptFinancialData(encryptedData: EncryptedData, userId?: stri
     dataType: 'financial_data',
     classification: encryptedData.classification,
   };
-  
+
   const decryptedText = decryptData(encryptedData, context);
   return JSON.parse(decryptedText);
 }
@@ -319,7 +319,7 @@ export function generateSecureHash(data: string, salt?: string): string {
 export function generateHashWithSalt(data: string): { hash: string; salt: string } {
   const salt = CryptoJS.lib.WordArray.random(16).toString();
   const hash = CryptoJS.SHA256(data + salt).toString();
-  
+
   return { hash, salt };
 }
 
@@ -349,11 +349,11 @@ export function maskSensitiveData(data: string, maskChar = '*', visibleChars = 4
   if (!data || data.length <= visibleChars) {
     return maskChar.repeat(data?.length || 8);
   }
-  
+
   const visiblePrefix = data.substring(0, Math.ceil(visibleChars / 2));
   const visibleSuffix = data.substring(data.length - Math.floor(visibleChars / 2));
   const maskedMiddle = maskChar.repeat(Math.max(4, data.length - visibleChars));
-  
+
   return visiblePrefix + maskedMiddle + visibleSuffix;
 }
 
@@ -362,10 +362,10 @@ export function anonymizeData(data: any): any {
   if (!data || typeof data !== 'object') {
     return data;
   }
-  
+
   const sensitiveFields = ['email', 'phone', 'ssn', 'creditCard', 'address', 'name'];
   const anonymized = { ...data };
-  
+
   sensitiveFields.forEach(field => {
     if (anonymized[field]) {
       if (typeof anonymized[field] === 'string') {
@@ -373,7 +373,7 @@ export function anonymizeData(data: any): any {
       }
     }
   });
-  
+
   return anonymized;
 }
 
@@ -408,12 +408,12 @@ export function generateUUID(): string {
 
 // Check if data requires encryption based on content
 export function requiresEncryption(data: any, fieldName?: string): DataClassification | null {
-  if (!data) return null;
-  
+  if (!data) {return null;}
+
   const restrictedFields = ['ssn', 'medicalRecord', 'diagnosis', 'prescription'];
   const confidentialFields = ['email', 'phone', 'address', 'bankAccount', 'creditCard'];
   const internalFields = ['notes', 'comments', 'personalInfo'];
-  
+
   if (fieldName) {
     if (restrictedFields.some(field => fieldName.toLowerCase().includes(field))) {
       return DataClassification.RESTRICTED;
@@ -425,22 +425,22 @@ export function requiresEncryption(data: any, fieldName?: string): DataClassific
       return DataClassification.INTERNAL;
     }
   }
-  
+
   // Content-based detection
   const dataStr = typeof data === 'string' ? data : JSON.stringify(data);
-  
+
   // Medical terms
   const medicalTerms = ['diagnosis', 'medication', 'allergy', 'medical', 'health', 'treatment'];
   if (medicalTerms.some(term => dataStr.toLowerCase().includes(term))) {
     return DataClassification.RESTRICTED;
   }
-  
+
   // Financial terms
   const financialTerms = ['bank', 'credit', 'card', 'account', 'payment', 'salary', 'wage'];
   if (financialTerms.some(term => dataStr.toLowerCase().includes(term))) {
     return DataClassification.CONFIDENTIAL;
   }
-  
+
   return DataClassification.INTERNAL;
 }
 
@@ -449,32 +449,32 @@ export function secureDeepCopy(obj: any, userId?: string): any {
   if (obj === null || typeof obj !== 'object') {
     return obj;
   }
-  
+
   if (obj instanceof Date) {
     return new Date(obj.getTime());
   }
-  
+
   if (Array.isArray(obj)) {
     return obj.map(item => secureDeepCopy(item, userId));
   }
-  
+
   const copy: any = {};
   Object.keys(obj).forEach(key => {
     const classification = requiresEncryption(obj[key], key);
-    
+
     if (classification && classification !== DataClassification.PUBLIC) {
       // Encrypt sensitive data
       copy[key] = encryptData(
         typeof obj[key] === 'string' ? obj[key] : JSON.stringify(obj[key]),
         classification,
         EncryptionAlgorithm.AES_256_GCM,
-        { userId, operation: 'encrypt', dataType: key, classification }
+        { userId, operation: 'encrypt', dataType: key, classification },
       );
     } else {
       copy[key] = secureDeepCopy(obj[key], userId);
     }
   });
-  
+
   return copy;
 }
 

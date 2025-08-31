@@ -10,12 +10,12 @@ const MedicalCenterPage: React.FC = () => {
 
     const teamPlayers = tacticsState.players.filter(p => p.team === selectedTeam);
     const staff = franchiseState.staff[selectedTeam];
-    
+
     // Filter players by medical status
-    const injuredPlayers = teamPlayers.filter(p => 
-        p.availability.status === 'Minor Injury' || p.availability.status === 'Major Injury'
+    const injuredPlayers = teamPlayers.filter(p =>
+        p.availability.status === 'Minor Injury' || p.availability.status === 'Major Injury',
     );
-    
+
     const lowFitnessPlayers = teamPlayers.filter(p => p.stamina < 70);
     const highRiskPlayers = teamPlayers.filter(p => p.injuryRisk > 60);
 
@@ -36,14 +36,14 @@ const MedicalCenterPage: React.FC = () => {
     };
 
     const getFitnessColor = (stamina: number) => {
-        if (stamina >= 80) return 'text-green-400';
-        if (stamina >= 60) return 'text-yellow-400';
+        if (stamina >= 80) {return 'text-green-400';}
+        if (stamina >= 60) {return 'text-yellow-400';}
         return 'text-red-400';
     };
 
     const getRiskColor = (risk: number) => {
-        if (risk >= 80) return 'text-red-400';
-        if (risk >= 60) return 'text-yellow-400';
+        if (risk >= 80) {return 'text-red-400';}
+        if (risk >= 60) {return 'text-yellow-400';}
         return 'text-green-400';
     };
 
@@ -60,7 +60,7 @@ const MedicalCenterPage: React.FC = () => {
         const baseEffectiveness = 50;
         const medicineBonus = staff.medicine ? (staff.medicine.injuryPreventionBonus + staff.medicine.rehabBonus) / 2 : 0;
         const fitnessBonus = staff.fitnessCoach ? staff.fitnessCoach.fitnessCoaching / 10 : 0;
-        
+
         return Math.min(100, baseEffectiveness + medicineBonus + fitnessBonus);
     };
 
@@ -81,8 +81,8 @@ const MedicalCenterPage: React.FC = () => {
                         <button
                             onClick={() => setSelectedTeam('home')}
                             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                                selectedTeam === 'home' 
-                                    ? 'bg-teal-600 text-white' 
+                                selectedTeam === 'home'
+                                    ? 'bg-teal-600 text-white'
                                     : 'text-gray-400 hover:text-white hover:bg-gray-700'
                             }`}
                         >
@@ -91,8 +91,8 @@ const MedicalCenterPage: React.FC = () => {
                         <button
                             onClick={() => setSelectedTeam('away')}
                             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                                selectedTeam === 'away' 
-                                    ? 'bg-teal-600 text-white' 
+                                selectedTeam === 'away'
+                                    ? 'bg-teal-600 text-white'
                                     : 'text-gray-400 hover:text-white hover:bg-gray-700'
                             }`}
                         >
@@ -221,8 +221,8 @@ const MedicalCenterPage: React.FC = () => {
                                                 <p className="text-gray-400">Age {player.age} • {player.nationality}</p>
                                                 <div className="flex items-center space-x-4 mt-2">
                                                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                                                        player.availability.status === 'Minor Injury' 
-                                                            ? 'bg-yellow-600 text-white' 
+                                                        player.availability.status === 'Minor Injury'
+                                                            ? 'bg-yellow-600 text-white'
                                                             : 'bg-red-600 text-white'
                                                     }`}>
                                                         {player.availability.status}
@@ -250,7 +250,7 @@ const MedicalCenterPage: React.FC = () => {
                                             </span>
                                         </div>
                                         <div className="w-full bg-gray-700 rounded-full h-2">
-                                            <div 
+                                            <div
                                                 className="bg-teal-400 h-2 rounded-full transition-all duration-300"
                                                 style={{ width: `${Math.floor(Math.random() * 40) + 30}%` }}
                                             ></div>
@@ -299,7 +299,7 @@ const MedicalCenterPage: React.FC = () => {
                                             </span>
                                         </div>
                                         <div className="w-full bg-gray-700 rounded-full h-2">
-                                            <div 
+                                            <div
                                                 className={`h-2 rounded-full transition-all duration-300 ${
                                                     player.stamina >= 80 ? 'bg-green-400' :
                                                     player.stamina >= 60 ? 'bg-yellow-400' : 'bg-red-400'
@@ -317,7 +317,7 @@ const MedicalCenterPage: React.FC = () => {
                                             </span>
                                         </div>
                                         <div className="w-full bg-gray-700 rounded-full h-2">
-                                            <div 
+                                            <div
                                                 className={`h-2 rounded-full transition-all duration-300 ${
                                                     player.injuryRisk >= 80 ? 'bg-red-400' :
                                                     player.injuryRisk >= 60 ? 'bg-yellow-400' : 'bg-green-400'
@@ -338,7 +338,7 @@ const MedicalCenterPage: React.FC = () => {
                                             </span>
                                         </div>
                                         <div className="w-full bg-gray-700 rounded-full h-2">
-                                            <div 
+                                            <div
                                                 className={`h-2 rounded-full transition-all duration-300 ${
                                                     player.fatigue >= 80 ? 'bg-red-400' :
                                                     player.fatigue >= 60 ? 'bg-yellow-400' : 'bg-green-400'

@@ -26,16 +26,16 @@ export const uiReducer = (draft: UIState, action: Action): UIState | void => {
         draft.playerToCompareId = action.payload;
         break;
     case 'SELECT_PLAYER':
-      if (draft.isPresentationMode) return;
+      if (draft.isPresentationMode) {return;}
       if (draft.drawingTool !== 'select' && !draft.isAnimating) {
         draft.drawingTool = 'select';
       }
-      if (draft.isAnimating) return;
+      if (draft.isAnimating) {return;}
       draft.selectedPlayerId = action.payload;
       draft.highlightedByAIPlayerIds = [];
       break;
     case 'OPEN_SLOT_ACTION_MENU':
-        if (draft.isPresentationMode) return;
+        if (draft.isPresentationMode) {return;}
         draft.activeModal = 'slotActionMenu';
         draft.slotActionMenuData = action.payload;
         break;
@@ -71,7 +71,7 @@ export const uiReducer = (draft: UIState, action: Action): UIState | void => {
       draft.isFormationStrengthVisible = !draft.isFormationStrengthVisible;
       break;
     case 'SET_ACTIVE_STEP': {
-        if (action.payload === draft.activeStepIndex) return;
+        if (action.payload === draft.activeStepIndex) {return;}
         draft.isAnimating = false;
         draft.animationTrails = null;
         draft.playerInitialPositions = null;
@@ -117,7 +117,7 @@ export const uiReducer = (draft: UIState, action: Action): UIState | void => {
         draft.highlightedByAIPlayerIds = [...action.payload.playerIdsToHighlight];
         break;
     case 'SEND_CHAT_MESSAGE_FAILURE': draft.isChatProcessing = false; draft.chatHistory.push({ id: 'error', sender: 'ai', text: 'Sorry, I encountered an error. Please try again.' }); break;
-    
+
     case 'GENERATE_OPPOSITION_REPORT_START':
         draft.isLoadingOppositionReport = true;
         draft.oppositionReport = null;
@@ -142,15 +142,15 @@ export const uiReducer = (draft: UIState, action: Action): UIState | void => {
     case 'SET_ACTIVE_TEAM_CONTEXT':
         draft.activeTeamContext = action.payload;
         break;
-    
+
     case 'TOGGLE_PLAYBOOK_CATEGORY':
         draft.playbookCategories[action.payload] = !draft.playbookCategories[action.payload];
         break;
-        
+
     case 'SET_AI_PERSONALITY':
         draft.settings.aiPersonality = action.payload;
         break;
-        
+
     case 'START_PLAYER_CONVERSATION':
         draft.activeModal = 'playerConversation';
         draft.playerConversationData = { playerId: action.payload.playerId };
@@ -159,11 +159,11 @@ export const uiReducer = (draft: UIState, action: Action): UIState | void => {
     case 'START_TUTORIAL': draft.tutorial.isActive = true; draft.tutorial.step = 0; break;
     case 'END_TUTORIAL': draft.tutorial.isActive = false; break;
     case 'SET_TUTORIAL_STEP': draft.tutorial.step = action.payload; break;
-    
+
     case 'GET_AI_DEVELOPMENT_SUMMARY_START': draft.isLoadingDevelopmentSummary = true; draft.developmentSummary = null; break;
     case 'GET_AI_DEVELOPMENT_SUMMARY_SUCCESS': draft.isLoadingDevelopmentSummary = false; draft.developmentSummary = action.payload; break;
     case 'GET_AI_DEVELOPMENT_SUMMARY_FAILURE': draft.isLoadingDevelopmentSummary = false; break;
-    
+
     case 'SIMULATE_MATCH_UPDATE':
       draft.simulationTimeline.push(action.payload);
       break;

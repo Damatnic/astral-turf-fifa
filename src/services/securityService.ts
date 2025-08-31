@@ -1,6 +1,6 @@
 /**
  * Security Service for Data Encryption and Authentication
- * 
+ *
  * Provides encryption, decryption, and security utilities for cloud sync
  * and external API integrations
  */
@@ -17,7 +17,7 @@ class SecurityService {
   private readonly defaultConfig: EncryptionConfig = {
     algorithm: 'AES',
     keySize: 256,
-    iterations: 10000
+    iterations: 10000,
   };
 
   private encryptionKey: string | null = null;
@@ -75,7 +75,7 @@ class SecurityService {
     const usedSalt = salt || CryptoJS.lib.WordArray.random(16).toString();
     const hash = CryptoJS.PBKDF2(password, usedSalt, {
       keySize: this.defaultConfig.keySize / 32,
-      iterations: this.defaultConfig.iterations
+      iterations: this.defaultConfig.iterations,
     }).toString();
 
     return { hash, salt: usedSalt };
@@ -131,7 +131,7 @@ class SecurityService {
   private deriveKey(userKey: string): string {
     return CryptoJS.PBKDF2(userKey, 'astral_turf_salt', {
       keySize: this.defaultConfig.keySize / 32,
-      iterations: this.defaultConfig.iterations
+      iterations: this.defaultConfig.iterations,
     }).toString();
   }
 }

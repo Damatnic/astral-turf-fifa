@@ -1,6 +1,6 @@
 /**
  * Security Module - Enterprise-Grade Security Infrastructure
- * 
+ *
  * This module provides comprehensive security utilities for the Astral Turf application:
  * - JWT token management with secure sessions
  * - Input validation and sanitization

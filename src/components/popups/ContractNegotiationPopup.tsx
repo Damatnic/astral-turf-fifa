@@ -20,29 +20,29 @@ const ContractNegotiationPopup: React.FC = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [negotiationData?.conversation]);
 
-    if (!negotiationData || !player) return null;
+    if (!negotiationData || !player) {return null;}
 
     const handleSendOffer = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!offer.trim() || isLoadingNegotiation) return;
+        if (!offer.trim() || isLoadingNegotiation) {return;}
 
         franchiseDispatch({ type: 'SEND_NEGOTIATION_OFFER_START', payload: { offerText: offer } });
         setOffer('');
 
         try {
             const response = await getAgentNegotiationResponse(
-                player.name, 
-                player.stats.careerHistory.length > 0 ? 500000 : 100000, 
-                negotiationData.agentPersonality, 
-                offer, 
-                negotiationData.conversation.join('\n')
+                player.name,
+                player.stats.careerHistory.length > 0 ? 500000 : 100000,
+                negotiationData.agentPersonality,
+                offer,
+                negotiationData.conversation.join('\n'),
             );
             franchiseDispatch({ type: 'SEND_NEGOTIATION_OFFER_SUCCESS', payload: { response } });
         } catch (error) {
             franchiseDispatch({ type: 'SEND_NEGOTIATION_OFFER_FAILURE' });
         }
     };
-    
+
     const lastMessage = negotiationData.conversation[negotiationData.conversation.length - 1];
 
     return (

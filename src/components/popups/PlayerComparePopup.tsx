@@ -33,10 +33,10 @@ const PlayerComparePopup: React.FC = () => {
 
     const { editingPlayerId, playerToCompareId, isComparingAI, aiComparisonResult, settings, activeTeamContext } = uiState;
     const { players, formations, activeFormationIds } = tacticsState;
-    
+
     const player1 = players.find(p => p.id === editingPlayerId);
     const player2 = players.find(p => p.id === playerToCompareId);
-    
+
     const activeTeam = activeTeamContext === 'away' ? 'away' : 'home';
     const activeFormationId = activeFormationIds[activeTeam];
     const activeFormation = formations[activeFormationId];
@@ -48,7 +48,7 @@ const PlayerComparePopup: React.FC = () => {
     };
 
     const handleAnalyze = async () => {
-        if (!player1 || !player2 || !activeFormation) return;
+        if (!player1 || !player2 || !activeFormation) {return;}
         dispatch({ type: 'GENERATE_AI_COMPARISON_START' });
         try {
             const result = await getAIPlayerComparison(player1, player2, activeFormation, settings.aiPersonality);
@@ -59,7 +59,7 @@ const PlayerComparePopup: React.FC = () => {
         }
     };
 
-    if (!player1) return null;
+    if (!player1) {return null;}
 
     const attributeLabels = Object.keys(player1.attributes);
     const radarChartDatasets = [];
@@ -67,20 +67,20 @@ const PlayerComparePopup: React.FC = () => {
         radarChartDatasets.push({
             label: player1.name,
             color: player1.teamColor,
-            values: attributeLabels.map(label => player1.attributes[label as keyof typeof player1.attributes])
+            values: attributeLabels.map(label => player1.attributes[label as keyof typeof player1.attributes]),
         });
     }
     if (player2) {
         radarChartDatasets.push({
             label: player2.name,
             color: player2.teamColor,
-            values: attributeLabels.map(label => player2.attributes[label as keyof typeof player2.attributes])
+            values: attributeLabels.map(label => player2.attributes[label as keyof typeof player2.attributes]),
         });
     }
 
     return (
         <div className="fixed inset-0 bg-black/60 z-40 backdrop-blur-sm flex items-center justify-center p-4" onClick={closeModal}>
-            <div 
+            <div
                 onClick={(e) => e.stopPropagation()}
                 className="relative bg-gray-800 rounded-lg shadow-2xl w-full max-w-lg border border-gray-700/50 flex flex-col animate-fade-in-scale"
                 style={{animationDuration: '0.2s'}}
@@ -103,7 +103,7 @@ const PlayerComparePopup: React.FC = () => {
                         </div>
                          <div>
                             <label htmlFor="player2-select" className="block text-sm font-medium text-gray-400 mb-1">Player 2</label>
-                            <select 
+                            <select
                                 id="player2-select"
                                 value={playerToCompareId || ''}
                                 onChange={handleSelectPlayer2}
@@ -125,7 +125,7 @@ const PlayerComparePopup: React.FC = () => {
                         {player1 && <LegendItem color={player1.teamColor} label={player1.name} />}
                         {player2 && <LegendItem color={player2.teamColor} label={player2.name} />}
                     </div>
-                    
+
                     <div className="text-center">
                         <button
                             onClick={handleAnalyze}

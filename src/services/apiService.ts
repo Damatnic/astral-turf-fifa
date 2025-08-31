@@ -1,6 +1,6 @@
 /**
  * Comprehensive REST and GraphQL API Service
- * 
+ *
  * Provides public and private APIs for third-party integrations, developer access,
  * and external system connectivity with authentication, rate limiting, and monitoring
  */
@@ -188,7 +188,7 @@ class ApiService {
     name: string,
     permissions: string[] = [],
     rateLimitPerHour: number = 1000,
-    allowedOrigins: string[] = ['*']
+    allowedOrigins: string[] = ['*'],
   ): Promise<ApiKey> {
     const apiKey: ApiKey = {
       id: uuidv4(),
@@ -200,11 +200,11 @@ class ApiService {
       isActive: true,
       createdAt: Date.now(),
       usageCount: 0,
-      allowedOrigins
+      allowedOrigins,
     };
 
     this.apiKeys.set(apiKey.key, apiKey);
-    
+
     // Save to storage
     await this.saveApiKey(apiKey);
 
@@ -221,7 +221,7 @@ class ApiService {
     apiKey: string,
     data?: any,
     params?: Record<string, any>,
-    headers?: Record<string, string>
+    headers?: Record<string, string>,
   ): Promise<{ status: number; data: any; headers: Record<string, string> }> {
     const startTime = Date.now();
 
@@ -265,7 +265,7 @@ class ApiService {
         ipAddress: 'localhost', // Would be extracted from request
         userAgent: 'api-client',
         requestSize: JSON.stringify(data || {}).length,
-        responseSize: JSON.stringify(response.data).length
+        responseSize: JSON.stringify(response.data).length,
       });
 
       return response;
@@ -282,7 +282,7 @@ class ApiService {
         ipAddress: 'localhost',
         userAgent: 'api-client',
         requestSize: JSON.stringify(data || {}).length,
-        responseSize: 0
+        responseSize: 0,
       });
 
       throw error;
@@ -295,7 +295,7 @@ class ApiService {
   async executeGraphQL(
     query: string,
     variables: Record<string, any> = {},
-    apiKey: string
+    apiKey: string,
   ): Promise<{ data: any; errors?: any[] }> {
     const startTime = Date.now();
 
@@ -313,7 +313,7 @@ class ApiService {
 
       // Parse and validate query
       const parsedQuery = this.parseGraphQLQuery(query);
-      
+
       // Execute query
       const result = await this.executeGraphQLQuery(parsedQuery, variables);
 
@@ -328,7 +328,7 @@ class ApiService {
         ipAddress: 'localhost',
         userAgent: 'graphql-client',
         requestSize: query.length,
-        responseSize: JSON.stringify(result).length
+        responseSize: JSON.stringify(result).length,
       });
 
       return result;
@@ -336,7 +336,7 @@ class ApiService {
     } catch (error) {
       return {
         data: null,
-        errors: [{ message: error.message, timestamp: Date.now() }]
+        errors: [{ message: error.message, timestamp: Date.now() }],
       };
     }
   }
@@ -348,7 +348,7 @@ class ApiService {
     userId: string,
     url: string,
     events: string[],
-    secret?: string
+    secret?: string,
   ): Promise<WebhookSubscription> {
     const webhook: WebhookSubscription = {
       id: uuidv4(),
@@ -360,11 +360,11 @@ class ApiService {
       retryAttempts: 0,
       maxRetries: 3,
       successCount: 0,
-      failureCount: 0
+      failureCount: 0,
     };
 
     this.webhooks.set(webhook.id, webhook);
-    
+
     // Test webhook endpoint
     await this.testWebhookEndpoint(webhook);
 
@@ -405,7 +405,7 @@ class ApiService {
       authentication: ['api_key', 'oauth', 'jwt'],
       endpoints: Array.from(this.endpoints.values()),
       graphqlSchema: this.graphqlSchema,
-      examples: this.getApiExamples()
+      examples: this.getApiExamples(),
     };
   }
 
@@ -414,7 +414,7 @@ class ApiService {
    */
   getUsageAnalytics(
     apiKeyId?: string,
-    timeframe: 'hour' | 'day' | 'week' | 'month' = 'day'
+    timeframe: 'hour' | 'day' | 'week' | 'month' = 'day',
   ): {
     totalCalls: number;
     successfulCalls: number;
@@ -428,17 +428,17 @@ class ApiService {
       hour: 60 * 60 * 1000,
       day: 24 * 60 * 60 * 1000,
       week: 7 * 24 * 60 * 60 * 1000,
-      month: 30 * 24 * 60 * 60 * 1000
+      month: 30 * 24 * 60 * 60 * 1000,
     };
-    
+
     const cutoff = now - timeframes[timeframe];
-    let allUsage: ApiUsage[] = [];
+    const allUsage: ApiUsage[] = [];
 
     // Collect usage data
     for (const usage of this.usageLog.values()) {
-      const filteredUsage = usage.filter(u => 
-        u.timestamp >= cutoff && 
-        (!apiKeyId || u.apiKeyId === apiKeyId)
+      const filteredUsage = usage.filter(u =>
+        u.timestamp >= cutoff &&
+        (!apiKeyId || u.apiKeyId === apiKeyId),
       );
       allUsage.push(...filteredUsage);
     }
@@ -446,7 +446,7 @@ class ApiService {
     const totalCalls = allUsage.length;
     const successfulCalls = allUsage.filter(u => u.statusCode < 400).length;
     const failedCalls = totalCalls - successfulCalls;
-    const avgResponseTime = totalCalls > 0 ? 
+    const avgResponseTime = totalCalls > 0 ?
       allUsage.reduce((sum, u) => sum + u.responseTime, 0) / totalCalls : 0;
 
     // Calculate top endpoints
@@ -467,7 +467,7 @@ class ApiService {
       failedCalls,
       avgResponseTime,
       topEndpoints,
-      rateLimitHits: 0 // Would track from rate limiter
+      rateLimitHits: 0, // Would track from rate limiter
     };
   }
 
@@ -478,16 +478,16 @@ class ApiService {
     switch (language) {
       case 'javascript':
         return this.generateJavaScriptSDK();
-      
+
       case 'python':
         return this.generatePythonSDK();
-      
+
       case 'curl':
         return this.generateCurlExamples();
-      
+
       case 'php':
         return this.generatePHPSDK();
-      
+
       default:
         return '';
     }
@@ -519,14 +519,14 @@ class ApiService {
         parameters: [
           { name: 'team', type: 'string', required: false, description: 'Filter by team' },
           { name: 'position', type: 'string', required: false, description: 'Filter by position' },
-          { name: 'limit', type: 'number', required: false, description: 'Number of results', defaultValue: 20 }
+          { name: 'limit', type: 'number', required: false, description: 'Number of results', defaultValue: 20 },
         ],
         authentication: 'api_key',
         rateLimitPerHour: 1000,
         isPublic: true,
         version: '1.0',
         deprecated: false,
-        examples: []
+        examples: [],
       },
       {
         path: '/players/{id}',
@@ -534,14 +534,14 @@ class ApiService {
         type: 'rest',
         description: 'Get player by ID',
         parameters: [
-          { name: 'id', type: 'string', required: true, description: 'Player ID' }
+          { name: 'id', type: 'string', required: true, description: 'Player ID' },
         ],
         authentication: 'api_key',
         rateLimitPerHour: 2000,
         isPublic: true,
         version: '1.0',
         deprecated: false,
-        examples: []
+        examples: [],
       },
       {
         path: '/players',
@@ -551,14 +551,14 @@ class ApiService {
         parameters: [
           { name: 'name', type: 'string', required: true, description: 'Player name' },
           { name: 'age', type: 'number', required: true, description: 'Player age' },
-          { name: 'position', type: 'string', required: true, description: 'Player position' }
+          { name: 'position', type: 'string', required: true, description: 'Player position' },
         ],
         authentication: 'jwt',
         rateLimitPerHour: 100,
         isPublic: false,
         version: '1.0',
         deprecated: false,
-        examples: []
+        examples: [],
       },
 
       // Formation endpoints
@@ -568,14 +568,14 @@ class ApiService {
         type: 'rest',
         description: 'Get list of formations',
         parameters: [
-          { name: 'type', type: 'string', required: false, description: 'Formation type' }
+          { name: 'type', type: 'string', required: false, description: 'Formation type' },
         ],
         authentication: 'api_key',
         rateLimitPerHour: 1000,
         isPublic: true,
         version: '1.0',
         deprecated: false,
-        examples: []
+        examples: [],
       },
       {
         path: '/formations',
@@ -584,14 +584,14 @@ class ApiService {
         description: 'Create custom formation',
         parameters: [
           { name: 'name', type: 'string', required: true, description: 'Formation name' },
-          { name: 'slots', type: 'array', required: true, description: 'Formation slots' }
+          { name: 'slots', type: 'array', required: true, description: 'Formation slots' },
         ],
         authentication: 'jwt',
         rateLimitPerHour: 50,
         isPublic: false,
         version: '1.0',
         deprecated: false,
-        examples: []
+        examples: [],
       },
 
       // Match endpoints
@@ -602,14 +602,14 @@ class ApiService {
         description: 'Get match history',
         parameters: [
           { name: 'team', type: 'string', required: false, description: 'Filter by team' },
-          { name: 'season', type: 'string', required: false, description: 'Filter by season' }
+          { name: 'season', type: 'string', required: false, description: 'Filter by season' },
         ],
         authentication: 'api_key',
         rateLimitPerHour: 500,
         isPublic: true,
         version: '1.0',
         deprecated: false,
-        examples: []
+        examples: [],
       },
 
       // Statistics endpoints
@@ -620,14 +620,14 @@ class ApiService {
         description: 'Get player statistics',
         parameters: [
           { name: 'id', type: 'string', required: true, description: 'Player ID' },
-          { name: 'period', type: 'string', required: false, description: 'Time period', defaultValue: 'season' }
+          { name: 'period', type: 'string', required: false, description: 'Time period', defaultValue: 'season' },
         ],
         authentication: 'api_key',
         rateLimitPerHour: 2000,
         isPublic: true,
         version: '1.0',
         deprecated: false,
-        examples: []
+        examples: [],
       },
 
       // GraphQL endpoint
@@ -638,24 +638,24 @@ class ApiService {
         description: 'GraphQL endpoint for complex queries',
         parameters: [
           { name: 'query', type: 'string', required: true, description: 'GraphQL query' },
-          { name: 'variables', type: 'object', required: false, description: 'Query variables' }
+          { name: 'variables', type: 'object', required: false, description: 'Query variables' },
         ],
         authentication: 'api_key',
         rateLimitPerHour: 1000,
         isPublic: true,
         version: '1.0',
         deprecated: false,
-        examples: []
-      }
+        examples: [],
+      },
     ];
 
     endpoints.forEach(endpoint => {
       const fullEndpoint: ApiEndpoint = {
         id: uuidv4(),
         ...endpoint,
-        examples: this.generateEndpointExamples(endpoint)
+        examples: this.generateEndpointExamples(endpoint),
       };
-      
+
       this.endpoints.set(`${endpoint.method}:${endpoint.path}`, fullEndpoint);
     });
   }
@@ -673,8 +673,8 @@ class ApiService {
             { name: 'position', type: 'String!', description: 'Player position' },
             { name: 'nationality', type: 'String', description: 'Player nationality' },
             { name: 'attributes', type: 'PlayerAttributes', description: 'Player attributes' },
-            { name: 'stats', type: 'PlayerStats', description: 'Player statistics' }
-          ]
+            { name: 'stats', type: 'PlayerStats', description: 'Player statistics' },
+          ],
         },
         {
           name: 'PlayerAttributes',
@@ -683,8 +683,8 @@ class ApiService {
             { name: 'speed', type: 'Int!', description: 'Speed rating' },
             { name: 'passing', type: 'Int!', description: 'Passing rating' },
             { name: 'tackling', type: 'Int!', description: 'Tackling rating' },
-            { name: 'shooting', type: 'Int!', description: 'Shooting rating' }
-          ]
+            { name: 'shooting', type: 'Int!', description: 'Shooting rating' },
+          ],
         },
         {
           name: 'Formation',
@@ -692,9 +692,9 @@ class ApiService {
           fields: [
             { name: 'id', type: 'ID!', description: 'Formation identifier' },
             { name: 'name', type: 'String!', description: 'Formation name' },
-            { name: 'slots', type: '[FormationSlot]!', description: 'Formation slots' }
-          ]
-        }
+            { name: 'slots', type: '[FormationSlot]!', description: 'Formation slots' },
+          ],
+        },
       ],
       queries: [
         {
@@ -703,26 +703,26 @@ class ApiService {
           type: '[Player]',
           args: [
             { name: 'team', type: 'String', description: 'Filter by team', required: false },
-            { name: 'position', type: 'String', description: 'Filter by position', required: false }
+            { name: 'position', type: 'String', description: 'Filter by position', required: false },
           ],
-          resolver: 'Query.players'
+          resolver: 'Query.players',
         },
         {
           name: 'player',
           description: 'Get player by ID',
           type: 'Player',
           args: [
-            { name: 'id', type: 'ID!', description: 'Player ID', required: true }
+            { name: 'id', type: 'ID!', description: 'Player ID', required: true },
           ],
-          resolver: 'Query.player'
+          resolver: 'Query.player',
         },
         {
           name: 'formations',
           description: 'Get list of formations',
           type: '[Formation]',
           args: [],
-          resolver: 'Query.formations'
-        }
+          resolver: 'Query.formations',
+        },
       ],
       mutations: [
         {
@@ -730,9 +730,9 @@ class ApiService {
           description: 'Create new player',
           type: 'Player',
           args: [
-            { name: 'input', type: 'CreatePlayerInput!', description: 'Player data', required: true }
+            { name: 'input', type: 'CreatePlayerInput!', description: 'Player data', required: true },
           ],
-          resolver: 'Mutation.createPlayer'
+          resolver: 'Mutation.createPlayer',
         },
         {
           name: 'updatePlayer',
@@ -740,10 +740,10 @@ class ApiService {
           type: 'Player',
           args: [
             { name: 'id', type: 'ID!', description: 'Player ID', required: true },
-            { name: 'input', type: 'UpdatePlayerInput!', description: 'Updated data', required: true }
+            { name: 'input', type: 'UpdatePlayerInput!', description: 'Updated data', required: true },
           ],
-          resolver: 'Mutation.updatePlayer'
-        }
+          resolver: 'Mutation.updatePlayer',
+        },
       ],
       subscriptions: [
         {
@@ -751,20 +751,20 @@ class ApiService {
           description: 'Subscribe to player updates',
           type: 'Player',
           args: [
-            { name: 'playerId', type: 'ID', description: 'Specific player ID', required: false }
+            { name: 'playerId', type: 'ID', description: 'Specific player ID', required: false },
           ],
-          resolver: 'Subscription.playerUpdated'
+          resolver: 'Subscription.playerUpdated',
         },
         {
           name: 'matchEvents',
           description: 'Subscribe to live match events',
           type: 'MatchEvent',
           args: [
-            { name: 'matchId', type: 'ID!', description: 'Match ID', required: true }
+            { name: 'matchId', type: 'ID!', description: 'Match ID', required: true },
           ],
-          resolver: 'Subscription.matchEvents'
-        }
-      ]
+          resolver: 'Subscription.matchEvents',
+        },
+      ],
     };
   }
 
@@ -772,21 +772,21 @@ class ApiService {
     endpoint: ApiEndpoint,
     data?: any,
     params?: Record<string, any>,
-    headers?: Record<string, string>
+    headers?: Record<string, string>,
   ): Promise<{ status: number; data: any; headers: Record<string, string> }> {
     // Simulate endpoint execution
     // In real implementation, this would route to actual handlers
 
     const mockData = this.generateMockResponse(endpoint);
-    
+
     return {
       status: 200,
       data: mockData,
       headers: {
         'content-type': 'application/json',
         'x-rate-limit-remaining': '999',
-        'x-response-time': '45ms'
-      }
+        'x-response-time': '45ms',
+      },
     };
   }
 
@@ -801,12 +801,12 @@ class ApiService {
               age: 25,
               position: 'MF',
               nationality: 'England',
-              attributes: { speed: 80, passing: 85, tackling: 70, shooting: 75 }
-            }
+              attributes: { speed: 80, passing: 85, tackling: 70, shooting: 75 },
+            },
           ],
-          pagination: { total: 1, page: 1, limit: 20 }
+          pagination: { total: 1, page: 1, limit: 20 },
         };
-      
+
       case '/players/{id}':
         return {
           id: '1',
@@ -815,9 +815,9 @@ class ApiService {
           position: 'MF',
           nationality: 'England',
           attributes: { speed: 80, passing: 85, tackling: 70, shooting: 75 },
-          stats: { goals: 12, assists: 8, matches: 25 }
+          stats: { goals: 12, assists: 8, matches: 25 },
         };
-      
+
       case '/formations':
         return {
           formations: [
@@ -826,12 +826,12 @@ class ApiService {
               name: '4-4-2',
               slots: [
                 { id: '1', role: 'GK', position: { x: 50, y: 5 } },
-                { id: '2', role: 'DF', position: { x: 20, y: 25 } }
-              ]
-            }
-          ]
+                { id: '2', role: 'DF', position: { x: 20, y: 25 } },
+              ],
+            },
+          ],
         };
-      
+
       default:
         return { message: 'Success', data: {} };
     }
@@ -847,24 +847,24 @@ class ApiService {
           method: endpoint.method,
           headers: {
             'Authorization': 'Bearer your-api-key',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
           },
-          body: endpoint.method !== 'GET' ? { example: 'data' } : undefined
+          body: endpoint.method !== 'GET' ? { example: 'data' } : undefined,
         },
         response: {
           status: 200,
           headers: {
-            'content-type': 'application/json'
+            'content-type': 'application/json',
           },
-          body: this.generateMockResponse({ ...endpoint, id: '', examples: [] })
-        }
-      }
+          body: this.generateMockResponse({ ...endpoint, id: '', examples: [] }),
+        },
+      },
     ];
   }
 
   private validateApiKey(apiKey: string): Promise<ApiKey | null> {
     const keyData = this.apiKeys.get(apiKey);
-    
+
     if (!keyData || !keyData.isActive) {
       return Promise.resolve(null);
     }
@@ -876,7 +876,7 @@ class ApiService {
 
     keyData.lastUsed = Date.now();
     keyData.usageCount++;
-    
+
     return Promise.resolve(keyData);
   }
 
@@ -886,7 +886,7 @@ class ApiService {
     const hourAgo = now - (60 * 60 * 1000);
 
     let limiter = this.rateLimiter.get(key);
-    
+
     if (!limiter || limiter.resetTime < hourAgo) {
       limiter = { count: 0, resetTime: now };
       this.rateLimiter.set(key, limiter);
@@ -925,7 +925,7 @@ class ApiService {
     if (!this.usageLog.has(usage.apiKeyId)) {
       this.usageLog.set(usage.apiKeyId, []);
     }
-    
+
     this.usageLog.get(usage.apiKeyId)!.push(usage);
 
     // Keep only last 10,000 entries per API key
@@ -953,10 +953,10 @@ class ApiService {
             id: '1',
             name: 'John Smith',
             age: 25,
-            position: 'MF'
-          }
-        ]
-      }
+            position: 'MF',
+          },
+        ],
+      },
     };
   }
 
@@ -965,7 +965,7 @@ class ApiService {
       event,
       data,
       timestamp: Date.now(),
-      webhook_id: webhook.id
+      webhook_id: webhook.id,
     };
 
     const signature = this.generateWebhookSignature(payload, webhook.secret);
@@ -975,9 +975,9 @@ class ApiService {
         headers: {
           'Content-Type': 'application/json',
           'X-Webhook-Signature': signature,
-          'User-Agent': 'AstralTurf-Webhooks/1.0'
+          'User-Agent': 'AstralTurf-Webhooks/1.0',
         },
-        timeout: 10000
+        timeout: 10000,
       });
 
       webhook.successCount++;
@@ -1012,7 +1012,7 @@ class ApiService {
       event: 'webhook.test',
       data: { message: 'This is a test webhook delivery' },
       timestamp: Date.now(),
-      webhook_id: webhook.id
+      webhook_id: webhook.id,
     };
 
     try {
@@ -1020,9 +1020,9 @@ class ApiService {
         headers: {
           'Content-Type': 'application/json',
           'X-Webhook-Signature': this.generateWebhookSignature(testPayload, webhook.secret),
-          'User-Agent': 'AstralTurf-Webhooks/1.0'
+          'User-Agent': 'AstralTurf-Webhooks/1.0',
         },
-        timeout: 5000
+        timeout: 5000,
       });
 
       console.log(`✅ Webhook endpoint test successful: ${webhook.url}`);
@@ -1058,11 +1058,11 @@ class ApiService {
 
   private getApiExamples(): ApiExample[] {
     const examples: ApiExample[] = [];
-    
+
     for (const endpoint of this.endpoints.values()) {
       examples.push(...endpoint.examples);
     }
-    
+
     return examples;
   }
 
@@ -1287,14 +1287,14 @@ $players = $api->getPlayers(['team' => 'home']);
   private setupApiClients(): void {
     // Setup internal API clients for different services
     const services = ['auth', 'players', 'formations', 'matches'];
-    
+
     services.forEach(service => {
       const client = axios.create({
         baseURL: `http://localhost:3000/api/${service}`,
         timeout: 5000,
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       });
 
       this.apiClients.set(service, client);
@@ -1306,7 +1306,7 @@ $players = $api->getPlayers(['team' => 'home']);
     setInterval(() => {
       const now = Date.now();
       const hourAgo = now - (60 * 60 * 1000);
-      
+
       for (const [key, limiter] of this.rateLimiter.entries()) {
         if (limiter.resetTime < hourAgo) {
           limiter.count = 0;

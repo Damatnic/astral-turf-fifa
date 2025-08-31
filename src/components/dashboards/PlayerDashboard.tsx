@@ -36,7 +36,7 @@ const PlayerDashboard: React.FC = () => {
     if (!player || !role) {
         return <div className="p-8 text-center text-gray-400">Player data not found.</div>;
     }
-    
+
     const completedChallenges = skillChallenges.filter(sc => player.completedChallenges.includes(sc.id));
 
     return (

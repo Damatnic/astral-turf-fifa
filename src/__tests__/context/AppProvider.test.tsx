@@ -43,7 +43,7 @@ Object.defineProperty(global, 'console', {
 const TestComponent = () => {
   const authContext = React.useContext(require('../../context/AuthContext').AuthContext);
   const tacticsContext = React.useContext(require('../../context/TacticsContext').TacticsContext);
-  
+
   return (
     <div>
       <div data-testid="auth-user">
@@ -71,7 +71,7 @@ describe('AppProvider', () => {
       render(
         <AppProvider>
           <div data-testid="test-child">Test Child</div>
-        </AppProvider>
+        </AppProvider>,
       );
 
       expect(screen.getByTestId('test-child')).toBeInTheDocument();
@@ -84,13 +84,13 @@ describe('AppProvider', () => {
       render(
         <AppProvider>
           <TestComponent />
-        </AppProvider>
+        </AppProvider>,
       );
 
       expect(screen.getByTestId('auth-user')).toHaveTextContent('No user');
       // Default state should have initial players
       expect(screen.getByTestId('tactics-players')).toHaveTextContent(
-        INITIAL_STATE.tactics.players.length.toString()
+        INITIAL_STATE.tactics.players.length.toString(),
       );
     });
 
@@ -101,7 +101,7 @@ describe('AppProvider', () => {
       render(
         <AppProvider>
           <TestComponent />
-        </AppProvider>
+        </AppProvider>,
       );
 
       await waitFor(() => {
@@ -124,7 +124,7 @@ describe('AppProvider', () => {
       render(
         <AppProvider>
           <TestComponent />
-        </AppProvider>
+        </AppProvider>,
       );
 
       expect(mockLocalStorage.getItem).toHaveBeenCalledWith('astralTurfActiveState');
@@ -141,11 +141,11 @@ describe('AppProvider', () => {
       render(
         <AppProvider>
           <TestComponent />
-        </AppProvider>
+        </AppProvider>,
       );
 
       expect(mockConsole.warn).toHaveBeenCalledWith(
-        expect.stringContaining('Saved state version (old-version) does not match app version')
+        expect.stringContaining('Saved state version (old-version) does not match app version'),
       );
       expect(mockLocalStorage.removeItem).toHaveBeenCalledWith('astralTurfActiveState');
     });
@@ -156,12 +156,12 @@ describe('AppProvider', () => {
       render(
         <AppProvider>
           <TestComponent />
-        </AppProvider>
+        </AppProvider>,
       );
 
       expect(mockConsole.error).toHaveBeenCalledWith(
         'Failed to load state from localStorage',
-        expect.any(Error)
+        expect.any(Error),
       );
     });
 
@@ -169,14 +169,14 @@ describe('AppProvider', () => {
       render(
         <AppProvider>
           <TestComponent />
-        </AppProvider>
+        </AppProvider>,
       );
 
       // Wait for the effect to run
       await waitFor(() => {
         expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
           'astralTurfActiveState',
-          expect.any(String)
+          expect.any(String),
         );
       });
     });
@@ -189,13 +189,13 @@ describe('AppProvider', () => {
       render(
         <AppProvider>
           <TestComponent />
-        </AppProvider>
+        </AppProvider>,
       );
 
       await waitFor(() => {
         expect(mockConsole.error).toHaveBeenCalledWith(
           'Failed to save state to localStorage',
-          expect.any(Error)
+          expect.any(Error),
         );
       });
     });
@@ -220,13 +220,13 @@ describe('AppProvider', () => {
       render(
         <AppProvider>
           <StateChanger />
-        </AppProvider>
+        </AppProvider>,
       );
 
       await waitFor(() => {
         expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
           'astralTurfSave_slot1',
-          expect.any(String)
+          expect.any(String),
         );
       });
     });
@@ -259,13 +259,13 @@ describe('AppProvider', () => {
       render(
         <AppProvider>
           <StateChanger />
-        </AppProvider>
+        </AppProvider>,
       );
 
       await waitFor(() => {
         expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
           'astralTurfSaveSlots',
-          expect.stringContaining('"lastSaved"')
+          expect.stringContaining('"lastSaved"'),
         );
       });
     });
@@ -287,7 +287,7 @@ describe('AppProvider', () => {
       const AnimationTester = () => {
         const { dispatch } = React.useContext(require('../../context/UIContext').UIContext);
         const { tacticsState } = React.useContext(require('../../context/TacticsContext').TacticsContext);
-        
+
         React.useEffect(() => {
           // Set up animation state
           dispatch({ type: 'SET_ACTIVE_PLAYBOOK_ITEM', payload: 'test-item' });
@@ -304,7 +304,7 @@ describe('AppProvider', () => {
       render(
         <AppProvider>
           <AnimationTester />
-        </AppProvider>
+        </AppProvider>,
       );
 
       // Animation timing is tested indirectly through state changes
@@ -327,7 +327,7 @@ describe('AppProvider', () => {
         render(
           <AppProvider>
             <div>Test</div>
-          </AppProvider>
+          </AppProvider>,
         );
       }).not.toThrow();
     });

@@ -19,11 +19,11 @@ const PlayerSwapListItem: React.FC<{
     onSwap: (targetPlayerId: string) => void;
     onCompare: (targetPlayerId: string) => void;
 }> = ({ player, onSwap, onCompare }) => {
-    
+
     const handleCompareClick = (e: React.MouseEvent) => {
         e.stopPropagation();
         onCompare(player.id);
-    }
+    };
 
     return (
         <div
@@ -36,7 +36,7 @@ const PlayerSwapListItem: React.FC<{
                 </div>
                 <span className="truncate">{player.name}</span>
             </div>
-            <button 
+            <button
                 onClick={handleCompareClick}
                 title={`Compare with ${player.name}`}
                 className="p-1 text-gray-400 opacity-0 group-hover:opacity-100 hover:text-white hover:bg-teal-500/50 rounded-full transition-all"
@@ -76,22 +76,22 @@ const SlotActionMenu: React.FC = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [isSlotActionMenuOpen, dispatch]);
 
-    if (!isSlotActionMenuOpen || !slotActionMenuData) return null;
+    if (!isSlotActionMenuOpen || !slotActionMenuData) {return null;}
 
     const { sourcePlayerId, targetPlayerId, trigger, position } = slotActionMenuData;
 
     const sourcePlayer = players.find(p => p.id === sourcePlayerId);
     const targetPlayer = players.find(p => p.id === targetPlayerId);
-    
-    if (!sourcePlayer) return null;
-    
+
+    if (!sourcePlayer) {return null;}
+
     const activeTeam = sourcePlayer.team;
     const activeFormation = formations[activeFormationIds[activeTeam]];
     if (!activeFormation) {
         return null;
     }
     const sourceSlot = activeFormation.slots.find(s => s.playerId === sourcePlayerId);
-    
+
     const canSwapOnDrag = !!sourceSlot && !!targetPlayerId && sourcePlayerId !== targetPlayerId;
     const isCaptain = captainIds[activeTeam] === sourcePlayerId;
 
@@ -101,8 +101,8 @@ const SlotActionMenu: React.FC = () => {
 
     const handleDragSwap = () => {
         tacticsDispatch({ type: 'RESOLVE_SLOT_ACTION', payload: { decision: 'swap' } });
-    }
-    
+    };
+
     const handleDirectSwap = (otherPlayerId: string) => {
         tacticsDispatch({ type: 'SWAP_PLAYERS', payload: { sourcePlayerId, targetPlayerId: otherPlayerId } });
     };
@@ -114,7 +114,7 @@ const SlotActionMenu: React.FC = () => {
     };
 
     const handleOpenCompare = () => {
-        if (!targetPlayer) return;
+        if (!targetPlayer) {return;}
         dispatch({ type: 'SET_EDITING_PLAYER_ID', payload: targetPlayer.id });
         dispatch({ type: 'SET_COMPARE_PLAYER_ID', payload: null });
         dispatch({ type: 'OPEN_MODAL', payload: 'comparePlayer' });
@@ -127,14 +127,14 @@ const SlotActionMenu: React.FC = () => {
         transform: trigger === 'click' ? 'translate(-50%, calc(-100% - 10px))' : 'translate(-50%, -50%)',
         zIndex: 50,
     };
-    
+
     const availablePlayers = useMemo(() => {
-      if (!activeFormation) return { onField: [], benched: [] };
+      if (!activeFormation) {return { onField: [], benched: [] };}
       const playersOnFieldIds = new Set(activeFormation.slots.map(slot => slot.playerId).filter(Boolean));
-      const filtered = players.filter(p => 
-        p.id !== sourcePlayerId && p.team === activeTeam
+      const filtered = players.filter(p =>
+        p.id !== sourcePlayerId && p.team === activeTeam,
       );
-      
+
       const onField = filtered.filter(p => playersOnFieldIds.has(p.id));
       const benched = filtered.filter(p => !playersOnFieldIds.has(p.id));
 
@@ -146,7 +146,7 @@ const SlotActionMenu: React.FC = () => {
       return {
           onField: onField.filter(p => p.name.toLowerCase().includes(lowerCaseQuery)),
           benched: benched.filter(p => p.name.toLowerCase().includes(lowerCaseQuery)),
-      }
+      };
     }, [players, activeFormation, sourcePlayerId, activeTeam, searchQuery]);
 
     return (

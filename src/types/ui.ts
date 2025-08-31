@@ -108,7 +108,7 @@ export interface UIState {
   teamKits: { home: any, away: any }; // TeamKit when imported
   notifications: Notification[];
   activeTeamContext: TeamView;
-  
+
   // Modals & UI State
   activeModal: null | ModalType;
   editingPlayerId: string | null;
@@ -116,7 +116,7 @@ export interface UIState {
   slotActionMenuData: SlotActionMenuData | null;
   tutorial: Tutorial;
   playerConversationData: PlayerConversationData | null;
-  
+
   // Drawing & Animation
   drawingTool: DrawingTool;
   drawingColor: string;

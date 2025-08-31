@@ -34,6 +34,19 @@ export default [
         clearTimeout: 'readonly',
         setInterval: 'readonly',
         clearInterval: 'readonly',
+        navigator: 'readonly',
+        self: 'readonly',
+        caches: 'readonly',
+        Response: 'readonly',
+        require: 'readonly',
+        module: 'readonly',
+        HTMLElement: 'readonly',
+        HTMLInputElement: 'readonly',
+        HTMLDivElement: 'readonly',
+        HTMLCanvasElement: 'readonly',
+        KeyboardEvent: 'readonly',
+        Event: 'readonly',
+        CanvasRenderingContext2D: 'readonly',
       },
     },
     plugins: {
@@ -111,6 +124,8 @@ export default [
       // Relax some rules for test files
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/ban-ts-comment': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+      '@typescript-eslint/no-require-imports': 'off',
       'no-console': 'off',
       'react/display-name': 'off',
     },
@@ -120,6 +135,23 @@ export default [
     rules: {
       'no-console': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
+    },
+  },
+  {
+    files: ['scripts/**/*.js'],
+    rules: {
+      'no-console': 'off',
+      '@typescript-eslint/no-require-imports': 'off',
+    },
+  },
+  {
+    files: ['src/pages/**/*.tsx', 'src/components/**/*.tsx'],
+    rules: {
+      '@typescript-eslint/no-unused-vars': 'warn',
+      '@typescript-eslint/no-explicit-any': 'warn',
+      'react/no-unescaped-entities': 'warn',
+      'react/no-array-index-key': 'warn',
+      'no-console': 'warn',
     },
   },
   {

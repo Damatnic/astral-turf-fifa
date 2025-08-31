@@ -22,7 +22,7 @@ const CustomFormationEditorPopup: React.FC = () => {
         id: `custom_slot_${i}`,
         role: 'MF' as PositionRole,
         defaultPosition: { x: -100, y: -100 },
-        playerId: null
+        playerId: null,
     })));
     const [formationName, setFormationName] = useState('');
     const fieldRef = useRef<HTMLDivElement>(null);
@@ -30,8 +30,8 @@ const CustomFormationEditorPopup: React.FC = () => {
     const handleDrop = (e: React.DragEvent) => {
         e.preventDefault();
         const data = e.dataTransfer.getData('application/json');
-        if (!data || !fieldRef.current) return;
-        
+        if (!data || !fieldRef.current) {return;}
+
         const { type, payload } = JSON.parse(data);
         const fieldRect = fieldRef.current.getBoundingClientRect();
         const x = ((e.clientX - fieldRect.left) / fieldRect.width) * 100;
@@ -46,7 +46,7 @@ const CustomFormationEditorPopup: React.FC = () => {
                     newSlots[emptySlotIndex] = {
                         ...existingSlot,
                         role: payload.category as PositionRole,
-                        defaultPosition: { x, y }
+                        defaultPosition: { x, y },
                     };
                     setSlots(newSlots);
                 }
@@ -79,7 +79,7 @@ const CustomFormationEditorPopup: React.FC = () => {
             id: name,
             name,
             slots,
-            isCustom: true
+            isCustom: true,
         };
         tacticsDispatch({ type: 'SAVE_CUSTOM_FORMATION', payload: newFormation });
         dispatch({ type: 'CLOSE_MODAL' });

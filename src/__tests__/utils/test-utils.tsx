@@ -47,7 +47,7 @@ interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
 
 export const renderWithProviders = (
   ui: React.ReactElement,
-  options: CustomRenderOptions = {}
+  options: CustomRenderOptions = {},
 ) => {
   const {
     initialState = {},
@@ -58,11 +58,11 @@ export const renderWithProviders = (
   // Create wrapper component with providers
   const Wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const content = <AppProvider>{children}</AppProvider>;
-    
+
     if (withRouter) {
       return <BrowserRouter>{content}</BrowserRouter>;
     }
-    
+
     return content;
   };
 

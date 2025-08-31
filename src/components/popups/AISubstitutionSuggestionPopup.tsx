@@ -34,14 +34,14 @@ const AISubstitutionSuggestionPopup: React.FC = () => {
     }, [aiSubSuggestionData, isLoadingAISubSuggestion, dispatch, players, formations, activeFormationIds, activeTeamContext, settings.aiPersonality]);
 
     const handleClose = () => dispatch({ type: 'CLOSE_MODAL' });
-    
+
     const handleMakeSubstitution = () => {
-        if (!aiSubSuggestionData) return;
+        if (!aiSubSuggestionData) {return;}
         tacticsDispatch({ type: 'SWAP_PLAYERS', payload: { sourcePlayerId: aiSubSuggestionData.playerInId, targetPlayerId: aiSubSuggestionData.playerOutId } });
         dispatch({ type: 'ADD_NOTIFICATION', payload: { message: 'Substitution made!', type: 'success' } });
         handleClose();
     };
-    
+
     const playerOut = players.find(p => p.id === aiSubSuggestionData?.playerOutId);
     const playerIn = players.find(p => p.id === aiSubSuggestionData?.playerInId);
 

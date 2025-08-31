@@ -1,6 +1,6 @@
 /**
  * Social Media Integration Service
- * 
+ *
  * Provides comprehensive social media connectivity for sharing achievements, updates,
  * and team content across platforms with privacy controls and engagement tracking
  */
@@ -123,7 +123,7 @@ class SocialMediaIntegrationService {
       clientId: string;
       clientSecret: string;
       redirectUri?: string;
-    }
+    },
   ): Promise<string> {
     const platform = Array.from(this.platforms.values())
       .find(p => p.type === platformType);
@@ -135,11 +135,11 @@ class SocialMediaIntegrationService {
     try {
       const authUrl = await this.generateAuthUrl(platform, credentials);
       console.log(`🔐 ${platform.name} auth URL generated:`, authUrl);
-      
+
       // In a real implementation, this would open OAuth flow
       // For demonstration, we'll simulate the connection
       await this.simulateOAuthConnection(platform.id, credentials);
-      
+
       return authUrl;
 
     } catch (error) {
@@ -162,7 +162,7 @@ class SocialMediaIntegrationService {
       highlights?: string[];
       playerOfTheMatch?: string;
     },
-    platforms: string[] = []
+    platforms: string[] = [],
   ): Promise<string[]> {
     const template = this.templates.get('match_result');
     if (!template) {
@@ -176,16 +176,16 @@ class SocialMediaIntegrationService {
       opponent: matchResult.opponent,
       homeScore: matchResult.homeScore,
       awayScore: matchResult.awayScore,
-      result: matchResult.homeScore > matchResult.awayScore ? 'WIN' : 
+      result: matchResult.homeScore > matchResult.awayScore ? 'WIN' :
               matchResult.homeScore < matchResult.awayScore ? 'LOSS' : 'DRAW',
       venue: matchResult.venue,
       date: matchResult.date,
-      playerOfTheMatch: matchResult.playerOfTheMatch || ''
+      playerOfTheMatch: matchResult.playerOfTheMatch || '',
     });
 
     for (const platformId of targetPlatforms) {
       const platform = this.platforms.get(platformId);
-      if (!platform?.isConnected || !platform.isEnabled) continue;
+      if (!platform?.isConnected || !platform.isEnabled) {continue;}
 
       try {
         const postId = await this.createPost({
@@ -193,7 +193,7 @@ class SocialMediaIntegrationService {
           content,
           hashtags: [...template.hashtags, '#MatchResult', '#Soccer'],
           media: matchResult.highlights?.map(url => ({ type: 'image' as const, url })),
-          metadata: { type: 'match_result', matchData: matchResult }
+          metadata: { type: 'match_result', matchData: matchResult },
         });
 
         postIds.push(postId);
@@ -219,7 +219,7 @@ class SocialMediaIntegrationService {
       statistic?: number;
       image?: string;
     },
-    platforms: string[] = []
+    platforms: string[] = [],
   ): Promise<string[]> {
     // Check privacy settings first
     const privacy = this.privacySettings.get(playerId);
@@ -233,7 +233,7 @@ class SocialMediaIntegrationService {
       throw new Error('Player achievement template not found');
     }
 
-    const targetPlatforms = platforms.length > 0 ? platforms : 
+    const targetPlatforms = platforms.length > 0 ? platforms :
       template.platforms.filter(p => !privacy?.restrictedPlatforms.includes(p));
 
     const postIds: string[] = [];
@@ -243,12 +243,12 @@ class SocialMediaIntegrationService {
       achievementType: achievement.type,
       description: achievement.description,
       match: achievement.match || '',
-      statistic: achievement.statistic?.toString() || ''
+      statistic: achievement.statistic?.toString() || '',
     });
 
     for (const platformId of targetPlatforms) {
       const platform = this.platforms.get(platformId);
-      if (!platform?.isConnected || !platform.isEnabled) continue;
+      if (!platform?.isConnected || !platform.isEnabled) {continue;}
 
       try {
         const postId = await this.createPost({
@@ -256,7 +256,7 @@ class SocialMediaIntegrationService {
           content,
           hashtags: [...template.hashtags, `#${achievement.type}`, '#PlayerAchievement'],
           media: achievement.image ? [{ type: 'image', url: achievement.image }] : undefined,
-          metadata: { type: 'player_achievement', playerId, achievementData: achievement }
+          metadata: { type: 'player_achievement', playerId, achievementData: achievement },
         });
 
         postIds.push(postId);
@@ -282,7 +282,7 @@ class SocialMediaIntegrationService {
       images?: string[];
       playerSpotlight?: string;
     },
-    platforms: string[] = []
+    platforms: string[] = [],
   ): Promise<string[]> {
     const template = this.templates.get('training_update');
     if (!template) {
@@ -296,12 +296,12 @@ class SocialMediaIntegrationService {
       trainingType: trainingInfo.type,
       focus: trainingInfo.focus.join(', '),
       highlights: trainingInfo.highlights.join('. '),
-      playerSpotlight: trainingInfo.playerSpotlight || ''
+      playerSpotlight: trainingInfo.playerSpotlight || '',
     });
 
     for (const platformId of targetPlatforms) {
       const platform = this.platforms.get(platformId);
-      if (!platform?.isConnected || !platform.isEnabled) continue;
+      if (!platform?.isConnected || !platform.isEnabled) {continue;}
 
       try {
         const postId = await this.createPost({
@@ -309,7 +309,7 @@ class SocialMediaIntegrationService {
           content,
           hashtags: [...template.hashtags, '#Training', '#TeamWork'],
           media: trainingInfo.images?.map(url => ({ type: 'image' as const, url })),
-          metadata: { type: 'training_update', teamId, trainingData: trainingInfo }
+          metadata: { type: 'training_update', teamId, trainingData: trainingInfo },
         });
 
         postIds.push(postId);
@@ -335,7 +335,7 @@ class SocialMediaIntegrationService {
       deadline?: string;
       tryoutInfo?: string;
     },
-    platforms: string[] = []
+    platforms: string[] = [],
   ): Promise<string[]> {
     const template = this.templates.get('recruitment');
     if (!template) {
@@ -350,19 +350,19 @@ class SocialMediaIntegrationService {
       requirements: recruitmentInfo.requirements.join(', '),
       contactInfo: recruitmentInfo.contactInfo,
       deadline: recruitmentInfo.deadline || '',
-      tryoutInfo: recruitmentInfo.tryoutInfo || ''
+      tryoutInfo: recruitmentInfo.tryoutInfo || '',
     });
 
     for (const platformId of targetPlatforms) {
       const platform = this.platforms.get(platformId);
-      if (!platform?.isConnected || !platform.isEnabled) continue;
+      if (!platform?.isConnected || !platform.isEnabled) {continue;}
 
       try {
         const postId = await this.createPost({
           platformId,
           content,
           hashtags: [...template.hashtags, '#Recruitment', '#JoinOurTeam'],
-          metadata: { type: 'recruitment', teamId, recruitmentData: recruitmentInfo }
+          metadata: { type: 'recruitment', teamId, recruitmentData: recruitmentInfo },
         });
 
         postIds.push(postId);
@@ -387,7 +387,7 @@ class SocialMediaIntegrationService {
       hashtags?: string[];
       mentions?: string[];
       media?: { type: 'image' | 'video'; url: string }[];
-    } = {}
+    } = {},
   ): Promise<string> {
     const postId = uuidv4();
 
@@ -405,16 +405,16 @@ class SocialMediaIntegrationService {
         shares: 0,
         comments: 0,
         views: 0,
-        lastUpdated: Date.now()
+        lastUpdated: Date.now(),
       },
-      metadata: {}
+      metadata: {},
     };
 
     this.posts.set(postId, post);
     this.scheduledPosts.set(postId, {
       postId,
       scheduledTime: scheduledTime.getTime(),
-      processed: false
+      processed: false,
     });
 
     console.log(`⏰ Post scheduled for ${scheduledTime.toISOString()}`);
@@ -426,7 +426,7 @@ class SocialMediaIntegrationService {
    */
   async getEngagementMetrics(
     platformId: string,
-    period: 'day' | 'week' | 'month' = 'week'
+    period: 'day' | 'week' | 'month' = 'week',
   ): Promise<EngagementMetrics> {
     const platform = this.platforms.get(platformId);
     if (!platform?.isConnected) {
@@ -438,16 +438,16 @@ class SocialMediaIntegrationService {
     const periods = {
       day: 24 * 60 * 60 * 1000,
       week: 7 * 24 * 60 * 60 * 1000,
-      month: 30 * 24 * 60 * 60 * 1000
+      month: 30 * 24 * 60 * 60 * 1000,
     };
 
     const cutoff = now - periods[period];
-    
+
     const periodPosts = Array.from(this.posts.values())
-      .filter(post => 
+      .filter(post =>
         post.platformId === platformId &&
         post.publishedTime &&
-        post.publishedTime >= cutoff
+        post.publishedTime >= cutoff,
       );
 
     const totalPosts = periodPosts.length;
@@ -456,13 +456,13 @@ class SocialMediaIntegrationService {
     const totalComments = periodPosts.reduce((sum, post) => sum + post.engagement.comments, 0);
     const totalViews = periodPosts.reduce((sum, post) => sum + post.engagement.views, 0);
 
-    const avgEngagementRate = totalPosts > 0 ? 
+    const avgEngagementRate = totalPosts > 0 ?
       ((totalLikes + totalShares + totalComments) / totalViews) * 100 : 0;
 
     const topPerformingPosts = periodPosts
-      .sort((a, b) => 
+      .sort((a, b) =>
         (b.engagement.likes + b.engagement.shares + b.engagement.comments) -
-        (a.engagement.likes + a.engagement.shares + a.engagement.comments)
+        (a.engagement.likes + a.engagement.shares + a.engagement.comments),
       )
       .slice(0, 5);
 
@@ -479,8 +479,8 @@ class SocialMediaIntegrationService {
       demographics: {
         ageGroups: { '18-24': 25, '25-34': 35, '35-44': 20, '45+': 20 },
         locations: { 'Local': 60, 'Regional': 25, 'National': 15 },
-        interests: ['Soccer', 'Sports', 'Fitness']
-      }
+        interests: ['Soccer', 'Sports', 'Fitness'],
+      },
     };
   }
 
@@ -497,7 +497,7 @@ class SocialMediaIntegrationService {
       sharePersonalAchievements: true,
       allowMentions: true,
       allowTagging: true,
-      restrictedPlatforms: []
+      restrictedPlatforms: [],
     };
 
     const updatedSettings = { ...currentSettings, ...settings };
@@ -565,9 +565,9 @@ class SocialMediaIntegrationService {
         shares: 0,
         comments: 0,
         views: 0,
-        lastUpdated: Date.now()
+        lastUpdated: Date.now(),
       },
-      metadata: options.metadata || {}
+      metadata: options.metadata || {},
     };
 
     this.posts.set(postId, post);
@@ -593,19 +593,19 @@ class SocialMediaIntegrationService {
         case 'twitter':
           await this.publishToTwitter(platform, post);
           break;
-        
+
         case 'facebook':
           await this.publishToFacebook(platform, post);
           break;
-        
+
         case 'instagram':
           await this.publishToInstagram(platform, post);
           break;
-        
+
         case 'linkedin':
           await this.publishToLinkedIn(platform, post);
           break;
-        
+
         default:
           console.log(`📱 Publishing to ${platform.name} (simulated)`);
       }
@@ -624,7 +624,7 @@ class SocialMediaIntegrationService {
   private async publishToTwitter(platform: SocialMediaPlatform, post: SocialMediaPost): Promise<void> {
     // Twitter API implementation
     console.log('🐦 Publishing to Twitter:', post.content.substring(0, 50) + '...');
-    
+
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 500));
   }
@@ -632,7 +632,7 @@ class SocialMediaIntegrationService {
   private async publishToFacebook(platform: SocialMediaPlatform, post: SocialMediaPost): Promise<void> {
     // Facebook API implementation
     console.log('📘 Publishing to Facebook:', post.content.substring(0, 50) + '...');
-    
+
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 500));
   }
@@ -640,7 +640,7 @@ class SocialMediaIntegrationService {
   private async publishToInstagram(platform: SocialMediaPlatform, post: SocialMediaPost): Promise<void> {
     // Instagram API implementation
     console.log('📷 Publishing to Instagram:', post.content.substring(0, 50) + '...');
-    
+
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 500));
   }
@@ -648,14 +648,14 @@ class SocialMediaIntegrationService {
   private async publishToLinkedIn(platform: SocialMediaPlatform, post: SocialMediaPost): Promise<void> {
     // LinkedIn API implementation
     console.log('💼 Publishing to LinkedIn:', post.content.substring(0, 50) + '...');
-    
+
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 500));
   }
 
   private processTemplate(template: string, variables: Record<string, string>): string {
     let processed = template;
-    
+
     Object.entries(variables).forEach(([key, value]) => {
       const placeholder = new RegExp(`\\{\\{${key}\\}\\}`, 'g');
       processed = processed.replace(placeholder, value);
@@ -669,16 +669,16 @@ class SocialMediaIntegrationService {
     switch (platform.type) {
       case 'twitter':
         return `https://api.twitter.com/oauth/authorize?client_id=${credentials.clientId}`;
-      
+
       case 'facebook':
         return `https://www.facebook.com/v18.0/dialog/oauth?client_id=${credentials.clientId}`;
-      
+
       case 'instagram':
         return `https://api.instagram.com/oauth/authorize?client_id=${credentials.clientId}`;
-      
+
       case 'linkedin':
         return `https://www.linkedin.com/oauth/v2/authorization?client_id=${credentials.clientId}`;
-      
+
       default:
         return 'https://example.com/oauth/authorize';
     }
@@ -706,7 +706,7 @@ class SocialMediaIntegrationService {
 
   private simulateEngagement(postId: string): void {
     const post = this.posts.get(postId);
-    if (!post) return;
+    if (!post) {return;}
 
     // Simulate random engagement
     post.engagement.likes += Math.floor(Math.random() * 50) + 1;
@@ -725,7 +725,7 @@ class SocialMediaIntegrationService {
       { id: 'instagram', name: 'Instagram', type: 'instagram' as const },
       { id: 'linkedin', name: 'LinkedIn', type: 'linkedin' as const },
       { id: 'youtube', name: 'YouTube', type: 'youtube' as const },
-      { id: 'tiktok', name: 'TikTok', type: 'tiktok' as const }
+      { id: 'tiktok', name: 'TikTok', type: 'tiktok' as const },
     ];
 
     platforms.forEach(platform => {
@@ -734,7 +734,7 @@ class SocialMediaIntegrationService {
         isConnected: false,
         accountHandle: '',
         permissions: [],
-        isEnabled: false
+        isEnabled: false,
       });
     });
   }
@@ -749,7 +749,7 @@ class SocialMediaIntegrationService {
         hashtags: ['#MatchResult', '#Soccer', '#TeamWork'],
         variables: ['result', 'homeScore', 'awayScore', 'opponent', 'venue', 'playerOfTheMatch'],
         isActive: true,
-        privacyLevel: 'public' as const
+        privacyLevel: 'public' as const,
       },
       {
         name: 'Player Achievement',
@@ -759,7 +759,7 @@ class SocialMediaIntegrationService {
         hashtags: ['#PlayerAchievement', '#TeamPride', '#Soccer'],
         variables: ['playerName', 'description', 'match'],
         isActive: true,
-        privacyLevel: 'public' as const
+        privacyLevel: 'public' as const,
       },
       {
         name: 'Training Update',
@@ -769,7 +769,7 @@ class SocialMediaIntegrationService {
         hashtags: ['#Training', '#HardWork', '#TeamDevelopment'],
         variables: ['trainingType', 'focus', 'highlights', 'playerSpotlight'],
         isActive: true,
-        privacyLevel: 'public' as const
+        privacyLevel: 'public' as const,
       },
       {
         name: 'Recruitment',
@@ -779,8 +779,8 @@ class SocialMediaIntegrationService {
         hashtags: ['#Recruitment', '#JoinOurTeam', '#SoccerOpportunity'],
         variables: ['positions', 'requirements', 'contactInfo', 'deadline'],
         isActive: true,
-        privacyLevel: 'public' as const
-      }
+        privacyLevel: 'public' as const,
+      },
     ];
 
     templates.forEach(template => {
@@ -812,7 +812,7 @@ class SocialMediaIntegrationService {
               post.status = 'published';
               post.publishedTime = Date.now();
               scheduledPost.processed = true;
-              
+
               if (this.onPostPublishedCallback) {
                 this.onPostPublishedCallback(post);
               }
@@ -830,7 +830,7 @@ class SocialMediaIntegrationService {
     for (const post of this.posts.values()) {
       if (post.status === 'published' && post.publishedTime) {
         const timeSincePublished = Date.now() - post.publishedTime;
-        
+
         // Simulate engagement decay over time
         if (timeSincePublished < 24 * 60 * 60 * 1000) { // First 24 hours
           this.simulateEngagement(post.id);

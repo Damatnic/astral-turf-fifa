@@ -17,9 +17,9 @@ const FinancesPage: React.FC = () => {
                     team: selectedTeam,
                     item: {
                         name: newFeeItem.name,
-                        amount: newFeeItem.amount
-                    }
-                }
+                        amount: newFeeItem.amount,
+                    },
+                },
             });
             setNewFeeItem({ name: '', amount: 0 });
         }
@@ -30,13 +30,13 @@ const FinancesPage: React.FC = () => {
             type: 'REMOVE_FEE_ITEM',
             payload: {
                 team: selectedTeam,
-                itemId
-            }
+                itemId,
+            },
         });
     };
 
     const totalIncome = finances.income.ticketSales + finances.income.sponsorship + finances.income.prizeMoney;
-    const totalExpenses = finances.expenses.playerWages + finances.expenses.staffWages + 
+    const totalExpenses = finances.expenses.playerWages + finances.expenses.staffWages +
                          finances.expenses.stadiumMaintenance + finances.expenses.travel;
     const netIncome = totalIncome - totalExpenses;
 
@@ -55,8 +55,8 @@ const FinancesPage: React.FC = () => {
                         <button
                             onClick={() => setSelectedTeam('home')}
                             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                                selectedTeam === 'home' 
-                                    ? 'bg-teal-600 text-white' 
+                                selectedTeam === 'home'
+                                    ? 'bg-teal-600 text-white'
                                     : 'text-gray-400 hover:text-white hover:bg-gray-700'
                             }`}
                         >
@@ -65,8 +65,8 @@ const FinancesPage: React.FC = () => {
                         <button
                             onClick={() => setSelectedTeam('away')}
                             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                                selectedTeam === 'away' 
-                                    ? 'bg-teal-600 text-white' 
+                                selectedTeam === 'away'
+                                    ? 'bg-teal-600 text-white'
                                     : 'text-gray-400 hover:text-white hover:bg-gray-700'
                             }`}
                         >
@@ -119,7 +119,7 @@ const FinancesPage: React.FC = () => {
                             </div>
                             <div className={netIncome >= 0 ? 'text-green-400' : 'text-red-400'}>
                                 <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                                           d={netIncome >= 0 ? "M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" : "M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"} />
                                 </svg>
                             </div>

@@ -12,7 +12,7 @@ const SeasonEndSummaryPopup: React.FC = () => {
         dispatch({ type: 'CLOSE_MODAL' });
     };
 
-    if (!lastSeasonAwards) return null;
+    if (!lastSeasonAwards) {return null;}
 
     return (
         <div className="fixed inset-0 bg-black/60 z-50 backdrop-blur-sm flex items-center justify-center p-4">

@@ -6,10 +6,10 @@ const JobSecurityPage: React.FC = () => {
     const { jobSecurity, fanConfidence, boardObjectives, gameWeek, season, manager } = franchiseState;
 
     const getSecurityLevel = () => {
-        if (jobSecurity >= 80) return { level: 'Excellent', color: 'text-green-400', bg: 'bg-green-600/20' };
-        if (jobSecurity >= 60) return { level: 'Good', color: 'text-blue-400', bg: 'bg-blue-600/20' };
-        if (jobSecurity >= 40) return { level: 'Unstable', color: 'text-yellow-400', bg: 'bg-yellow-600/20' };
-        if (jobSecurity >= 20) return { level: 'At Risk', color: 'text-orange-400', bg: 'bg-orange-600/20' };
+        if (jobSecurity >= 80) {return { level: 'Excellent', color: 'text-green-400', bg: 'bg-green-600/20' };}
+        if (jobSecurity >= 60) {return { level: 'Good', color: 'text-blue-400', bg: 'bg-blue-600/20' };}
+        if (jobSecurity >= 40) {return { level: 'Unstable', color: 'text-yellow-400', bg: 'bg-yellow-600/20' };}
+        if (jobSecurity >= 20) {return { level: 'At Risk', color: 'text-orange-400', bg: 'bg-orange-600/20' };}
         return { level: 'Critical', color: 'text-red-400', bg: 'bg-red-600/20' };
     };
 
@@ -59,7 +59,7 @@ const JobSecurityPage: React.FC = () => {
                         </div>
                         <div className="mt-4">
                             <div className="w-full bg-gray-700 rounded-full h-2">
-                                <div 
+                                <div
                                     className="bg-blue-400 h-2 rounded-full transition-all duration-500"
                                     style={{ width: `${fanConfidence}%` }}
                                 ></div>
@@ -82,7 +82,7 @@ const JobSecurityPage: React.FC = () => {
                         </div>
                         <div className="mt-4">
                             <div className="w-full bg-gray-700 rounded-full h-2">
-                                <div 
+                                <div
                                     className="bg-green-400 h-2 rounded-full transition-all duration-500"
                                     style={{ width: `${(completedObjectives / boardObjectives.length) * 100}%` }}
                                 ></div>
@@ -105,7 +105,7 @@ const JobSecurityPage: React.FC = () => {
                         </div>
                         <div className="mt-4">
                             <div className="w-full bg-gray-700 rounded-full h-2">
-                                <div 
+                                <div
                                     className="bg-red-400 h-2 rounded-full transition-all duration-500"
                                     style={{ width: `${Math.min((criticalObjectives / 5) * 100, 100)}%` }}
                                 ></div>
@@ -162,7 +162,7 @@ const JobSecurityPage: React.FC = () => {
                                         <span className="text-teal-400">{((gameWeek / 38) * 100).toFixed(0)}%</span>
                                     </div>
                                     <div className="w-full bg-gray-700 rounded-full h-2">
-                                        <div 
+                                        <div
                                             className="bg-teal-400 h-2 rounded-full transition-all duration-500"
                                             style={{ width: `${(gameWeek / 38) * 100}%` }}
                                         ></div>
@@ -195,7 +195,7 @@ const JobSecurityPage: React.FC = () => {
                                     </div>
                                 </div>
                             )}
-                            
+
                             {fanConfidence >= 60 && (
                                 <div className="flex items-start space-x-3">
                                     <div className="text-green-400 mt-1">

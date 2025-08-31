@@ -43,7 +43,7 @@ export const franchiseReducer = (draft: FranchiseState, action: Action): Franchi
 
     case 'MARK_INBOX_ITEM_READ': {
       const item = draft.inbox.find(i => i.id === action.payload);
-      if(item) item.isRead = true;
+      if(item) {item.isRead = true;}
       break;
     }
 
@@ -51,7 +51,7 @@ export const franchiseReducer = (draft: FranchiseState, action: Action): Franchi
       draft.inbox = draft.inbox.filter(i => i.id !== action.payload);
       break;
     }
-      
+
     case 'HIRE_STAFF': {
         const cost = action.payload.staff.cost;
         if(draft.finances[action.payload.team].transferBudget >= cost) {
@@ -137,7 +137,7 @@ export const franchiseReducer = (draft: FranchiseState, action: Action): Franchi
     case 'ADD_SKILL_CHALLENGE': {
         const newChallenge = {
             id: `challenge_${Date.now()}`,
-            ...action.payload
+            ...action.payload,
         };
         draft.skillChallenges.push(newChallenge);
         break;
@@ -172,19 +172,19 @@ export const franchiseReducer = (draft: FranchiseState, action: Action): Franchi
     case 'SEND_NEGOTIATION_OFFER_START':
         draft.negotiationData?.conversation.push(`You: ${action.payload.offerText}`);
         break;
-    
+
     case 'SEND_NEGOTIATION_OFFER_SUCCESS':
         draft.negotiationData?.conversation.push(`Agent: "${action.payload.response.response}"`);
         break;
-    
+
     case 'END_NEGOTIATION':
         draft.negotiationData = null;
         break;
-    
+
     case 'CREATE_MENTORING_GROUP': {
         const { team, mentorId, menteeIds } = action.payload;
         draft.mentoringGroups[team].push({ mentorId, menteeIds });
-        
+
         // Form friendships
         menteeIds.forEach(menteeId => {
             if (!draft.relationships[mentorId]) {
@@ -199,7 +199,7 @@ export const franchiseReducer = (draft: FranchiseState, action: Action): Franchi
         addInboxItem(draft, 'mentoring', 'New Mentoring Group', 'A new mentoring group has been established.');
         break;
     }
-    
+
     case 'DISSOLVE_MENTORING_GROUP': {
         const { team, mentorId } = action.payload;
         const group = draft.mentoringGroups[team].find(g => g.mentorId === mentorId);

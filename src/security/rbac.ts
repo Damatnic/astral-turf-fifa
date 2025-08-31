@@ -1,6 +1,6 @@
 /**
  * Role-Based Access Control (RBAC) Security Module
- * 
+ *
  * Provides comprehensive authorization system with granular permissions
  * for Coach, Player, and Family roles with security validation.
  */
@@ -15,44 +15,44 @@ export enum Permission {
   EDIT_PLAYERS = 'EDIT_PLAYERS',
   DELETE_PLAYERS = 'DELETE_PLAYERS',
   ASSIGN_PLAYERS = 'ASSIGN_PLAYERS',
-  
+
   // Formation and tactics permissions
   VIEW_FORMATIONS = 'VIEW_FORMATIONS',
   EDIT_FORMATIONS = 'EDIT_FORMATIONS',
   CREATE_FORMATIONS = 'CREATE_FORMATIONS',
   DELETE_FORMATIONS = 'DELETE_FORMATIONS',
-  
+
   // Match and simulation permissions
   SIMULATE_MATCHES = 'SIMULATE_MATCHES',
   VIEW_MATCH_REPORTS = 'VIEW_MATCH_REPORTS',
   EXPORT_LINEUPS = 'EXPORT_LINEUPS',
-  
+
   // Training permissions
   VIEW_TRAINING = 'VIEW_TRAINING',
   EDIT_TRAINING = 'EDIT_TRAINING',
   ASSIGN_TRAINING = 'ASSIGN_TRAINING',
-  
+
   // Financial permissions
   VIEW_FINANCES = 'VIEW_FINANCES',
   MANAGE_TRANSFERS = 'MANAGE_TRANSFERS',
   MANAGE_CONTRACTS = 'MANAGE_CONTRACTS',
-  
+
   // Administrative permissions
   MANAGE_USERS = 'MANAGE_USERS',
   VIEW_AUDIT_LOGS = 'VIEW_AUDIT_LOGS',
   SYSTEM_SETTINGS = 'SYSTEM_SETTINGS',
-  
+
   // Communication permissions
   SEND_MESSAGES = 'SEND_MESSAGES',
   VIEW_CONVERSATIONS = 'VIEW_CONVERSATIONS',
   MODERATE_CHAT = 'MODERATE_CHAT',
-  
+
   // Personal data permissions
   VIEW_PERSONAL_DATA = 'VIEW_PERSONAL_DATA',
   EDIT_PERSONAL_DATA = 'EDIT_PERSONAL_DATA',
   VIEW_MEDICAL_DATA = 'VIEW_MEDICAL_DATA',
   EDIT_MEDICAL_DATA = 'EDIT_MEDICAL_DATA',
-  
+
   // AI and analytics permissions
   USE_AI_FEATURES = 'USE_AI_FEATURES',
   VIEW_ANALYTICS = 'VIEW_ANALYTICS',
@@ -97,90 +97,90 @@ export const ROLE_PERMISSIONS: Record<UserRole, PermissionRule[]> = {
     { permission: Permission.EDIT_PLAYERS, resource: Resource.PLAYER, description: 'Edit player details' },
     { permission: Permission.DELETE_PLAYERS, resource: Resource.PLAYER, description: 'Delete players' },
     { permission: Permission.ASSIGN_PLAYERS, resource: Resource.PLAYER, description: 'Assign players to positions' },
-    
+
     // Full formation management
     { permission: Permission.VIEW_FORMATIONS, resource: Resource.FORMATION, description: 'View formations' },
     { permission: Permission.EDIT_FORMATIONS, resource: Resource.FORMATION, description: 'Edit formations' },
     { permission: Permission.CREATE_FORMATIONS, resource: Resource.FORMATION, description: 'Create new formations' },
     { permission: Permission.DELETE_FORMATIONS, resource: Resource.FORMATION, description: 'Delete formations' },
-    
+
     // Match management
     { permission: Permission.SIMULATE_MATCHES, resource: Resource.MATCH, description: 'Simulate matches' },
     { permission: Permission.VIEW_MATCH_REPORTS, resource: Resource.MATCH, description: 'View match reports' },
     { permission: Permission.EXPORT_LINEUPS, resource: Resource.MATCH, description: 'Export lineups' },
-    
+
     // Training management
     { permission: Permission.VIEW_TRAINING, resource: Resource.TRAINING, description: 'View training schedules' },
     { permission: Permission.EDIT_TRAINING, resource: Resource.TRAINING, description: 'Edit training schedules' },
     { permission: Permission.ASSIGN_TRAINING, resource: Resource.TRAINING, description: 'Assign individual training' },
-    
+
     // Financial management
     { permission: Permission.VIEW_FINANCES, resource: Resource.FINANCE, description: 'View financial data' },
     { permission: Permission.MANAGE_TRANSFERS, resource: Resource.FINANCE, description: 'Manage transfers' },
     { permission: Permission.MANAGE_CONTRACTS, resource: Resource.FINANCE, description: 'Manage contracts' },
-    
+
     // Administrative permissions
     { permission: Permission.MANAGE_USERS, resource: Resource.SYSTEM, description: 'Manage user accounts' },
     { permission: Permission.VIEW_AUDIT_LOGS, resource: Resource.SYSTEM, description: 'View security logs' },
     { permission: Permission.SYSTEM_SETTINGS, resource: Resource.SYSTEM, description: 'Modify system settings' },
-    
+
     // Communication
     { permission: Permission.SEND_MESSAGES, resource: Resource.CHAT, description: 'Send messages' },
     { permission: Permission.VIEW_CONVERSATIONS, resource: Resource.CHAT, description: 'View all conversations' },
     { permission: Permission.MODERATE_CHAT, resource: Resource.CHAT, description: 'Moderate chat messages' },
-    
+
     // AI and analytics
     { permission: Permission.USE_AI_FEATURES, resource: Resource.ANALYTICS, description: 'Use AI features' },
     { permission: Permission.VIEW_ANALYTICS, resource: Resource.ANALYTICS, description: 'View analytics' },
     { permission: Permission.EXPORT_DATA, resource: Resource.ANALYTICS, description: 'Export data' },
   ],
-  
+
   player: [
     // Limited player viewing (own data + teammates)
     { permission: Permission.VIEW_PLAYERS, resource: Resource.PLAYER, conditions: [Condition.SAME_TEAM], description: 'View team players' },
     { permission: Permission.EDIT_PERSONAL_DATA, resource: Resource.PERSONAL_DATA, conditions: [Condition.OWN_DATA], description: 'Edit own data' },
-    
+
     // Formation viewing only
     { permission: Permission.VIEW_FORMATIONS, resource: Resource.FORMATION, description: 'View formations' },
-    
+
     // Match viewing
     { permission: Permission.VIEW_MATCH_REPORTS, resource: Resource.MATCH, description: 'View match reports' },
-    
+
     // Training viewing
     { permission: Permission.VIEW_TRAINING, resource: Resource.TRAINING, conditions: [Condition.OWN_DATA], description: 'View own training' },
-    
+
     // Personal communication
     { permission: Permission.SEND_MESSAGES, resource: Resource.CHAT, description: 'Send messages to coach' },
     { permission: Permission.VIEW_CONVERSATIONS, resource: Resource.CHAT, conditions: [Condition.OWN_DATA], description: 'View own conversations' },
-    
+
     // Personal data access
     { permission: Permission.VIEW_PERSONAL_DATA, resource: Resource.PERSONAL_DATA, conditions: [Condition.OWN_DATA], description: 'View own data' },
     { permission: Permission.VIEW_MEDICAL_DATA, resource: Resource.PERSONAL_DATA, conditions: [Condition.OWN_DATA], description: 'View own medical data' },
-    
+
     // Basic AI features
     { permission: Permission.USE_AI_FEATURES, resource: Resource.ANALYTICS, description: 'Use basic AI features' },
   ],
-  
+
   family: [
     // Limited player viewing (associated players only)
     { permission: Permission.VIEW_PLAYERS, resource: Resource.PLAYER, conditions: [Condition.APPROVED_BY_COACH], description: 'View associated players' },
-    
+
     // Formation viewing (limited)
     { permission: Permission.VIEW_FORMATIONS, resource: Resource.FORMATION, conditions: [Condition.APPROVED_BY_COACH], description: 'View formations with player' },
-    
+
     // Match reports for associated players
     { permission: Permission.VIEW_MATCH_REPORTS, resource: Resource.MATCH, conditions: [Condition.APPROVED_BY_COACH], description: 'View match reports' },
-    
+
     // Training viewing for associated players
     { permission: Permission.VIEW_TRAINING, resource: Resource.TRAINING, conditions: [Condition.APPROVED_BY_COACH], description: 'View player training' },
-    
+
     // Communication with coach
     { permission: Permission.SEND_MESSAGES, resource: Resource.CHAT, conditions: [Condition.APPROVED_BY_COACH], description: 'Message coach about player' },
     { permission: Permission.VIEW_CONVERSATIONS, resource: Resource.CHAT, conditions: [Condition.OWN_DATA], description: 'View own conversations' },
-    
+
     // Associated player data (limited)
     { permission: Permission.VIEW_PERSONAL_DATA, resource: Resource.PERSONAL_DATA, conditions: [Condition.APPROVED_BY_COACH], description: 'View player data' },
-    
+
     // Own account management
     { permission: Permission.EDIT_PERSONAL_DATA, resource: Resource.PERSONAL_DATA, conditions: [Condition.OWN_DATA], description: 'Edit own account' },
   ],
@@ -217,14 +217,14 @@ export function hasPermission(
   userRole: UserRole,
   permission: Permission,
   resource: Resource,
-  context?: PermissionContext
+  context?: PermissionContext,
 ): PermissionResult {
   try {
     const rolePermissions = ROLE_PERMISSIONS[userRole];
     const matchingRule = rolePermissions.find(
-      rule => rule.permission === permission && rule.resource === resource
+      rule => rule.permission === permission && rule.resource === resource,
     );
-    
+
     if (!matchingRule) {
       securityLogger.warn('Permission denied - no matching rule', {
         userRole,
@@ -232,13 +232,13 @@ export function hasPermission(
         resource,
         userId: context?.userId,
       });
-      
+
       return {
         granted: false,
         reason: 'Permission not granted for this role',
       };
     }
-    
+
     // Check conditions if present
     if (matchingRule.conditions && context) {
       const conditionResult = evaluateConditions(matchingRule.conditions, context);
@@ -251,18 +251,18 @@ export function hasPermission(
           userId: context.userId,
           reason: conditionResult.reason,
         });
-        
+
         return conditionResult;
       }
     }
-    
+
     securityLogger.info('Permission granted', {
       userRole,
       permission,
       resource,
       userId: context?.userId,
     });
-    
+
     return {
       granted: true,
       conditions: matchingRule.conditions,
@@ -274,7 +274,7 @@ export function hasPermission(
       permission,
       resource,
     });
-    
+
     return {
       granted: false,
       reason: 'Permission check failed',
@@ -290,7 +290,7 @@ function evaluateConditions(conditions: Condition[], context: PermissionContext)
       return result;
     }
   }
-  
+
   return { granted: true };
 }
 
@@ -305,7 +305,7 @@ function evaluateCondition(condition: Condition, context: PermissionContext): Pe
         granted: false,
         reason: 'Can only access own data',
       };
-    
+
     case Condition.SAME_TEAM:
       // In a real application, this would check team membership
       // For now, we'll assume it's valid if teamId is provided
@@ -316,12 +316,12 @@ function evaluateCondition(condition: Condition, context: PermissionContext): Pe
         granted: false,
         reason: 'Must be on the same team',
       };
-    
+
     case Condition.APPROVED_BY_COACH:
       // This would check if family member has coach approval
       // For demo purposes, we'll assume approval exists
       return { granted: true };
-    
+
     case Condition.ACTIVE_SESSION:
       if (context.sessionId) {
         return { granted: true };
@@ -330,7 +330,7 @@ function evaluateCondition(condition: Condition, context: PermissionContext): Pe
         granted: false,
         reason: 'Requires active session',
       };
-    
+
     case Condition.BUSINESS_HOURS:
       const hour = new Date().getHours();
       if (hour >= 8 && hour <= 18) {
@@ -340,7 +340,7 @@ function evaluateCondition(condition: Condition, context: PermissionContext): Pe
         granted: false,
         reason: 'Action only allowed during business hours',
       };
-    
+
     default:
       return {
         granted: false,
@@ -358,10 +358,10 @@ export function getRolePermissions(userRole: UserRole): PermissionRule[] {
 export function hasAnyPermission(
   userRole: UserRole,
   permissions: Array<{ permission: Permission; resource: Resource }>,
-  context?: PermissionContext
+  context?: PermissionContext,
 ): boolean {
   return permissions.some(
-    ({ permission, resource }) => hasPermission(userRole, permission, resource, context).granted
+    ({ permission, resource }) => hasPermission(userRole, permission, resource, context).granted,
   );
 }
 
@@ -369,19 +369,19 @@ export function hasAnyPermission(
 export function canAccessResource(
   userRole: UserRole,
   resource: Resource,
-  context?: PermissionContext
+  context?: PermissionContext,
 ): PermissionResult {
   // Find any permission rule for this resource
   const rolePermissions = ROLE_PERMISSIONS[userRole];
   const resourceRules = rolePermissions.filter(rule => rule.resource === resource);
-  
+
   if (resourceRules.length === 0) {
     return {
       granted: false,
       reason: 'No access to this resource type',
     };
   }
-  
+
   // Check if any rule grants access
   for (const rule of resourceRules) {
     const result = hasPermission(userRole, rule.permission, resource, context);
@@ -389,7 +389,7 @@ export function canAccessResource(
       return result;
     }
   }
-  
+
   return {
     granted: false,
     reason: 'Insufficient permissions for this resource',
@@ -421,7 +421,7 @@ export function canAccessPlayerData(
   userRole: UserRole,
   userId: string,
   targetPlayerId: string,
-  permission: Permission = Permission.VIEW_PLAYERS
+  permission: Permission = Permission.VIEW_PLAYERS,
 ): boolean {
   const context: PermissionContext = {
     userId,
@@ -429,7 +429,7 @@ export function canAccessPlayerData(
     targetUserId: targetPlayerId,
     resourceType: Resource.PLAYER,
   };
-  
+
   return hasPermission(userRole, permission, Resource.PLAYER, context).granted;
 }
 
@@ -437,14 +437,14 @@ export function canAccessPlayerData(
 export function canSendMessage(
   userRole: UserRole,
   userId: string,
-  targetUserId?: string
+  targetUserId?: string,
 ): boolean {
   const context: PermissionContext = {
     userId,
     userRole,
     targetUserId,
   };
-  
+
   return hasPermission(userRole, Permission.SEND_MESSAGES, Resource.CHAT, context).granted;
 }
 

@@ -56,11 +56,11 @@ const SetPieceContext: React.FC<{ category: PlayCategory }> = ({ category }) => 
                 <rect x="425" y="0" width="200" height="40" stroke={contextStroke} strokeWidth="2" fill={contextFill} />
                 <rect x="425" y="640" width="200" height="40" stroke={contextStroke} strokeWidth="2" fill={contextFill} />
             </>
-        )
+        ),
     };
-    
+
     const contextSvg = contexts[category];
-    if (!contextSvg) return null;
+    if (!contextSvg) {return null;}
 
     return (
         <svg className="absolute inset-0 w-full h-full" viewBox="0 0 1050 680" preserveAspectRatio="none">
@@ -95,23 +95,23 @@ const FormationStrengthOverlay: React.FC = () => {
     const { activeTeamContext, isFormationStrengthVisible } = uiState;
 
 
-    if (!isFormationStrengthVisible) return null;
+    if (!isFormationStrengthVisible) {return null;}
 
     const activeTeam = activeTeamContext === 'away' ? 'away' : 'home';
     const formation = formations?.[activeFormationIds?.[activeTeam]];
-    if (!formation) return null;
+    if (!formation) {return null;}
 
     const points = (formation?.slots ?? [])
         .filter(s => s?.playerId)
         .map(s => (activeTeam === 'away' ? mirrorPosition(s?.defaultPosition ?? {x: 50, y: 50}) : s?.defaultPosition ?? {x: 50, y: 50}));
 
-    if (points.length < 3) return null;
+    if (points.length < 3) {return null;}
 
     // Create a color stop for each player position
     const colorStops = points.map(p => `radial-gradient(circle at ${p.x}% ${p.y}%, rgba(45, 212, 191, 0.25) 0%, transparent 20%)`).join(', ');
 
     return (
-        <div 
+        <div
             className="absolute inset-0 pointer-events-none transition-opacity duration-500"
             style={{
                 background: colorStops,
@@ -135,12 +135,12 @@ const SoccerField: React.FC = () => {
   const homeFormation = formations?.[activeFormationIds?.home];
   const awayFormation = formations?.[activeFormationIds?.away];
 
-  if (!homeFormation || !awayFormation) return <div>Loading Formation...</div>;
+  if (!homeFormation || !awayFormation) {return <div>Loading Formation...</div>;}
 
   const activePlaybookItem = activePlaybookItemId ? playbook?.[activePlaybookItemId] : null;
 
     const uniqueTrailColors = useMemo(() => {
-        if (!animationTrails) return [];
+        if (!animationTrails) {return [];}
         return [...new Set(animationTrails.map(t => t?.color).filter(Boolean))];
     }, [animationTrails]);
 
@@ -152,22 +152,22 @@ const SoccerField: React.FC = () => {
 
         for (const slotA of slotsWithPlayers) {
             const playerA = players?.find(p => p?.id === slotA?.playerId);
-            if (!playerA) continue;
-            
+            if (!playerA) {continue;}
+
             for (const slotB of slotsWithPlayers) {
-                if (slotA?.id === slotB?.id) continue;
-                
+                if (slotA?.id === slotB?.id) {continue;}
+
                 const pairKey = [slotA?.id, slotB?.id].sort().join('-');
-                if (checkedPairs.has(pairKey)) continue;
+                if (checkedPairs.has(pairKey)) {continue;}
                 checkedPairs.add(pairKey);
 
                 const playerB = players?.find(p => p?.id === slotB?.playerId);
-                if (!playerB) continue;
+                if (!playerB) {continue;}
 
                 const posA = slotA?.defaultPosition ?? {x: 0, y: 0};
                 const posB = slotB?.defaultPosition ?? {x: 0, y: 0};
                 const dist = Math.sqrt(Math.pow(posA.x - posB.x, 2) + Math.pow(posA.y - posB.y, 2));
-                
+
                 if (dist < 30) { // Adjacency threshold
                     let posA = playerA?.position ?? {x: 50, y: 50};
                     let posB = playerB?.position ?? {x: 50, y: 50};
@@ -176,9 +176,9 @@ const SoccerField: React.FC = () => {
                         posA = mirrorPosition(posA);
                         posB = mirrorPosition(posB);
                     }
-                    
+
                     const chemistryScore = calculateChemistryScore(playerA, playerB, chemistry ?? {}, relationships ?? {}, mentoringGroups?.[team] ?? {});
-                    
+
                     if (chemistryScore > 40) { // Only show links for decent chemistry
                         const color = chemistryScore >= 75 ? '#2dd4bf' : '#facc15'; // teal-400 vs amber-400
                         const opacity = chemistryScore >= 75 ? 0.7 : 0.5;
@@ -189,7 +189,7 @@ const SoccerField: React.FC = () => {
         }
         return links;
     };
-    
+
     const chemistryLinks = useMemo(() => {
         let links: { key: string; x1: number; y1: number; x2: number; y2: number; color: string; opacity: number; score: number; }[] = [];
         if (activeTeamContext === 'home' || activeTeamContext === 'both') {
@@ -208,13 +208,13 @@ const SoccerField: React.FC = () => {
     setDragOverSlotId(null);
     const playerId = e?.dataTransfer?.getData('text/plain');
 
-    if (!fieldRef?.current || drawingTool !== 'select' || !playerId) return;
+    if (!fieldRef?.current || drawingTool !== 'select' || !playerId) {return;}
 
     // In snap mode, don't allow drops on the field itself
-    if (positioningMode === 'snap') return;
+    if (positioningMode === 'snap') {return;}
 
     // Don't process if dropped on an interactive zone (player or slot)
-    if ((e.target as HTMLElement).closest('[data-is-interactive-zone="true"]')) return;
+    if ((e.target as HTMLElement).closest('[data-is-interactive-zone="true"]')) {return;}
 
     const fieldRect = fieldRef.current.getBoundingClientRect();
     const x = ((e.clientX - fieldRect.left) / fieldRect.width) * 100;
@@ -228,18 +228,18 @@ const SoccerField: React.FC = () => {
       e.stopPropagation();
       setDragOverSlotId(null);
       const playerId = e?.dataTransfer?.getData('text/plain');
-      if (!playerId) return;
+      if (!playerId) {return;}
 
-      if (slot.playerId === playerId) return;
+      if (slot.playerId === playerId) {return;}
 
       if (slot.playerId) {
-          dispatch({ type: 'OPEN_SLOT_ACTION_MENU', payload: { 
-              sourcePlayerId: playerId, 
+          dispatch({ type: 'OPEN_SLOT_ACTION_MENU', payload: {
+              sourcePlayerId: playerId,
               targetSlotId: slot.id,
               targetPlayerId: slot.playerId,
               trigger: 'drag',
-              position: { x: e.clientX, y: e.clientY }
-            } 
+              position: { x: e.clientX, y: e.clientY },
+            },
           });
       } else {
           // In free mode, update position; in snap mode, assign to slot
@@ -249,7 +249,7 @@ const SoccerField: React.FC = () => {
               dispatch({ type: 'ASSIGN_PLAYER_TO_SLOT', payload: { slotId: slot.id, playerId, team } });
           }
       }
-  }
+  };
 
   const handleActionBubbleClick = (e: React.MouseEvent, player: Player, slot: FormationSlot) => {
     e.stopPropagation();
@@ -259,8 +259,8 @@ const SoccerField: React.FC = () => {
       targetSlotId: slot.id,
       targetPlayerId: player.id,
       trigger: 'click',
-      position: { x: rect.left + rect.width / 2, y: rect.top }
-    }})
+      position: { x: rect.left + rect.width / 2, y: rect.top },
+    }});
   };
 
 
@@ -269,20 +269,20 @@ const SoccerField: React.FC = () => {
     e.dataTransfer.dropEffect = 'move';
     setDragOverSlotId(slotId);
   };
-  
+
   const getCursorStyle = () => {
-    if (isPresentationMode) return 'default';
-    if (drawingTool !== 'select') return 'crosshair';
+    if (isPresentationMode) {return 'default';}
+    if (drawingTool !== 'select') {return 'crosshair';}
     return 'default';
   };
 
   const renderTeam = (team: Team) => {
       const formation = team === 'home' ? homeFormation : awayFormation;
       const shouldMirror = team === 'away';
-      
+
       // Get all players from this team
       const allTeamPlayers = (players ?? []).filter(p => p?.team === team);
-      
+
       // Map players to include their slot (if any) and position
       const teamPlayers = allTeamPlayers.map(player => {
           const slot = (formation?.slots ?? []).find(s => s?.playerId === player?.id);
@@ -290,10 +290,10 @@ const SoccerField: React.FC = () => {
           const position = shouldMirror ? mirrorPosition(playerPosition) : playerPosition;
           return { player, slot, position };
       });
-      
+
       const teamSlots = (formation?.slots ?? []).map(slot => ({
-          ...slot, 
-          defaultPosition: shouldMirror ? mirrorPosition(slot?.defaultPosition ?? {x: 50, y: 50}) : slot?.defaultPosition ?? {x: 50, y: 50}
+          ...slot,
+          defaultPosition: shouldMirror ? mirrorPosition(slot?.defaultPosition ?? {x: 50, y: 50}) : slot?.defaultPosition ?? {x: 50, y: 50},
       }));
 
       return (
@@ -354,11 +354,11 @@ const SoccerField: React.FC = () => {
                 />
             ))}
           </>
-      )
+      );
   };
-  
+
   return (
-    <div 
+    <div
         className={`aspect-[105/68] w-full max-w-[95vh] relative shadow-2xl rounded-lg overflow-hidden border-4 border-slate-700 ${positioningMode === 'free' ? 'free-positioning-mode' : ''}`}
         ref={fieldRef}
         onDrop={handleFieldDrop}
@@ -395,7 +395,7 @@ const SoccerField: React.FC = () => {
             </g>
 
             {animationTrails && animationTrails.map(trail => (
-              <polyline 
+              <polyline
                 key={trail.playerId}
                 points={trail.points.map(p => `${p.x},${p.y}`).join(' ')}
                 fill="none"

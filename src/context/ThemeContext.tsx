@@ -17,7 +17,7 @@ export const designTokens = {
       700: '#0369a1',
       800: '#075985',
       900: '#0c4a6e',
-      950: '#082f49'
+      950: '#082f49',
     },
     // Secondary Colors
     secondary: {
@@ -31,7 +31,7 @@ export const designTokens = {
       700: '#334155',
       800: '#1e293b',
       900: '#0f172a',
-      950: '#020617'
+      950: '#020617',
     },
     // Accent Colors
     accent: {
@@ -39,40 +39,40 @@ export const designTokens = {
         50: '#f0fdf4',
         500: '#22c55e',
         600: '#16a34a',
-        700: '#15803d'
+        700: '#15803d',
       },
       red: {
         50: '#fef2f2',
         500: '#ef4444',
         600: '#dc2626',
-        700: '#b91c1c'
+        700: '#b91c1c',
       },
       yellow: {
         50: '#fffbeb',
         500: '#f59e0b',
         600: '#d97706',
-        700: '#b45309'
+        700: '#b45309',
       },
       purple: {
         50: '#faf5ff',
         500: '#a855f7',
         600: '#9333ea',
-        700: '#7c3aed'
-      }
+        700: '#7c3aed',
+      },
     },
     // Semantic Colors
     success: '#22c55e',
     warning: '#f59e0b',
     error: '#ef4444',
-    info: '#3b82f6'
+    info: '#3b82f6',
   },
-  
+
   // Typography Scale
   typography: {
     fontFamilies: {
       sans: ['Inter', 'system-ui', 'sans-serif'],
       mono: ['JetBrains Mono', 'Monaco', 'Cascadia Code', 'Segoe UI Mono', 'monospace'],
-      display: ['Poppins', 'system-ui', 'sans-serif']
+      display: ['Poppins', 'system-ui', 'sans-serif'],
     },
     fontSizes: {
       xs: '0.75rem',    // 12px
@@ -92,13 +92,13 @@ export const designTokens = {
       medium: 500,
       semibold: 600,
       bold: 700,
-      extrabold: 800
+      extrabold: 800,
     },
     lineHeights: {
       tight: 1.25,
       normal: 1.5,
-      relaxed: 1.75
-    }
+      relaxed: 1.75,
+    },
   },
 
   // Spacing Scale
@@ -136,7 +136,7 @@ export const designTokens = {
     64: '16rem',     // 256px
     72: '18rem',     // 288px
     80: '20rem',     // 320px
-    96: '24rem'      // 384px
+    96: '24rem',      // 384px
   },
 
   // Border Radius
@@ -149,7 +149,7 @@ export const designTokens = {
     xl: '0.75rem',    // 12px
     '2xl': '1rem',    // 16px
     '3xl': '1.5rem',  // 24px
-    full: '9999px'
+    full: '9999px',
   },
 
   // Shadows
@@ -161,7 +161,7 @@ export const designTokens = {
     xl: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
     '2xl': '0 25px 50px -12px rgb(0 0 0 / 0.25)',
     inner: 'inset 0 2px 4px 0 rgb(0 0 0 / 0.05)',
-    none: '0 0 #0000'
+    none: '0 0 #0000',
   },
 
   // Animation Durations
@@ -169,7 +169,7 @@ export const designTokens = {
     fast: '150ms',
     normal: '250ms',
     slow: '350ms',
-    slower: '500ms'
+    slower: '500ms',
   },
 
   // Z-Index Scale
@@ -186,8 +186,8 @@ export const designTokens = {
     popover: 1500,
     skipLink: 1600,
     toast: 1700,
-    tooltip: 1800
-  }
+    tooltip: 1800,
+  },
 };
 
 // Theme definitions
@@ -235,34 +235,34 @@ const lightTheme: Theme = {
     background: {
       primary: '#ffffff',
       secondary: '#f8fafc',
-      tertiary: '#f1f5f9'
+      tertiary: '#f1f5f9',
     },
     text: {
       primary: '#0f172a',
       secondary: '#334155',
       tertiary: '#64748b',
-      inverse: '#ffffff'
+      inverse: '#ffffff',
     },
     border: {
       primary: '#e2e8f0',
-      secondary: '#cbd5e1'
+      secondary: '#cbd5e1',
     },
     accent: {
       primary: designTokens.colors.primary[500],
-      secondary: designTokens.colors.primary[100]
+      secondary: designTokens.colors.primary[100],
     },
     status: {
       success: designTokens.colors.accent.green[500],
       warning: designTokens.colors.accent.yellow[500],
       error: designTokens.colors.accent.red[500],
-      info: designTokens.colors.primary[500]
-    }
+      info: designTokens.colors.primary[500],
+    },
   },
   gradients: {
     primary: 'linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%)',
     secondary: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)',
-    accent: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)'
-  }
+    accent: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+  },
 };
 
 const darkTheme: Theme = {
@@ -271,34 +271,34 @@ const darkTheme: Theme = {
     background: {
       primary: '#0f172a',
       secondary: '#1e293b',
-      tertiary: '#334155'
+      tertiary: '#334155',
     },
     text: {
       primary: '#f8fafc',
       secondary: '#e2e8f0',
       tertiary: '#cbd5e1',
-      inverse: '#0f172a'
+      inverse: '#0f172a',
     },
     border: {
       primary: '#334155',
-      secondary: '#475569'
+      secondary: '#475569',
     },
     accent: {
       primary: designTokens.colors.primary[400],
-      secondary: designTokens.colors.primary[900]
+      secondary: designTokens.colors.primary[900],
     },
     status: {
       success: designTokens.colors.accent.green[500],
       warning: designTokens.colors.accent.yellow[500],
       error: designTokens.colors.accent.red[500],
-      info: designTokens.colors.primary[400]
-    }
+      info: designTokens.colors.primary[400],
+    },
   },
   gradients: {
     primary: 'linear-gradient(135deg, #38bdf8 0%, #3b82f6 100%)',
     secondary: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)',
-    accent: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)'
-  }
+    accent: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+  },
 };
 
 interface ThemeContextType {
@@ -316,9 +316,9 @@ interface ThemeProviderProps {
   defaultMode?: ThemeMode;
 }
 
-export const ThemeProvider: React.FC<ThemeProviderProps> = ({ 
-  children, 
-  defaultMode = 'system' 
+export const ThemeProvider: React.FC<ThemeProviderProps> = ({
+  children,
+  defaultMode = 'system',
 }) => {
   const [themeMode, setThemeModeState] = useState<ThemeMode>(() => {
     // Check localStorage first
@@ -352,24 +352,24 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
   // Apply theme CSS variables
   useEffect(() => {
     const root = document.documentElement;
-    
+
     // Apply color variables
     Object.entries(theme.colors.background).forEach(([key, value]) => {
       root.style.setProperty(`--color-bg-${key}`, value);
     });
-    
+
     Object.entries(theme.colors.text).forEach(([key, value]) => {
       root.style.setProperty(`--color-text-${key}`, value);
     });
-    
+
     Object.entries(theme.colors.border).forEach(([key, value]) => {
       root.style.setProperty(`--color-border-${key}`, value);
     });
-    
+
     Object.entries(theme.colors.accent).forEach(([key, value]) => {
       root.style.setProperty(`--color-accent-${key}`, value);
     });
-    
+
     Object.entries(theme.colors.status).forEach(([key, value]) => {
       root.style.setProperty(`--color-status-${key}`, value);
     });
@@ -399,7 +399,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
     themeMode,
     setThemeMode,
     tokens: designTokens,
-    isDark
+    isDark,
   };
 
   return (
@@ -410,15 +410,15 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ 
+          transition={{
             duration: 0.3,
-            ease: 'easeInOut'
+            ease: 'easeInOut',
           }}
           className="w-full h-full"
           style={{
             backgroundColor: theme.colors.background.primary,
             color: theme.colors.text.primary,
-            transition: 'background-color 300ms ease-in-out, color 300ms ease-in-out'
+            transition: 'background-color 300ms ease-in-out, color 300ms ease-in-out',
           }}
         >
           {children}
@@ -460,9 +460,9 @@ export const createThemeStyles = (theme: Theme, tokens: typeof designTokens) => 
       fontSize: tokens.typography.fontSizes.sm,
       fontWeight: tokens.typography.fontWeights.medium,
       transition: `all ${tokens.transitions.normal} ease-in-out`,
-    }
+    },
   },
-  
+
   // Card styles
   card: {
     backgroundColor: theme.colors.background.secondary,
@@ -482,7 +482,7 @@ export const createThemeStyles = (theme: Theme, tokens: typeof designTokens) => 
     padding: `${tokens.spacing[3]} ${tokens.spacing[4]}`,
     fontSize: tokens.typography.fontSizes.sm,
     transition: `all ${tokens.transitions.normal} ease-in-out`,
-  }
+  },
 });
 
 export default ThemeContext;

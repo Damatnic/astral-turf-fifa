@@ -6,7 +6,7 @@ export const calculateChemistryScore = (
     playerB: Player,
     chemistryMatrix: RootState['tactics']['chemistry'],
     relationships: RootState['franchise']['relationships'],
-    mentoringGroups: MentoringGroup[]
+    mentoringGroups: MentoringGroup[],
 ): number => {
     let score = 0;
 
@@ -20,10 +20,10 @@ export const calculateChemistryScore = (
     }
 
     // 3. Mentoring (Max 15)
-    const inSameGroup = mentoringGroups.some(group => 
+    const inSameGroup = mentoringGroups.some(group =>
         (group.mentorId === playerA.id && group.menteeIds.includes(playerB.id)) ||
         (group.mentorId === playerB.id && group.menteeIds.includes(playerA.id)) ||
-        (group.menteeIds.includes(playerA.id) && group.menteeIds.includes(playerB.id))
+        (group.menteeIds.includes(playerA.id) && group.menteeIds.includes(playerB.id)),
     );
     if (inSameGroup) {
         score += 15;
@@ -57,12 +57,12 @@ export const calculateChemistryScore = (
 };
 
 export const calculateTeamChemistry = (
-    players: Player[], 
-    formations: Record<string, Formation>, 
-    activeFormationIds: { home: string; away: string }
+    players: Player[],
+    formations: Record<string, Formation>,
+    activeFormationIds: { home: string; away: string },
 ): Record<string, Record<string, number>> => {
     const chemistry: Record<string, Record<string, number>> = {};
-    
+
     // Initialize chemistry matrix
     players.forEach(playerA => {
         chemistry[playerA.id] = {};
@@ -70,10 +70,10 @@ export const calculateTeamChemistry = (
             if (playerA.id !== playerB.id && playerA.team === playerB.team) {
                 // Check if players are positioned close to each other
                 const distance = Math.sqrt(
-                    Math.pow(playerA.position.x - playerB.position.x, 2) + 
-                    Math.pow(playerA.position.y - playerB.position.y, 2)
+                    Math.pow(playerA.position.x - playerB.position.x, 2) +
+                    Math.pow(playerA.position.y - playerB.position.y, 2),
                 );
-                
+
                 // Players build chemistry when they play close together
                 const proximityBonus = Math.max(0, 150 - distance); // Closer = higher bonus
                 const currentChemistry = chemistry[playerA.id]?.[playerB.id] || 0;
@@ -83,71 +83,71 @@ export const calculateTeamChemistry = (
             }
         });
     });
-    
+
     return chemistry;
 };
 
 export const getPositionalLinks = (
-    player: Player, 
-    formation: Formation
+    player: Player,
+    formation: Formation,
 ): string[] => {
     const playerSlot = formation.slots.find(slot => slot.playerId === player.id);
-    if (!playerSlot) return [];
-    
+    if (!playerSlot) {return [];}
+
     // Find nearby positions based on formation layout
     const linkedPositions: string[] = [];
     const playerPos = playerSlot.defaultPosition;
-    
+
     formation.slots.forEach(slot => {
         if (slot.playerId && slot.playerId !== player.id) {
             const distance = Math.sqrt(
-                Math.pow(slot.defaultPosition.x - playerPos.x, 2) + 
-                Math.pow(slot.defaultPosition.y - playerPos.y, 2)
+                Math.pow(slot.defaultPosition.x - playerPos.x, 2) +
+                Math.pow(slot.defaultPosition.y - playerPos.y, 2),
             );
-            
+
             // Consider positions within ~100 units as linked
             if (distance <= 100) {
                 linkedPositions.push(slot.playerId);
             }
         }
     });
-    
+
     return linkedPositions;
 };
 
 export const calculateFormationChemistry = (
-    players: Player[], 
+    players: Player[],
     formation: Formation,
     relationships: RootState['franchise']['relationships'],
     mentoringGroups: MentoringGroup[],
-    chemistryMatrix: Record<string, Record<string, number>>
+    chemistryMatrix: Record<string, Record<string, number>>,
 ): number => {
     let totalChemistry = 0;
     let links = 0;
-    
-    const onFieldPlayers = players.filter(p => 
-        formation.slots.some(slot => slot.playerId === p.id)
+
+    const onFieldPlayers = players.filter(p =>
+        formation.slots.some(slot => slot.playerId === p.id),
     );
-    
+
     // Calculate chemistry between all player pairs on the field
     for (let i = 0; i < onFieldPlayers.length; i++) {
         for (let j = i + 1; j < onFieldPlayers.length; j++) {
             const playerA = onFieldPlayers[i];
             const playerB = onFieldPlayers[j];
-            
+
             const chemistry = calculateChemistryScore(
-                playerA, 
-                playerB, 
-                chemistryMatrix, 
-                relationships, 
-                mentoringGroups
+                playerA,
+                playerB,
+                chemistryMatrix,
+                relationships,
+                mentoringGroups,
             );
-            
+
             totalChemistry += chemistry;
             links++;
         }
     }
-    
+
     return links > 0 ? Math.round(totalChemistry / links) : 0;
 };
 
@@ -155,33 +155,33 @@ export const suggestChemistryImprovements = (
     players: Player[],
     formation: Formation,
     relationships: RootState['franchise']['relationships'],
-    mentoringGroups: MentoringGroup[]
+    mentoringGroups: MentoringGroup[],
 ): string[] => {
     const suggestions: string[] = [];
-    
+
     // Find players with low chemistry
-    const onFieldPlayers = players.filter(p => 
-        formation.slots.some(slot => slot.playerId === p.id)
+    const onFieldPlayers = players.filter(p =>
+        formation.slots.some(slot => slot.playerId === p.id),
     );
-    
+
     // Suggest mentoring groups for young players
     const youngPlayers = onFieldPlayers.filter(p => p.age < 23);
     const leaders = onFieldPlayers.filter(p => p.traits.includes('Leader') && p.age > 28);
-    
+
     if (youngPlayers.length > 0 && leaders.length > 0) {
         suggestions.push(`Consider creating mentoring groups with experienced leaders like ${leaders[0].name} to help develop young talent.`);
     }
-    
+
     // Suggest nationality-based groupings
     const nationalities = [...new Set(onFieldPlayers.map(p => p.nationality))];
-    const largeSameNationalityGroups = nationalities.filter(nat => 
-        onFieldPlayers.filter(p => p.nationality === nat).length >= 3
+    const largeSameNationalityGroups = nationalities.filter(nat =>
+        onFieldPlayers.filter(p => p.nationality === nat).length >= 3,
     );
-    
+
     if (largeSameNationalityGroups.length > 0) {
         suggestions.push(`Players from ${largeSameNationalityGroups[0]} have natural chemistry - consider positioning them close together.`);
     }
-    
+
     // Identify rivalry issues
     const rivalries: string[] = [];
     onFieldPlayers.forEach(playerA => {
@@ -194,11 +194,11 @@ export const suggestChemistryImprovements = (
             }
         });
     });
-    
+
     if (rivalries.length > 0) {
         suggestions.push(...rivalries.slice(0, 2)); // Limit to first 2 rivalry warnings
     }
-    
+
     return suggestions;
 };
 
@@ -207,5 +207,5 @@ export const chemistryService = {
     calculateTeamChemistry,
     getPositionalLinks,
     calculateFormationChemistry,
-    suggestChemistryImprovements
+    suggestChemistryImprovements,
 };

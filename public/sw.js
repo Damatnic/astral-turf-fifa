@@ -1,3 +1,4 @@
+/* eslint-env serviceworker */
 /**
  * Astral Turf Service Worker
  * Provides aggressive caching for improved performance
@@ -11,7 +12,7 @@ const STATIC_RESOURCES = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/favicon.svg'
+  '/favicon.svg',
 ];
 
 // Runtime caching patterns
@@ -23,49 +24,41 @@ const RUNTIME_CACHE_PATTERNS = {
   // API responses (if any)
   api: /\/api\//,
   // AI prompts and templates
-  prompts: /\/prompts\//
+  prompts: /\/prompts\//,
 };
 
 // Install event - cache static resources
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing service worker...');
-  
   event.waitUntil(
     caches.open(STATIC_CACHE_NAME)
       .then((cache) => {
-        console.log('[SW] Caching static resources');
         return cache.addAll(STATIC_RESOURCES);
       })
       .then(() => {
-        console.log('[SW] Static resources cached successfully');
         return self.skipWaiting();
       })
-      .catch((error) => {
-        console.error('[SW] Failed to cache static resources:', error);
-      })
+      .catch((_error) => {
+        // Silently handle cache errors
+      }),
   );
 });
 
 // Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activating service worker...');
-  
   event.waitUntil(
     caches.keys()
       .then((cacheNames) => {
         return Promise.all(
           cacheNames.map((cacheName) => {
             if (cacheName !== CACHE_NAME && cacheName !== STATIC_CACHE_NAME) {
-              console.log('[SW] Deleting old cache:', cacheName);
               return caches.delete(cacheName);
             }
-          })
+          }),
         );
       })
       .then(() => {
-        console.log('[SW] Service worker activated');
         return self.clients.claim();
-      })
+      }),
   );
 });
 
@@ -85,7 +78,7 @@ self.addEventListener('fetch', (event) => {
   }
 
   event.respondWith(
-    handleRequest(request)
+    handleRequest(request),
   );
 });
 
@@ -116,9 +109,9 @@ async function handleRequest(request) {
 
     // Default: Network with cache fallback
     return await networkWithCacheFallback(request);
-    
-  } catch (error) {
-    console.error('[SW] Error handling request:', error);
+
+  } catch {
+    // Fallback to network request
     return fetch(request);
   }
 }
@@ -135,13 +128,13 @@ async function cacheFirst(request) {
     const cache = await caches.open(CACHE_NAME);
     cache.put(request, response.clone());
   }
-  
+
   return response;
 }
 
 async function staleWhileRevalidate(request) {
   const cached = await caches.match(request);
-  
+
   const networkPromise = fetch(request).then((response) => {
     if (response.ok) {
       const cache = caches.open(CACHE_NAME);
@@ -183,7 +176,7 @@ async function cacheFirstWithNetworkFallback(request) {
       cache.put(request, response.clone());
     }
     return response;
-  } catch (error) {
+  } catch {
     // For HTML requests, return a cached fallback or offline page
     const fallback = await caches.match('/');
     return fallback || new Response('Offline', { status: 503 });
@@ -198,7 +191,7 @@ async function networkWithCacheFallback(request) {
       cache.put(request, response.clone());
     }
     return response;
-  } catch (error) {
+  } catch {
     const cached = await caches.match(request);
     return cached || new Response('Offline', { status: 503 });
   }
@@ -206,22 +199,17 @@ async function networkWithCacheFallback(request) {
 
 // Background sync for offline functionality (future enhancement)
 self.addEventListener('sync', (event) => {
-  console.log('[SW] Background sync triggered:', event.tag);
-  
   if (event.tag === 'background-sync') {
     event.waitUntil(doBackgroundSync());
   }
 });
 
 async function doBackgroundSync() {
-  console.log('[SW] Performing background sync...');
   // Implement background sync logic here if needed
 }
 
 // Push notifications (future enhancement)
 self.addEventListener('push', (event) => {
-  console.log('[SW] Push notification received:', event);
-  
   const options = {
     body: event.data?.text() || 'New update available!',
     icon: '/favicon.svg',
@@ -229,13 +217,13 @@ self.addEventListener('push', (event) => {
     vibrate: [100, 50, 100],
     data: {
       dateOfArrival: Date.now(),
-      primaryKey: 1
-    }
+      primaryKey: 1,
+    },
   };
 
   event.waitUntil(
-    self.registration.showNotification('Astral Turf', options)
+    self.registration.showNotification('Astral Turf', options),
   );
 });
 
-console.log('[SW] Service worker script loaded');
+// Service worker script loaded

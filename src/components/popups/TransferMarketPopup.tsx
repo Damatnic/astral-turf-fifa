@@ -5,11 +5,11 @@ import type { TransferPlayer, TransferMarketFilters, PositionRole } from '../../
 import { PLAYER_ROLES } from '../../constants';
 
 const TabButton: React.FC<{ active: boolean; onClick: () => void; children: React.ReactNode }> = ({ active, onClick, children }) => (
-    <button 
-        onClick={onClick} 
+    <button
+        onClick={onClick}
         className={`px-4 py-2 text-sm font-semibold rounded-t-md transition-colors ${
-            active 
-                ? 'bg-gray-700 text-teal-300 border-b-2 border-teal-400' 
+            active
+                ? 'bg-gray-700 text-teal-300 border-b-2 border-teal-400'
                 : 'bg-gray-800 text-gray-400 hover:bg-gray-700/50'
         }`}
     >
@@ -17,8 +17,8 @@ const TabButton: React.FC<{ active: boolean; onClick: () => void; children: Reac
     </button>
 );
 
-const PlayerCard: React.FC<{ player: TransferPlayer; onMakeOffer: (playerId: string) => void; onScout: (playerId: string) => void; onCompare: (playerId: string) => void }> = ({ 
-    player, onMakeOffer, onScout, onCompare 
+const PlayerCard: React.FC<{ player: TransferPlayer; onMakeOffer: (playerId: string) => void; onScout: (playerId: string) => void; onCompare: (playerId: string) => void }> = ({
+    player, onMakeOffer, onScout, onCompare,
 }) => {
     const roleInfo = PLAYER_ROLES.find(role => role.id === player.roleId);
     const averageAttribute = Math.round(Object.values(player.attributes).reduce((sum, value) => sum + value, 0) / Object.keys(player.attributes).length);
@@ -87,20 +87,20 @@ const PlayerCard: React.FC<{ player: TransferPlayer; onMakeOffer: (playerId: str
 
             {/* Action Buttons */}
             <div className="flex space-x-2">
-                <button 
+                <button
                     onClick={() => onMakeOffer(player.id)}
                     className="flex-1 px-3 py-2 bg-green-600 hover:bg-green-500 text-white text-sm font-medium rounded-md transition-colors flex items-center justify-center"
                 >
                     <MoneyIcon className="w-4 h-4 mr-1" />
                     Make Offer
                 </button>
-                <button 
+                <button
                     onClick={() => onScout(player.id)}
                     className="px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-md transition-colors"
                 >
                     Scout
                 </button>
-                <button 
+                <button
                     onClick={() => onCompare(player.id)}
                     className="px-3 py-2 bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium rounded-md transition-colors"
                 >
@@ -122,7 +122,7 @@ const TransferMarketPopup: React.FC = () => {
         position: 'All',
         age: { min: 16, max: 35 },
         potential: { min: 50, max: 99 },
-        price: { min: 0, max: 200 }
+        price: { min: 0, max: 200 },
     });
 
     const handleClose = () => dispatch({ type: 'CLOSE_MODAL' });
@@ -159,7 +159,7 @@ const TransferMarketPopup: React.FC = () => {
             lastConversationInitiatedWeek: 0,
             moraleBoost: null,
             completedChallenges: [],
-            askingPrice: 45
+            askingPrice: 45,
         },
         {
             id: 'transfer_2',
@@ -191,7 +191,7 @@ const TransferMarketPopup: React.FC = () => {
             lastConversationInitiatedWeek: 0,
             moraleBoost: null,
             completedChallenges: [],
-            askingPrice: 32
+            askingPrice: 32,
         },
         {
             id: 'transfer_3',
@@ -223,14 +223,14 @@ const TransferMarketPopup: React.FC = () => {
             lastConversationInitiatedWeek: 0,
             moraleBoost: null,
             completedChallenges: [],
-            askingPrice: 28
-        }
+            askingPrice: 28,
+        },
     ];
 
     const filteredPlayers = useMemo(() => {
         return mockTransferPlayers.filter(player => {
             const matchesName = player.name.toLowerCase().includes(filters.name.toLowerCase());
-            const matchesPosition = filters.position === 'All' || 
+            const matchesPosition = filters.position === 'All' ||
                 PLAYER_ROLES.find(role => role.id === player.roleId)?.category === filters.position;
             const matchesAge = player.age >= filters.age.min && player.age <= filters.age.max;
             const matchesPotential = player.potential[1] >= filters.potential.min && player.potential[1] <= filters.potential.max;
@@ -245,9 +245,9 @@ const TransferMarketPopup: React.FC = () => {
         if (player) {
             // Open contract negotiation modal
             dispatch({ type: 'OPEN_MODAL', payload: 'contractNegotiation' });
-            dispatch({ type: 'ADD_NOTIFICATION', payload: { 
-                message: `Initiating transfer negotiation for ${player.name}...`, 
-                type: 'info' 
+            dispatch({ type: 'ADD_NOTIFICATION', payload: {
+                message: `Initiating transfer negotiation for ${player.name}...`,
+                type: 'info',
             }});
         }
     };
@@ -275,11 +275,11 @@ const TransferMarketPopup: React.FC = () => {
                         <h2 className="text-xl font-bold text-teal-400">Transfer Market</h2>
                     </div>
                     <div className="flex items-center space-x-4">
-                        <button 
+                        <button
                             onClick={() => setShowFilters(!showFilters)}
                             className={`p-2 rounded-full transition-colors ${
-                                showFilters 
-                                    ? 'bg-teal-600 text-white' 
+                                showFilters
+                                    ? 'bg-teal-600 text-white'
                                     : 'text-gray-400 hover:bg-gray-700 hover:text-white'
                             }`}
                         >
@@ -350,9 +350,9 @@ const TransferMarketPopup: React.FC = () => {
                                         min="16"
                                         max="35"
                                         value={filters.age.min}
-                                        onChange={e => setFilters(prev => ({ 
-                                            ...prev, 
-                                            age: { ...prev.age, min: parseInt(e.target.value) }
+                                        onChange={e => setFilters(prev => ({
+                                            ...prev,
+                                            age: { ...prev.age, min: parseInt(e.target.value) },
                                         }))}
                                         className="w-20 px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white text-sm"
                                     />
@@ -362,9 +362,9 @@ const TransferMarketPopup: React.FC = () => {
                                         min="16"
                                         max="35"
                                         value={filters.age.max}
-                                        onChange={e => setFilters(prev => ({ 
-                                            ...prev, 
-                                            age: { ...prev.age, max: parseInt(e.target.value) }
+                                        onChange={e => setFilters(prev => ({
+                                            ...prev,
+                                            age: { ...prev.age, max: parseInt(e.target.value) },
                                         }))}
                                         className="w-20 px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white text-sm"
                                     />
@@ -379,9 +379,9 @@ const TransferMarketPopup: React.FC = () => {
                                         min="50"
                                         max="99"
                                         value={filters.potential.min}
-                                        onChange={e => setFilters(prev => ({ 
-                                            ...prev, 
-                                            potential: { ...prev.potential, min: parseInt(e.target.value) }
+                                        onChange={e => setFilters(prev => ({
+                                            ...prev,
+                                            potential: { ...prev.potential, min: parseInt(e.target.value) },
                                         }))}
                                         className="w-20 px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white text-sm"
                                     />
@@ -391,9 +391,9 @@ const TransferMarketPopup: React.FC = () => {
                                         min="50"
                                         max="99"
                                         value={filters.potential.max}
-                                        onChange={e => setFilters(prev => ({ 
-                                            ...prev, 
-                                            potential: { ...prev.potential, max: parseInt(e.target.value) }
+                                        onChange={e => setFilters(prev => ({
+                                            ...prev,
+                                            potential: { ...prev.potential, max: parseInt(e.target.value) },
                                         }))}
                                         className="w-20 px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white text-sm"
                                     />
@@ -408,9 +408,9 @@ const TransferMarketPopup: React.FC = () => {
                                         min="0"
                                         max="200"
                                         value={filters.price.min}
-                                        onChange={e => setFilters(prev => ({ 
-                                            ...prev, 
-                                            price: { ...prev.price, min: parseInt(e.target.value) }
+                                        onChange={e => setFilters(prev => ({
+                                            ...prev,
+                                            price: { ...prev.price, min: parseInt(e.target.value) },
                                         }))}
                                         className="w-20 px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white text-sm"
                                     />
@@ -420,9 +420,9 @@ const TransferMarketPopup: React.FC = () => {
                                         min="0"
                                         max="200"
                                         value={filters.price.max}
-                                        onChange={e => setFilters(prev => ({ 
-                                            ...prev, 
-                                            price: { ...prev.price, max: parseInt(e.target.value) }
+                                        onChange={e => setFilters(prev => ({
+                                            ...prev,
+                                            price: { ...prev.price, max: parseInt(e.target.value) },
                                         }))}
                                         className="w-20 px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white text-sm"
                                     />
@@ -504,7 +504,7 @@ const TransferMarketPopup: React.FC = () => {
                     <div className="flex items-center text-sm text-gray-400">
                         <span>Showing {filteredPlayers.length} of {mockTransferPlayers.length} available players</span>
                     </div>
-                    <button 
+                    <button
                         onClick={handleClose}
                         className="px-6 py-2 bg-teal-600 hover:bg-teal-500 text-white font-bold rounded-md transition-colors"
                     >

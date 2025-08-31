@@ -20,10 +20,10 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
         break;
     case 'SET_CAPTAIN': {
         const player = draft.players.find(p => p.id === action.payload);
-        if (!player) break;
-        
-        if (player.team === 'home' && draft.captainIds.away === player.id) draft.captainIds.away = null;
-        if (player.team === 'away' && draft.captainIds.home === player.id) draft.captainIds.home = null;
+        if (!player) {break;}
+
+        if (player.team === 'home' && draft.captainIds.away === player.id) {draft.captainIds.away = null;}
+        if (player.team === 'away' && draft.captainIds.home === player.id) {draft.captainIds.home = null;}
 
         draft.captainIds[player.team] = draft.captainIds[player.team] === player.id ? null : player.id;
         break;
@@ -41,10 +41,10 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
     case 'SWAP_PLAYERS': {
         const { sourcePlayerId, targetPlayerId } = action.payload;
         const sourcePlayer = draft.players.find(p => p.id === sourcePlayerId);
-        if (!sourcePlayer) break;
-        
+        if (!sourcePlayer) {break;}
+
         const activeFormation = draft.formations[draft.activeFormationIds[sourcePlayer.team]];
-        if (!activeFormation) break;
+        if (!activeFormation) {break;}
 
         const sourceSlot = activeFormation.slots.find(s => s.playerId === sourcePlayerId);
         const targetSlot = activeFormation.slots.find(s => s.playerId === targetPlayerId);
@@ -60,7 +60,7 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
         } else if (targetSlot) { // Dragging benched player onto field
             targetSlot.playerId = sourcePlayerId;
         }
-        
+
         // Update positions after swap
         draft.players.forEach(p => {
             if (p.team === sourcePlayer.team) {
@@ -92,7 +92,7 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
     case 'BENCH_PLAYER': {
         const { playerId } = action.payload;
         const player = draft.players.find(p => p.id === playerId);
-        if(!player) break;
+        if(!player) {break;}
         const formation = draft.formations[draft.activeFormationIds[player.team]];
         const slot = formation?.slots.find(s => s.playerId === playerId);
         if (slot) {
@@ -104,7 +104,7 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
     case 'BENCH_ALL_PLAYERS': {
         const { team } = action.payload;
         const formation = draft.formations[draft.activeFormationIds[team]];
-        if (!formation) break;
+        if (!formation) {break;}
         formation.slots.forEach(slot => {
             slot.playerId = null;
         });
@@ -219,7 +219,7 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
         }
         break;
     }
-    
+
     case 'SEND_PLAYER_MESSAGE_START': {
         const player = draft.players.find(p => p.id === action.payload.playerId);
         if (player) {
@@ -240,7 +240,7 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
         }
         break;
     }
-    
+
     case 'SEND_PLAYER_MESSAGE_FAILURE': {
         const player = draft.players.find(p => p.id === action.payload.playerId);
         if (player) {
@@ -248,20 +248,20 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
         }
         break;
     }
-    
+
     case 'ADD_COMMUNICATION_LOG': {
         const player = draft.players.find(p => p.id === action.payload.playerId);
         if (player) {
             const newEntry: CommunicationLogEntry = {
                 ...action.payload.entry,
                 id: `comm_${Date.now()}`,
-                date: new Date().toISOString()
+                date: new Date().toISOString(),
             };
             player.communicationLog.unshift(newEntry);
         }
         break;
     }
-    
+
     case 'ADD_CONTRACT_CLAUSE': {
         const player = draft.players.find(p => p.id === action.payload.playerId);
         if (player) {
@@ -269,7 +269,7 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
                 id: `clause_${Date.now()}`,
                 text: action.payload.clauseText,
                 status: 'Unmet',
-                isCustom: true
+                isCustom: true,
             };
             player.contract.clauses.push(newClause);
         }
@@ -299,7 +299,7 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
             draft.players.splice(playerIndex, 1);
             // Also remove from any formation
             Object.values(draft.formations).forEach(f => {
-                f.slots.forEach(s => { if(s.playerId === action.payload) s.playerId = null; });
+                f.slots.forEach(s => { if(s.playerId === action.payload) {s.playerId = null;} });
             });
         }
         break;

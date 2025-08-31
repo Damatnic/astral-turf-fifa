@@ -8,6 +8,7 @@ import { FranchiseContext } from './FranchiseContext';
 import { UIContext } from './UIContext';
 import { AuthContext } from './AuthContext';
 import { authService } from '../services/authService';
+import { ChallengeProvider } from './ChallengeContext';
 
 export const cleanStateForSaving = (state: RootState): object => {
     const stateToSave = produce(state, draft => {
@@ -27,20 +28,20 @@ export const cleanStateForSaving = (state: RootState): object => {
         // Remove transient UI state properties
         const transientUIKeys: (keyof RootState['ui'])[] = [
             'activeModal', 'isLoadingAI', 'editingPlayerId', 'playerToCompareId', 'aiComparisonResult', 'isComparingAI',
-            'slotActionMenuData', 'isAnimating', 'playerInitialPositions', 'animationTrails', 'isSuggestingFormation', 
-            'aiSuggestedFormation', 'chatHistory', 'isChatProcessing', 'highlightedByAIPlayerIds', 'isExportingLineup', 
+            'slotActionMenuData', 'isAnimating', 'playerInitialPositions', 'animationTrails', 'isSuggestingFormation',
+            'aiSuggestedFormation', 'chatHistory', 'isChatProcessing', 'highlightedByAIPlayerIds', 'isExportingLineup',
             'isPresentationMode', 'notifications', 'rosterSearchQuery', 'rosterRoleFilters', 'isGridVisible', 'playbookCategories',
-            'isFormationStrengthVisible', 'isLoadingOppositionReport', 'oppositionReport', 'advancedRosterFilters', 
-            'isSimulatingMatch', 'simulationTimeline', 'isLoadingPostMatchReport', 'postMatchReport', 
+            'isFormationStrengthVisible', 'isLoadingOppositionReport', 'oppositionReport', 'advancedRosterFilters',
+            'isSimulatingMatch', 'simulationTimeline', 'isLoadingPostMatchReport', 'postMatchReport',
             'isLoadingPressConference', 'pressConferenceData', 'isLoadingAISubSuggestion', 'aiSubSuggestionData',
-            'isScoutingPlayer', 'scoutedPlayerId', 'scoutReport', 'isLoadingConversation', 'playerConversationData'
+            'isScoutingPlayer', 'scoutedPlayerId', 'scoutReport', 'isLoadingConversation', 'playerConversationData',
         ];
         transientUIKeys.forEach(key => delete (draft.ui as any)[key]);
-        
+
         const transientFranchiseKeys: (keyof RootState['franchise'])[] = ['negotiationData', 'lastMatchResult'];
         transientFranchiseKeys.forEach(key => delete (draft.franchise as any)[key]);
     });
-    
+
     // Don't save auth state
     const { auth, ...restOfState } = stateToSave;
     return { ...restOfState, version: APP_VERSION };
@@ -77,12 +78,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (state.ui.isAnimating && !state.ui.isPaused && state.ui.activePlaybookItemId) {
       const activeItem = state.tactics.playbook[state.ui.activePlaybookItemId];
       const currentStepIndex = state.ui.activeStepIndex || 0;
-      
+
       if (activeItem && currentStepIndex < activeItem.steps.length - 1) {
         const timer = setTimeout(() => {
           dispatch({ type: 'SET_ACTIVE_STEP', payload: currentStepIndex + 1 });
         }, 2000); // 2 seconds per step
-        
+
         return () => clearTimeout(timer);
       } else if (currentStepIndex >= activeItem.steps.length - 1) {
         // Animation finished
@@ -96,7 +97,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (state.ui.activeSaveSlotId) {
         const stateToSave = cleanStateForSaving(state);
         localStorage.setItem(`astralTurfSave_${state.ui.activeSaveSlotId}`, JSON.stringify(stateToSave));
-        
+
         const slots = JSON.parse(localStorage.getItem('astralTurfSaveSlots') || '{}');
         if (slots[state.ui.activeSaveSlotId]) {
             slots[state.ui.activeSaveSlotId].lastSaved = new Date().toISOString();
@@ -115,7 +116,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       <TacticsContext.Provider value={{ tacticsState: state.tactics, dispatch }}>
           <FranchiseContext.Provider value={{ franchiseState: state.franchise, dispatch }}>
               <UIContext.Provider value={{ uiState: state.ui, dispatch }}>
-                  {children}
+                  <ChallengeProvider>
+                      {children}
+                  </ChallengeProvider>
               </UIContext.Provider>
           </FranchiseContext.Provider>
       </TacticsContext.Provider>

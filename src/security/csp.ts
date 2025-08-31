@@ -1,6 +1,6 @@
 /**
  * Content Security Policy (CSP) and Security Headers Module
- * 
+ *
  * Provides comprehensive Content Security Policy configuration and security headers
  * to prevent XSS, clickjacking, MIME sniffing, and other client-side attacks.
  */
@@ -59,14 +59,14 @@ export interface SecurityHeaderConfig {
 export function generateCSPHeader(): string {
   try {
     const directives: string[] = [];
-    
+
     // Add each directive with its sources
     const addDirective = (directive: string, sources: string[]) => {
       if (sources.length > 0) {
         directives.push(`${directive} ${sources.join(' ')}`);
       }
     };
-    
+
     addDirective(CSPDirective.DEFAULT_SRC, CSP_CONFIG.DEFAULT_SRC);
     addDirective(CSPDirective.SCRIPT_SRC, CSP_CONFIG.SCRIPT_SRC);
     addDirective(CSPDirective.STYLE_SRC, CSP_CONFIG.STYLE_SRC);
@@ -78,30 +78,30 @@ export function generateCSPHeader(): string {
     addDirective(CSPDirective.BASE_URI, CSP_CONFIG.BASE_URI);
     addDirective(CSPDirective.FORM_ACTION, CSP_CONFIG.FORM_ACTION);
     addDirective(CSPDirective.FRAME_ANCESTORS, CSP_CONFIG.FRAME_ANCESTORS);
-    
+
     // Add upgrade-insecure-requests if enabled
     if (CSP_CONFIG.UPGRADE_INSECURE_REQUESTS && !ENVIRONMENT_CONFIG.isDevelopment) {
       directives.push('upgrade-insecure-requests');
     }
-    
+
     // Add report URI in production
     if (!ENVIRONMENT_CONFIG.isDevelopment) {
       directives.push('report-uri /api/csp-violations');
     }
-    
+
     const cspHeader = directives.join('; ');
-    
+
     securityLogger.info('CSP header generated', {
       directiveCount: directives.length,
       headerLength: cspHeader.length,
     });
-    
+
     return cspHeader;
   } catch (error) {
     securityLogger.error('Failed to generate CSP header', {
       error: error instanceof Error ? error.message : 'Unknown error',
     });
-    
+
     // Fallback to basic CSP
     return "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'";
   }
@@ -122,7 +122,7 @@ export function generateDevelopmentCSP(): string {
     "form-action 'self'",
     "frame-ancestors 'none'",
   ];
-  
+
   return devDirectives.join('; ');
 }
 
@@ -133,7 +133,7 @@ export function validateCSPDirective(directive: string, sources: string[]): bool
   if (!validDirectives.includes(directive as CSPDirective)) {
     return false;
   }
-  
+
   // Check if sources are valid
   const validSourceKeywords = [
     "'self'",
@@ -144,18 +144,18 @@ export function validateCSPDirective(directive: string, sources: string[]): bool
     "'unsafe-hashes'",
     "'report-sample'",
   ];
-  
+
   return sources.every(source => {
     // Allow valid keywords
-    if (validSourceKeywords.includes(source)) return true;
-    
+    if (validSourceKeywords.includes(source)) {return true;}
+
     // Allow data: and blob: schemes
-    if (source.startsWith('data:') || source.startsWith('blob:')) return true;
-    
+    if (source.startsWith('data:') || source.startsWith('blob:')) {return true;}
+
     // Allow valid URLs and wildcards
     try {
-      if (source === '*') return true;
-      if (source.startsWith('*.')) return true;
+      if (source === '*') {return true;}
+      if (source.startsWith('*.')) {return true;}
       if (source.startsWith('https://') || source.startsWith('http://')) {
         new URL(source);
         return true;
@@ -178,46 +178,46 @@ export function validateCSPDirective(directive: string, sources: string[]): bool
 // Get all security headers
 export function getSecurityHeaders(): Record<string, string> {
   const headers: Record<string, string> = {};
-  
+
   // Add CSP header
-  headers['Content-Security-Policy'] = ENVIRONMENT_CONFIG.isDevelopment 
-    ? generateDevelopmentCSP() 
+  headers['Content-Security-Policy'] = ENVIRONMENT_CONFIG.isDevelopment
+    ? generateDevelopmentCSP()
     : generateCSPHeader();
-  
+
   // Add other security headers
   Object.entries(SECURITY_HEADERS).forEach(([name, value]) => {
     if (name === 'X-Powered-By') {
       // Remove this header instead of setting it
       return;
     }
-    
+
     if (name === 'Strict-Transport-Security' && ENVIRONMENT_CONFIG.isDevelopment) {
       // Skip HSTS in development
       return;
     }
-    
+
     headers[name] = value;
   });
-  
+
   return headers;
 }
 
 // Validate security header value
 export function validateSecurityHeader(name: string, value: string): boolean {
-  if (!name || !value) return false;
-  
+  if (!name || !value) {return false;}
+
   // Check for header injection attempts
   if (name.includes('\n') || name.includes('\r') || value.includes('\n') || value.includes('\r')) {
     securityLogger.warn('Header injection attempt detected', { name, value });
     return false;
   }
-  
+
   // Specific validations for certain headers
   switch (name.toLowerCase()) {
     case 'strict-transport-security':
       return /^max-age=\d+/.test(value);
     case 'x-frame-options':
-      return ['DENY', 'SAMEORIGIN'].includes(value.toUpperCase()) || 
+      return ['DENY', 'SAMEORIGIN'].includes(value.toUpperCase()) ||
              value.toLowerCase().startsWith('allow-from ');
     case 'x-content-type-options':
       return value.toLowerCase() === 'nosniff';
@@ -235,7 +235,7 @@ export function validateSecurityHeader(name: string, value: string): boolean {
 // Process CSP violation report
 export function processCSpViolation(report: CSPViolationReport): void {
   const violation = report['csp-report'];
-  
+
   securityLogger.logSecurityEvent(
     'XSS_ATTEMPT' as any,
     'CSP violation detected',
@@ -248,9 +248,9 @@ export function processCSpViolation(report: CSPViolationReport): void {
         lineNumber: violation['line-number'],
         columnNumber: violation['column-number'],
       },
-    }
+    },
   );
-  
+
   // Track violation patterns
   trackViolationPattern(violation);
 }
@@ -262,7 +262,7 @@ function trackViolationPattern(violation: CSPViolationReport['csp-report']): voi
     blockedUri: violation['blocked-uri'],
     timestamp: new Date().toISOString(),
   };
-  
+
   // In production, this would be sent to monitoring service
   if (ENVIRONMENT_CONFIG.isDevelopment) {
     console.warn('CSP Violation Pattern:', pattern);
@@ -275,30 +275,30 @@ function trackViolationPattern(violation: CSPViolationReport['csp-report']): voi
 
 // Generate meta tag for CSP (for HTML documents)
 export function generateCSPMetaTag(): string {
-  const cspHeader = ENVIRONMENT_CONFIG.isDevelopment 
-    ? generateDevelopmentCSP() 
+  const cspHeader = ENVIRONMENT_CONFIG.isDevelopment
+    ? generateDevelopmentCSP()
     : generateCSPHeader();
-    
+
   return `<meta http-equiv="Content-Security-Policy" content="${cspHeader.replace(/"/g, '&quot;')}">`;
 }
 
 // Generate all security meta tags
 export function generateSecurityMetaTags(): string[] {
   const metaTags: string[] = [];
-  
+
   // CSP meta tag
   if (ENVIRONMENT_CONFIG.ENABLE_CSP) {
     metaTags.push(generateCSPMetaTag());
   }
-  
+
   // Other security meta tags
   metaTags.push('<meta http-equiv="X-Content-Type-Options" content="nosniff">');
   metaTags.push('<meta http-equiv="X-Frame-Options" content="DENY">');
   metaTags.push('<meta http-equiv="X-XSS-Protection" content="1; mode=block">');
-  
+
   // Referrer policy
   metaTags.push('<meta name="referrer" content="strict-origin-when-cross-origin">');
-  
+
   return metaTags;
 }
 
@@ -309,7 +309,7 @@ export function generateSecurityMetaTags(): string[] {
 // Apply CSP headers to response (for server-side use)
 export function applySecurityHeaders(headers: Headers): void {
   const securityHeaders = getSecurityHeaders();
-  
+
   Object.entries(securityHeaders).forEach(([name, value]) => {
     if (validateSecurityHeader(name, value)) {
       headers.set(name, value);
@@ -323,11 +323,11 @@ export function applySecurityHeaders(headers: Headers): void {
 export function injectCSPIntoHTML(html: string): string {
   const metaTags = generateSecurityMetaTags();
   const metaTagsString = metaTags.join('\n  ');
-  
+
   // Insert meta tags after <head> tag
   return html.replace(
     /<head(\s[^>]*)?>/i,
-    (match) => `${match}\n  ${metaTagsString}`
+    (match) => `${match}\n  ${metaTagsString}`,
   );
 }
 
@@ -346,10 +346,10 @@ export function generateCSPNonce(): string {
 export function addNonceToCSP(csp: string, nonce: string): string {
   return csp.replace(
     /(script-src[^;]+)/,
-    `$1 'nonce-${nonce}'`
+    `$1 'nonce-${nonce}'`,
   ).replace(
     /(style-src[^;]+)/,
-    `$1 'nonce-${nonce}'`
+    `$1 'nonce-${nonce}'`,
   );
 }
 

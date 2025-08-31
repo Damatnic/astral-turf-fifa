@@ -1,4 +1,5 @@
 
+/* eslint-env browser */
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
@@ -16,14 +17,16 @@ function registerServiceWorker() {
     window.addEventListener('load', async () => {
       try {
         const registration = await navigator.serviceWorker.register('/sw.js');
+        // eslint-disable-next-line no-console
         console.log('Service Worker registered successfully:', registration);
-        
+
         // Handle service worker updates
         registration.addEventListener('updatefound', () => {
           const newWorker = registration.installing;
           if (newWorker) {
             newWorker.addEventListener('statechange', () => {
               if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                // eslint-disable-next-line no-console
                 console.log('New service worker available, page will refresh');
                 window.location.reload();
               }
@@ -31,6 +34,7 @@ function registerServiceWorker() {
           }
         });
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Service Worker registration failed:', error);
       }
     });
@@ -49,7 +53,7 @@ function preloadCriticalResources() {
     link.rel = 'preload';
     link.href = resource.href;
     link.as = resource.as;
-    if (resource.crossorigin) link.crossOrigin = resource.crossorigin;
+    if (resource.crossorigin) {link.crossOrigin = resource.crossorigin;}
     document.head.appendChild(link);
   });
 }
@@ -75,5 +79,5 @@ root.render(
         </HashRouter>
       </SecurityProvider>
     </SecurityErrorBoundary>
-  </React.StrictMode>
+  </React.StrictMode>,
 );

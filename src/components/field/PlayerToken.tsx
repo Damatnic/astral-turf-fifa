@@ -14,7 +14,7 @@ const KitPattern: React.FC<{ player: Player }> = ({ player }) => {
     const { uiState } = useUIContext();
     const kit = uiState?.teamKits?.[player?.team];
 
-    if (!kit) return null;
+    if (!kit) {return null;}
 
     switch (kit.pattern) {
         case 'stripes':
@@ -45,7 +45,7 @@ const KitPattern: React.FC<{ player: Player }> = ({ player }) => {
         default:
             return <div className="w-full h-full rounded-full" style={{ backgroundColor: kit?.primaryColor ?? '#000000' }}></div>;
     }
-}
+};
 
 const PlayerToken: React.FC<PlayerTokenProps> = memo(({ player, isSelected, isHighlightedByAI }) => {
   const { uiState, dispatch } = useUIContext();
@@ -64,7 +64,7 @@ const PlayerToken: React.FC<PlayerTokenProps> = memo(({ player, isSelected, isHi
     }
     e?.dataTransfer?.setData('text/plain', player?.id ?? '');
     e.dataTransfer.effectAllowed = 'move';
-    
+
     // Create a ghost image for dragging
     const ghostNode = e?.currentTarget?.cloneNode(true) as HTMLElement;
     if (ghostNode) {
@@ -74,7 +74,7 @@ const PlayerToken: React.FC<PlayerTokenProps> = memo(({ player, isSelected, isHi
         e?.dataTransfer?.setDragImage(ghostNode, 24, 24); // Center the ghost image on cursor
         setTimeout(() => ghostNode.remove(), 0);
     }
-    
+
     if (e?.currentTarget) {
       e.currentTarget.classList.add('dragging');
     }
@@ -85,12 +85,12 @@ const PlayerToken: React.FC<PlayerTokenProps> = memo(({ player, isSelected, isHi
       e.currentTarget.classList.remove('dragging');
     }
   };
-  
+
   const handleSelect = (e: React.MouseEvent) => {
       e?.stopPropagation();
       dispatch({ type: 'SELECT_PLAYER', payload: player?.id ?? '' });
   };
-  
+
   const availabilityIcon = () => {
     switch (player?.availability?.status) {
         case 'Minor Injury':
@@ -102,14 +102,14 @@ const PlayerToken: React.FC<PlayerTokenProps> = memo(({ player, isSelected, isHi
         default:
             return null;
     }
-  }
+  };
 
   const moraleColor = {
-    'Excellent': 'text-green-400', 'Good': 'text-green-500', 'Okay': 'text-yellow-400', 'Poor': 'text-orange-500', 'Very Poor': 'text-red-500'
+    'Excellent': 'text-green-400', 'Good': 'text-green-500', 'Okay': 'text-yellow-400', 'Poor': 'text-orange-500', 'Very Poor': 'text-red-500',
   }[player?.morale ?? 'Okay'];
 
   const staminaColor = (player?.stamina ?? 0) > 70 ? 'bg-green-500' : (player?.stamina ?? 0) > 40 ? 'bg-yellow-500' : 'bg-red-500';
-  
+
   return (
       <div
         ref={selfRef}
@@ -120,13 +120,13 @@ const PlayerToken: React.FC<PlayerTokenProps> = memo(({ player, isSelected, isHi
         className={`relative flex flex-col items-center transition-all duration-200 hover:scale-105 ${isDraggable ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'}`}
       >
         <div className={`relative ${isHighlightedByAI ? 'ai-highlight' : ''} rounded-full`}>
-            <div 
+            <div
               className={`relative w-10 h-10 rounded-full border-2 flex items-center justify-center text-white text-sm font-bold transition-all duration-200 overflow-hidden ${isSelected ? 'ring-2 ring-offset-2 ring-offset-slate-900 ring-teal-400 shadow-lg shadow-teal-400/25 scale-110' : 'shadow-md hover:shadow-lg'} border-black/30`}
               title={playerRole?.name || 'Player'}
             >
                 <KitPattern player={player} />
                 <span className="relative z-10 drop-shadow-lg">{playerRole?.abbreviation || '??'}</span>
-                
+
                 {/* Status Indicators */}
                 <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-8 h-2.5 bg-gray-900/50 rounded-full border border-gray-500/50 flex items-center p-px" title={`Stamina: ${player?.stamina ?? 0}%`}>
                     <div className={`${staminaColor} h-1 rounded-full`} style={{width: `${player?.stamina ?? 0}%`}}></div>

@@ -51,12 +51,12 @@ export const SwipeArea: React.FC<SwipeAreaProps> = ({
   children,
   config,
   className = '',
-  disabled = false
+  disabled = false,
 }) => {
   const { threshold = 100, velocityThreshold = 500, onSwipe } = config;
 
   const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    if (disabled || !onSwipe) return;
+    if (disabled || !onSwipe) {return;}
 
     const { offset, velocity } = info;
     const distance = Math.sqrt(offset.x ** 2 + offset.y ** 2);
@@ -64,7 +64,7 @@ export const SwipeArea: React.FC<SwipeAreaProps> = ({
 
     if (distance > threshold || velocityMagnitude > velocityThreshold) {
       let direction: 'up' | 'down' | 'left' | 'right' = 'right';
-      
+
       if (Math.abs(offset.x) > Math.abs(offset.y)) {
         direction = offset.x > 0 ? 'right' : 'left';
       } else {
@@ -75,7 +75,7 @@ export const SwipeArea: React.FC<SwipeAreaProps> = ({
         type: 'swipe',
         direction,
         velocity: velocityMagnitude,
-        distance
+        distance,
       });
     }
   };
@@ -106,7 +106,7 @@ export const Draggable: React.FC<DraggableProps> = ({
   children,
   config,
   className = '',
-  disabled = false
+  disabled = false,
 }) => {
   const { constraints, elastic = true, onDrag, onDragStart, onDragEnd } = config;
   const [isDragging, setIsDragging] = useState(false);
@@ -122,7 +122,7 @@ export const Draggable: React.FC<DraggableProps> = ({
       onDrag({
         type: 'drag',
         distance: Math.sqrt(info.offset.x ** 2 + info.offset.y ** 2),
-        velocity: Math.sqrt(info.velocity.x ** 2 + info.velocity.y ** 2)
+        velocity: Math.sqrt(info.velocity.x ** 2 + info.velocity.y ** 2),
       });
     }
   };
@@ -142,10 +142,10 @@ export const Draggable: React.FC<DraggableProps> = ({
       onDragStart={handleDragStart}
       onDrag={handleDrag}
       onDragEnd={handleDragEnd}
-      whileDrag={{ 
+      whileDrag={{
         scale: 1.05,
         zIndex: 1000,
-        boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.25)"
+        boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.25)",
       }}
     >
       {children}
@@ -165,7 +165,7 @@ export const PinchZoom: React.FC<PinchZoomProps> = ({
   children,
   config,
   className = '',
-  disabled = false
+  disabled = false,
 }) => {
   const { minScale = 0.5, maxScale = 3, onPinch, onPinchStart, onPinchEnd } = config;
   const [scale, setScale] = useState(1);
@@ -173,7 +173,7 @@ export const PinchZoom: React.FC<PinchZoomProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (disabled || !containerRef.current) return;
+    if (disabled || !containerRef.current) {return;}
 
     const element = containerRef.current;
     let initialDistance = 0;
@@ -200,17 +200,17 @@ export const PinchZoom: React.FC<PinchZoomProps> = ({
         const currentDistance = getDistance(e.touches[0], e.touches[1]);
         const scaleChange = currentDistance / initialDistance;
         const newScale = Math.max(minScale, Math.min(maxScale, initialScale * scaleChange));
-        
+
         setScale(newScale);
-        
+
         if (onPinch) {
           onPinch({
             type: 'pinch',
             scale: newScale,
             center: {
               x: (e.touches[0].clientX + e.touches[1].clientX) / 2,
-              y: (e.touches[0].clientY + e.touches[1].clientY) / 2
-            }
+              y: (e.touches[0].clientY + e.touches[1].clientY) / 2,
+            },
           });
         }
       }
@@ -238,9 +238,9 @@ export const PinchZoom: React.FC<PinchZoomProps> = ({
     <div
       ref={containerRef}
       className={className}
-      style={{ 
+      style={{
         touchAction: disabled ? 'auto' : 'none',
-        userSelect: 'none'
+        userSelect: 'none',
       }}
     >
       <motion.div
@@ -267,18 +267,18 @@ export const LongPress: React.FC<LongPressProps> = ({
   onLongPress,
   delay = 500,
   className = '',
-  disabled = false
+  disabled = false,
 }) => {
   const [isPressed, setIsPressed] = useState(false);
   const [hasTriggered, setHasTriggered] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout>();
 
   const startPress = () => {
-    if (disabled) return;
-    
+    if (disabled) {return;}
+
     setIsPressed(true);
     setHasTriggered(false);
-    
+
     timeoutRef.current = setTimeout(() => {
       if (!hasTriggered) {
         setHasTriggered(true);
@@ -310,7 +310,7 @@ export const LongPress: React.FC<LongPressProps> = ({
       onPointerLeave={endPress}
       animate={{
         scale: isPressed ? 0.95 : 1,
-        opacity: hasTriggered ? 0.8 : 1
+        opacity: hasTriggered ? 0.8 : 1,
       }}
       transition={{ duration: 0.1 }}
     >
@@ -331,19 +331,19 @@ export const MultiTouchArea: React.FC<MultiTouchAreaProps> = ({
   children,
   onGesture,
   className = '',
-  disabled = false
+  disabled = false,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [touches, setTouches] = useState<Touch[]>([]);
 
   useEffect(() => {
-    if (disabled || !containerRef.current) return;
+    if (disabled || !containerRef.current) {return;}
 
     const element = containerRef.current;
 
     const handleTouchStart = (e: TouchEvent) => {
       setTouches(Array.from(e.touches));
-      
+
       if (e.touches.length === 1) {
         // Single tap detection will be handled by timeout
         setTimeout(() => {
@@ -403,7 +403,7 @@ export const SortableList: React.FC<SortableListProps> = ({
   onReorder,
   className = '',
   itemClassName = '',
-  disabled = false
+  disabled = false,
 }) => {
   const { theme, tokens } = useTheme();
   const [draggedItem, setDraggedItem] = useState<string | null>(null);
@@ -414,7 +414,7 @@ export const SortableList: React.FC<SortableListProps> = ({
   }, [items]);
 
   const handleDragStart = (itemId: string) => {
-    if (disabled) return;
+    if (disabled) {return;}
     setDraggedItem(itemId);
   };
 
@@ -424,7 +424,7 @@ export const SortableList: React.FC<SortableListProps> = ({
   };
 
   const handleDragOver = (overId: string) => {
-    if (disabled || !draggedItem || draggedItem === overId) return;
+    if (disabled || !draggedItem || draggedItem === overId) {return;}
 
     const draggedIndex = reorderedItems.findIndex(item => item.id === draggedItem);
     const overIndex = reorderedItems.findIndex(item => item.id === overId);
@@ -448,7 +448,7 @@ export const SortableList: React.FC<SortableListProps> = ({
             border: `1px solid ${theme.colors.border.primary}`,
             borderRadius: tokens.borderRadius.lg,
             padding: tokens.spacing[3],
-            cursor: disabled ? 'default' : 'grab'
+            cursor: disabled ? 'default' : 'grab',
           }}
           layout
           drag={!disabled ? 'y' : false}
@@ -460,7 +460,7 @@ export const SortableList: React.FC<SortableListProps> = ({
             scale: 1.02,
             zIndex: 1000,
             boxShadow: tokens.shadows.lg,
-            backgroundColor: theme.colors.background.primary
+            backgroundColor: theme.colors.background.primary,
           }}
           animate={{
             opacity: draggedItem === item.id ? 0.8 : 1,
@@ -468,14 +468,14 @@ export const SortableList: React.FC<SortableListProps> = ({
           transition={{
             type: "spring",
             stiffness: 500,
-            damping: 30
+            damping: 30,
           }}
         >
           {item.content}
-          
+
           {/* Drag indicator */}
           {!disabled && (
-            <div 
+            <div
               className="absolute right-3 top-1/2 transform -translate-y-1/2"
               style={{ color: theme.colors.text.tertiary }}
             >
@@ -500,14 +500,14 @@ export const useGesture = () => {
   }>({
     isGesturing: false,
     gestureType: null,
-    gestureData: null
+    gestureData: null,
   });
 
   const startGesture = (type: string, data: any = {}) => {
     setGestureState({
       isGesturing: true,
       gestureType: type,
-      gestureData: data
+      gestureData: data,
     });
   };
 
@@ -515,14 +515,14 @@ export const useGesture = () => {
     setGestureState({
       isGesturing: false,
       gestureType: null,
-      gestureData: null
+      gestureData: null,
     });
   };
 
   const updateGesture = (data: any) => {
     setGestureState(prev => ({
       ...prev,
-      gestureData: { ...prev.gestureData, ...data }
+      gestureData: { ...prev.gestureData, ...data },
     }));
   };
 
@@ -530,7 +530,7 @@ export const useGesture = () => {
     gestureState,
     startGesture,
     endGesture,
-    updateGesture
+    updateGesture,
   };
 };
 
@@ -541,5 +541,5 @@ export default {
   LongPress,
   MultiTouchArea,
   SortableList,
-  useGesture
+  useGesture,
 };

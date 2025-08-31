@@ -7,22 +7,22 @@ const LeagueTablePage: React.FC = () => {
 
     // Sort league table by points, then goal difference, then goals scored
     const sortedTable = Object.values(season.leagueTable).sort((a, b) => {
-        if (b.points !== a.points) return b.points - a.points;
-        if (b.goalDifference !== a.goalDifference) return b.goalDifference - a.goalDifference;
+        if (b.points !== a.points) {return b.points - a.points;}
+        if (b.goalDifference !== a.goalDifference) {return b.goalDifference - a.goalDifference;}
         return b.goalsFor - a.goalsFor;
     });
 
     const getPositionColor = (position: number) => {
-        if (position <= 4) return 'text-green-400'; // Champions League
-        if (position <= 6) return 'text-blue-400'; // Europa League
-        if (position >= 18) return 'text-red-400'; // Relegation
+        if (position <= 4) {return 'text-green-400';} // Champions League
+        if (position <= 6) {return 'text-blue-400';} // Europa League
+        if (position >= 18) {return 'text-red-400';} // Relegation
         return 'text-gray-300'; // Mid-table
     };
 
     const getPositionBackground = (position: number) => {
-        if (position <= 4) return 'bg-green-600/10 border-l-4 border-l-green-400';
-        if (position <= 6) return 'bg-blue-600/10 border-l-4 border-l-blue-400';
-        if (position >= 18) return 'bg-red-600/10 border-l-4 border-l-red-400';
+        if (position <= 4) {return 'bg-green-600/10 border-l-4 border-l-green-400';}
+        if (position <= 6) {return 'bg-blue-600/10 border-l-4 border-l-blue-400';}
+        if (position >= 18) {return 'bg-red-600/10 border-l-4 border-l-red-400';}
         return '';
     };
 
@@ -175,7 +175,7 @@ const LeagueTablePage: React.FC = () => {
                                 <p className="text-xs text-gray-400">Positions 1-4</p>
                             </div>
                         </div>
-                        
+
                         <div className="flex items-center space-x-3">
                             <div className="w-4 h-4 bg-blue-400 rounded"></div>
                             <div>
@@ -183,7 +183,7 @@ const LeagueTablePage: React.FC = () => {
                                 <p className="text-xs text-gray-400">Positions 5-6</p>
                             </div>
                         </div>
-                        
+
                         <div className="flex items-center space-x-3">
                             <div className="w-4 h-4 bg-red-400 rounded"></div>
                             <div>

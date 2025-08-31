@@ -1,6 +1,6 @@
 /**
  * Real-Time Data Synchronization Service
- * 
+ *
  * Provides comprehensive cloud sync, real-time updates, and multi-device continuity
  * for the Astral Turf Soccer Management Application
  */
@@ -59,24 +59,24 @@ class SyncService {
    */
   async initialize(userId: string, authToken: string): Promise<void> {
     this.userId = userId;
-    
-    const syncServerUrl = process.env.NODE_ENV === 'production' 
-      ? 'https://sync.astralturf.com' 
+
+    const syncServerUrl = process.env.NODE_ENV === 'production'
+      ? 'https://sync.astralturf.com'
       : 'http://localhost:3001';
 
     this.socket = io(syncServerUrl, {
       auth: {
         token: authToken,
         userId: userId,
-        deviceId: this.deviceId
+        deviceId: this.deviceId,
       },
       transports: ['websocket', 'polling'],
       timeout: 10000,
-      retries: 3
+      retries: 3,
     });
 
     this.setupSocketEventListeners();
-    
+
     return new Promise((resolve, reject) => {
       if (!this.socket) {
         reject(new Error('Socket initialization failed'));
@@ -118,23 +118,23 @@ class SyncService {
       type: 'STATE_UPDATE',
       payload: {
         action,
-        partialState: this.extractRelevantState(action, state)
+        partialState: this.extractRelevantState(action, state),
       },
       timestamp: Date.now(),
       userId: this.userId,
-      deviceId: this.deviceId
+      deviceId: this.deviceId,
     };
 
     try {
       const encryptedPayload = await encrypt(JSON.stringify(syncEvent.payload));
-      
+
       this.socket.emit('sync_state', {
         ...syncEvent,
-        payload: encryptedPayload
+        payload: encryptedPayload,
       });
 
       this.lastSyncTimestamp = syncEvent.timestamp;
-      
+
     } catch (error) {
       console.error('❌ Failed to sync state:', error);
       this.queueSyncEvent('STATE_UPDATE', { action, state });
@@ -156,17 +156,17 @@ class SyncService {
       payload: { playerId, playerData },
       timestamp: Date.now(),
       userId: this.userId!,
-      deviceId: this.deviceId
+      deviceId: this.deviceId,
     };
 
     try {
       const encryptedPayload = await encrypt(JSON.stringify(syncEvent.payload));
-      
+
       this.socket.emit('sync_player', {
         ...syncEvent,
-        payload: encryptedPayload
+        payload: encryptedPayload,
       });
-      
+
     } catch (error) {
       console.error('❌ Failed to sync player update:', error);
       this.queueSyncEvent('PLAYER_UPDATE', { playerId, playerData });
@@ -188,17 +188,17 @@ class SyncService {
       payload: { formationId, tacticsData },
       timestamp: Date.now(),
       userId: this.userId!,
-      deviceId: this.deviceId
+      deviceId: this.deviceId,
     };
 
     try {
       const encryptedPayload = await encrypt(JSON.stringify(syncEvent.payload));
-      
+
       this.socket.emit('sync_tactics', {
         ...syncEvent,
-        payload: encryptedPayload
+        payload: encryptedPayload,
       });
-      
+
     } catch (error) {
       console.error('❌ Failed to sync tactical update:', error);
       this.queueSyncEvent('TACTICAL_UPDATE', { formationId, tacticsData });
@@ -238,7 +238,7 @@ class SyncService {
    */
   async resolveConflict(conflictId: string, strategy: 'local' | 'remote' | 'merge'): Promise<void> {
     const conflict = this.conflictQueue.find(c => c.id === conflictId);
-    if (!conflict || !this.socket) return;
+    if (!conflict || !this.socket) {return;}
 
     let resolvedData: any;
 
@@ -257,7 +257,7 @@ class SyncService {
     this.socket.emit('resolve_conflict', {
       conflictId,
       resolvedData,
-      strategy
+      strategy,
     });
 
     // Remove from conflict queue
@@ -299,7 +299,7 @@ class SyncService {
       queueSize: this.syncQueue.length,
       conflictsCount: this.conflictQueue.length,
       lastSync: this.lastSyncTimestamp,
-      connectedDevices: this.getConnectedDevices().length
+      connectedDevices: this.getConnectedDevices().length,
     };
   }
 
@@ -319,14 +319,14 @@ class SyncService {
   // Private methods
 
   private setupSocketEventListeners(): void {
-    if (!this.socket) return;
+    if (!this.socket) {return;}
 
     // Handle incoming state updates from other devices
     this.socket.on('state_update', async (data: SyncEvent) => {
       try {
         const decryptedPayload = await decrypt(data.payload);
         const payload = JSON.parse(decryptedPayload);
-        
+
         if (this.onStateUpdateCallback && data.deviceId !== this.deviceId) {
           this.onStateUpdateCallback(payload.action);
         }
@@ -349,7 +349,7 @@ class SyncService {
       devices.forEach(device => {
         this.connectedDevices.set(device.id, device);
       });
-      
+
       if (this.onDeviceUpdateCallback) {
         this.onDeviceUpdateCallback(devices);
       }
@@ -375,11 +375,11 @@ class SyncService {
       payload,
       timestamp: Date.now(),
       userId: this.userId || '',
-      deviceId: this.deviceId
+      deviceId: this.deviceId,
     };
 
     this.syncQueue.push(syncEvent);
-    
+
     // Keep queue size manageable
     if (this.syncQueue.length > 100) {
       this.syncQueue = this.syncQueue.slice(-50);
@@ -397,10 +397,10 @@ class SyncService {
     for (const event of eventsToProcess) {
       try {
         const encryptedPayload = await encrypt(JSON.stringify(event.payload));
-        
+
         this.socket.emit(`sync_${event.type.toLowerCase()}`, {
           ...event,
-          payload: encryptedPayload
+          payload: encryptedPayload,
         });
       } catch (error) {
         console.error('❌ Failed to process queued sync event:', error);
@@ -416,14 +416,14 @@ class SyncService {
       case 'UPDATE_PLAYER':
       case 'ADD_PLAYER':
         return { tactics: { players: state.tactics.players } };
-      
+
       case 'SET_ACTIVE_FORMATION':
       case 'ASSIGN_PLAYER_TO_SLOT':
         return { tactics: { activeFormationIds: state.tactics.activeFormationIds, formations: state.tactics.formations } };
-      
+
       case 'SET_TEAM_TACTIC':
         return { tactics: { teamTactics: state.tactics.teamTactics } };
-      
+
       default:
         return {};
     }
@@ -432,25 +432,25 @@ class SyncService {
   private mergeConflictData(localData: any, remoteData: any): any {
     // Smart merge strategy - prioritize most recent changes
     const merged = { ...localData };
-    
+
     // Merge based on timestamps if available
     if (localData.timestamp && remoteData.timestamp) {
       if (remoteData.timestamp > localData.timestamp) {
         return { ...merged, ...remoteData };
       }
     }
-    
+
     return merged;
   }
 
   private getOrCreateDeviceId(): string {
     let deviceId = localStorage.getItem('astral_turf_device_id');
-    
+
     if (!deviceId) {
       deviceId = uuidv4();
       localStorage.setItem('astral_turf_device_id', deviceId);
     }
-    
+
     return deviceId;
   }
 }

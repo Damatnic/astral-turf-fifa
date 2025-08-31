@@ -10,15 +10,15 @@ interface LineChartProps {
     xAxisLabel?: string;
 }
 
-const LineChart: React.FC<LineChartProps> = ({ 
-    data, 
-    width = 500, 
-    height = 250, 
+const LineChart: React.FC<LineChartProps> = ({
+    data,
+    width = 500,
+    height = 250,
     color = '#2dd4bf',
     yAxisLabel = 'Value',
-    xAxisLabel = 'Week'
+    xAxisLabel = 'Week',
 }) => {
-    const padding = { top: 20, right: 20, bottom: 40, left: 40 };
+    const padding = useMemo(() => ({ top: 20, right: 20, bottom: 40, left: 40 }), []);
 
     const { xScale, yScale, path, points } = useMemo(() => {
         if (!data || data.length === 0) {
@@ -32,28 +32,21 @@ const LineChart: React.FC<LineChartProps> = ({
 
         const xScale = (x: number) => padding.left + ((x - xMin) / (xMax - xMin || 1)) * (width - padding.left - padding.right);
         const yScale = (y: number) => (height - padding.bottom) - ((y - yMin) / (yMax - yMin || 1)) * (height - padding.top - padding.bottom);
-        
+
         const path = data.map((d, i) => `${i === 0 ? 'M' : 'L'} ${xScale(d.x)} ${yScale(d.y)}`).join(' ');
 
         const points = data.map(d => ({
             x: xScale(d.x),
             y: yScale(d.y),
             originalX: d.x,
-            originalY: d.y
+            originalY: d.y,
         }));
 
         return { xScale, yScale, path, points };
     }, [data, width, height, padding]);
-    
-    if (!data || data.length < 2) {
-        return (
-            <div style={{width, height}} className="flex items-center justify-center text-sm text-gray-500 bg-gray-700/30 rounded-md">
-                Not enough data to display chart. Needs at least 2 weeks of history.
-            </div>
-        )
-    }
 
     const yAxisTicks = useMemo(() => {
+        if (!data || data.length === 0) { return []; }
         const yMin = Math.min(...data.map(d => d.y));
         const yMax = Math.max(...data.map(d => d.y));
         const ticks = [];
@@ -65,10 +58,19 @@ const LineChart: React.FC<LineChartProps> = ({
     }, [data, yScale]);
 
     const xAxisTicks = useMemo(() => {
+        if (!data || data.length === 0) { return []; }
         const xValues = data.map(d => d.x);
         const uniqueX = [...new Set(xValues)];
         return uniqueX.map(val => ({ value: val, x: xScale(val) }));
     }, [data, xScale]);
+
+    if (!data || data.length < 2) {
+        return (
+            <div style={{width, height}} className="flex items-center justify-center text-sm text-gray-500 bg-gray-700/30 rounded-md">
+                Not enough data to display chart. Needs at least 2 weeks of history.
+            </div>
+        );
+    }
 
     return (
         <svg width="100%" height="100%" viewBox={`0 0 ${width} ${height}`}>
@@ -91,10 +93,10 @@ const LineChart: React.FC<LineChartProps> = ({
 
             {/* Line */}
             <path d={path} fill="none" stroke={color} strokeWidth="2" />
-            
+
             {/* Points */}
-            {points.map((p, i) => (
-                <circle key={i} cx={p.x} cy={p.y} r="3" fill={color}>
+            {points.map((p) => (
+                <circle key={`${p.originalX}-${p.originalY}`} cx={p.x} cy={p.y} r="3" fill={color}>
                     <title>Week {p.originalX}: {p.originalY}</title>
                 </circle>
             ))}

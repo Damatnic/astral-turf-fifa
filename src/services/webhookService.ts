@@ -1,6 +1,6 @@
 /**
  * Webhook System for Real-Time Notifications
- * 
+ *
  * Provides comprehensive webhook infrastructure for real-time event notifications,
  * external system integration, and automated workflow triggers
  */
@@ -122,7 +122,7 @@ class WebhookService {
     this.httpClient = axios.create({
       timeout: 30000,
       maxRedirects: 3,
-      validateStatus: (status) => status < 500 // Retry on 5xx errors
+      validateStatus: (status) => status < 500, // Retry on 5xx errors
     });
 
     this.setupHttpClientInterceptors();
@@ -167,26 +167,26 @@ class WebhookService {
         initialDelay: 1000,
         maxDelay: 30000,
         backoffMultiplier: 2,
-        ...config.retryPolicy
+        ...config.retryPolicy,
       },
       filterRules: config.filterRules || [],
       transformRules: config.transformRules || [],
       rateLimit: {
         requestsPerMinute: 60,
-        burstLimit: 10
+        burstLimit: 10,
       },
       headers: {
         'User-Agent': 'AstralTurf-Webhooks/1.0',
         'Content-Type': 'application/json',
-        ...config.headers
+        ...config.headers,
       },
       createdAt: Date.now(),
       stats: {
         totalDeliveries: 0,
         successfulDeliveries: 0,
         failedDeliveries: 0,
-        avgResponseTime: 0
-      }
+        avgResponseTime: 0,
+      },
     };
 
     this.endpoints.set(endpoint.id, endpoint);
@@ -224,13 +224,13 @@ class WebhookService {
         requireSignature: true,
         allowedEventTypes: ['*'],
         requiredFields: ['type', 'data'],
-        ...config.validation
+        ...config.validation,
       },
       stats: {
         totalReceived: 0,
         successfulProcessed: 0,
-        failedProcessed: 0
-      }
+        failedProcessed: 0,
+      },
     };
 
     this.receivers.set(receiver.id, receiver);
@@ -252,7 +252,7 @@ class WebhookService {
       teamId?: string;
       correlationId?: string;
       priority?: 'low' | 'normal' | 'high';
-    } = {}
+    } = {},
   ): Promise<void> {
     const event: WebhookEvent = {
       id: uuidv4(),
@@ -265,8 +265,8 @@ class WebhookService {
         retry_count: 0,
         correlation_id: options.correlationId,
         user_id: options.userId,
-        team_id: options.teamId
-      }
+        team_id: options.teamId,
+      },
     };
 
     // Add to event queue
@@ -286,7 +286,7 @@ class WebhookService {
     path: string,
     headers: Record<string, string>,
     body: string,
-    signature?: string
+    signature?: string,
   ): Promise<{ success: boolean; message: string }> {
     try {
       // Find matching receiver
@@ -307,7 +307,7 @@ class WebhookService {
 
       // Parse event data
       const eventData = JSON.parse(body);
-      
+
       // Validate event structure
       if (!this.validateEventStructure(eventData, receiver.validation)) {
         receiver.stats.failedProcessed++;
@@ -324,8 +324,8 @@ class WebhookService {
         metadata: {
           version: eventData.metadata?.version || '1.0',
           retry_count: 0,
-          ...eventData.metadata
-        }
+          ...eventData.metadata,
+        },
       };
 
       // Process the event
@@ -361,7 +361,7 @@ class WebhookService {
    */
   getDeliveryHistory(
     endpointId?: string,
-    limit: number = 100
+    limit: number = 100,
   ): WebhookDelivery[] {
     let deliveries = Array.from(this.deliveries.values());
 
@@ -393,7 +393,7 @@ class WebhookService {
 
     try {
       const response = await this.deliverWebhook(endpoint, JSON.parse(delivery.requestBody));
-      
+
       delivery.status = 'success';
       delivery.httpStatus = response.status;
       delivery.responseBody = JSON.stringify(response.data);
@@ -468,16 +468,16 @@ class WebhookService {
   }
 
   private async processEventQueue(): Promise<void> {
-    if (this.eventQueue.length === 0) return;
+    if (this.eventQueue.length === 0) {return;}
 
     const event = this.eventQueue.shift()!;
-    
+
     // Find matching endpoints
     const matchingEndpoints = Array.from(this.endpoints.values())
-      .filter(endpoint => 
+      .filter(endpoint =>
         endpoint.isActive &&
         endpoint.events.includes(event.type) &&
-        this.passesFilters(event, endpoint.filterRules || [])
+        this.passesFilters(event, endpoint.filterRules || []),
       );
 
     // Deliver to each matching endpoint
@@ -492,13 +492,13 @@ class WebhookService {
 
   private async processRetries(): Promise<void> {
     const now = Date.now();
-    
+
     const retriableDeliveries = Array.from(this.deliveries.values())
-      .filter(d => 
+      .filter(d =>
         d.status === 'failed' &&
         d.nextRetryAt &&
         d.nextRetryAt <= now &&
-        d.retryCount < 5 // Max retry limit
+        d.retryCount < 5, // Max retry limit
       );
 
     for (const delivery of retriableDeliveries) {
@@ -527,11 +527,11 @@ class WebhookService {
         ...endpoint.headers,
         'X-Webhook-Signature': this.generateSignature(transformedEvent, endpoint.secret),
         'X-Webhook-ID': event.id,
-        'X-Webhook-Timestamp': event.timestamp.toString()
+        'X-Webhook-Timestamp': event.timestamp.toString(),
       },
       requestBody: JSON.stringify(transformedEvent),
       sentAt: Date.now(),
-      retryCount: 0
+      retryCount: 0,
     };
 
     this.deliveries.set(delivery.id, delivery);
@@ -539,7 +539,7 @@ class WebhookService {
 
     try {
       const response = await this.deliverWebhook(endpoint, transformedEvent);
-      
+
       delivery.status = 'success';
       delivery.httpStatus = response.status;
       delivery.responseBody = JSON.stringify(response.data);
@@ -561,12 +561,12 @@ class WebhookService {
       delivery.error = error.message;
       delivery.httpStatus = error.response?.status;
       delivery.responseBody = error.response?.data ? JSON.stringify(error.response.data) : undefined;
-      
+
       // Schedule retry
       if (delivery.retryCount < endpoint.retryPolicy.maxAttempts) {
         const delay = Math.min(
           endpoint.retryPolicy.initialDelay * Math.pow(endpoint.retryPolicy.backoffMultiplier, delivery.retryCount),
-          endpoint.retryPolicy.maxDelay
+          endpoint.retryPolicy.maxDelay,
         );
         delivery.nextRetryAt = Date.now() + delay;
       }
@@ -589,8 +589,8 @@ class WebhookService {
         ...endpoint.headers,
         'X-Webhook-Signature': signature,
         'X-Webhook-ID': event.id,
-        'X-Webhook-Timestamp': event.timestamp.toString()
-      }
+        'X-Webhook-Timestamp': event.timestamp.toString(),
+      },
     });
   }
 
@@ -603,13 +603,13 @@ class WebhookService {
       data: {
         message: 'This is a test webhook from Astral Turf',
         endpoint_id: endpoint.id,
-        endpoint_name: endpoint.name
+        endpoint_name: endpoint.name,
       },
       metadata: {
         version: '1.0',
         retry_count: 0,
-        test: true
-      }
+        test: true,
+      },
     };
 
     try {
@@ -624,7 +624,7 @@ class WebhookService {
   private passesFilters(event: WebhookEvent, filters: WebhookFilter[]): boolean {
     return filters.every(filter => {
       const value = this.getNestedValue(event, filter.field);
-      
+
       switch (filter.operator) {
         case 'equals':
           return value === filter.value;
@@ -647,22 +647,22 @@ class WebhookService {
   }
 
   private applyTransforms(event: WebhookEvent, transforms: WebhookTransform[]): WebhookEvent {
-    let transformedEvent = JSON.parse(JSON.stringify(event));
+    const transformedEvent = JSON.parse(JSON.stringify(event));
 
     transforms.forEach(transform => {
       switch (transform.type) {
         case 'rename_field':
           this.renameField(transformedEvent, transform.config.from, transform.config.to);
           break;
-        
+
         case 'add_field':
           this.setNestedValue(transformedEvent, transform.config.field, transform.config.value);
           break;
-        
+
         case 'remove_field':
           this.removeField(transformedEvent, transform.config.field);
           break;
-        
+
         case 'format_value':
           const currentValue = this.getNestedValue(transformedEvent, transform.config.field);
           const formattedValue = this.formatValue(currentValue, transform.config.format);
@@ -680,12 +680,12 @@ class WebhookService {
     const minuteAgo = now - 60000;
 
     let limiter = this.rateLimiters.get(key);
-    
+
     if (!limiter || limiter.resetTime < minuteAgo) {
-      limiter = { 
-        count: 0, 
-        resetTime: now, 
-        burst: 0 
+      limiter = {
+        count: 0,
+        resetTime: now,
+        burst: 0,
       };
       this.rateLimiters.set(key, limiter);
     }
@@ -705,7 +705,7 @@ class WebhookService {
 
     // Reset burst counter after 10 seconds
     setTimeout(() => {
-      if (limiter) limiter.burst = Math.max(0, limiter.burst - 1);
+      if (limiter) {limiter.burst = Math.max(0, limiter.burst - 1);}
     }, 10000);
 
     return true;
@@ -753,7 +753,7 @@ class WebhookService {
     if (totalSuccessful === 1) {
       return newResponseTime;
     }
-    
+
     const currentAvg = endpoint.stats.avgResponseTime;
     return ((currentAvg * (totalSuccessful - 1)) + newResponseTime) / totalSuccessful;
   }
@@ -766,7 +766,7 @@ class WebhookService {
     const keys = path.split('.');
     const lastKey = keys.pop()!;
     const target = keys.reduce((current, key) => {
-      if (!current[key]) current[key] = {};
+      if (!current[key]) {current[key] = {};}
       return current[key];
     }, obj);
     target[lastKey] = value;
@@ -780,7 +780,7 @@ class WebhookService {
     const keys = path.split('.');
     const lastKey = keys.pop()!;
     const target = keys.reduce((current, key) => current?.[key], obj);
-    if (target) delete target[lastKey];
+    if (target) {delete target[lastKey];}
   }
 
   private renameField(obj: any, fromPath: string, toPath: string): void {
@@ -813,7 +813,7 @@ class WebhookService {
         config.metadata = { startTime: Date.now() };
         return config;
       },
-      (error) => Promise.reject(error)
+      (error) => Promise.reject(error),
     );
 
     // Response interceptor
@@ -827,7 +827,7 @@ class WebhookService {
         const duration = Date.now() - (error.config?.metadata?.startTime || Date.now());
         console.log(`📉 Webhook request failed after ${duration}ms`);
         return Promise.reject(error);
-      }
+      },
     );
   }
 
@@ -842,8 +842,8 @@ class WebhookService {
       },
       validation: {
         allowedEventTypes: ['player.created', 'player.updated', 'player.deleted'],
-        requiredFields: ['data.player_id', 'data.changes']
-      }
+        requiredFields: ['data.player_id', 'data.changes'],
+      },
     });
 
     this.createWebhookReceiver({
@@ -855,8 +855,8 @@ class WebhookService {
       },
       validation: {
         allowedEventTypes: ['match.completed', 'match.updated'],
-        requiredFields: ['data.match_id', 'data.score']
-      }
+        requiredFields: ['data.match_id', 'data.score'],
+      },
     });
   }
 

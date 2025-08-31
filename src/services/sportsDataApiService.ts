@@ -1,6 +1,6 @@
 /**
  * Professional Sports Data API Integration Service
- * 
+ *
  * Provides comprehensive integration with professional soccer data APIs,
  * performance analytics, and industry-standard statistics for benchmarking
  */
@@ -184,11 +184,11 @@ class SportsDataApiService {
       rateLimitPerMinute: config.rateLimitPerMinute || 100,
       currentUsage: 0,
       lastReset: Date.now(),
-      supportedFeatures: config.supportedFeatures || []
+      supportedFeatures: config.supportedFeatures || [],
     };
 
     this.providers.set(provider.id, provider);
-    
+
     if (provider.isActive && provider.apiKey) {
       this.setupApiClient(provider);
     }
@@ -208,11 +208,11 @@ class SportsDataApiService {
       nationality?: string;
       marketValueMin?: number;
       marketValueMax?: number;
-    }
+    },
   ): Promise<ProfessionalPlayer[]> {
     const cacheKey = `players_${JSON.stringify(criteria)}`;
     const cached = this.getFromCache(cacheKey);
-    
+
     if (cached) {
       return cached;
     }
@@ -229,7 +229,7 @@ class SportsDataApiService {
       }
 
       const response = await client.get('/players/search', {
-        params: criteria
+        params: criteria,
       });
 
       const players: ProfessionalPlayer[] = response.data.players.map((player: any) => ({
@@ -248,8 +248,8 @@ class SportsDataApiService {
           passAccuracy: player.statistics?.pass_accuracy || 0,
           tacklesWon: player.statistics?.tackles_won || 0,
           aerialDuelsWon: player.statistics?.aerial_duels_won || 0,
-          rating: player.statistics?.rating || 0
-        }
+          rating: player.statistics?.rating || 0,
+        },
       }));
 
       this.setCache(cacheKey, players, 30 * 60 * 1000); // 30 minutes
@@ -267,20 +267,20 @@ class SportsDataApiService {
   async getLeagueData(leagueId: string, season: string = '2024'): Promise<LeagueData | null> {
     const cacheKey = `league_${leagueId}_${season}`;
     const cached = this.getFromCache(cacheKey);
-    
+
     if (cached) {
       return cached;
     }
 
     try {
       const provider = this.getProvider('football_api');
-      if (!provider?.isActive) return null;
+      if (!provider?.isActive) {return null;}
 
       const client = this.apiClients.get(provider.id);
-      if (!client) return null;
+      if (!client) {return null;}
 
       const response = await client.get(`/leagues/${leagueId}/standings`, {
-        params: { season }
+        params: { season },
       });
 
       const leagueData: LeagueData = {
@@ -298,8 +298,8 @@ class SportsDataApiService {
           drawn: team.all.draw,
           lost: team.all.lose,
           goalsFor: team.all.goals.for,
-          goalsAgainst: team.all.goals.against
-        }))
+          goalsAgainst: team.all.goals.against,
+        })),
       };
 
       this.setCache(cacheKey, leagueData, 60 * 60 * 1000); // 1 hour
@@ -317,20 +317,20 @@ class SportsDataApiService {
   async getMatchData(matchId: string): Promise<MatchData | null> {
     const cacheKey = `match_${matchId}`;
     const cached = this.getFromCache(cacheKey);
-    
+
     if (cached) {
       return cached;
     }
 
     try {
       const provider = this.getProvider('football_api');
-      if (!provider?.isActive) return null;
+      if (!provider?.isActive) {return null;}
 
       const client = this.apiClients.get(provider.id);
-      if (!client) return null;
+      if (!client) {return null;}
 
       const response = await client.get(`/matches/${matchId}`, {
-        params: { include: 'events,statistics' }
+        params: { include: 'events,statistics' },
       });
 
       const match = response.data;
@@ -341,40 +341,40 @@ class SportsDataApiService {
         date: match.fixture.date,
         score: {
           home: match.goals.home,
-          away: match.goals.away
+          away: match.goals.away,
         },
         events: match.events?.map((event: any) => ({
           minute: event.time.elapsed,
           type: event.type.toLowerCase(),
           player: event.player?.name || '',
-          team: event.team.id === match.teams.home.id ? 'home' : 'away'
+          team: event.team.id === match.teams.home.id ? 'home' : 'away',
         })) || [],
         statistics: {
           possession: {
             home: this.extractStatistic(match.statistics, 'Ball Possession', 'home'),
-            away: this.extractStatistic(match.statistics, 'Ball Possession', 'away')
+            away: this.extractStatistic(match.statistics, 'Ball Possession', 'away'),
           },
           shots: {
             home: this.extractStatistic(match.statistics, 'Total Shots', 'home'),
-            away: this.extractStatistic(match.statistics, 'Total Shots', 'away')
+            away: this.extractStatistic(match.statistics, 'Total Shots', 'away'),
           },
           shotsOnTarget: {
             home: this.extractStatistic(match.statistics, 'Shots on Goal', 'home'),
-            away: this.extractStatistic(match.statistics, 'Shots on Goal', 'away')
+            away: this.extractStatistic(match.statistics, 'Shots on Goal', 'away'),
           },
           passes: {
             home: this.extractStatistic(match.statistics, 'Total passes', 'home'),
-            away: this.extractStatistic(match.statistics, 'Total passes', 'away')
+            away: this.extractStatistic(match.statistics, 'Total passes', 'away'),
           },
           passAccuracy: {
             home: this.extractStatistic(match.statistics, 'Passes %', 'home'),
-            away: this.extractStatistic(match.statistics, 'Passes %', 'away')
+            away: this.extractStatistic(match.statistics, 'Passes %', 'away'),
           },
           fouls: {
             home: this.extractStatistic(match.statistics, 'Fouls', 'home'),
-            away: this.extractStatistic(match.statistics, 'Fouls', 'away')
-          }
-        }
+            away: this.extractStatistic(match.statistics, 'Fouls', 'away'),
+          },
+        },
       };
 
       this.setCache(cacheKey, matchData, 24 * 60 * 60 * 1000); // 24 hours
@@ -392,7 +392,7 @@ class SportsDataApiService {
   async connectWearableDevice(
     deviceType: 'catapult' | 'stats_sports' | 'polar' | 'garmin',
     deviceId: string,
-    playerId: string
+    playerId: string,
   ): Promise<void> {
     try {
       const provider = this.getProvider(deviceType);
@@ -405,15 +405,15 @@ class SportsDataApiService {
         case 'catapult':
           await this.connectCatapultDevice(provider, deviceId, playerId);
           break;
-        
+
         case 'stats_sports':
           await this.connectStatsSportsDevice(provider, deviceId, playerId);
           break;
-        
+
         case 'polar':
           await this.connectPolarDevice(provider, deviceId, playerId);
           break;
-        
+
         case 'garmin':
           await this.connectGarminDevice(provider, deviceId, playerId);
           break;
@@ -433,11 +433,11 @@ class SportsDataApiService {
   async getPerformanceData(
     playerId: string,
     startDate: string,
-    endDate: string
+    endDate: string,
   ): Promise<PerformanceMetrics[]> {
     const cacheKey = `performance_${playerId}_${startDate}_${endDate}`;
     const cached = this.getFromCache(cacheKey);
-    
+
     if (cached) {
       return cached;
     }
@@ -473,17 +473,17 @@ class SportsDataApiService {
   async getPlayerMarketData(playerId: string): Promise<MarketData | null> {
     const cacheKey = `market_${playerId}`;
     const cached = this.getFromCache(cacheKey);
-    
+
     if (cached) {
       return cached;
     }
 
     try {
       const provider = this.getProvider('football_api');
-      if (!provider?.isActive) return null;
+      if (!provider?.isActive) {return null;}
 
       const client = this.apiClients.get(provider.id);
-      if (!client) return null;
+      if (!client) {return null;}
 
       const response = await client.get(`/players/${playerId}/transfers`);
       const transferData = response.data;
@@ -493,17 +493,17 @@ class SportsDataApiService {
         currentValue: transferData.market_value || 0,
         valueHistory: transferData.value_history?.map((entry: any) => ({
           date: entry.date,
-          value: entry.value
+          value: entry.value,
         })) || [],
         transferHistory: transferData.transfers?.map((transfer: any) => ({
           date: transfer.date,
           fromClub: transfer.from?.name || '',
           toClub: transfer.to?.name || '',
           fee: transfer.fee || 0,
-          type: transfer.type || 'transfer'
+          type: transfer.type || 'transfer',
         })) || [],
         contractExpiry: transferData.contract_expiry || '',
-        estimatedWage: transferData.estimated_wage || 0
+        estimatedWage: transferData.estimated_wage || 0,
       };
 
       this.setCache(cacheKey, marketData, 24 * 60 * 60 * 1000); // 24 hours
@@ -521,11 +521,11 @@ class SportsDataApiService {
   async getPositionBenchmarks(
     position: string,
     league: string = 'all',
-    ageGroup: string = 'all'
+    ageGroup: string = 'all',
   ): Promise<BenchmarkData | null> {
     const cacheKey = `benchmark_${position}_${league}_${ageGroup}`;
     const cached = this.getFromCache(cacheKey);
-    
+
     if (cached) {
       return cached;
     }
@@ -533,9 +533,9 @@ class SportsDataApiService {
     try {
       // This would typically aggregate data from multiple sources
       const benchmarkData = await this.calculateBenchmarks(position, league, ageGroup);
-      
+
       this.setCache(cacheKey, benchmarkData, 60 * 60 * 1000); // 1 hour
-      
+
       if (this.onBenchmarkUpdateCallback) {
         this.onBenchmarkUpdateCallback(benchmarkData);
       }
@@ -564,7 +564,7 @@ class SportsDataApiService {
 
       ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        
+
         if (this.onDataUpdateCallback) {
           this.onDataUpdateCallback('live_match', data);
         }
@@ -593,16 +593,16 @@ class SportsDataApiService {
       const performanceData = await this.getPerformanceData(
         playerId,
         new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(), // Last 30 days
-        new Date().toISOString()
+        new Date().toISOString(),
       );
 
       // Analyze performance data for injury risk factors
       const riskFactors = this.analyzeInjuryRisk(performanceData);
-      
+
       return {
         riskScore: riskFactors.score,
         factors: riskFactors.factors,
-        recommendations: riskFactors.recommendations
+        recommendations: riskFactors.recommendations,
       };
 
     } catch (error) {
@@ -633,29 +633,29 @@ class SportsDataApiService {
         name: 'Football API',
         type: 'football_api' as const,
         baseUrl: 'https://api-football-v1.p.rapidapi.com/v3',
-        supportedFeatures: ['player_search', 'league_data', 'match_data', 'transfer_data']
+        supportedFeatures: ['player_search', 'league_data', 'match_data', 'transfer_data'],
       },
       {
         id: 'sports_radar',
         name: 'SportRadar',
         type: 'sports_radar' as const,
         baseUrl: 'https://api.sportradar.com/soccer',
-        supportedFeatures: ['live_data', 'detailed_statistics', 'historical_data']
+        supportedFeatures: ['live_data', 'detailed_statistics', 'historical_data'],
       },
       {
         id: 'catapult',
         name: 'Catapult Sports',
         type: 'catapult' as const,
         baseUrl: 'https://api.catapultsports.com',
-        supportedFeatures: ['performance_tracking', 'gps_data', 'injury_prevention']
+        supportedFeatures: ['performance_tracking', 'gps_data', 'injury_prevention'],
       },
       {
         id: 'stats_sports',
         name: 'STATSports',
         type: 'stats_sports' as const,
         baseUrl: 'https://api.statsports.com',
-        supportedFeatures: ['performance_tracking', 'heart_rate', 'load_monitoring']
-      }
+        supportedFeatures: ['performance_tracking', 'heart_rate', 'load_monitoring'],
+      },
     ];
 
     defaultProviders.forEach(provider => {
@@ -664,7 +664,7 @@ class SportsDataApiService {
         isActive: false,
         rateLimitPerMinute: 100,
         currentUsage: 0,
-        lastReset: Date.now()
+        lastReset: Date.now(),
       });
     });
   }
@@ -683,8 +683,8 @@ class SportsDataApiService {
       timeout: 10000,
       headers: {
         'Content-Type': 'application/json',
-        ...(provider.apiKey && { 'X-API-Key': provider.apiKey })
-      }
+        ...(provider.apiKey && { 'X-API-Key': provider.apiKey }),
+      },
     });
 
     // Add rate limiting
@@ -692,7 +692,7 @@ class SportsDataApiService {
       if (!this.checkRateLimit(provider)) {
         throw new Error(`Rate limit exceeded for ${provider.name}`);
       }
-      
+
       provider.currentUsage++;
       return config;
     });
@@ -703,7 +703,7 @@ class SportsDataApiService {
       (error) => {
         console.error(`API Error from ${provider.name}:`, error.message);
         return Promise.reject(error);
-      }
+      },
     );
 
     this.apiClients.set(provider.id, client);
@@ -739,7 +739,7 @@ class SportsDataApiService {
 
   private resetRateLimits(): void {
     const now = Date.now();
-    
+
     for (const provider of this.providers.values()) {
       provider.currentUsage = 0;
       provider.lastReset = now;
@@ -751,7 +751,7 @@ class SportsDataApiService {
     if (cached && cached.expiry > Date.now()) {
       return cached.data;
     }
-    
+
     this.dataCache.delete(key);
     return null;
   }
@@ -759,7 +759,7 @@ class SportsDataApiService {
   private setCache(key: string, data: any, ttl: number): void {
     this.dataCache.set(key, {
       data,
-      expiry: Date.now() + ttl
+      expiry: Date.now() + ttl,
     });
 
     // Clean old cache entries
@@ -775,8 +775,8 @@ class SportsDataApiService {
 
   private extractStatistic(statistics: any[], type: string, team: 'home' | 'away'): number {
     const stat = statistics?.find(s => s.type === type);
-    if (!stat) return 0;
-    
+    if (!stat) {return 0;}
+
     const value = team === 'home' ? stat.home : stat.away;
     return parseInt(value) || 0;
   }
@@ -805,7 +805,7 @@ class SportsDataApiService {
     provider: SportsDataProvider,
     playerId: string,
     startDate: string,
-    endDate: string
+    endDate: string,
   ): Promise<PerformanceMetrics[]> {
     // Provider-specific performance data fetching
     return [];
@@ -814,7 +814,7 @@ class SportsDataApiService {
   private async calculateBenchmarks(
     position: string,
     league: string,
-    ageGroup: string
+    ageGroup: string,
   ): Promise<BenchmarkData> {
     // Calculate position benchmarks from aggregated data
     return {
@@ -826,8 +826,8 @@ class SportsDataApiService {
         assists: { avg: 0.15, top10: 0.6, top5: 0.9 },
         passAccuracy: { avg: 82, top10: 91, top5: 94 },
         tacklesWon: { avg: 1.8, top10: 3.2, top5: 4.1 },
-        rating: { avg: 6.8, top10: 7.8, top5: 8.2 }
-      }
+        rating: { avg: 6.8, top10: 7.8, top5: 8.2 },
+      },
     };
   }
 
@@ -836,11 +836,11 @@ class SportsDataApiService {
     for (const [playerId, metrics] of this.performanceBuffer.entries()) {
       if (metrics.length > 0) {
         const latestMetric = metrics[metrics.length - 1];
-        
+
         if (this.onPerformanceDataCallback) {
           this.onPerformanceDataCallback(latestMetric);
         }
-        
+
         // Clear processed metrics
         this.performanceBuffer.set(playerId, []);
       }
@@ -893,7 +893,7 @@ class SportsDataApiService {
     return {
       score: Math.min(riskScore, 100),
       factors: riskFactors,
-      recommendations
+      recommendations,
     };
   }
 

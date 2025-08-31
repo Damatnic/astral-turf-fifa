@@ -18,7 +18,7 @@ const MatchSimulatorPopup: React.FC = () => {
     useEffect(() => {
         const runSimulation = async () => {
             dispatch({ type: 'SIMULATE_MATCH_START' });
-            
+
             const homeFormation = formations[activeFormationIds.home];
             const awayFormation = formations[activeFormationIds.away];
             if (!homeFormation || !awayFormation) {
@@ -35,17 +35,17 @@ const MatchSimulatorPopup: React.FC = () => {
                     dispatch({ type: 'SIMULATE_MATCH_UPDATE', payload: event });
                 }, event.minute * 50);
             };
-            
+
             const homeFamiliarity = tacticalFamiliarity[activeFormationIds.home] || 20;
             const awayFamiliarity = tacticalFamiliarity[activeFormationIds.away] || 20;
 
             const result: MatchResult = simulateMatch(
-                homePlayers, awayPlayers, teamTactics.home, teamTactics.away, 
-                homeFamiliarity, awayFamiliarity, chemistry, relationships, mentoringGroups, onUpdate
+                homePlayers, awayPlayers, teamTactics.home, teamTactics.away,
+                homeFamiliarity, awayFamiliarity, chemistry, relationships, mentoringGroups, onUpdate,
             );
-            
+
             await sleep(90 * 50 + 500); // Wait for simulation to finish
-            
+
             tacticsDispatch({ type: 'SIMULATE_MATCH_SUCCESS', payload: result });
         };
         runSimulation();

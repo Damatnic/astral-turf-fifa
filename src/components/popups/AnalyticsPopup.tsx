@@ -7,11 +7,11 @@ import LineChart from '../charts/LineChart';
 import RadarChart from '../charts/RadarChart';
 
 const TabButton: React.FC<{ active: boolean; onClick: () => void; children: React.ReactNode }> = ({ active, onClick, children }) => (
-    <button 
-        onClick={onClick} 
+    <button
+        onClick={onClick}
         className={`px-4 py-2 text-sm font-semibold rounded-t-md transition-colors ${
-            active 
-                ? 'bg-gray-700 text-teal-300 border-b-2 border-teal-400' 
+            active
+                ? 'bg-gray-700 text-teal-300 border-b-2 border-teal-400'
                 : 'bg-gray-800 text-gray-400 hover:bg-gray-700/50'
         }`}
     >
@@ -19,8 +19,8 @@ const TabButton: React.FC<{ active: boolean; onClick: () => void; children: Reac
     </button>
 );
 
-const StatCard: React.FC<{ title: string; value: string | number; change?: number; icon?: React.ReactNode }> = ({ 
-    title, value, change, icon 
+const StatCard: React.FC<{ title: string; value: string | number; change?: number; icon?: React.ReactNode }> = ({
+    title, value, change, icon,
 }) => (
     <div className="bg-gray-700/50 border border-gray-600 rounded-lg p-4">
         <div className="flex justify-between items-start mb-2">
@@ -38,14 +38,14 @@ const StatCard: React.FC<{ title: string; value: string | number; change?: numbe
 );
 
 const PlayerStatsRow: React.FC<{ player: Player; onViewDetails: (playerId: string) => void }> = ({ player, onViewDetails }) => {
-    const averageRating = Math.round((player.attributes.speed + player.attributes.passing + player.attributes.tackling + 
+    const averageRating = Math.round((player.attributes.speed + player.attributes.passing + player.attributes.tackling +
         player.attributes.shooting + player.attributes.dribbling + player.attributes.positioning + player.attributes.stamina) / 7);
-    
+
     return (
         <tr className="border-b border-gray-700 hover:bg-gray-700/30">
             <td className="px-4 py-3">
                 <div className="flex items-center">
-                    <div 
+                    <div
                         className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold mr-3"
                         style={{ backgroundColor: player.teamColor }}
                     >
@@ -70,7 +70,7 @@ const PlayerStatsRow: React.FC<{ player: Player; onViewDetails: (playerId: strin
                 </span>
             </td>
             <td className="px-4 py-3 text-center">
-                <button 
+                <button
                     onClick={() => onViewDetails(player.id)}
                     className="px-3 py-1 bg-teal-600 hover:bg-teal-500 text-white text-sm rounded-md transition-colors"
                 >
@@ -91,7 +91,7 @@ const AnalyticsPopup: React.FC = () => {
     const handleClose = () => dispatch({ type: 'CLOSE_MODAL' });
 
     const homeTeamPlayers = players.filter(p => p.team === 'home');
-    
+
     // Calculate team statistics
     const teamStats = {
         totalGoals: homeTeamPlayers.reduce((sum, p) => sum + p.stats.goals, 0),
@@ -120,7 +120,7 @@ const AnalyticsPopup: React.FC = () => {
             dribbling: player.attributes.dribbling,
             tackling: player.attributes.tackling,
             positioning: player.attributes.positioning,
-        }))
+        })),
     };
 
     const topScorers = homeTeamPlayers
@@ -146,7 +146,7 @@ const AnalyticsPopup: React.FC = () => {
                         <h2 className="text-xl font-bold text-teal-400">Team Analytics</h2>
                     </div>
                     <div className="flex items-center space-x-4">
-                        <select 
+                        <select
                             value={selectedPeriod}
                             onChange={(e) => setSelectedPeriod(e.target.value)}
                             className="px-3 py-1 bg-gray-700 border border-gray-600 rounded-md text-white text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
@@ -269,11 +269,11 @@ const AnalyticsPopup: React.FC = () => {
                                 <div>
                                     <h3 className="font-semibold text-lg text-gray-200 mb-4">Player Attributes Comparison</h3>
                                     <div className="bg-gray-700/30 rounded-lg p-4">
-                                        <RadarChart 
+                                        <RadarChart
                                             datasets={performanceData.playerAttributes.slice(0, 1).map(p => ({
                                                 label: p.name,
                                                 color: 'rgb(20, 184, 166)',
-                                                values: [p.speed, p.passing, p.shooting, p.dribbling, p.tackling, p.positioning]
+                                                values: [p.speed, p.passing, p.shooting, p.dribbling, p.tackling, p.positioning],
                                             }))}
                                             labels={['Speed', 'Passing', 'Shooting', 'Dribbling', 'Tackling', 'Positioning']}
                                         />
@@ -303,9 +303,9 @@ const AnalyticsPopup: React.FC = () => {
                                             </thead>
                                             <tbody>
                                                 {homeTeamPlayers.map(player => (
-                                                    <PlayerStatsRow 
-                                                        key={player.id} 
-                                                        player={player} 
+                                                    <PlayerStatsRow
+                                                        key={player.id}
+                                                        player={player}
                                                         onViewDetails={handleViewPlayerDetails}
                                                     />
                                                 ))}
@@ -420,7 +420,7 @@ const AnalyticsPopup: React.FC = () => {
                         <button className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-md transition-colors">
                             Export Report
                         </button>
-                        <button 
+                        <button
                             onClick={handleClose}
                             className="px-6 py-2 bg-teal-600 hover:bg-teal-500 text-white font-bold rounded-md transition-colors"
                         >

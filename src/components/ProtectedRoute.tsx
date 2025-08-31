@@ -15,11 +15,11 @@ interface ProtectedRouteProps {
  * Enhanced ProtectedRoute component that checks authentication status
  * and role-based permissions, redirecting as appropriate.
  */
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
-  children, 
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  children,
   allowedRoles,
   requiredPermissions,
-  fallbackPath = '/dashboard'
+  fallbackPath = '/dashboard',
 }) => {
   const { authState } = useAuthContext();
   const location = useLocation();
@@ -38,7 +38,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const { canAccess, fallbackPath: configFallback } = canAccessRoute(
     location.pathname,
     authState.user.role,
-    requiredPermissions || []
+    requiredPermissions || [],
   );
 
   if (!canAccess) {
@@ -57,9 +57,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
     // Check if any associations are approved by coach
     const hasApprovedAssociation = authState.familyAssociations.some(
-      assoc => assoc.approvedByCoach
+      assoc => assoc.approvedByCoach,
     );
-    
+
     if (!hasApprovedAssociation && location.pathname !== '/pending-approval') {
       return <Navigate to="/pending-approval" replace />;
     }
