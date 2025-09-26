@@ -43,7 +43,7 @@ export default defineConfig(({ mode }) => {
     },
     build: {
       rollupOptions: {
-        external: (id) => {
+        external: (_id) => {
           // Don't externalize React - keep it bundled to prevent context issues
           return false;
         },

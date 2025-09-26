@@ -42,25 +42,15 @@ Object.defineProperty(global, 'console', {
 // Test component to verify context values
 const TestComponent = () => {
   const { useAuthContext, useTacticsContext } = require('../../hooks');
+  const { authState } = useAuthContext();
+  const { tacticsState } = useTacticsContext();
 
-  try {
-    const { authState } = useAuthContext();
-    const { tacticsState } = useTacticsContext();
-
-    return (
-      <div>
-        <div data-testid="auth-user">{authState.user ? authState.user.email : 'No user'}</div>
-        <div data-testid="tactics-players">{tacticsState.players.length}</div>
-      </div>
-    );
-  } catch (_error) {
-    return (
-      <div>
-        <div data-testid="auth-user">Error</div>
-        <div data-testid="tactics-players">0</div>
-      </div>
-    );
-  }
+  return (
+    <div>
+      <div data-testid="auth-user">{authState.user ? authState.user.email : 'No user'}</div>
+      <div data-testid="tactics-players">{tacticsState.players.length}</div>
+    </div>
+  );
 };
 
 describe('AppProvider', () => {
@@ -218,16 +208,13 @@ describe('AppProvider', () => {
       // Mock the component to trigger state change
       const StateChanger = () => {
         const { useUIContext } = require('../../hooks');
-
-        try {
-          const { dispatch } = useUIContext();
-          React.useEffect(() => {
-            dispatch({ type: 'SET_ACTIVE_SAVE_SLOT', payload: 'slot1' });
-          }, [dispatch]);
-          return <div>State Changer</div>;
-        } catch {
-          return <div>State Changer Error</div>;
-        }
+        const { dispatch } = useUIContext();
+        
+        React.useEffect(() => {
+          dispatch({ type: 'SET_ACTIVE_SAVE_SLOT', payload: 'slot1' });
+        }, [dispatch]);
+        
+        return <div>State Changer</div>;
       };
 
       render(
@@ -262,17 +249,14 @@ describe('AppProvider', () => {
       });
 
       const StateChanger = () => {
-        const { useUIContext } = await import('../../hooks');
-
-        try {
-          const { dispatch } = useUIContext();
-          React.useEffect(() => {
-            dispatch({ type: 'SET_ACTIVE_SAVE_SLOT', payload: 'slot1' });
-          }, [dispatch]);
-          return <div>State Changer</div>;
-        } catch {
-          return <div>State Changer Error</div>;
-        }
+        const { useUIContext } = require('../../hooks');
+        const { dispatch } = useUIContext();
+        
+        React.useEffect(() => {
+          dispatch({ type: 'SET_ACTIVE_SAVE_SLOT', payload: 'slot1' });
+        }, [dispatch]);
+        
+        return <div>State Changer</div>;
       };
 
       render(
@@ -304,26 +288,21 @@ describe('AppProvider', () => {
       };
 
       const AnimationTester = () => {
-        const { useUIContext, useTacticsContext } = await import('../../hooks');
+        const { useUIContext, useTacticsContext } = require('../../hooks');
+        const { dispatch } = useUIContext();
+        const { tacticsState } = useTacticsContext();
 
-        try {
-          const { dispatch } = useUIContext();
-          const { tacticsState } = useTacticsContext();
+        React.useEffect(() => {
+          // Set up animation state
+          dispatch({ type: 'SET_ACTIVE_PLAYBOOK_ITEM', payload: 'test-item' });
+          dispatch({ type: 'START_ANIMATION' });
+        }, [dispatch]);
 
-          React.useEffect(() => {
-            // Set up animation state
-            dispatch({ type: 'SET_ACTIVE_PLAYBOOK_ITEM', payload: 'test-item' });
-            dispatch({ type: 'START_ANIMATION' });
-          }, [dispatch]);
-
-          return (
-            <div data-testid="animation-state">
-              {tacticsState.playbook?.['test-item'] ? 'Has playbook' : 'No playbook'}
-            </div>
-          );
-        } catch {
-          return <div data-testid="animation-state">Error</div>;
-        }
+        return (
+          <div data-testid="animation-state">
+            {tacticsState.playbook?.['test-item'] ? 'Has playbook' : 'No playbook'}
+          </div>
+        );
       };
 
       render(
