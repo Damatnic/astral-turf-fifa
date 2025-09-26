@@ -38,8 +38,12 @@ export default defineConfig(({ mode }) => {
       },
     },
     optimizeDeps: {
-      include: ['react', 'react-dom', 'react-router-dom'],
+      include: ['react', 'react-dom', 'react-router-dom', 'react/jsx-runtime'],
       force: true,
+      esbuildOptions: {
+        target: 'es2020',
+        jsx: 'automatic'
+      }
     },
     esbuild: {
       loader: 'tsx',
@@ -48,6 +52,10 @@ export default defineConfig(({ mode }) => {
     },
     build: {
       rollupOptions: {
+        external: (id) => {
+          // Don't externalize React - keep it bundled to prevent context issues
+          return false;
+        },
         output: {
           manualChunks: id => {
             // Vendor libraries

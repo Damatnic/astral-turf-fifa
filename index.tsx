@@ -1,6 +1,7 @@
 /* eslint-env browser */
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import './src/styles/globals.css';
 import App from './App';
 import { AppProvider } from './src/context/AppProvider';
 import { HashRouter } from 'react-router-dom';

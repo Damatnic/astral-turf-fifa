@@ -41,7 +41,7 @@ Object.defineProperty(global, 'console', {
 
 // Test component to verify context values
 const TestComponent = () => {
-  const { useAuthContext, useTacticsContext } = await import('../../hooks');
+  const { useAuthContext, useTacticsContext } = require('../../hooks');
 
   try {
     const { authState } = useAuthContext();
