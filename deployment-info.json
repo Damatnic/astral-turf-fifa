@@ -19,9 +19,10 @@
   },
   "application": {
     "name": "Astral Turf",
-    "version": "8.0.0",
-    "description": "Enterprise-grade football management application",
-    "aiService": "OpenAI (✅ Successfully integrated and deployed)"
+    "version": "9.0.0",
+    "description": "World-class tactical football management platform with AI-powered analysis",
+    "aiService": "OpenAI (✅ Successfully integrated and deployed)",
+    "tacticsBoard": "✅ COMPLETELY OVERHAULED - Professional-grade with 10+ major enhancements"
   },
   "build": {
     "bundleSize": {
