@@ -405,6 +405,44 @@ export async function generateTeamTalk(
   }
 }
 
+// Missing function implementations
+export async function generateTacticalAnalysis(
+  formation: Formation,
+  players: Player[],
+): Promise<AIInsight[]> {
+  return analyzeFormation(formation, players);
+}
+
+export async function generateFormationSuggestion(
+  players: Player[],
+  teamTactics: TeamTactics,
+  oppositionStyle?: string,
+): Promise<AISuggestedFormation> {
+  return suggestFormation(players, teamTactics, oppositionStyle);
+}
+
+export async function getFormationAnalysis(formation: Formation, players: Player[]): Promise<AIInsight[]> {
+  return analyzeFormation(formation, players);
+}
+
+export async function getPlayerComparison(player1: Player, player2: Player): Promise<AIComparison> {
+  return comparePlayers(player1, player2);
+}
+
+export async function optimizeFormation(
+  players: Player[],
+  teamTactics: TeamTactics,
+): Promise<AISuggestedFormation> {
+  return suggestFormation(players, teamTactics);
+}
+
+export async function generateChat(
+  messages: ChatMessage[],
+  context?: string,
+): Promise<string> {
+  return chatWithAI(messages, context);
+}
+
 // Export the service object
 export const openAiService = {
   generateTacticalAnalysis,

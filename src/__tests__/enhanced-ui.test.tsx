@@ -160,7 +160,7 @@ describe('Enhanced UI Components', () => {
     });
 
     it('should handle click events', async () => {
-      const handleClick = jest.fn();
+      const handleClick = vi.fn();
 
       render(
         <TestWrapper>
@@ -214,7 +214,7 @@ describe('Enhanced UI Components', () => {
     });
 
     it('should handle interactive state', async () => {
-      const handleClick = jest.fn();
+      const handleClick = vi.fn();
 
       render(
         <TestWrapper>
@@ -244,7 +244,7 @@ describe('Enhanced UI Components', () => {
     });
 
     it('should handle input changes', async () => {
-      const handleChange = jest.fn();
+      const handleChange = vi.fn();
 
       render(
         <TestWrapper>
@@ -280,7 +280,7 @@ describe('Enhanced UI Components', () => {
     it('should render correctly', () => {
       render(
         <TestWrapper>
-          <EnhancedSwitch checked={false} onChange={jest.fn()} label="Test Switch" />
+          <EnhancedSwitch checked={false} onChange={vi.fn()} label="Test Switch" />
         </TestWrapper>,
       );
 
@@ -291,7 +291,7 @@ describe('Enhanced UI Components', () => {
     });
 
     it('should handle toggle', async () => {
-      const handleChange = jest.fn();
+      const handleChange = vi.fn();
 
       render(
         <TestWrapper>
@@ -356,7 +356,7 @@ describe('Enhanced UI Components', () => {
 
   describe('Gesture Components', () => {
     it('should render SwipeArea', () => {
-      const handleSwipe = jest.fn();
+      const handleSwipe = vi.fn();
 
       render(
         <TestWrapper>
@@ -371,7 +371,7 @@ describe('Enhanced UI Components', () => {
     });
 
     it('should render Draggable', () => {
-      const handleDrag = jest.fn();
+      const handleDrag = vi.fn();
 
       render(
         <TestWrapper>
@@ -391,7 +391,7 @@ describe('Enhanced UI Components', () => {
         { id: '2', content: <div>Item 2</div> },
         { id: '3', content: <div>Item 3</div> },
       ];
-      const handleReorder = jest.fn();
+      const handleReorder = vi.fn();
 
       render(
         <TestWrapper>
@@ -473,15 +473,15 @@ describe('Enhanced UI Components', () => {
       // Mock matchMedia for prefers-reduced-motion
       Object.defineProperty(window, 'matchMedia', {
         writable: true,
-        value: jest.fn().mockImplementation(query => ({
+        value: vi.fn().mockImplementation(query => ({
           matches: query === '(prefers-reduced-motion: reduce)',
           media: query,
           onchange: null,
-          addListener: jest.fn(),
-          removeListener: jest.fn(),
-          addEventListener: jest.fn(),
-          removeEventListener: jest.fn(),
-          dispatchEvent: jest.fn(),
+          addListener: vi.fn(),
+          removeListener: vi.fn(),
+          addEventListener: vi.fn(),
+          removeEventListener: vi.fn(),
+          dispatchEvent: vi.fn(),
         })),
       });
 
@@ -575,24 +575,31 @@ describe('Integration Tests', () => {
 });
 
 // Mock Chart.js for testing
-vi.mock('chart.js', () => ({
-  Chart: vi.fn().mockImplementation(() => ({
+vi.mock('chart.js', () => {
+  const mockChart = vi.fn().mockImplementation(() => ({
     destroy: vi.fn(),
     update: vi.fn(),
     data: { datasets: [] },
-  })),
-  CategoryScale: vi.fn(),
-  LinearScale: vi.fn(),
-  PointElement: vi.fn(),
-  LineElement: vi.fn(),
-  BarElement: vi.fn(),
-  ArcElement: vi.fn(),
-  RadialLinearScale: vi.fn(),
-  Title: vi.fn(),
-  Tooltip: vi.fn(),
-  Legend: vi.fn(),
-  Filler: vi.fn(),
-}));
+  }));
+
+  // Add register method to the Chart function
+  mockChart.register = vi.fn();
+
+  return {
+    Chart: mockChart,
+    CategoryScale: vi.fn(),
+    LinearScale: vi.fn(),
+    PointElement: vi.fn(),
+    LineElement: vi.fn(),
+    BarElement: vi.fn(),
+    ArcElement: vi.fn(),
+    RadialLinearScale: vi.fn(),
+    Title: vi.fn(),
+    Tooltip: vi.fn(),
+    Legend: vi.fn(),
+    Filler: vi.fn(),
+  };
+});
 
 vi.mock('react-chartjs-2', () => ({
   Line: ({ data }: unknown) => (
@@ -617,7 +624,7 @@ vi.mock('framer-motion', () => ({
     input: ({ children, ...props }: unknown) => <input {...props}>{children}</input>,
   },
   AnimatePresence: ({ children }: unknown) => children,
-  useMotionValue: () => ({ set: jest.fn(), get: jest.fn(() => 0) }),
-  useTransform: () => ({ set: jest.fn(), get: jest.fn(() => 0) }),
-  useDragControls: () => ({ start: jest.fn() }),
+  useMotionValue: () => ({ set: vi.fn(), get: vi.fn(() => 0) }),
+  useTransform: () => ({ set: vi.fn(), get: vi.fn(() => 0) }),
+  useDragControls: () => ({ start: vi.fn() }),
 }));

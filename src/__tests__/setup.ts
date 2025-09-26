@@ -1,6 +1,102 @@
 import { expect, afterEach, beforeAll, afterAll, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
+import React from 'react';
+
+// Mock Chart.js before any imports
+vi.mock('chart.js', () => {
+  const mockChart = {
+    register: vi.fn(),
+    Chart: vi.fn().mockImplementation(() => ({
+      render: vi.fn(),
+      update: vi.fn(),
+      destroy: vi.fn(),
+      reset: vi.fn(),
+      stop: vi.fn(),
+      resize: vi.fn(),
+      clear: vi.fn(),
+      toBase64Image: vi.fn(),
+      generateLegend: vi.fn(),
+      getElementAtEvent: vi.fn(),
+      getElementsAtEvent: vi.fn(),
+      getElementsAtXAxis: vi.fn(),
+      getElementsAtEventForMode: vi.fn(),
+      getDatasetAtEvent: vi.fn(),
+    })),
+    defaults: {
+      global: {
+        responsive: true,
+        maintainAspectRatio: false,
+      },
+    },
+  };
+
+  // Mock all Chart.js components - need to match the import names
+  const chartWithRegister = Object.assign(mockChart.Chart, {
+    register: mockChart.register,
+  });
+
+  return {
+    Chart: chartWithRegister,
+    CategoryScale: vi.fn(),
+    LinearScale: vi.fn(),
+    PointElement: vi.fn(),
+    LineElement: vi.fn(),
+    BarElement: vi.fn(),
+    ArcElement: vi.fn(),
+    RadialLinearScale: vi.fn(),
+    Title: vi.fn(),
+    Tooltip: vi.fn(),
+    Legend: vi.fn(),
+    Filler: vi.fn(),
+    default: chartWithRegister,
+  };
+});
+
+// Mock react-chartjs-2
+vi.mock('react-chartjs-2', () => {
+  const MockChart = React.forwardRef<any, any>((props, ref) => {
+    return React.createElement('div', {
+      'data-testid': `mock-chart-${props.type || 'generic'}`,
+      ref,
+      style: props.style || {},
+      className: props.className || '',
+    });
+  });
+
+  MockChart.displayName = 'MockChart';
+
+  const Line = React.forwardRef<any, any>((props, ref) => 
+    React.createElement(MockChart, { ...props, type: 'line', ref })
+  );
+  Line.displayName = 'Line';
+
+  const Bar = React.forwardRef<any, any>((props, ref) => 
+    React.createElement(MockChart, { ...props, type: 'bar', ref })
+  );
+  Bar.displayName = 'Bar';
+
+  const Doughnut = React.forwardRef<any, any>((props, ref) => 
+    React.createElement(MockChart, { ...props, type: 'doughnut', ref })
+  );
+  Doughnut.displayName = 'Doughnut';
+
+  const Radar = React.forwardRef<any, any>((props, ref) => 
+    React.createElement(MockChart, { ...props, type: 'radar', ref })
+  );
+  Radar.displayName = 'Radar';
+
+  return {
+    Line,
+    Bar,
+    Doughnut,
+    Radar,
+    Pie: Bar,
+    PolarArea: Bar,
+    Scatter: Line,
+    Bubble: Line,
+  };
+});
 
 // Global test setup
 beforeAll(() => {

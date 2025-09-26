@@ -62,45 +62,10 @@ describe('AuthContext', () => {
       const originalError = console.error;
       console.error = vi.fn();
 
-      let errorThrown = false;
-      let errorMessage = '';
-
-      // Custom error boundary to catch the error
-      const ErrorBoundary: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-        try {
-          return <>{children}</>;
-        } catch (_error) {
-          errorThrown = true;
-          errorMessage = (error as Error).message;
-          return <div>Error caught</div>;
-        }
-      };
-
-      // Create a component that uses the hook
-      const TestComponent = () => {
-        try {
-          useAuthContext();
-          return <div>No error</div>;
-        } catch (_error) {
-          errorThrown = true;
-          errorMessage = (_error as Error).message;
-          throw _error;
-        }
-      };
-
-      try {
-        render(
-          <ErrorBoundary>
-            <TestComponent />
-          </ErrorBoundary>,
-        );
-      } catch (_error) {
-        errorThrown = true;
-        errorMessage = (_error as Error).message;
-      }
-
-      expect(errorThrown).toBe(true);
-      expect(errorMessage).toBe('useAuthContext must be used within an AppProvider');
+      // Use renderHook without wrapper to test error throwing
+      expect(() => {
+        renderHook(() => useAuthContext());
+      }).toThrow('useAuthContext must be used within an AppProvider');
 
       console.error = originalError;
     });

@@ -217,7 +217,7 @@ describe('AppProvider', () => {
 
       // Mock the component to trigger state change
       const StateChanger = () => {
-        const { useUIContext } = await import('../../hooks');
+        const { useUIContext } = require('../../hooks');
 
         try {
           const { dispatch } = useUIContext();

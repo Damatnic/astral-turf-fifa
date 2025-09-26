@@ -14,10 +14,10 @@ const isServerSide = typeof window === 'undefined' && typeof process !== 'undefi
 
 // Safe imports for logging services - using fallback logger for tests
 const securityLogger = {
-  info: (message: string, meta?: unknown) => // // console.log(`[INFO] ${message}`, meta),
+  info: (message: string, meta?: unknown) => console.log(`[INFO] ${message}`, meta),
   error: (message: string, meta?: unknown) => console.error(`[ERROR] ${message}`, meta),
-  warn: (message: string, meta?: unknown) => // // console.warn(`[WARN] ${message}`, meta),
-  logSecurityEvent: (type: string, message: string, meta?: unknown) => // // console.log(`[SECURITY] ${type}: ${message}`, meta),
+  warn: (message: string, meta?: unknown) => console.warn(`[WARN] ${message}`, meta),
+  logSecurityEvent: (type: string, message: string, meta?: unknown) => console.log(`[SECURITY] ${type}: ${message}`, meta),
 };
 
 const SecurityEventType = {

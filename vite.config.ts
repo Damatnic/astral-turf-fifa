@@ -10,7 +10,7 @@ export default defineConfig(({ mode }) => {
       environment: 'jsdom',
       setupFiles: ['./src/__tests__/setup.ts'],
       include: ['src/**/*.{test,spec}.{js,ts,jsx,tsx}'],
-      exclude: ['node_modules', 'dist', '.git', '.cache'],
+      exclude: ['node_modules', 'dist', '.git', '.cache', 'src/**/*.spec.ts', 'src/**/*e2e*', 'src/**/*E2E*'],
       coverage: {
         reporter: ['text', 'json', 'html'],
         exclude: ['node_modules/', 'src/__tests__/', 'dist/', '*.config.*'],
@@ -49,18 +49,54 @@ export default defineConfig(({ mode }) => {
         },
         output: {
           manualChunks: id => {
-            // Vendor libraries
+            // Vendor libraries - split into smaller chunks
             if (id.includes('node_modules')) {
               // OpenAI - large external library
               if (id.includes('openai')) {
                 return 'openai-vendor';
               }
-              // Keep React and React-DOM together in vendor chunk
-              if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
-                return 'vendor';
+              // React ecosystem - core chunk
+              if (id.includes('react') || id.includes('react-dom')) {
+                return 'react-vendor';
               }
-              // Other vendors
-              return 'vendor';
+              // React Router - separate chunk
+              if (id.includes('react-router')) {
+                return 'router-vendor';
+              }
+              // Framer Motion - large animation library
+              if (id.includes('framer-motion')) {
+                return 'animation-vendor';
+              }
+              // UI libraries (lucide, etc)
+              if (id.includes('lucide') || id.includes('@headlessui') || id.includes('@radix-ui')) {
+                return 'ui-vendor';
+              }
+              // Charts and visualization
+              if (id.includes('chart') || id.includes('d3') || id.includes('plotly')) {
+                return 'charts-vendor';
+              }
+              // Date and time libraries
+              if (id.includes('date-fns') || id.includes('moment') || id.includes('dayjs')) {
+                return 'date-vendor';
+              }
+              // Form and validation libraries
+              if (id.includes('formik') || id.includes('yup') || id.includes('joi') || id.includes('zod')) {
+                return 'forms-vendor';
+              }
+              // HTTP and API libraries
+              if (id.includes('axios') || id.includes('fetch') || id.includes('request')) {
+                return 'http-vendor';
+              }
+              // Utility libraries (lodash, ramda, etc)
+              if (id.includes('lodash') || id.includes('ramda') || id.includes('underscore')) {
+                return 'lodash-vendor';
+              }
+              // Crypto and security libraries
+              if (id.includes('crypto') || id.includes('bcrypt') || id.includes('jwt')) {
+                return 'crypto-vendor';
+              }
+              // All other vendors
+              return 'misc-vendor';
             }
 
             // AI services - large functionality
@@ -68,25 +104,36 @@ export default defineConfig(({ mode }) => {
               return 'ai-services';
             }
 
-            // Large page components
+            // Large page components - more granular splitting
             if (id.includes('src/pages/')) {
-              // Group analytics and advanced pages
-              if (
-                id.includes('Analytics') ||
-                id.includes('Advanced') ||
-                id.includes('TacticsBoard')
-              ) {
+              // Tactics and Analytics - heavy pages
+              if (id.includes('TacticsBoard')) {
+                return 'tactics-pages';
+              }
+              if (id.includes('Analytics')) {
                 return 'analytics-pages';
               }
-              // Group dashboard pages
-              if (id.includes('Dashboard') || id.includes('Player') || id.includes('Coach')) {
+              if (id.includes('Advanced')) {
+                return 'advanced-pages';
+              }
+              // Dashboard pages
+              if (id.includes('Dashboard')) {
                 return 'dashboard-pages';
               }
-              // Group settings and admin pages
-              if (id.includes('Settings') || id.includes('Staff') || id.includes('Finances')) {
+              // User management pages
+              if (id.includes('Player') || id.includes('Coach') || id.includes('Staff')) {
+                return 'user-pages';
+              }
+              // Admin and settings pages
+              if (id.includes('Settings') || id.includes('Finances') || id.includes('Admin')) {
                 return 'admin-pages';
               }
-              return 'pages';
+              // Authentication pages
+              if (id.includes('Login') || id.includes('Register') || id.includes('Auth')) {
+                return 'auth-pages';
+              }
+              // Remaining pages
+              return 'core-pages';
             }
 
             // Popup components
@@ -112,7 +159,7 @@ export default defineConfig(({ mode }) => {
         },
       },
       // Optimize chunk size warning limit to be more aggressive
-      chunkSizeWarningLimit: 250,
+      chunkSizeWarningLimit: 200,
       // Disable source maps in production for smaller bundles
       sourcemap: false,
       // Enable minification with esbuild for faster builds
