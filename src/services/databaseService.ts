@@ -8,10 +8,10 @@
 import { PrismaClient, Prisma } from '@prisma/client';
 // Fallback logger for tests
 const securityLogger = {
-  info: (message: string, meta?: unknown) => // // console.log(`[DB-INFO] ${message}`, meta),
+  info: (message: string, meta?: unknown) => {}, // console.log(`[DB-INFO] ${message}`, meta),
   error: (message: string, meta?: unknown) => console.error(`[DB-ERROR] ${message}`, meta),
-  warn: (message: string, meta?: unknown) => // // console.warn(`[DB-WARN] ${message}`, meta),
-  logSecurityEvent: (type: string, message: string, meta?: unknown) => // // console.log(`[DB-SECURITY] ${type}: ${message}`, meta),
+  warn: (message: string, meta?: unknown) => {}, // console.warn(`[DB-WARN] ${message}`, meta),
+  logSecurityEvent: (type: string, message: string, meta?: unknown) => {}, // console.log(`[DB-SECURITY] ${type}: ${message}`, meta),
 };
 
 const SecurityEventType = {

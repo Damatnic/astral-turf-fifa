@@ -469,9 +469,10 @@ class CloudStorageService {
     if (typeof TextEncoder === 'undefined' || typeof crypto === 'undefined') {
       return 'checksum-unavailable';
     }
-    const encoder = typeof TextEncoder !== 'undefined' ? new TextEncoder();
+    const encoder = typeof TextEncoder !== 'undefined' ? new TextEncoder() : null;
+    if (!encoder) return 'checksum-unavailable';
     const dataBuffer = encoder.encode(data);
-    const hashBuffer = await typeof crypto !== 'undefined' ? crypto.subtle.digest('SHA-256', dataBuffer);
+    const hashBuffer = await (typeof crypto !== 'undefined' ? crypto.subtle.digest('SHA-256', dataBuffer) : new ArrayBuffer(0));
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
   }
