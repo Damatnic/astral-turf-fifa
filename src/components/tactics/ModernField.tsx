@@ -294,8 +294,8 @@ const ModernField: React.FC<ModernFieldProps> = ({
                   key={slot.id}
                   className="absolute rounded-full border-2 border-dashed"
                   style={{
-                    left: `${slot.position.x}%`,
-                    top: `${slot.position.y}%`,
+                    left: `${slot.position?.x ?? 0}%`,
+                    top: `${slot.position?.y ?? 0}%`,
                     width: '60px',
                     height: '60px',
                     transform: 'translate(-50%, -50%)',

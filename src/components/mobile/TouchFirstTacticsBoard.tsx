@@ -68,7 +68,7 @@ export const TouchFirstTacticsBoard: React.FC<TouchFirstTacticsBoardProps> = ({
     gestureStart: null as Position | null,
     selectedPlayer: null as string | null,
     isDragging: false,
-    longPressTimer: null as NodeJS.Timeout | null
+    longPressTimer: null as ReturnType<typeof setTimeout> | null
   });
 
   const [mobileUI, setMobileUI] = useState({
@@ -250,6 +250,11 @@ export const TouchFirstTacticsBoard: React.FC<TouchFirstTacticsBoardProps> = ({
 
   const findPlayerAtPosition = (position: Position): Player | null => {
     return players.find(player => {
+      // Ensure player has valid position before accessing properties
+      if (!player?.position || typeof player.position.x !== 'number' || typeof player.position.y !== 'number') {
+        return false;
+      }
+      
       const distance = Math.sqrt(
         Math.pow(player.position.x - position.x, 2) +
         Math.pow(player.position.y - position.y, 2)
@@ -390,7 +395,7 @@ export const TouchFirstTacticsBoard: React.FC<TouchFirstTacticsBoardProps> = ({
           </svg>
 
           {/* Players */}
-          {players.map(player => (
+          {players.filter(player => player?.position && typeof player.position.x === 'number' && typeof player.position.y === 'number').map(player => (
             <div
               key={player.id}
               className={`absolute transform -translate-x-1/2 -translate-y-1/2 transition-all duration-200 ${
@@ -399,8 +404,8 @@ export const TouchFirstTacticsBoard: React.FC<TouchFirstTacticsBoardProps> = ({
                   : 'z-10'
               }`}
               style={{
-                left: `${(player.position.x / 100) * 100}%`,
-                top: `${(player.position.y / 100) * 100}%`,
+                left: `${((player.position?.x ?? 0) / 100) * 100}%`,
+                top: `${((player.position?.y ?? 0) / 100) * 100}%`,
                 touchAction: 'none'
               }}
             >
@@ -428,13 +433,13 @@ export const TouchFirstTacticsBoard: React.FC<TouchFirstTacticsBoardProps> = ({
           ))}
 
           {/* Touch Target Areas (Invisible helpers for easier touch) */}
-          {players.map(player => (
+          {players.filter(player => player?.position && typeof player.position.x === 'number' && typeof player.position.y === 'number').map(player => (
             <div
               key={`touch-${player.id}`}
               className="absolute transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 z-30"
               style={{
-                left: `${(player.position.x / 100) * 100}%`,
-                top: `${(player.position.y / 100) * 100}%`,
+                left: `${((player.position?.x ?? 0) / 100) * 100}%`,
+                top: `${((player.position?.y ?? 0) / 100) * 100}%`,
                 touchAction: 'none'
               }}
             />

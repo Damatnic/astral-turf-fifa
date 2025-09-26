@@ -127,8 +127,8 @@ const PlayerStatsOverlay: React.FC<PlayerStatsOverlayProps> = ({
       animate={{ opacity: 1, scale: 1 }}
       className="absolute transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
       style={{
-        left: (stats.position.x / 100) * fieldDimensions.width,
-        top: (stats.position.y / 100) * fieldDimensions.height,
+        left: ((stats.position?.x ?? 0) / 100) * fieldDimensions.width,
+        top: ((stats.position?.y ?? 0) / 100) * fieldDimensions.height,
       }}
     >
       {/* Performance Ring */}
