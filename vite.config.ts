@@ -30,11 +30,16 @@ export default defineConfig(({ mode }) => {
     define: {
       'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY || env.API_KEY),
       'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY || env.API_KEY),
+      global: 'globalThis',
     },
     resolve: {
       alias: {
         '@': resolve(__dirname, '.'),
       },
+    },
+    optimizeDeps: {
+      include: ['react', 'react-dom', 'react-router-dom'],
+      force: true,
     },
     esbuild: {
       loader: 'tsx',
@@ -51,13 +56,9 @@ export default defineConfig(({ mode }) => {
               if (id.includes('@google/genai')) {
                 return 'google-genai';
               }
-              // React core
-              if (id.includes('react') || id.includes('react-dom')) {
-                return 'react-vendor';
-              }
-              // Router
-              if (id.includes('react-router')) {
-                return 'router';
+              // Keep React and React-DOM together in vendor chunk
+              if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
+                return 'vendor';
               }
               // Other vendors
               return 'vendor';
