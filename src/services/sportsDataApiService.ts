@@ -166,7 +166,7 @@ class SportsDataApiService {
   async initialize(): Promise<void> {
     await this.loadApiCredentials();
     await this.testConnections();
-    // // console.log('⚽ Sports data API service initialized');
+    // // // // console.log('⚽ Sports data API service initialized');
   }
 
   /**
@@ -192,7 +192,7 @@ class SportsDataApiService {
       this.setupApiClient(provider);
     }
 
-    // // console.log(`📊 Sports data provider configured: ${provider.name}`);
+    // // // // console.log(`📊 Sports data provider configured: ${provider.name}`);
   }
 
   /**
@@ -255,7 +255,7 @@ class SportsDataApiService {
       return players;
 
     } catch (_error) {
-      console.error('❌ Failed to search professional players:', error);
+      console.error('❌ Failed to search professional players:', _error);
       return [];
     }
   }
@@ -305,7 +305,7 @@ class SportsDataApiService {
       return leagueData;
 
     } catch (_error) {
-      console.error('❌ Failed to get league data:', error);
+      console.error('❌ Failed to get league data:', _error);
       return null;
     }
   }
@@ -380,7 +380,7 @@ class SportsDataApiService {
       return matchData;
 
     } catch (_error) {
-      console.error('❌ Failed to get match data:', error);
+      console.error('❌ Failed to get match data:', _error);
       return null;
     }
   }
@@ -418,10 +418,10 @@ class SportsDataApiService {
           break;
       }
 
-      // // console.log(`📱 Connected ${deviceType} device for player ${playerId}`);
+      // // // // console.log(`📱 Connected ${deviceType} device for player ${playerId}`);
 
     } catch (_error) {
-      console.error(`❌ Failed to connect ${deviceType} device:`, error);
+      console.error(`❌ Failed to connect ${deviceType} device:`, _error);
       throw error;
     }
   }
@@ -461,7 +461,7 @@ class SportsDataApiService {
       return performanceData;
 
     } catch (_error) {
-      console.error('❌ Failed to get performance data:', error);
+      console.error('❌ Failed to get performance data:', _error);
       return [];
     }
   }
@@ -509,7 +509,7 @@ class SportsDataApiService {
       return marketData;
 
     } catch (_error) {
-      console.error('❌ Failed to get market data:', error);
+      console.error('❌ Failed to get market data:', _error);
       return null;
     }
   }
@@ -542,7 +542,7 @@ class SportsDataApiService {
       return benchmarkData;
 
     } catch (_error) {
-      console.error('❌ Failed to get position benchmarks:', error);
+      console.error('❌ Failed to get position benchmarks:', _error);
       return null;
     }
   }
@@ -559,7 +559,7 @@ class SportsDataApiService {
 
       // WebSocket connection for live data
       const wsUrl = `${provider.baseUrl.replace('http', 'ws')}/matches/${matchId}/live`;
-      const ws = typeof WebSocket !== 'undefined' ? new WebSocket(wsUrl) : null;
+      const ws = typeof WebSocket !== 'undefined' ? typeof WebSocket !== 'undefined' ? new WebSocket(wsUrl) : null;
 
       if (ws) {
         ws.onmessage = (event) => {
@@ -574,11 +574,11 @@ class SportsDataApiService {
           console.error('❌ Live match stream error:', error);
         };
 
-        // // console.log(`📡 Started live match stream for match ${matchId}`);
+        // // // // console.log(`📡 Started live match stream for match ${matchId}`);
       }
 
     } catch (_error) {
-      console.error('❌ Failed to start live match stream:', error);
+      console.error('❌ Failed to start live match stream:', _error);
     }
   }
 
@@ -607,7 +607,7 @@ class SportsDataApiService {
       };
 
     } catch (_error) {
-      console.error('❌ Failed to generate injury prevention insights:', error);
+      console.error('❌ Failed to generate injury prevention insights:', _error);
       return { riskScore: 0, factors: [], recommendations: [] };
     }
   }
@@ -783,22 +783,22 @@ class SportsDataApiService {
   }
 
   private async connectCatapultDevice(provider: SportsDataProvider, deviceId: string, playerId: string): Promise<void> {
-    // // console.log(`🔗 Connecting Catapult device ${deviceId} for player ${playerId}`);
+    // // // // console.log(`🔗 Connecting Catapult device ${deviceId} for player ${playerId}`);
     // Catapult-specific connection logic
   }
 
   private async connectStatsSportsDevice(provider: SportsDataProvider, deviceId: string, playerId: string): Promise<void> {
-    // // console.log(`🔗 Connecting STATSports device ${deviceId} for player ${playerId}`);
+    // // // // console.log(`🔗 Connecting STATSports device ${deviceId} for player ${playerId}`);
     // STATSports-specific connection logic
   }
 
   private async connectPolarDevice(provider: SportsDataProvider, deviceId: string, playerId: string): Promise<void> {
-    // // console.log(`🔗 Connecting Polar device ${deviceId} for player ${playerId}`);
+    // // // // console.log(`🔗 Connecting Polar device ${deviceId} for player ${playerId}`);
     // Polar-specific connection logic
   }
 
   private async connectGarminDevice(provider: SportsDataProvider, deviceId: string, playerId: string): Promise<void> {
-    // // console.log(`🔗 Connecting Garmin device ${deviceId} for player ${playerId}`);
+    // // // // console.log(`🔗 Connecting Garmin device ${deviceId} for player ${playerId}`);
     // Garmin-specific connection logic
   }
 
@@ -900,7 +900,7 @@ class SportsDataApiService {
 
   private async loadApiCredentials(): Promise<void> {
     // Load API credentials from secure storage
-    // // console.log('🔐 Loading API credentials');
+    // // // // console.log('🔐 Loading API credentials');
   }
 
   private async testConnections(): Promise<void> {
@@ -910,7 +910,7 @@ class SportsDataApiService {
           const client = this.apiClients.get(provider.id);
           if (client) {
             await client.get('/health', { timeout: 5000 });
-            // // console.log(`✅ ${provider.name} connection successful`);
+            // // // // console.log(`✅ ${provider.name} connection successful`);
           }
         } catch (_error) {
           console.error(`❌ ${provider.name} connection failed:`, error.message);

@@ -61,7 +61,7 @@ function runCommandWithInput(command, args = [], inputs = []) {
     // Start sending inputs after a brief delay
     setTimeout(sendInputs, 3000);
 
-    child.on('close', (code) => {
+    child.on('close', code => {
       if (code === 0) {
         resolve(code);
       } else {
@@ -69,18 +69,21 @@ function runCommandWithInput(command, args = [], inputs = []) {
       }
     });
 
-    child.on('error', (error) => {
+    child.on('error', error => {
       reject(error);
     });
   });
 }
 
 async function main() {
-  log(`
+  log(
+    `
 🌟 ================================== 🌟
    ASTRAL TURF AUTO DEPLOYMENT
 🌟 ================================== 🌟
-`, colors.blue);
+`,
+    colors.blue
+  );
 
   try {
     // Step 1: Check if logged in
@@ -93,11 +96,11 @@ async function main() {
         });
 
         let output = '';
-        child.stdout.on('data', (data) => {
+        child.stdout.on('data', data => {
           output += data.toString();
         });
 
-        child.on('close', (code) => {
+        child.on('close', code => {
           if (code === 0 && output.trim() && !output.includes('Error')) {
             resolve();
           } else {
@@ -116,33 +119,33 @@ async function main() {
     // Step 2: Create vercel.json
     logStep('Creating vercel.json configuration...');
     const vercelConfig = {
-      "name": "astral-turf",
-      "version": 2,
-      "builds": [
+      name: 'astral-turf',
+      version: 2,
+      builds: [
         {
-          "src": "package.json",
-          "use": "@vercel/static-build",
-          "config": {
-            "distDir": "dist",
+          src: 'package.json',
+          use: '@vercel/static-build',
+          config: {
+            distDir: 'dist',
           },
         },
       ],
-      "routes": [
+      routes: [
         {
-          "src": "/health",
-          "dest": "/api/health.js",
+          src: '/health',
+          dest: '/api/health.js',
         },
         {
-          "src": "/api/(.*)",
-          "dest": "/api/$1.js",
+          src: '/api/(.*)',
+          dest: '/api/$1.js',
         },
         {
-          "src": "/(.*)",
-          "dest": "/index.html",
+          src: '/(.*)',
+          dest: '/index.html',
         },
       ],
-      "env": {
-        "NODE_ENV": "production",
+      env: {
+        NODE_ENV: 'production',
       },
     };
 
@@ -157,10 +160,10 @@ async function main() {
     logWarning('- Directory: ./');
 
     const inputs = [
-      'y',           // Set up and deploy?
+      'y', // Set up and deploy?
       'astral-turf', // Project name
-      './',          // Directory
-      'n',            // Link to existing project? No, create new
+      './', // Directory
+      'n', // Link to existing project? No, create new
     ];
 
     await runCommandWithInput('vercel', [], inputs);
@@ -168,7 +171,8 @@ async function main() {
     logSuccess('Deployment completed!');
 
     // Step 4: Show deployment info
-    log(`
+    log(
+      `
 🎉 DEPLOYMENT SUCCESSFUL! 🎉
 
 📱 Your application should now be deployed to Vercel!
@@ -192,8 +196,9 @@ GEMINI_API_KEY=your-gemini-api-key-here
 📊 Check deployment status:
    vercel ls
    vercel logs
-`, colors.green);
-
+`,
+      colors.green
+    );
   } catch (error) {
     logError(`Deployment failed: ${error.message}`);
     logError('');

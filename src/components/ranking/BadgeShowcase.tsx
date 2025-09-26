@@ -13,19 +13,29 @@ const BadgeShowcase: React.FC<BadgeShowcaseProps> = ({ badges, playerName }) => 
 
   const getRarityColor = (rarity: PlayerBadge['rarity']) => {
     switch (rarity) {
-      case 'legendary': return 'from-purple-600 to-pink-600 border-purple-500';
-      case 'epic': return 'from-purple-500 to-blue-600 border-purple-400';
-      case 'rare': return 'from-blue-500 to-cyan-600 border-blue-400';
-      case 'uncommon': return 'from-green-500 to-emerald-600 border-green-400';
-      default: return 'from-gray-500 to-gray-600 border-gray-400';
+      case 'legendary':
+        return 'from-purple-600 to-pink-600 border-purple-500';
+      case 'epic':
+        return 'from-purple-500 to-blue-600 border-purple-400';
+      case 'rare':
+        return 'from-blue-500 to-cyan-600 border-blue-400';
+      case 'uncommon':
+        return 'from-green-500 to-emerald-600 border-green-400';
+      default:
+        return 'from-gray-500 to-gray-600 border-gray-400';
     }
   };
 
-  const badgesByRarity = badges.reduce((acc, badge) => {
-    if (!acc[badge.rarity]) {acc[badge.rarity] = [];}
-    acc[badge.rarity].push(badge);
-    return acc;
-  }, {} as Record<string, PlayerBadge[]>);
+  const badgesByRarity = badges.reduce(
+    (acc, badge) => {
+      if (!acc[badge.rarity]) {
+        acc[badge.rarity] = [];
+      }
+      acc[badge.rarity].push(badge);
+      return acc;
+    },
+    {} as Record<string, PlayerBadge[]>,
+  );
 
   return (
     <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
@@ -39,7 +49,9 @@ const BadgeShowcase: React.FC<BadgeShowcaseProps> = ({ badges, playerName }) => 
         <div className="space-y-6">
           {(['legendary', 'epic', 'rare', 'uncommon', 'common'] as const).map(rarity => {
             const rarityBadges = badgesByRarity[rarity];
-            if (!rarityBadges?.length) {return null;}
+            if (!rarityBadges?.length) {
+              return null;
+            }
 
             return (
               <div key={rarity}>
@@ -77,9 +89,11 @@ const BadgeShowcase: React.FC<BadgeShowcaseProps> = ({ badges, playerName }) => 
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             className="bg-gray-800 rounded-lg p-6 max-w-sm w-full mx-4 border border-gray-700"
-            onClick={(e) => e.stopPropagation()}
+            onClick={e => e.stopPropagation()}
           >
-            <div className={`w-24 h-24 mx-auto rounded-lg bg-gradient-to-br ${getRarityColor(selectedBadge.rarity)} p-1 mb-4`}>
+            <div
+              className={`w-24 h-24 mx-auto rounded-lg bg-gradient-to-br ${getRarityColor(selectedBadge.rarity)} p-1 mb-4`}
+            >
               <div className="w-full h-full bg-gray-900 rounded-lg flex items-center justify-center">
                 <span className="text-4xl">🏅</span>
               </div>

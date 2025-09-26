@@ -19,13 +19,13 @@ spec:
     prefix: production
   config:
     region: us-east-1
-    s3ForcePathStyle: "false"
+    s3ForcePathStyle: 'false'
     s3Url: https://s3.us-east-1.amazonaws.com
-    checksumAlgorithm: ""
-  
+    checksumAlgorithm: ''
+
   # Validation frequency
   validationFrequency: 24h
-  
+
   # Access mode
   accessMode: ReadWrite
 
@@ -56,78 +56,78 @@ metadata:
     app.kubernetes.io/component: backup-schedule
 spec:
   # Run at 2:00 AM UTC every day
-  schedule: "0 2 * * *"
-  
+  schedule: '0 2 * * *'
+
   template:
     # Include specific namespaces
     includedNamespaces:
-    - astral-turf
-    - monitoring
-    
+      - astral-turf
+      - monitoring
+
     # Include specific resources
     includedResources:
-    - persistentvolumes
-    - persistentvolumeclaims
-    - secrets
-    - configmaps
-    - deployments
-    - services
-    - ingresses
-    - servicemonitors
-    - prometheusrules
-    
+      - persistentvolumes
+      - persistentvolumeclaims
+      - secrets
+      - configmaps
+      - deployments
+      - services
+      - ingresses
+      - servicemonitors
+      - prometheusrules
+
     # Exclude temporary resources
     excludedResources:
-    - pods
-    - replicasets
-    - events
-    
+      - pods
+      - replicasets
+      - events
+
     # Label selector for specific resources
     labelSelector:
       matchLabels:
-        backup: "enabled"
-    
+        backup: 'enabled'
+
     # Snapshot volumes
     snapshotVolumes: true
-    
+
     # Include cluster resources
     includeClusterResources: true
-    
+
     # TTL for backups (30 days)
     ttl: 720h
-    
+
     # Storage location
     storageLocation: astral-turf-backup-storage
-    
+
     # Volume snapshot locations
     volumeSnapshotLocations:
-    - astral-turf-snapshot-location
-    
+      - astral-turf-snapshot-location
+
     # Backup hooks
     hooks:
       resources:
-      - name: postgres-backup-hook
-        includedNamespaces:
-        - astral-turf
-        labelSelector:
-          matchLabels:
-            app: postgres
-        pre:
-        - exec:
-            container: postgres
-            command:
-            - /bin/bash
-            - -c
-            - "pg_dump -h localhost -U astral astral_turf > /tmp/backup.sql"
-            onError: Fail
-            timeout: 10m
-        post:
-        - exec:
-            container: postgres
-            command:
-            - /bin/bash
-            - -c
-            - "rm -f /tmp/backup.sql"
+        - name: postgres-backup-hook
+          includedNamespaces:
+            - astral-turf
+          labelSelector:
+            matchLabels:
+              app: postgres
+          pre:
+            - exec:
+                container: postgres
+                command:
+                  - /bin/bash
+                  - -c
+                  - 'pg_dump -h localhost -U astral astral_turf > /tmp/backup.sql'
+                onError: Fail
+                timeout: 10m
+          post:
+            - exec:
+                container: postgres
+                command:
+                  - /bin/bash
+                  - -c
+                  - 'rm -f /tmp/backup.sql'
 
 ---
 # Weekly Full Backup Schedule
@@ -141,41 +141,41 @@ metadata:
     app.kubernetes.io/component: backup-schedule
 spec:
   # Run at 1:00 AM UTC every Sunday
-  schedule: "0 1 * * 0"
-  
+  schedule: '0 1 * * 0'
+
   template:
     # Include all namespaces except system ones
     includedNamespaces:
-    - astral-turf
-    - monitoring
-    - ingress-nginx
-    - cert-manager
-    
+      - astral-turf
+      - monitoring
+      - ingress-nginx
+      - cert-manager
+
     # Include all resources
     includedResources: []
-    
+
     # Exclude ephemeral resources
     excludedResources:
-    - pods
-    - replicasets
-    - events
-    - endpoints
-    
+      - pods
+      - replicasets
+      - events
+      - endpoints
+
     # Snapshot all volumes
     snapshotVolumes: true
-    
+
     # Include cluster-scoped resources
     includeClusterResources: true
-    
+
     # TTL for weekly backups (90 days)
     ttl: 2160h
-    
+
     # Storage location
     storageLocation: astral-turf-backup-storage
-    
+
     # Volume snapshot locations
     volumeSnapshotLocations:
-    - astral-turf-snapshot-location
+      - astral-turf-snapshot-location
 
 ---
 # Monthly Archive Backup Schedule
@@ -189,40 +189,40 @@ metadata:
     app.kubernetes.io/component: backup-schedule
 spec:
   # Run at 12:00 AM UTC on the 1st of every month
-  schedule: "0 0 1 * *"
-  
+  schedule: '0 0 1 * *'
+
   template:
     # Include all application namespaces
     includedNamespaces:
-    - astral-turf
-    - monitoring
-    
+      - astral-turf
+      - monitoring
+
     # Include all resources
     includedResources: []
-    
+
     # Exclude runtime resources
     excludedResources:
-    - pods
-    - replicasets
-    - events
-    - endpoints
-    - leases
-    
+      - pods
+      - replicasets
+      - events
+      - endpoints
+      - leases
+
     # Snapshot volumes
     snapshotVolumes: true
-    
+
     # Include cluster resources
     includeClusterResources: true
-    
+
     # TTL for monthly archives (1 year)
     ttl: 8760h
-    
+
     # Storage location
     storageLocation: astral-turf-backup-storage
-    
+
     # Volume snapshot locations
     volumeSnapshotLocations:
-    - astral-turf-snapshot-location
+      - astral-turf-snapshot-location
 
 ---
 # Backup Verification Job
@@ -236,11 +236,11 @@ metadata:
     app.kubernetes.io/component: backup-verification
 spec:
   # Run every day at 6:00 AM UTC
-  schedule: "0 6 * * *"
-  
+  schedule: '0 6 * * *'
+
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3
-  
+
   jobTemplate:
     spec:
       template:
@@ -249,67 +249,67 @@ spec:
             app: backup-verification
         spec:
           restartPolicy: OnFailure
-          
+
           containers:
-          - name: backup-verifier
-            image: velero/velero:v1.11.1
-            command:
-            - /bin/bash
-            - -c
-            - |
-              #!/bin/bash
-              set -e
-              
-              echo "Starting backup verification..."
-              
-              # Get the latest backup
-              LATEST_BACKUP=$(velero backup get -o json | jq -r '.items | sort_by(.metadata.creationTimestamp) | last | .metadata.name')
-              
-              if [ "$LATEST_BACKUP" = "null" ]; then
-                echo "No backups found!"
-                exit 1
-              fi
-              
-              echo "Latest backup: $LATEST_BACKUP"
-              
-              # Check backup status
-              BACKUP_STATUS=$(velero backup describe $LATEST_BACKUP -o json | jq -r '.status.phase')
-              
-              if [ "$BACKUP_STATUS" != "Completed" ]; then
-                echo "Latest backup is not completed. Status: $BACKUP_STATUS"
-                exit 1
-              fi
-              
-              # Check for errors
-              ERRORS=$(velero backup describe $LATEST_BACKUP -o json | jq -r '.status.errors // 0')
-              
-              if [ "$ERRORS" -gt 0 ]; then
-                echo "Latest backup has $ERRORS errors"
-                exit 1
-              fi
-              
-              echo "Backup verification successful!"
-              
-              # Send notification (webhook)
-              curl -X POST "${WEBHOOK_URL}" \
-                -H "Content-Type: application/json" \
-                -d "{\"message\": \"Backup verification successful for $LATEST_BACKUP\"}"
-            
-            env:
-            - name: WEBHOOK_URL
-              valueFrom:
-                secretKeyRef:
-                  name: backup-webhook
-                  key: url
-            
-            resources:
-              requests:
-                cpu: 100m
-                memory: 128Mi
-              limits:
-                cpu: 200m
-                memory: 256Mi
-          
+            - name: backup-verifier
+              image: velero/velero:v1.11.1
+              command:
+                - /bin/bash
+                - -c
+                - |
+                  #!/bin/bash
+                  set -e
+
+                  echo "Starting backup verification..."
+
+                  # Get the latest backup
+                  LATEST_BACKUP=$(velero backup get -o json | jq -r '.items | sort_by(.metadata.creationTimestamp) | last | .metadata.name')
+
+                  if [ "$LATEST_BACKUP" = "null" ]; then
+                    echo "No backups found!"
+                    exit 1
+                  fi
+
+                  echo "Latest backup: $LATEST_BACKUP"
+
+                  # Check backup status
+                  BACKUP_STATUS=$(velero backup describe $LATEST_BACKUP -o json | jq -r '.status.phase')
+
+                  if [ "$BACKUP_STATUS" != "Completed" ]; then
+                    echo "Latest backup is not completed. Status: $BACKUP_STATUS"
+                    exit 1
+                  fi
+
+                  # Check for errors
+                  ERRORS=$(velero backup describe $LATEST_BACKUP -o json | jq -r '.status.errors // 0')
+
+                  if [ "$ERRORS" -gt 0 ]; then
+                    echo "Latest backup has $ERRORS errors"
+                    exit 1
+                  fi
+
+                  echo "Backup verification successful!"
+
+                  # Send notification (webhook)
+                  curl -X POST "${WEBHOOK_URL}" \
+                    -H "Content-Type: application/json" \
+                    -d "{\"message\": \"Backup verification successful for $LATEST_BACKUP\"}"
+
+              env:
+                - name: WEBHOOK_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: backup-webhook
+                      key: url
+
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  cpu: 200m
+                  memory: 256Mi
+
           serviceAccountName: velero
 
 ---
@@ -328,9 +328,9 @@ spec:
     matchLabels:
       app.kubernetes.io/name: velero
   endpoints:
-  - port: monitoring
-    interval: 30s
-    path: /metrics
+    - port: monitoring
+      interval: 30s
+      path: /metrics
 
 ---
 # Backup Alerts
@@ -346,48 +346,47 @@ metadata:
     role: alert-rules
 spec:
   groups:
-  - name: velero-backup
-    interval: 30s
-    rules:
-    
-    # Backup failed
-    - alert: VeleroBackupFailed
-      expr: |
-        increase(velero_backup_failure_total[1h]) > 0
-      for: 5m
-      labels:
-        severity: critical
-        component: backup
-      annotations:
-        summary: "Velero backup failed"
-        description: "Velero backup has failed in the last hour"
-        runbook_url: "https://docs.astral-turf.com/runbooks/backup-failed"
-    
-    # No recent backup
-    - alert: VeleroNoRecentBackup
-      expr: |
-        time() - velero_backup_last_successful_timestamp > 86400
-      for: 30m
-      labels:
-        severity: warning
-        component: backup
-      annotations:
-        summary: "No recent Velero backup"
-        description: "No successful backup in the last 24 hours"
-        runbook_url: "https://docs.astral-turf.com/runbooks/no-recent-backup"
-    
-    # Backup duration too long
-    - alert: VeleroBackupTooLong
-      expr: |
-        velero_backup_duration_seconds > 3600
-      for: 5m
-      labels:
-        severity: warning
-        component: backup
-      annotations:
-        summary: "Velero backup taking too long"
-        description: "Backup {{ $labels.backup_name }} has been running for more than 1 hour"
-        runbook_url: "https://docs.astral-turf.com/runbooks/backup-duration"
+    - name: velero-backup
+      interval: 30s
+      rules:
+        # Backup failed
+        - alert: VeleroBackupFailed
+          expr: |
+            increase(velero_backup_failure_total[1h]) > 0
+          for: 5m
+          labels:
+            severity: critical
+            component: backup
+          annotations:
+            summary: 'Velero backup failed'
+            description: 'Velero backup has failed in the last hour'
+            runbook_url: 'https://docs.astral-turf.com/runbooks/backup-failed'
+
+        # No recent backup
+        - alert: VeleroNoRecentBackup
+          expr: |
+            time() - velero_backup_last_successful_timestamp > 86400
+          for: 30m
+          labels:
+            severity: warning
+            component: backup
+          annotations:
+            summary: 'No recent Velero backup'
+            description: 'No successful backup in the last 24 hours'
+            runbook_url: 'https://docs.astral-turf.com/runbooks/no-recent-backup'
+
+        # Backup duration too long
+        - alert: VeleroBackupTooLong
+          expr: |
+            velero_backup_duration_seconds > 3600
+          for: 5m
+          labels:
+            severity: warning
+            component: backup
+          annotations:
+            summary: 'Velero backup taking too long'
+            description: 'Backup {{ $labels.backup_name }} has been running for more than 1 hour'
+            runbook_url: 'https://docs.astral-turf.com/runbooks/backup-duration'
 
 ---
 # Cross-Region Backup Replication
@@ -401,11 +400,11 @@ metadata:
     app.kubernetes.io/component: cross-region-sync
 spec:
   # Run every 6 hours
-  schedule: "0 */6 * * *"
-  
+  schedule: '0 */6 * * *'
+
   successfulJobsHistoryLimit: 2
   failedJobsHistoryLimit: 2
-  
+
   jobTemplate:
     spec:
       template:
@@ -414,50 +413,50 @@ spec:
             app: cross-region-sync
         spec:
           restartPolicy: OnFailure
-          
+
           containers:
-          - name: s3-sync
-            image: amazon/aws-cli:2.13.0
-            command:
-            - /bin/bash
-            - -c
-            - |
-              #!/bin/bash
-              set -e
-              
-              echo "Starting cross-region backup synchronization..."
-              
-              # Sync from primary to secondary region
-              aws s3 sync s3://astral-turf-velero-backups s3://astral-turf-velero-backups-dr \
-                --region us-west-2 \
-                --storage-class STANDARD_IA \
-                --exclude "*.tmp" \
-                --delete
-              
-              echo "Cross-region sync completed successfully"
-              
-              # Verify sync
-              PRIMARY_COUNT=$(aws s3 ls s3://astral-turf-velero-backups --recursive | wc -l)
-              SECONDARY_COUNT=$(aws s3 ls s3://astral-turf-velero-backups-dr --recursive | wc -l)
-              
-              echo "Primary bucket files: $PRIMARY_COUNT"
-              echo "Secondary bucket files: $SECONDARY_COUNT"
-              
-              if [ "$PRIMARY_COUNT" -ne "$SECONDARY_COUNT" ]; then
-                echo "Warning: File count mismatch between regions"
-                exit 1
-              fi
-            
-            env:
-            - name: AWS_DEFAULT_REGION
-              value: us-east-1
-            
-            resources:
-              requests:
-                cpu: 100m
-                memory: 256Mi
-              limits:
-                cpu: 500m
-                memory: 512Mi
-          
+            - name: s3-sync
+              image: amazon/aws-cli:2.13.0
+              command:
+                - /bin/bash
+                - -c
+                - |
+                  #!/bin/bash
+                  set -e
+
+                  echo "Starting cross-region backup synchronization..."
+
+                  # Sync from primary to secondary region
+                  aws s3 sync s3://astral-turf-velero-backups s3://astral-turf-velero-backups-dr \
+                    --region us-west-2 \
+                    --storage-class STANDARD_IA \
+                    --exclude "*.tmp" \
+                    --delete
+
+                  echo "Cross-region sync completed successfully"
+
+                  # Verify sync
+                  PRIMARY_COUNT=$(aws s3 ls s3://astral-turf-velero-backups --recursive | wc -l)
+                  SECONDARY_COUNT=$(aws s3 ls s3://astral-turf-velero-backups-dr --recursive | wc -l)
+
+                  echo "Primary bucket files: $PRIMARY_COUNT"
+                  echo "Secondary bucket files: $SECONDARY_COUNT"
+
+                  if [ "$PRIMARY_COUNT" -ne "$SECONDARY_COUNT" ]; then
+                    echo "Warning: File count mismatch between regions"
+                    exit 1
+                  fi
+
+              env:
+                - name: AWS_DEFAULT_REGION
+                  value: us-east-1
+
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+                limits:
+                  cpu: 500m
+                  memory: 512Mi
+
           serviceAccountName: velero

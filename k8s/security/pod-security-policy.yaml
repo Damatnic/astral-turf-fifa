@@ -20,15 +20,15 @@ spec:
   # Privilege and access controls
   privileged: false
   allowPrivilegeEscalation: false
-  
+
   # Required security context
   requiredDropCapabilities:
     - ALL
-  
+
   # Disallow adding capabilities
   allowedCapabilities: []
   defaultAddCapabilities: []
-  
+
   # Volume restrictions
   volumes:
     - 'configMap'
@@ -37,46 +37,46 @@ spec:
     - 'secret'
     - 'downwardAPI'
     - 'persistentVolumeClaim'
-  
+
   # Host network restrictions
   hostNetwork: false
   hostIPC: false
   hostPID: false
-  
+
   # Host path restrictions
   allowedHostPaths: []
-  
+
   # User restrictions
   runAsUser:
     rule: 'MustRunAsNonRoot'
-  
+
   runAsGroup:
     rule: 'MustRunAs'
     ranges:
       - min: 1000
         max: 65535
-  
+
   # Supplemental groups
   supplementalGroups:
     rule: 'MustRunAs'
     ranges:
       - min: 1000
         max: 65535
-  
+
   # File system restrictions
   fsGroup:
     rule: 'MustRunAs'
     ranges:
       - min: 1000
         max: 65535
-  
+
   # Read-only root filesystem
   readOnlyRootFilesystem: true
-  
+
   # SELinux
   seLinux:
     rule: 'RunAsAny'
-  
+
   # Forbidden sysctls
   forbiddenSysctls:
     - '*'
@@ -91,11 +91,11 @@ metadata:
     app.kubernetes.io/name: astral-turf
     app.kubernetes.io/component: security
 rules:
-- apiGroups: ['policy']
-  resources: ['podsecuritypolicies']
-  verbs: ['use']
-  resourceNames:
-  - astral-turf-psp
+  - apiGroups: ['policy']
+    resources: ['podsecuritypolicies']
+    verbs: ['use']
+    resourceNames:
+      - astral-turf-psp
 
 ---
 # Cluster Role Binding for PSP
@@ -111,9 +111,9 @@ roleRef:
   name: astral-turf-psp-user
   apiGroup: rbac.authorization.k8s.io
 subjects:
-- kind: ServiceAccount
-  name: astral-turf-app
-  namespace: astral-turf
+  - kind: ServiceAccount
+    name: astral-turf-app
+    namespace: astral-turf
 
 ---
 # Pod Security Policy for Privileged Workloads (monitoring, ingress)
@@ -129,13 +129,13 @@ spec:
   privileged: true
   allowPrivilegeEscalation: true
   allowedCapabilities:
-  - '*'
+    - '*'
   volumes:
-  - '*'
+    - '*'
   hostNetwork: true
   hostPorts:
-  - min: 0
-    max: 65535
+    - min: 0
+      max: 65535
   hostIPC: true
   hostPID: true
   runAsUser:
@@ -156,11 +156,11 @@ metadata:
   labels:
     app.kubernetes.io/component: security
 rules:
-- apiGroups: ['policy']
-  resources: ['podsecuritypolicies']
-  verbs: ['use']
-  resourceNames:
-  - privileged-psp
+  - apiGroups: ['policy']
+    resources: ['podsecuritypolicies']
+    verbs: ['use']
+    resourceNames:
+      - privileged-psp
 
 ---
 # Cluster Role Binding for Privileged Workloads
@@ -175,18 +175,18 @@ roleRef:
   name: privileged-psp-user
   apiGroup: rbac.authorization.k8s.io
 subjects:
-# NGINX Ingress Controller
-- kind: ServiceAccount
-  name: nginx-ingress-controller
-  namespace: ingress-nginx
-# Prometheus Node Exporter
-- kind: ServiceAccount
-  name: prometheus-node-exporter
-  namespace: monitoring
-# Kube-proxy
-- kind: ServiceAccount
-  name: kube-proxy
-  namespace: kube-system
+  # NGINX Ingress Controller
+  - kind: ServiceAccount
+    name: nginx-ingress-controller
+    namespace: ingress-nginx
+  # Prometheus Node Exporter
+  - kind: ServiceAccount
+    name: prometheus-node-exporter
+    namespace: monitoring
+  # Kube-proxy
+  - kind: ServiceAccount
+    name: kube-proxy
+    namespace: kube-system
 
 ---
 # Pod Security Standards (for Kubernetes 1.23+)
@@ -199,7 +199,7 @@ metadata:
     pod-security.kubernetes.io/enforce: baseline
     pod-security.kubernetes.io/audit: restricted
     pod-security.kubernetes.io/warn: restricted
-    
+
     # Exempt system workloads
     pod-security.kubernetes.io/enforce-version: latest
     pod-security.kubernetes.io/audit-version: latest
@@ -217,25 +217,25 @@ metadata:
     app.kubernetes.io/component: security
 spec:
   limits:
-  # Pod-level limits
-  - default:
-      cpu: "500m"
-      memory: "512Mi"
-      ephemeral-storage: "1Gi"
-    defaultRequest:
-      cpu: "100m"
-      memory: "128Mi"
-      ephemeral-storage: "100Mi"
-    type: Container
-  
-  # Container-level limits
-  - max:
-      cpu: "2"
-      memory: "4Gi"
-      ephemeral-storage: "10Gi"
-    type: Container
-  
-  # PVC limits
-  - max:
-      storage: "100Gi"
-    type: PersistentVolumeClaim
+    # Pod-level limits
+    - default:
+        cpu: '500m'
+        memory: '512Mi'
+        ephemeral-storage: '1Gi'
+      defaultRequest:
+        cpu: '100m'
+        memory: '128Mi'
+        ephemeral-storage: '100Mi'
+      type: Container
+
+    # Container-level limits
+    - max:
+        cpu: '2'
+        memory: '4Gi'
+        ephemeral-storage: '10Gi'
+      type: Container
+
+    # PVC limits
+    - max:
+        storage: '100Gi'
+      type: PersistentVolumeClaim

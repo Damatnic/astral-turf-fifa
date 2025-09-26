@@ -38,7 +38,7 @@ const SignupPage: React.FC = () => {
   useEffect(() => {
     document.body.classList.add('auth-bg');
     return () => {
-        document.body.classList.remove('auth-bg');
+      document.body.classList.remove('auth-bg');
     };
   }, []);
 
@@ -114,53 +114,70 @@ const SignupPage: React.FC = () => {
   };
 
   return (
-    <div className={`
+    <div
+      className={`
       mobile-full-height mobile-safe-area w-screen 
       flex items-center justify-center
       ${isMobile ? 'mobile-p-3' : 'p-4'}
-    `}>
-      <div className={`
+    `}
+    >
+      <div
+        className={`
         w-full 
         ${isMobile ? 'max-w-sm' : 'max-w-md'}
-      `}>
+      `}
+      >
         {/* Mobile-Optimized Header */}
-        <div className={`
+        <div
+          className={`
           text-center 
           ${isMobile ? 'mb-6' : 'mb-8'}
-        `}>
-          <LogoIcon className={`
+        `}
+        >
+          <LogoIcon
+            className={`
             mx-auto text-teal-400
             ${isMobile ? 'w-12 h-12' : 'w-16 h-16'}
-          `} />
-          <h1 className={`
+          `}
+          />
+          <h1
+            className={`
             font-bold mt-2 tracking-wider text-white
             ${isMobile ? 'text-2xl' : 'text-3xl'}
-          `}>
+          `}
+          >
             {isMobile ? 'Create Account' : 'Create Your Account'}
           </h1>
         </div>
 
         {/* Mobile-First Form Container */}
-        <div className={`
+        <div
+          className={`
           bg-slate-800/80 backdrop-blur-sm rounded-lg shadow-2xl border border-slate-700/50
           ${isMobile ? 'mobile-p-3' : 'p-8'}
-        `}>
+        `}
+        >
           <form onSubmit={handleSubmit} className={`${isMobile ? 'space-y-4' : 'space-y-6'}`}>
             {/* Mobile-Optimized Role Selection */}
             <div>
-              <label className={`block font-medium text-slate-400 ${isMobile ? 'text-sm mb-2' : 'text-sm mb-2'}`}>
+              <label
+                className={`block font-medium text-slate-400 ${isMobile ? 'text-sm mb-2' : 'text-sm mb-2'}`}
+              >
                 I am a...
               </label>
-              <div className={`flex rounded-lg bg-slate-700 border border-slate-600 ${isMobile ? 'p-1' : 'p-1'}`}>
+              <div
+                className={`flex rounded-lg bg-slate-700 border border-slate-600 ${isMobile ? 'p-1' : 'p-1'}`}
+              >
                 <button
                   type="button"
                   onClick={() => handleRoleChange('coach')}
                   className={`
                     w-1/2 font-semibold rounded transition-colors
                     ${isMobile ? 'py-3 text-sm' : 'py-2 text-sm'}
-                    ${formData.role === 'coach'
-                      ? 'bg-teal-600 text-white'
-                      : 'text-slate-300 hover:text-white active:bg-slate-600'
+                    ${
+                      formData.role === 'coach'
+                        ? 'bg-teal-600 text-white'
+                        : 'text-slate-300 hover:text-white active:bg-slate-600'
                     }
                   `}
                   disabled={isLoading}
@@ -173,9 +190,10 @@ const SignupPage: React.FC = () => {
                   className={`
                     w-1/2 font-semibold rounded transition-colors
                     ${isMobile ? 'py-3 text-sm' : 'py-2 text-sm'}
-                    ${formData.role === 'player'
-                      ? 'bg-teal-600 text-white'
-                      : 'text-slate-300 hover:text-white active:bg-slate-600'
+                    ${
+                      formData.role === 'player'
+                        ? 'bg-teal-600 text-white'
+                        : 'text-slate-300 hover:text-white active:bg-slate-600'
                     }
                   `}
                   disabled={isLoading}
@@ -187,7 +205,10 @@ const SignupPage: React.FC = () => {
 
             {/* Mobile-Optimized Form Fields */}
             <div>
-              <label htmlFor="email" className={`block font-medium text-slate-400 ${isMobile ? 'text-sm mb-2' : 'text-sm'}`}>
+              <label
+                htmlFor="email"
+                className={`block font-medium text-slate-400 ${isMobile ? 'text-sm mb-2' : 'text-sm'}`}
+              >
                 Email
               </label>
               <input
@@ -203,15 +224,16 @@ const SignupPage: React.FC = () => {
                 `}
                 required
                 disabled={isLoading}
-                placeholder={isMobile ? "Your email" : "Enter your email"}
+                placeholder={isMobile ? 'Your email' : 'Enter your email'}
               />
-              {errors.email && (
-                <p className="mt-1 text-sm text-red-400">{errors.email}</p>
-              )}
+              {errors.email && <p className="mt-1 text-sm text-red-400">{errors.email}</p>}
             </div>
 
             <div>
-              <label htmlFor="password" className={`block font-medium text-slate-400 ${isMobile ? 'text-sm mb-2' : 'text-sm'}`}>
+              <label
+                htmlFor="password"
+                className={`block font-medium text-slate-400 ${isMobile ? 'text-sm mb-2' : 'text-sm'}`}
+              >
                 Password
               </label>
               <input
@@ -227,15 +249,16 @@ const SignupPage: React.FC = () => {
                 `}
                 required
                 disabled={isLoading}
-                placeholder={isMobile ? "Your password" : "Enter your password"}
+                placeholder={isMobile ? 'Your password' : 'Enter your password'}
               />
-              {errors.password && (
-                <p className="mt-1 text-sm text-red-400">{errors.password}</p>
-              )}
+              {errors.password && <p className="mt-1 text-sm text-red-400">{errors.password}</p>}
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className={`block font-medium text-slate-400 ${isMobile ? 'text-sm mb-2' : 'text-sm'}`}>
+              <label
+                htmlFor="confirmPassword"
+                className={`block font-medium text-slate-400 ${isMobile ? 'text-sm mb-2' : 'text-sm'}`}
+              >
                 Confirm Password
               </label>
               <input
@@ -251,7 +274,7 @@ const SignupPage: React.FC = () => {
                 `}
                 required
                 disabled={isLoading}
-                placeholder={isMobile ? "Confirm password" : "Confirm your password"}
+                placeholder={isMobile ? 'Confirm password' : 'Confirm your password'}
               />
               {errors.confirmPassword && (
                 <p className="mt-1 text-sm text-red-400">{errors.confirmPassword}</p>
@@ -260,8 +283,12 @@ const SignupPage: React.FC = () => {
 
             {/* Mobile-Optimized Error Display */}
             {(errors.general || authState.error) && (
-              <div className={`bg-red-900/20 border border-red-500/20 rounded-md ${isMobile ? 'mobile-p-2' : 'p-3'}`}>
-                <p className={`text-red-400 ${isMobile ? 'text-sm' : 'text-sm'}`}>{errors.general || authState.error}</p>
+              <div
+                className={`bg-red-900/20 border border-red-500/20 rounded-md ${isMobile ? 'mobile-p-2' : 'p-3'}`}
+              >
+                <p className={`text-red-400 ${isMobile ? 'text-sm' : 'text-sm'}`}>
+                  {errors.general || authState.error}
+                </p>
               </div>
             )}
 
@@ -284,7 +311,9 @@ const SignupPage: React.FC = () => {
           </form>
 
           {/* Mobile-Optimized Footer Links */}
-          <div className={`text-center text-slate-400 ${isMobile ? 'mt-4 text-sm' : 'mt-6 text-sm'}`}>
+          <div
+            className={`text-center text-slate-400 ${isMobile ? 'mt-4 text-sm' : 'mt-6 text-sm'}`}
+          >
             <p>
               Already have an account?{' '}
               <Link to="/login" className="font-semibold text-teal-400 hover:text-teal-300">

@@ -22,10 +22,11 @@ test.describe('Basic Application Navigation', () => {
     await page.waitForTimeout(2000);
 
     // Filter out known development warnings
-    const criticalErrors = errors.filter(error =>
-      !error.includes('CJS build of Vite') &&
-      !error.includes('deprecated') &&
-      !error.includes('Warning'),
+    const criticalErrors = errors.filter(
+      error =>
+        !error.includes('CJS build of Vite') &&
+        !error.includes('deprecated') &&
+        !error.includes('Warning'),
     );
 
     expect(criticalErrors).toHaveLength(0);
@@ -148,8 +149,12 @@ test.describe('Accessibility', () => {
     await expect(submitButton).toBeVisible();
 
     // Check that inputs have labels or aria-labels
-    const emailLabel = await emailInput.getAttribute('aria-label') || await emailInput.getAttribute('placeholder');
-    const passwordLabel = await passwordInput.getAttribute('aria-label') || await passwordInput.getAttribute('placeholder');
+    const emailLabel =
+      (await emailInput.getAttribute('aria-label')) ||
+      (await emailInput.getAttribute('placeholder'));
+    const passwordLabel =
+      (await passwordInput.getAttribute('aria-label')) ||
+      (await passwordInput.getAttribute('placeholder'));
 
     expect(emailLabel).toBeTruthy();
     expect(passwordLabel).toBeTruthy();

@@ -2,7 +2,15 @@
 
 import type { PlayerAttributes } from './player';
 
-export type TrainingDrillCategory = 'attacking' | 'defending' | 'physical' | 'technical' | 'tactical' | 'set_pieces' | 'warmup' | 'cooldown';
+export type TrainingDrillCategory =
+  | 'attacking'
+  | 'defending'
+  | 'physical'
+  | 'technical'
+  | 'tactical'
+  | 'set_pieces'
+  | 'warmup'
+  | 'cooldown';
 export type TrainingIntensity = 'low' | 'medium' | 'high';
 
 export interface TrainingDrill {

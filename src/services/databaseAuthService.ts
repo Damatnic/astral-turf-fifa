@@ -71,7 +71,10 @@ class DatabaseAuthService {
   /**
    * User registration with database storage
    */
-  async signup(signupData: DatabaseSignupData, context: LoginContext): Promise<DatabaseLoginResponse> {
+  async signup(
+    signupData: DatabaseSignupData,
+    context: LoginContext,
+  ): Promise<DatabaseLoginResponse> {
     const startTime = Date.now();
 
     try {
@@ -132,7 +135,7 @@ class DatabaseAuthService {
       const passwordHash = await hashPassword(sanitizedData.password);
 
       // Create user in database using transaction
-      const result = await databaseService.executeTransaction(async (prisma) => {
+      const result = await databaseService.executeTransaction(async prisma => {
         // Create user
         const newUser = await prisma.user.create({
           data: {
@@ -185,7 +188,6 @@ class DatabaseAuthService {
 
       // Automatically log in the new user
       return await this.login(sanitizedData.email, sanitizedData.password, context);
-
     } catch (_error) {
       securityLogger.error('Database signup failed', {
         email: signupData.email,
@@ -202,7 +204,11 @@ class DatabaseAuthService {
   /**
    * User login with database authentication
    */
-  async login(email: string, password: string, context: LoginContext): Promise<DatabaseLoginResponse> {
+  async login(
+    email: string,
+    password: string,
+    context: LoginContext,
+  ): Promise<DatabaseLoginResponse> {
     const startTime = Date.now();
 
     try {
@@ -311,26 +317,26 @@ class DatabaseAuthService {
       const tokens = generateTokenPair(this.convertToPublicUser(user), sessionId);
 
       // Cache session data in Redis
-      await cache.set(`session:${sessionId}`, {
-        userId: user.id,
-        sessionId,
-        deviceInfo: session.deviceInfo,
-        ipAddress: session.ipAddress,
-        userAgent: session.userAgent,
-      }, { ttl: 24 * 60 * 60 }); // 24 hours
-
-      // Record successful login
-      securityLogger.logSecurityEvent(
-        SecurityEventType.LOGIN_SUCCESS,
-        'User login successful',
+      await cache.set(
+        `session:${sessionId}`,
         {
           userId: user.id,
           sessionId,
-          ipAddress: context.ipAddress,
-          userAgent: context.userAgent,
-          loginDuration: Date.now() - startTime,
+          deviceInfo: session.deviceInfo,
+          ipAddress: session.ipAddress,
+          userAgent: session.userAgent,
         },
-      );
+        { ttl: 24 * 60 * 60 },
+      ); // 24 hours
+
+      // Record successful login
+      securityLogger.logSecurityEvent(SecurityEventType.LOGIN_SUCCESS, 'User login successful', {
+        userId: user.id,
+        sessionId,
+        ipAddress: context.ipAddress,
+        userAgent: context.userAgent,
+        loginDuration: Date.now() - startTime,
+      });
 
       // Generate security notices
       const securityNotices = await this.generateSecurityNotices(user, context);
@@ -345,7 +351,6 @@ class DatabaseAuthService {
         },
         securityNotices,
       };
-
     } catch (_error) {
       const errorMessage = error instanceof Error ? error.message : 'Login failed';
 
@@ -380,15 +385,11 @@ class DatabaseAuthService {
         // Remove from Redis cache
         await cache.del(`session:${sessionId}`);
 
-        securityLogger.logSecurityEvent(
-          SecurityEventType.LOGOUT,
-          'User logout successful',
-          {
-            userId: session.userId,
-            sessionId,
-            ipAddress: context.ipAddress,
-          },
-        );
+        securityLogger.logSecurityEvent(SecurityEventType.LOGOUT, 'User logout successful', {
+          userId: session.userId,
+          sessionId,
+          ipAddress: context.ipAddress,
+        });
       }
     } catch (_error) {
       securityLogger.error('Logout failed', {
@@ -435,13 +436,17 @@ class DatabaseAuthService {
 
         // Cache session if found
         if (session) {
-          await cache.set(`session:${sessionId}`, {
-            userId: session.userId,
-            sessionId: session.sessionToken,
-            deviceInfo: session.deviceInfo,
-            ipAddress: session.ipAddress,
-            userAgent: session.userAgent,
-          }, { ttl: 24 * 60 * 60 });
+          await cache.set(
+            `session:${sessionId}`,
+            {
+              userId: session.userId,
+              sessionId: session.sessionToken,
+              deviceInfo: session.deviceInfo,
+              ipAddress: session.ipAddress,
+              userAgent: session.userAgent,
+            },
+            { ttl: 24 * 60 * 60 },
+          );
         }
       }
 
@@ -471,18 +476,13 @@ class DatabaseAuthService {
       }
 
       // Log data access
-      securityLogger.logSecurityEvent(
-        SecurityEventType.DATA_ACCESS,
-        'User data accessed',
-        {
-          userId: user.id,
-          sessionId,
-          sensitive: false,
-        },
-      );
+      securityLogger.logSecurityEvent(SecurityEventType.DATA_ACCESS, 'User data accessed', {
+        userId: user.id,
+        sessionId,
+        sensitive: false,
+      });
 
       return this.convertToPublicUser(user);
-
     } catch (_error) {
       securityLogger.error('Get current user failed', {
         sessionId,
@@ -512,14 +512,10 @@ class DatabaseAuthService {
         },
       });
 
-      securityLogger.logSecurityEvent(
-        SecurityEventType.DATA_MODIFICATION,
-        'User profile updated',
-        {
-          userId,
-          updatedFields: Object.keys(updates),
-        },
-      );
+      securityLogger.logSecurityEvent(SecurityEventType.DATA_MODIFICATION, 'User profile updated', {
+        userId,
+        updatedFields: Object.keys(updates),
+      });
 
       return this.convertToPublicUser(updatedUser);
     } catch (_error) {
@@ -585,7 +581,7 @@ class DatabaseAuthService {
       const newPasswordHash = await hashPassword(newPassword);
 
       // Update password using transaction
-      await databaseService.executeTransaction(async (prisma) => {
+      await databaseService.executeTransaction(async prisma => {
         // Update user password
         await prisma.user.update({
           where: { id: userId },
@@ -641,7 +637,6 @@ class DatabaseAuthService {
           ipAddress: context.ipAddress,
         },
       );
-
     } catch (_error) {
       securityLogger.error('Password change failed', {
         userId,
@@ -675,17 +670,13 @@ class DatabaseAuthService {
         });
       }
 
-      securityLogger.logSecurityEvent(
-        SecurityEventType.LOGIN_FAILURE,
-        `Login failed: ${reason}`,
-        {
-          email: sanitizeUserInput(email),
-          userId,
-          ipAddress: context.ipAddress,
-          userAgent: context.userAgent,
-          reason,
-        },
-      );
+      securityLogger.logSecurityEvent(SecurityEventType.LOGIN_FAILURE, `Login failed: ${reason}`, {
+        email: sanitizeUserInput(email),
+        userId,
+        ipAddress: context.ipAddress,
+        userAgent: context.userAgent,
+        reason,
+      });
     } catch (_error) {
       securityLogger.error('Failed to record login failure', {
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -728,23 +719,25 @@ class DatabaseAuthService {
       timezone: prismaUser.timezone,
       language: prismaUser.language,
       lastLoginAt: prismaUser.lastLoginAt?.toISOString(),
-      notifications: prismaUser.notifications ? {
-        email: prismaUser.notifications.email,
-        sms: prismaUser.notifications.sms,
-        push: prismaUser.notifications.push,
-        matchUpdates: prismaUser.notifications.matchUpdates,
-        trainingReminders: prismaUser.notifications.trainingReminders,
-        emergencyAlerts: prismaUser.notifications.emergencyAlerts,
-        paymentReminders: prismaUser.notifications.paymentReminders,
-      } : {
-        email: true,
-        sms: false,
-        push: true,
-        matchUpdates: true,
-        trainingReminders: true,
-        emergencyAlerts: true,
-        paymentReminders: false,
-      },
+      notifications: prismaUser.notifications
+        ? {
+            email: prismaUser.notifications.email,
+            sms: prismaUser.notifications.sms,
+            push: prismaUser.notifications.push,
+            matchUpdates: prismaUser.notifications.matchUpdates,
+            trainingReminders: prismaUser.notifications.trainingReminders,
+            emergencyAlerts: prismaUser.notifications.emergencyAlerts,
+            paymentReminders: prismaUser.notifications.paymentReminders,
+          }
+        : {
+            email: true,
+            sms: false,
+            push: true,
+            matchUpdates: true,
+            trainingReminders: true,
+            emergencyAlerts: true,
+            paymentReminders: false,
+          },
     };
   }
 

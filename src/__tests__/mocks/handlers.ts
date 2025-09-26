@@ -7,7 +7,7 @@ const API_BASE_URL = 'https://api.example.com';
 export const handlers = [
   // Mock authentication endpoints
   http.post(`${API_BASE_URL}/auth/login`, async ({ request }) => {
-    const { email, password } = await request.json() as any;
+    const { email, password } = (await request.json()) as any;
 
     if (email === 'test@example.com' && password === 'password123') {
       return HttpResponse.json({
@@ -20,15 +20,12 @@ export const handlers = [
       });
     }
 
-    return HttpResponse.json(
-      { error: 'Invalid credentials' },
-      { status: 401 },
-    );
+    return HttpResponse.json({ error: 'Invalid credentials' }, { status: 401 });
   }),
 
   // Mock AI service endpoints
   http.post(`${API_BASE_URL}/ai/chat`, async ({ request }) => {
-    const { prompt } = await request.json() as any;
+    const { prompt } = (await request.json()) as any;
 
     return HttpResponse.json({
       response: `Mock AI response to: ${prompt}`,
@@ -39,7 +36,7 @@ export const handlers = [
 
   // Mock tactical analysis endpoint
   http.post(`${API_BASE_URL}/ai/tactics`, async ({ request }) => {
-    const { formation, players } = await request.json() as any;
+    const { formation, players } = (await request.json()) as any;
 
     return HttpResponse.json({
       analysis: 'Mock tactical analysis',
@@ -102,36 +99,24 @@ export const handlers = [
 
   // Catch-all handler for unhandled requests
   http.get('*', ({ request }) => {
-    // // console.warn(`Unhandled GET request: ${request.url}`);
-    return HttpResponse.json(
-      { error: 'Not found' },
-      { status: 404 },
-    );
+    // // // // console.warn(`Unhandled GET request: ${request.url}`);
+    return HttpResponse.json({ error: 'Not found' }, { status: 404 });
   }),
 
   http.post('*', ({ request }) => {
-    // // console.warn(`Unhandled POST request: ${request.url}`);
-    return HttpResponse.json(
-      { error: 'Not found' },
-      { status: 404 },
-    );
+    // // // // console.warn(`Unhandled POST request: ${request.url}`);
+    return HttpResponse.json({ error: 'Not found' }, { status: 404 });
   }),
 ];
 
 // Error handlers for testing error scenarios
 export const errorHandlers = [
   http.post(`${API_BASE_URL}/auth/login`, () => {
-    return HttpResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 },
-    );
+    return HttpResponse.json({ error: 'Internal server error' }, { status: 500 });
   }),
 
   http.post(`${API_BASE_URL}/ai/chat`, () => {
-    return HttpResponse.json(
-      { error: 'AI service unavailable' },
-      { status: 503 },
-    );
+    return HttpResponse.json({ error: 'AI service unavailable' }, { status: 503 });
   }),
 ];
 

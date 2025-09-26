@@ -1,0 +1,326 @@
+/* Modern Design System CSS Variables */
+:root {
+  /* Primary Color Palette */
+  --primary-50: 240 253 250;
+  --primary-100: 204 251 241;
+  --primary-200: 153 246 228;
+  --primary-300: 94 234 212;
+  --primary-400: 45 212 191;
+  --primary-500: 20 184 166;
+  --primary-600: 13 148 136;
+  --primary-700: 15 118 110;
+  --primary-800: 17 94 89;
+  --primary-900: 19 78 74;
+  --primary-950: 4 47 46;
+
+  /* Secondary Color Palette */
+  --secondary-50: 248 250 252;
+  --secondary-100: 241 245 249;
+  --secondary-200: 226 232 240;
+  --secondary-300: 203 213 225;
+  --secondary-400: 148 163 184;
+  --secondary-500: 100 116 139;
+  --secondary-600: 71 85 105;
+  --secondary-700: 51 65 85;
+  --secondary-800: 30 41 59;
+  --secondary-900: 15 23 42;
+  --secondary-950: 2 6 23;
+
+  /* Semantic Colors */
+  --success-50: 240 253 244;
+  --success-100: 220 252 231;
+  --success-200: 187 247 208;
+  --success-300: 134 239 172;
+  --success-400: 74 222 128;
+  --success-500: 34 197 94;
+  --success-600: 22 163 74;
+  --success-700: 21 128 61;
+  --success-800: 22 101 52;
+  --success-900: 20 83 45;
+
+  --warning-50: 255 251 235;
+  --warning-100: 254 243 199;
+  --warning-200: 253 230 138;
+  --warning-300: 252 211 77;
+  --warning-400: 251 191 36;
+  --warning-500: 245 158 11;
+  --warning-600: 217 119 6;
+  --warning-700: 180 83 9;
+  --warning-800: 146 64 14;
+  --warning-900: 120 53 15;
+
+  --error-50: 254 242 242;
+  --error-100: 254 226 226;
+  --error-200: 254 202 202;
+  --error-300: 252 165 165;
+  --error-400: 248 113 113;
+  --error-500: 239 68 68;
+  --error-600: 220 38 38;
+  --error-700: 185 28 28;
+  --error-800: 153 27 27;
+  --error-900: 127 29 29;
+
+  /* Team Colors */
+  --team-home-50: 239 246 255;
+  --team-home-100: 219 234 254;
+  --team-home-200: 191 219 254;
+  --team-home-300: 147 197 253;
+  --team-home-400: 96 165 250;
+  --team-home-500: 59 130 246;
+  --team-home-600: 37 99 235;
+  --team-home-700: 29 78 216;
+  --team-home-800: 30 64 175;
+  --team-home-900: 30 58 138;
+
+  --team-away-50: 254 242 242;
+  --team-away-100: 254 226 226;
+  --team-away-200: 254 202 202;
+  --team-away-300: 252 165 165;
+  --team-away-400: 248 113 113;
+  --team-away-500: 239 68 68;
+  --team-away-600: 220 38 38;
+  --team-away-700: 185 28 28;
+  --team-away-800: 153 27 27;
+  --team-away-900: 127 29 29;
+
+  /* Accent Colors */
+  --accent-50: 254 243 199;
+  --accent-100: 253 230 138;
+  --accent-200: 252 211 77;
+  --accent-300: 251 191 36;
+  --accent-400: 245 158 11;
+  --accent-500: 217 119 6;
+  --accent-600: 180 83 9;
+  --accent-700: 146 64 14;
+  --accent-800: 120 53 15;
+  --accent-900: 69 26 3;
+}
+
+/* Dark Theme */
+.dark {
+  /* Background Colors */
+  --bg-primary: rgb(var(--secondary-950));
+  --bg-secondary: rgb(var(--secondary-900));
+  --bg-tertiary: rgb(var(--secondary-800));
+  --bg-quaternary: rgb(var(--secondary-700));
+
+  /* Text Colors */
+  --text-primary: rgb(var(--secondary-50));
+  --text-secondary: rgb(var(--secondary-300));
+  --text-tertiary: rgb(var(--secondary-400));
+  --text-muted: rgb(var(--secondary-500));
+
+  /* Border Colors */
+  --border-primary: rgb(var(--secondary-700) / 0.5);
+  --border-secondary: rgb(var(--secondary-600) / 0.5);
+  --border-focus: rgb(var(--primary-500));
+
+  /* Accent Colors */
+  --accent-primary: rgb(var(--primary-400));
+  --accent-secondary: rgb(var(--primary-300));
+  --accent-hover: rgb(var(--primary-500));
+
+  /* Interactive States */
+  --surface-hover: rgb(var(--secondary-800) / 0.8);
+  --surface-active: rgb(var(--secondary-700) / 0.9);
+  --surface-selected: rgb(var(--primary-900) / 0.3);
+
+  /* Status Colors */
+  --status-success: rgb(var(--success-400));
+  --status-warning: rgb(var(--warning-400));
+  --status-error: rgb(var(--error-400));
+  --status-info: rgb(var(--primary-400));
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.25), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+
+  /* Glass Effects */
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-strong-bg: rgba(255, 255, 255, 0.1);
+  --glass-strong-border: rgba(255, 255, 255, 0.2);
+}
+
+/* Light Theme */
+.light {
+  /* Background Colors */
+  --bg-primary: rgb(var(--secondary-50));
+  --bg-secondary: rgb(var(--secondary-100));
+  --bg-tertiary: rgb(var(--secondary-200));
+  --bg-quaternary: rgb(var(--secondary-300));
+
+  /* Text Colors */
+  --text-primary: rgb(var(--secondary-900));
+  --text-secondary: rgb(var(--secondary-700));
+  --text-tertiary: rgb(var(--secondary-600));
+  --text-muted: rgb(var(--secondary-500));
+
+  /* Border Colors */
+  --border-primary: rgb(var(--secondary-300) / 0.8);
+  --border-secondary: rgb(var(--secondary-400) / 0.6);
+  --border-focus: rgb(var(--primary-600));
+
+  /* Accent Colors */
+  --accent-primary: rgb(var(--primary-600));
+  --accent-secondary: rgb(var(--primary-700));
+  --accent-hover: rgb(var(--primary-500));
+
+  /* Interactive States */
+  --surface-hover: rgb(var(--secondary-200) / 0.8);
+  --surface-active: rgb(var(--secondary-300) / 0.9);
+  --surface-selected: rgb(var(--primary-100) / 0.6);
+
+  /* Status Colors */
+  --status-success: rgb(var(--success-600));
+  --status-warning: rgb(var(--warning-600));
+  --status-error: rgb(var(--error-600));
+  --status-info: rgb(var(--primary-600));
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+  /* Glass Effects */
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.9);
+  --glass-strong-bg: rgba(255, 255, 255, 0.95);
+  --glass-strong-border: rgba(255, 255, 255, 1);
+}
+
+/* Component-specific variables */
+:root {
+  /* Typography Scale */
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
+  --font-size-5xl: 3rem;
+
+  /* Line Heights */
+  --line-height-tight: 1.25;
+  --line-height-snug: 1.375;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+  --line-height-loose: 2;
+
+  /* Spacing Scale */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 0.75rem;
+  --spacing-lg: 1rem;
+  --spacing-xl: 1.25rem;
+  --spacing-2xl: 1.5rem;
+  --spacing-3xl: 2rem;
+  --spacing-4xl: 2.5rem;
+  --spacing-5xl: 3rem;
+
+  /* Border Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.5rem;
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Z-Index Scale */
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+  --z-toast: 1080;
+}
+
+/* Modern scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-primary);
+  border-radius: var(--radius-full);
+  transition: background var(--transition-fast);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-secondary);
+}
+
+/* Firefox scrollbar styling */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-primary) var(--bg-secondary);
+}
+
+/* Focus styles for accessibility */
+.focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --border-primary: rgb(var(--secondary-900));
+    --border-secondary: rgb(var(--secondary-800));
+  }
+
+  .light {
+    --border-primary: rgb(var(--secondary-100));
+    --border-secondary: rgb(var(--secondary-200));
+  }
+}
+
+/* Print styles */
+@media print {
+  * {
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  a,
+  a:visited {
+    text-decoration: underline;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}

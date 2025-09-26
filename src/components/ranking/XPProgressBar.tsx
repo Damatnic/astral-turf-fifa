@@ -36,19 +36,17 @@ const XPProgressBar: React.FC<XPProgressBarProps> = ({
     <div className="w-full">
       {showNumbers && (
         <div className="flex justify-between items-center mb-1">
-          <span className="text-sm font-medium text-gray-300">
-            Level {currentLevel}
-          </span>
+          <span className="text-sm font-medium text-gray-300">Level {currentLevel}</span>
           <span className="text-sm text-gray-400">
             {xpInCurrentLevel.toLocaleString()} / {xpNeededForLevel.toLocaleString()} XP
           </span>
-          <span className="text-sm font-medium text-gray-300">
-            Level {currentLevel + 1}
-          </span>
+          <span className="text-sm font-medium text-gray-300">Level {currentLevel + 1}</span>
         </div>
       )}
 
-      <div className={`w-full bg-gray-700 rounded-full ${heightClasses[height]} overflow-hidden relative`}>
+      <div
+        className={`w-full bg-gray-700 rounded-full ${heightClasses[height]} overflow-hidden relative`}
+      >
         <motion.div
           className={`${heightClasses[height]} rounded-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 relative overflow-hidden`}
           initial={{ width: 0 }}
@@ -72,9 +70,7 @@ const XPProgressBar: React.FC<XPProgressBarProps> = ({
 
         {/* Level markers */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-xs font-bold text-white/50">
-            {Math.round(progressPercentage)}%
-          </span>
+          <span className="text-xs font-bold text-white/50">{Math.round(progressPercentage)}%</span>
         </div>
       </div>
 

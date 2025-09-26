@@ -13,10 +13,25 @@ export interface PlayerAttributes {
 }
 
 export type PositionRole = 'GK' | 'DF' | 'MF' | 'FW';
+export interface Position {
+  x: number;
+  y: number;
+}
 export type PlayerMorale = 'Excellent' | 'Good' | 'Okay' | 'Poor' | 'Very Poor';
 export type PlayerForm = 'Excellent' | 'Good' | 'Average' | 'Poor' | 'Very Poor';
-export type PlayerAvailabilityStatus = 'Available' | 'Minor Injury' | 'Major Injury' | 'Suspended' | 'International Duty';
-export type PlayerTrait = 'Leader' | 'Ambitious' | 'Loyal' | 'Injury Prone' | 'Consistent' | 'Temperamental';
+export type PlayerAvailabilityStatus =
+  | 'Available'
+  | 'Minor Injury'
+  | 'Major Injury'
+  | 'Suspended'
+  | 'International Duty';
+export type PlayerTrait =
+  | 'Leader'
+  | 'Ambitious'
+  | 'Loyal'
+  | 'Injury Prone'
+  | 'Consistent'
+  | 'Temperamental';
 export type Team = 'home' | 'away';
 
 export interface PlayerRole {
@@ -154,13 +169,27 @@ export interface Player {
   completedChallenges: string[];
 }
 
-export type TransferPlayer = Omit<Player, 'position' | 'teamColor' | 'attributeHistory'> & { askingPrice: number };
+export type TransferPlayer = Omit<Player, 'position' | 'teamColor' | 'attributeHistory'> & {
+  askingPrice: number;
+};
 
-export interface YouthProspect extends Omit<Player, 'attributes' | 'potential' | 'currentPotential' | 'age' | 'position' | 'teamColor' | 'conversationHistory' | 'attributeHistory' | 'attributeDevelopmentProgress' > {
+export interface YouthProspect
+  extends Omit<
+    Player,
+    | 'attributes'
+    | 'potential'
+    | 'currentPotential'
+    | 'age'
+    | 'position'
+    | 'teamColor'
+    | 'conversationHistory'
+    | 'attributeHistory'
+    | 'attributeDevelopmentProgress'
+  > {
   age: 16 | 17 | 18;
   potential: readonly [number, number];
   attributes: { readonly [K in keyof PlayerAttributes]: readonly [number, number] };
-  position: { x: number, y: number };
+  position: { x: number; y: number };
   teamColor: string;
   conversationHistory: ChatMessage[];
 }
@@ -199,7 +228,7 @@ export interface AttributeFilter {
 }
 
 export interface AdvancedRosterFilters {
-  age: { min: number, max: number };
+  age: { min: number; max: number };
   availability: readonly PlayerAvailabilityStatus[];
   attributes: readonly AttributeFilter[];
 }

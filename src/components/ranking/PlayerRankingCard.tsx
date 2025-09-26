@@ -19,17 +19,31 @@ const PlayerRankingCard: React.FC<PlayerRankingCardProps> = ({
   compact = false,
 }) => {
   const getLevelColor = (level: number): string => {
-    if (level >= 80) {return 'from-purple-600 to-pink-600';}
-    if (level >= 60) {return 'from-blue-600 to-purple-600';}
-    if (level >= 40) {return 'from-green-600 to-blue-600';}
-    if (level >= 20) {return 'from-yellow-600 to-green-600';}
+    if (level >= 80) {
+      return 'from-purple-600 to-pink-600';
+    }
+    if (level >= 60) {
+      return 'from-blue-600 to-purple-600';
+    }
+    if (level >= 40) {
+      return 'from-green-600 to-blue-600';
+    }
+    if (level >= 20) {
+      return 'from-yellow-600 to-green-600';
+    }
     return 'from-gray-600 to-yellow-600';
   };
 
   const getRankBadge = (rank: number): string => {
-    if (rank === 1) {return '🥇';}
-    if (rank === 2) {return '🥈';}
-    if (rank === 3) {return '🥉';}
+    if (rank === 1) {
+      return '🥇';
+    }
+    if (rank === 2) {
+      return '🥈';
+    }
+    if (rank === 3) {
+      return '🥉';
+    }
     return '';
   };
 
@@ -76,18 +90,22 @@ const PlayerRankingCard: React.FC<PlayerRankingCardProps> = ({
                 <span className="text-2xl font-bold text-white">{player.jerseyNumber}</span>
               </div>
               {rank && rank <= 3 && (
-                <div className="absolute -top-2 -right-2 text-2xl">
-                  {getRankBadge(rank)}
-                </div>
+                <div className="absolute -top-2 -right-2 text-2xl">{getRankBadge(rank)}</div>
               )}
             </div>
             <div>
               <h3 className="text-xl font-bold text-white">{player.name}</h3>
-              <p className="text-sm text-gray-400">{player.position} • {player.nationality}</p>
+              <p className="text-sm text-gray-400">
+                {player.position} • {player.nationality}
+              </p>
               <div className="flex items-center mt-1">
-                <span className="text-sm font-medium text-blue-400">Level {profile.currentLevel}</span>
+                <span className="text-sm font-medium text-blue-400">
+                  Level {profile.currentLevel}
+                </span>
                 {profile.streakDays > 0 && (
-                  <span className="ml-3 text-sm text-orange-400">🔥 {profile.streakDays} day streak</span>
+                  <span className="ml-3 text-sm text-orange-400">
+                    🔥 {profile.streakDays} day streak
+                  </span>
                 )}
               </div>
             </div>
@@ -107,7 +125,9 @@ const PlayerRankingCard: React.FC<PlayerRankingCardProps> = ({
             <p className="text-xs text-gray-400">Total XP</p>
           </div>
           <div className="bg-gray-700 rounded-lg p-3 text-center">
-            <p className="text-2xl font-bold text-green-400">{profile.totalStats.totalChallengesCompleted}</p>
+            <p className="text-2xl font-bold text-green-400">
+              {profile.totalStats.totalChallengesCompleted}
+            </p>
             <p className="text-xs text-gray-400">Challenges</p>
           </div>
           <div className="bg-gray-700 rounded-lg p-3 text-center">
@@ -141,7 +161,9 @@ const PlayerRankingCard: React.FC<PlayerRankingCardProps> = ({
         {/* Progress to Next Level */}
         <div>
           <div className="flex justify-between items-center mb-1">
-            <span className="text-sm text-gray-400">Progress to Level {profile.currentLevel + 1}</span>
+            <span className="text-sm text-gray-400">
+              Progress to Level {profile.currentLevel + 1}
+            </span>
             <span className="text-sm font-medium text-white">
               {profile.xpToNextLevel} XP needed
             </span>

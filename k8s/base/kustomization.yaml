@@ -9,7 +9,7 @@ kind: Kustomization
 metadata:
   name: astral-turf-base
   annotations:
-    config.kubernetes.io/local-config: "true"
+    config.kubernetes.io/local-config: 'true'
 
 resources:
   - namespace.yaml
@@ -36,8 +36,8 @@ commonLabels:
   app.kubernetes.io/managed-by: kustomize
 
 commonAnnotations:
-  kubernetes.io/managed-by: "quantum-infrastructure"
-  deployment.kubernetes.io/revision: "1"
+  kubernetes.io/managed-by: 'quantum-infrastructure'
+  deployment.kubernetes.io/revision: '1'
 
 images:
   - name: astral-turf

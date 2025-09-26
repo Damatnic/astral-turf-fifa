@@ -1,10 +1,5 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import type {
-  Player,
-  Formation,
-  DrawingShape,
-  User,
-} from '../../types';
+import React, { useState, useEffect, useRef } from 'react';
+import type { Player, Formation, DrawingShape, User } from '../../types';
 
 interface CollaborationState {
   users: Array<{
@@ -49,8 +44,8 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
   players,
   currentUser,
   sessionId,
-  onPositionChange,
-  onDrawingAdd,
+  _onPositionChange,
+  _onDrawingAdd,
   className = '',
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -70,16 +65,24 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
     version: 1,
   });
 
-  const [selectedTool, setSelectedTool] = useState<'select' | 'arrow' | 'zone' | 'comment'>('select');
-  const [isDrawing, setIsDrawing] = useState(false);
-  const [currentDrawing, setCurrentDrawing] = useState<DrawingShape | null>(null);
+  const [selectedTool, setSelectedTool] = useState<'select' | 'arrow' | 'zone' | 'comment'>(
+    'select',
+  );
+  const [_isDrawing, _setIsDrawing] = useState(false);
+  const [_currentDrawing, _setCurrentDrawing] = useState<DrawingShape | null>(null);
   const [showComments, setShowComments] = useState(true);
   const [newComment, setNewComment] = useState('');
   const [commentPosition, setCommentPosition] = useState<{ x: number; y: number } | null>(null);
 
   // Mock WebSocket connection (in real implementation, this would be a proper WebSocket)
   const [mockConnectedUsers] = useState([
-    { id: 'user2', name: 'Assistant Coach', color: '#ef4444', cursor: { x: 200, y: 150 }, isActive: true },
+    {
+      id: 'user2',
+      name: 'Assistant Coach',
+      color: '#ef4444',
+      cursor: { x: 200, y: 150 },
+      isActive: true,
+    },
     { id: 'user3', name: 'Analyst', color: '#10b981', cursor: { x: 300, y: 250 }, isActive: true },
   ]);
 
@@ -106,10 +109,14 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) {return;}
+    if (!canvas) {
+      return;
+    }
 
     const ctx = canvas.getContext('2d');
-    if (!ctx) {return;}
+    if (!ctx) {
+      return;
+    }
 
     // Set canvas size
     canvas.width = 800;
@@ -122,7 +129,6 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
     drawDrawings(ctx);
     drawCursors(ctx);
     drawComments(ctx);
-
   }, [formation, players, collaborationState, showComments]);
 
   const drawField = (ctx: CanvasRenderingContext2D, w: number, h: number) => {
@@ -152,11 +158,15 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
   const drawPlayers = (ctx: CanvasRenderingContext2D) => {
     players.forEach(player => {
       const slot = formation.slots.find(s => s.playerId === player.id);
-      if (!slot) {return;}
+      if (!slot) {
+        return;
+      }
 
       // Use collaborative position or default
-      const position = collaborationState.playerPositions[player.id] ||
-                     { x: slot.defaultPosition.x * 8, y: slot.defaultPosition.y * 6 }; // Scale to canvas
+      const position = collaborationState.playerPositions[player.id] || {
+        x: slot.defaultPosition.x * 8,
+        y: slot.defaultPosition.y * 6,
+      }; // Scale to canvas
 
       // Draw player circle
       ctx.fillStyle = player.teamColor || '#3b82f6';
@@ -235,7 +245,9 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
 
   const drawCursors = (ctx: CanvasRenderingContext2D) => {
     collaborationState.users.forEach(user => {
-      if (user.id === currentUser.id || !user.cursor || !user.isActive) {return;}
+      if (user.id === currentUser.id || !user.cursor || !user.isActive) {
+        return;
+      }
 
       const { x, y } = user.cursor;
 
@@ -265,7 +277,9 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
   };
 
   const drawComments = (ctx: CanvasRenderingContext2D) => {
-    if (!showComments) {return;}
+    if (!showComments) {
+      return;
+    }
 
     collaborationState.comments.forEach(comment => {
       const { x, y } = comment.position;
@@ -326,7 +340,9 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
 
   const handleCanvasClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
-    if (!canvas) {return;}
+    if (!canvas) {
+      return;
+    }
 
     const rect = canvas.getBoundingClientRect();
     const x = event.clientX - rect.left;
@@ -338,7 +354,9 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
   };
 
   const addComment = () => {
-    if (!newComment.trim() || !commentPosition) {return;}
+    if (!newComment.trim() || !commentPosition) {
+      return;
+    }
 
     const comment = {
       id: `comment_${Date.now()}`,
@@ -391,18 +409,13 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
                     className="flex items-center space-x-1 px-2 py-1 rounded-full text-xs"
                     style={{ backgroundColor: user.color + '30', color: user.color }}
                   >
-                    <div
-                      className="w-2 h-2 rounded-full"
-                      style={{ backgroundColor: user.color }}
-                    />
+                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: user.color }} />
                     <span>{user.name}</span>
                   </div>
                 ))}
               </div>
 
-              <div className="text-sm text-gray-400">
-                Session: {sessionId.substring(0, 8)}...
-              </div>
+              <div className="text-sm text-gray-400">Session: {sessionId.substring(0, 8)}...</div>
             </div>
           </div>
         </div>
@@ -437,9 +450,7 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
                 <button
                   onClick={() => setShowComments(!showComments)}
                   className={`px-3 py-2 rounded text-sm font-medium ${
-                    showComments
-                      ? 'bg-green-600 text-white'
-                      : 'bg-gray-600 text-gray-300'
+                    showComments ? 'bg-green-600 text-white' : 'bg-gray-600 text-gray-300'
                   }`}
                 >
                   {showComments ? '🔍 Hide Comments' : '💭 Show Comments'}
@@ -455,7 +466,8 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
             </div>
 
             <div className="text-sm text-gray-400">
-              v{collaborationState.version} • {collaborationState.drawings.length} drawings • {collaborationState.comments.length} comments
+              v{collaborationState.version} • {collaborationState.drawings.length} drawings •{' '}
+              {collaborationState.comments.length} comments
             </div>
           </div>
 
@@ -476,7 +488,7 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
                 <h3 className="text-lg font-semibold text-white mb-4">Add Comment</h3>
                 <textarea
                   value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
+                  onChange={e => setNewComment(e.target.value)}
                   placeholder="Enter your tactical comment..."
                   className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 resize-none h-24"
                   autoFocus

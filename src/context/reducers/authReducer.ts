@@ -40,9 +40,7 @@ export const authReducer = (draft: AuthState, action: Action): AuthState | void 
       draft.familyAssociations.push(action.payload);
       break;
     case 'UPDATE_FAMILY_ASSOCIATION':
-      const index = draft.familyAssociations.findIndex(
-        assoc => assoc.id === action.payload.id,
-      );
+      const index = draft.familyAssociations.findIndex(assoc => assoc.id === action.payload.id);
       if (index !== -1) {
         draft.familyAssociations[index] = action.payload;
       }

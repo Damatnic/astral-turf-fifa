@@ -22,7 +22,7 @@ export interface TeamFinances {
     ticketSales: number;
     sponsorship: number;
     prizeMoney: number;
-  }
+  };
 }
 
 // Stadium and facilities

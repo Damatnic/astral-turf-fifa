@@ -60,8 +60,8 @@ export class SecurityErrorBoundary extends Component<Props, State> {
 
   static getDerivedStateFromError(error: Error): Partial<State> {
     const errorId = `error_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    const isSecurityRelated = SECURITY_ERROR_PATTERNS.some(pattern =>
-      pattern.test(error.message) || pattern.test(error.name),
+    const isSecurityRelated = SECURITY_ERROR_PATTERNS.some(
+      pattern => pattern.test(error.message) || pattern.test(error.name),
     );
 
     return {
@@ -111,8 +111,7 @@ export class SecurityErrorBoundary extends Component<Props, State> {
 
       // Track error patterns for security analysis
       this.trackErrorPattern(sanitizedError);
-
-    } catch (_loggingError) {
+    } catch (__loggingError) {
       // Fallback error logging to console if security logger fails
       console.error('Security error boundary logging failed:', loggingError);
       console.error('Original error:', error);
@@ -241,14 +240,11 @@ export class SecurityErrorBoundary extends Component<Props, State> {
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                   {this.state.isSecurityRelated
                     ? 'A security-related error has occurred. For your protection, some features may be temporarily unavailable.'
-                    : 'An unexpected error has occurred. We apologize for the inconvenience.'
-                  }
+                    : 'An unexpected error has occurred. We apologize for the inconvenience.'}
                 </p>
 
                 {ENVIRONMENT_CONFIG.isDevelopment && (
-                  <p className="text-xs text-gray-500 mt-2">
-                    Error ID: {this.state.errorId}
-                  </p>
+                  <p className="text-xs text-gray-500 mt-2">Error ID: {this.state.errorId}</p>
                 )}
               </div>
 
@@ -286,8 +282,9 @@ export class SecurityErrorBoundary extends Component<Props, State> {
                     </svg>
                     <div className="ml-3">
                       <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                        <strong>Security Notice:</strong> This incident has been logged for security review.
-                        If you believe this error is related to suspicious activity, please contact support immediately.
+                        <strong>Security Notice:</strong> This incident has been logged for security
+                        review. If you believe this error is related to suspicious activity, please
+                        contact support immediately.
                       </p>
                     </div>
                   </div>
@@ -296,7 +293,7 @@ export class SecurityErrorBoundary extends Component<Props, State> {
 
               <div className="mt-6 text-center">
                 <button
-                  onClick={() => window.location.href = '/'}
+                  onClick={() => (window.location.href = '/')}
                   className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
                 >
                   Return to Home

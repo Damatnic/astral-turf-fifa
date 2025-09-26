@@ -45,8 +45,8 @@ class ProcessPolyfill {
       eventListeners.forEach(listener => {
         try {
           listener(...args);
-        } catch (_error) {
-          // // console.warn('Error in process event listener:', error);
+        } catch {
+          // // // // console.warn('Error in process event listener:', error);
         }
       });
       return true;
@@ -54,8 +54,8 @@ class ProcessPolyfill {
     return false;
   }
 
-  exit(code?: number): never {
-    // // console.warn(`process.exit(${code}) called in browser - ignoring`);
+  exit(_code?: number): never {
+    // // // // console.warn(`process.exit(${code}) called in browser - ignoring`);
     return undefined as never;
   }
 
@@ -68,6 +68,6 @@ class ProcessPolyfill {
 export const processPolyfill = typeof window !== 'undefined' ? new ProcessPolyfill() : undefined;
 
 // Make it available globally if needed
-if (typeof window !== 'undefined' && !(window as Record<string, unknown>).process) {
-  (window as Record<string, unknown>).process = processPolyfill;
+if (typeof window !== 'undefined' && !(window as unknown as Record<string, unknown>).process) {
+  (window as unknown as Record<string, unknown>).process = processPolyfill;
 }

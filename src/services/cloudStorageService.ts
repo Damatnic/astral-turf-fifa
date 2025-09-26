@@ -91,7 +91,7 @@ class CloudStorageService {
     // Initialize database
     await this.db.open();
 
-    // // console.log('☁️ Cloud storage service initialized');
+    // // // // console.log('☁️ Cloud storage service initialized');
   }
 
   /**
@@ -126,10 +126,10 @@ class CloudStorageService {
         await this.syncToCloud();
       }
 
-      // // console.log('💾 State saved locally and queued for cloud sync');
+      // // // // console.log('💾 State saved locally and queued for cloud sync');
 
     } catch (_error) {
-      console.error('❌ Failed to save state:', error);
+      console.error('❌ Failed to save state:', _error);
       throw error;
     }
   }
@@ -165,7 +165,7 @@ class CloudStorageService {
       return localState?.state || null;
 
     } catch (_error) {
-      console.error('❌ Failed to load state:', error);
+      console.error('❌ Failed to load state:', _error);
       return null;
     }
   }
@@ -195,7 +195,7 @@ class CloudStorageService {
         this.onSyncCompleteCallback(true);
       }
 
-      // // console.log(`☁️ Synced ${pendingStates.length} states to cloud`);
+      // // // // console.log(`☁️ Synced ${pendingStates.length} states to cloud`);
 
     } catch (_error) {
       await this.logSync('SYNC_TO_CLOUD', false, 0, error.message);
@@ -254,11 +254,11 @@ class CloudStorageService {
         await this.uploadBackupToCloud(backupId, backupData);
       }
 
-      // // console.log(`💾 Backup created: ${backupId}`);
+      // // // // console.log(`💾 Backup created: ${backupId}`);
       return backupId;
 
     } catch (_error) {
-      console.error('❌ Backup creation failed:', error);
+      console.error('❌ Backup creation failed:', _error);
       throw error;
     }
   }
@@ -284,7 +284,7 @@ class CloudStorageService {
       throw new Error('Backup data not available offline');
 
     } catch (_error) {
-      console.error('❌ Backup restoration failed:', error);
+      console.error('❌ Backup restoration failed:', _error);
       throw error;
     }
   }
@@ -336,7 +336,7 @@ class CloudStorageService {
       .and(backup => backup.isAutomatic)
       .delete();
 
-    // // console.log(`🧹 Cleaned up data older than ${daysToKeep} days`);
+    // // // // console.log(`🧹 Cleaned up data older than ${daysToKeep} days`);
   }
 
   // Event listener setters
@@ -366,7 +366,7 @@ class CloudStorageService {
       const state = JSON.parse(decryptedState);
       return { state, version: latestState.version };
     } catch (_error) {
-      console.error('❌ Failed to decrypt local state:', error);
+      console.error('❌ Failed to decrypt local state:', _error);
       return null;
     }
   }
@@ -393,7 +393,7 @@ class CloudStorageService {
       return { state, version: data.version };
 
     } catch (_error) {
-      console.error('❌ Failed to load cloud state:', error);
+      console.error('❌ Failed to load cloud state:', _error);
       return null;
     }
   }
@@ -469,9 +469,9 @@ class CloudStorageService {
     if (typeof TextEncoder === 'undefined' || typeof crypto === 'undefined') {
       return 'checksum-unavailable';
     }
-    const encoder = new TextEncoder();
+    const encoder = typeof TextEncoder !== 'undefined' ? new TextEncoder();
     const dataBuffer = encoder.encode(data);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
+    const hashBuffer = await typeof crypto !== 'undefined' ? crypto.subtle.digest('SHA-256', dataBuffer);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
   }
@@ -504,13 +504,13 @@ class CloudStorageService {
   private setupOnlineDetection(): void {
     window.addEventListener('online', () => {
       this.isOnline = true;
-      // // console.log('🌐 Connection restored - initiating sync');
+      // // // // console.log('🌐 Connection restored - initiating sync');
       this.syncToCloud();
     });
 
     window.addEventListener('offline', () => {
       this.isOnline = false;
-      // // console.log('📡 Connection lost - entering offline mode');
+      // // // // console.log('📡 Connection lost - entering offline mode');
     });
   }
 

@@ -1,0 +1,1391 @@
+{
+  "numTotalTestSuites": 71,
+  "numPassedTestSuites": 49,
+  "numFailedTestSuites": 22,
+  "numPendingTestSuites": 0,
+  "numTotalTests": 133,
+  "numPassedTests": 116,
+  "numFailedTests": 17,
+  "numPendingTests": 0,
+  "numTodoTests": 0,
+  "snapshot": {
+    "added": 0,
+    "failure": false,
+    "filesAdded": 0,
+    "filesRemoved": 0,
+    "filesRemovedList": [],
+    "filesUnmatched": 0,
+    "filesUpdated": 0,
+    "matched": 0,
+    "total": 0,
+    "unchecked": 0,
+    "uncheckedKeysByFile": [],
+    "unmatched": 0,
+    "updated": 0,
+    "didUpdate": false
+  },
+  "startTime": 1758901797009,
+  "success": false,
+  "testResults": [
+    {
+      "assertionResults": [],
+      "startTime": 1758901797009,
+      "endTime": 1758901797009,
+      "status": "failed",
+      "message": "Chart.register is not a function",
+      "name": "C:/Users/damat/_REPOS/Astral Turf/src/__tests__/enhanced-ui.test.tsx"
+    },
+    {
+      "assertionResults": [],
+      "startTime": 1758901797009,
+      "endTime": 1758901797009,
+      "status": "failed",
+      "message": "Transform failed with 1 error:\nC:/Users/damat/_REPOS/Astral Turf/src/services/redisService.ts:18:7: ERROR: Expected \"}\" but found \":\"",
+      "name": "C:/Users/damat/_REPOS/Astral Turf/src/__tests__/production-readiness.test.ts"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["Application Smoke Tests"],
+          "fullName": "Application Smoke Tests should have proper application version",
+          "status": "passed",
+          "title": "should have proper application version",
+          "duration": 0.9761999999998352,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Application Smoke Tests"],
+          "fullName": "Application Smoke Tests should have initial state defined",
+          "status": "passed",
+          "title": "should have initial state defined",
+          "duration": 0.38619999999991705,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Application Smoke Tests"],
+          "fullName": "Application Smoke Tests should have proper auth initial state",
+          "status": "passed",
+          "title": "should have proper auth initial state",
+          "duration": 0.5507000000000062,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Application Smoke Tests"],
+          "fullName": "Application Smoke Tests should have tactics state with required properties",
+          "status": "passed",
+          "title": "should have tactics state with required properties",
+          "duration": 0.15180000000009386,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Application Smoke Tests"],
+          "fullName": "Application Smoke Tests should have UI state with required properties",
+          "status": "passed",
+          "title": "should have UI state with required properties",
+          "duration": 0.7414999999998599,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Application Smoke Tests"],
+          "fullName": "Application Smoke Tests should have franchise state with required properties",
+          "status": "passed",
+          "title": "should have franchise state with required properties",
+          "duration": 0.2861000000000331,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Application Smoke Tests"],
+          "fullName": "Application Smoke Tests should have valid formation data",
+          "status": "passed",
+          "title": "should have valid formation data",
+          "duration": 0.27549999999996544,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Application Smoke Tests"],
+          "fullName": "Application Smoke Tests should have valid player data structure",
+          "status": "passed",
+          "title": "should have valid player data structure",
+          "duration": 0.2535000000000309,
+          "failureMessages": [],
+          "meta": {}
+        }
+      ],
+      "startTime": 1758901798774,
+      "endTime": 1758901798778.2754,
+      "status": "passed",
+      "message": "",
+      "name": "C:/Users/damat/_REPOS/Astral Turf/src/__tests__/smoke.test.ts"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["Layout Component"],
+          "fullName": "Layout Component should render basic layout structure",
+          "status": "passed",
+          "title": "should render basic layout structure",
+          "duration": 28.978599999999915,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Layout Component"],
+          "fullName": "Layout Component should apply correct theme classes",
+          "status": "passed",
+          "title": "should apply correct theme classes",
+          "duration": 4.50830000000019,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Layout Component"],
+          "fullName": "Layout Component should apply dark theme classes by default",
+          "status": "passed",
+          "title": "should apply dark theme classes by default",
+          "duration": 3.54970000000003,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Layout Component"],
+          "fullName": "Layout Component should apply mobile layout classes on mobile devices",
+          "status": "passed",
+          "title": "should apply mobile layout classes on mobile devices",
+          "duration": 2.6488999999999123,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Layout Component"],
+          "fullName": "Layout Component should apply tablet layout classes on tablet devices",
+          "status": "passed",
+          "title": "should apply tablet layout classes on tablet devices",
+          "duration": 3.5045000000000073,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Layout Component"],
+          "fullName": "Layout Component should hide header in presentation mode",
+          "status": "passed",
+          "title": "should hide header in presentation mode",
+          "duration": 2.2856000000001586,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Layout Component"],
+          "fullName": "Layout Component should show header when not in presentation mode",
+          "status": "passed",
+          "title": "should show header when not in presentation mode",
+          "duration": 2.929499999999962,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Layout Component"],
+          "fullName": "Layout Component should render modal when activeModal is set",
+          "status": "passed",
+          "title": "should render modal when activeModal is set",
+          "duration": 30.609699999999975,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Layout Component"],
+          "fullName": "Layout Component should render AI chat modal",
+          "status": "passed",
+          "title": "should render AI chat modal",
+          "duration": 14.702199999999948,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Layout Component"],
+          "fullName": "Layout Component should not render modal when activeModal is null",
+          "status": "passed",
+          "title": "should not render modal when activeModal is null",
+          "duration": 4.579500000000053,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Layout Component"],
+          "fullName": "Layout Component should show loading indicator while modal is loading",
+          "status": "passed",
+          "title": "should show loading indicator while modal is loading",
+          "duration": 10.651699999999892,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Layout Component"],
+          "fullName": "Layout Component should render printable lineup when exporting",
+          "status": "passed",
+          "title": "should render printable lineup when exporting",
+          "duration": 5.518500000000131,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Layout Component"],
+          "fullName": "Layout Component should not render printable lineup when not exporting",
+          "status": "passed",
+          "title": "should not render printable lineup when not exporting",
+          "duration": 3.9596999999998843,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Layout Component"],
+          "fullName": "Layout Component should handle keyboard shortcuts for drawing tools",
+          "status": "passed",
+          "title": "should handle keyboard shortcuts for drawing tools",
+          "duration": 4.760099999999966,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Layout Component"],
+          "fullName": "Layout Component should handle soft reset keyboard shortcut",
+          "status": "passed",
+          "title": "should handle soft reset keyboard shortcut",
+          "duration": 3.5994000000000597,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Layout Component"],
+          "fullName": "Layout Component should ignore keyboard shortcuts when input is focused",
+          "status": "passed",
+          "title": "should ignore keyboard shortcuts when input is focused",
+          "duration": 8.229600000000119,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Layout Component"],
+          "fullName": "Layout Component should ignore drawing shortcuts in presentation mode",
+          "status": "passed",
+          "title": "should ignore drawing shortcuts in presentation mode",
+          "duration": 3.5648000000001048,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Layout Component"],
+          "fullName": "Layout Component should apply mobile-specific classes and structure",
+          "status": "passed",
+          "title": "should apply mobile-specific classes and structure",
+          "duration": 2.9333999999998923,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Layout Component"],
+          "fullName": "Layout Component should apply desktop layout structure",
+          "status": "passed",
+          "title": "should apply desktop layout structure",
+          "duration": 3.2824000000000524,
+          "failureMessages": [],
+          "meta": {}
+        }
+      ],
+      "startTime": 1758901799016,
+      "endTime": 1758901799162.2825,
+      "status": "passed",
+      "message": "",
+      "name": "C:/Users/damat/_REPOS/Astral Turf/src/__tests__/components/Layout.test.tsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["Accessibility Testing", "Semantic HTML Structure"],
+          "fullName": "Accessibility Testing Semantic HTML Structure should use proper semantic HTML elements",
+          "status": "passed",
+          "title": "should use proper semantic HTML elements",
+          "duration": 47.401700000000346,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Accessibility Testing", "Semantic HTML Structure"],
+          "fullName": "Accessibility Testing Semantic HTML Structure should have proper heading hierarchy",
+          "status": "passed",
+          "title": "should have proper heading hierarchy",
+          "duration": 17.42450000000008,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Accessibility Testing", "Keyboard Navigation"],
+          "fullName": "Accessibility Testing Keyboard Navigation should support keyboard navigation",
+          "status": "failed",
+          "title": "should support keyboard navigation",
+          "duration": 33.03510000000006,
+          "failureMessages": [
+            "TestingLibraryElementError: Unable to find an accessible element with the role \"textbox\"\n\nHere are the accessible roles:\n\n  button:\n\n  Name \"File\":\n  \u001b[36m<button\u001b[39m\n    \u001b[33mclass\u001b[39m=\u001b[32m\"px-3 py-2 text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] rounded-md\"\u001b[39m\n  \u001b[36m/>\u001b[39m\n\n  Name \"Franchise\":\n  \u001b[36m<button\u001b[39m\n    \u001b[33mclass\u001b[39m=\u001b[32m\"px-3 py-2 text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] rounded-md\"\u001b[39m\n    \u001b[33mdata-testid\u001b[39m=\u001b[32m\"header-franchise-button\"\u001b[39m\n  \u001b[36m/>\u001b[39m\n\n  Name \"Toggle Theme\":\n  \u001b[36m<button\u001b[39m\n    \u001b[33maria-label\u001b[39m=\u001b[32m\"Toggle Theme\"\u001b[39m\n    \u001b[33mclass\u001b[39m=\u001b[32m\"relative inline-flex items-center justify-center font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:ring-offset-2 focus:ring-offset-secondary-900 rounded-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 border border-transparent text-sm !p-0 p-1.5 text-secondary-300 hover:text-accent-400 hover:bg-secondary-700/50\"\u001b[39m\n  \u001b[36m/>\u001b[39m\n\n  Name \"Logout\":\n  \u001b[36m<button\u001b[39m\n    \u001b[33mclass\u001b[39m=\u001b[32m\"relative inline-flex items-center justify-center font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:ring-offset-2 focus:ring-offset-secondary-900 rounded-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 hover:bg-secondary-600/50 border border-transparent px-3 py-1.5 text-sm text-secondary-300 hover:text-error-400\"\u001b[39m\n  \u001b[36m/>\u001b[39m\n\n  Name \"Button 1\":\n  \u001b[36m<button />\u001b[39m\n\n  Name \"Button 2\":\n  \u001b[36m<button />\u001b[39m\n\n  --------------------------------------------------\n  combobox:\n\n  Name \"\":\n  \u001b[36m<input\u001b[39m\n    \u001b[33mplaceholder\u001b[39m=\u001b[32m\"Test input\"\u001b[39m\n    \u001b[33mtype\u001b[39m=\u001b[32m\"text\"\u001b[39m\n  \u001b[36m/>\u001b[39m\n\n  --------------------------------------------------\n\nIgnored nodes: comments, script, style\n\u001b[36m<body>\u001b[39m\n  \u001b[36m<div>\u001b[39m\n    \u001b[36m<div\u001b[39m\n      \u001b[33mclass\u001b[39m=\u001b[32m\"mobile-full-height mobile-safe-area flex flex-col w-screen min-h-screen bg-gradient-to-br from-secondary-950 via-secondary-900 to-secondary-950 text-white font-sans antialiased overflow-hidden transition-all duration-300 dark desktop-layout\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[36m<div\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"flex-shrink-0 z-40 relative\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<header\u001b[39m\n          \u001b[33mclass\u001b[39m=\u001b[32m\"flex-shrink-0 backdrop-blur-xl border-b shadow-lg relative z-50 bg-secondary-900/80 border-secondary-700/50 supports-[backdrop-filter]:bg-secondary-900/60 h-16 px-6 flex items-center justify-between transition-all duration-300\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[36m<div\u001b[39m\n            \u001b[33mclass\u001b[39m=\u001b[32m\"absolute inset-0 bg-gradient-to-r from-primary-500/5 via-transparent to-accent-500/5\"\u001b[39m\n          \u001b[36m/>\u001b[39m\n          \u001b[36m<div\u001b[39m\n            \u001b[33mclass\u001b[39m=\u001b[32m\"flex items-center space-x-3 relative z-10\"\u001b[39m\n          \u001b[36m>\u001b[39m\n            \u001b[36m<div\u001b[39m\n              \u001b[33mclass\u001b[39m=\u001b[32m\"flex items-center space-x-2\"\u001b[39m\n            \u001b[36m>\u001b[39m\n              \u001b[36m<div\u001b[39m\n                \u001b[33mclass\u001b[39m=\u001b[32m\"relative\"\u001b[39m\n              \u001b[36m>\u001b[39m\n                \u001b[36m<svg\u001b[39m\n                  \u001b[33mclass\u001b[39m=\u001b[32m\"text-primary-400 drop-shadow-sm w-8 h-8\"\u001b[39m\n                  \u001b[33mfill\u001b[39m=\u001b[32m\"currentColor\"\u001b[39m\n                  \u001b[33mviewBox\u001b[39m=\u001b[32m\"0 0 100 100\"\u001b[39m\n                  \u001b[33mxmlns\u001b[39m=\u001b[32m\"http://www.w3.org/2000/svg\"\u001b[39m\n                \u001b[36m>\u001b[39m\n                  \u001b[36m<circle\u001b[39m\n                    \u001b[33mcx\u001b[39m=\u001b[32m\"50\"\u001b[39m\n                    \u001b[33mcy\u001b[39m=\u001b[32m\"50\"\u001b[39m\n                    \u001b[33mfill\u001b[39m=\u001b[32m\"currentColor\"\u001b[39m\n                    \u001b[33mr\u001b[39m=\u001b[32m\"45\"\u001b[39m\n                    \u001b[33mstroke\u001b[39m=\u001b[32m\"none\"\u001b[39m\n                  \u001b[36m/>\u001b[39m\n                  \u001b[36m<path\u001b[39m\n                    \u001b[33md\u001b[39m=\u001b[32m\"M50 25 L62 35 L58 50 L42 50 L38 35 Z\"\u001b[39m\n                    \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                  \u001b[36m/>\u001b[39m\n                  \u001b[36m<path\u001b[39m\n                    \u001b[33md\u001b[39m=\u001b[32m\"M50 25 L38 35 L32 22 L44 12 L56 12 L62 22 Z\"\u001b[39m\n                    \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                  \u001b[36m/>\u001b[39m\n                  \u001b[36m<path\u001b[39m\n                    \u001b[33md\u001b[39m=\u001b[32m\"M62 35 L74 32 L80 45 L74 58 L62 55 L58 50 Z\"\u001b[39m\n                    \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                  \u001b[36m/>\u001b[39m\n                  \u001b[36m<path\u001b[39m\n                    \u001b[33md\u001b[39m=\u001b[32m\"M58 50 L62 65 L56 78 L44 78 L38 65 L42 50 Z\"\u001b[39m\n                    \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                  \u001b[36m/>\u001b[39m\n                  \u001b[36m<path\u001b[39m\n                    \u001b[33md\u001b[39m=\u001b[32m\"M38 35 L26 32 L20 45 L26 58 L38 55 L42 50 Z\"\u001b[39m\n                    \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                  \u001b[36m/>\u001b[39m\n                  \u001b[36m<path\u001b[39m\n                    \u001b[33md\u001b[39m=\u001b[32m\"M32 22 L20 25 L14 12 L26 2 L38 5 L38 18 Z\"\u001b[39m\n                    \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                  \u001b[36m/>\u001b[39m\n                  \u001b[36m<path\u001b[39m\n                    \u001b[33md\u001b[39m=\u001b[32m\"M68 22 L80 25 L86 12 L74 2 L62 5 L62 18 Z\"\u001b[39m\n                    \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                  \u001b[36m/>\u001b[39m\n                \u001b[36m</svg>\u001b[39m\n                \u001b[36m<div\u001b[39m\n                  \u001b[33mclass\u001b[39m=\u001b[32m\"absolute inset-0 text-primary-400 blur-sm opacity-50\"\u001b[39m\n                \u001b[36m>\u001b[39m\n                  \u001b[36m<svg\u001b[39m\n                    \u001b[33mclass\u001b[39m=\u001b[32m\"w-8 h-8\"\u001b[39m\n                    \u001b[33mfill\u001b[39m=\u001b[32m\"currentColor\"\u001b[39m\n                    \u001b[33mviewBox\u001b[39m=\u001b[32m\"0 0 100 100\"\u001b[39m\n                    \u001b[33mxmlns\u001b[39m=\u001b[32m\"http://www.w3.org/2000/svg\"\u001b[39m\n                  \u001b[36m>\u001b[39m\n                    \u001b[36m<circle\u001b[39m\n                      \u001b[33mcx\u001b[39m=\u001b[32m\"50\"\u001b[39m\n                      \u001b[33mcy\u001b[39m=\u001b[32m\"50\"\u001b[39m\n                      \u001b[33mfill\u001b[39m=\u001b[32m\"currentColor\"\u001b[39m\n                      \u001b[33mr\u001b[39m=\u001b[32m\"45\"\u001b[39m\n                      \u001b[33mstroke\u001b[39m=\u001b[32m\"none\"\u001b[39m\n                    \u001b[36m/>\u001b[39m\n                    \u001b[36m<path\u001b[39m\n                      \u001b[33md\u001b[39m=\u001b[32m\"M50 25 L62 35 L58 50 L42 50 L38 35 Z\"\u001b[39m\n                      \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                    \u001b[36m/>\u001b[39m\n                    \u001b[36m<path\u001b[39m\n                      \u001b[33md\u001b[39m=\u001b[32m\"M50 25 L38 35 L32 22 L44 12 L56 12 L62 22 Z\"\u001b[39m\n                      \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                    \u001b[36m/>\u001b[39m\n                    \u001b[36m<path\u001b[39m\n                      \u001b[33md\u001b[39m=\u001b[32m\"M62 35 L74 32 L80 45 L74 58 L62 55 L58 50 Z\"\u001b[39m\n                      \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                    \u001b[36m/>\u001b[39m\n                    \u001b[36m<path\u001b[39m\n                      \u001b[33md\u001b[39m=\u001b[32m\"M58 50 L62 65 L56 78 L44 78 L38 65 L42 50 Z\"\u001b[39m\n                      \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                    \u001b[36m/>\u001b[39m\n                    \u001b[36m<path\u001b[39m\n                      \u001b[33md\u001b[39m=\u001b[32m\"M38 35 L26 32 L20 45 L26 58 L38 55 L42 50 Z\"\u001b[39m\n                      \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                    \u001b[36m/>\u001b[39m\n                    \u001b[36m<path\u001b[39m\n                      \u001b[33md\u001b[39m=\u001b[32m\"M32 22 L20 25 L14 12 L26 2 L38 5 L38 18 Z\"\u001b[39m\n                      \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                    \u001b[36m/>\u001b[39m\n                    \u001b[36m<path\u001b[39m\n                      \u001b[33md\u001b[39m=\u001b[32m\"M68 22 L80 25 L86 12 L74 2 L62 5 L62 18 Z\"\u001b[39m\n                      \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                    \u001b[36m/>\u001b[39m\n                  \u001b[36m</svg>\u001b[39m\n                \u001b[36m</div>\u001b[39m\n              \u001b[36m</div>\u001b[39m\n              \u001b[36m<h1\u001b[39m\n                \u001b[33mclass\u001b[39m=\u001b[32m\"font-bold tracking-wider text-white text-xl drop-shadow-sm\"\u001b[39m\n              \u001b[36m>\u001b[39m\n                \u001b[36m<span\u001b[39m\n                  \u001b[33mclass\u001b[39m=\u001b[32m\"text-primary-400\"\u001b[39m\n                \u001b[36m>\u001b[39m\n                  \u001b[0mAstral\u001b[0m\n                \u001b[36m</span>\u001b[39m\n                \u001b[36m<span\u001b[39m\n                  \u001b[33mclass\u001b[39m=\u001b[32m\"text-white\"\u001b[39m\n                \u001b[36m>\u001b[39m\n                  \u001b[0mTurf\u001b[0m\n                \u001b[36m</span>\u001b[39m\n              \u001b[36m</h1>\u001b[39m\n            \u001b[36m</div>\u001b[39m\n            \u001b[36m<div\u001b[39m\n              \u001b[33mclass\u001b[39m=\u001b[32m\"flex items-center space-x-2 ml-6\"\u001b[39m\n            \u001b[36m>\u001b[39m\n              \u001b[36m<div\u001b[39m\n                \u001b[33mclass\u001b[39m=\u001b[32m\"relative\"\u001b[39m\n              \u001b[36m>\u001b[39m\n                \u001b[36m<button\u001b[39m\n                  \u001b[33mclass\u001b[39m=\u001b[32m\"px-3 py-2 text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] rounded-md\"\u001b[39m\n                \u001b[36m>\u001b[39m\n                  \u001b[0mFile\u001b[0m\n                \u001b[36m</button>\u001b[39m\n              \u001b[36m</div>\u001b[39m\n              \u001b[36m<div\u001b[39m\n                \u001b[33mclass\u001b[3...\n    at Object.getElementError (C:\\Users\\damat\\_REPOS\\Astral Turf\\node_modules\\@testing-library\\dom\\dist\\config.js:37:19)\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\node_modules\\@testing-library\\dom\\dist\\query-helpers.js:76:38\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\node_modules\\@testing-library\\dom\\dist\\query-helpers.js:109:15\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\accessibility\\a11y.test.tsx:125:29\n    at file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:146:14\n    at file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:533:11\n    at runWithTimeout (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:39:7)\n    at runTest (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:1056:17)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at runSuite (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:1205:15)"
+          ],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Accessibility Testing", "Keyboard Navigation"],
+          "fullName": "Accessibility Testing Keyboard Navigation should have proper focus management",
+          "status": "failed",
+          "title": "should have proper focus management",
+          "duration": 26.641799999999876,
+          "failureMessages": [
+            "AssertionError: expected <body><div>…(1)</div></body> to be <button …(1)></button> // Object.is equality\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\accessibility\\a11y.test.tsx:149:40\n    at file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:146:14\n    at file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:533:11\n    at runWithTimeout (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:39:7)\n    at runTest (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:1056:17)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at runSuite (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:1205:15)\n    at runSuite (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:1205:15)\n    at runSuite (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:1205:15)\n    at runFiles (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:1262:5)"
+          ],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Accessibility Testing", "ARIA Attributes"],
+          "fullName": "Accessibility Testing ARIA Attributes should have proper ARIA labels for interactive elements",
+          "status": "failed",
+          "title": "should have proper ARIA labels for interactive elements",
+          "duration": 17.448899999999867,
+          "failureMessages": [
+            "TestingLibraryElementError: Unable to find a label with the text of: Close modal\n\nIgnored nodes: comments, script, style\n\u001b[36m<body>\u001b[39m\n  \u001b[36m<div>\u001b[39m\n    \u001b[36m<div\u001b[39m\n      \u001b[33mclass\u001b[39m=\u001b[32m\"mobile-full-height mobile-safe-area flex flex-col w-screen min-h-screen bg-gradient-to-br from-secondary-950 via-secondary-900 to-secondary-950 text-white font-sans antialiased overflow-hidden transition-all duration-300 dark desktop-layout\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[36m<div\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"flex-shrink-0 z-40 relative\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<header\u001b[39m\n          \u001b[33mclass\u001b[39m=\u001b[32m\"flex-shrink-0 backdrop-blur-xl border-b shadow-lg relative z-50 bg-secondary-900/80 border-secondary-700/50 supports-[backdrop-filter]:bg-secondary-900/60 h-16 px-6 flex items-center justify-between transition-all duration-300\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[36m<div\u001b[39m\n            \u001b[33mclass\u001b[39m=\u001b[32m\"absolute inset-0 bg-gradient-to-r from-primary-500/5 via-transparent to-accent-500/5\"\u001b[39m\n          \u001b[36m/>\u001b[39m\n          \u001b[36m<div\u001b[39m\n            \u001b[33mclass\u001b[39m=\u001b[32m\"flex items-center space-x-3 relative z-10\"\u001b[39m\n          \u001b[36m>\u001b[39m\n            \u001b[36m<div\u001b[39m\n              \u001b[33mclass\u001b[39m=\u001b[32m\"flex items-center space-x-2\"\u001b[39m\n            \u001b[36m>\u001b[39m\n              \u001b[36m<div\u001b[39m\n                \u001b[33mclass\u001b[39m=\u001b[32m\"relative\"\u001b[39m\n              \u001b[36m>\u001b[39m\n                \u001b[36m<svg\u001b[39m\n                  \u001b[33mclass\u001b[39m=\u001b[32m\"text-primary-400 drop-shadow-sm w-8 h-8\"\u001b[39m\n                  \u001b[33mfill\u001b[39m=\u001b[32m\"currentColor\"\u001b[39m\n                  \u001b[33mviewBox\u001b[39m=\u001b[32m\"0 0 100 100\"\u001b[39m\n                  \u001b[33mxmlns\u001b[39m=\u001b[32m\"http://www.w3.org/2000/svg\"\u001b[39m\n                \u001b[36m>\u001b[39m\n                  \u001b[36m<circle\u001b[39m\n                    \u001b[33mcx\u001b[39m=\u001b[32m\"50\"\u001b[39m\n                    \u001b[33mcy\u001b[39m=\u001b[32m\"50\"\u001b[39m\n                    \u001b[33mfill\u001b[39m=\u001b[32m\"currentColor\"\u001b[39m\n                    \u001b[33mr\u001b[39m=\u001b[32m\"45\"\u001b[39m\n                    \u001b[33mstroke\u001b[39m=\u001b[32m\"none\"\u001b[39m\n                  \u001b[36m/>\u001b[39m\n                  \u001b[36m<path\u001b[39m\n                    \u001b[33md\u001b[39m=\u001b[32m\"M50 25 L62 35 L58 50 L42 50 L38 35 Z\"\u001b[39m\n                    \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                  \u001b[36m/>\u001b[39m\n                  \u001b[36m<path\u001b[39m\n                    \u001b[33md\u001b[39m=\u001b[32m\"M50 25 L38 35 L32 22 L44 12 L56 12 L62 22 Z\"\u001b[39m\n                    \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                  \u001b[36m/>\u001b[39m\n                  \u001b[36m<path\u001b[39m\n                    \u001b[33md\u001b[39m=\u001b[32m\"M62 35 L74 32 L80 45 L74 58 L62 55 L58 50 Z\"\u001b[39m\n                    \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                  \u001b[36m/>\u001b[39m\n                  \u001b[36m<path\u001b[39m\n                    \u001b[33md\u001b[39m=\u001b[32m\"M58 50 L62 65 L56 78 L44 78 L38 65 L42 50 Z\"\u001b[39m\n                    \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                  \u001b[36m/>\u001b[39m\n                  \u001b[36m<path\u001b[39m\n                    \u001b[33md\u001b[39m=\u001b[32m\"M38 35 L26 32 L20 45 L26 58 L38 55 L42 50 Z\"\u001b[39m\n                    \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                  \u001b[36m/>\u001b[39m\n                  \u001b[36m<path\u001b[39m\n                    \u001b[33md\u001b[39m=\u001b[32m\"M32 22 L20 25 L14 12 L26 2 L38 5 L38 18 Z\"\u001b[39m\n                    \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                  \u001b[36m/>\u001b[39m\n                  \u001b[36m<path\u001b[39m\n                    \u001b[33md\u001b[39m=\u001b[32m\"M68 22 L80 25 L86 12 L74 2 L62 5 L62 18 Z\"\u001b[39m\n                    \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                  \u001b[36m/>\u001b[39m\n                \u001b[36m</svg>\u001b[39m\n                \u001b[36m<div\u001b[39m\n                  \u001b[33mclass\u001b[39m=\u001b[32m\"absolute inset-0 text-primary-400 blur-sm opacity-50\"\u001b[39m\n                \u001b[36m>\u001b[39m\n                  \u001b[36m<svg\u001b[39m\n                    \u001b[33mclass\u001b[39m=\u001b[32m\"w-8 h-8\"\u001b[39m\n                    \u001b[33mfill\u001b[39m=\u001b[32m\"currentColor\"\u001b[39m\n                    \u001b[33mviewBox\u001b[39m=\u001b[32m\"0 0 100 100\"\u001b[39m\n                    \u001b[33mxmlns\u001b[39m=\u001b[32m\"http://www.w3.org/2000/svg\"\u001b[39m\n                  \u001b[36m>\u001b[39m\n                    \u001b[36m<circle\u001b[39m\n                      \u001b[33mcx\u001b[39m=\u001b[32m\"50\"\u001b[39m\n                      \u001b[33mcy\u001b[39m=\u001b[32m\"50\"\u001b[39m\n                      \u001b[33mfill\u001b[39m=\u001b[32m\"currentColor\"\u001b[39m\n                      \u001b[33mr\u001b[39m=\u001b[32m\"45\"\u001b[39m\n                      \u001b[33mstroke\u001b[39m=\u001b[32m\"none\"\u001b[39m\n                    \u001b[36m/>\u001b[39m\n                    \u001b[36m<path\u001b[39m\n                      \u001b[33md\u001b[39m=\u001b[32m\"M50 25 L62 35 L58 50 L42 50 L38 35 Z\"\u001b[39m\n                      \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                    \u001b[36m/>\u001b[39m\n                    \u001b[36m<path\u001b[39m\n                      \u001b[33md\u001b[39m=\u001b[32m\"M50 25 L38 35 L32 22 L44 12 L56 12 L62 22 Z\"\u001b[39m\n                      \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                    \u001b[36m/>\u001b[39m\n                    \u001b[36m<path\u001b[39m\n                      \u001b[33md\u001b[39m=\u001b[32m\"M62 35 L74 32 L80 45 L74 58 L62 55 L58 50 Z\"\u001b[39m\n                      \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                    \u001b[36m/>\u001b[39m\n                    \u001b[36m<path\u001b[39m\n                      \u001b[33md\u001b[39m=\u001b[32m\"M58 50 L62 65 L56 78 L44 78 L38 65 L42 50 Z\"\u001b[39m\n                      \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                    \u001b[36m/>\u001b[39m\n                    \u001b[36m<path\u001b[39m\n                      \u001b[33md\u001b[39m=\u001b[32m\"M38 35 L26 32 L20 45 L26 58 L38 55 L42 50 Z\"\u001b[39m\n                      \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                    \u001b[36m/>\u001b[39m\n                    \u001b[36m<path\u001b[39m\n                      \u001b[33md\u001b[39m=\u001b[32m\"M32 22 L20 25 L14 12 L26 2 L38 5 L38 18 Z\"\u001b[39m\n                      \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                    \u001b[36m/>\u001b[39m\n                    \u001b[36m<path\u001b[39m\n                      \u001b[33md\u001b[39m=\u001b[32m\"M68 22 L80 25 L86 12 L74 2 L62 5 L62 18 Z\"\u001b[39m\n                      \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                    \u001b[36m/>\u001b[39m\n                  \u001b[36m</svg>\u001b[39m\n                \u001b[36m</div>\u001b[39m\n              \u001b[36m</div>\u001b[39m\n              \u001b[36m<h1\u001b[39m\n                \u001b[33mclass\u001b[39m=\u001b[32m\"font-bold tracking-wider text-white text-xl drop-shadow-sm\"\u001b[39m\n              \u001b[36m>\u001b[39m\n                \u001b[36m<span\u001b[39m\n                  \u001b[33mclass\u001b[39m=\u001b[32m\"text-primary-400\"\u001b[39m\n                \u001b[36m>\u001b[39m\n                  \u001b[0mAstral\u001b[0m\n                \u001b[36m</span>\u001b[39m\n                \u001b[36m<span\u001b[39m\n                  \u001b[33mclass\u001b[39m=\u001b[32m\"text-white\"\u001b[39m\n                \u001b[36m>\u001b[39m\n                  \u001b[0mTurf\u001b[0m\n                \u001b[36m</span>\u001b[39m\n              \u001b[36m</h1>\u001b[39m\n            \u001b[36m</div>\u001b[39m\n            \u001b[36m<div\u001b[39m\n              \u001b[33mclass\u001b[39m=\u001b[32m\"flex items-center space-x-2 ml-6\"\u001b[39m\n            \u001b[36m>\u001b[39m\n              \u001b[36m<div\u001b[39m\n                \u001b[33mclass\u001b[39m=\u001b[32m\"relative\"\u001b[39m\n              \u001b[36m>\u001b[39m\n                \u001b[36m<button\u001b[39m\n                  \u001b[33mclass\u001b[39m=\u001b[32m\"px-3 py-2 text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] rounded-md\"\u001b[39m\n                \u001b[36m>\u001b[39m\n                  \u001b[0mFile\u001b[0m\n                \u001b[36m</button>\u001b[39m\n              \u001b[36m</div>\u001b[39m\n              \u001b[36m<div\u001b[39m\n                \u001b[33mclass\u001b[3...\n    at Object.getElementError (C:\\Users\\damat\\_REPOS\\Astral Turf\\node_modules\\@testing-library\\dom\\dist\\config.js:37:19)\n    at getAllByLabelText (C:\\Users\\damat\\_REPOS\\Astral Turf\\node_modules\\@testing-library\\dom\\dist\\queries\\label-text.js:111:38)\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\node_modules\\@testing-library\\dom\\dist\\query-helpers.js:52:17\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\node_modules\\@testing-library\\dom\\dist\\query-helpers.js:95:19\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\accessibility\\a11y.test.tsx:165:38\n    at file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:146:14\n    at file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:533:11\n    at runWithTimeout (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:39:7)\n    at runTest (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:1056:17)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)"
+          ],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Accessibility Testing", "ARIA Attributes"],
+          "fullName": "Accessibility Testing ARIA Attributes should use ARIA roles appropriately",
+          "status": "passed",
+          "title": "should use ARIA roles appropriately",
+          "duration": 7.584700000000339,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Accessibility Testing", "Color Contrast and Visual Accessibility"],
+          "fullName": "Accessibility Testing Color Contrast and Visual Accessibility should not rely solely on color for information",
+          "status": "failed",
+          "title": "should not rely solely on color for information",
+          "duration": 11.828500000000076,
+          "failureMessages": [
+            "TestingLibraryElementError: Unable to find a label with the text of: Error message\n\nIgnored nodes: comments, script, style\n\u001b[36m<body>\u001b[39m\n  \u001b[36m<div>\u001b[39m\n    \u001b[36m<div\u001b[39m\n      \u001b[33mclass\u001b[39m=\u001b[32m\"mobile-full-height mobile-safe-area flex flex-col w-screen min-h-screen bg-gradient-to-br from-secondary-950 via-secondary-900 to-secondary-950 text-white font-sans antialiased overflow-hidden transition-all duration-300 dark desktop-layout\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[36m<div\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"flex-shrink-0 z-40 relative\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<header\u001b[39m\n          \u001b[33mclass\u001b[39m=\u001b[32m\"flex-shrink-0 backdrop-blur-xl border-b shadow-lg relative z-50 bg-secondary-900/80 border-secondary-700/50 supports-[backdrop-filter]:bg-secondary-900/60 h-16 px-6 flex items-center justify-between transition-all duration-300\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[36m<div\u001b[39m\n            \u001b[33mclass\u001b[39m=\u001b[32m\"absolute inset-0 bg-gradient-to-r from-primary-500/5 via-transparent to-accent-500/5\"\u001b[39m\n          \u001b[36m/>\u001b[39m\n          \u001b[36m<div\u001b[39m\n            \u001b[33mclass\u001b[39m=\u001b[32m\"flex items-center space-x-3 relative z-10\"\u001b[39m\n          \u001b[36m>\u001b[39m\n            \u001b[36m<div\u001b[39m\n              \u001b[33mclass\u001b[39m=\u001b[32m\"flex items-center space-x-2\"\u001b[39m\n            \u001b[36m>\u001b[39m\n              \u001b[36m<div\u001b[39m\n                \u001b[33mclass\u001b[39m=\u001b[32m\"relative\"\u001b[39m\n              \u001b[36m>\u001b[39m\n                \u001b[36m<svg\u001b[39m\n                  \u001b[33mclass\u001b[39m=\u001b[32m\"text-primary-400 drop-shadow-sm w-8 h-8\"\u001b[39m\n                  \u001b[33mfill\u001b[39m=\u001b[32m\"currentColor\"\u001b[39m\n                  \u001b[33mviewBox\u001b[39m=\u001b[32m\"0 0 100 100\"\u001b[39m\n                  \u001b[33mxmlns\u001b[39m=\u001b[32m\"http://www.w3.org/2000/svg\"\u001b[39m\n                \u001b[36m>\u001b[39m\n                  \u001b[36m<circle\u001b[39m\n                    \u001b[33mcx\u001b[39m=\u001b[32m\"50\"\u001b[39m\n                    \u001b[33mcy\u001b[39m=\u001b[32m\"50\"\u001b[39m\n                    \u001b[33mfill\u001b[39m=\u001b[32m\"currentColor\"\u001b[39m\n                    \u001b[33mr\u001b[39m=\u001b[32m\"45\"\u001b[39m\n                    \u001b[33mstroke\u001b[39m=\u001b[32m\"none\"\u001b[39m\n                  \u001b[36m/>\u001b[39m\n                  \u001b[36m<path\u001b[39m\n                    \u001b[33md\u001b[39m=\u001b[32m\"M50 25 L62 35 L58 50 L42 50 L38 35 Z\"\u001b[39m\n                    \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                  \u001b[36m/>\u001b[39m\n                  \u001b[36m<path\u001b[39m\n                    \u001b[33md\u001b[39m=\u001b[32m\"M50 25 L38 35 L32 22 L44 12 L56 12 L62 22 Z\"\u001b[39m\n                    \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                  \u001b[36m/>\u001b[39m\n                  \u001b[36m<path\u001b[39m\n                    \u001b[33md\u001b[39m=\u001b[32m\"M62 35 L74 32 L80 45 L74 58 L62 55 L58 50 Z\"\u001b[39m\n                    \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                  \u001b[36m/>\u001b[39m\n                  \u001b[36m<path\u001b[39m\n                    \u001b[33md\u001b[39m=\u001b[32m\"M58 50 L62 65 L56 78 L44 78 L38 65 L42 50 Z\"\u001b[39m\n                    \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                  \u001b[36m/>\u001b[39m\n                  \u001b[36m<path\u001b[39m\n                    \u001b[33md\u001b[39m=\u001b[32m\"M38 35 L26 32 L20 45 L26 58 L38 55 L42 50 Z\"\u001b[39m\n                    \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                  \u001b[36m/>\u001b[39m\n                  \u001b[36m<path\u001b[39m\n                    \u001b[33md\u001b[39m=\u001b[32m\"M32 22 L20 25 L14 12 L26 2 L38 5 L38 18 Z\"\u001b[39m\n                    \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                  \u001b[36m/>\u001b[39m\n                  \u001b[36m<path\u001b[39m\n                    \u001b[33md\u001b[39m=\u001b[32m\"M68 22 L80 25 L86 12 L74 2 L62 5 L62 18 Z\"\u001b[39m\n                    \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                  \u001b[36m/>\u001b[39m\n                \u001b[36m</svg>\u001b[39m\n                \u001b[36m<div\u001b[39m\n                  \u001b[33mclass\u001b[39m=\u001b[32m\"absolute inset-0 text-primary-400 blur-sm opacity-50\"\u001b[39m\n                \u001b[36m>\u001b[39m\n                  \u001b[36m<svg\u001b[39m\n                    \u001b[33mclass\u001b[39m=\u001b[32m\"w-8 h-8\"\u001b[39m\n                    \u001b[33mfill\u001b[39m=\u001b[32m\"currentColor\"\u001b[39m\n                    \u001b[33mviewBox\u001b[39m=\u001b[32m\"0 0 100 100\"\u001b[39m\n                    \u001b[33mxmlns\u001b[39m=\u001b[32m\"http://www.w3.org/2000/svg\"\u001b[39m\n                  \u001b[36m>\u001b[39m\n                    \u001b[36m<circle\u001b[39m\n                      \u001b[33mcx\u001b[39m=\u001b[32m\"50\"\u001b[39m\n                      \u001b[33mcy\u001b[39m=\u001b[32m\"50\"\u001b[39m\n                      \u001b[33mfill\u001b[39m=\u001b[32m\"currentColor\"\u001b[39m\n                      \u001b[33mr\u001b[39m=\u001b[32m\"45\"\u001b[39m\n                      \u001b[33mstroke\u001b[39m=\u001b[32m\"none\"\u001b[39m\n                    \u001b[36m/>\u001b[39m\n                    \u001b[36m<path\u001b[39m\n                      \u001b[33md\u001b[39m=\u001b[32m\"M50 25 L62 35 L58 50 L42 50 L38 35 Z\"\u001b[39m\n                      \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                    \u001b[36m/>\u001b[39m\n                    \u001b[36m<path\u001b[39m\n                      \u001b[33md\u001b[39m=\u001b[32m\"M50 25 L38 35 L32 22 L44 12 L56 12 L62 22 Z\"\u001b[39m\n                      \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                    \u001b[36m/>\u001b[39m\n                    \u001b[36m<path\u001b[39m\n                      \u001b[33md\u001b[39m=\u001b[32m\"M62 35 L74 32 L80 45 L74 58 L62 55 L58 50 Z\"\u001b[39m\n                      \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                    \u001b[36m/>\u001b[39m\n                    \u001b[36m<path\u001b[39m\n                      \u001b[33md\u001b[39m=\u001b[32m\"M58 50 L62 65 L56 78 L44 78 L38 65 L42 50 Z\"\u001b[39m\n                      \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                    \u001b[36m/>\u001b[39m\n                    \u001b[36m<path\u001b[39m\n                      \u001b[33md\u001b[39m=\u001b[32m\"M38 35 L26 32 L20 45 L26 58 L38 55 L42 50 Z\"\u001b[39m\n                      \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                    \u001b[36m/>\u001b[39m\n                    \u001b[36m<path\u001b[39m\n                      \u001b[33md\u001b[39m=\u001b[32m\"M32 22 L20 25 L14 12 L26 2 L38 5 L38 18 Z\"\u001b[39m\n                      \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                    \u001b[36m/>\u001b[39m\n                    \u001b[36m<path\u001b[39m\n                      \u001b[33md\u001b[39m=\u001b[32m\"M68 22 L80 25 L86 12 L74 2 L62 5 L62 18 Z\"\u001b[39m\n                      \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                    \u001b[36m/>\u001b[39m\n                  \u001b[36m</svg>\u001b[39m\n                \u001b[36m</div>\u001b[39m\n              \u001b[36m</div>\u001b[39m\n              \u001b[36m<h1\u001b[39m\n                \u001b[33mclass\u001b[39m=\u001b[32m\"font-bold tracking-wider text-white text-xl drop-shadow-sm\"\u001b[39m\n              \u001b[36m>\u001b[39m\n                \u001b[36m<span\u001b[39m\n                  \u001b[33mclass\u001b[39m=\u001b[32m\"text-primary-400\"\u001b[39m\n                \u001b[36m>\u001b[39m\n                  \u001b[0mAstral\u001b[0m\n                \u001b[36m</span>\u001b[39m\n                \u001b[36m<span\u001b[39m\n                  \u001b[33mclass\u001b[39m=\u001b[32m\"text-white\"\u001b[39m\n                \u001b[36m>\u001b[39m\n                  \u001b[0mTurf\u001b[0m\n                \u001b[36m</span>\u001b[39m\n              \u001b[36m</h1>\u001b[39m\n            \u001b[36m</div>\u001b[39m\n            \u001b[36m<div\u001b[39m\n              \u001b[33mclass\u001b[39m=\u001b[32m\"flex items-center space-x-2 ml-6\"\u001b[39m\n            \u001b[36m>\u001b[39m\n              \u001b[36m<div\u001b[39m\n                \u001b[33mclass\u001b[39m=\u001b[32m\"relative\"\u001b[39m\n              \u001b[36m>\u001b[39m\n                \u001b[36m<button\u001b[39m\n                  \u001b[33mclass\u001b[39m=\u001b[32m\"px-3 py-2 text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] rounded-md\"\u001b[39m\n                \u001b[36m>\u001b[39m\n                  \u001b[0mFile\u001b[0m\n                \u001b[36m</button>\u001b[39m\n              \u001b[36m</div>\u001b[39m\n              \u001b[36m<div\u001b[39m\n                \u001b[33mclass\u001b[3...\n    at Object.getElementError (C:\\Users\\damat\\_REPOS\\Astral Turf\\node_modules\\@testing-library\\dom\\dist\\config.js:37:19)\n    at getAllByLabelText (C:\\Users\\damat\\_REPOS\\Astral Turf\\node_modules\\@testing-library\\dom\\dist\\queries\\label-text.js:111:38)\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\node_modules\\@testing-library\\dom\\dist\\query-helpers.js:52:17\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\node_modules\\@testing-library\\dom\\dist\\query-helpers.js:95:19\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\accessibility\\a11y.test.tsx:205:35\n    at file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:146:14\n    at file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:533:11\n    at runWithTimeout (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:39:7)\n    at runTest (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:1056:17)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)"
+          ],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Accessibility Testing", "Color Contrast and Visual Accessibility"],
+          "fullName": "Accessibility Testing Color Contrast and Visual Accessibility should provide text alternatives for visual content",
+          "status": "failed",
+          "title": "should provide text alternatives for visual content",
+          "duration": 8.365099999999984,
+          "failureMessages": [
+            "Error: \u001b[2mexpect(\u001b[22m\u001b[31melement\u001b[39m\u001b[2m).toHaveAttribute(\u001b[22m\u001b[32m\u001b[32m\"aria-label\"\u001b[32m\u001b[39m\u001b[2m) // element.hasAttribute(\"aria-label\")\u001b[22m\n\nExpected the element to have attribute:\n\u001b[32m  aria-label\u001b[39m\nReceived:\n\u001b[31m  null\u001b[39m\n    at Proxy.expectWrapper (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/expect/dist/index.js:1996:19)\n    at Proxy.<anonymous> (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/expect/dist/index.js:972:17)\n    at Proxy.methodWrapper (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/chai/index.js:1686:25)\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\accessibility\\a11y.test.tsx:231:21\n    at file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:146:14\n    at file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:533:11\n    at runWithTimeout (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:39:7)\n    at runTest (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:1056:17)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at runSuite (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:1205:15)"
+          ],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Accessibility Testing", "Screen Reader Support"],
+          "fullName": "Accessibility Testing Screen Reader Support should provide descriptive text for screen readers",
+          "status": "passed",
+          "title": "should provide descriptive text for screen readers",
+          "duration": 8.00729999999976,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Accessibility Testing", "Screen Reader Support"],
+          "fullName": "Accessibility Testing Screen Reader Support should announce dynamic content changes",
+          "status": "passed",
+          "title": "should announce dynamic content changes",
+          "duration": 6.529500000000098,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Accessibility Testing", "Form Accessibility"],
+          "fullName": "Accessibility Testing Form Accessibility should have proper form labels and validation",
+          "status": "failed",
+          "title": "should have proper form labels and validation",
+          "duration": 13.553499999999985,
+          "failureMessages": [
+            "TestingLibraryElementError: Found a label with the text of: Email Address, however the element associated with this label (<input />) is non-labellable [https://html.spec.whatwg.org/multipage/forms.html#category-label]. If you really need to label a <input />, you can use aria-label or aria-labelledby instead.\n\nIgnored nodes: comments, script, style\n\u001b[36m<body>\u001b[39m\n  \u001b[36m<div>\u001b[39m\n    \u001b[36m<div\u001b[39m\n      \u001b[33mclass\u001b[39m=\u001b[32m\"mobile-full-height mobile-safe-area flex flex-col w-screen min-h-screen bg-gradient-to-br from-secondary-950 via-secondary-900 to-secondary-950 text-white font-sans antialiased overflow-hidden transition-all duration-300 dark desktop-layout\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[36m<div\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"flex-shrink-0 z-40 relative\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<header\u001b[39m\n          \u001b[33mclass\u001b[39m=\u001b[32m\"flex-shrink-0 backdrop-blur-xl border-b shadow-lg relative z-50 bg-secondary-900/80 border-secondary-700/50 supports-[backdrop-filter]:bg-secondary-900/60 h-16 px-6 flex items-center justify-between transition-all duration-300\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[36m<div\u001b[39m\n            \u001b[33mclass\u001b[39m=\u001b[32m\"absolute inset-0 bg-gradient-to-r from-primary-500/5 via-transparent to-accent-500/5\"\u001b[39m\n          \u001b[36m/>\u001b[39m\n          \u001b[36m<div\u001b[39m\n            \u001b[33mclass\u001b[39m=\u001b[32m\"flex items-center space-x-3 relative z-10\"\u001b[39m\n          \u001b[36m>\u001b[39m\n            \u001b[36m<div\u001b[39m\n              \u001b[33mclass\u001b[39m=\u001b[32m\"flex items-center space-x-2\"\u001b[39m\n            \u001b[36m>\u001b[39m\n              \u001b[36m<div\u001b[39m\n                \u001b[33mclass\u001b[39m=\u001b[32m\"relative\"\u001b[39m\n              \u001b[36m>\u001b[39m\n                \u001b[36m<svg\u001b[39m\n                  \u001b[33mclass\u001b[39m=\u001b[32m\"text-primary-400 drop-shadow-sm w-8 h-8\"\u001b[39m\n                  \u001b[33mfill\u001b[39m=\u001b[32m\"currentColor\"\u001b[39m\n                  \u001b[33mviewBox\u001b[39m=\u001b[32m\"0 0 100 100\"\u001b[39m\n                  \u001b[33mxmlns\u001b[39m=\u001b[32m\"http://www.w3.org/2000/svg\"\u001b[39m\n                \u001b[36m>\u001b[39m\n                  \u001b[36m<circle\u001b[39m\n                    \u001b[33mcx\u001b[39m=\u001b[32m\"50\"\u001b[39m\n                    \u001b[33mcy\u001b[39m=\u001b[32m\"50\"\u001b[39m\n                    \u001b[33mfill\u001b[39m=\u001b[32m\"currentColor\"\u001b[39m\n                    \u001b[33mr\u001b[39m=\u001b[32m\"45\"\u001b[39m\n                    \u001b[33mstroke\u001b[39m=\u001b[32m\"none\"\u001b[39m\n                  \u001b[36m/>\u001b[39m\n                  \u001b[36m<path\u001b[39m\n                    \u001b[33md\u001b[39m=\u001b[32m\"M50 25 L62 35 L58 50 L42 50 L38 35 Z\"\u001b[39m\n                    \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                  \u001b[36m/>\u001b[39m\n                  \u001b[36m<path\u001b[39m\n                    \u001b[33md\u001b[39m=\u001b[32m\"M50 25 L38 35 L32 22 L44 12 L56 12 L62 22 Z\"\u001b[39m\n                    \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                  \u001b[36m/>\u001b[39m\n                  \u001b[36m<path\u001b[39m\n                    \u001b[33md\u001b[39m=\u001b[32m\"M62 35 L74 32 L80 45 L74 58 L62 55 L58 50 Z\"\u001b[39m\n                    \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                  \u001b[36m/>\u001b[39m\n                  \u001b[36m<path\u001b[39m\n                    \u001b[33md\u001b[39m=\u001b[32m\"M58 50 L62 65 L56 78 L44 78 L38 65 L42 50 Z\"\u001b[39m\n                    \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                  \u001b[36m/>\u001b[39m\n                  \u001b[36m<path\u001b[39m\n                    \u001b[33md\u001b[39m=\u001b[32m\"M38 35 L26 32 L20 45 L26 58 L38 55 L42 50 Z\"\u001b[39m\n                    \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                  \u001b[36m/>\u001b[39m\n                  \u001b[36m<path\u001b[39m\n                    \u001b[33md\u001b[39m=\u001b[32m\"M32 22 L20 25 L14 12 L26 2 L38 5 L38 18 Z\"\u001b[39m\n                    \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                  \u001b[36m/>\u001b[39m\n                  \u001b[36m<path\u001b[39m\n                    \u001b[33md\u001b[39m=\u001b[32m\"M68 22 L80 25 L86 12 L74 2 L62 5 L62 18 Z\"\u001b[39m\n                    \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                  \u001b[36m/>\u001b[39m\n                \u001b[36m</svg>\u001b[39m\n                \u001b[36m<div\u001b[39m\n                  \u001b[33mclass\u001b[39m=\u001b[32m\"absolute inset-0 text-primary-400 blur-sm opacity-50\"\u001b[39m\n                \u001b[36m>\u001b[39m\n                  \u001b[36m<svg\u001b[39m\n                    \u001b[33mclass\u001b[39m=\u001b[32m\"w-8 h-8\"\u001b[39m\n                    \u001b[33mfill\u001b[39m=\u001b[32m\"currentColor\"\u001b[39m\n                    \u001b[33mviewBox\u001b[39m=\u001b[32m\"0 0 100 100\"\u001b[39m\n                    \u001b[33mxmlns\u001b[39m=\u001b[32m\"http://www.w3.org/2000/svg\"\u001b[39m\n                  \u001b[36m>\u001b[39m\n                    \u001b[36m<circle\u001b[39m\n                      \u001b[33mcx\u001b[39m=\u001b[32m\"50\"\u001b[39m\n                      \u001b[33mcy\u001b[39m=\u001b[32m\"50\"\u001b[39m\n                      \u001b[33mfill\u001b[39m=\u001b[32m\"currentColor\"\u001b[39m\n                      \u001b[33mr\u001b[39m=\u001b[32m\"45\"\u001b[39m\n                      \u001b[33mstroke\u001b[39m=\u001b[32m\"none\"\u001b[39m\n                    \u001b[36m/>\u001b[39m\n                    \u001b[36m<path\u001b[39m\n                      \u001b[33md\u001b[39m=\u001b[32m\"M50 25 L62 35 L58 50 L42 50 L38 35 Z\"\u001b[39m\n                      \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                    \u001b[36m/>\u001b[39m\n                    \u001b[36m<path\u001b[39m\n                      \u001b[33md\u001b[39m=\u001b[32m\"M50 25 L38 35 L32 22 L44 12 L56 12 L62 22 Z\"\u001b[39m\n                      \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                    \u001b[36m/>\u001b[39m\n                    \u001b[36m<path\u001b[39m\n                      \u001b[33md\u001b[39m=\u001b[32m\"M62 35 L74 32 L80 45 L74 58 L62 55 L58 50 Z\"\u001b[39m\n                      \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                    \u001b[36m/>\u001b[39m\n                    \u001b[36m<path\u001b[39m\n                      \u001b[33md\u001b[39m=\u001b[32m\"M58 50 L62 65 L56 78 L44 78 L38 65 L42 50 Z\"\u001b[39m\n                      \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                    \u001b[36m/>\u001b[39m\n                    \u001b[36m<path\u001b[39m\n                      \u001b[33md\u001b[39m=\u001b[32m\"M38 35 L26 32 L20 45 L26 58 L38 55 L42 50 Z\"\u001b[39m\n                      \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                    \u001b[36m/>\u001b[39m\n                    \u001b[36m<path\u001b[39m\n                      \u001b[33md\u001b[39m=\u001b[32m\"M32 22 L20 25 L14 12 L26 2 L38 5 L38 18 Z\"\u001b[39m\n                      \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                    \u001b[36m/>\u001b[39m\n                    \u001b[36m<path\u001b[39m\n                      \u001b[33md\u001b[39m=\u001b[32m\"M68 22 L80 25 L86 12 L74 2 L62 5 L62 18 Z\"\u001b[39m\n                      \u001b[33mfill\u001b[39m=\u001b[32m\"white\"\u001b[39m\n                    \u001b[36m/>\u001b[39m\n                  \u001b[36m</svg>\u001b[39m\n                \u001b[36m</div>\u001b[39m\n              \u001b[36m</div>\u001b[39m\n              \u001b[36m<h1\u001b[39m\n                \u001b[33mclass\u001b[39m=\u001b[32m\"font-bold tracking-wider text-white text-xl drop-shadow-sm\"\u001b[39m\n              \u001b[36m>\u001b[39m\n                \u001b[36m<span\u001b[39m\n                  \u001b[33mclass\u001b[39m=\u001b[32m\"text-primary-400\"\u001b[39m\n                \u001b[36m>\u001b[39m\n                  \u001b[0mAstral\u001b[0m\n                \u001b[36m</span>\u001b[39m\n                \u001b[36m<span\u001b[39m\n                  \u001b[33mclass\u001b[39m=\u001b[32m\"text-white\"\u001b[39m\n                \u001b[36m>\u001b[39m\n                  \u001b[0mTurf\u001b[0m\n                \u001b[36m</span>\u001b[39m\n              \u001b[36m</h1>\u001b[39m\n            \u001b[36m</div>\u001b[39m\n            \u001b[36m<div\u001b[39m\n              \u001b[33mclass\u001b[39m=\u001b[32m\"flex items-center space-x-2 ml-6\"\u001b[39m\n            \u001b[36m>\u001b[39m\n              \u001b[36m<div\u001b[39m\n                \u001b[33mclass\u001b[39m=\u001b[32m\"relative\"\u001b[39m\n              \u001b[36m>\u001b[39m\n                \u001b[36m<button\u001b[39m\n                  \u001b[33mclass\u001b[39m=\u001b[32m\"px-3 py-2 text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] rounded-md\"\u001b[39m\n                \u001b[36m>\u001b[39m\n                  \u001b[0mFile\u001b[0m\n                \u001b[36m</button>\u001b[39m\n              \u001b[36m</div>\u001b[39m\n              \u001b[36m<div\u001b[39m\n                \u001b[33mclass\u001b[3...\n    at Object.getElementError (C:\\Users\\damat\\_REPOS\\Astral Turf\\node_modules\\@testing-library\\dom\\dist\\config.js:37:19)\n    at getAllByLabelText (C:\\Users\\damat\\_REPOS\\Astral Turf\\node_modules\\@testing-library\\dom\\dist\\queries\\label-text.js:106:40)\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\node_modules\\@testing-library\\dom\\dist\\query-helpers.js:52:17\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\node_modules\\@testing-library\\dom\\dist\\query-helpers.js:95:19\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\accessibility\\a11y.test.tsx:291:33\n    at file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:146:14\n    at file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:533:11\n    at runWithTimeout (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:39:7)\n    at runTest (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:1056:17)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)"
+          ],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Accessibility Testing", "Mobile Accessibility"],
+          "fullName": "Accessibility Testing Mobile Accessibility should maintain accessibility on mobile devices",
+          "status": "passed",
+          "title": "should maintain accessibility on mobile devices",
+          "duration": 6.520800000000236,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Accessibility Testing", "Mobile Accessibility"],
+          "fullName": "Accessibility Testing Mobile Accessibility should support touch navigation",
+          "status": "passed",
+          "title": "should support touch navigation",
+          "duration": 8.879899999999907,
+          "failureMessages": [],
+          "meta": {}
+        }
+      ],
+      "startTime": 1758901799200,
+      "endTime": 1758901799413.88,
+      "status": "failed",
+      "message": "",
+      "name": "C:/Users/damat/_REPOS/Astral Turf/src/__tests__/accessibility/a11y.test.tsx"
+    },
+    {
+      "assertionResults": [],
+      "startTime": 1758901797009,
+      "endTime": 1758901797009,
+      "status": "failed",
+      "message": "Playwright Test did not expect test.describe() to be called here.\nMost common reasons include:\n- You are calling test.describe() in a configuration file.\n- You are calling test.describe() in a file that is imported by the configuration file.\n- You have two different versions of @playwright/test. This usually happens\n  when one of the dependencies in your package.json depends on @playwright/test.",
+      "name": "C:/Users/damat/_REPOS/Astral Turf/src/__tests__/e2e/basic-navigation.spec.ts"
+    },
+    {
+      "assertionResults": [],
+      "startTime": 1758901797009,
+      "endTime": 1758901797009,
+      "status": "failed",
+      "message": "Playwright Test did not expect test.describe() to be called here.\nMost common reasons include:\n- You are calling test.describe() in a configuration file.\n- You are calling test.describe() in a file that is imported by the configuration file.\n- You have two different versions of @playwright/test. This usually happens\n  when one of the dependencies in your package.json depends on @playwright/test.",
+      "name": "C:/Users/damat/_REPOS/Astral Turf/src/__tests__/e2e/tactics-board.spec.ts"
+    },
+    {
+      "assertionResults": [],
+      "startTime": 1758901797009,
+      "endTime": 1758901797009,
+      "status": "failed",
+      "message": "Transform failed with 1 error:\nC:/Users/damat/_REPOS/Astral Turf/src/__tests__/context/AppProvider.test.tsx:44:48: ERROR: \"await\" can only be used inside an \"async\" function",
+      "name": "C:/Users/damat/_REPOS/Astral Turf/src/__tests__/context/AppProvider.test.tsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["AuthContext", "useAuthContext hook"],
+          "fullName": "AuthContext useAuthContext hook should return auth state and dispatch from context",
+          "status": "passed",
+          "title": "should return auth state and dispatch from context",
+          "duration": 14.44970000000012,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["AuthContext", "useAuthContext hook"],
+          "fullName": "AuthContext useAuthContext hook should throw error when used outside of context provider",
+          "status": "passed",
+          "title": "should throw error when used outside of context provider",
+          "duration": 13.272400000000061,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["AuthContext", "useAuthContext hook"],
+          "fullName": "AuthContext useAuthContext hook should return unauthenticated state correctly",
+          "status": "passed",
+          "title": "should return unauthenticated state correctly",
+          "duration": 2.2889000000000124,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["AuthContext", "useAuthContext hook"],
+          "fullName": "AuthContext useAuthContext hook should return error state correctly",
+          "status": "passed",
+          "title": "should return error state correctly",
+          "duration": 1.3858999999999924,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["AuthContext", "useAuthContext hook"],
+          "fullName": "AuthContext useAuthContext hook should handle different user roles correctly",
+          "status": "passed",
+          "title": "should handle different user roles correctly",
+          "duration": 0.9988000000000739,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["AuthContext", "useAuthContext hook"],
+          "fullName": "AuthContext useAuthContext hook should handle player role correctly",
+          "status": "passed",
+          "title": "should handle player role correctly",
+          "duration": 0.8022000000000844,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["AuthContext", "useAuthContext hook"],
+          "fullName": "AuthContext useAuthContext hook should handle family role correctly",
+          "status": "passed",
+          "title": "should handle family role correctly",
+          "duration": 1.0153000000000247,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["AuthContext", "useAuthContext hook"],
+          "fullName": "AuthContext useAuthContext hook should provide initial state values from constants",
+          "status": "passed",
+          "title": "should provide initial state values from constants",
+          "duration": 0.7887000000000626,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["AuthContext", "AuthContext default values"],
+          "fullName": "AuthContext AuthContext default values should have undefined as default value",
+          "status": "passed",
+          "title": "should have undefined as default value",
+          "duration": 0.13710000000014588,
+          "failureMessages": [],
+          "meta": {}
+        }
+      ],
+      "startTime": 1758901798798,
+      "endTime": 1758901798833.1372,
+      "status": "passed",
+      "message": "",
+      "name": "C:/Users/damat/_REPOS/Astral Turf/src/__tests__/context/AuthContext.test.tsx"
+    },
+    {
+      "assertionResults": [],
+      "startTime": 1758901797009,
+      "endTime": 1758901797009,
+      "status": "failed",
+      "message": "[vitest] There was an error when mocking a module. If you are using \"vi.mock\" factory, make sure there are no top level variables inside, since this call is hoisted to top of the file. Read more: https://vitest.dev/api/vi.html#vi-mock",
+      "name": "C:/Users/damat/_REPOS/Astral Turf/src/__tests__/integration/LoginFlow.test.tsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["Tactics Board Integration", "Desktop Layout"],
+          "fullName": "Tactics Board Integration Desktop Layout should render full desktop layout with all components",
+          "status": "passed",
+          "title": "should render full desktop layout with all components",
+          "duration": 24.499700000000075,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Tactics Board Integration", "Desktop Layout"],
+          "fullName": "Tactics Board Integration Desktop Layout should apply correct CSS classes for desktop layout",
+          "status": "passed",
+          "title": "should apply correct CSS classes for desktop layout",
+          "duration": 3.7783999999999196,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Tactics Board Integration", "Desktop Layout"],
+          "fullName": "Tactics Board Integration Desktop Layout should show both sidebars in desktop mode",
+          "status": "passed",
+          "title": "should show both sidebars in desktop mode",
+          "duration": 5.794399999999996,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Tactics Board Integration", "Mobile Layout"],
+          "fullName": "Tactics Board Integration Mobile Layout should render mobile layout with collapsed sidebars",
+          "status": "passed",
+          "title": "should render mobile layout with collapsed sidebars",
+          "duration": 6.043300000000045,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Tactics Board Integration", "Mobile Layout"],
+          "fullName": "Tactics Board Integration Mobile Layout should apply mobile-specific CSS classes",
+          "status": "passed",
+          "title": "should apply mobile-specific CSS classes",
+          "duration": 4.330500000000029,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Tactics Board Integration", "Mobile Layout"],
+          "fullName": "Tactics Board Integration Mobile Layout should apply mobile padding to field container",
+          "status": "passed",
+          "title": "should apply mobile padding to field container",
+          "duration": 4.79119999999989,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Tactics Board Integration", "Tablet Layout"],
+          "fullName": "Tactics Board Integration Tablet Layout should render tablet layout appropriately",
+          "status": "passed",
+          "title": "should render tablet layout appropriately",
+          "duration": 5.329500000000053,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Tactics Board Integration", "Presentation Mode"],
+          "fullName": "Tactics Board Integration Presentation Mode should hide sidebars in presentation mode",
+          "status": "passed",
+          "title": "should hide sidebars in presentation mode",
+          "duration": 1.9574999999999818,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Tactics Board Integration", "Presentation Mode"],
+          "fullName": "Tactics Board Integration Presentation Mode should show presentation controls in presentation mode",
+          "status": "passed",
+          "title": "should show presentation controls in presentation mode",
+          "duration": 3.2572000000000116,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Tactics Board Integration", "Presentation Mode"],
+          "fullName": "Tactics Board Integration Presentation Mode should apply presentation mode styling",
+          "status": "passed",
+          "title": "should apply presentation mode styling",
+          "duration": 3.7784999999998945,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Tactics Board Integration", "Presentation Mode"],
+          "fullName": "Tactics Board Integration Presentation Mode should still show essential field components",
+          "status": "failed",
+          "title": "should still show essential field components",
+          "duration": 13.724899999999934,
+          "failureMessages": [
+            "TestingLibraryElementError: Unable to find an element by: [data-testid=\"dugout\"]\n\nIgnored nodes: comments, script, style\n\u001b[36m<body>\u001b[39m\n  \u001b[36m<div>\u001b[39m\n    \u001b[36m<div\u001b[39m\n      \u001b[33mclass\u001b[39m=\u001b[32m\"\n      flex w-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900\n      flex-row h-screen\n    \"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[36m<main\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"\n        flex-grow flex flex-col min-h-0 relative\n        \n      \"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<div\u001b[39m\n          \u001b[33mclass\u001b[39m=\u001b[32m\"absolute inset-0 bg-gradient-to-b from-emerald-950/20 via-slate-900/40 to-slate-950/20\"\u001b[39m\n        \u001b[36m/>\u001b[39m\n        \u001b[36m<div\u001b[39m\n          \u001b[33mclass\u001b[39m=\u001b[32m\"\n          flex-grow flex items-center justify-center relative z-10\n          p-0\n        \"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[36m<div\u001b[39m\n            \u001b[33mclass\u001b[39m=\u001b[32m\"\n            relative w-full h-full\n            max-w-7xl max-h-full\n          \"\u001b[39m\n          \u001b[36m>\u001b[39m\n            \u001b[36m<div\u001b[39m\n              \u001b[33mclass\u001b[39m=\u001b[32m\"\n              absolute inset-0 shadow-2xl bg-gradient-to-br from-emerald-900/10 to-slate-900/20 backdrop-blur-sm border border-emerald-500/10\n              rounded-lg\n            \"\u001b[39m\n            \u001b[36m/>\u001b[39m\n            \u001b[36m<div\u001b[39m\n              \u001b[33mclass\u001b[39m=\u001b[32m\"relative z-10 w-full h-full\"\u001b[39m\n            \u001b[36m>\u001b[39m\n              \u001b[36m<div\u001b[39m\n                \u001b[33mdata-testid\u001b[39m=\u001b[32m\"soccer-field\"\u001b[39m\n              \u001b[36m>\u001b[39m\n                \u001b[0mSoccer Field\u001b[0m\n              \u001b[36m</div>\u001b[39m\n            \u001b[36m</div>\u001b[39m\n          \u001b[36m</div>\u001b[39m\n        \u001b[36m</div>\u001b[39m\n        \u001b[36m<div\u001b[39m\n          \u001b[33mdata-testid\u001b[39m=\u001b[32m\"presentation-controls\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[0mPresentation Controls\u001b[0m\n        \u001b[36m</div>\u001b[39m\n      \u001b[36m</main>\u001b[39m\n    \u001b[36m</div>\u001b[39m\n  \u001b[36m</div>\u001b[39m\n\u001b[36m</body>\u001b[39m\n    at Object.getElementError (C:\\Users\\damat\\_REPOS\\Astral Turf\\node_modules\\@testing-library\\dom\\dist\\config.js:37:19)\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\node_modules\\@testing-library\\dom\\dist\\query-helpers.js:76:38\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\node_modules\\@testing-library\\dom\\dist\\query-helpers.js:52:17\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\node_modules\\@testing-library\\dom\\dist\\query-helpers.js:95:19\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\integration\\TacticsBoard.test.tsx:243:21\n    at file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:146:14\n    at file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:533:11\n    at runWithTimeout (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:39:7)\n    at runTest (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:1056:17)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)"
+          ],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Tactics Board Integration", "Component Integration"],
+          "fullName": "Tactics Board Integration Component Integration should pass tactics state to field components",
+          "status": "passed",
+          "title": "should pass tactics state to field components",
+          "duration": 4.03449999999998,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Tactics Board Integration", "Component Integration"],
+          "fullName": "Tactics Board Integration Component Integration should handle UI state changes",
+          "status": "passed",
+          "title": "should handle UI state changes",
+          "duration": 3.552099999999882,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Tactics Board Integration", "Responsive Behavior"],
+          "fullName": "Tactics Board Integration Responsive Behavior should adapt to screen size changes",
+          "status": "failed",
+          "title": "should adapt to screen size changes",
+          "duration": 6.119900000000143,
+          "failureMessages": [
+            "Error: \u001b[2mexpect(\u001b[22m\u001b[31melement\u001b[39m\u001b[2m).not.toBeInTheDocument()\u001b[22m\n\n\u001b[31mexpected document not to contain element, found <div\n  data-testid=\"left-sidebar\"\n>\n  Left Sidebar\n</div> instead\u001b[39m\n    at Proxy.expectWrapper (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/expect/dist/index.js:1996:19)\n    at Proxy.<anonymous> (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/expect/dist/index.js:972:17)\n    at Proxy.methodWrapper (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/chai/index.js:1686:25)\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\integration\\TacticsBoard.test.tsx:297:56\n    at file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:146:14\n    at file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:533:11\n    at runWithTimeout (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:39:7)\n    at runTest (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:1056:17)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at runSuite (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:1205:15)"
+          ],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Tactics Board Integration", "Responsive Behavior"],
+          "fullName": "Tactics Board Integration Responsive Behavior should handle drawer navigation states",
+          "status": "passed",
+          "title": "should handle drawer navigation states",
+          "duration": 4.9430999999999585,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Tactics Board Integration", "Responsive Behavior"],
+          "fullName": "Tactics Board Integration Responsive Behavior should maintain field functionality across breakpoints",
+          "status": "failed",
+          "title": "should maintain field functionality across breakpoints",
+          "duration": 7.457599999999729,
+          "failureMessages": [
+            "TestingLibraryElementError: Found multiple elements by: [data-testid=\"soccer-field\"]\n\nHere are the matching elements:\n\nIgnored nodes: comments, script, style\n\u001b[36m<div\u001b[39m\n  \u001b[33mdata-testid\u001b[39m=\u001b[32m\"soccer-field\"\u001b[39m\n\u001b[36m>\u001b[39m\n  \u001b[0mSoccer Field\u001b[0m\n\u001b[36m</div>\u001b[39m\n\nIgnored nodes: comments, script, style\n\u001b[36m<div\u001b[39m\n  \u001b[33mdata-testid\u001b[39m=\u001b[32m\"soccer-field\"\u001b[39m\n\u001b[36m>\u001b[39m\n  \u001b[0mSoccer Field\u001b[0m\n\u001b[36m</div>\u001b[39m\n\n(If this is intentional, then use the `*AllBy*` variant of the query (like `queryAllByText`, `getAllByText`, or `findAllByText`)).\n\nIgnored nodes: comments, script, style\n\u001b[36m<body>\u001b[39m\n  \u001b[36m<div>\u001b[39m\n    \u001b[36m<div\u001b[39m\n      \u001b[33mclass\u001b[39m=\u001b[32m\"\n      flex w-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900\n      flex-row h-screen\n    \"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[36m<div\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"flex-shrink-0 w-80 transition-all duration-300 ease-in-out backdrop-blur-sm\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<div\u001b[39m\n          \u001b[33mclass\u001b[39m=\u001b[32m\"h-full border-r border-slate-700/50 bg-slate-900/80\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[36m<div\u001b[39m\n            \u001b[33mdata-testid\u001b[39m=\u001b[32m\"left-sidebar\"\u001b[39m\n          \u001b[36m>\u001b[39m\n            \u001b[0mLeft Sidebar\u001b[0m\n          \u001b[36m</div>\u001b[39m\n        \u001b[36m</div>\u001b[39m\n      \u001b[36m</div>\u001b[39m\n      \u001b[36m<main\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"\n        flex-grow flex flex-col min-h-0 relative\n        \n      \"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<div\u001b[39m\n          \u001b[33mclass\u001b[39m=\u001b[32m\"absolute inset-0 bg-gradient-to-b from-emerald-950/20 via-slate-900/40 to-slate-950/20\"\u001b[39m\n        \u001b[36m/>\u001b[39m\n        \u001b[36m<div\u001b[39m\n          \u001b[33mclass\u001b[39m=\u001b[32m\"\n          flex-grow flex items-center justify-center relative z-10\n          p-4\n        \"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[36m<div\u001b[39m\n            \u001b[33mclass\u001b[39m=\u001b[32m\"\n            relative w-full h-full\n            max-w-7xl max-h-full\n          \"\u001b[39m\n          \u001b[36m>\u001b[39m\n            \u001b[36m<div\u001b[39m\n              \u001b[33mclass\u001b[39m=\u001b[32m\"\n              absolute inset-0 shadow-2xl bg-gradient-to-br from-emerald-900/10 to-slate-900/20 backdrop-blur-sm border border-emerald-500/10\n              rounded-lg\n            \"\u001b[39m\n            \u001b[36m/>\u001b[39m\n            \u001b[36m<div\u001b[39m\n              \u001b[33mclass\u001b[39m=\u001b[32m\"relative z-10 w-full h-full\"\u001b[39m\n            \u001b[36m>\u001b[39m\n              \u001b[36m<div\u001b[39m\n                \u001b[33mdata-testid\u001b[39m=\u001b[32m\"soccer-field\"\u001b[39m\n              \u001b[36m>\u001b[39m\n                \u001b[0mSoccer Field\u001b[0m\n              \u001b[36m</div>\u001b[39m\n            \u001b[36m</div>\u001b[39m\n          \u001b[36m</div>\u001b[39m\n          \u001b[36m<div\u001b[39m\n            \u001b[33mdata-testid\u001b[39m=\u001b[32m\"tactical-toolbar\"\u001b[39m\n          \u001b[36m>\u001b[39m\n            \u001b[0mTactical Toolbar\u001b[0m\n          \u001b[36m</div>\u001b[39m\n        \u001b[36m</div>\u001b[39m\n        \u001b[36m<div\u001b[39m\n          \u001b[33mclass\u001b[39m=\u001b[32m\"\n            border-t border-slate-700/50 bg-slate-900/80 backdrop-blur-sm\n            \n          \"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[36m<div\u001b[39m\n            \u001b[33mdata-testid\u001b[39m=\u001b[32m\"dugout\"\u001b[39m\n          \u001b[36m>\u001b[39m\n            \u001b[0mDugout\u001b[0m\n          \u001b[36m</div>\u001b[39m\n        \u001b[36m</div>\u001b[39m\n      \u001b[36m</main>\u001b[39m\n      \u001b[36m<div\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"flex-shrink-0 w-80 transition-all duration-300 ease-in-out backdrop-blur-sm\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<div\u001b[39m\n          \u001b[33mclass\u001b[39m=\u001b[32m\"h-full border-l border-slate-700/50 bg-slate-900/80\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[36m<div\u001b[39m\n            \u001b[33mdata-testid\u001b[39m=\u001b[32m\"right-sidebar\"\u001b[39m\n          \u001b[36m>\u001b[39m\n            \u001b[0mRight Sidebar\u001b[0m\n          \u001b[36m</div>\u001b[39m\n        \u001b[36m</div>\u001b[39m\n      \u001b[36m</div>\u001b[39m\n      \u001b[36m<div\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"\n          fixed z-50\n          bottom-6 right-6\n        \"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<div\u001b[39m\n          \u001b[33mdata-testid\u001b[39m=\u001b[32m\"chat-button\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[0mChat Button\u001b[0m\n        \u001b[36m</div>\u001b[39m\n      \u001b[36m</div>\u001b[39m\n    \u001b[36m</div>\u001b[39m\n  \u001b[36m</div>\u001b[39m\n  \u001b[36m<div>\u001b[39m\n    \u001b[36m<div\u001b[39m\n      \u001b[33mclass\u001b[39m=\u001b[32m\"\n      flex w-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900\n      flex-col mobile-full-height\n    \"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[36m<div\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"flex-shrink-0 w-80 transition-all duration-300 ease-in-out backdrop-blur-sm\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<div\u001b[39m\n          \u001b[33mclass\u001b[39m=\u001b[32m\"h-full border-r border-slate-700/50 bg-slate-900/80\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[36m<div\u001b[39m\n            \u001b[33mdata-testid\u001b[39m=\u001b[32m\"left-sidebar\"\u001b[39m\n          \u001b[36m>\u001b[39m\n            \u001b[0mLeft Sidebar\u001b[0m\n          \u001b[36m</div>\u001b[39m\n        \u001b[36m</div>\u001b[39m\n      \u001b[36m</div>\u001b[39m\n      \u001b[36m<main\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"\n        flex-grow flex flex-col min-h-0 relative\n        flex-1\n      \"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<div\u001b[39m\n          \u001b[33mclass\u001b[39m=\u001b[32m\"absolute inset-0 bg-gradient-to-b from-emerald-950/20 via-slate-900/40 to-slate-950/20\"\u001b[39m\n        \u001b[36m/>\u001b[39m\n        \u001b[36m<div\u001b[39m\n          \u001b[33mclass\u001b[39m=\u001b[32m\"\n          flex-grow flex items-center justify-center relative z-10\n          mobile-p-2\n        \"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[36m<div\u001b[39m\n            \u001b[33mclass\u001b[39m=\u001b[32m\"\n            relative w-full h-full\n            \n          \"\u001b[39m\n          \u001b[36m>\u001b[39m\n            \u001b[36m<div\u001b[39m\n              \u001b[33mclass\u001b[39m=\u001b[32m\"\n              absolute inset-0 shadow-2xl bg-gradient-to-br from-emerald-900/10 to-slate-900/20 backdrop-blur-sm border border-emerald-500/10\n              rounded-lg\n            \"\u001b[39m\n            \u001b[36m/>\u001b[39m\n            \u001b[36m<div\u001b[39m\n              \u001b[33mclass\u001b[39m=\u001b[32m\"relative z-10 w-full h-full\"\u001b[39m\n            \u001b[36m>\u001b[39m\n              \u001b[36m<div\u001b[39m\n                \u001b[33mdata-testid\u001b[39m=\u001b[32m\"soccer-field\"\u001b[39m\n              \u001b[36m>\u001b[39m\n                \u001b[0mSoccer Field\u001b[0m\n              \u001b[36m</div>\u001b[39m\n            \u001b[36m</div>\u001b[39m\n          \u001b[36m</div>\u001b[39m\n          \u001b[36m<div\u001b[39m\n            \u001b[33mdata-testid\u001b[39m=\u001b[32m\"tactical-toolbar\"\u001b[39m\n          \u001b[36m>\u001b[39m\n            \u001b[0mTactical Toolbar\u001b[0m\n          \u001b[36m</div>\u001b[39m\n        \u001b[36m</div>\u001b[39m\n        \u001b[36m<div\u001b[39m\n          \u001b[33mclass\u001b[39m=\u001b[32m\"\n            border-t border-slate-700/50 bg-slate-900/80 backdrop-blur-sm\n            flex-shrink-0\n          \"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[36m<div\u001b[39m\n            \u001b[33mdata-testid\u001b[39m=\u001b[32m\"dugout\"\u001b[39m\n          \u001b[36m>\u001b[39m\n            \u001b[0mDugout\u001b[0m\n          \u001b[36m</div>\u001b[39m\n        \u001b[36m</div>\u001b[39m\n      \u001b[36m</main>\u001b[39m\n      \u001b[36m<div\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"flex-shrink-0 w-80 transition-all duration-300 ease-in-out backdrop-blur-sm\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<div\u001b[39m\n          \u001b[33mclass\u001b[39m=\u001b[32m\"h-full border-l border-slate-700/50 bg-slate-900/80\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[36m<div\u001b[39m\n            \u001b[33mdata-testid\u001b[39m=\u001b[32m\"right-sidebar\"\u001b[39m\n          \u001b[36m>\u001b[39m\n            \u001b[0mRight Sidebar\u001b[0m\n          \u001b[36m</div>\u001b[39m\n        \u001b[36m</div>\u001b[39m\n      \u001b[36m</div>\u001b[39m\n      \u001b[36m<div\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"flex-shrink-0 bg-slate-900/90 border-t border-slate-700/50\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<div\u001b[39m\n          \u001b[33mclass\u001b[39m=\u001b[32m\"flex justify-center space-x-1 p-2\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[36m<button\u001b[39m\n            \u001b[33mclass\u001b[39m=\u001b[32m\"btn-mobile flex-1 bg-slate-800 hover:bg-slate-700 text-white text-sm py-2 rounded-lg transition-colors\"\u001b[39m\n          \u001b[36m>\u001b[39m\n            \u001b[0mPlayers\u001b[0m\n          \u001b[36m</button>\u001b[39m\n          \u001b[36m<button\u001b[39m\n            \u001b[33mclass\u001b[39m=\u001b[32m\"btn-mobile flex-1 bg-slate-800 hover:bg-slate-700 text-white text-sm py-2 rounded-lg transition-colors\"\u001b[39m\n          \u001b[36m>\u001b[39m\n            \u001b[0mFormation\u001b[0m\n          \u001b[36m</button>\u001b[39m\n          \u001b[36m<button\u001b[39m\n            \u001b[33mclass\u001b[39m=\u001b[32m\"btn-mobile flex-1 bg-slate-800 hover:bg-slate-700 text-white text-sm py-2 rounded-lg transition-colors\"\u001b[39m\n          \u001b[36m>\u001b[39m\n            \u001b[0mAnalytics\u001b[0m\n          \u001b[36m</button>\u001b[39m\n        \u001b[36m</div>\u001b[39m\n      \u001b[36m</div>\u001b[39m\n      \u001b[36m<div\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"\n          fixed z-50\n          bottom-20 right-4\n        \"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<div\u001b[39m\n          \u001b[33mdata-testid\u001b[39m=\u001b[32m\"chat-button\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[0mChat Button\u001b[0m\n        \u001b[36m</div>\u001b[39m\n      \u001b[36m</div>\u001b[39m\n    \u001b[36m</div>\u001b[39m\n  \u001b[36m</div>\u001b[39m\n\u001b[36m</body>\u001b[39m\n    at Object.getElementError (C:\\Users\\damat\\_REPOS\\Astral Turf\\node_modules\\@testing-library\\dom\\dist\\config.js:37:19)\n    at getElementError (C:\\Users\\damat\\_REPOS\\Astral Turf\\node_modules\\@testing-library\\dom\\dist\\query-helpers.js:20:35)\n    at getMultipleElementsFoundError (C:\\Users\\damat\\_REPOS\\Astral Turf\\node_modules\\@testing-library\\dom\\dist\\query-helpers.js:23:10)\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\node_modules\\@testing-library\\dom\\dist\\query-helpers.js:55:13\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\node_modules\\@testing-library\\dom\\dist\\query-helpers.js:95:19\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\integration\\TacticsBoard.test.tsx:324:21\n    at file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:146:14\n    at file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:533:11\n    at runWithTimeout (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:39:7)\n    at runTest (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:1056:17)"
+          ],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Tactics Board Integration", "Background and Styling"],
+          "fullName": "Tactics Board Integration Background and Styling should apply gradient backgrounds",
+          "status": "passed",
+          "title": "should apply gradient backgrounds",
+          "duration": 2.432300000000396,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Tactics Board Integration", "Background and Styling"],
+          "fullName": "Tactics Board Integration Background and Styling should apply backdrop blur effects",
+          "status": "passed",
+          "title": "should apply backdrop blur effects",
+          "duration": 2.9463999999998123,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Tactics Board Integration", "Background and Styling"],
+          "fullName": "Tactics Board Integration Background and Styling should use appropriate border styling",
+          "status": "passed",
+          "title": "should use appropriate border styling",
+          "duration": 3.1480999999998858,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Tactics Board Integration", "Accessibility"],
+          "fullName": "Tactics Board Integration Accessibility should have proper semantic structure",
+          "status": "passed",
+          "title": "should have proper semantic structure",
+          "duration": 2.7314000000001215,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Tactics Board Integration", "Accessibility"],
+          "fullName": "Tactics Board Integration Accessibility should maintain focus management across layout changes",
+          "status": "failed",
+          "title": "should maintain focus management across layout changes",
+          "duration": 3.3060999999997875,
+          "failureMessages": [
+            "TestingLibraryElementError: Unable to find an element by: [data-testid=\"presentation-controls\"]\n\nIgnored nodes: comments, script, style\n\u001b[36m<body>\u001b[39m\n  \u001b[36m<div>\u001b[39m\n    \u001b[36m<div\u001b[39m\n      \u001b[33mclass\u001b[39m=\u001b[32m\"\n      flex w-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900\n      flex-row h-screen\n    \"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[36m<div\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"flex-shrink-0 w-80 transition-all duration-300 ease-in-out backdrop-blur-sm\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<div\u001b[39m\n          \u001b[33mclass\u001b[39m=\u001b[32m\"h-full border-r border-slate-700/50 bg-slate-900/80\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[36m<div\u001b[39m\n            \u001b[33mdata-testid\u001b[39m=\u001b[32m\"left-sidebar\"\u001b[39m\n          \u001b[36m>\u001b[39m\n            \u001b[0mLeft Sidebar\u001b[0m\n          \u001b[36m</div>\u001b[39m\n        \u001b[36m</div>\u001b[39m\n      \u001b[36m</div>\u001b[39m\n      \u001b[36m<main\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"\n        flex-grow flex flex-col min-h-0 relative\n        \n      \"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<div\u001b[39m\n          \u001b[33mclass\u001b[39m=\u001b[32m\"absolute inset-0 bg-gradient-to-b from-emerald-950/20 via-slate-900/40 to-slate-950/20\"\u001b[39m\n        \u001b[36m/>\u001b[39m\n        \u001b[36m<div\u001b[39m\n          \u001b[33mclass\u001b[39m=\u001b[32m\"\n          flex-grow flex items-center justify-center relative z-10\n          p-4\n        \"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[36m<div\u001b[39m\n            \u001b[33mclass\u001b[39m=\u001b[32m\"\n            relative w-full h-full\n            max-w-7xl max-h-full\n          \"\u001b[39m\n          \u001b[36m>\u001b[39m\n            \u001b[36m<div\u001b[39m\n              \u001b[33mclass\u001b[39m=\u001b[32m\"\n              absolute inset-0 shadow-2xl bg-gradient-to-br from-emerald-900/10 to-slate-900/20 backdrop-blur-sm border border-emerald-500/10\n              rounded-lg\n            \"\u001b[39m\n            \u001b[36m/>\u001b[39m\n            \u001b[36m<div\u001b[39m\n              \u001b[33mclass\u001b[39m=\u001b[32m\"relative z-10 w-full h-full\"\u001b[39m\n            \u001b[36m>\u001b[39m\n              \u001b[36m<div\u001b[39m\n                \u001b[33mdata-testid\u001b[39m=\u001b[32m\"soccer-field\"\u001b[39m\n              \u001b[36m>\u001b[39m\n                \u001b[0mSoccer Field\u001b[0m\n              \u001b[36m</div>\u001b[39m\n            \u001b[36m</div>\u001b[39m\n          \u001b[36m</div>\u001b[39m\n          \u001b[36m<div\u001b[39m\n            \u001b[33mdata-testid\u001b[39m=\u001b[32m\"tactical-toolbar\"\u001b[39m\n          \u001b[36m>\u001b[39m\n            \u001b[0mTactical Toolbar\u001b[0m\n          \u001b[36m</div>\u001b[39m\n        \u001b[36m</div>\u001b[39m\n        \u001b[36m<div\u001b[39m\n          \u001b[33mclass\u001b[39m=\u001b[32m\"\n            border-t border-slate-700/50 bg-slate-900/80 backdrop-blur-sm\n            \n          \"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[36m<div\u001b[39m\n            \u001b[33mdata-testid\u001b[39m=\u001b[32m\"dugout\"\u001b[39m\n          \u001b[36m>\u001b[39m\n            \u001b[0mDugout\u001b[0m\n          \u001b[36m</div>\u001b[39m\n        \u001b[36m</div>\u001b[39m\n      \u001b[36m</main>\u001b[39m\n      \u001b[36m<div\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"flex-shrink-0 w-80 transition-all duration-300 ease-in-out backdrop-blur-sm\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<div\u001b[39m\n          \u001b[33mclass\u001b[39m=\u001b[32m\"h-full border-l border-slate-700/50 bg-slate-900/80\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[36m<div\u001b[39m\n            \u001b[33mdata-testid\u001b[39m=\u001b[32m\"right-sidebar\"\u001b[39m\n          \u001b[36m>\u001b[39m\n            \u001b[0mRight Sidebar\u001b[0m\n          \u001b[36m</div>\u001b[39m\n        \u001b[36m</div>\u001b[39m\n      \u001b[36m</div>\u001b[39m\n      \u001b[36m<div\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"\n          fixed z-50\n          bottom-6 right-6\n        \"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<div\u001b[39m\n          \u001b[33mdata-testid\u001b[39m=\u001b[32m\"chat-button\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[0mChat Button\u001b[0m\n        \u001b[36m</div>\u001b[39m\n      \u001b[36m</div>\u001b[39m\n    \u001b[36m</div>\u001b[39m\n  \u001b[36m</div>\u001b[39m\n\u001b[36m</body>\u001b[39m\n    at Object.getElementError (C:\\Users\\damat\\_REPOS\\Astral Turf\\node_modules\\@testing-library\\dom\\dist\\config.js:37:19)\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\node_modules\\@testing-library\\dom\\dist\\query-helpers.js:76:38\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\node_modules\\@testing-library\\dom\\dist\\query-helpers.js:52:17\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\node_modules\\@testing-library\\dom\\dist\\query-helpers.js:95:19\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\integration\\TacticsBoard.test.tsx:377:21\n    at file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:146:14\n    at file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:533:11\n    at runWithTimeout (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:39:7)\n    at runTest (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:1056:17)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)"
+          ],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Tactics Board Integration", "Accessibility"],
+          "fullName": "Tactics Board Integration Accessibility should handle keyboard navigation",
+          "status": "failed",
+          "title": "should handle keyboard navigation",
+          "duration": 6.357600000000275,
+          "failureMessages": [
+            "TestingLibraryElementError: Unable to find an accessible element with the role \"main\"\n\nThere are no accessible roles. But there might be some inaccessible roles. If you wish to access them, then set the `hidden` option to `true`. Learn more about this here: https://testing-library.com/docs/dom-testing-library/api-queries#byrole\n\nIgnored nodes: comments, script, style\n\u001b[36m<body>\u001b[39m\n  \u001b[36m<div>\u001b[39m\n    \u001b[36m<div\u001b[39m\n      \u001b[33mclass\u001b[39m=\u001b[32m\"\n      flex w-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900\n      flex-row h-screen\n    \"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[36m<div\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"flex-shrink-0 w-80 transition-all duration-300 ease-in-out backdrop-blur-sm\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<div\u001b[39m\n          \u001b[33mclass\u001b[39m=\u001b[32m\"h-full border-r border-slate-700/50 bg-slate-900/80\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[36m<div\u001b[39m\n            \u001b[33mdata-testid\u001b[39m=\u001b[32m\"left-sidebar\"\u001b[39m\n          \u001b[36m>\u001b[39m\n            \u001b[0mLeft Sidebar\u001b[0m\n          \u001b[36m</div>\u001b[39m\n        \u001b[36m</div>\u001b[39m\n      \u001b[36m</div>\u001b[39m\n      \u001b[36m<main\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"\n        flex-grow flex flex-col min-h-0 relative\n        \n      \"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<div\u001b[39m\n          \u001b[33mclass\u001b[39m=\u001b[32m\"absolute inset-0 bg-gradient-to-b from-emerald-950/20 via-slate-900/40 to-slate-950/20\"\u001b[39m\n        \u001b[36m/>\u001b[39m\n        \u001b[36m<div\u001b[39m\n          \u001b[33mclass\u001b[39m=\u001b[32m\"\n          flex-grow flex items-center justify-center relative z-10\n          p-4\n        \"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[36m<div\u001b[39m\n            \u001b[33mclass\u001b[39m=\u001b[32m\"\n            relative w-full h-full\n            max-w-7xl max-h-full\n          \"\u001b[39m\n          \u001b[36m>\u001b[39m\n            \u001b[36m<div\u001b[39m\n              \u001b[33mclass\u001b[39m=\u001b[32m\"\n              absolute inset-0 shadow-2xl bg-gradient-to-br from-emerald-900/10 to-slate-900/20 backdrop-blur-sm border border-emerald-500/10\n              rounded-lg\n            \"\u001b[39m\n            \u001b[36m/>\u001b[39m\n            \u001b[36m<div\u001b[39m\n              \u001b[33mclass\u001b[39m=\u001b[32m\"relative z-10 w-full h-full\"\u001b[39m\n            \u001b[36m>\u001b[39m\n              \u001b[36m<div\u001b[39m\n                \u001b[33mdata-testid\u001b[39m=\u001b[32m\"soccer-field\"\u001b[39m\n              \u001b[36m>\u001b[39m\n                \u001b[0mSoccer Field\u001b[0m\n              \u001b[36m</div>\u001b[39m\n            \u001b[36m</div>\u001b[39m\n          \u001b[36m</div>\u001b[39m\n          \u001b[36m<div\u001b[39m\n            \u001b[33mdata-testid\u001b[39m=\u001b[32m\"tactical-toolbar\"\u001b[39m\n          \u001b[36m>\u001b[39m\n            \u001b[0mTactical Toolbar\u001b[0m\n          \u001b[36m</div>\u001b[39m\n        \u001b[36m</div>\u001b[39m\n        \u001b[36m<div\u001b[39m\n          \u001b[33mclass\u001b[39m=\u001b[32m\"\n            border-t border-slate-700/50 bg-slate-900/80 backdrop-blur-sm\n            \n          \"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[36m<div\u001b[39m\n            \u001b[33mdata-testid\u001b[39m=\u001b[32m\"dugout\"\u001b[39m\n          \u001b[36m>\u001b[39m\n            \u001b[0mDugout\u001b[0m\n          \u001b[36m</div>\u001b[39m\n        \u001b[36m</div>\u001b[39m\n      \u001b[36m</main>\u001b[39m\n      \u001b[36m<div\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"flex-shrink-0 w-80 transition-all duration-300 ease-in-out backdrop-blur-sm\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<div\u001b[39m\n          \u001b[33mclass\u001b[39m=\u001b[32m\"h-full border-l border-slate-700/50 bg-slate-900/80\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[36m<div\u001b[39m\n            \u001b[33mdata-testid\u001b[39m=\u001b[32m\"right-sidebar\"\u001b[39m\n          \u001b[36m>\u001b[39m\n            \u001b[0mRight Sidebar\u001b[0m\n          \u001b[36m</div>\u001b[39m\n        \u001b[36m</div>\u001b[39m\n      \u001b[36m</div>\u001b[39m\n      \u001b[36m<div\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"\n          fixed z-50\n          bottom-6 right-6\n        \"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<div\u001b[39m\n          \u001b[33mdata-testid\u001b[39m=\u001b[32m\"chat-button\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[0mChat Button\u001b[0m\n        \u001b[36m</div>\u001b[39m\n      \u001b[36m</div>\u001b[39m\n    \u001b[36m</div>\u001b[39m\n  \u001b[36m</div>\u001b[39m\n\u001b[36m</body>\u001b[39m\n    at Object.getElementError (C:\\Users\\damat\\_REPOS\\Astral Turf\\node_modules\\@testing-library\\dom\\dist\\config.js:37:19)\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\node_modules\\@testing-library\\dom\\dist\\query-helpers.js:76:38\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\node_modules\\@testing-library\\dom\\dist\\query-helpers.js:52:17\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\node_modules\\@testing-library\\dom\\dist\\query-helpers.js:95:19\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\integration\\TacticsBoard.test.tsx:384:34\n    at file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:146:14\n    at file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:533:11\n    at runWithTimeout (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:39:7)\n    at runTest (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:1056:17)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)"
+          ],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Tactics Board Integration", "Performance"],
+          "fullName": "Tactics Board Integration Performance should use React.memo for optimization",
+          "status": "passed",
+          "title": "should use React.memo for optimization",
+          "duration": 3.8481000000001586,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Tactics Board Integration", "Performance"],
+          "fullName": "Tactics Board Integration Performance should not re-render unnecessarily",
+          "status": "passed",
+          "title": "should not re-render unnecessarily",
+          "duration": 4.511499999999614,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Tactics Board Integration", "Error Boundaries"],
+          "fullName": "Tactics Board Integration Error Boundaries should handle component errors gracefully",
+          "status": "passed",
+          "title": "should handle component errors gracefully",
+          "duration": 6.778700000000299,
+          "failureMessages": [],
+          "meta": {}
+        }
+      ],
+      "startTime": 1758901799016,
+      "endTime": 1758901799156.7788,
+      "status": "failed",
+      "message": "",
+      "name": "C:/Users/damat/_REPOS/Astral Turf/src/__tests__/integration/TacticsBoard.test.tsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["Performance Testing", "Component Rendering Performance"],
+          "fullName": "Performance Testing Component Rendering Performance should render Layout component quickly",
+          "status": "passed",
+          "title": "should render Layout component quickly",
+          "duration": 30.55789999999979,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Performance Testing", "Component Rendering Performance"],
+          "fullName": "Performance Testing Component Rendering Performance should handle large datasets efficiently",
+          "status": "passed",
+          "title": "should handle large datasets efficiently",
+          "duration": 57.16449999999986,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Performance Testing", "Component Rendering Performance"],
+          "fullName": "Performance Testing Component Rendering Performance should efficiently update state",
+          "status": "passed",
+          "title": "should efficiently update state",
+          "duration": 9.927099999999882,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Performance Testing", "Memory Usage"],
+          "fullName": "Performance Testing Memory Usage should not create memory leaks during rerenders",
+          "status": "passed",
+          "title": "should not create memory leaks during rerenders",
+          "duration": 134.60780000000068,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Performance Testing", "Memory Usage"],
+          "fullName": "Performance Testing Memory Usage should clean up event listeners properly",
+          "status": "passed",
+          "title": "should clean up event listeners properly",
+          "duration": 5.70719999999983,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Performance Testing", "Animation Performance"],
+          "fullName": "Performance Testing Animation Performance should handle animations smoothly",
+          "status": "passed",
+          "title": "should handle animations smoothly",
+          "duration": 15.109000000000378,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Performance Testing", "Animation Performance"],
+          "fullName": "Performance Testing Animation Performance should maintain 60fps during animations",
+          "status": "passed",
+          "title": "should maintain 60fps during animations",
+          "duration": 146.73289999999997,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Performance Testing", "Bundle Size Impact"],
+          "fullName": "Performance Testing Bundle Size Impact should use code splitting effectively",
+          "status": "passed",
+          "title": "should use code splitting effectively",
+          "duration": 1.8877999999995154,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Performance Testing", "Bundle Size Impact"],
+          "fullName": "Performance Testing Bundle Size Impact should avoid unnecessary re-renders with React.memo",
+          "status": "passed",
+          "title": "should avoid unnecessary re-renders with React.memo",
+          "duration": 1.0958000000000538,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Performance Testing", "Network Performance"],
+          "fullName": "Performance Testing Network Performance should handle offline scenarios gracefully",
+          "status": "passed",
+          "title": "should handle offline scenarios gracefully",
+          "duration": 4.920399999999972,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Performance Testing", "Network Performance"],
+          "fullName": "Performance Testing Network Performance should debounce rapid state updates",
+          "status": "passed",
+          "title": "should debounce rapid state updates",
+          "duration": 145.39770000000044,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Performance Testing", "Resource Loading"],
+          "fullName": "Performance Testing Resource Loading should load images efficiently",
+          "status": "passed",
+          "title": "should load images efficiently",
+          "duration": 6.57759999999962,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Performance Testing", "Resource Loading"],
+          "fullName": "Performance Testing Resource Loading should handle font loading optimally",
+          "status": "passed",
+          "title": "should handle font loading optimally",
+          "duration": 6.361499999999978,
+          "failureMessages": [],
+          "meta": {}
+        }
+      ],
+      "startTime": 1758901801748,
+      "endTime": 1758901802314.3616,
+      "status": "passed",
+      "message": "",
+      "name": "C:/Users/damat/_REPOS/Astral Turf/src/__tests__/performance/performance.test.tsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["AuthService", "getCurrentUserSync"],
+          "fullName": "AuthService getCurrentUserSync should return user from localStorage if exists",
+          "status": "passed",
+          "title": "should return user from localStorage if exists",
+          "duration": 3.32529999999997,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["AuthService", "getCurrentUserSync"],
+          "fullName": "AuthService getCurrentUserSync should return null if no user in localStorage",
+          "status": "passed",
+          "title": "should return null if no user in localStorage",
+          "duration": 0.43679999999994834,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["AuthService", "getCurrentUserSync"],
+          "fullName": "AuthService getCurrentUserSync should return null if localStorage data is corrupted",
+          "status": "passed",
+          "title": "should return null if localStorage data is corrupted",
+          "duration": 0.30550000000016553,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["AuthService", "logout"],
+          "fullName": "AuthService logout should clear localStorage",
+          "status": "passed",
+          "title": "should clear localStorage",
+          "duration": 0.710399999999936,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["AuthService", "updateUserProfile"],
+          "fullName": "AuthService updateUserProfile should successfully update user profile",
+          "status": "passed",
+          "title": "should successfully update user profile",
+          "duration": 0.5763999999999214,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["AuthService", "updateUserProfile"],
+          "fullName": "AuthService updateUserProfile should reject update for non-existent user",
+          "status": "passed",
+          "title": "should reject update for non-existent user",
+          "duration": 1.6679999999998927,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["AuthService", "updateUserProfile"],
+          "fullName": "AuthService updateUserProfile should update localStorage if updating current user",
+          "status": "passed",
+          "title": "should update localStorage if updating current user",
+          "duration": 1.5984000000000833,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["AuthService", "requestPasswordReset"],
+          "fullName": "AuthService requestPasswordReset should successfully request password reset for existing user",
+          "status": "passed",
+          "title": "should successfully request password reset for existing user",
+          "duration": 0.794399999999996,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["AuthService", "requestPasswordReset"],
+          "fullName": "AuthService requestPasswordReset should reject password reset for non-existent user",
+          "status": "passed",
+          "title": "should reject password reset for non-existent user",
+          "duration": 0.45879999999988286,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["AuthService", "resetPassword"],
+          "fullName": "AuthService resetPassword should successfully reset password with valid token and password",
+          "status": "passed",
+          "title": "should successfully reset password with valid token and password",
+          "duration": 0.314600000000155,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["AuthService", "resetPassword"],
+          "fullName": "AuthService resetPassword should reject password reset with short password",
+          "status": "passed",
+          "title": "should reject password reset with short password",
+          "duration": 0.34799999999995634,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["AuthService", "createFamilyAssociation"],
+          "fullName": "AuthService createFamilyAssociation should successfully create family association",
+          "status": "passed",
+          "title": "should successfully create family association",
+          "duration": 0.2619999999999436,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["AuthService", "createFamilyAssociation"],
+          "fullName": "AuthService createFamilyAssociation should reject association with non-existent player",
+          "status": "passed",
+          "title": "should reject association with non-existent player",
+          "duration": 0.18529999999987012,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["AuthService", "createFamilyAssociation"],
+          "fullName": "AuthService createFamilyAssociation should set default permissions for new association",
+          "status": "passed",
+          "title": "should set default permissions for new association",
+          "duration": 0.22840000000019245,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["AuthService", "updateNotificationSettings"],
+          "fullName": "AuthService updateNotificationSettings should successfully update notification settings",
+          "status": "passed",
+          "title": "should successfully update notification settings",
+          "duration": 0.1955000000000382,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["AuthService", "updateNotificationSettings"],
+          "fullName": "AuthService updateNotificationSettings should reject update for non-existent user",
+          "status": "passed",
+          "title": "should reject update for non-existent user",
+          "duration": 0.18429999999989377,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["AuthService", "deactivateUser"],
+          "fullName": "AuthService deactivateUser should successfully deactivate user",
+          "status": "passed",
+          "title": "should successfully deactivate user",
+          "duration": 0.1492000000000644,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["AuthService", "deactivateUser"],
+          "fullName": "AuthService deactivateUser should reject deactivation for non-existent user",
+          "status": "passed",
+          "title": "should reject deactivation for non-existent user",
+          "duration": 0.1972000000000662,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["AuthService", "activateUser"],
+          "fullName": "AuthService activateUser should successfully activate user",
+          "status": "passed",
+          "title": "should successfully activate user",
+          "duration": 0.1958999999999378,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["AuthService", "activateUser"],
+          "fullName": "AuthService activateUser should reject activation for non-existent user",
+          "status": "passed",
+          "title": "should reject activation for non-existent user",
+          "duration": 0.18670000000020082,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["AuthService", "getAllUsers"],
+          "fullName": "AuthService getAllUsers should return array of all users",
+          "status": "passed",
+          "title": "should return array of all users",
+          "duration": 0.3812000000000353,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["AuthService", "getFamilyAssociations"],
+          "fullName": "AuthService getFamilyAssociations should return family associations for user",
+          "status": "passed",
+          "title": "should return family associations for user",
+          "duration": 0.13030000000003383,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["AuthService", "getFamilyAssociations"],
+          "fullName": "AuthService getFamilyAssociations should return empty array for non-existent user",
+          "status": "passed",
+          "title": "should return empty array for non-existent user",
+          "duration": 0.1958999999999378,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["AuthService", "approveFamilyAssociation"],
+          "fullName": "AuthService approveFamilyAssociation should successfully approve family association",
+          "status": "passed",
+          "title": "should successfully approve family association",
+          "duration": 0.2984999999998763,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["AuthService", "approveFamilyAssociation"],
+          "fullName": "AuthService approveFamilyAssociation should reject approval for non-existent association",
+          "status": "passed",
+          "title": "should reject approval for non-existent association",
+          "duration": 0.21329999999989013,
+          "failureMessages": [],
+          "meta": {}
+        }
+      ],
+      "startTime": 1758901798884,
+      "endTime": 1758901798899.2134,
+      "status": "passed",
+      "message": "",
+      "name": "C:/Users/damat/_REPOS/Astral Turf/src/__tests__/services/authService.test.ts"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["Visual Regression Testing", "Layout Visual Tests"],
+          "fullName": "Visual Regression Testing Layout Visual Tests should render layout with consistent styling",
+          "status": "passed",
+          "title": "should render layout with consistent styling",
+          "duration": 50.73180000000002,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Visual Regression Testing", "Layout Visual Tests"],
+          "fullName": "Visual Regression Testing Layout Visual Tests should maintain responsive design consistency",
+          "status": "passed",
+          "title": "should maintain responsive design consistency",
+          "duration": 21.590200000000095,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Visual Regression Testing", "Component Visual Consistency"],
+          "fullName": "Visual Regression Testing Component Visual Consistency should maintain consistent button styling",
+          "status": "passed",
+          "title": "should maintain consistent button styling",
+          "duration": 12.111899999999878,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Visual Regression Testing", "Component Visual Consistency"],
+          "fullName": "Visual Regression Testing Component Visual Consistency should maintain consistent modal styling",
+          "status": "passed",
+          "title": "should maintain consistent modal styling",
+          "duration": 16.33069999999998,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Visual Regression Testing", "Color Consistency"],
+          "fullName": "Visual Regression Testing Color Consistency should use consistent color scheme",
+          "status": "passed",
+          "title": "should use consistent color scheme",
+          "duration": 7.186700000000201,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Visual Regression Testing", "Color Consistency"],
+          "fullName": "Visual Regression Testing Color Consistency should support theme switching",
+          "status": "passed",
+          "title": "should support theme switching",
+          "duration": 13.475099999999657,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Visual Regression Testing", "Animation Consistency"],
+          "fullName": "Visual Regression Testing Animation Consistency should apply consistent transition classes",
+          "status": "passed",
+          "title": "should apply consistent transition classes",
+          "duration": 8.908699999999953,
+          "failureMessages": [],
+          "meta": {}
+        }
+      ],
+      "startTime": 1758901799199,
+      "endTime": 1758901799329.9087,
+      "status": "passed",
+      "message": "",
+      "name": "C:/Users/damat/_REPOS/Astral Turf/src/__tests__/visual/visual-regression.test.tsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["rootReducer", "State management actions"],
+          "fullName": "rootReducer State management actions should handle LOAD_STATE action",
+          "status": "passed",
+          "title": "should handle LOAD_STATE action",
+          "duration": 1.7197999999998501,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["rootReducer", "State management actions"],
+          "fullName": "rootReducer State management actions should handle RESET_STATE action",
+          "status": "passed",
+          "title": "should handle RESET_STATE action",
+          "duration": 0.3141000000000531,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["rootReducer", "Cross-cutting actions"],
+          "fullName": "rootReducer Cross-cutting actions should handle SOFT_RESET_APP action",
+          "status": "failed",
+          "title": "should handle SOFT_RESET_APP action",
+          "duration": 5.982999999999947,
+          "failureMessages": [
+            "TypeError: Cannot read properties of undefined (reading 'find')\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\context\\reducers\\rootReducer.ts:66:53\n    at Array.forEach (<anonymous>)\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\context\\reducers\\rootReducer.ts:64:47\n    at Proxy.produce (C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\context\\reducers\\rootReducer.test.ts:5:5)\n    at Module.rootReducer (C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\context\\reducers\\rootReducer.ts:51:20)\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\context\\reducers\\rootReducer.test.ts:148:24\n    at file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:146:14\n    at file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:533:11\n    at runWithTimeout (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:39:7)\n    at runTest (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:1056:17)"
+          ],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["rootReducer", "Cross-cutting actions"],
+          "fullName": "rootReducer Cross-cutting actions should handle ADVANCE_WEEK action",
+          "status": "failed",
+          "title": "should handle ADVANCE_WEEK action",
+          "duration": 1.2555999999999585,
+          "failureMessages": [
+            "TypeError: Cannot read properties of undefined (reading 'fitnessCoach')\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\context\\reducers\\rootReducer.ts:103:65\n    at Array.forEach (<anonymous>)\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\context\\reducers\\rootReducer.ts:101:40\n    at Proxy.produce (C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\context\\reducers\\rootReducer.test.ts:5:5)\n    at Module.rootReducer (C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\context\\reducers\\rootReducer.ts:51:20)\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\context\\reducers\\rootReducer.test.ts:157:24\n    at file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:146:14\n    at file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:533:11\n    at runWithTimeout (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:39:7)\n    at runTest (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:1056:17)"
+          ],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["rootReducer", "Cross-cutting actions"],
+          "fullName": "rootReducer Cross-cutting actions should handle SIMULATE_MATCH_UPDATE action",
+          "status": "passed",
+          "title": "should handle SIMULATE_MATCH_UPDATE action",
+          "duration": 2.133199999999988,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["rootReducer", "Cross-cutting actions"],
+          "fullName": "rootReducer Cross-cutting actions should handle SIMULATE_MATCH_SUCCESS action",
+          "status": "failed",
+          "title": "should handle SIMULATE_MATCH_SUCCESS action",
+          "duration": 1.7132999999998901,
+          "failureMessages": [
+            "TypeError: Cannot read properties of undefined (reading 'leagueTeams')\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\context\\reducers\\rootReducer.ts:230:69\n    at Proxy.produce (C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\context\\reducers\\rootReducer.test.ts:5:5)\n    at Module.rootReducer (C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\context\\reducers\\rootReducer.ts:51:20)\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\context\\reducers\\rootReducer.test.ts:209:24\n    at file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:146:14\n    at file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:533:11\n    at runWithTimeout (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:39:7)\n    at runTest (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:1056:17)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at runSuite (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:1205:15)"
+          ],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["rootReducer", "Playbook actions"],
+          "fullName": "rootReducer Playbook actions should handle CREATE_PLAYBOOK_ITEM action",
+          "status": "passed",
+          "title": "should handle CREATE_PLAYBOOK_ITEM action",
+          "duration": 0.9880000000000564,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["rootReducer", "Playbook actions"],
+          "fullName": "rootReducer Playbook actions should handle ADD_PLAYBOOK_STEP action",
+          "status": "passed",
+          "title": "should handle ADD_PLAYBOOK_STEP action",
+          "duration": 0.38009999999985666,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["rootReducer", "Playbook actions"],
+          "fullName": "rootReducer Playbook actions should handle ADD_LIBRARY_PLAY_TO_PLAYBOOK action",
+          "status": "failed",
+          "title": "should handle ADD_LIBRARY_PLAY_TO_PLAYBOOK action",
+          "duration": 0.4779999999998381,
+          "failureMessages": [
+            "TypeError: Cannot read properties of undefined (reading 'forEach')\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\context\\reducers\\rootReducer.ts:293:37\n    at Array.forEach (<anonymous>)\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\context\\reducers\\rootReducer.ts:292:65\n    at Proxy.produce (C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\context\\reducers\\rootReducer.test.ts:5:5)\n    at Module.rootReducer (C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\context\\reducers\\rootReducer.ts:51:20)\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\context\\reducers\\rootReducer.test.ts:301:24\n    at file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:146:14\n    at file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:533:11\n    at runWithTimeout (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:39:7)\n    at runTest (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:1056:17)"
+          ],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["rootReducer", "Delegation to sub-reducers"],
+          "fullName": "rootReducer Delegation to sub-reducers should delegate actions to all sub-reducers",
+          "status": "passed",
+          "title": "should delegate actions to all sub-reducers",
+          "duration": 1.8036999999999352,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["rootReducer", "Default case handling"],
+          "fullName": "rootReducer Default case handling should handle unknown actions gracefully",
+          "status": "passed",
+          "title": "should handle unknown actions gracefully",
+          "duration": 0.7617000000000189,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["rootReducer", "Default case handling"],
+          "fullName": "rootReducer Default case handling should return initial state when called with undefined state",
+          "status": "passed",
+          "title": "should return initial state when called with undefined state",
+          "duration": 0.19519999999988613,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["rootReducer", "Complex cross-cutting scenarios"],
+          "fullName": "rootReducer Complex cross-cutting scenarios should handle player development during ADVANCE_WEEK",
+          "status": "failed",
+          "title": "should handle player development during ADVANCE_WEEK",
+          "duration": 0.6107999999999265,
+          "failureMessages": [
+            "TypeError: Cannot read properties of undefined (reading 'fitnessCoach')\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\context\\reducers\\rootReducer.ts:103:65\n    at Array.forEach (<anonymous>)\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\context\\reducers\\rootReducer.ts:101:40\n    at Proxy.produce (C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\context\\reducers\\rootReducer.test.ts:5:5)\n    at Module.rootReducer (C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\context\\reducers\\rootReducer.ts:51:20)\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\context\\reducers\\rootReducer.test.ts:413:24\n    at file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:146:14\n    at file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:533:11\n    at runWithTimeout (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:39:7)\n    at runTest (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:1056:17)"
+          ],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["rootReducer", "Complex cross-cutting scenarios"],
+          "fullName": "rootReducer Complex cross-cutting scenarios should handle relationship changes during match simulation",
+          "status": "failed",
+          "title": "should handle relationship changes during match simulation",
+          "duration": 0.4109000000000833,
+          "failureMessages": [
+            "TypeError: Cannot read properties of undefined (reading 'unshift')\n    at addNewsItem (C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\context\\reducers\\rootReducer.ts:29:30)\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\context\\reducers\\rootReducer.ts:225:37\n    at Array.forEach (<anonymous>)\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\context\\reducers\\rootReducer.ts:218:39\n    at Proxy.produce (C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\context\\reducers\\rootReducer.test.ts:5:5)\n    at Module.rootReducer (C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\context\\reducers\\rootReducer.ts:51:20)\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\context\\reducers\\rootReducer.test.ts:458:24\n    at file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:146:14\n    at file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:533:11\n    at runWithTimeout (file:///C:/Users/damat/_REPOS/Astral%20Turf/node_modules/@vitest/runner/dist/index.js:39:7)"
+          ],
+          "meta": {}
+        }
+      ],
+      "startTime": 1758901798781,
+      "endTime": 1758901798800.6108,
+      "status": "failed",
+      "message": "",
+      "name": "C:/Users/damat/_REPOS/Astral Turf/src/__tests__/context/reducers/rootReducer.test.ts"
+    }
+  ]
+}

@@ -56,7 +56,9 @@ export const SwipeArea: React.FC<SwipeAreaProps> = ({
   const { threshold = 100, velocityThreshold = 500, onSwipe } = config;
 
   const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    if (disabled || !onSwipe) {return;}
+    if (disabled || !onSwipe) {
+      return;
+    }
 
     const { offset, velocity } = info;
     const distance = Math.sqrt(offset.x ** 2 + offset.y ** 2);
@@ -145,7 +147,7 @@ export const Draggable: React.FC<DraggableProps> = ({
       whileDrag={{
         scale: 1.05,
         zIndex: 1000,
-        boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.25)",
+        boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.25)',
       }}
     >
       {children}
@@ -173,7 +175,9 @@ export const PinchZoom: React.FC<PinchZoomProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (disabled || !containerRef.current) {return;}
+    if (disabled || !containerRef.current) {
+      return;
+    }
 
     const element = containerRef.current;
     let initialDistance = 0;
@@ -243,10 +247,7 @@ export const PinchZoom: React.FC<PinchZoomProps> = ({
         userSelect: 'none',
       }}
     >
-      <motion.div
-        style={{ scale }}
-        transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      >
+      <motion.div style={{ scale }} transition={{ type: 'spring', stiffness: 300, damping: 30 }}>
         {children}
       </motion.div>
     </div>
@@ -274,7 +275,9 @@ export const LongPress: React.FC<LongPressProps> = ({
   const timeoutRef = useRef<unknown>();
 
   const startPress = () => {
-    if (disabled) {return;}
+    if (disabled) {
+      return;
+    }
 
     setIsPressed(true);
     setHasTriggered(false);
@@ -337,7 +340,9 @@ export const MultiTouchArea: React.FC<MultiTouchAreaProps> = ({
   const [touches, setTouches] = useState<Touch[]>([]);
 
   useEffect(() => {
-    if (disabled || !containerRef.current) {return;}
+    if (disabled || !containerRef.current) {
+      return;
+    }
 
     const element = containerRef.current;
 
@@ -414,7 +419,9 @@ export const SortableList: React.FC<SortableListProps> = ({
   }, [items]);
 
   const handleDragStart = (itemId: string) => {
-    if (disabled) {return;}
+    if (disabled) {
+      return;
+    }
     setDraggedItem(itemId);
   };
 
@@ -424,7 +431,9 @@ export const SortableList: React.FC<SortableListProps> = ({
   };
 
   const handleDragOver = (overId: string) => {
-    if (disabled || !draggedItem || draggedItem === overId) {return;}
+    if (disabled || !draggedItem || draggedItem === overId) {
+      return;
+    }
 
     const draggedIndex = reorderedItems.findIndex(item => item.id === draggedItem);
     const overIndex = reorderedItems.findIndex(item => item.id === overId);
@@ -439,7 +448,7 @@ export const SortableList: React.FC<SortableListProps> = ({
 
   return (
     <div className={`space-y-2 ${className}`}>
-      {reorderedItems.map((item) => (
+      {reorderedItems.map(item => (
         <motion.div
           key={item.id}
           className={`${itemClassName} relative`}
@@ -466,7 +475,7 @@ export const SortableList: React.FC<SortableListProps> = ({
             opacity: draggedItem === item.id ? 0.8 : 1,
           }}
           transition={{
-            type: "spring",
+            type: 'spring',
             stiffness: 500,
             damping: 30,
           }}
@@ -480,8 +489,8 @@ export const SortableList: React.FC<SortableListProps> = ({
               style={{ color: theme.colors.text.tertiary }}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2l-5-5v3h-3v4h3v3l5-5z"/>
-                <path d="M14 15h-4v3H7l5 5 5-5h-3v-3z"/>
+                <path d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2l-5-5v3h-3v4h3v3l5-5z" />
+                <path d="M14 15h-4v3H7l5 5 5-5h-3v-3z" />
               </svg>
             </div>
           )}

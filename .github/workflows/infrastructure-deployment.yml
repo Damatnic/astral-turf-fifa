@@ -55,38 +55,38 @@ jobs:
     name: 🔍 Terraform Validation
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: ${{ env.TF_VERSION }}
-      
+
       - name: Terraform Format Check
         run: |
           cd terraform
           terraform fmt -check -recursive
-      
+
       - name: Terraform Init
         run: |
           cd terraform/environments/${{ env.TF_VAR_environment }}
           terraform init -backend-config="bucket=astral-turf-terraform-state"
-      
+
       - name: Terraform Validate
         run: |
           cd terraform/environments/${{ env.TF_VAR_environment }}
           terraform validate
-      
+
       - name: Terraform Security Scan
         uses: aquasecurity/tfsec-action@v1.0.0
         with:
           working_directory: terraform
           format: sarif
           output: tfsec-results.sarif
-      
+
       - name: Upload security scan results
         uses: github/codeql-action/upload-sarif@v2
         with:
@@ -97,7 +97,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     needs: [terraform-validate]
-    
+
     strategy:
       matrix:
         environment: [staging, production]
@@ -106,41 +106,41 @@ jobs:
             aws_role: ${{ secrets.AWS_ROLE_STAGING }}
           - environment: production
             aws_role: ${{ secrets.AWS_ROLE_PRODUCTION }}
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ matrix.aws_role }}
           aws-region: us-east-1
-      
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: ${{ env.TF_VERSION }}
-      
+
       - name: Terraform Init
         run: |
           cd terraform/environments/${{ matrix.environment }}
           terraform init
-      
+
       - name: Terraform Plan
         id: plan
         run: |
           cd terraform/environments/${{ matrix.environment }}
           terraform plan -var-file="../../../config/${{ matrix.environment }}.tfvars" -out=tfplan
           terraform show -no-color tfplan > plan-output.txt
-      
+
       - name: Save plan output
         uses: actions/upload-artifact@v4
         with:
           name: terraform-plan-${{ matrix.environment }}
           path: terraform/environments/${{ matrix.environment }}/plan-output.txt
           retention-days: 7
-      
+
       - name: Comment PR with plan
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
@@ -152,9 +152,9 @@ jobs:
             \`\`\`terraform
             ${plan}
             \`\`\`
-            
+
             *Pushed by: @${{ github.actor }}*`;
-            
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
@@ -174,32 +174,31 @@ jobs:
       (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') ||
       (github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'apply')
     environment: ${{ github.event.inputs.environment || 'staging' }}
-    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_PRODUCTION }}
           aws-region: us-east-1
-      
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: ${{ env.TF_VERSION }}
-      
+
       - name: Terraform Init
         run: |
           cd terraform/environments/${{ env.TF_VAR_environment }}
           terraform init
-      
+
       - name: Terraform Apply
         run: |
           cd terraform/environments/${{ env.TF_VAR_environment }}
           terraform apply -var-file="../../../config/${{ env.TF_VAR_environment }}.tfvars" -auto-approve
-      
+
       - name: Extract outputs
         id: outputs
         run: |
@@ -207,30 +206,30 @@ jobs:
           echo "cluster_endpoint=$(terraform output -raw eks_cluster_endpoint)" >> $GITHUB_OUTPUT
           echo "cluster_name=$(terraform output -raw eks_cluster_name)" >> $GITHUB_OUTPUT
           echo "rds_endpoint=$(terraform output -raw rds_endpoint)" >> $GITHUB_OUTPUT
-      
+
       - name: Update kubeconfig
         run: |
           aws eks update-kubeconfig --region us-east-1 --name ${{ steps.outputs.outputs.cluster_name }}
-      
+
       - name: Deploy Kubernetes manifests
         run: |
           cd k8s/overlays/${{ env.TF_VAR_environment }}
           kubectl apply -k .
-          
+
           # Wait for deployments
           kubectl rollout status deployment/astral-turf-app -n astral-turf --timeout=600s
           kubectl rollout status deployment/nginx-deployment -n astral-turf --timeout=300s
-      
+
       - name: Run infrastructure tests
         run: |
           # Test EKS cluster
           kubectl cluster-info
           kubectl get nodes
-          
+
           # Test application deployment
           kubectl get pods -n astral-turf
           kubectl get services -n astral-turf
-          
+
           # Test database connectivity
           kubectl run postgres-test --rm -i --restart=Never --image=postgres:15 --env="PGPASSWORD=${{ secrets.POSTGRES_PASSWORD }}" -- psql -h ${{ steps.outputs.outputs.rds_endpoint }} -U astral -d astral_turf -c "SELECT 1"
 
@@ -243,76 +242,76 @@ jobs:
     timeout-minutes: 20
     needs: [terraform-apply]
     if: success()
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_PRODUCTION }}
           aws-region: us-east-1
-      
+
       - name: Setup kubectl
         uses: azure/setup-kubectl@v3
         with:
           version: 'latest'
-      
+
       - name: Setup Helm
         uses: azure/setup-helm@v3
         with:
           version: 'latest'
-      
+
       - name: Update kubeconfig
         run: |
           aws eks update-kubeconfig --region us-east-1 --name astral-turf-${{ env.TF_VAR_environment }}
-      
+
       - name: Deploy monitoring stack
         run: |
           # Add Prometheus Helm repository
           helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
           helm repo add grafana https://grafana.github.io/helm-charts
           helm repo update
-          
+
           # Install Prometheus
           helm upgrade --install prometheus prometheus-community/kube-prometheus-stack \
             --namespace monitoring \
             --create-namespace \
             --values k8s/monitoring/prometheus-values.yaml \
             --wait
-          
+
           # Install Grafana
           helm upgrade --install grafana grafana/grafana \
             --namespace monitoring \
             --values k8s/monitoring/grafana-values.yaml \
             --wait
-      
+
       - name: Deploy ingress controller
         run: |
           # Install NGINX Ingress Controller
           helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
           helm repo update
-          
+
           helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
             --namespace ingress-nginx \
             --create-namespace \
             --values k8s/ingress/nginx-values.yaml \
             --wait
-      
+
       - name: Deploy cert-manager
         run: |
           # Install cert-manager
           helm repo add jetstack https://charts.jetstack.io
           helm repo update
-          
+
           helm upgrade --install cert-manager jetstack/cert-manager \
             --namespace cert-manager \
             --create-namespace \
             --version v1.13.0 \
             --set installCRDs=true \
             --wait
-          
+
           # Apply cluster issuer
           kubectl apply -f k8s/cert-manager/cluster-issuer.yaml
 
@@ -324,78 +323,78 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     needs: [k8s-deploy]
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_PRODUCTION }}
           aws-region: us-east-1
-      
+
       - name: Setup kubectl
         uses: azure/setup-kubectl@v3
         with:
           version: 'latest'
-      
+
       - name: Update kubeconfig
         run: |
           aws eks update-kubeconfig --region us-east-1 --name astral-turf-${{ env.TF_VAR_environment }}
-      
+
       - name: Run infrastructure health checks
         run: |
           # Check cluster health
           kubectl cluster-info
           kubectl get nodes -o wide
-          
+
           # Check system pods
           kubectl get pods -n kube-system
           kubectl get pods -n monitoring
           kubectl get pods -n ingress-nginx
           kubectl get pods -n cert-manager
-          
+
           # Check application pods
           kubectl get pods -n astral-turf
-          
+
           # Check services and ingress
           kubectl get services -n astral-turf
           kubectl get ingress -n astral-turf
-          
+
           # Check HPA status
           kubectl get hpa -n astral-turf
-          
+
           # Check persistent volumes
           kubectl get pv,pvc -n astral-turf
-      
+
       - name: Run connectivity tests
         run: |
           # Test internal connectivity
           kubectl run curl-test --rm -i --restart=Never --image=curlimages/curl -- curl -f http://astral-turf-service.astral-turf.svc.cluster.local:3000/health
-          
+
           # Test external connectivity (if ingress is ready)
           external_ip=$(kubectl get service ingress-nginx-controller -n ingress-nginx -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
           if [ ! -z "$external_ip" ]; then
             curl -f -H "Host: app.astral-turf.com" http://$external_ip/health || echo "External connectivity not yet available"
           fi
-      
+
       - name: Generate infrastructure report
         run: |
           echo "# Infrastructure Deployment Report" > infrastructure-report.md
           echo "## Environment: ${{ env.TF_VAR_environment }}" >> infrastructure-report.md
           echo "## Deployment Date: $(date)" >> infrastructure-report.md
           echo "" >> infrastructure-report.md
-          
+
           echo "### Cluster Information" >> infrastructure-report.md
           kubectl cluster-info --dump-cluster-info >> infrastructure-report.md
-          
+
           echo "### Resource Status" >> infrastructure-report.md
           kubectl get all -n astral-turf >> infrastructure-report.md
-          
+
           echo "### Node Status" >> infrastructure-report.md
           kubectl describe nodes >> infrastructure-report.md
-      
+
       - name: Upload infrastructure report
         uses: actions/upload-artifact@v4
         with:

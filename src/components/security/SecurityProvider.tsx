@@ -7,7 +7,11 @@
 
 import React, { createContext, useContext, useEffect, useCallback, ReactNode } from 'react';
 import { securityLogger, SecurityEventType } from '../../security/logging';
-import { initializeSecurityMonitoring, monitorSecurityEvent, getActiveSecurityIncidents } from '../../security/monitoring';
+import {
+  initializeSecurityMonitoring,
+  monitorSecurityEvent,
+  getActiveSecurityIncidents,
+} from '../../security/monitoring';
 import type { SecurityIncident } from '../../security/monitoring';
 import { initializeCSPMonitoring, cspUtils } from '../../security/csp';
 import { ENVIRONMENT_CONFIG } from '../../security/config';
@@ -74,11 +78,12 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
     // Monitor performance for potential DoS attacks
     if ('PerformanceObserver' in window) {
       try {
-        const observer = new PerformanceObserver((list) => {
+        const observer = new PerformanceObserver(list => {
           const entries = list.getEntries();
-          entries.forEach((entry) => {
+          entries.forEach(entry => {
             // Monitor for unusually slow operations
-            if (entry.duration > 5000) { // 5 seconds
+            if (entry.duration > 5000) {
+              // 5 seconds
               monitorSecurityEvent(SecurityEventType.SUSPICIOUS_ACTIVITY, {
                 type: 'performance_anomaly',
                 duration: entry.duration,
@@ -99,7 +104,7 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
 
     // Monitor for suspicious URL changes
     const originalPushState = history.pushState;
-    history.pushState = function(state, title, url) {
+    history.pushState = function (state, title, url) {
       if (url && typeof url === 'string') {
         const sanitizedUrl = sanitizeUserInput(url);
         if (sanitizedUrl !== url) {
@@ -116,7 +121,7 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
 
   const injectSecurityHeaders = useCallback(() => {
     // Skip injecting meta tags - CSP is handled via HTTP headers in vercel.json
-    // // console.log('Security headers handled via HTTP headers, skipping meta tag injection');
+    // // // // console.log('Security headers handled via HTTP headers, skipping meta tag injection');
     return;
 
     // // Inject security meta tags if not already present
@@ -144,19 +149,15 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
     const handleError = (event: ErrorEvent) => {
       const error = event.error || new Error(event.message);
 
-      securityLogger.logSecurityEvent(
-        SecurityEventType.SYSTEM_ERROR,
-        'Unhandled global error',
-        {
-          metadata: {
-            message: sanitizeUserInput(error.message || ''),
-            filename: event.filename,
-            lineno: event.lineno,
-            colno: event.colno,
-            stack: ENVIRONMENT_CONFIG.isDevelopment ? error.stack : '[REDACTED]',
-          },
+      securityLogger.logSecurityEvent(SecurityEventType.SYSTEM_ERROR, 'Unhandled global error', {
+        metadata: {
+          message: sanitizeUserInput(error.message || ''),
+          filename: event.filename,
+          lineno: event.lineno,
+          colno: event.colno,
+          stack: ENVIRONMENT_CONFIG.isDevelopment ? error.stack : '[REDACTED]',
         },
-      );
+      });
     };
 
     // Global unhandled promise rejection handler
@@ -187,13 +188,13 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
 
   const setupCSPViolationHandling = useCallback(() => {
     // Listen for CSP violations
-    document.addEventListener('securitypolicyviolation', (event) => {
+    document.addEventListener('securitypolicyviolation', event => {
       const violation = {
         'csp-report': {
           'blocked-uri': event.blockedURI,
           'document-uri': event.documentURI,
           'original-policy': event.originalPolicy,
-          'referrer': event.referrer,
+          referrer: event.referrer,
           'status-code': 0,
           'violated-directive': event.violatedDirective,
           'line-number': event.lineNumber,
@@ -239,9 +240,13 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
     const activeThreats = incidents.filter(i => i.riskScore > 70).length;
 
     let securityLevel: SecurityStatus['securityLevel'] = 'low';
-    if (activeThreats > 5) {securityLevel = 'critical';}
-    else if (activeThreats > 2) {securityLevel = 'high';}
-    else if (activeThreats > 0) {securityLevel = 'medium';}
+    if (activeThreats > 5) {
+      securityLevel = 'critical';
+    } else if (activeThreats > 2) {
+      securityLevel = 'high';
+    } else if (activeThreats > 0) {
+      securityLevel = 'medium';
+    }
 
     return {
       activeThreats,
@@ -251,23 +256,26 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
     };
   }, []);
 
-  const handleSecurityViolation = useCallback((violation: SecurityViolation) => {
-    const eventTypeMap = {
-      csp: SecurityEventType.SECURITY_POLICY_VIOLATION,
-      input: SecurityEventType.MALICIOUS_INPUT,
-      access: SecurityEventType.UNAUTHORIZED_ACCESS,
-      rate_limit: SecurityEventType.RATE_LIMIT_EXCEEDED,
-    };
+  const handleSecurityViolation = useCallback(
+    (violation: SecurityViolation) => {
+      const eventTypeMap = {
+        csp: SecurityEventType.SECURITY_POLICY_VIOLATION,
+        input: SecurityEventType.MALICIOUS_INPUT,
+        access: SecurityEventType.UNAUTHORIZED_ACCESS,
+        rate_limit: SecurityEventType.RATE_LIMIT_EXCEEDED,
+      };
 
-    const eventType = eventTypeMap[violation.type] || SecurityEventType.SUSPICIOUS_ACTIVITY;
+      const eventType = eventTypeMap[violation.type] || SecurityEventType.SUSPICIOUS_ACTIVITY;
 
-    reportSecurityEvent(eventType, {
-      violationType: violation.type,
-      description: violation.description,
-      severity: violation.severity,
-      metadata: violation.metadata,
-    });
-  }, [reportSecurityEvent]);
+      reportSecurityEvent(eventType, {
+        violationType: violation.type,
+        description: violation.description,
+        severity: violation.severity,
+        metadata: violation.metadata,
+      });
+    },
+    [reportSecurityEvent],
+  );
 
   const contextValue: SecurityContextType = {
     reportSecurityEvent,
@@ -276,11 +284,7 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
     isSecurityEnabled: true,
   };
 
-  return (
-    <SecurityContext.Provider value={contextValue}>
-      {children}
-    </SecurityContext.Provider>
-  );
+  return <SecurityContext.Provider value={contextValue}>{children}</SecurityContext.Provider>;
 }
 
 export function useSecurityContext(): SecurityContextType {
@@ -295,30 +299,39 @@ export function useSecurityContext(): SecurityContextType {
 export function useSecurityReporting() {
   const { reportSecurityEvent } = useSecurityContext();
 
-  const reportSuspiciousActivity = useCallback((description: string, metadata?: unknown) => {
-    reportSecurityEvent(SecurityEventType.SUSPICIOUS_ACTIVITY, {
-      description,
-      metadata,
-      source: 'component',
-    });
-  }, [reportSecurityEvent]);
+  const reportSuspiciousActivity = useCallback(
+    (description: string, metadata?: unknown) => {
+      reportSecurityEvent(SecurityEventType.SUSPICIOUS_ACTIVITY, {
+        description,
+        metadata,
+        source: 'component',
+      });
+    },
+    [reportSecurityEvent],
+  );
 
-  const reportUnauthorizedAccess = useCallback((resource: string, metadata?: unknown) => {
-    reportSecurityEvent(SecurityEventType.UNAUTHORIZED_ACCESS, {
-      resource,
-      metadata,
-      source: 'component',
-    });
-  }, [reportSecurityEvent]);
+  const reportUnauthorizedAccess = useCallback(
+    (resource: string, metadata?: unknown) => {
+      reportSecurityEvent(SecurityEventType.UNAUTHORIZED_ACCESS, {
+        resource,
+        metadata,
+        source: 'component',
+      });
+    },
+    [reportSecurityEvent],
+  );
 
-  const reportInputThreat = useCallback((input: string, threatType: string, metadata?: unknown) => {
-    reportSecurityEvent(SecurityEventType.MALICIOUS_INPUT, {
-      input: input.substring(0, 200), // Truncate for security
-      threatType,
-      metadata,
-      source: 'component',
-    });
-  }, [reportSecurityEvent]);
+  const reportInputThreat = useCallback(
+    (input: string, threatType: string, metadata?: unknown) => {
+      reportSecurityEvent(SecurityEventType.MALICIOUS_INPUT, {
+        input: input.substring(0, 200), // Truncate for security
+        threatType,
+        metadata,
+        source: 'component',
+      });
+    },
+    [reportSecurityEvent],
+  );
 
   return {
     reportSuspiciousActivity,

@@ -43,14 +43,32 @@ type ChallengeAction =
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_ERROR'; payload: string | null }
   | { type: 'START_CHALLENGE'; payload: { playerId: string; challengeId: string } }
-  | { type: 'UPDATE_CHALLENGE_PROGRESS'; payload: { playerId: string; challengeId: string; requirementId: string; value: number } }
+  | {
+      type: 'UPDATE_CHALLENGE_PROGRESS';
+      payload: { playerId: string; challengeId: string; requirementId: string; value: number };
+    }
   | { type: 'COMPLETE_CHALLENGE'; payload: { playerId: string; challengeId: string } }
-  | { type: 'SUBMIT_EVIDENCE'; payload: { playerId: string; challengeId: string; evidence: EvidenceSubmission } }
-  | { type: 'SPEND_ATTRIBUTE_POINTS'; payload: { playerId: string; attribute: keyof PlayerAttributes; points: number } }
+  | {
+      type: 'SUBMIT_EVIDENCE';
+      payload: { playerId: string; challengeId: string; evidence: EvidenceSubmission };
+    }
+  | {
+      type: 'SPEND_ATTRIBUTE_POINTS';
+      payload: { playerId: string; attribute: keyof PlayerAttributes; points: number };
+    }
   | { type: 'CREATE_CUSTOM_CHALLENGE'; payload: Challenge }
   | { type: 'UPDATE_CHALLENGE'; payload: { challengeId: string; updates: Partial<Challenge> } }
   | { type: 'DELETE_CHALLENGE'; payload: string }
-  | { type: 'REVIEW_CHALLENGE'; payload: { playerId: string; challengeId: string; approved: boolean; reviewerId: string; notes?: string } };
+  | {
+      type: 'REVIEW_CHALLENGE';
+      payload: {
+        playerId: string;
+        challengeId: string;
+        approved: boolean;
+        reviewerId: string;
+        notes?: string;
+      };
+    };
 
 // Initial State
 const initialState: ChallengeState = {
@@ -122,7 +140,10 @@ function challengeReducer(state: ChallengeState, action: ChallengeAction): Chall
       return { ...state, error: action.payload };
 
     case 'START_CHALLENGE': {
-      const progress = challengeService.startChallenge(action.payload.playerId, action.payload.challengeId);
+      const progress = challengeService.startChallenge(
+        action.payload.playerId,
+        action.payload.challengeId,
+      );
       if (progress) {
         const profile = playerRankingService.getProfile(action.payload.playerId);
         if (!profile.challengesActive.includes(action.payload.challengeId)) {
@@ -143,7 +164,10 @@ function challengeReducer(state: ChallengeState, action: ChallengeAction): Chall
         return {
           ...state,
           playerProfiles: new Map(state.playerProfiles).set(action.payload.playerId, profile),
-          currentPlayerProfile: state.currentPlayerProfile?.playerId === action.payload.playerId ? profile : state.currentPlayerProfile,
+          currentPlayerProfile:
+            state.currentPlayerProfile?.playerId === action.payload.playerId
+              ? profile
+              : state.currentPlayerProfile,
           notifications: [notification, ...state.notifications].slice(0, 50),
         };
       }
@@ -158,7 +182,8 @@ function challengeReducer(state: ChallengeState, action: ChallengeAction): Chall
       return {
         ...state,
         playerProfiles: new Map(state.playerProfiles).set(playerId, profile),
-        currentPlayerProfile: state.currentPlayerProfile?.playerId === playerId ? profile : state.currentPlayerProfile,
+        currentPlayerProfile:
+          state.currentPlayerProfile?.playerId === playerId ? profile : state.currentPlayerProfile,
       };
     }
 
@@ -221,7 +246,10 @@ function challengeReducer(state: ChallengeState, action: ChallengeAction): Chall
         return {
           ...state,
           playerProfiles: new Map(state.playerProfiles).set(playerId, profile),
-          currentPlayerProfile: state.currentPlayerProfile?.playerId === playerId ? profile : state.currentPlayerProfile,
+          currentPlayerProfile:
+            state.currentPlayerProfile?.playerId === playerId
+              ? profile
+              : state.currentPlayerProfile,
           notifications: [...notifications, ...state.notifications].slice(0, 50),
         };
       }
@@ -261,7 +289,10 @@ function challengeReducer(state: ChallengeState, action: ChallengeAction): Chall
         return {
           ...state,
           playerProfiles: new Map(state.playerProfiles).set(playerId, profile),
-          currentPlayerProfile: state.currentPlayerProfile?.playerId === playerId ? profile : state.currentPlayerProfile,
+          currentPlayerProfile:
+            state.currentPlayerProfile?.playerId === playerId
+              ? profile
+              : state.currentPlayerProfile,
         };
       }
       return state;
@@ -282,7 +313,7 @@ function challengeReducer(state: ChallengeState, action: ChallengeAction): Chall
       if (updated) {
         return {
           ...state,
-          challenges: state.challenges.map(c => c.id === challengeId ? updated : c),
+          challenges: state.challenges.map(c => (c.id === challengeId ? updated : c)),
         };
       }
       return state;
@@ -295,7 +326,8 @@ function challengeReducer(state: ChallengeState, action: ChallengeAction): Chall
         return {
           ...state,
           challenges: state.challenges.filter(c => c.id !== action.payload),
-          selectedChallenge: state.selectedChallenge?.id === action.payload ? null : state.selectedChallenge,
+          selectedChallenge:
+            state.selectedChallenge?.id === action.payload ? null : state.selectedChallenge,
         };
       }
       return state;
@@ -303,7 +335,13 @@ function challengeReducer(state: ChallengeState, action: ChallengeAction): Chall
 
     case 'REVIEW_CHALLENGE': {
       const { playerId, challengeId, approved, reviewerId, notes } = action.payload;
-      const success = challengeService.reviewChallengeCompletion(playerId, challengeId, approved, reviewerId, notes);
+      const success = challengeService.reviewChallengeCompletion(
+        playerId,
+        challengeId,
+        approved,
+        reviewerId,
+        notes,
+      );
 
       if (success) {
         const notification: ChallengeNotification = {
@@ -339,7 +377,10 @@ function challengeReducer(state: ChallengeState, action: ChallengeAction): Chall
         return {
           ...state,
           playerProfiles: new Map(state.playerProfiles).set(playerId, profile),
-          currentPlayerProfile: state.currentPlayerProfile?.playerId === playerId ? profile : state.currentPlayerProfile,
+          currentPlayerProfile:
+            state.currentPlayerProfile?.playerId === playerId
+              ? profile
+              : state.currentPlayerProfile,
           notifications: [notification, ...state.notifications].slice(0, 50),
         };
       }
@@ -361,10 +402,23 @@ interface ChallengeContextValue {
   getAvailableChallenges: (playerId: string) => Challenge[];
   getActiveChallenges: (playerId: string) => Challenge[];
   startChallenge: (playerId: string, challengeId: string) => void;
-  updateProgress: (playerId: string, challengeId: string, requirementId: string, value: number) => void;
+  updateProgress: (
+    playerId: string,
+    challengeId: string,
+    requirementId: string,
+    value: number
+  ) => void;
   completeChallenge: (playerId: string, challengeId: string) => void;
-  submitEvidence: (playerId: string, challengeId: string, evidence: Omit<EvidenceSubmission, 'id' | 'submittedAt'>) => void;
-  spendAttributePoints: (playerId: string, attribute: keyof PlayerAttributes, points: number) => void;
+  submitEvidence: (
+    playerId: string,
+    challengeId: string,
+    evidence: Omit<EvidenceSubmission, 'id' | 'submittedAt'>
+  ) => void;
+  spendAttributePoints: (
+    playerId: string,
+    attribute: keyof PlayerAttributes,
+    points: number
+  ) => void;
   createCustomChallenge: (challenge: Omit<Challenge, 'id' | 'createdAt' | 'updatedAt'>) => void;
   updateLeaderboard: (playerIds: string[], sortBy?: 'total' | 'weekly' | 'monthly') => void;
   getRecommendedChallenges: (playerId: string) => Challenge[];
@@ -421,19 +475,35 @@ export const ChallengeProvider: React.FC<ChallengeProviderProps> = ({ children }
     dispatch({ type: 'START_CHALLENGE', payload: { playerId, challengeId } });
   };
 
-  const updateProgress = (playerId: string, challengeId: string, requirementId: string, value: number) => {
-    dispatch({ type: 'UPDATE_CHALLENGE_PROGRESS', payload: { playerId, challengeId, requirementId, value } });
+  const updateProgress = (
+    playerId: string,
+    challengeId: string,
+    requirementId: string,
+    value: number,
+  ) => {
+    dispatch({
+      type: 'UPDATE_CHALLENGE_PROGRESS',
+      payload: { playerId, challengeId, requirementId, value },
+    });
   };
 
   const completeChallenge = (playerId: string, challengeId: string) => {
     dispatch({ type: 'COMPLETE_CHALLENGE', payload: { playerId, challengeId } });
   };
 
-  const submitEvidence = (playerId: string, challengeId: string, evidence: Omit<EvidenceSubmission, 'id' | 'submittedAt'>) => {
+  const submitEvidence = (
+    playerId: string,
+    challengeId: string,
+    evidence: Omit<EvidenceSubmission, 'id' | 'submittedAt'>,
+  ) => {
     dispatch({ type: 'SUBMIT_EVIDENCE', payload: { playerId, challengeId, evidence } });
   };
 
-  const spendAttributePoints = (playerId: string, attribute: keyof PlayerAttributes, points: number) => {
+  const spendAttributePoints = (
+    playerId: string,
+    attribute: keyof PlayerAttributes,
+    points: number,
+  ) => {
     dispatch({ type: 'SPEND_ATTRIBUTE_POINTS', payload: { playerId, attribute, points } });
   };
 
@@ -441,7 +511,10 @@ export const ChallengeProvider: React.FC<ChallengeProviderProps> = ({ children }
     dispatch({ type: 'CREATE_CUSTOM_CHALLENGE', payload: challenge as Challenge });
   };
 
-  const updateLeaderboard = (playerIds: string[], sortBy: 'total' | 'weekly' | 'monthly' = 'total') => {
+  const updateLeaderboard = (
+    playerIds: string[],
+    sortBy: 'total' | 'weekly' | 'monthly' = 'total',
+  ) => {
     const leaderboard = playerRankingService.getLeaderboard(playerIds, sortBy);
     dispatch({ type: 'UPDATE_LEADERBOARD', payload: leaderboard });
   };
@@ -468,8 +541,8 @@ export const ChallengeProvider: React.FC<ChallengeProviderProps> = ({ children }
         };
 
         // Only add if not already notified
-        const alreadyNotified = state.notifications.some(n =>
-          n.type === 'challenge_expiring' && n.challengeId === challenge.id,
+        const alreadyNotified = state.notifications.some(
+          n => n.type === 'challenge_expiring' && n.challengeId === challenge.id,
         );
 
         if (!alreadyNotified) {
@@ -495,11 +568,7 @@ export const ChallengeProvider: React.FC<ChallengeProviderProps> = ({ children }
     getRecommendedChallenges,
   };
 
-  return (
-    <ChallengeContext.Provider value={value}>
-      {children}
-    </ChallengeContext.Provider>
-  );
+  return <ChallengeContext.Provider value={value}>{children}</ChallengeContext.Provider>;
 };
 
 // Hook

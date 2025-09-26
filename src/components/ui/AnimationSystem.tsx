@@ -2,7 +2,9 @@ import React from 'react';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
 
 // Define our own HTMLMotionProps equivalent since it's not exported in v12
-type HTMLMotionProps<T extends keyof React.JSX.IntrinsicElements> = React.ComponentProps<typeof motion[T]>;
+type HTMLMotionProps<T extends keyof React.JSX.IntrinsicElements> = React.ComponentProps<
+  (typeof motion)[T]
+>;
 
 // Animation variants for common patterns
 export const slideInVariants: Variants = {
@@ -91,7 +93,7 @@ export const springVariants: Variants = {
     opacity: 1,
     y: 0,
     transition: {
-      type: "spring",
+      type: 'spring',
       stiffness: 400,
       damping: 30,
     },
@@ -107,21 +109,21 @@ export const springVariants: Variants = {
 export const buttonVariants: Variants = {
   idle: {
     scale: 1,
-    boxShadow: "0 0 0 0 rgba(255, 255, 255, 0)",
+    boxShadow: '0 0 0 0 rgba(255, 255, 255, 0)',
   },
   hover: {
     scale: 1.02,
-    boxShadow: "0 4px 20px 0 rgba(255, 255, 255, 0.1)",
+    boxShadow: '0 4px 20px 0 rgba(255, 255, 255, 0.1)',
     transition: {
       duration: 0.2,
-      ease: "easeOut",
+      ease: 'easeOut',
     },
   },
   tap: {
     scale: 0.98,
     transition: {
       duration: 0.1,
-      ease: "easeInOut",
+      ease: 'easeInOut',
     },
   },
 };
@@ -130,15 +132,15 @@ export const cardVariants: Variants = {
   idle: {
     scale: 1,
     rotateY: 0,
-    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
   },
   hover: {
     scale: 1.02,
     rotateY: 1,
-    boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.25)",
+    boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.25)',
     transition: {
       duration: 0.3,
-      ease: "easeOut",
+      ease: 'easeOut',
     },
   },
   tap: {
@@ -150,7 +152,7 @@ export const cardVariants: Variants = {
 };
 
 // High-level animation components
-interface AnimatedContainerProps extends HTMLMotionProps<"div"> {
+interface AnimatedContainerProps extends HTMLMotionProps<'div'> {
   variant?: 'slide' | 'fade' | 'scale' | 'spring';
   stagger?: boolean;
 }
@@ -180,19 +182,13 @@ export const AnimatedContainer: React.FC<AnimatedContainerProps> = ({
   }
 
   return (
-    <motion.div
-      variants={variants}
-      initial="hidden"
-      animate="visible"
-      exit="exit"
-      {...props}
-    >
+    <motion.div variants={variants} initial="hidden" animate="visible" exit="exit" {...props}>
       {children}
     </motion.div>
   );
 };
 
-interface AnimatedButtonProps extends HTMLMotionProps<"button"> {
+interface AnimatedButtonProps extends HTMLMotionProps<'button'> {
   variant?: 'default' | 'card';
 }
 
@@ -204,13 +200,7 @@ export const AnimatedButton: React.FC<AnimatedButtonProps> = ({
   const variants = variant === 'card' ? cardVariants : buttonVariants;
 
   return (
-    <motion.button
-      variants={variants}
-      initial="idle"
-      whileHover="hover"
-      whileTap="tap"
-      {...props}
-    >
+    <motion.button variants={variants} initial="idle" whileHover="hover" whileTap="tap" {...props}>
       {children}
     </motion.button>
   );
@@ -221,7 +211,7 @@ interface AnimatedListProps {
   className?: string;
 }
 
-export const AnimatedList: React.FC<AnimatedListProps> = ({ children, className = "" }) => {
+export const AnimatedList: React.FC<AnimatedListProps> = ({ children, className = '' }) => {
   return (
     <motion.div
       variants={staggerChildrenVariants}
@@ -231,10 +221,7 @@ export const AnimatedList: React.FC<AnimatedListProps> = ({ children, className 
       className={className}
     >
       {React.Children.map(children, (child, index) => (
-        <motion.div
-          key={index}
-          variants={fadeInVariants}
-        >
+        <motion.div key={index} variants={fadeInVariants}>
           {child}
         </motion.div>
       ))}
@@ -247,10 +234,7 @@ interface PageTransitionProps {
   mode?: 'wait' | 'sync' | 'popLayout';
 }
 
-export const PageTransition: React.FC<PageTransitionProps> = ({
-  children,
-  mode = 'wait',
-}) => {
+export const PageTransition: React.FC<PageTransitionProps> = ({ children, mode = 'wait' }) => {
   return (
     <AnimatePresence mode={mode}>
       <motion.div
@@ -276,7 +260,7 @@ interface LoadingAnimationProps {
 export const LoadingAnimation: React.FC<LoadingAnimationProps> = ({
   type = 'spinner',
   size = 'md',
-  className = "",
+  className = '',
 }) => {
   const sizeClasses = {
     sm: 'w-4 h-4',
@@ -292,7 +276,7 @@ export const LoadingAnimation: React.FC<LoadingAnimationProps> = ({
         transition={{
           duration: 1,
           repeat: Infinity,
-          ease: "linear",
+          ease: 'linear',
         }}
       />
     );
@@ -301,7 +285,7 @@ export const LoadingAnimation: React.FC<LoadingAnimationProps> = ({
   if (type === 'dots') {
     return (
       <div className={`flex space-x-1 ${className}`}>
-        {[0, 1, 2].map((i) => (
+        {[0, 1, 2].map(i => (
           <motion.div
             key={i}
             className={`${size === 'sm' ? 'w-1 h-1' : size === 'lg' ? 'w-3 h-3' : 'w-2 h-2'} bg-blue-500 rounded-full`}
@@ -330,7 +314,7 @@ export const LoadingAnimation: React.FC<LoadingAnimationProps> = ({
       transition={{
         duration: 1.5,
         repeat: Infinity,
-        ease: "easeInOut",
+        ease: 'easeInOut',
       }}
     />
   );
@@ -344,7 +328,7 @@ interface SuccessAnimationProps {
 
 export const SuccessAnimation: React.FC<SuccessAnimationProps> = ({
   size = 'md',
-  className = "",
+  className = '',
   onComplete,
 }) => {
   const sizeClasses = {
@@ -401,7 +385,7 @@ interface ErrorAnimationProps {
 
 export const ErrorAnimation: React.FC<ErrorAnimationProps> = ({
   size = 'md',
-  className = "",
+  className = '',
   onComplete,
 }) => {
   const sizeClasses = {

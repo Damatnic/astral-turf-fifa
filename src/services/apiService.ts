@@ -162,7 +162,11 @@ class ApiService {
   // Event callbacks
   private onApiCallCallback?: (usage: ApiUsage) => void;
   private onRateLimitExceededCallback?: (apiKey: string, endpoint: string) => void;
-  private onWebhookDeliveryCallback?: (webhookId: string, success: boolean, response?: unknown) => void;
+  private onWebhookDeliveryCallback?: (
+    webhookId: string,
+    success: boolean,
+    response?: unknown
+  ) => void;
 
   constructor() {
     this.graphqlSchema = this.initializeGraphQLSchema();
@@ -177,7 +181,7 @@ class ApiService {
     await this.loadApiKeys();
     await this.loadWebhookSubscriptions();
     this.setupApiClients();
-    // // console.log('🔌 API service initialized');
+    // // // // console.log('🔌 API service initialized');
   }
 
   /**
@@ -208,7 +212,7 @@ class ApiService {
     // Save to storage
     await this.saveApiKey(apiKey);
 
-    // // console.log(`🔑 API key created: ${name}`);
+    // // // // console.log(`🔑 API key created: ${name}`);
     return apiKey;
   }
 
@@ -269,7 +273,6 @@ class ApiService {
       });
 
       return response;
-
     } catch (_error) {
       // Log failed usage
       this.logApiUsage({
@@ -332,7 +335,6 @@ class ApiService {
       });
 
       return result;
-
     } catch (_error) {
       return {
         data: null,
@@ -368,7 +370,7 @@ class ApiService {
     // Test webhook endpoint
     await this.testWebhookEndpoint(webhook);
 
-    // // console.log(`🪝 Webhook subscription created: ${url}`);
+    // // // // console.log(`🪝 Webhook subscription created: ${url}`);
     return webhook;
   }
 
@@ -376,14 +378,15 @@ class ApiService {
    * Trigger webhook event
    */
   async triggerWebhookEvent(event: string, data: unknown): Promise<void> {
-    const relevantWebhooks = Array.from(this.webhooks.values())
-      .filter(webhook => webhook.isActive && webhook.events.includes(event));
+    const relevantWebhooks = Array.from(this.webhooks.values()).filter(
+      webhook => webhook.isActive && webhook.events.includes(event),
+    );
 
     for (const webhook of relevantWebhooks) {
       try {
         await this.deliverWebhook(webhook, event, data);
       } catch (_error) {
-        console.error(`❌ Failed to deliver webhook ${webhook.id}:`, error);
+        console.error(`❌ Failed to deliver webhook ${webhook.id}:`, _error);
       }
     }
   }
@@ -436,9 +439,8 @@ class ApiService {
 
     // Collect usage data
     for (const usage of this.usageLog.values()) {
-      const filteredUsage = usage.filter(u =>
-        u.timestamp >= cutoff &&
-        (!apiKeyId || u.apiKeyId === apiKeyId),
+      const filteredUsage = usage.filter(
+        u => u.timestamp >= cutoff && (!apiKeyId || u.apiKeyId === apiKeyId),
       );
       allUsage.push(...filteredUsage);
     }
@@ -446,8 +448,8 @@ class ApiService {
     const totalCalls = allUsage.length;
     const successfulCalls = allUsage.filter(u => u.statusCode < 400).length;
     const failedCalls = totalCalls - successfulCalls;
-    const avgResponseTime = totalCalls > 0 ?
-      allUsage.reduce((sum, u) => sum + u.responseTime, 0) / totalCalls : 0;
+    const avgResponseTime =
+      totalCalls > 0 ? allUsage.reduce((sum, u) => sum + u.responseTime, 0) / totalCalls : 0;
 
     // Calculate top endpoints
     const endpointCounts = new Map<string, number>();
@@ -502,7 +504,9 @@ class ApiService {
     this.onRateLimitExceededCallback = callback;
   }
 
-  onWebhookDelivery(callback: (webhookId: string, success: boolean, response?: unknown) => void): void {
+  onWebhookDelivery(
+    callback: (webhookId: string, success: boolean, response?: unknown) => void,
+  ): void {
     this.onWebhookDeliveryCallback = callback;
   }
 
@@ -519,7 +523,13 @@ class ApiService {
         parameters: [
           { name: 'team', type: 'string', required: false, description: 'Filter by team' },
           { name: 'position', type: 'string', required: false, description: 'Filter by position' },
-          { name: 'limit', type: 'number', required: false, description: 'Number of results', defaultValue: 20 },
+          {
+            name: 'limit',
+            type: 'number',
+            required: false,
+            description: 'Number of results',
+            defaultValue: 20,
+          },
         ],
         authentication: 'api_key',
         rateLimitPerHour: 1000,
@@ -533,9 +543,7 @@ class ApiService {
         method: 'GET',
         type: 'rest',
         description: 'Get player by ID',
-        parameters: [
-          { name: 'id', type: 'string', required: true, description: 'Player ID' },
-        ],
+        parameters: [{ name: 'id', type: 'string', required: true, description: 'Player ID' }],
         authentication: 'api_key',
         rateLimitPerHour: 2000,
         isPublic: true,
@@ -620,7 +628,13 @@ class ApiService {
         description: 'Get player statistics',
         parameters: [
           { name: 'id', type: 'string', required: true, description: 'Player ID' },
-          { name: 'period', type: 'string', required: false, description: 'Time period', defaultValue: 'season' },
+          {
+            name: 'period',
+            type: 'string',
+            required: false,
+            description: 'Time period',
+            defaultValue: 'season',
+          },
         ],
         authentication: 'api_key',
         rateLimitPerHour: 2000,
@@ -703,7 +717,12 @@ class ApiService {
           type: '[Player]',
           args: [
             { name: 'team', type: 'String', description: 'Filter by team', required: false },
-            { name: 'position', type: 'String', description: 'Filter by position', required: false },
+            {
+              name: 'position',
+              type: 'String',
+              description: 'Filter by position',
+              required: false,
+            },
           ],
           resolver: 'Query.players',
         },
@@ -711,9 +730,7 @@ class ApiService {
           name: 'player',
           description: 'Get player by ID',
           type: 'Player',
-          args: [
-            { name: 'id', type: 'ID!', description: 'Player ID', required: true },
-          ],
+          args: [{ name: 'id', type: 'ID!', description: 'Player ID', required: true }],
           resolver: 'Query.player',
         },
         {
@@ -730,7 +747,12 @@ class ApiService {
           description: 'Create new player',
           type: 'Player',
           args: [
-            { name: 'input', type: 'CreatePlayerInput!', description: 'Player data', required: true },
+            {
+              name: 'input',
+              type: 'CreatePlayerInput!',
+              description: 'Player data',
+              required: true,
+            },
           ],
           resolver: 'Mutation.createPlayer',
         },
@@ -740,7 +762,12 @@ class ApiService {
           type: 'Player',
           args: [
             { name: 'id', type: 'ID!', description: 'Player ID', required: true },
-            { name: 'input', type: 'UpdatePlayerInput!', description: 'Updated data', required: true },
+            {
+              name: 'input',
+              type: 'UpdatePlayerInput!',
+              description: 'Updated data',
+              required: true,
+            },
           ],
           resolver: 'Mutation.updatePlayer',
         },
@@ -759,9 +786,7 @@ class ApiService {
           name: 'matchEvents',
           description: 'Subscribe to live match events',
           type: 'MatchEvent',
-          args: [
-            { name: 'matchId', type: 'ID!', description: 'Match ID', required: true },
-          ],
+          args: [{ name: 'matchId', type: 'ID!', description: 'Match ID', required: true }],
           resolver: 'Subscription.matchEvents',
         },
       ],
@@ -846,7 +871,7 @@ class ApiService {
           url: `https://api.astralturf.com/v1${endpoint.path}`,
           method: endpoint.method,
           headers: {
-            'Authorization': 'Bearer your-api-key',
+            Authorization: 'Bearer your-api-key',
             'Content-Type': 'application/json',
           },
           body: endpoint.method !== 'GET' ? { example: 'data' } : undefined,
@@ -883,7 +908,7 @@ class ApiService {
   private checkRateLimit(apiKey: string, endpoint: string): boolean {
     const key = `${apiKey}:${endpoint}`;
     const now = Date.now();
-    const hourAgo = now - (60 * 60 * 1000);
+    const hourAgo = now - 60 * 60 * 1000;
 
     let limiter = this.rateLimiter.get(key);
 
@@ -944,7 +969,10 @@ class ApiService {
     return { query, parsed: true };
   }
 
-  private async executeGraphQLQuery(parsedQuery: unknown, variables: Record<string, unknown>): Promise<unknown> {
+  private async executeGraphQLQuery(
+    parsedQuery: unknown,
+    variables: Record<string, unknown>,
+  ): Promise<unknown> {
     // Simulate GraphQL execution
     return {
       data: {
@@ -960,7 +988,11 @@ class ApiService {
     };
   }
 
-  private async deliverWebhook(webhook: WebhookSubscription, event: string, data: unknown): Promise<void> {
+  private async deliverWebhook(
+    webhook: WebhookSubscription,
+    event: string,
+    data: unknown,
+  ): Promise<void> {
     const payload = {
       event,
       data,
@@ -987,16 +1019,18 @@ class ApiService {
       if (this.onWebhookDeliveryCallback) {
         this.onWebhookDeliveryCallback(webhook.id, true, response.data);
       }
-
     } catch (_error) {
       webhook.failureCount++;
       webhook.retryAttempts++;
 
       if (webhook.retryAttempts < webhook.maxRetries) {
         // Schedule retry with exponential backoff
-        setTimeout(() => {
-          this.deliverWebhook(webhook, event, data);
-        }, Math.pow(2, webhook.retryAttempts) * 1000);
+        setTimeout(
+          () => {
+            this.deliverWebhook(webhook, event, data);
+          },
+          Math.pow(2, webhook.retryAttempts) * 1000,
+        );
       } else {
         webhook.isActive = false;
       }
@@ -1025,10 +1059,9 @@ class ApiService {
         timeout: 5000,
       });
 
-      // // console.log(`✅ Webhook endpoint test successful: ${webhook.url}`);
-
+      // // // // console.log(`✅ Webhook endpoint test successful: ${webhook.url}`);
     } catch (_error) {
-      // // console.warn(`⚠️ Webhook endpoint test failed: ${webhook.url}`);
+      // // // // console.warn(`⚠️ Webhook endpoint test failed: ${webhook.url}`);
       // Don't disable webhook, just log the warning
     }
   }
@@ -1303,32 +1336,35 @@ $players = $api->getPlayers(['team' => 'home']);
 
   private setupRateLimitReset(): void {
     // Reset rate limits every hour
-    setInterval(() => {
-      const now = Date.now();
-      const hourAgo = now - (60 * 60 * 1000);
+    setInterval(
+      () => {
+        const now = Date.now();
+        const hourAgo = now - 60 * 60 * 1000;
 
-      for (const [key, limiter] of this.rateLimiter.entries()) {
-        if (limiter.resetTime < hourAgo) {
-          limiter.count = 0;
-          limiter.resetTime = now;
+        for (const [key, limiter] of this.rateLimiter.entries()) {
+          if (limiter.resetTime < hourAgo) {
+            limiter.count = 0;
+            limiter.resetTime = now;
+          }
         }
-      }
-    }, 60 * 60 * 1000);
+      },
+      60 * 60 * 1000,
+    );
   }
 
   private async loadApiKeys(): Promise<void> {
     // Load API keys from storage
-    // // console.log('🔑 Loading API keys');
+    // // // // console.log('🔑 Loading API keys');
   }
 
   private async saveApiKey(apiKey: ApiKey): Promise<void> {
     // Save API key to storage
-    // // console.log(`💾 API key saved: ${apiKey.name}`);
+    // // // // console.log(`💾 API key saved: ${apiKey.name}`);
   }
 
   private async loadWebhookSubscriptions(): Promise<void> {
     // Load webhook subscriptions from storage
-    // // console.log('🪝 Loading webhook subscriptions');
+    // // // // console.log('🪝 Loading webhook subscriptions');
   }
 }
 

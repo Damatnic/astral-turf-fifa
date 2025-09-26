@@ -96,7 +96,9 @@ class SecureAuthenticationService {
   }
 
   private async initializeService(): Promise<void> {
-    if (this.initialized) {return;}
+    if (this.initialized) {
+      return;
+    }
 
     try {
       // Initialize security modules
@@ -109,7 +111,7 @@ class SecureAuthenticationService {
       securityLogger.info('Secure authentication service initialized');
     } catch (_error) {
       securityLogger.error('Failed to initialize secure authentication service', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
       });
       throw new Error('Authentication service initialization failed');
     }
@@ -143,7 +145,7 @@ class SecureAuthenticationService {
       });
     } catch (_error) {
       securityLogger.error('Demo user migration failed', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
       });
     }
   }
@@ -151,13 +153,18 @@ class SecureAuthenticationService {
   /**
    * Secure Login Implementation
    */
-  async login(email: string, password: string, context: LoginContext): Promise<SecureLoginResponse> {
+  async login(
+    email: string,
+    password: string,
+    context: LoginContext,
+  ): Promise<SecureLoginResponse> {
     const startTime = Date.now();
 
     try {
       // Rate limiting check
       const rateLimitKey = `login:${context.ipAddress || 'unknown'}`;
-      if (checkRateLimit(rateLimitKey, 5, 15 * 60 * 1000)) { // 5 attempts per 15 minutes
+      if (checkRateLimit(rateLimitKey, 5, 15 * 60 * 1000)) {
+        // 5 attempts per 15 minutes
         securityLogger.logSuspiciousActivity('rate_limit', {
           type: 'login',
           ipAddress: context.ipAddress,
@@ -169,7 +176,13 @@ class SecureAuthenticationService {
       // Input validation and sanitization
       const validationResult = validateInput(validationSchemas.login, { email, password });
       if (!validationResult.success) {
-        recordLoginAttempt(email, context.ipAddress || '', context.userAgent || '', false, 'Invalid input');
+        recordLoginAttempt(
+          email,
+          context.ipAddress || '',
+          context.userAgent || '',
+          false,
+          'Invalid input',
+        );
         throw new Error('Invalid email or password format');
       }
 
@@ -179,7 +192,13 @@ class SecureAuthenticationService {
       const user = Array.from(users.values()).find(u => u.email === sanitizedEmail && u.isActive);
 
       if (!user) {
-        recordLoginAttempt(sanitizedEmail, context.ipAddress || '', context.userAgent || '', false, 'User not found');
+        recordLoginAttempt(
+          sanitizedEmail,
+          context.ipAddress || '',
+          context.userAgent || '',
+          false,
+          'User not found',
+        );
         monitorSecurityEvent(SecurityEventType.LOGIN_FAILURE, {
           email: sanitizedEmail,
           ipAddress: context.ipAddress,
@@ -190,7 +209,13 @@ class SecureAuthenticationService {
 
       // Check if account is locked
       if (isAccountLocked(user)) {
-        recordLoginAttempt(sanitizedEmail, context.ipAddress || '', context.userAgent || '', false, 'Account locked');
+        recordLoginAttempt(
+          sanitizedEmail,
+          context.ipAddress || '',
+          context.userAgent || '',
+          false,
+          'Account locked',
+        );
         securityLogger.logSecurityEvent(
           SecurityEventType.UNAUTHORIZED_ACCESS,
           'Login attempt on locked account',
@@ -219,7 +244,13 @@ class SecureAuthenticationService {
 
       if (!isPasswordValid) {
         user.failedLoginAttempts++;
-        recordLoginAttempt(sanitizedEmail, context.ipAddress || '', context.userAgent || '', false, 'Invalid password');
+        recordLoginAttempt(
+          sanitizedEmail,
+          context.ipAddress || '',
+          context.userAgent || '',
+          false,
+          'Invalid password',
+        );
 
         if (user.failedLoginAttempts >= 5) {
           lockAccount(user.id);
@@ -278,9 +309,8 @@ class SecureAuthenticationService {
         },
         securityNotices,
       };
-
     } catch (_error) {
-      const errorMessage = error instanceof Error ? error.message : 'Login failed';
+      const errorMessage = _error instanceof Error ? _error.message : 'Login failed';
 
       securityLogger.error('Login failed', {
         email: sanitizeUserInput(email),
@@ -302,7 +332,8 @@ class SecureAuthenticationService {
     try {
       // Rate limiting for signup
       const rateLimitKey = `signup:${context.ipAddress || 'unknown'}`;
-      if (checkRateLimit(rateLimitKey, 3, 60 * 60 * 1000)) { // 3 signups per hour
+      if (checkRateLimit(rateLimitKey, 3, 60 * 60 * 1000)) {
+        // 3 signups per hour
         throw new Error('Signup rate limit exceeded. Please try again later.');
       }
 
@@ -401,13 +432,12 @@ class SecureAuthenticationService {
 
       // Automatically log in the new user
       return await this.login(sanitizedData.email, sanitizedData.password, context);
-
     } catch (_error) {
       securityLogger.error('Signup failed', {
         email: signupData.email,
         role: signupData.role,
         ipAddress: context.ipAddress,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
         duration: Date.now() - startTime,
       });
 
@@ -447,10 +477,9 @@ class SecureAuthenticationService {
         sessionId: payload.sessionId,
         ipAddress: context.ipAddress,
       });
-
     } catch (_error) {
       securityLogger.error('Logout failed', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
         ipAddress: context.ipAddress,
       });
       throw error;
@@ -471,22 +500,17 @@ class SecureAuthenticationService {
       if (payload) {
         updateSessionActivity(payload.sessionId);
 
-        securityLogger.logSecurityEvent(
-          SecurityEventType.TOKEN_REFRESH,
-          'Access token refreshed',
-          {
-            userId: payload.userId,
-            sessionId: payload.sessionId,
-            ipAddress: context.ipAddress,
-          },
-        );
+        securityLogger.logSecurityEvent(SecurityEventType.TOKEN_REFRESH, 'Access token refreshed', {
+          userId: payload.userId,
+          sessionId: payload.sessionId,
+          ipAddress: context.ipAddress,
+        });
       }
 
       return newTokens;
-
     } catch (_error) {
       securityLogger.error('Token refresh failed', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
         ipAddress: context.ipAddress,
       });
       throw error;
@@ -514,7 +538,10 @@ class SecureAuthenticationService {
       }
 
       // Verify current password
-      const isCurrentPasswordValid = await verifyPassword(passwordData.currentPassword, user.passwordHash);
+      const isCurrentPasswordValid = await verifyPassword(
+        passwordData.currentPassword,
+        user.passwordHash,
+      );
       if (!isCurrentPasswordValid) {
         securityLogger.logSecurityEvent(
           SecurityEventType.UNAUTHORIZED_ACCESS,
@@ -531,7 +558,10 @@ class SecureAuthenticationService {
       }
 
       // Check password history
-      const wasUsedBefore = await isPasswordPreviouslyUsed(passwordData.newPassword, user.passwordHistory);
+      const wasUsedBefore = await isPasswordPreviouslyUsed(
+        passwordData.newPassword,
+        user.passwordHistory,
+      );
       if (wasUsedBefore) {
         throw new Error('Cannot reuse a previously used password');
       }
@@ -564,11 +594,10 @@ class SecureAuthenticationService {
           sessionsTerminated: user.activeSessions.length,
         },
       );
-
     } catch (_error) {
       securityLogger.error('Password change failed', {
         userId,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
         ipAddress: context.ipAddress,
       });
       throw error;
@@ -596,10 +625,9 @@ class SecureAuthenticationService {
       securityLogger.logDataAccess(payload.userId, 'user_profile', 'read', false);
 
       return this.convertToPublicUser(user);
-
     } catch (_error) {
       securityLogger.error('Get current user failed', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
         ipAddress: context.ipAddress,
       });
       return null;
@@ -637,7 +665,12 @@ class SecureAuthenticationService {
         timestamp: new Date(),
       };
 
-      const hasPermissionResult = hasPermission(payload.role, permission, resource, permissionContext);
+      const hasPermissionResult = hasPermission(
+        payload.role,
+        permission,
+        resource,
+        permissionContext,
+      );
 
       securityLogger.logPermissionCheck(
         hasPermissionResult.granted,
@@ -648,12 +681,11 @@ class SecureAuthenticationService {
       );
 
       return hasPermissionResult.granted;
-
     } catch (_error) {
       securityLogger.error('Permission check failed', {
         permission,
         resource,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
       });
       return false;
     }
@@ -664,7 +696,13 @@ class SecureAuthenticationService {
    */
 
   private convertToPublicUser(secureUser: SecureUser): User {
-    const { passwordHash: _passwordHash, passwordHistory: _passwordHistory, refreshTokens: _refreshTokens, activeSessions: _activeSessions, ...publicUser } = secureUser;
+    const {
+      passwordHash: _passwordHash,
+      passwordHistory: _passwordHistory,
+      refreshTokens: _refreshTokens,
+      activeSessions: _activeSessions,
+      ...publicUser
+    } = secureUser;
     return publicUser as User;
   }
 

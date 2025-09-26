@@ -93,96 +93,282 @@ export interface PermissionRule {
 export const ROLE_PERMISSIONS: Record<UserRole, PermissionRule[]> = {
   coach: [
     // Full player management
-    { permission: Permission.VIEW_PLAYERS, resource: Resource.PLAYER, description: 'View all players' },
-    { permission: Permission.EDIT_PLAYERS, resource: Resource.PLAYER, description: 'Edit player details' },
-    { permission: Permission.DELETE_PLAYERS, resource: Resource.PLAYER, description: 'Delete players' },
-    { permission: Permission.ASSIGN_PLAYERS, resource: Resource.PLAYER, description: 'Assign players to positions' },
+    {
+      permission: Permission.VIEW_PLAYERS,
+      resource: Resource.PLAYER,
+      description: 'View all players',
+    },
+    {
+      permission: Permission.EDIT_PLAYERS,
+      resource: Resource.PLAYER,
+      description: 'Edit player details',
+    },
+    {
+      permission: Permission.DELETE_PLAYERS,
+      resource: Resource.PLAYER,
+      description: 'Delete players',
+    },
+    {
+      permission: Permission.ASSIGN_PLAYERS,
+      resource: Resource.PLAYER,
+      description: 'Assign players to positions',
+    },
 
     // Full formation management
-    { permission: Permission.VIEW_FORMATIONS, resource: Resource.FORMATION, description: 'View formations' },
-    { permission: Permission.EDIT_FORMATIONS, resource: Resource.FORMATION, description: 'Edit formations' },
-    { permission: Permission.CREATE_FORMATIONS, resource: Resource.FORMATION, description: 'Create new formations' },
-    { permission: Permission.DELETE_FORMATIONS, resource: Resource.FORMATION, description: 'Delete formations' },
+    {
+      permission: Permission.VIEW_FORMATIONS,
+      resource: Resource.FORMATION,
+      description: 'View formations',
+    },
+    {
+      permission: Permission.EDIT_FORMATIONS,
+      resource: Resource.FORMATION,
+      description: 'Edit formations',
+    },
+    {
+      permission: Permission.CREATE_FORMATIONS,
+      resource: Resource.FORMATION,
+      description: 'Create new formations',
+    },
+    {
+      permission: Permission.DELETE_FORMATIONS,
+      resource: Resource.FORMATION,
+      description: 'Delete formations',
+    },
 
     // Match management
-    { permission: Permission.SIMULATE_MATCHES, resource: Resource.MATCH, description: 'Simulate matches' },
-    { permission: Permission.VIEW_MATCH_REPORTS, resource: Resource.MATCH, description: 'View match reports' },
-    { permission: Permission.EXPORT_LINEUPS, resource: Resource.MATCH, description: 'Export lineups' },
+    {
+      permission: Permission.SIMULATE_MATCHES,
+      resource: Resource.MATCH,
+      description: 'Simulate matches',
+    },
+    {
+      permission: Permission.VIEW_MATCH_REPORTS,
+      resource: Resource.MATCH,
+      description: 'View match reports',
+    },
+    {
+      permission: Permission.EXPORT_LINEUPS,
+      resource: Resource.MATCH,
+      description: 'Export lineups',
+    },
 
     // Training management
-    { permission: Permission.VIEW_TRAINING, resource: Resource.TRAINING, description: 'View training schedules' },
-    { permission: Permission.EDIT_TRAINING, resource: Resource.TRAINING, description: 'Edit training schedules' },
-    { permission: Permission.ASSIGN_TRAINING, resource: Resource.TRAINING, description: 'Assign individual training' },
+    {
+      permission: Permission.VIEW_TRAINING,
+      resource: Resource.TRAINING,
+      description: 'View training schedules',
+    },
+    {
+      permission: Permission.EDIT_TRAINING,
+      resource: Resource.TRAINING,
+      description: 'Edit training schedules',
+    },
+    {
+      permission: Permission.ASSIGN_TRAINING,
+      resource: Resource.TRAINING,
+      description: 'Assign individual training',
+    },
 
     // Financial management
-    { permission: Permission.VIEW_FINANCES, resource: Resource.FINANCE, description: 'View financial data' },
-    { permission: Permission.MANAGE_TRANSFERS, resource: Resource.FINANCE, description: 'Manage transfers' },
-    { permission: Permission.MANAGE_CONTRACTS, resource: Resource.FINANCE, description: 'Manage contracts' },
+    {
+      permission: Permission.VIEW_FINANCES,
+      resource: Resource.FINANCE,
+      description: 'View financial data',
+    },
+    {
+      permission: Permission.MANAGE_TRANSFERS,
+      resource: Resource.FINANCE,
+      description: 'Manage transfers',
+    },
+    {
+      permission: Permission.MANAGE_CONTRACTS,
+      resource: Resource.FINANCE,
+      description: 'Manage contracts',
+    },
 
     // Administrative permissions
-    { permission: Permission.MANAGE_USERS, resource: Resource.SYSTEM, description: 'Manage user accounts' },
-    { permission: Permission.VIEW_AUDIT_LOGS, resource: Resource.SYSTEM, description: 'View security logs' },
-    { permission: Permission.SYSTEM_SETTINGS, resource: Resource.SYSTEM, description: 'Modify system settings' },
+    {
+      permission: Permission.MANAGE_USERS,
+      resource: Resource.SYSTEM,
+      description: 'Manage user accounts',
+    },
+    {
+      permission: Permission.VIEW_AUDIT_LOGS,
+      resource: Resource.SYSTEM,
+      description: 'View security logs',
+    },
+    {
+      permission: Permission.SYSTEM_SETTINGS,
+      resource: Resource.SYSTEM,
+      description: 'Modify system settings',
+    },
 
     // Communication
     { permission: Permission.SEND_MESSAGES, resource: Resource.CHAT, description: 'Send messages' },
-    { permission: Permission.VIEW_CONVERSATIONS, resource: Resource.CHAT, description: 'View all conversations' },
-    { permission: Permission.MODERATE_CHAT, resource: Resource.CHAT, description: 'Moderate chat messages' },
+    {
+      permission: Permission.VIEW_CONVERSATIONS,
+      resource: Resource.CHAT,
+      description: 'View all conversations',
+    },
+    {
+      permission: Permission.MODERATE_CHAT,
+      resource: Resource.CHAT,
+      description: 'Moderate chat messages',
+    },
 
     // AI and analytics
-    { permission: Permission.USE_AI_FEATURES, resource: Resource.ANALYTICS, description: 'Use AI features' },
-    { permission: Permission.VIEW_ANALYTICS, resource: Resource.ANALYTICS, description: 'View analytics' },
-    { permission: Permission.EXPORT_DATA, resource: Resource.ANALYTICS, description: 'Export data' },
+    {
+      permission: Permission.USE_AI_FEATURES,
+      resource: Resource.ANALYTICS,
+      description: 'Use AI features',
+    },
+    {
+      permission: Permission.VIEW_ANALYTICS,
+      resource: Resource.ANALYTICS,
+      description: 'View analytics',
+    },
+    {
+      permission: Permission.EXPORT_DATA,
+      resource: Resource.ANALYTICS,
+      description: 'Export data',
+    },
   ],
 
   player: [
     // Limited player viewing (own data + teammates)
-    { permission: Permission.VIEW_PLAYERS, resource: Resource.PLAYER, conditions: [Condition.SAME_TEAM], description: 'View team players' },
-    { permission: Permission.EDIT_PERSONAL_DATA, resource: Resource.PERSONAL_DATA, conditions: [Condition.OWN_DATA], description: 'Edit own data' },
+    {
+      permission: Permission.VIEW_PLAYERS,
+      resource: Resource.PLAYER,
+      conditions: [Condition.SAME_TEAM],
+      description: 'View team players',
+    },
+    {
+      permission: Permission.EDIT_PERSONAL_DATA,
+      resource: Resource.PERSONAL_DATA,
+      conditions: [Condition.OWN_DATA],
+      description: 'Edit own data',
+    },
 
     // Formation viewing only
-    { permission: Permission.VIEW_FORMATIONS, resource: Resource.FORMATION, description: 'View formations' },
+    {
+      permission: Permission.VIEW_FORMATIONS,
+      resource: Resource.FORMATION,
+      description: 'View formations',
+    },
 
     // Match viewing
-    { permission: Permission.VIEW_MATCH_REPORTS, resource: Resource.MATCH, description: 'View match reports' },
+    {
+      permission: Permission.VIEW_MATCH_REPORTS,
+      resource: Resource.MATCH,
+      description: 'View match reports',
+    },
 
     // Training viewing
-    { permission: Permission.VIEW_TRAINING, resource: Resource.TRAINING, conditions: [Condition.OWN_DATA], description: 'View own training' },
+    {
+      permission: Permission.VIEW_TRAINING,
+      resource: Resource.TRAINING,
+      conditions: [Condition.OWN_DATA],
+      description: 'View own training',
+    },
 
     // Personal communication
-    { permission: Permission.SEND_MESSAGES, resource: Resource.CHAT, description: 'Send messages to coach' },
-    { permission: Permission.VIEW_CONVERSATIONS, resource: Resource.CHAT, conditions: [Condition.OWN_DATA], description: 'View own conversations' },
+    {
+      permission: Permission.SEND_MESSAGES,
+      resource: Resource.CHAT,
+      description: 'Send messages to coach',
+    },
+    {
+      permission: Permission.VIEW_CONVERSATIONS,
+      resource: Resource.CHAT,
+      conditions: [Condition.OWN_DATA],
+      description: 'View own conversations',
+    },
 
     // Personal data access
-    { permission: Permission.VIEW_PERSONAL_DATA, resource: Resource.PERSONAL_DATA, conditions: [Condition.OWN_DATA], description: 'View own data' },
-    { permission: Permission.VIEW_MEDICAL_DATA, resource: Resource.PERSONAL_DATA, conditions: [Condition.OWN_DATA], description: 'View own medical data' },
+    {
+      permission: Permission.VIEW_PERSONAL_DATA,
+      resource: Resource.PERSONAL_DATA,
+      conditions: [Condition.OWN_DATA],
+      description: 'View own data',
+    },
+    {
+      permission: Permission.VIEW_MEDICAL_DATA,
+      resource: Resource.PERSONAL_DATA,
+      conditions: [Condition.OWN_DATA],
+      description: 'View own medical data',
+    },
 
     // Basic AI features
-    { permission: Permission.USE_AI_FEATURES, resource: Resource.ANALYTICS, description: 'Use basic AI features' },
+    {
+      permission: Permission.USE_AI_FEATURES,
+      resource: Resource.ANALYTICS,
+      description: 'Use basic AI features',
+    },
   ],
 
   family: [
     // Limited player viewing (associated players only)
-    { permission: Permission.VIEW_PLAYERS, resource: Resource.PLAYER, conditions: [Condition.APPROVED_BY_COACH], description: 'View associated players' },
+    {
+      permission: Permission.VIEW_PLAYERS,
+      resource: Resource.PLAYER,
+      conditions: [Condition.APPROVED_BY_COACH],
+      description: 'View associated players',
+    },
 
     // Formation viewing (limited)
-    { permission: Permission.VIEW_FORMATIONS, resource: Resource.FORMATION, conditions: [Condition.APPROVED_BY_COACH], description: 'View formations with player' },
+    {
+      permission: Permission.VIEW_FORMATIONS,
+      resource: Resource.FORMATION,
+      conditions: [Condition.APPROVED_BY_COACH],
+      description: 'View formations with player',
+    },
 
     // Match reports for associated players
-    { permission: Permission.VIEW_MATCH_REPORTS, resource: Resource.MATCH, conditions: [Condition.APPROVED_BY_COACH], description: 'View match reports' },
+    {
+      permission: Permission.VIEW_MATCH_REPORTS,
+      resource: Resource.MATCH,
+      conditions: [Condition.APPROVED_BY_COACH],
+      description: 'View match reports',
+    },
 
     // Training viewing for associated players
-    { permission: Permission.VIEW_TRAINING, resource: Resource.TRAINING, conditions: [Condition.APPROVED_BY_COACH], description: 'View player training' },
+    {
+      permission: Permission.VIEW_TRAINING,
+      resource: Resource.TRAINING,
+      conditions: [Condition.APPROVED_BY_COACH],
+      description: 'View player training',
+    },
 
     // Communication with coach
-    { permission: Permission.SEND_MESSAGES, resource: Resource.CHAT, conditions: [Condition.APPROVED_BY_COACH], description: 'Message coach about player' },
-    { permission: Permission.VIEW_CONVERSATIONS, resource: Resource.CHAT, conditions: [Condition.OWN_DATA], description: 'View own conversations' },
+    {
+      permission: Permission.SEND_MESSAGES,
+      resource: Resource.CHAT,
+      conditions: [Condition.APPROVED_BY_COACH],
+      description: 'Message coach about player',
+    },
+    {
+      permission: Permission.VIEW_CONVERSATIONS,
+      resource: Resource.CHAT,
+      conditions: [Condition.OWN_DATA],
+      description: 'View own conversations',
+    },
 
     // Associated player data (limited)
-    { permission: Permission.VIEW_PERSONAL_DATA, resource: Resource.PERSONAL_DATA, conditions: [Condition.APPROVED_BY_COACH], description: 'View player data' },
+    {
+      permission: Permission.VIEW_PERSONAL_DATA,
+      resource: Resource.PERSONAL_DATA,
+      conditions: [Condition.APPROVED_BY_COACH],
+      description: 'View player data',
+    },
 
     // Own account management
-    { permission: Permission.EDIT_PERSONAL_DATA, resource: Resource.PERSONAL_DATA, conditions: [Condition.OWN_DATA], description: 'Edit own account' },
+    {
+      permission: Permission.EDIT_PERSONAL_DATA,
+      resource: Resource.PERSONAL_DATA,
+      conditions: [Condition.OWN_DATA],
+      description: 'Edit own account',
+    },
   ],
 };
 
@@ -434,11 +620,7 @@ export function canAccessPlayerData(
 }
 
 // Validate chat permissions
-export function canSendMessage(
-  userRole: UserRole,
-  userId: string,
-  targetUserId?: string,
-): boolean {
+export function canSendMessage(userRole: UserRole, userId: string, targetUserId?: string): boolean {
   const context: PermissionContext = {
     userId,
     userRole,

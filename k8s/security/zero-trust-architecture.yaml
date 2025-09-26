@@ -37,25 +37,25 @@ spec:
     matchLabels:
       app.kubernetes.io/name: astral-turf
   rules:
-  - from:
-    - source:
-        principals: ["cluster.local/ns/astral-turf/sa/astral-turf-sa"]
-    - source:
-        namespaces: ["istio-system", "monitoring"]
-    to:
-    - operation:
-        methods: ["GET", "POST", "PUT", "DELETE"]
-        paths: ["/api/*", "/health", "/ready", "/metrics"]
-  - from:
-    - source:
-        principals: ["cluster.local/ns/istio-system/sa/istio-ingressgateway-service-account"]
-    to:
-    - operation:
-        methods: ["GET", "POST"]
-        paths: ["/", "/api/*", "/health"]
+    - from:
+        - source:
+            principals: ['cluster.local/ns/astral-turf/sa/astral-turf-sa']
+        - source:
+            namespaces: ['istio-system', 'monitoring']
+      to:
+        - operation:
+            methods: ['GET', 'POST', 'PUT', 'DELETE']
+            paths: ['/api/*', '/health', '/ready', '/metrics']
+    - from:
+        - source:
+            principals: ['cluster.local/ns/istio-system/sa/istio-ingressgateway-service-account']
+      to:
+        - operation:
+            methods: ['GET', 'POST']
+            paths: ['/', '/api/*', '/health']
   when:
-  - key: request.headers[x-forwarded-proto]
-    values: ["https"]
+    - key: request.headers[x-forwarded-proto]
+      values: ['https']
 
 ---
 apiVersion: networking.istio.io/v1beta1
@@ -67,25 +67,25 @@ spec:
   selector:
     istio: ingressgateway
   servers:
-  - port:
-      number: 443
-      name: https
-      protocol: HTTPS
-    tls:
-      mode: SIMPLE
-      credentialName: astral-turf-tls
-    hosts:
-    - app.astral-turf.com
-    - api.astral-turf.com
-  - port:
-      number: 80
-      name: http
-      protocol: HTTP
-    hosts:
-    - app.astral-turf.com
-    - api.astral-turf.com
-    tls:
-      httpsRedirect: true
+    - port:
+        number: 443
+        name: https
+        protocol: HTTPS
+      tls:
+        mode: SIMPLE
+        credentialName: astral-turf-tls
+      hosts:
+        - app.astral-turf.com
+        - api.astral-turf.com
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - app.astral-turf.com
+        - api.astral-turf.com
+      tls:
+        httpsRedirect: true
 
 ---
 apiVersion: networking.istio.io/v1beta1
@@ -95,42 +95,42 @@ metadata:
   namespace: astral-turf
 spec:
   hosts:
-  - app.astral-turf.com
-  - api.astral-turf.com
+    - app.astral-turf.com
+    - api.astral-turf.com
   gateways:
-  - astral-turf-gateway
+    - astral-turf-gateway
   http:
-  - match:
-    - uri:
-        prefix: /api/
-    route:
-    - destination:
-        host: astral-turf-service
-        port:
-          number: 3000
-    headers:
-      request:
-        add:
-          x-request-id: "%REQ(x-request-id)%"
-          x-forwarded-proto: https
-    fault:
-      delay:
-        percentage:
-          value: 0.1
-        fixedDelay: 5s
-    retries:
-      attempts: 3
-      perTryTimeout: 10s
-      retryOn: gateway-error,connect-failure,refused-stream
-  - match:
-    - uri:
-        prefix: /
-    route:
-    - destination:
-        host: astral-turf-service
-        port:
-          number: 3000
-    timeout: 30s
+    - match:
+        - uri:
+            prefix: /api/
+      route:
+        - destination:
+            host: astral-turf-service
+            port:
+              number: 3000
+      headers:
+        request:
+          add:
+            x-request-id: '%REQ(x-request-id)%'
+            x-forwarded-proto: https
+      fault:
+        delay:
+          percentage:
+            value: 0.1
+          fixedDelay: 5s
+      retries:
+        attempts: 3
+        perTryTimeout: 10s
+        retryOn: gateway-error,connect-failure,refused-stream
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: astral-turf-service
+            port:
+              number: 3000
+      timeout: 30s
 
 ---
 # ==================================================================
@@ -147,65 +147,65 @@ spec:
     matchLabels:
       app.kubernetes.io/name: astral-turf
   policyTypes:
-  - Ingress
-  - Egress
+    - Ingress
+    - Egress
   ingress:
-  # Allow traffic from istio-proxy
-  - from:
-    - namespaceSelector:
-        matchLabels:
-          name: istio-system
-    ports:
-    - protocol: TCP
-      port: 3000
-  # Allow monitoring
-  - from:
-    - namespaceSelector:
-        matchLabels:
-          name: monitoring
-    - podSelector:
-        matchLabels:
-          app.kubernetes.io/name: prometheus
-    ports:
-    - protocol: TCP
-      port: 9090
-  # Allow internal pod communication
-  - from:
-    - podSelector:
-        matchLabels:
-          app.kubernetes.io/name: astral-turf
-    ports:
-    - protocol: TCP
-      port: 3000
+    # Allow traffic from istio-proxy
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: istio-system
+      ports:
+        - protocol: TCP
+          port: 3000
+    # Allow monitoring
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: prometheus
+      ports:
+        - protocol: TCP
+          port: 9090
+    # Allow internal pod communication
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: astral-turf
+      ports:
+        - protocol: TCP
+          port: 3000
   egress:
-  # Allow DNS
-  - to: []
-    ports:
-    - protocol: UDP
-      port: 53
-    - protocol: TCP
-      port: 53
-  # Allow HTTPS for external APIs
-  - to: []
-    ports:
-    - protocol: TCP
-      port: 443
-  # Allow database connection
-  - to:
-    - namespaceSelector:
-        matchLabels:
-          name: database
-    ports:
-    - protocol: TCP
-      port: 5432
-  # Allow Redis connection
-  - to:
-    - namespaceSelector:
-        matchLabels:
-          name: cache
-    ports:
-    - protocol: TCP
-      port: 6379
+    # Allow DNS
+    - to: []
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    # Allow HTTPS for external APIs
+    - to: []
+      ports:
+        - protocol: TCP
+          port: 443
+    # Allow database connection
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: database
+      ports:
+        - protocol: TCP
+          port: 5432
+    # Allow Redis connection
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: cache
+      ports:
+        - protocol: TCP
+          port: 6379
 
 ---
 # ==================================================================
@@ -230,119 +230,119 @@ spec:
         app.kubernetes.io/name: falco
         app.kubernetes.io/component: runtime-security
       annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "8765"
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '8765'
     spec:
       serviceAccountName: falco
       hostNetwork: true
       hostPID: true
       tolerations:
-      - effect: NoSchedule
-        key: node-role.kubernetes.io/master
-      - effect: NoSchedule
-        key: node-role.kubernetes.io/control-plane
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
       containers:
-      - name: falco
-        image: falcosecurity/falco-no-driver:0.36.2
-        imagePullPolicy: IfNotPresent
-        args:
-        - /usr/bin/falco
-        - --cri
-        - /host/run/containerd/containerd.sock
-        - --cri
-        - /host/run/crio/crio.sock
-        - -K
-        - /var/run/secrets/kubernetes.io/serviceaccount/token
-        - -k
-        - https://kubernetes.default
-        - --k8s-node-name
-        - $(FALCO_K8S_NODE_NAME)
-        - -pk
-        livenessProbe:
-          initialDelaySeconds: 60
-          timeoutSeconds: 5
-          periodSeconds: 15
-          httpGet:
-            path: /healthz
-            port: 8765
-        readinessProbe:
-          initialDelaySeconds: 30
-          timeoutSeconds: 5
-          periodSeconds: 15
-          httpGet:
-            path: /healthz
-            port: 8765
-        securityContext:
-          privileged: true
-        env:
-        - name: FALCO_K8S_NODE_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: spec.nodeName
-        - name: FALCO_GRPC_ENABLED
-          value: "true"
-        - name: FALCO_GRPC_BIND_ADDRESS
-          value: "0.0.0.0:5060"
-        - name: FALCO_WEBSERVER_ENABLED
-          value: "true"
-        - name: FALCO_WEBSERVER_LISTEN_PORT
-          value: "8765"
-        volumeMounts:
-        - mountPath: /host/var/run/docker.sock
-          name: docker-socket
-        - mountPath: /host/run/containerd/containerd.sock
-          name: containerd-socket
-        - mountPath: /host/run/crio/crio.sock
-          name: crio-socket
-        - mountPath: /host/dev
-          name: dev-fs
-        - mountPath: /host/proc
-          name: proc-fs
-          readOnly: true
-        - mountPath: /host/boot
-          name: boot-fs
-          readOnly: true
-        - mountPath: /host/lib/modules
-          name: lib-modules
-        - mountPath: /host/usr
-          name: usr-fs
-          readOnly: true
-        - mountPath: /host/etc
-          name: etc-fs
-          readOnly: true
-        - mountPath: /etc/falco
-          name: falco-config
+        - name: falco
+          image: falcosecurity/falco-no-driver:0.36.2
+          imagePullPolicy: IfNotPresent
+          args:
+            - /usr/bin/falco
+            - --cri
+            - /host/run/containerd/containerd.sock
+            - --cri
+            - /host/run/crio/crio.sock
+            - -K
+            - /var/run/secrets/kubernetes.io/serviceaccount/token
+            - -k
+            - https://kubernetes.default
+            - --k8s-node-name
+            - $(FALCO_K8S_NODE_NAME)
+            - -pk
+          livenessProbe:
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+            periodSeconds: 15
+            httpGet:
+              path: /healthz
+              port: 8765
+          readinessProbe:
+            initialDelaySeconds: 30
+            timeoutSeconds: 5
+            periodSeconds: 15
+            httpGet:
+              path: /healthz
+              port: 8765
+          securityContext:
+            privileged: true
+          env:
+            - name: FALCO_K8S_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: FALCO_GRPC_ENABLED
+              value: 'true'
+            - name: FALCO_GRPC_BIND_ADDRESS
+              value: '0.0.0.0:5060'
+            - name: FALCO_WEBSERVER_ENABLED
+              value: 'true'
+            - name: FALCO_WEBSERVER_LISTEN_PORT
+              value: '8765'
+          volumeMounts:
+            - mountPath: /host/var/run/docker.sock
+              name: docker-socket
+            - mountPath: /host/run/containerd/containerd.sock
+              name: containerd-socket
+            - mountPath: /host/run/crio/crio.sock
+              name: crio-socket
+            - mountPath: /host/dev
+              name: dev-fs
+            - mountPath: /host/proc
+              name: proc-fs
+              readOnly: true
+            - mountPath: /host/boot
+              name: boot-fs
+              readOnly: true
+            - mountPath: /host/lib/modules
+              name: lib-modules
+            - mountPath: /host/usr
+              name: usr-fs
+              readOnly: true
+            - mountPath: /host/etc
+              name: etc-fs
+              readOnly: true
+            - mountPath: /etc/falco
+              name: falco-config
       volumes:
-      - name: docker-socket
-        hostPath:
-          path: /var/run/docker.sock
-      - name: containerd-socket
-        hostPath:
-          path: /run/containerd/containerd.sock
-      - name: crio-socket
-        hostPath:
-          path: /run/crio/crio.sock
-      - name: dev-fs
-        hostPath:
-          path: /dev
-      - name: proc-fs
-        hostPath:
-          path: /proc
-      - name: boot-fs
-        hostPath:
-          path: /boot
-      - name: lib-modules
-        hostPath:
-          path: /lib/modules
-      - name: usr-fs
-        hostPath:
-          path: /usr
-      - name: etc-fs
-        hostPath:
-          path: /etc
-      - name: falco-config
-        configMap:
-          name: falco-config
+        - name: docker-socket
+          hostPath:
+            path: /var/run/docker.sock
+        - name: containerd-socket
+          hostPath:
+            path: /run/containerd/containerd.sock
+        - name: crio-socket
+          hostPath:
+            path: /run/crio/crio.sock
+        - name: dev-fs
+          hostPath:
+            path: /dev
+        - name: proc-fs
+          hostPath:
+            path: /proc
+        - name: boot-fs
+          hostPath:
+            path: /boot
+        - name: lib-modules
+          hostPath:
+            path: /lib/modules
+        - name: usr-fs
+          hostPath:
+            path: /usr
+        - name: etc-fs
+          hostPath:
+            path: /etc
+        - name: falco-config
+          configMap:
+            name: falco-config
 
 ---
 apiVersion: v1
@@ -358,51 +358,51 @@ data:
     - /etc/falco/falco_rules.yaml
     - /etc/falco/falco_rules.local.yaml
     - /etc/falco/k8s_audit_rules.yaml
-    
+
     time_format_iso_8601: true
     json_output: true
     json_include_output_property: true
     json_include_tags_property: true
-    
+
     log_stderr: true
     log_syslog: true
     log_level: info
-    
+
     priority: debug
-    
+
     buffered_outputs: false
-    
+
     syscall_event_drops:
       actions:
         - log
         - alert
       rate: 0.03333
       max_burst: 1000
-    
+
     outputs:
       rate: 1
       max_burst: 1000
-    
+
     syslog_output:
       enabled: true
-    
+
     program_output:
       enabled: true
       keep_alive: false
       program: "curl -d @- -X POST http://falcosidekick:2801/"
-    
+
     http_output:
       enabled: true
       url: http://falcosidekick:2801/
-    
+
     grpc:
       enabled: true
       bind_address: "0.0.0.0:5060"
       threadiness: 0
-    
+
     grpc_output:
       enabled: true
-    
+
     webserver:
       enabled: true
       listen_port: 8765
@@ -453,19 +453,19 @@ metadata:
   namespace: gatekeeper-system
 spec:
   match:
-    - excludedNamespaces: ["kube-system", "gatekeeper-system", "istio-system"]
-      processes: ["*"]
+    - excludedNamespaces: ['kube-system', 'gatekeeper-system', 'istio-system']
+      processes: ['*']
   validation:
     traces:
       - user:
           kind:
-            group: "*"
-            version: "*"
-            kind: "*"
+            group: '*'
+            version: '*'
+            kind: '*'
       - kind:
-          group: "*"
-          version: "*"
-          kind: "*"
+          group: '*'
+          version: '*'
+          kind: '*'
 
 ---
 apiVersion: templates.gatekeeper.sh/v1beta1
@@ -473,7 +473,7 @@ kind: ConstraintTemplate
 metadata:
   name: astralturfsecuritypolicy
   annotations:
-    description: "Astral Turf security policy constraints"
+    description: 'Astral Turf security policy constraints'
 spec:
   crd:
     spec:
@@ -496,7 +496,7 @@ spec:
     - target: admission.k8s.gatekeeper.sh
       rego: |
         package astralturfsecuritypolicy
-        
+
         violation[{"msg": msg}] {
           # Check required security labels
           required := input.parameters.requiredLabels
@@ -505,7 +505,7 @@ spec:
           not provided[missing]
           msg := sprintf("Missing required security label: %v", [missing])
         }
-        
+
         violation[{"msg": msg}] {
           # Check container registry whitelist
           allowed_registries := input.parameters.allowedRegistries
@@ -514,7 +514,7 @@ spec:
           not image_from_allowed_registry(image, allowed_registries)
           msg := sprintf("Container image %v not from allowed registry", [image])
         }
-        
+
         violation[{"msg": msg}] {
           # Check replica limits
           max_replicas := input.parameters.maxReplicas
@@ -522,7 +522,7 @@ spec:
           replicas > max_replicas
           msg := sprintf("Replica count %v exceeds maximum %v", [replicas, max_replicas])
         }
-        
+
         image_from_allowed_registry(image, allowed_registries) {
           registry := allowed_registries[_]
           startswith(image, registry)
@@ -536,18 +536,18 @@ metadata:
 spec:
   match:
     kinds:
-      - apiGroups: ["apps"]
-        kinds: ["Deployment"]
-    namespaces: ["astral-turf"]
+      - apiGroups: ['apps']
+        kinds: ['Deployment']
+    namespaces: ['astral-turf']
   parameters:
     requiredLabels:
-      - "app.kubernetes.io/name"
-      - "app.kubernetes.io/version"
-      - "security.astral-turf.com/scan-status"
+      - 'app.kubernetes.io/name'
+      - 'app.kubernetes.io/version'
+      - 'security.astral-turf.com/scan-status'
     allowedRegistries:
-      - "ghcr.io/astral-turf/"
-      - "registry.k8s.io/"
-      - "quay.io/prometheus/"
+      - 'ghcr.io/astral-turf/'
+      - 'registry.k8s.io/'
+      - 'quay.io/prometheus/'
     maxReplicas: 1000
 
 ---
@@ -578,15 +578,15 @@ metadata:
 spec:
   provider:
     vault:
-      server: "https://vault.astral-turf.com"
-      path: "secret"
-      version: "v2"
+      server: 'https://vault.astral-turf.com'
+      path: 'secret'
+      version: 'v2'
       auth:
         kubernetes:
-          mountPath: "kubernetes"
-          role: "astral-turf-role"
+          mountPath: 'kubernetes'
+          role: 'astral-turf-role'
           serviceAccountRef:
-            name: "external-secrets-sa"
+            name: 'external-secrets-sa'
 
 ---
 apiVersion: external-secrets.io/v1beta1
@@ -603,22 +603,22 @@ spec:
     name: astral-turf-secrets
     creationPolicy: Owner
   data:
-  - secretKey: database-url
-    remoteRef:
-      key: astral-turf/database
-      property: connection-string
-  - secretKey: jwt-secret
-    remoteRef:
-      key: astral-turf/auth
-      property: jwt-signing-key
-  - secretKey: gemini-api-key
-    remoteRef:
-      key: astral-turf/ai
-      property: gemini-key
-  - secretKey: encryption-key
-    remoteRef:
-      key: astral-turf/encryption
-      property: master-key
+    - secretKey: database-url
+      remoteRef:
+        key: astral-turf/database
+        property: connection-string
+    - secretKey: jwt-secret
+      remoteRef:
+        key: astral-turf/auth
+        property: jwt-signing-key
+    - secretKey: gemini-api-key
+      remoteRef:
+        key: astral-turf/ai
+        property: gemini-key
+    - secretKey: encryption-key
+      remoteRef:
+        key: astral-turf/encryption
+        property: master-key
 
 ---
 # ==================================================================
@@ -642,12 +642,12 @@ metadata:
   labels:
     app.kubernetes.io/name: falco
 rules:
-- apiGroups: [""]
-  resources: ["nodes", "pods", "events"]
-  verbs: ["get", "list", "watch"]
-- apiGroups: ["apps"]
-  resources: ["deployments", "replicasets"]
-  verbs: ["get", "list", "watch"]
+  - apiGroups: ['']
+    resources: ['nodes', 'pods', 'events']
+    verbs: ['get', 'list', 'watch']
+  - apiGroups: ['apps']
+    resources: ['deployments', 'replicasets']
+    verbs: ['get', 'list', 'watch']
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -661,9 +661,9 @@ roleRef:
   kind: ClusterRole
   name: falco
 subjects:
-- kind: ServiceAccount
-  name: falco
-  namespace: security-system
+  - kind: ServiceAccount
+    name: falco
+    namespace: security-system
 
 ---
 apiVersion: v1

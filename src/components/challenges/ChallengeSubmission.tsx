@@ -34,8 +34,16 @@ const ChallengeSubmission: React.FC<ChallengeSubmissionProps> = ({
           onClick={() => setShowDetails(!showDetails)}
           className="text-gray-400 hover:text-white"
         >
-          <svg className={`w-5 h-5 transform transition-transform ${showDetails ? 'rotate-180' : ''}`} fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+          <svg
+            className={`w-5 h-5 transform transition-transform ${showDetails ? 'rotate-180' : ''}`}
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path
+              fillRule="evenodd"
+              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+              clipRule="evenodd"
+            />
           </svg>
         </button>
       </div>
@@ -50,7 +58,9 @@ const ChallengeSubmission: React.FC<ChallengeSubmissionProps> = ({
             <div key={req.id}>
               <div className="flex justify-between text-sm mb-1">
                 <span className="text-gray-400">{req.description}</span>
-                <span className="text-white">{current}/{req.target} {req.unit}</span>
+                <span className="text-white">
+                  {current}/{req.target} {req.unit}
+                </span>
               </div>
               <div className="w-full bg-gray-700 rounded-full h-2">
                 <div
@@ -82,10 +92,12 @@ const ChallengeSubmission: React.FC<ChallengeSubmissionProps> = ({
 
       {/* Review Notes */}
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-400 mb-1">Review Notes (Optional)</label>
+        <label className="block text-sm font-medium text-gray-400 mb-1">
+          Review Notes (Optional)
+        </label>
         <textarea
           value={notes}
-          onChange={(e) => setNotes(e.target.value)}
+          onChange={e => setNotes(e.target.value)}
           className="w-full px-3 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none h-20 resize-none"
           placeholder="Add notes for the player..."
         />

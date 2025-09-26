@@ -30,16 +30,28 @@ const ChallengeLeaderboard: React.FC<ChallengeLeaderboardProps> = ({
   });
 
   const getRankBadge = (rank: number): string => {
-    if (rank === 1) {return '🥇';}
-    if (rank === 2) {return '🥈';}
-    if (rank === 3) {return '🥉';}
+    if (rank === 1) {
+      return '🥇';
+    }
+    if (rank === 2) {
+      return '🥈';
+    }
+    if (rank === 3) {
+      return '🥉';
+    }
     return '';
   };
 
   const getRankColor = (rank: number): string => {
-    if (rank === 1) {return 'from-yellow-600/20 to-yellow-700/20 border-yellow-600/50';}
-    if (rank === 2) {return 'from-gray-500/20 to-gray-600/20 border-gray-500/50';}
-    if (rank === 3) {return 'from-orange-600/20 to-orange-700/20 border-orange-600/50';}
+    if (rank === 1) {
+      return 'from-yellow-600/20 to-yellow-700/20 border-yellow-600/50';
+    }
+    if (rank === 2) {
+      return 'from-gray-500/20 to-gray-600/20 border-gray-500/50';
+    }
+    if (rank === 3) {
+      return 'from-orange-600/20 to-orange-700/20 border-orange-600/50';
+    }
     return 'from-gray-800 to-gray-800 border-gray-700';
   };
 
@@ -82,14 +94,12 @@ const ChallengeLeaderboard: React.FC<ChallengeLeaderboardProps> = ({
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ delay: index * 0.05 }}
-                className={`relative overflow-hidden ${
-                  isCurrentPlayer ? 'bg-blue-600/10' : ''
-                }`}
+                className={`relative overflow-hidden ${isCurrentPlayer ? 'bg-blue-600/10' : ''}`}
               >
                 <div
-                  className={`p-4 cursor-pointer hover:bg-gray-700/50 transition-colors bg-gradient-to-r ${
-                    getRankColor(rank)
-                  } ${rank <= 3 ? 'border-l-4' : ''}`}
+                  className={`p-4 cursor-pointer hover:bg-gray-700/50 transition-colors bg-gradient-to-r ${getRankColor(
+                    rank,
+                  )} ${rank <= 3 ? 'border-l-4' : ''}`}
                   onClick={() => {
                     setExpandedPlayerId(isExpanded ? null : entry.playerId);
                     onPlayerSelect?.(entry.playerId);
@@ -107,12 +117,17 @@ const ChallengeLeaderboard: React.FC<ChallengeLeaderboardProps> = ({
                       </div>
 
                       <div className="flex items-center space-x-3">
-                        <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                          rank === 1 ? 'bg-gradient-to-br from-yellow-400 to-yellow-600' :
-                          rank === 2 ? 'bg-gradient-to-br from-gray-300 to-gray-500' :
-                          rank === 3 ? 'bg-gradient-to-br from-orange-400 to-orange-600' :
-                          'bg-gradient-to-br from-blue-500 to-purple-600'
-                        }`}>
+                        <div
+                          className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                            rank === 1
+                              ? 'bg-gradient-to-br from-yellow-400 to-yellow-600'
+                              : rank === 2
+                                ? 'bg-gradient-to-br from-gray-300 to-gray-500'
+                                : rank === 3
+                                  ? 'bg-gradient-to-br from-orange-400 to-orange-600'
+                                  : 'bg-gradient-to-br from-blue-500 to-purple-600'
+                          }`}
+                        >
                           <span className="text-lg font-bold text-white">L{entry.level}</span>
                         </div>
 
@@ -120,7 +135,9 @@ const ChallengeLeaderboard: React.FC<ChallengeLeaderboardProps> = ({
                           <p className="font-semibold text-white">
                             {entry.playerName}
                             {isCurrentPlayer && (
-                              <span className="ml-2 px-2 py-0.5 bg-blue-600 text-white text-xs rounded">YOU</span>
+                              <span className="ml-2 px-2 py-0.5 bg-blue-600 text-white text-xs rounded">
+                                YOU
+                              </span>
                             )}
                           </p>
                           <p className="text-sm text-gray-400">{entry.teamName}</p>
@@ -133,7 +150,11 @@ const ChallengeLeaderboard: React.FC<ChallengeLeaderboardProps> = ({
                           {entry.trend === 'up' && (
                             <span className="text-green-400 flex items-center text-sm">
                               <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                                <path
+                                  fillRule="evenodd"
+                                  d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z"
+                                  clipRule="evenodd"
+                                />
                               </svg>
                               {Math.abs(entry.previousRank - rank)}
                             </span>
@@ -141,7 +162,11 @@ const ChallengeLeaderboard: React.FC<ChallengeLeaderboardProps> = ({
                           {entry.trend === 'down' && (
                             <span className="text-red-400 flex items-center text-sm">
                               <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                <path
+                                  fillRule="evenodd"
+                                  d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z"
+                                  clipRule="evenodd"
+                                />
                               </svg>
                               {Math.abs(entry.previousRank - rank)}
                             </span>
@@ -157,14 +182,18 @@ const ChallengeLeaderboard: React.FC<ChallengeLeaderboardProps> = ({
                     <div className="flex items-center space-x-6">
                       <div className="text-center">
                         <p className="text-2xl font-bold text-white">
-                          {sortBy === 'weekly' ? entry.weeklyXP.toLocaleString() :
-                           sortBy === 'monthly' ? entry.monthlyXP.toLocaleString() :
-                           entry.totalXP.toLocaleString()}
+                          {sortBy === 'weekly'
+                            ? entry.weeklyXP.toLocaleString()
+                            : sortBy === 'monthly'
+                              ? entry.monthlyXP.toLocaleString()
+                              : entry.totalXP.toLocaleString()}
                         </p>
                         <p className="text-xs text-gray-500">
-                          {sortBy === 'weekly' ? 'Weekly XP' :
-                           sortBy === 'monthly' ? 'Monthly XP' :
-                           'Total XP'}
+                          {sortBy === 'weekly'
+                            ? 'Weekly XP'
+                            : sortBy === 'monthly'
+                              ? 'Monthly XP'
+                              : 'Total XP'}
                         </p>
                       </div>
 
@@ -174,7 +203,7 @@ const ChallengeLeaderboard: React.FC<ChallengeLeaderboardProps> = ({
                       </div>
 
                       <button
-                        onClick={(e) => {
+                        onClick={e => {
                           e.stopPropagation();
                           setExpandedPlayerId(isExpanded ? null : entry.playerId);
                         }}
@@ -187,7 +216,11 @@ const ChallengeLeaderboard: React.FC<ChallengeLeaderboardProps> = ({
                           fill="currentColor"
                           viewBox="0 0 20 20"
                         >
-                          <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                          <path
+                            fillRule="evenodd"
+                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                            clipRule="evenodd"
+                          />
                         </svg>
                       </button>
                     </div>
@@ -204,15 +237,21 @@ const ChallengeLeaderboard: React.FC<ChallengeLeaderboardProps> = ({
                       <div className="grid grid-cols-3 gap-4">
                         <div className="text-center">
                           <p className="text-sm text-gray-400">All Time XP</p>
-                          <p className="text-lg font-bold text-white">{entry.totalXP.toLocaleString()}</p>
+                          <p className="text-lg font-bold text-white">
+                            {entry.totalXP.toLocaleString()}
+                          </p>
                         </div>
                         <div className="text-center">
                           <p className="text-sm text-gray-400">Weekly XP</p>
-                          <p className="text-lg font-bold text-blue-400">{entry.weeklyXP.toLocaleString()}</p>
+                          <p className="text-lg font-bold text-blue-400">
+                            {entry.weeklyXP.toLocaleString()}
+                          </p>
                         </div>
                         <div className="text-center">
                           <p className="text-sm text-gray-400">Monthly XP</p>
-                          <p className="text-lg font-bold text-purple-400">{entry.monthlyXP.toLocaleString()}</p>
+                          <p className="text-lg font-bold text-purple-400">
+                            {entry.monthlyXP.toLocaleString()}
+                          </p>
                         </div>
                       </div>
                     </motion.div>

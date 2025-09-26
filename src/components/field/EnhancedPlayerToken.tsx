@@ -14,38 +14,54 @@ interface EnhancedPlayerTokenProps {
   interactive?: boolean;
 }
 
-// Player availability indicator
-const AvailabilityIndicator: React.FC<{ availability: Player['availability'] }> = React.memo(({ availability }) => {
-  const indicators = {
-    available: { color: '#10b981', icon: '●', tooltip: 'Available' },
-    injured: { color: '#ef4444', icon: '🏥', tooltip: 'Injured' },
-    suspended: { color: '#f59e0b', icon: '🟡', tooltip: 'Suspended' },
-    rested: { color: '#6b7280', icon: '😴', tooltip: 'Rested' },
-    international: { color: '#3b82f6', icon: '🌍', tooltip: 'International Duty' },
-  };
+// Player availability indicator with validation
+const AvailabilityIndicator: React.FC<{ availability: Player['availability'] }> = React.memo(
+  ({ availability }) => {
+    const indicators = {
+      available: { color: '#10b981', icon: '●', tooltip: 'Available' },
+      injured: { color: '#ef4444', icon: '🏥', tooltip: 'Injured' },
+      suspended: { color: '#f59e0b', icon: '🟡', tooltip: 'Suspended' },
+      rested: { color: '#6b7280', icon: '😴', tooltip: 'Rested' },
+      international: { color: '#3b82f6', icon: '🌍', tooltip: 'International Duty' },
+    };
 
-  const indicator = indicators[availability] || indicators.available;
+    const safeAvailability = availability || 'available';
+    const indicator = indicators[safeAvailability] || indicators.available;
 
-  return (
-    <div
-      className="absolute -top-1 -right-1 w-3 h-3 rounded-full border border-white/50 flex items-center justify-center text-xs"
-      style={{ backgroundColor: indicator.color }}
-      title={indicator.tooltip}
-    >
-      {availability !== 'available' && (
-        <span className="text-white text-[8px]">{indicator.icon}</span>
-      )}
-    </div>
-  );
-});
+    return (
+      <div
+        className="absolute -top-1 -right-1 w-3 h-3 rounded-full border border-white/50 flex items-center justify-center text-xs"
+        style={{ backgroundColor: indicator.color }}
+        title={indicator.tooltip}
+      >
+        {availability !== 'available' && (
+          <span className="text-white text-[8px]">{indicator.icon}</span>
+        )}
+      </div>
+    );
+  },
+);
 
-// Player stats overlay
-const PlayerStatsOverlay: React.FC<{ 
-  player: Player; 
-  isVisible: boolean; 
-  position: { x: number; y: number } 
+// Player stats overlay with comprehensive validation
+const PlayerStatsOverlay: React.FC<{
+  player: Player;
+  isVisible: boolean;
+  position: { x: number; y: number };
 }> = React.memo(({ player, isVisible, position }) => {
-  if (!isVisible) return null;
+  if (!isVisible || !player) {
+    return null;
+  }
+
+  // Validate position data
+  if (
+    !position ||
+    typeof position.x !== 'number' ||
+    typeof position.y !== 'number' ||
+    isNaN(position.x) ||
+    isNaN(position.y)
+  ) {
+    return null;
+  }
 
   const stats = [
     { label: 'OVR', value: player.overall || 75 },
@@ -65,16 +81,18 @@ const PlayerStatsOverlay: React.FC<{
         transform: 'translateY(-100%)',
       }}
     >
-      <div className="text-sm font-bold text-white mb-2">{player.name}</div>
+      <div className="text-sm font-bold text-white mb-2">{player.name || 'Unknown Player'}</div>
       <div className="grid grid-cols-3 gap-2 text-xs">
         {stats.map(stat => (
           <div key={stat.label} className="flex flex-col items-center">
             <div className="text-gray-400">{stat.label}</div>
-            <div 
+            <div
               className={`font-bold ${
-                stat.value >= 80 ? 'text-green-400' :
-                stat.value >= 70 ? 'text-yellow-400' :
-                'text-red-400'
+                stat.value >= 80
+                  ? 'text-green-400'
+                  : stat.value >= 70
+                    ? 'text-yellow-400'
+                    : 'text-red-400'
               }`}
             >
               {stat.value}
@@ -88,18 +106,24 @@ const PlayerStatsOverlay: React.FC<{
 
 const EnhancedPlayerToken: React.FC<EnhancedPlayerTokenProps> = ({
   player,
-  isSelected,
-  isHighlightedByAI,
+  isSelected = false,
+  isHighlightedByAI = false,
   size = 'medium',
   showStats = false,
   showRole = true,
   interactive = true,
 }) => {
+  // Validate player data immediately
+  if (!player || !player.id || !player.name) {
+    // // console.warn('EnhancedPlayerToken: Invalid player data', player);
+    return null;
+  }
+
   const { uiState, dispatch } = useUIContext();
   const { tacticsState } = useTacticsContext();
   const { startDrag, endDrag, validateDrop } = useTacticsBoard();
-  const { drawingTool, isPresentationMode } = uiState;
-  const { captainIds } = tacticsState;
+  const { drawingTool, isPresentationMode } = uiState || {};
+  const { captainIds } = tacticsState || {};
 
   const tokenRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
@@ -107,8 +131,9 @@ const EnhancedPlayerToken: React.FC<EnhancedPlayerTokenProps> = ({
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   const isDraggable = interactive && drawingTool === 'select' && !isPresentationMode;
-  const isCaptain = player?.id === captainIds?.home || player?.id === captainIds?.away;
-  const playerRole = PLAYER_ROLES?.find(r => r?.id === player?.roleId);
+  const isCaptain = player.id === captainIds?.home || player.id === captainIds?.away;
+  const playerRole =
+    player.roleId && PLAYER_ROLES ? PLAYER_ROLES.find(r => r?.id === player.roleId) : null;
 
   // Size configurations
   const sizeConfig = useMemo(() => {
@@ -120,11 +145,11 @@ const EnhancedPlayerToken: React.FC<EnhancedPlayerTokenProps> = ({
     return configs[size];
   }, [size]);
 
-  // Player kit colors
+  // Player kit colors with validation
   const kitColors = useMemo(() => {
-    const team = player.team;
+    const team = player.team || 'home';
     const kit = player.kit;
-    
+
     return {
       primary: kit?.primaryColor || (team === 'home' ? '#3b82f6' : '#ef4444'),
       secondary: kit?.secondaryColor || '#ffffff',
@@ -132,71 +157,117 @@ const EnhancedPlayerToken: React.FC<EnhancedPlayerTokenProps> = ({
     };
   }, [player.team, player.kit]);
 
-  // Enhanced drag handlers
-  const handleDragStart = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-    if (!isDraggable || !player) {
-      e.preventDefault();
-      return;
-    }
+  // Enhanced drag handlers with comprehensive validation
+  const handleDragStart = useCallback(
+    (e: React.DragEvent<HTMLDivElement>) => {
+      if (!isDraggable || !player || !player.id) {
+        e.preventDefault();
+        // // console.warn('Drag prevented: invalid player or not draggable', { isDraggable, player });
+        return;
+      }
 
-    setIsDragging(true);
-    startDrag(player, e);
+      try {
+        setIsDragging(true);
+        startDrag(player, e);
 
-    // Add visual feedback
-    if (tokenRef.current) {
-      tokenRef.current.style.opacity = '0.7';
-      tokenRef.current.style.transform = 'scale(1.1)';
-    }
-  }, [isDraggable, player, startDrag]);
+        // Add visual feedback
+        if (tokenRef.current) {
+          tokenRef.current.style.opacity = '0.7';
+          tokenRef.current.style.transform = 'scale(1.1)';
+        }
+      } catch (_error) {
+        console.error('Failed to start drag:', error);
+        setIsDragging(false);
+      }
+    },
+    [isDraggable, player, startDrag],
+  );
 
-  const handleDragEnd = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-    setIsDragging(false);
-    endDrag();
+  const handleDragEnd = useCallback(
+    (e: React.DragEvent<HTMLDivElement>) => {
+      try {
+        setIsDragging(false);
+        endDrag();
 
-    // Reset visual feedback
-    if (tokenRef.current) {
-      tokenRef.current.style.opacity = '';
-      tokenRef.current.style.transform = '';
-    }
-  }, [endDrag]);
+        // Reset visual feedback
+        if (tokenRef.current) {
+          tokenRef.current.style.opacity = '';
+          tokenRef.current.style.transform = '';
+        }
+      } catch (_error) {
+        console.error('Failed to end drag:', error);
+      }
+    },
+    [endDrag],
+  );
 
-  const handleClick = useCallback((e: React.MouseEvent) => {
-    if (!interactive) return;
-    
-    e.stopPropagation();
-    dispatch({ type: 'SELECT_PLAYER', payload: player?.id ?? '' });
-  }, [interactive, dispatch, player?.id]);
+  const handleClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (!interactive || !player?.id) {
+        return;
+      }
 
-  const handleDoubleClick = useCallback((e: React.MouseEvent) => {
-    if (!interactive) return;
-    
-    e.stopPropagation();
-    // Open player details modal
-    dispatch({ type: 'OPEN_MODAL', payload: { type: 'PLAYER_DETAILS', playerId: player.id } });
-  }, [interactive, dispatch, player.id]);
+      e.stopPropagation();
+      try {
+        dispatch({ type: 'SELECT_PLAYER', payload: player.id });
+      } catch (_error) {
+        console.error('Failed to select player:', error);
+      }
+    },
+    [interactive, dispatch, player?.id],
+  );
 
-  const handleMouseEnter = useCallback((e: React.MouseEvent) => {
-    if (showStats) {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-      setIsHovered(true);
-    }
-  }, [showStats]);
+  const handleDoubleClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (!interactive || !player?.id) {
+        return;
+      }
+
+      e.stopPropagation();
+      try {
+        // Open player details modal
+        dispatch({ type: 'OPEN_MODAL', payload: { type: 'PLAYER_DETAILS', playerId: player.id } });
+      } catch (_error) {
+        console.error('Failed to open player modal:', error);
+      }
+    },
+    [interactive, dispatch, player?.id],
+  );
+
+  const handleMouseEnter = useCallback(
+    (e: React.MouseEvent) => {
+      if (showStats && e.clientX !== undefined && e.clientY !== undefined) {
+        setMousePosition({ x: e.clientX, y: e.clientY });
+        setIsHovered(true);
+      }
+    },
+    [showStats],
+  );
 
   const handleMouseLeave = useCallback(() => {
     setIsHovered(false);
   }, []);
 
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (showStats && isHovered) {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    }
-  }, [showStats, isHovered]);
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      if (showStats && isHovered && e.clientX !== undefined && e.clientY !== undefined) {
+        setMousePosition({ x: e.clientX, y: e.clientY });
+      }
+    },
+    [showStats, isHovered],
+  );
 
   // Performance rating color
   const getPerformanceColor = useCallback((rating: number) => {
-    if (rating >= 80) return '#10b981'; // Green
-    if (rating >= 70) return '#f59e0b'; // Yellow
-    if (rating >= 60) return '#f97316'; // Orange
+    if (rating >= 80) {
+      return '#10b981';
+    } // Green
+    if (rating >= 70) {
+      return '#f59e0b';
+    } // Yellow
+    if (rating >= 60) {
+      return '#f97316';
+    } // Orange
     return '#ef4444'; // Red
   }, []);
 
@@ -221,9 +292,10 @@ const EnhancedPlayerToken: React.FC<EnhancedPlayerTokenProps> = ({
           height: sizeConfig.size,
           background: `linear-gradient(135deg, ${kitColors.primary}, ${kitColors.accent})`,
           border: `2px solid ${kitColors.secondary}`,
-          boxShadow: isSelected || isHighlightedByAI 
-            ? `0 0 20px ${isSelected ? '#facc15' : '#10b981'}` 
-            : '0 4px 12px rgba(0,0,0,0.3)',
+          boxShadow:
+            isSelected || isHighlightedByAI
+              ? `0 0 20px ${isSelected ? '#facc15' : '#10b981'}`
+              : '0 4px 12px rgba(0,0,0,0.3)',
         }}
         draggable={isDraggable}
         onDragStart={handleDragStart}
@@ -233,18 +305,27 @@ const EnhancedPlayerToken: React.FC<EnhancedPlayerTokenProps> = ({
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         onMouseMove={handleMouseMove}
-        title={`${player.name} - ${playerRole?.name || player.roleId}`}
+        title={`${player.name || 'Unknown'} - ${playerRole?.name || player.roleId || 'Unknown Role'}`}
       >
         {/* Player initials or number */}
-        <div className={`
+        <div
+          className={`
           absolute inset-0 flex items-center justify-center font-bold text-white
           ${sizeConfig.text}
-        `}>
+        `}
+        >
           {player.number ? (
             <span className="drop-shadow-sm">{player.number}</span>
           ) : (
             <span className="drop-shadow-sm">
-              {player.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+              {player.name
+                ? player.name
+                    .split(' ')
+                    .map(n => n[0] || '')
+                    .join('')
+                    .slice(0, 2)
+                    .toUpperCase()
+                : '??'}
             </span>
           )}
         </div>
@@ -257,7 +338,7 @@ const EnhancedPlayerToken: React.FC<EnhancedPlayerTokenProps> = ({
         )}
 
         {/* Availability indicator */}
-        <AvailabilityIndicator availability={player.availability} />
+        <AvailabilityIndicator availability={player.availability || 'available'} />
 
         {/* Role indicator */}
         {showRole && playerRole && size !== 'small' && (
@@ -270,7 +351,7 @@ const EnhancedPlayerToken: React.FC<EnhancedPlayerTokenProps> = ({
 
         {/* Performance rating */}
         {size !== 'small' && (
-          <div 
+          <div
             className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full border border-white/50 flex items-center justify-center text-xs font-bold text-white"
             style={{ backgroundColor: performanceColor }}
           >
@@ -279,9 +360,7 @@ const EnhancedPlayerToken: React.FC<EnhancedPlayerTokenProps> = ({
         )}
 
         {/* Drag indicator */}
-        {isDragging && (
-          <div className="absolute inset-0 bg-white/20 rounded-full animate-ping" />
-        )}
+        {isDragging && <div className="absolute inset-0 bg-white/20 rounded-full animate-ping" />}
 
         {/* Selection pulse */}
         {isSelected && (
@@ -296,11 +375,7 @@ const EnhancedPlayerToken: React.FC<EnhancedPlayerTokenProps> = ({
 
       {/* Stats overlay */}
       {showStats && (
-        <PlayerStatsOverlay
-          player={player}
-          isVisible={isHovered}
-          position={mousePosition}
-        />
+        <PlayerStatsOverlay player={player} isVisible={isHovered} position={mousePosition} />
       )}
     </>
   );

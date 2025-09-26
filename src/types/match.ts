@@ -27,7 +27,18 @@ export interface MatchResult {
 }
 
 // Team tactics and strategy
-export type TeamTacticValue = 'very-defensive' | 'defensive' | 'balanced' | 'attacking' | 'very-attacking' | 'low' | 'medium' | 'high' | 'deep' | 'narrow' | 'wide';
+export type TeamTacticValue =
+  | 'very-defensive'
+  | 'defensive'
+  | 'balanced'
+  | 'attacking'
+  | 'very-attacking'
+  | 'low'
+  | 'medium'
+  | 'high'
+  | 'deep'
+  | 'narrow'
+  | 'wide';
 
 export interface TeamTactics {
   mentality: TeamTacticValue;
@@ -37,7 +48,12 @@ export interface TeamTactics {
 }
 
 // Set pieces
-export type SetPieceType = 'left_corner' | 'right_corner' | 'short_free_kick' | 'long_free_kick' | 'penalty';
+export type SetPieceType =
+  | 'left_corner'
+  | 'right_corner'
+  | 'short_free_kick'
+  | 'long_free_kick'
+  | 'penalty';
 export type SetPieceAssignments = Partial<Record<SetPieceType, string | null>>;
 
 // Formation related types
@@ -45,6 +61,7 @@ export interface FormationSlot {
   id: string;
   role: string; // Will be PositionRole from player.ts
   defaultPosition: { x: number; y: number };
+  position?: { x: number; y: number }; // Current position during play
   playerId: string | null;
 }
 

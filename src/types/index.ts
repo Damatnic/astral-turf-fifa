@@ -14,11 +14,33 @@ export * from './auth';
 export * from './challenges';
 
 // Import what we need for main state interfaces
-import type { Player, Team, MentoringGroup, PlayerRelationshipType, Promise, TransferPlayer } from './player';
+import type {
+  Player,
+  Team,
+  MentoringGroup,
+  PlayerRelationshipType,
+  Promise,
+  TransferPlayer,
+  Position,
+} from './player';
 import type { Formation, TeamTactics, SetPieceAssignments } from './match';
 import type { DrawingShape, PlaybookItem, UIState } from './ui';
-import type { Season, BoardObjective, Manager, HistoricalSeasonRecord, ScoutingAssignment, PressNarrative, SeasonAwards, NewsItem } from './league';
-import type { WeeklySchedule, TrainingPlanTemplate, SkillChallenge, YouthAcademy } from './training';
+import type {
+  Season,
+  BoardObjective,
+  Manager,
+  HistoricalSeasonRecord,
+  ScoutingAssignment,
+  PressNarrative,
+  SeasonAwards,
+  NewsItem,
+} from './league';
+import type {
+  WeeklySchedule,
+  TrainingPlanTemplate,
+  SkillChallenge,
+  YouthAcademy,
+} from './training';
 import type { Staff, AgentPersonality } from './staff';
 import type { TeamFinances, Stadium, SponsorshipDeal } from './finance';
 import type { InboxItem } from './communication';
@@ -35,7 +57,7 @@ export interface TacticsState {
   tacticalFamiliarity: Record<string, number>; // formationId -> familiarity %
   chemistry: Record<string, Record<string, number>>; // playerA_id -> { playerB_id -> raw_chemistry_score }
   captainIds: { home: string | null; away: string | null };
-  setPieceTakers: { home: SetPieceAssignments, away: SetPieceAssignments };
+  setPieceTakers: { home: SetPieceAssignments; away: SetPieceAssignments };
 }
 
 export interface FranchiseState {
@@ -45,19 +67,19 @@ export interface FranchiseState {
   boardObjectives: readonly BoardObjective[];
   jobSecurity: number; // 0-100
   fanConfidence: number; // 0-100
-  finances: { home: TeamFinances, away: TeamFinances };
-  trainingSchedule: { home: WeeklySchedule, away: WeeklySchedule };
+  finances: { home: TeamFinances; away: TeamFinances };
+  trainingSchedule: { home: WeeklySchedule; away: WeeklySchedule };
   inbox: InboxItem[];
   transferMarket: {
-    forSale: TransferPlayer[],
-    forLoan: Player[],
-    freeAgents: Player[],
+    forSale: TransferPlayer[];
+    forLoan: Player[];
+    freeAgents: Player[];
   };
   matchHistory: unknown[]; // MatchResult[] when match types are properly imported
-  youthAcademy: { home: YouthAcademy, away: YouthAcademy };
-  staff: { home: Staff, away: Staff };
-  stadium: { home: Stadium, away: Stadium };
-  sponsorships: { home: SponsorshipDeal | null, away: SponsorshipDeal | null };
+  youthAcademy: { home: YouthAcademy; away: YouthAcademy };
+  staff: { home: Staff; away: Staff };
+  stadium: { home: Stadium; away: Stadium };
+  sponsorships: { home: SponsorshipDeal | null; away: SponsorshipDeal | null };
   historicalData: readonly HistoricalSeasonRecord[];
   hallOfFame: readonly Player[];
   newsFeed: NewsItem[];
@@ -66,8 +88,9 @@ export interface FranchiseState {
     playerId: string;
     conversation: string[];
     agentPersonality: AgentPersonality;
+    offer?: unknown; // Contract offer details
   } | null;
-  mentoringGroups: { home: MentoringGroup[], away: MentoringGroup[] };
+  mentoringGroups: { home: MentoringGroup[]; away: MentoringGroup[] };
   relationships: Record<string, Record<string, PlayerRelationshipType>>;
   scoutingAssignments: ScoutingAssignment[];
   pressNarratives: PressNarrative[];
@@ -117,24 +140,33 @@ export type Action =
   | { type: 'ASSIGN_PLAYER_TEAM'; payload: { playerId: string; team: Team } }
   | { type: 'ADD_DEVELOPMENT_LOG'; payload: { playerId: string; entry: unknown } } // DevelopmentLogEntry
   | { type: 'SET_INDIVIDUAL_TRAINING_FOCUS'; payload: { playerId: string; focus: unknown } } // IndividualTrainingFocus
-  | { type: 'ADD_CONTRACT_CLAUSE'; payload: { playerId: string, clauseText: string } }
-  | { type: 'UPDATE_CONTRACT_CLAUSE'; payload: { playerId: string, clauseId: string, status: unknown } } // ContractClause status
-  | { type: 'REMOVE_CONTRACT_CLAUSE'; payload: { playerId: string, clauseId: string } }
+  | { type: 'ADD_CONTRACT_CLAUSE'; payload: { playerId: string; clauseText: string } }
+  | {
+      type: 'UPDATE_CONTRACT_CLAUSE';
+      payload: { playerId: string; clauseId: string; status: unknown };
+    } // ContractClause status
+  | { type: 'REMOVE_CONTRACT_CLAUSE'; payload: { playerId: string; clauseId: string } }
   | { type: 'TERMINATE_PLAYER_CONTRACT'; payload: string }
   | { type: 'ADD_COMMUNICATION_LOG'; payload: { playerId: string; entry: unknown } } // CommunicationLogEntry
-  | { type: 'UPDATE_PLAYER_CHALLENGE_COMPLETION'; payload: { playerId: string, challengeId: string } }
+  | {
+      type: 'UPDATE_PLAYER_CHALLENGE_COMPLETION';
+      payload: { playerId: string; challengeId: string };
+    }
 
   // Formation & Tactics Actions
   | { type: 'SET_ACTIVE_FORMATION'; payload: { formationId: string; team: Team } }
   | { type: 'CLEAR_FORMATION' }
-  | { type: 'ASSIGN_PLAYER_TO_SLOT'; payload: { slotId: string; playerId: string, team: Team } }
-  | { type: 'UPDATE_PLAYER_POSITION'; payload: { playerId: string; position: { x: number; y: number } } }
+  | { type: 'ASSIGN_PLAYER_TO_SLOT'; payload: { slotId: string; playerId: string; team: Team } }
+  | {
+      type: 'UPDATE_PLAYER_POSITION';
+      payload: { playerId: string; position: { x: number; y: number } };
+    }
   | { type: 'SET_TEAM_TACTIC'; payload: { team: Team; tactic: unknown; value: unknown } } // TeamTactics properties
-  | { type: 'SAVE_CUSTOM_FORMATION', payload: Formation }
-  | { type: 'DELETE_CUSTOM_FORMATION', payload: string }
+  | { type: 'SAVE_CUSTOM_FORMATION'; payload: Formation }
+  | { type: 'DELETE_CUSTOM_FORMATION'; payload: string }
   | { type: 'UPDATE_TACTICAL_FAMILIARITY'; payload: { formationId: string; increase: number } }
-  | { type: 'SET_SET_PIECE_TAKER'; payload: { team: Team, type: unknown, playerId: string | null } } // SetPieceType
-  | { type: 'APPLY_TEAM_TALK_EFFECT'; payload: { team: Team, effect: number } }
+  | { type: 'SET_SET_PIECE_TAKER'; payload: { team: Team; type: unknown; playerId: string | null } } // SetPieceType
+  | { type: 'APPLY_TEAM_TALK_EFFECT'; payload: { team: Team; effect: number } }
   | { type: 'CLEAR_MORALE_BOOSTS'; payload: { team: Team } }
 
   // UI Actions (extensive set)
@@ -145,7 +177,10 @@ export type Action =
   | { type: 'SET_COMPARE_PLAYER_ID'; payload: string | null }
   | { type: 'OPEN_SLOT_ACTION_MENU'; payload: unknown } // SlotActionMenuData
   | { type: 'CLOSE_SLOT_ACTION_MENU' }
-  | { type: 'RESOLVE_SLOT_ACTION'; payload: { decision: 'swap' | 'replace' | 'bench' | 'captain' | 'loan' } }
+  | {
+      type: 'RESOLVE_SLOT_ACTION';
+      payload: { decision: 'swap' | 'replace' | 'bench' | 'captain' | 'loan' };
+    }
   | { type: 'SWAP_PLAYERS'; payload: { sourcePlayerId: string; targetPlayerId: string } }
   | { type: 'TOGGLE_GRID_VISIBILITY' }
   | { type: 'TOGGLE_FORMATION_STRENGTH_VISIBILITY' }
@@ -192,7 +227,10 @@ export type Action =
   | { type: 'SUGGEST_FORMATION_SUCCESS'; payload: unknown } // AISuggestedFormation
   | { type: 'SUGGEST_FORMATION_FAILURE' }
   | { type: 'SEND_CHAT_MESSAGE_START'; payload: unknown } // ChatMessage
-  | { type: 'SEND_CHAT_MESSAGE_SUCCESS'; payload: { response: unknown, playerIdsToHighlight: readonly string[] } }
+  | {
+      type: 'SEND_CHAT_MESSAGE_SUCCESS';
+      payload: { response: unknown; playerIdsToHighlight: readonly string[] };
+    }
   | { type: 'SEND_CHAT_MESSAGE_FAILURE' }
 
   // Match and simulation Actions
@@ -207,12 +245,12 @@ export type Action =
   // Franchise Management Actions
   | { type: 'ADVANCE_WEEK' }
   | { type: 'ADVANCE_SEASON' }
-  | { type: 'SIGN_TRANSFER_PLAYER'; payload: { player: TransferPlayer, team: Team } }
-  | { type: 'SELL_PLAYER'; payload: { playerId: string, price: number } }
+  | { type: 'SIGN_TRANSFER_PLAYER'; payload: { player: TransferPlayer; team: Team } }
+  | { type: 'SELL_PLAYER'; payload: { playerId: string; price: number } }
   | { type: 'GENERATE_TRANSFER_MARKET_PLAYERS' }
   | { type: 'ADD_INBOX_ITEM'; payload: unknown } // InboxItem without id, week, isRead
   | { type: 'MARK_INBOX_ITEM_READ'; payload: string }
-  | { type: 'REMOVE_INBOX_ITEM', payload: string }
+  | { type: 'REMOVE_INBOX_ITEM'; payload: string }
 
   // Save/Load Actions
   | { type: 'SET_ACTIVE_SAVE_SLOT'; payload: string | null }

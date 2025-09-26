@@ -27,13 +27,13 @@ export enum DataClassification {
 
 // Encrypted data structure
 export interface EncryptedData {
-  data: string;          // Base64 encoded encrypted data
-  iv: string;           // Base64 encoded initialization vector
+  data: string; // Base64 encoded encrypted data
+  iv: string; // Base64 encoded initialization vector
   algorithm: EncryptionAlgorithm;
   classification: DataClassification;
-  timestamp: string;    // ISO timestamp when encrypted
-  keyVersion: number;   // Version of key used for rotation
-  checksum?: string;    // Data integrity verification
+  timestamp: string; // ISO timestamp when encrypted
+  keyVersion: number; // Version of key used for rotation
+  checksum?: string; // Data integrity verification
 }
 
 // Key derivation result
@@ -55,12 +55,13 @@ export interface EncryptionContext {
  */
 
 // Master key for encryption (in production, use secure key management service)
-const MASTER_KEY = process.env.ENCRYPTION_MASTER_KEY || 'astral-turf-master-encryption-key-2024-secure';
+const MASTER_KEY =
+  process.env.ENCRYPTION_MASTER_KEY || 'astral-turf-master-encryption-key-2024-secure';
 
 // Generate a secure random key
 export function generateKey(length = 32): string {
   const array = new Uint8Array(length);
-  if (typeof crypto !== 'undefined') {
+  if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
     crypto.getRandomValues(array);
   }
   return btoa(String.fromCharCode(...array));
@@ -135,20 +136,16 @@ export function encryptData(
 
     // Log encryption operation
     if (context) {
-      securityLogger.logSecurityEvent(
-        'DATA_MODIFICATION' as any,
-        'Data encrypted',
-        {
-          userId: context.userId,
-          metadata: {
-            operation: context.operation,
-            dataType: context.dataType,
-            classification: context.classification,
-            algorithm,
-            dataLength: data.length,
-          },
+      securityLogger.logSecurityEvent('DATA_MODIFICATION' as any, 'Data encrypted', {
+        userId: context.userId,
+        metadata: {
+          operation: context.operation,
+          dataType: context.dataType,
+          classification: context.classification,
+          algorithm,
+          dataLength: data.length,
         },
-      );
+      });
     }
 
     return encryptedData;
@@ -165,10 +162,7 @@ export function encryptData(
 }
 
 // Decrypt data
-export function decryptData(
-  encryptedData: EncryptedData,
-  context?: EncryptionContext,
-): string {
+export function decryptData(encryptedData: EncryptedData, context?: EncryptionContext): string {
   try {
     const key = getEncryptionKey(encryptedData.classification);
     const { key: derivedKey } = deriveKey(key);
@@ -199,20 +193,16 @@ export function decryptData(
 
     // Log decryption operation
     if (context) {
-      securityLogger.logSecurityEvent(
-        'DATA_ACCESS' as any,
-        'Data decrypted',
-        {
-          userId: context.userId,
-          metadata: {
-            operation: context.operation,
-            dataType: context.dataType,
-            classification: encryptedData.classification,
-            algorithm: encryptedData.algorithm,
-            timestamp: encryptedData.timestamp,
-          },
+      securityLogger.logSecurityEvent('DATA_ACCESS' as any, 'Data decrypted', {
+        userId: context.userId,
+        metadata: {
+          operation: context.operation,
+          dataType: context.dataType,
+          classification: encryptedData.classification,
+          algorithm: encryptedData.algorithm,
+          timestamp: encryptedData.timestamp,
         },
-      );
+      });
     }
 
     return decryptedText;
@@ -241,7 +231,12 @@ export function encryptPersonalInfo(personalInfo: unknown, userId?: string): Enc
     classification: DataClassification.CONFIDENTIAL,
   };
 
-  return encryptData(JSON.stringify(personalInfo), DataClassification.CONFIDENTIAL, EncryptionAlgorithm.AES_256_GCM, context);
+  return encryptData(
+    JSON.stringify(personalInfo),
+    DataClassification.CONFIDENTIAL,
+    EncryptionAlgorithm.AES_256_GCM,
+    context,
+  );
 }
 
 // Decrypt personal information
@@ -266,7 +261,12 @@ export function encryptMedicalData(medicalData: unknown, userId?: string): Encry
     classification: DataClassification.RESTRICTED,
   };
 
-  return encryptData(JSON.stringify(medicalData), DataClassification.RESTRICTED, EncryptionAlgorithm.AES_256_GCM, context);
+  return encryptData(
+    JSON.stringify(medicalData),
+    DataClassification.RESTRICTED,
+    EncryptionAlgorithm.AES_256_GCM,
+    context,
+  );
 }
 
 // Decrypt medical data
@@ -291,7 +291,12 @@ export function encryptFinancialData(financialData: unknown, userId?: string): E
     classification: DataClassification.CONFIDENTIAL,
   };
 
-  return encryptData(JSON.stringify(financialData), DataClassification.CONFIDENTIAL, EncryptionAlgorithm.AES_256_GCM, context);
+  return encryptData(
+    JSON.stringify(financialData),
+    DataClassification.CONFIDENTIAL,
+    EncryptionAlgorithm.AES_256_GCM,
+    context,
+  );
 }
 
 // Decrypt financial information
@@ -386,7 +391,7 @@ export function anonymizeData(data: unknown): unknown {
 // Generate cryptographically secure random string
 export function generateSecureRandom(length = 32): string {
   const array = new Uint8Array(length);
-  if (typeof crypto !== 'undefined') {
+  if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
     crypto.getRandomValues(array);
   }
   return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
@@ -399,9 +404,9 @@ export function generateSecureToken(length = 32): string {
 
 // Generate UUID v4
 export function generateUUID(): string {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    const r = Math.random() * 16 | 0;
-    const v = c == 'x' ? r : (r & 0x3 | 0x8);
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    const r = (Math.random() * 16) | 0;
+    const v = c == 'x' ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
 }
@@ -412,7 +417,9 @@ export function generateUUID(): string {
 
 // Check if data requires encryption based on content
 export function requiresEncryption(data: unknown, fieldName?: string): DataClassification | null {
-  if (!data) {return null;}
+  if (!data) {
+    return null;
+  }
 
   const restrictedFields = ['ssn', 'medicalRecord', 'diagnosis', 'prescription'];
   const confidentialFields = ['email', 'phone', 'address', 'bankAccount', 'creditCard'];

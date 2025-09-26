@@ -31,11 +31,38 @@ const PURIFY_CONFIGS = {
 
   // Rich text configuration - allows more formatting but still secure
   rich: {
-    ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'p', 'br', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote'],
+    ALLOWED_TAGS: [
+      'b',
+      'i',
+      'em',
+      'strong',
+      'p',
+      'br',
+      'ul',
+      'ol',
+      'li',
+      'h1',
+      'h2',
+      'h3',
+      'h4',
+      'h5',
+      'h6',
+      'blockquote',
+    ],
     ALLOWED_ATTR: ['href', 'title'],
     ALLOW_DATA_ATTR: false,
     FORBID_TAGS: ['script', 'object', 'embed', 'form', 'input', 'button', 'iframe', 'svg'],
-    FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur', 'style', 'class', 'id'],
+    FORBID_ATTR: [
+      'onerror',
+      'onload',
+      'onclick',
+      'onmouseover',
+      'onfocus',
+      'onblur',
+      'style',
+      'class',
+      'id',
+    ],
   },
 } as const;
 
@@ -182,14 +209,7 @@ export function sanitizeUrl(url: string): string {
     const sanitized = url.trim();
 
     // Check for dangerous protocols
-    const dangerousProtocols = [
-      'javascript:',
-      'data:',
-      'vbscript:',
-      'file:',
-      'ftp:',
-      'about:',
-    ];
+    const dangerousProtocols = ['javascript:', 'data:', 'vbscript:', 'file:', 'ftp:', 'about:'];
 
     const lowerUrl = sanitized.toLowerCase();
     if (dangerousProtocols.some(protocol => lowerUrl.startsWith(protocol))) {

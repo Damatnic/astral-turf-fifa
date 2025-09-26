@@ -36,11 +36,16 @@ const ChallengeCard: React.FC<ChallengeCardProps> = ({
 
   const getDifficultyColor = (difficulty: Challenge['difficulty']) => {
     switch (difficulty) {
-      case 'easy': return 'bg-green-600/20 text-green-400 border-green-600/30';
-      case 'medium': return 'bg-blue-600/20 text-blue-400 border-blue-600/30';
-      case 'hard': return 'bg-orange-600/20 text-orange-400 border-orange-600/30';
-      case 'elite': return 'bg-red-600/20 text-red-400 border-red-600/30';
-      default: return 'bg-gray-600/20 text-gray-400 border-gray-600/30';
+      case 'easy':
+        return 'bg-green-600/20 text-green-400 border-green-600/30';
+      case 'medium':
+        return 'bg-blue-600/20 text-blue-400 border-blue-600/30';
+      case 'hard':
+        return 'bg-orange-600/20 text-orange-400 border-orange-600/30';
+      case 'elite':
+        return 'bg-red-600/20 text-red-400 border-red-600/30';
+      default:
+        return 'bg-gray-600/20 text-gray-400 border-gray-600/30';
     }
   };
 
@@ -49,7 +54,11 @@ const ChallengeCard: React.FC<ChallengeCardProps> = ({
       case 'fitness':
         return (
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
+            <path
+              fillRule="evenodd"
+              d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+              clipRule="evenodd"
+            />
           </svg>
         );
       case 'technical':
@@ -61,13 +70,21 @@ const ChallengeCard: React.FC<ChallengeCardProps> = ({
       case 'tactical':
         return (
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M12 1.586l-4 4v12.828l4-4V1.586zM3.707 3.293A1 1 0 002 4v10a1 1 0 00.293.707L6 18.414V5.586L3.707 3.293z" clipRule="evenodd" />
+            <path
+              fillRule="evenodd"
+              d="M12 1.586l-4 4v12.828l4-4V1.586zM3.707 3.293A1 1 0 002 4v10a1 1 0 00.293.707L6 18.414V5.586L3.707 3.293z"
+              clipRule="evenodd"
+            />
           </svg>
         );
       case 'mental':
         return (
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
+            <path
+              fillRule="evenodd"
+              d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"
+              clipRule="evenodd"
+            />
           </svg>
         );
     }
@@ -75,11 +92,16 @@ const ChallengeCard: React.FC<ChallengeCardProps> = ({
 
   const getCategoryColor = (category: Challenge['category']) => {
     switch (category) {
-      case 'fitness': return 'text-green-400';
-      case 'technical': return 'text-blue-400';
-      case 'tactical': return 'text-purple-400';
-      case 'mental': return 'text-yellow-400';
-      default: return 'text-gray-400';
+      case 'fitness':
+        return 'text-green-400';
+      case 'technical':
+        return 'text-blue-400';
+      case 'tactical':
+        return 'text-purple-400';
+      case 'mental':
+        return 'text-yellow-400';
+      default:
+        return 'text-gray-400';
     }
   };
 
@@ -94,7 +116,9 @@ const ChallengeCard: React.FC<ChallengeCardProps> = ({
             <div>
               <p className="font-medium text-white text-sm">{challenge.title}</p>
               <div className="flex items-center space-x-2 mt-1">
-                <span className={`px-2 py-0.5 rounded text-xs font-medium ${getDifficultyColor(challenge.difficulty)}`}>
+                <span
+                  className={`px-2 py-0.5 rounded text-xs font-medium ${getDifficultyColor(challenge.difficulty)}`}
+                >
                   {challenge.difficulty}
                 </span>
                 <span className="text-xs text-gray-500">{challenge.xpReward} XP</span>
@@ -110,11 +134,17 @@ const ChallengeCard: React.FC<ChallengeCardProps> = ({
             </button>
           )}
           {isActive && (
-            <span className="px-2 py-1 bg-yellow-600/20 text-yellow-400 text-xs rounded">Active</span>
+            <span className="px-2 py-1 bg-yellow-600/20 text-yellow-400 text-xs rounded">
+              Active
+            </span>
           )}
           {isCompleted && (
             <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                clipRule="evenodd"
+              />
             </svg>
           )}
         </div>
@@ -138,7 +168,9 @@ const ChallengeCard: React.FC<ChallengeCardProps> = ({
               <h3 className="font-semibold text-white">{challenge.title}</h3>
               <p className="text-sm text-gray-400 mt-1">{challenge.description}</p>
               <div className="flex items-center space-x-3 mt-2">
-                <span className={`px-2 py-1 rounded text-xs font-medium ${getDifficultyColor(challenge.difficulty)}`}>
+                <span
+                  className={`px-2 py-1 rounded text-xs font-medium ${getDifficultyColor(challenge.difficulty)}`}
+                >
                   {challenge.difficulty}
                 </span>
                 <span className="text-xs text-gray-500 capitalize">{challenge.category}</span>
@@ -189,17 +221,24 @@ const ChallengeCard: React.FC<ChallengeCardProps> = ({
       className="bg-gray-800 rounded-lg border border-gray-700 hover:border-gray-600 transition-all overflow-hidden"
     >
       {/* Header */}
-      <div className={`p-4 bg-gradient-to-r ${
-        challenge.category === 'fitness' ? 'from-green-600/20 to-green-700/20' :
-        challenge.category === 'technical' ? 'from-blue-600/20 to-blue-700/20' :
-        challenge.category === 'tactical' ? 'from-purple-600/20 to-purple-700/20' :
-        'from-yellow-600/20 to-yellow-700/20'
-      }`}>
+      <div
+        className={`p-4 bg-gradient-to-r ${
+          challenge.category === 'fitness'
+            ? 'from-green-600/20 to-green-700/20'
+            : challenge.category === 'technical'
+              ? 'from-blue-600/20 to-blue-700/20'
+              : challenge.category === 'tactical'
+                ? 'from-purple-600/20 to-purple-700/20'
+                : 'from-yellow-600/20 to-yellow-700/20'
+        }`}
+      >
         <div className="flex items-start justify-between">
           <div className={`p-2 rounded-lg bg-gray-800/50 ${getCategoryColor(challenge.category)}`}>
             {getCategoryIcon(challenge.category)}
           </div>
-          <span className={`px-2 py-1 rounded text-xs font-medium border ${getDifficultyColor(challenge.difficulty)}`}>
+          <span
+            className={`px-2 py-1 rounded text-xs font-medium border ${getDifficultyColor(challenge.difficulty)}`}
+          >
             {challenge.difficulty}
           </span>
         </div>
@@ -212,10 +251,14 @@ const ChallengeCard: React.FC<ChallengeCardProps> = ({
 
         {/* Requirements */}
         <div className="space-y-2 mb-4">
-          {challenge.requirements.slice(0, 2).map((req) => (
+          {challenge.requirements.slice(0, 2).map(req => (
             <div key={req.id} className="flex items-center text-xs text-gray-500">
               <svg className="w-3 h-3 mr-2 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.293l-3-3a1 1 0 00-1.414 1.414L10.586 9.5H5a1 1 0 100 2h5.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clipRule="evenodd" />
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.293l-3-3a1 1 0 00-1.414 1.414L10.586 9.5H5a1 1 0 100 2h5.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z"
+                  clipRule="evenodd"
+                />
               </svg>
               {req.description}
             </div>
@@ -234,7 +277,9 @@ const ChallengeCard: React.FC<ChallengeCardProps> = ({
             </div>
             {challenge.attributePointReward && (
               <div className="text-center">
-                <p className="text-xl font-bold text-green-400">+{challenge.attributePointReward}</p>
+                <p className="text-xl font-bold text-green-400">
+                  +{challenge.attributePointReward}
+                </p>
                 <p className="text-xs text-gray-500">Points</p>
               </div>
             )}
@@ -274,7 +319,11 @@ const ChallengeCard: React.FC<ChallengeCardProps> = ({
         {isCompleted && (
           <div className="w-full px-4 py-2 bg-green-600/20 text-green-400 rounded-lg text-center font-medium flex items-center justify-center">
             <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                clipRule="evenodd"
+              />
             </svg>
             Completed
           </div>
@@ -284,7 +333,11 @@ const ChallengeCard: React.FC<ChallengeCardProps> = ({
         {challenge.timeLimit && !isCompleted && (
           <div className="mt-2 flex items-center justify-center text-xs text-gray-500">
             <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                clipRule="evenodd"
+              />
             </svg>
             {challenge.timeLimit} hour time limit
           </div>

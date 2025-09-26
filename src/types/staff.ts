@@ -1,6 +1,11 @@
 // Staff and management related types
 
-export type CoachSpecialty = 'attacking' | 'defending' | 'balanced' | 'youth_development' | 'technical';
+export type CoachSpecialty =
+  | 'attacking'
+  | 'defending'
+  | 'balanced'
+  | 'youth_development'
+  | 'technical';
 export type AgentPersonality = 'standard' | 'greedy' | 'loyal';
 
 export interface HeadCoach {

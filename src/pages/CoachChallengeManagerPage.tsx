@@ -128,9 +128,8 @@ const CoachChallengeManagerPage: React.FC = () => {
     // Calculate active assignments
     tacticsState.players.forEach(player => {
       const progress = challengeService.getPlayerProgress(player.id);
-      const activeCoachChallenges = progress.filter(p =>
-        p.status === 'active' &&
-        coachChallenges.some(c => c.id === p.challengeId),
+      const activeCoachChallenges = progress.filter(
+        p => p.status === 'active' && coachChallenges.some(c => c.id === p.challengeId),
       );
       stats.activeAssignments += activeCoachChallenges.length;
     });
@@ -163,9 +162,7 @@ const CoachChallengeManagerPage: React.FC = () => {
     stats.completionRate = totalAttempts > 0 ? (totalCompleted / totalAttempts) * 100 : 0;
 
     // Find most popular category
-    const maxCategory = Object.entries(categoryCount).reduce((a, b) =>
-      a[1] > b[1] ? a : b,
-    );
+    const maxCategory = Object.entries(categoryCount).reduce((a, b) => (a[1] > b[1] ? a : b));
     stats.popularCategory = maxCategory[0] as ChallengeCategory;
 
     return stats;
@@ -189,7 +186,11 @@ const CoachChallengeManagerPage: React.FC = () => {
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
             >
               <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+                <path
+                  fillRule="evenodd"
+                  d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                  clipRule="evenodd"
+                />
               </svg>
               Create Challenge
             </button>
@@ -211,7 +212,9 @@ const CoachChallengeManagerPage: React.FC = () => {
             </div>
             <div className="bg-gray-700 rounded-lg p-3">
               <p className="text-xs text-gray-400">Completion Rate</p>
-              <p className="text-xl font-bold text-green-400">{Math.round(stats.completionRate)}%</p>
+              <p className="text-xl font-bold text-green-400">
+                {Math.round(stats.completionRate)}%
+              </p>
             </div>
             <div className="bg-gray-700 rounded-lg p-3">
               <p className="text-xs text-gray-400">XP Awarded</p>
@@ -257,49 +260,74 @@ const CoachChallengeManagerPage: React.FC = () => {
                 <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
                   <h2 className="text-xl font-bold text-white mb-4">Quick Create</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {(['fitness', 'technical', 'tactical', 'mental'] as ChallengeCategory[]).map(category => (
-                      <button
-                        key={category}
-                        onClick={() => {
-                          setSelectedTemplate({
-                            id: `quick-${category}`,
-                            name: `${category} Challenge`,
-                            description: `Create a ${category} challenge`,
-                            category,
-                            defaultRequirements: [],
-                            defaultRewards: [],
-                            customizable: true,
-                            popularityScore: 0,
-                            usageCount: 0,
-                          });
-                          setShowCreator(true);
-                        }}
-                        className="p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors text-left"
-                      >
-                        <div className="flex items-center mb-2">
-                          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                            category === 'fitness' ? 'bg-green-600' :
-                            category === 'technical' ? 'bg-blue-600' :
-                            category === 'tactical' ? 'bg-purple-600' :
-                            'bg-yellow-600'
-                          }`}>
-                            <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                              {category === 'fitness' ? (
-                                <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
-                              ) : category === 'technical' ? (
-                                <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z" />
-                              ) : category === 'tactical' ? (
-                                <path fillRule="evenodd" d="M12 1.586l-4 4v12.828l4-4V1.586zM3.707 3.293A1 1 0 002 4v10a1 1 0 00.293.707L6 18.414V5.586L3.707 3.293zM17.707 5.293L14 1.586v12.828l2.293 2.293A1 1 0 0018 16V6a1 1 0 00-.293-.707z" clipRule="evenodd" />
-                              ) : (
-                                <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
-                              )}
-                            </svg>
+                    {(['fitness', 'technical', 'tactical', 'mental'] as ChallengeCategory[]).map(
+                      category => (
+                        <button
+                          key={category}
+                          onClick={() => {
+                            setSelectedTemplate({
+                              id: `quick-${category}`,
+                              name: `${category} Challenge`,
+                              description: `Create a ${category} challenge`,
+                              category,
+                              defaultRequirements: [],
+                              defaultRewards: [],
+                              customizable: true,
+                              popularityScore: 0,
+                              usageCount: 0,
+                            });
+                            setShowCreator(true);
+                          }}
+                          className="p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors text-left"
+                        >
+                          <div className="flex items-center mb-2">
+                            <div
+                              className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                                category === 'fitness'
+                                  ? 'bg-green-600'
+                                  : category === 'technical'
+                                    ? 'bg-blue-600'
+                                    : category === 'tactical'
+                                      ? 'bg-purple-600'
+                                      : 'bg-yellow-600'
+                              }`}
+                            >
+                              <svg
+                                className="w-6 h-6 text-white"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                              >
+                                {category === 'fitness' ? (
+                                  <path
+                                    fillRule="evenodd"
+                                    d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+                                    clipRule="evenodd"
+                                  />
+                                ) : category === 'technical' ? (
+                                  <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z" />
+                                ) : category === 'tactical' ? (
+                                  <path
+                                    fillRule="evenodd"
+                                    d="M12 1.586l-4 4v12.828l4-4V1.586zM3.707 3.293A1 1 0 002 4v10a1 1 0 00.293.707L6 18.414V5.586L3.707 3.293zM17.707 5.293L14 1.586v12.828l2.293 2.293A1 1 0 0018 16V6a1 1 0 00-.293-.707z"
+                                    clipRule="evenodd"
+                                  />
+                                ) : (
+                                  <path
+                                    fillRule="evenodd"
+                                    d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"
+                                    clipRule="evenodd"
+                                  />
+                                )}
+                              </svg>
+                            </div>
+                            <span className="ml-3 font-medium text-white capitalize">
+                              {category}
+                            </span>
                           </div>
-                          <span className="ml-3 font-medium text-white capitalize">{category}</span>
-                        </div>
-                        <p className="text-sm text-gray-400">Create a {category} challenge</p>
-                      </button>
-                    ))}
+                          <p className="text-sm text-gray-400">Create a {category} challenge</p>
+                        </button>
+                      ),
+                    )}
                   </div>
                 </div>
 
@@ -307,30 +335,33 @@ const CoachChallengeManagerPage: React.FC = () => {
                 <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
                   <h2 className="text-xl font-bold text-white mb-4">Popular Templates</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {challengeService.getTemplates().slice(0, 4).map(template => (
-                      <div key={template.id} className="bg-gray-700 rounded-lg p-4">
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <h3 className="font-medium text-white">{template.name}</h3>
-                            <p className="text-sm text-gray-400 mt-1">{template.description}</p>
-                            <div className="flex items-center mt-2 text-xs text-gray-500">
-                              <span className="capitalize">{template.category}</span>
-                              <span className="mx-2">•</span>
-                              <span>Used {template.usageCount} times</span>
+                    {challengeService
+                      .getTemplates()
+                      .slice(0, 4)
+                      .map(template => (
+                        <div key={template.id} className="bg-gray-700 rounded-lg p-4">
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <h3 className="font-medium text-white">{template.name}</h3>
+                              <p className="text-sm text-gray-400 mt-1">{template.description}</p>
+                              <div className="flex items-center mt-2 text-xs text-gray-500">
+                                <span className="capitalize">{template.category}</span>
+                                <span className="mx-2">•</span>
+                                <span>Used {template.usageCount} times</span>
+                              </div>
                             </div>
+                            <button
+                              onClick={() => {
+                                setSelectedTemplate(template);
+                                setShowCreator(true);
+                              }}
+                              className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
+                            >
+                              Use
+                            </button>
                           </div>
-                          <button
-                            onClick={() => {
-                              setSelectedTemplate(template);
-                              setShowCreator(true);
-                            }}
-                            className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
-                          >
-                            Use
-                          </button>
                         </div>
-                      </div>
-                    ))}
+                      ))}
                   </div>
                 </div>
               </div>
@@ -340,32 +371,43 @@ const CoachChallengeManagerPage: React.FC = () => {
               <div className="space-y-4">
                 {coachChallenges.length > 0 ? (
                   coachChallenges.map(challenge => (
-                    <div key={challenge.id} className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+                    <div
+                      key={challenge.id}
+                      className="bg-gray-800 rounded-lg p-6 border border-gray-700"
+                    >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <h3 className="text-lg font-semibold text-white">{challenge.title}</h3>
                           <p className="text-gray-400 mt-1">{challenge.description}</p>
 
                           <div className="flex flex-wrap items-center gap-3 mt-3">
-                            <span className={`px-2 py-1 rounded text-xs font-medium capitalize ${
-                              challenge.category === 'fitness' ? 'bg-green-600/20 text-green-400' :
-                              challenge.category === 'technical' ? 'bg-blue-600/20 text-blue-400' :
-                              challenge.category === 'tactical' ? 'bg-purple-600/20 text-purple-400' :
-                              'bg-yellow-600/20 text-yellow-400'
-                            }`}>
+                            <span
+                              className={`px-2 py-1 rounded text-xs font-medium capitalize ${
+                                challenge.category === 'fitness'
+                                  ? 'bg-green-600/20 text-green-400'
+                                  : challenge.category === 'technical'
+                                    ? 'bg-blue-600/20 text-blue-400'
+                                    : challenge.category === 'tactical'
+                                      ? 'bg-purple-600/20 text-purple-400'
+                                      : 'bg-yellow-600/20 text-yellow-400'
+                              }`}
+                            >
                               {challenge.category}
                             </span>
-                            <span className={`px-2 py-1 rounded text-xs font-medium capitalize ${
-                              challenge.difficulty === 'easy' ? 'bg-green-600/20 text-green-400' :
-                              challenge.difficulty === 'medium' ? 'bg-blue-600/20 text-blue-400' :
-                              challenge.difficulty === 'hard' ? 'bg-orange-600/20 text-orange-400' :
-                              'bg-red-600/20 text-red-400'
-                            }`}>
+                            <span
+                              className={`px-2 py-1 rounded text-xs font-medium capitalize ${
+                                challenge.difficulty === 'easy'
+                                  ? 'bg-green-600/20 text-green-400'
+                                  : challenge.difficulty === 'medium'
+                                    ? 'bg-blue-600/20 text-blue-400'
+                                    : challenge.difficulty === 'hard'
+                                      ? 'bg-orange-600/20 text-orange-400'
+                                      : 'bg-red-600/20 text-red-400'
+                              }`}
+                            >
                               {challenge.difficulty}
                             </span>
-                            <span className="text-xs text-gray-500">
-                              {challenge.xpReward} XP
-                            </span>
+                            <span className="text-xs text-gray-500">{challenge.xpReward} XP</span>
                             {challenge.targetPlayers && challenge.targetPlayers.length > 0 && (
                               <span className="text-xs text-gray-500">
                                 Assigned to {challenge.targetPlayers.length} player(s)
@@ -401,7 +443,11 @@ const CoachChallengeManagerPage: React.FC = () => {
                             className="p-2 text-gray-400 hover:text-red-400 transition-colors"
                           >
                             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                              <path
+                                fillRule="evenodd"
+                                d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                                clipRule="evenodd"
+                              />
                             </svg>
                           </button>
                         </div>
@@ -410,10 +456,22 @@ const CoachChallengeManagerPage: React.FC = () => {
                   ))
                 ) : (
                   <div className="bg-gray-800 rounded-lg p-12 text-center border border-gray-700">
-                    <svg className="w-16 h-16 mx-auto text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    <svg
+                      className="w-16 h-16 mx-auto text-gray-600 mb-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                      />
                     </svg>
-                    <h3 className="text-xl font-semibold text-gray-300 mb-2">No Challenges Created</h3>
+                    <h3 className="text-xl font-semibold text-gray-300 mb-2">
+                      No Challenges Created
+                    </h3>
                     <p className="text-gray-500 mb-4">Start creating challenges for your players</p>
                     <button
                       onClick={() => setShowCreator(true)}
@@ -435,14 +493,33 @@ const CoachChallengeManagerPage: React.FC = () => {
                       progress={progress}
                       challenge={state.challenges.find(c => c.id === progress.challengeId)!}
                       playerName={getPlayerName(progress.playerId)}
-                      onApprove={(notes) => handleReviewSubmission(progress.playerId, progress.challengeId, true, notes)}
-                      onReject={(notes) => handleReviewSubmission(progress.playerId, progress.challengeId, false, notes)}
+                      onApprove={notes =>
+                        handleReviewSubmission(progress.playerId, progress.challengeId, true, notes)
+                      }
+                      onReject={notes =>
+                        handleReviewSubmission(
+                          progress.playerId,
+                          progress.challengeId,
+                          false,
+                          notes,
+                        )
+                      }
                     />
                   ))
                 ) : (
                   <div className="bg-gray-800 rounded-lg p-12 text-center border border-gray-700">
-                    <svg className="w-16 h-16 mx-auto text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <svg
+                      className="w-16 h-16 mx-auto text-gray-600 mb-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
                     </svg>
                     <h3 className="text-xl font-semibold text-gray-300 mb-2">No Pending Reviews</h3>
                     <p className="text-gray-500">All challenge submissions have been reviewed</p>
@@ -454,18 +531,26 @@ const CoachChallengeManagerPage: React.FC = () => {
             {activeTab === 'templates' && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {challengeService.getTemplates().map(template => (
-                  <div key={template.id} className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+                  <div
+                    key={template.id}
+                    className="bg-gray-800 rounded-lg p-6 border border-gray-700"
+                  >
                     <div className="flex items-start justify-between mb-4">
                       <div>
                         <h3 className="text-lg font-semibold text-white">{template.name}</h3>
                         <p className="text-gray-400 mt-1">{template.description}</p>
                       </div>
-                      <span className={`px-2 py-1 rounded text-xs font-medium capitalize ${
-                        template.category === 'fitness' ? 'bg-green-600/20 text-green-400' :
-                        template.category === 'technical' ? 'bg-blue-600/20 text-blue-400' :
-                        template.category === 'tactical' ? 'bg-purple-600/20 text-purple-400' :
-                        'bg-yellow-600/20 text-yellow-400'
-                      }`}>
+                      <span
+                        className={`px-2 py-1 rounded text-xs font-medium capitalize ${
+                          template.category === 'fitness'
+                            ? 'bg-green-600/20 text-green-400'
+                            : template.category === 'technical'
+                              ? 'bg-blue-600/20 text-blue-400'
+                              : template.category === 'tactical'
+                                ? 'bg-purple-600/20 text-purple-400'
+                                : 'bg-yellow-600/20 text-yellow-400'
+                        }`}
+                      >
                         {template.category}
                       </span>
                     </div>
@@ -483,7 +568,11 @@ const CoachChallengeManagerPage: React.FC = () => {
                       <div className="flex items-center text-xs text-gray-500">
                         <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                           <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-                          <path fillRule="evenodd" d="M4 5a2 2 0 012-2 1 1 0 000 2H6a2 2 0 100 4h2a2 2 0 100-4h-.5a1 1 0 000-2H8a2 2 0 012-2h2a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2V5z" clipRule="evenodd" />
+                          <path
+                            fillRule="evenodd"
+                            d="M4 5a2 2 0 012-2 1 1 0 000 2H6a2 2 0 100 4h2a2 2 0 100-4h-.5a1 1 0 000-2H8a2 2 0 012-2h2a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2V5z"
+                            clipRule="evenodd"
+                          />
                         </svg>
                         Used {template.usageCount} times
                       </div>
@@ -514,7 +603,9 @@ const CoachChallengeManagerPage: React.FC = () => {
                     </div>
                     <div className="bg-gray-700 rounded-lg p-4">
                       <p className="text-gray-400 text-sm mb-1">Completion Rate</p>
-                      <p className="text-2xl font-bold text-green-400">{Math.round(stats.completionRate)}%</p>
+                      <p className="text-2xl font-bold text-green-400">
+                        {Math.round(stats.completionRate)}%
+                      </p>
                     </div>
                     <div className="bg-gray-700 rounded-lg p-4">
                       <p className="text-gray-400 text-sm mb-1">Total XP Awarded</p>
@@ -522,7 +613,9 @@ const CoachChallengeManagerPage: React.FC = () => {
                     </div>
                     <div className="bg-gray-700 rounded-lg p-4">
                       <p className="text-gray-400 text-sm mb-1">Most Popular</p>
-                      <p className="text-2xl font-bold text-blue-400 capitalize">{stats.popularCategory || 'N/A'}</p>
+                      <p className="text-2xl font-bold text-blue-400 capitalize">
+                        {stats.popularCategory || 'N/A'}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -540,21 +633,29 @@ const CoachChallengeManagerPage: React.FC = () => {
                       const active = coachProgress.filter(p => p.status === 'active').length;
 
                       return (
-                        <div key={player.id} className="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
+                        <div
+                          key={player.id}
+                          className="flex items-center justify-between p-3 bg-gray-700 rounded-lg"
+                        >
                           <div className="flex items-center">
                             <div className="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center mr-3">
-                              <span className="text-sm font-bold text-white">{player.jerseyNumber}</span>
+                              <span className="text-sm font-bold text-white">
+                                {player.jerseyNumber}
+                              </span>
                             </div>
                             <div>
                               <p className="font-medium text-white">{player.name}</p>
-                              <p className="text-xs text-gray-400">{active} active, {completed} completed</p>
+                              <p className="text-xs text-gray-400">
+                                {active} active, {completed} completed
+                              </p>
                             </div>
                           </div>
                           <div className="text-right">
                             <p className="text-sm font-medium text-green-400">
                               {coachProgress.length > 0
                                 ? Math.round((completed / coachProgress.length) * 100)
-                                : 0}% Success
+                                : 0}
+                              % Success
                             </p>
                           </div>
                         </div>
@@ -573,9 +674,13 @@ const CoachChallengeManagerPage: React.FC = () => {
 
                       tacticsState.players.forEach(player => {
                         const progress = challengeService.getPlayerProgress(player.id);
-                        const challengeProgress = progress.filter(p => p.challengeId === challenge.id);
+                        const challengeProgress = progress.filter(
+                          p => p.challengeId === challenge.id,
+                        );
                         attempts += challengeProgress.length;
-                        completions += challengeProgress.filter(p => p.status === 'completed').length;
+                        completions += challengeProgress.filter(
+                          p => p.status === 'completed',
+                        ).length;
                       });
 
                       const successRate = attempts > 0 ? (completions / attempts) * 100 : 0;
@@ -592,7 +697,9 @@ const CoachChallengeManagerPage: React.FC = () => {
                               style={{ width: `${successRate}%` }}
                             />
                           </div>
-                          <p className="text-xs text-gray-400 mt-1">{Math.round(successRate)}% success rate</p>
+                          <p className="text-xs text-gray-400 mt-1">
+                            {Math.round(successRate)}% success rate
+                          </p>
                         </div>
                       );
                     })}

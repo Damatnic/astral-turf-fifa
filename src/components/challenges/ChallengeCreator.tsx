@@ -1,6 +1,11 @@
 // Challenge Creator Component
 import React, { useState } from 'react';
-import type { Challenge, ChallengeTemplate, ChallengeCategory, ChallengeDifficulty } from '../../types/challenges';
+import type {
+  Challenge,
+  ChallengeTemplate,
+  ChallengeCategory,
+  ChallengeDifficulty,
+} from '../../types/challenges';
 import type { Player } from '../../types/player';
 
 interface ChallengeCreatorProps {
@@ -18,8 +23,12 @@ const ChallengeCreator: React.FC<ChallengeCreatorProps> = ({
   onClose,
 }) => {
   const [title, setTitle] = useState(existingChallenge?.title || template?.name || '');
-  const [description, setDescription] = useState(existingChallenge?.description || template?.description || '');
-  const [category, setCategory] = useState(existingChallenge?.category || template?.category || 'fitness');
+  const [description, setDescription] = useState(
+    existingChallenge?.description || template?.description || '',
+  );
+  const [category, setCategory] = useState(
+    existingChallenge?.category || template?.category || 'fitness',
+  );
   const [difficulty, setDifficulty] = useState(existingChallenge?.difficulty || 'medium');
   const [xpReward, setXpReward] = useState(existingChallenge?.xpReward || 100);
 
@@ -49,7 +58,7 @@ const ChallengeCreator: React.FC<ChallengeCreatorProps> = ({
             <input
               type="text"
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={e => setTitle(e.target.value)}
               className="w-full px-3 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
             />
           </div>
@@ -58,7 +67,7 @@ const ChallengeCreator: React.FC<ChallengeCreatorProps> = ({
             <label className="block text-sm font-medium text-gray-400 mb-1">Description</label>
             <textarea
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={e => setDescription(e.target.value)}
               className="w-full px-3 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none h-24 resize-none"
             />
           </div>
@@ -68,7 +77,7 @@ const ChallengeCreator: React.FC<ChallengeCreatorProps> = ({
               <label className="block text-sm font-medium text-gray-400 mb-1">Category</label>
               <select
                 value={category}
-                onChange={(e) => setCategory(e.target.value as ChallengeCategory)}
+                onChange={e => setCategory(e.target.value as ChallengeCategory)}
                 className="w-full px-3 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
               >
                 <option value="fitness">Fitness</option>
@@ -82,7 +91,7 @@ const ChallengeCreator: React.FC<ChallengeCreatorProps> = ({
               <label className="block text-sm font-medium text-gray-400 mb-1">Difficulty</label>
               <select
                 value={difficulty}
-                onChange={(e) => setDifficulty(e.target.value as ChallengeDifficulty)}
+                onChange={e => setDifficulty(e.target.value as ChallengeDifficulty)}
                 className="w-full px-3 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
               >
                 <option value="easy">Easy</option>
@@ -98,7 +107,7 @@ const ChallengeCreator: React.FC<ChallengeCreatorProps> = ({
             <input
               type="number"
               value={xpReward}
-              onChange={(e) => setXpReward(parseInt(e.target.value) || 0)}
+              onChange={e => setXpReward(parseInt(e.target.value) || 0)}
               className="w-full px-3 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
               min="0"
               step="50"

@@ -162,10 +162,7 @@ describe('Login Integration Flow', () => {
       await user.click(submitButton);
 
       await waitFor(() => {
-        expect(mockAuthService.login).toHaveBeenCalledWith(
-          'coach@astralfc.com',
-          'password123',
-        );
+        expect(mockAuthService.login).toHaveBeenCalledWith('coach@astralfc.com', 'password123');
       });
 
       await waitFor(() => {
@@ -176,7 +173,7 @@ describe('Login Integration Flow', () => {
     it('should show loading state during authentication', async () => {
       // Create a promise that we can control
       let resolveLogin: (value: unknown) => void;
-      const loginPromise = new Promise((resolve) => {
+      const loginPromise = new Promise(resolve => {
         resolveLogin = resolve;
       });
 

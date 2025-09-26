@@ -153,12 +153,12 @@ class IntegrationManager {
    */
   async initialize(userId: string, userApiKey: string): Promise<void> {
     if (this.isInitialized) {
-      // // console.log('⚠️ Integration manager already initialized');
+      // // // // console.log('⚠️ Integration manager already initialized');
       return;
     }
 
     try {
-      // // console.log('🚀 Initializing Integration Manager...');
+      // // // // console.log('🚀 Initializing Integration Manager...');
 
       // Initialize security
       initSecurity(userApiKey);
@@ -185,12 +185,21 @@ class IntegrationManager {
       this.setupCrossServiceEventHandlers();
 
       this.isInitialized = true;
-      this.logEvent('integration_manager', 'initialization', 'All services initialized successfully', 'info');
+      this.logEvent(
+        'integration_manager',
+        'initialization',
+        'All services initialized successfully',
+        'info',
+      );
 
-      // // console.log('✅ Integration Manager initialized successfully');
-
+      // // // // console.log('✅ Integration Manager initialized successfully');
     } catch (_error) {
-      this.logEvent('integration_manager', 'error', `Initialization failed: ${error.message}`, 'critical');
+      this.logEvent(
+        'integration_manager',
+        'error',
+        `Initialization failed: ${error.message}`,
+        'critical',
+      );
       throw error;
     }
   }
@@ -228,8 +237,10 @@ class IntegrationManager {
 
       services[status.service] = {
         operationsPerHour: this.calculateOperationsPerHour(status),
-        successRate: status.metrics.totalOperations > 0 ?
-          (status.metrics.successfulOperations / status.metrics.totalOperations) * 100 : 0,
+        successRate:
+          status.metrics.totalOperations > 0
+            ? (status.metrics.successfulOperations / status.metrics.totalOperations) * 100
+            : 0,
         avgResponseTime: status.metrics.avgResponseTime,
         dataVolume: this.calculateDataVolume(status),
         lastActivity: status.lastSync || 0,
@@ -237,7 +248,8 @@ class IntegrationManager {
     });
 
     const avgResponseTime = responseTimeCount > 0 ? totalResponseTime / responseTimeCount : 0;
-    const errorRate = totalOperations > 0 ? ((totalOperations - successfulOperations) / totalOperations) * 100 : 0;
+    const errorRate =
+      totalOperations > 0 ? ((totalOperations - successfulOperations) / totalOperations) * 100 : 0;
 
     return {
       overview: {
@@ -268,12 +280,21 @@ class IntegrationManager {
       await this.saveConfiguration();
       await this.applyConfigurationChanges(oldConfig, this.config);
 
-      this.logEvent('integration_manager', 'config_change', 'Configuration updated successfully', 'info');
-      // // console.log('⚙️ Integration configuration updated');
-
+      this.logEvent(
+        'integration_manager',
+        'config_change',
+        'Configuration updated successfully',
+        'info',
+      );
+      // // // // console.log('⚙️ Integration configuration updated');
     } catch (_error) {
       this.config = oldConfig; // Rollback
-      this.logEvent('integration_manager', 'error', `Configuration update failed: ${error.message}`, 'error');
+      this.logEvent(
+        'integration_manager',
+        'error',
+        `Configuration update failed: ${error.message}`,
+        'error',
+      );
       throw error;
     }
   }
@@ -281,7 +302,9 @@ class IntegrationManager {
   /**
    * Test connection to specific integration
    */
-  async testConnection(serviceName: string): Promise<{ success: boolean; message: string; responseTime: number }> {
+  async testConnection(
+    serviceName: string,
+  ): Promise<{ success: boolean; message: string; responseTime: number }> {
     const startTime = Date.now();
 
     try {
@@ -330,7 +353,6 @@ class IntegrationManager {
         this.updateServiceStatus(serviceName, { status: 'disconnected' });
         return { success: false, message: 'Service not properly connected', responseTime };
       }
-
     } catch (_error) {
       const responseTime = Date.now() - startTime;
       this.updateServiceStatus(serviceName, {
@@ -376,7 +398,6 @@ class IntegrationManager {
       });
 
       this.logEvent(serviceName, 'sync', 'Manual sync completed successfully', 'info');
-
     } catch (_error) {
       this.updateServiceStatus(serviceName, {
         status: 'error',
@@ -398,9 +419,7 @@ class IntegrationManager {
       events = events.filter(e => e.service === service);
     }
 
-    return events
-      .sort((a, b) => b.timestamp - a.timestamp)
-      .slice(0, limit);
+    return events.sort((a, b) => b.timestamp - a.timestamp).slice(0, limit);
   }
 
   /**
@@ -558,7 +577,13 @@ class IntegrationManager {
           service: 'sync',
           name: 'Real-time Sync',
           status: 'connected',
-          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 0, avgResponseTime: 0, uptime: 100 },
+          metrics: {
+            totalOperations: 0,
+            successfulOperations: 0,
+            failedOperations: 0,
+            avgResponseTime: 0,
+            uptime: 100,
+          },
         });
       } catch (_error) {
         this.updateServiceStatus('sync', {
@@ -566,7 +591,13 @@ class IntegrationManager {
           name: 'Real-time Sync',
           status: 'error',
           errorMessage: error.message,
-          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 1, avgResponseTime: 0, uptime: 0 },
+          metrics: {
+            totalOperations: 0,
+            successfulOperations: 0,
+            failedOperations: 1,
+            avgResponseTime: 0,
+            uptime: 0,
+          },
         });
       }
     }
@@ -584,7 +615,13 @@ class IntegrationManager {
           service: 'cloudStorage',
           name: 'Cloud Storage',
           status: 'connected',
-          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 0, avgResponseTime: 0, uptime: 100 },
+          metrics: {
+            totalOperations: 0,
+            successfulOperations: 0,
+            failedOperations: 0,
+            avgResponseTime: 0,
+            uptime: 100,
+          },
         });
       } catch (_error) {
         this.updateServiceStatus('cloudStorage', {
@@ -592,7 +629,13 @@ class IntegrationManager {
           name: 'Cloud Storage',
           status: 'error',
           errorMessage: error.message,
-          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 1, avgResponseTime: 0, uptime: 0 },
+          metrics: {
+            totalOperations: 0,
+            successfulOperations: 0,
+            failedOperations: 1,
+            avgResponseTime: 0,
+            uptime: 0,
+          },
         });
       }
     }
@@ -604,7 +647,13 @@ class IntegrationManager {
         service: 'deviceContinuity',
         name: 'Device Continuity',
         status: 'connected',
-        metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 0, avgResponseTime: 0, uptime: 100 },
+        metrics: {
+          totalOperations: 0,
+          successfulOperations: 0,
+          failedOperations: 0,
+          avgResponseTime: 0,
+          uptime: 100,
+        },
       });
     } catch (_error) {
       this.updateServiceStatus('deviceContinuity', {
@@ -612,7 +661,13 @@ class IntegrationManager {
         name: 'Device Continuity',
         status: 'error',
         errorMessage: error.message,
-        metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 1, avgResponseTime: 0, uptime: 0 },
+        metrics: {
+          totalOperations: 0,
+          successfulOperations: 0,
+          failedOperations: 1,
+          avgResponseTime: 0,
+          uptime: 0,
+        },
       });
     }
   }
@@ -626,7 +681,13 @@ class IntegrationManager {
           service: 'calendar',
           name: 'Calendar Integration',
           status: 'connected',
-          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 0, avgResponseTime: 0, uptime: 100 },
+          metrics: {
+            totalOperations: 0,
+            successfulOperations: 0,
+            failedOperations: 0,
+            avgResponseTime: 0,
+            uptime: 100,
+          },
         });
       } catch (_error) {
         this.updateServiceStatus('calendar', {
@@ -634,7 +695,13 @@ class IntegrationManager {
           name: 'Calendar Integration',
           status: 'error',
           errorMessage: error.message,
-          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 1, avgResponseTime: 0, uptime: 0 },
+          metrics: {
+            totalOperations: 0,
+            successfulOperations: 0,
+            failedOperations: 1,
+            avgResponseTime: 0,
+            uptime: 0,
+          },
         });
       }
     }
@@ -647,7 +714,13 @@ class IntegrationManager {
           service: 'notifications',
           name: 'Notifications',
           status: 'connected',
-          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 0, avgResponseTime: 0, uptime: 100 },
+          metrics: {
+            totalOperations: 0,
+            successfulOperations: 0,
+            failedOperations: 0,
+            avgResponseTime: 0,
+            uptime: 100,
+          },
         });
       } catch (_error) {
         this.updateServiceStatus('notifications', {
@@ -655,7 +728,13 @@ class IntegrationManager {
           name: 'Notifications',
           status: 'error',
           errorMessage: error.message,
-          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 1, avgResponseTime: 0, uptime: 0 },
+          metrics: {
+            totalOperations: 0,
+            successfulOperations: 0,
+            failedOperations: 1,
+            avgResponseTime: 0,
+            uptime: 0,
+          },
         });
       }
     }
@@ -668,7 +747,13 @@ class IntegrationManager {
           service: 'socialMedia',
           name: 'Social Media',
           status: 'connected',
-          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 0, avgResponseTime: 0, uptime: 100 },
+          metrics: {
+            totalOperations: 0,
+            successfulOperations: 0,
+            failedOperations: 0,
+            avgResponseTime: 0,
+            uptime: 100,
+          },
         });
       } catch (_error) {
         this.updateServiceStatus('socialMedia', {
@@ -676,7 +761,13 @@ class IntegrationManager {
           name: 'Social Media',
           status: 'error',
           errorMessage: error.message,
-          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 1, avgResponseTime: 0, uptime: 0 },
+          metrics: {
+            totalOperations: 0,
+            successfulOperations: 0,
+            failedOperations: 1,
+            avgResponseTime: 0,
+            uptime: 0,
+          },
         });
       }
     }
@@ -691,7 +782,13 @@ class IntegrationManager {
           service: 'sportsData',
           name: 'Sports Data APIs',
           status: 'connected',
-          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 0, avgResponseTime: 0, uptime: 100 },
+          metrics: {
+            totalOperations: 0,
+            successfulOperations: 0,
+            failedOperations: 0,
+            avgResponseTime: 0,
+            uptime: 100,
+          },
         });
       } catch (_error) {
         this.updateServiceStatus('sportsData', {
@@ -699,7 +796,13 @@ class IntegrationManager {
           name: 'Sports Data APIs',
           status: 'error',
           errorMessage: error.message,
-          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 1, avgResponseTime: 0, uptime: 0 },
+          metrics: {
+            totalOperations: 0,
+            successfulOperations: 0,
+            failedOperations: 1,
+            avgResponseTime: 0,
+            uptime: 0,
+          },
         });
       }
     }
@@ -714,7 +817,13 @@ class IntegrationManager {
           service: 'api',
           name: 'Public API',
           status: 'connected',
-          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 0, avgResponseTime: 0, uptime: 100 },
+          metrics: {
+            totalOperations: 0,
+            successfulOperations: 0,
+            failedOperations: 0,
+            avgResponseTime: 0,
+            uptime: 100,
+          },
         });
       } catch (_error) {
         this.updateServiceStatus('api', {
@@ -722,7 +831,13 @@ class IntegrationManager {
           name: 'Public API',
           status: 'error',
           errorMessage: error.message,
-          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 1, avgResponseTime: 0, uptime: 0 },
+          metrics: {
+            totalOperations: 0,
+            successfulOperations: 0,
+            failedOperations: 1,
+            avgResponseTime: 0,
+            uptime: 0,
+          },
         });
       }
     }
@@ -735,7 +850,13 @@ class IntegrationManager {
           service: 'webhooks',
           name: 'Webhooks',
           status: 'connected',
-          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 0, avgResponseTime: 0, uptime: 100 },
+          metrics: {
+            totalOperations: 0,
+            successfulOperations: 0,
+            failedOperations: 0,
+            avgResponseTime: 0,
+            uptime: 100,
+          },
         });
       } catch (_error) {
         this.updateServiceStatus('webhooks', {
@@ -743,7 +864,13 @@ class IntegrationManager {
           name: 'Webhooks',
           status: 'error',
           errorMessage: error.message,
-          metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 1, avgResponseTime: 0, uptime: 0 },
+          metrics: {
+            totalOperations: 0,
+            successfulOperations: 0,
+            failedOperations: 1,
+            avgResponseTime: 0,
+            uptime: 0,
+          },
         });
       }
     }
@@ -751,9 +878,12 @@ class IntegrationManager {
 
   private setupServiceMonitoring(): void {
     // Monitor service health every 5 minutes
-    setInterval(() => {
-      this.checkServiceHealth();
-    }, 5 * 60 * 1000);
+    setInterval(
+      () => {
+        this.checkServiceHealth();
+      },
+      5 * 60 * 1000,
+    );
 
     // Update metrics every minute
     setInterval(() => {
@@ -761,20 +891,23 @@ class IntegrationManager {
     }, 60 * 1000);
 
     // Clean old event logs every hour
-    setInterval(() => {
-      this.cleanEventLog();
-    }, 60 * 60 * 1000);
+    setInterval(
+      () => {
+        this.cleanEventLog();
+      },
+      60 * 60 * 1000,
+    );
   }
 
   private setupCrossServiceEventHandlers(): void {
     // Setup event handlers to coordinate between services
 
     // Sync service events
-    syncService.onStateUpdate((action) => {
+    syncService.onStateUpdate(action => {
       this.logEvent('sync', 'data_update', 'State synchronized across devices', 'info');
     });
 
-    syncService.onConflict((conflict) => {
+    syncService.onConflict(conflict => {
       this.logEvent('sync', 'error', 'Sync conflict detected', 'warning');
     });
 
@@ -797,18 +930,18 @@ class IntegrationManager {
     });
 
     // Social media events
-    socialMediaIntegrationService.onPostPublished((post) => {
+    socialMediaIntegrationService.onPostPublished(post => {
       this.logEvent('socialMedia', 'data_update', `Post published to ${post.platformId}`, 'info');
       this.updateServiceMetrics('socialMedia', 'success');
     });
 
     // API events
-    apiService.onApiCall((usage) => {
+    apiService.onApiCall(usage => {
       this.updateServiceMetrics('api', usage.statusCode < 400 ? 'success' : 'failure');
     });
 
     // Webhook events
-    webhookService.onWebhookDelivered((delivery) => {
+    webhookService.onWebhookDelivered(delivery => {
       this.logEvent('webhooks', 'sync', `Webhook delivered to ${delivery.url}`, 'info');
       this.updateServiceMetrics('webhooks', 'success');
     });
@@ -847,7 +980,9 @@ class IntegrationManager {
 
   private updateServiceMetrics(serviceName: string, operation: 'success' | 'failure'): void {
     const status = this.serviceStatuses.get(serviceName);
-    if (!status) {return;}
+    if (!status) {
+      return;
+    }
 
     status.metrics.totalOperations++;
     if (operation === 'success') {
@@ -859,7 +994,12 @@ class IntegrationManager {
     this.serviceStatuses.set(serviceName, status);
   }
 
-  private logEvent(service: string, type: IntegrationEvent['type'], data: unknown, severity: IntegrationEvent['severity']): void {
+  private logEvent(
+    service: string,
+    type: IntegrationEvent['type'],
+    data: unknown,
+    severity: IntegrationEvent['severity'],
+  ): void {
     const event: IntegrationEvent = {
       id: `event_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       timestamp: Date.now(),
@@ -890,7 +1030,7 @@ class IntegrationManager {
   }
 
   private cleanEventLog(): void {
-    const oneWeekAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+    const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
     this.eventLog = this.eventLog.filter(event => event.timestamp > oneWeekAgo);
   }
 
@@ -898,26 +1038,29 @@ class IntegrationManager {
     // Setup periodic tasks that run regardless of initialization status
 
     // Save metrics history every hour
-    setInterval(() => {
-      if (this.isInitialized) {
-        const metrics = this.getIntegrationMetrics();
-        const timestamp = Date.now();
+    setInterval(
+      () => {
+        if (this.isInitialized) {
+          const metrics = this.getIntegrationMetrics();
+          const timestamp = Date.now();
 
-        this.metricsHistory.set(timestamp.toString(), {
-          timestamp,
-          metrics,
-        });
-
-        // Keep only last 168 hours (1 week)
-        const history = Array.from(this.metricsHistory.entries());
-        if (history.length > 168) {
-          const toDelete = history.slice(0, -168);
-          toDelete.forEach(([key]) => {
-            this.metricsHistory.delete(key);
+          this.metricsHistory.set(timestamp.toString(), {
+            timestamp,
+            metrics,
           });
+
+          // Keep only last 168 hours (1 week)
+          const history = Array.from(this.metricsHistory.entries());
+          if (history.length > 168) {
+            const toDelete = history.slice(0, -168);
+            toDelete.forEach(([key]) => {
+              this.metricsHistory.delete(key);
+            });
+          }
         }
-      }
-    }, 60 * 60 * 1000);
+      },
+      60 * 60 * 1000,
+    );
   }
 
   private calculateOperationsPerHour(status: IntegrationStatus): number {
@@ -959,12 +1102,15 @@ class IntegrationManager {
 
   private async saveConfiguration(): Promise<void> {
     // In a real implementation, would save to secure storage
-    // // console.log('💾 Integration configuration saved');
+    // // // // console.log('💾 Integration configuration saved');
   }
 
-  private async applyConfigurationChanges(oldConfig: IntegrationConfig, newConfig: IntegrationConfig): Promise<void> {
+  private async applyConfigurationChanges(
+    oldConfig: IntegrationConfig,
+    newConfig: IntegrationConfig,
+  ): Promise<void> {
     // Apply configuration changes to running services
-    // // console.log('⚙️ Applying configuration changes');
+    // // // // console.log('⚙️ Applying configuration changes');
   }
 }
 

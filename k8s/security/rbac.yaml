@@ -24,20 +24,20 @@ metadata:
     app.kubernetes.io/name: astral-turf
     app.kubernetes.io/component: security
 rules:
-# Read-only access to nodes for resource monitoring
-- apiGroups: [""]
-  resources: ["nodes"]
-  verbs: ["get", "list"]
+  # Read-only access to nodes for resource monitoring
+  - apiGroups: ['']
+    resources: ['nodes']
+    verbs: ['get', 'list']
 
-# Read-only access to pods for health checking
-- apiGroups: [""]
-  resources: ["pods"]
-  verbs: ["get", "list"]
+  # Read-only access to pods for health checking
+  - apiGroups: ['']
+    resources: ['pods']
+    verbs: ['get', 'list']
 
-# Access to own namespace resources
-- apiGroups: [""]
-  resources: ["services", "endpoints", "configmaps"]
-  verbs: ["get", "list", "watch"]
+  # Access to own namespace resources
+  - apiGroups: ['']
+    resources: ['services', 'endpoints', 'configmaps']
+    verbs: ['get', 'list', 'watch']
 
 ---
 # Cluster Role Binding
@@ -49,9 +49,9 @@ metadata:
     app.kubernetes.io/name: astral-turf
     app.kubernetes.io/component: security
 subjects:
-- kind: ServiceAccount
-  name: astral-turf-app
-  namespace: astral-turf
+  - kind: ServiceAccount
+    name: astral-turf-app
+    namespace: astral-turf
 roleRef:
   kind: ClusterRole
   name: astral-turf-app-role
@@ -68,21 +68,21 @@ metadata:
     app.kubernetes.io/name: astral-turf
     app.kubernetes.io/component: security
 rules:
-# Read access to secrets (only specific ones)
-- apiGroups: [""]
-  resources: ["secrets"]
-  resourceNames: ["astral-turf-secrets", "tls-secret"]
-  verbs: ["get"]
+  # Read access to secrets (only specific ones)
+  - apiGroups: ['']
+    resources: ['secrets']
+    resourceNames: ['astral-turf-secrets', 'tls-secret']
+    verbs: ['get']
 
-# Read/write access to configmaps
-- apiGroups: [""]
-  resources: ["configmaps"]
-  verbs: ["get", "list", "watch", "create", "update", "patch"]
+  # Read/write access to configmaps
+  - apiGroups: ['']
+    resources: ['configmaps']
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch']
 
-# Read access to persistent volume claims
-- apiGroups: [""]
-  resources: ["persistentvolumeclaims"]
-  verbs: ["get", "list", "watch"]
+  # Read access to persistent volume claims
+  - apiGroups: ['']
+    resources: ['persistentvolumeclaims']
+    verbs: ['get', 'list', 'watch']
 
 ---
 # Role Binding for namespace operations
@@ -95,9 +95,9 @@ metadata:
     app.kubernetes.io/name: astral-turf
     app.kubernetes.io/component: security
 subjects:
-- kind: ServiceAccount
-  name: astral-turf-app
-  namespace: astral-turf
+  - kind: ServiceAccount
+    name: astral-turf-app
+    namespace: astral-turf
 roleRef:
   kind: Role
   name: astral-turf-namespace-role
@@ -124,30 +124,30 @@ metadata:
     app.kubernetes.io/name: prometheus
     app.kubernetes.io/component: security
 rules:
-# Full access to monitoring resources
-- apiGroups: ["monitoring.coreos.com"]
-  resources: ["*"]
-  verbs: ["*"]
+  # Full access to monitoring resources
+  - apiGroups: ['monitoring.coreos.com']
+    resources: ['*']
+    verbs: ['*']
 
-# Read access to cluster resources for monitoring
-- apiGroups: [""]
-  resources: ["nodes", "nodes/metrics", "services", "endpoints", "pods"]
-  verbs: ["get", "list", "watch"]
+  # Read access to cluster resources for monitoring
+  - apiGroups: ['']
+    resources: ['nodes', 'nodes/metrics', 'services', 'endpoints', 'pods']
+    verbs: ['get', 'list', 'watch']
 
-# Access to config maps and secrets for configuration
-- apiGroups: [""]
-  resources: ["configmaps", "secrets"]
-  verbs: ["get", "list", "watch"]
+  # Access to config maps and secrets for configuration
+  - apiGroups: ['']
+    resources: ['configmaps', 'secrets']
+    verbs: ['get', 'list', 'watch']
 
-# Access to deployments for monitoring
-- apiGroups: ["apps"]
-  resources: ["deployments", "replicasets", "daemonsets", "statefulsets"]
-  verbs: ["get", "list", "watch"]
+  # Access to deployments for monitoring
+  - apiGroups: ['apps']
+    resources: ['deployments', 'replicasets', 'daemonsets', 'statefulsets']
+    verbs: ['get', 'list', 'watch']
 
-# Access to ingresses for monitoring
-- apiGroups: ["networking.k8s.io"]
-  resources: ["ingresses"]
-  verbs: ["get", "list", "watch"]
+  # Access to ingresses for monitoring
+  - apiGroups: ['networking.k8s.io']
+    resources: ['ingresses']
+    verbs: ['get', 'list', 'watch']
 
 ---
 # Cluster Role Binding for Prometheus
@@ -159,9 +159,9 @@ metadata:
     app.kubernetes.io/name: prometheus
     app.kubernetes.io/component: security
 subjects:
-- kind: ServiceAccount
-  name: prometheus-operator
-  namespace: monitoring
+  - kind: ServiceAccount
+    name: prometheus-operator
+    namespace: monitoring
 roleRef:
   kind: ClusterRole
   name: prometheus-operator-role
@@ -189,15 +189,15 @@ metadata:
     app.kubernetes.io/name: grafana
     app.kubernetes.io/component: security
 rules:
-# Access to own configmaps and secrets
-- apiGroups: [""]
-  resources: ["configmaps", "secrets"]
-  verbs: ["get", "list", "watch"]
+  # Access to own configmaps and secrets
+  - apiGroups: ['']
+    resources: ['configmaps', 'secrets']
+    verbs: ['get', 'list', 'watch']
 
-# Access to services for datasource discovery
-- apiGroups: [""]
-  resources: ["services"]
-  verbs: ["get", "list", "watch"]
+  # Access to services for datasource discovery
+  - apiGroups: ['']
+    resources: ['services']
+    verbs: ['get', 'list', 'watch']
 
 ---
 # Role Binding for Grafana
@@ -210,9 +210,9 @@ metadata:
     app.kubernetes.io/name: grafana
     app.kubernetes.io/component: security
 subjects:
-- kind: ServiceAccount
-  name: grafana
-  namespace: monitoring
+  - kind: ServiceAccount
+    name: grafana
+    namespace: monitoring
 roleRef:
   kind: Role
   name: grafana-role
@@ -239,44 +239,44 @@ metadata:
     app.kubernetes.io/name: nginx-ingress
     app.kubernetes.io/component: security
 rules:
-# Access to ingress resources
-- apiGroups: ["networking.k8s.io"]
-  resources: ["ingresses", "ingressclasses"]
-  verbs: ["get", "list", "watch"]
+  # Access to ingress resources
+  - apiGroups: ['networking.k8s.io']
+    resources: ['ingresses', 'ingressclasses']
+    verbs: ['get', 'list', 'watch']
 
-- apiGroups: ["networking.k8s.io"]
-  resources: ["ingresses/status"]
-  verbs: ["update"]
+  - apiGroups: ['networking.k8s.io']
+    resources: ['ingresses/status']
+    verbs: ['update']
 
-# Access to services and endpoints
-- apiGroups: [""]
-  resources: ["services", "endpoints"]
-  verbs: ["get", "list", "watch"]
+  # Access to services and endpoints
+  - apiGroups: ['']
+    resources: ['services', 'endpoints']
+    verbs: ['get', 'list', 'watch']
 
-# Access to secrets for TLS
-- apiGroups: [""]
-  resources: ["secrets"]
-  verbs: ["get", "list", "watch"]
+  # Access to secrets for TLS
+  - apiGroups: ['']
+    resources: ['secrets']
+    verbs: ['get', 'list', 'watch']
 
-# Access to configmaps
-- apiGroups: [""]
-  resources: ["configmaps"]
-  verbs: ["get", "list", "watch", "update", "create"]
+  # Access to configmaps
+  - apiGroups: ['']
+    resources: ['configmaps']
+    verbs: ['get', 'list', 'watch', 'update', 'create']
 
-# Access to pods for readiness
-- apiGroups: [""]
-  resources: ["pods"]
-  verbs: ["get", "list", "watch"]
+  # Access to pods for readiness
+  - apiGroups: ['']
+    resources: ['pods']
+    verbs: ['get', 'list', 'watch']
 
-# Access to events for logging
-- apiGroups: [""]
-  resources: ["events"]
-  verbs: ["create", "patch"]
+  # Access to events for logging
+  - apiGroups: ['']
+    resources: ['events']
+    verbs: ['create', 'patch']
 
-# Access to nodes for node selection
-- apiGroups: [""]
-  resources: ["nodes"]
-  verbs: ["get", "list", "watch"]
+  # Access to nodes for node selection
+  - apiGroups: ['']
+    resources: ['nodes']
+    verbs: ['get', 'list', 'watch']
 
 ---
 # Cluster Role Binding for NGINX Ingress
@@ -288,9 +288,9 @@ metadata:
     app.kubernetes.io/name: nginx-ingress
     app.kubernetes.io/component: security
 subjects:
-- kind: ServiceAccount
-  name: nginx-ingress-controller
-  namespace: ingress-nginx
+  - kind: ServiceAccount
+    name: nginx-ingress-controller
+    namespace: ingress-nginx
 roleRef:
   kind: ClusterRole
   name: nginx-ingress-controller-role

@@ -46,7 +46,7 @@ function runCommand(command, args = [], options = {}) {
       ...options,
     });
 
-    child.on('close', (code) => {
+    child.on('close', code => {
       if (code === 0) {
         resolve(code);
       } else {
@@ -57,11 +57,14 @@ function runCommand(command, args = [], options = {}) {
 }
 
 async function main() {
-  log(`
+  log(
+    `
 🌟 ================================== 🌟
    ASTRAL TURF SIMPLE DEPLOYMENT
 🌟 ================================== 🌟
-`, colors.blue);
+`,
+    colors.blue
+  );
 
   try {
     // Step 1: Login to Vercel
@@ -79,29 +82,29 @@ async function main() {
     if (!fs.existsSync('vercel.json')) {
       logStep('Creating vercel.json configuration...');
       const vercelConfig = {
-        "name": "astral-turf",
-        "version": 2,
-        "builds": [
+        name: 'astral-turf',
+        version: 2,
+        builds: [
           {
-            "src": "package.json",
-            "use": "@vercel/static-build",
-            "config": {
-              "distDir": "dist",
+            src: 'package.json',
+            use: '@vercel/static-build',
+            config: {
+              distDir: 'dist',
             },
           },
         ],
-        "routes": [
+        routes: [
           {
-            "src": "/health",
-            "dest": "/api/health.js",
+            src: '/health',
+            dest: '/api/health.js',
           },
           {
-            "src": "/api/(.*)",
-            "dest": "/api/$1.js",
+            src: '/api/(.*)',
+            dest: '/api/$1.js',
           },
           {
-            "src": "/(.*)",
-            "dest": "/index.html",
+            src: '/(.*)',
+            dest: '/index.html',
           },
         ],
       };
@@ -121,7 +124,8 @@ async function main() {
     logSuccess('Deployment initiated!');
 
     // Step 4: Show next steps
-    log(`
+    log(
+      `
 🎉 DEPLOYMENT STARTED! 🎉
 
 📋 Next Steps:
@@ -147,8 +151,9 @@ OPTIONAL VARIABLES (copy from vercel-env-template.txt):
 
 📊 Monitor your deployment:
    vercel logs
-`, colors.green);
-
+`,
+      colors.green
+    );
   } catch (error) {
     logError(`Deployment failed: ${error.message}`);
     logError('');

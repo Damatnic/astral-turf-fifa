@@ -37,20 +37,24 @@ class ChallengeService {
         category: 'fitness',
         difficulty: 'easy',
         frequency: 'daily',
-        requirements: [{
-          id: 'run-distance',
-          type: 'metric',
-          metric: 'distance',
-          target: 5,
-          unit: 'km',
-          description: 'Run 5 kilometers',
-          trackingMethod: 'manual',
-        }],
-        rewards: [{
-          type: 'xp',
-          value: 100,
-          description: '100 XP',
-        }],
+        requirements: [
+          {
+            id: 'run-distance',
+            type: 'metric',
+            metric: 'distance',
+            target: 5,
+            unit: 'km',
+            description: 'Run 5 kilometers',
+            trackingMethod: 'manual',
+          },
+        ],
+        rewards: [
+          {
+            type: 'xp',
+            value: 100,
+            description: '100 XP',
+          },
+        ],
         xpReward: 100,
         timeLimit: 24,
         createdBy: 'system',
@@ -66,19 +70,23 @@ class ChallengeService {
         category: 'technical',
         difficulty: 'easy',
         frequency: 'daily',
-        requirements: [{
-          id: 'juggling-time',
-          type: 'activity',
-          target: 15,
-          unit: 'minutes',
-          description: 'Juggle for 15 minutes',
-          trackingMethod: 'manual',
-        }],
-        rewards: [{
-          type: 'xp',
-          value: 75,
-          description: '75 XP',
-        }],
+        requirements: [
+          {
+            id: 'juggling-time',
+            type: 'activity',
+            target: 15,
+            unit: 'minutes',
+            description: 'Juggle for 15 minutes',
+            trackingMethod: 'manual',
+          },
+        ],
+        rewards: [
+          {
+            type: 'xp',
+            value: 75,
+            description: '75 XP',
+          },
+        ],
         xpReward: 75,
         timeLimit: 24,
         createdBy: 'system',
@@ -95,14 +103,16 @@ class ChallengeService {
         category: 'fitness',
         difficulty: 'medium',
         frequency: 'weekly',
-        requirements: [{
-          id: 'gym-sessions',
-          type: 'activity',
-          target: 3,
-          unit: 'sessions',
-          description: 'Complete 3 gym sessions',
-          trackingMethod: 'manual',
-        }],
+        requirements: [
+          {
+            id: 'gym-sessions',
+            type: 'activity',
+            target: 3,
+            unit: 'sessions',
+            description: 'Complete 3 gym sessions',
+            trackingMethod: 'manual',
+          },
+        ],
         rewards: [
           {
             type: 'xp',
@@ -306,7 +316,7 @@ class ChallengeService {
         });
       }
     } catch (_error) {
-      console.error('Failed to load challenge data:', error);
+      console.error('Failed to load challenge data:', _error);
     }
   }
 
@@ -326,7 +336,7 @@ class ChallengeService {
       localStorage.setItem('astralTurf_challenges', JSON.stringify(challengesObj));
       localStorage.setItem('astralTurf_challengeProgress', JSON.stringify(progressObj));
     } catch (_error) {
-      console.error('Failed to save challenge data:', error);
+      console.error('Failed to save challenge data:', _error);
     }
   }
 
@@ -352,10 +362,11 @@ class ChallengeService {
       }
       if (filters.search) {
         const searchLower = filters.search.toLowerCase();
-        filtered = filtered.filter(c =>
-          c.title.toLowerCase().includes(searchLower) ||
-          c.description.toLowerCase().includes(searchLower) ||
-          c.tags?.some(tag => tag.toLowerCase().includes(searchLower)),
+        filtered = filtered.filter(
+          c =>
+            c.title.toLowerCase().includes(searchLower) ||
+            c.description.toLowerCase().includes(searchLower) ||
+            c.tags?.some(tag => tag.toLowerCase().includes(searchLower)),
         );
       }
 
@@ -363,7 +374,9 @@ class ChallengeService {
       if (filters.sortBy) {
         switch (filters.sortBy) {
           case 'newest':
-            filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+            filtered.sort(
+              (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+            );
             break;
           case 'xp':
             filtered.sort((a, b) => b.xpReward - a.xpReward);
@@ -374,8 +387,8 @@ class ChallengeService {
             break;
           case 'expiring':
             filtered = filtered.filter(c => c.expiresAt);
-            filtered.sort((a, b) =>
-              new Date(a.expiresAt!).getTime() - new Date(b.expiresAt!).getTime(),
+            filtered.sort(
+              (a, b) => new Date(a.expiresAt!).getTime() - new Date(b.expiresAt!).getTime(),
             );
             break;
         }
@@ -397,9 +410,7 @@ class ChallengeService {
       .filter(p => p.status === 'active')
       .map(p => p.challengeId);
 
-    return activeChallengeIds
-      .map(id => this.challenges.get(id))
-      .filter(Boolean) as Challenge[];
+    return activeChallengeIds.map(id => this.challenges.get(id)).filter(Boolean) as Challenge[];
   }
 
   // Get available challenges for a player
@@ -426,7 +437,9 @@ class ChallengeService {
         const hasPrereqs = challenge.prerequisiteChallengeIds.every(prereqId =>
           playerProgress.some(p => p.challengeId === prereqId && p.status === 'completed'),
         );
-        if (!hasPrereqs) {return false;}
+        if (!hasPrereqs) {
+          return false;
+        }
       }
 
       // Check availability dates
@@ -445,13 +458,19 @@ class ChallengeService {
   // Start a challenge for a player
   startChallenge(playerId: string, challengeId: string): ChallengeProgress | null {
     const challenge = this.challenges.get(challengeId);
-    if (!challenge) {return null;}
+    if (!challenge) {
+      return null;
+    }
 
     const playerProgress = this.progress.get(playerId) || [];
 
     // Check if already active
-    const existing = playerProgress.find(p => p.challengeId === challengeId && p.status === 'active');
-    if (existing) {return existing;}
+    const existing = playerProgress.find(
+      p => p.challengeId === challengeId && p.status === 'active',
+    );
+    if (existing) {
+      return existing;
+    }
 
     const newProgress: ChallengeProgress = {
       challengeId,
@@ -472,9 +491,12 @@ class ChallengeService {
 
     // Set up expiration timer if needed
     if (challenge.timeLimit) {
-      const timerId = setTimeout(() => {
-        this.expireChallenge(playerId, challengeId);
-      }, challenge.timeLimit * 60 * 60 * 1000);
+      const timerId = setTimeout(
+        () => {
+          this.expireChallenge(playerId, challengeId);
+        },
+        challenge.timeLimit * 60 * 60 * 1000,
+      );
 
       this.activeTimers.set(`${playerId}-${challengeId}`, timerId);
     }
@@ -491,19 +513,21 @@ class ChallengeService {
     value: number,
   ): ChallengeProgress | null {
     const playerProgress = this.progress.get(playerId) || [];
-    const progress = playerProgress.find(p =>
-      p.challengeId === challengeId && p.status === 'active',
+    const progress = playerProgress.find(
+      p => p.challengeId === challengeId && p.status === 'active',
     );
 
-    if (!progress) {return null;}
+    if (!progress) {
+      return null;
+    }
 
     progress.currentProgress[requirementId] = value;
 
     // Check if challenge is complete
     const challenge = this.challenges.get(challengeId);
     if (challenge) {
-      const isComplete = challenge.requirements.every(req =>
-        progress.currentProgress[req.id] >= req.target,
+      const isComplete = challenge.requirements.every(
+        req => progress.currentProgress[req.id] >= req.target,
       );
 
       if (isComplete && challenge.autoValidate) {
@@ -522,11 +546,13 @@ class ChallengeService {
     evidence: Omit<EvidenceSubmission, 'id' | 'submittedAt'>,
   ): boolean {
     const playerProgress = this.progress.get(playerId) || [];
-    const progress = playerProgress.find(p =>
-      p.challengeId === challengeId && p.status === 'active',
+    const progress = playerProgress.find(
+      p => p.challengeId === challengeId && p.status === 'active',
     );
 
-    if (!progress) {return false;}
+    if (!progress) {
+      return false;
+    }
 
     const submission: EvidenceSubmission = {
       ...evidence,
@@ -548,11 +574,13 @@ class ChallengeService {
   // Complete a challenge
   completeChallenge(playerId: string, challengeId: string): boolean {
     const playerProgress = this.progress.get(playerId) || [];
-    const progress = playerProgress.find(p =>
-      p.challengeId === challengeId && p.status === 'active',
+    const progress = playerProgress.find(
+      p => p.challengeId === challengeId && p.status === 'active',
     );
 
-    if (!progress) {return false;}
+    if (!progress) {
+      return false;
+    }
 
     progress.status = 'completed';
     progress.completedAt = new Date().toISOString();
@@ -571,8 +599,8 @@ class ChallengeService {
   // Expire a challenge
   private expireChallenge(playerId: string, challengeId: string) {
     const playerProgress = this.progress.get(playerId) || [];
-    const progress = playerProgress.find(p =>
-      p.challengeId === challengeId && p.status === 'active',
+    const progress = playerProgress.find(
+      p => p.challengeId === challengeId && p.status === 'active',
     );
 
     if (progress) {
@@ -601,7 +629,9 @@ class ChallengeService {
   // Update challenge
   updateChallenge(challengeId: string, updates: Partial<Challenge>): Challenge | null {
     const challenge = this.challenges.get(challengeId);
-    if (!challenge) {return null;}
+    if (!challenge) {
+      return null;
+    }
 
     const updated = {
       ...challenge,
@@ -634,7 +664,9 @@ class ChallengeService {
     const playerProgress = this.progress.get(playerId) || [];
     const progress = playerProgress.find(p => p.challengeId === challengeId);
 
-    if (!progress || progress.approvalStatus !== 'pending') {return false;}
+    if (!progress || progress.approvalStatus !== 'pending') {
+      return false;
+    }
 
     progress.approvalStatus = approved ? 'approved' : 'rejected';
     progress.approvedBy = reviewerId;
@@ -677,7 +709,7 @@ class ChallengeService {
 
     // Streak multiplier
     if (streakDays > 0) {
-      const streakMultiplier = Math.min(1 + (streakDays * 0.1), 2); // Max 2x for streaks
+      const streakMultiplier = Math.min(1 + streakDays * 0.1, 2); // Max 2x for streaks
       totalXP *= streakMultiplier;
     }
 
@@ -720,15 +752,30 @@ class ChallengeService {
       },
       technical: {
         titles: ['Ball Control', 'Passing Practice', 'Shooting Drills', 'First Touch'],
-        descriptions: ['Master the ball', 'Perfect your passing', 'Improve accuracy', 'Control improvement'],
+        descriptions: [
+          'Master the ball',
+          'Perfect your passing',
+          'Improve accuracy',
+          'Control improvement',
+        ],
       },
       tactical: {
         titles: ['Video Analysis', 'Position Study', 'Formation Review', 'Tactical Quiz'],
-        descriptions: ['Study gameplay', 'Learn positioning', 'Understand formations', 'Test knowledge'],
+        descriptions: [
+          'Study gameplay',
+          'Learn positioning',
+          'Understand formations',
+          'Test knowledge',
+        ],
       },
       mental: {
         titles: ['Meditation', 'Team Building', 'Leadership Task', 'Visualization'],
-        descriptions: ['Mental clarity', 'Build chemistry', 'Lead by example', 'Mental preparation'],
+        descriptions: [
+          'Mental clarity',
+          'Build chemistry',
+          'Lead by example',
+          'Mental preparation',
+        ],
       },
     };
 
@@ -742,19 +789,23 @@ class ChallengeService {
       category,
       difficulty,
       frequency,
-      requirements: [{
-        id: 'req-1',
-        type: 'activity',
-        target: difficulty === 'easy' ? 1 : difficulty === 'medium' ? 2 : 3,
-        unit: 'hours',
-        description: 'Complete activity',
-        trackingMethod: 'manual',
-      }],
-      rewards: [{
-        type: 'xp',
-        value: difficulty === 'easy' ? 100 : difficulty === 'medium' ? 250 : 500,
-        description: 'XP Reward',
-      }],
+      requirements: [
+        {
+          id: 'req-1',
+          type: 'activity',
+          target: difficulty === 'easy' ? 1 : difficulty === 'medium' ? 2 : 3,
+          unit: 'hours',
+          description: 'Complete activity',
+          trackingMethod: 'manual',
+        },
+      ],
+      rewards: [
+        {
+          type: 'xp',
+          value: difficulty === 'easy' ? 100 : difficulty === 'medium' ? 250 : 500,
+          description: 'XP Reward',
+        },
+      ],
       xpReward: difficulty === 'easy' ? 100 : difficulty === 'medium' ? 250 : 500,
       timeLimit: frequency === 'daily' ? 24 : frequency === 'weekly' ? 168 : 720,
       createdBy: 'system',

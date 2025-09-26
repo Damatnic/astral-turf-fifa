@@ -80,7 +80,6 @@ class JWTRotationService {
           previousKeysCount: this.previousKeys.length,
         },
       });
-
     } catch (_error) {
       log.error('Failed to initialize JWT rotation service', {
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -169,7 +168,6 @@ class JWTRotationService {
           previousKeysCount: this.previousKeys.length,
         },
       });
-
     } catch (_error) {
       log.error('JWT key rotation failed', {
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -184,10 +182,14 @@ class JWTRotationService {
    */
   async emergencyRevocation(reason: string): Promise<void> {
     try {
-      log.security(SecurityEventType.CONFIGURATION_CHANGE, 'Emergency JWT key revocation initiated', {
-        severity: 'critical',
-        metadata: { reason },
-      });
+      log.security(
+        SecurityEventType.CONFIGURATION_CHANGE,
+        'Emergency JWT key revocation initiated',
+        {
+          severity: 'critical',
+          metadata: { reason },
+        },
+      );
 
       // Clear all existing keys
       this.previousKeys = [];
@@ -204,14 +206,17 @@ class JWTRotationService {
       // Cache new key
       await this.cacheKeys();
 
-      log.security(SecurityEventType.CONFIGURATION_CHANGE, 'Emergency JWT key revocation completed', {
-        severity: 'critical',
-        metadata: {
-          newKeyId: this.currentKey.id,
-          reason,
+      log.security(
+        SecurityEventType.CONFIGURATION_CHANGE,
+        'Emergency JWT key revocation completed',
+        {
+          severity: 'critical',
+          metadata: {
+            newKeyId: this.currentKey.id,
+            reason,
+          },
         },
-      });
-
+      );
     } catch (_error) {
       log.error('Emergency JWT key revocation failed', {
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -378,7 +383,6 @@ class JWTRotationService {
           },
         });
       }
-
     } catch (_error) {
       log.error('Failed to load JWT keys from storage', {
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -428,7 +432,6 @@ class JWTRotationService {
       }
 
       log.info('Saved JWT keys to database');
-
     } catch (_error) {
       log.error('Failed to save JWT keys to database', {
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -442,10 +445,14 @@ class JWTRotationService {
   private async cacheKeys(): Promise<void> {
     try {
       if (redisService.isHealthy()) {
-        await cache.set('jwt_keys', {
-          current: this.currentKey,
-          previous: this.previousKeys,
-        }, { ttl: 3600 }); // Cache for 1 hour
+        await cache.set(
+          'jwt_keys',
+          {
+            current: this.currentKey,
+            previous: this.previousKeys,
+          },
+          { ttl: 3600 },
+        ); // Cache for 1 hour
 
         log.debug('Cached JWT keys in Redis');
       }
@@ -495,12 +502,14 @@ class JWTRotationService {
 
     return {
       initialized: this.isInitialized,
-      currentKey: this.currentKey ? {
-        id: this.currentKey.id,
-        version: this.currentKey.version,
-        createdAt: this.currentKey.createdAt.toISOString(),
-        expiresAt: this.currentKey.expiresAt.toISOString(),
-      } : null,
+      currentKey: this.currentKey
+        ? {
+            id: this.currentKey.id,
+            version: this.currentKey.version,
+            createdAt: this.currentKey.createdAt.toISOString(),
+            expiresAt: this.currentKey.expiresAt.toISOString(),
+          }
+        : null,
       previousKeysCount: this.previousKeys.length,
       nextRotationAt,
       autoRotationEnabled: this.config.autoRotation,

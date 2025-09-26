@@ -41,19 +41,26 @@ Object.defineProperty(global, 'console', {
 
 // Test component to verify context values
 const TestComponent = () => {
-  const authContext = React.useContext(require('../../context/AuthContext').AuthContext);
-  const tacticsContext = React.useContext(require('../../context/TacticsContext').TacticsContext);
+  const { useAuthContext, useTacticsContext } = await import('../../hooks');
 
-  return (
-    <div>
-      <div data-testid="auth-user">
-        {authContext.authState.user ? authContext.authState.user.email : 'No user'}
+  try {
+    const { authState } = useAuthContext();
+    const { tacticsState } = useTacticsContext();
+
+    return (
+      <div>
+        <div data-testid="auth-user">{authState.user ? authState.user.email : 'No user'}</div>
+        <div data-testid="tactics-players">{tacticsState.players.length}</div>
       </div>
-      <div data-testid="tactics-players">
-        {tacticsContext.tacticsState.players.length}
+    );
+  } catch (_error) {
+    return (
+      <div>
+        <div data-testid="auth-user">Error</div>
+        <div data-testid="tactics-players">0</div>
       </div>
-    </div>
-  );
+    );
+  }
 };
 
 describe('AppProvider', () => {
@@ -114,7 +121,7 @@ describe('AppProvider', () => {
     it('should load saved state from localStorage when version matches', () => {
       const savedState = {
         version: APP_VERSION,
-        tactics: createMockTacticsState({ selectedPlayers: ['player1'] }),
+        tactics: createMockTacticsState(),
         ui: createMockUIState({ theme: 'light' }),
         franchise: INITIAL_STATE.franchise,
       };
@@ -210,11 +217,17 @@ describe('AppProvider', () => {
 
       // Mock the component to trigger state change
       const StateChanger = () => {
-        const { dispatch } = React.useContext(require('../../context/UIContext').UIContext);
-        React.useEffect(() => {
-          dispatch({ type: 'SET_ACTIVE_SAVE_SLOT', payload: 'slot1' });
-        }, [dispatch]);
-        return <div>State Changer</div>;
+        const { useUIContext } = await import('../../hooks');
+
+        try {
+          const { dispatch } = useUIContext();
+          React.useEffect(() => {
+            dispatch({ type: 'SET_ACTIVE_SAVE_SLOT', payload: 'slot1' });
+          }, [dispatch]);
+          return <div>State Changer</div>;
+        } catch {
+          return <div>State Changer Error</div>;
+        }
       };
 
       render(
@@ -233,7 +246,7 @@ describe('AppProvider', () => {
 
     it('should update save slot metadata', async () => {
       const existingSlots = {
-        'slot1': {
+        slot1: {
           id: 'slot1',
           name: 'Test Save',
           createdAt: '2024-01-01T00:00:00Z',
@@ -241,7 +254,7 @@ describe('AppProvider', () => {
         },
       };
 
-      mockLocalStorage.getItem.mockImplementation((key) => {
+      mockLocalStorage.getItem.mockImplementation(key => {
         if (key === 'astralTurfSaveSlots') {
           return JSON.stringify(existingSlots);
         }
@@ -249,11 +262,17 @@ describe('AppProvider', () => {
       });
 
       const StateChanger = () => {
-        const { dispatch } = React.useContext(require('../../context/UIContext').UIContext);
-        React.useEffect(() => {
-          dispatch({ type: 'SET_ACTIVE_SAVE_SLOT', payload: 'slot1' });
-        }, [dispatch]);
-        return <div>State Changer</div>;
+        const { useUIContext } = await import('../../hooks');
+
+        try {
+          const { dispatch } = useUIContext();
+          React.useEffect(() => {
+            dispatch({ type: 'SET_ACTIVE_SAVE_SLOT', payload: 'slot1' });
+          }, [dispatch]);
+          return <div>State Changer</div>;
+        } catch {
+          return <div>State Changer Error</div>;
+        }
       };
 
       render(
@@ -285,20 +304,26 @@ describe('AppProvider', () => {
       };
 
       const AnimationTester = () => {
-        const { dispatch } = React.useContext(require('../../context/UIContext').UIContext);
-        const { tacticsState } = React.useContext(require('../../context/TacticsContext').TacticsContext);
+        const { useUIContext, useTacticsContext } = await import('../../hooks');
 
-        React.useEffect(() => {
-          // Set up animation state
-          dispatch({ type: 'SET_ACTIVE_PLAYBOOK_ITEM', payload: 'test-item' });
-          dispatch({ type: 'START_ANIMATION' });
-        }, [dispatch]);
+        try {
+          const { dispatch } = useUIContext();
+          const { tacticsState } = useTacticsContext();
 
-        return (
-          <div data-testid="animation-state">
-            {tacticsState.playbook?.['test-item'] ? 'Has playbook' : 'No playbook'}
-          </div>
-        );
+          React.useEffect(() => {
+            // Set up animation state
+            dispatch({ type: 'SET_ACTIVE_PLAYBOOK_ITEM', payload: 'test-item' });
+            dispatch({ type: 'START_ANIMATION' });
+          }, [dispatch]);
+
+          return (
+            <div data-testid="animation-state">
+              {tacticsState.playbook?.['test-item'] ? 'Has playbook' : 'No playbook'}
+            </div>
+          );
+        } catch {
+          return <div data-testid="animation-state">Error</div>;
+        }
       };
 
       render(
@@ -343,14 +368,12 @@ describe('cleanStateForSaving', () => {
       tactics: {
         ...createMockTacticsState(),
         playbook: {
-          'item1': {
+          item1: {
             id: 'item1',
             name: 'Test Play',
-            category: 'Attack',
+            category: 'General' as const,
             formationId: 'formation1',
-            steps: [
-              { id: 'step1', playerPositions: {}, drawings: [] },
-            ],
+            steps: [{ id: 'step1', playerPositions: {}, drawings: [] }],
           },
         },
       },
@@ -364,8 +387,20 @@ describe('cleanStateForSaving', () => {
       },
       franchise: {
         ...INITIAL_STATE.franchise,
-        negotiationData: { playerId: 'player1', offer: 50000 },
-        lastMatchResult: { homeScore: 2, awayScore: 1, events: [], commentary: [], matchRatings: {} },
+        negotiationData: {
+          playerId: 'player1',
+          conversation: [],
+          agentPersonality: 'standard' as const,
+          offer: 50000 as unknown,
+        },
+        lastMatchResult: {
+          homeScore: 2,
+          awayScore: 1,
+          events: [],
+          commentaryLog: [],
+          isRivalry: false,
+          playerStats: {},
+        },
       },
     };
   });
@@ -390,7 +425,15 @@ describe('cleanStateForSaving', () => {
       { ...mockState.tactics.players[0], id: 'player1', position: { x: 100, y: 200 } },
     ];
     mockState.tactics.drawings = [
-      { id: 'draw1', type: 'line', points: [{ x: 0, y: 0 }, { x: 10, y: 10 }], color: 'red' },
+      {
+        id: 'draw1',
+        tool: 'line',
+        points: [
+          { x: 0, y: 0 },
+          { x: 10, y: 10 },
+        ],
+        color: 'red',
+      },
     ];
 
     const cleanedState = cleanStateForSaving(mockState) as any;

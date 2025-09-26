@@ -79,7 +79,7 @@ class DeviceContinuityService {
     // Start session heartbeat
     this.startSessionHeartbeat();
 
-    // // console.log('📱 Multi-device continuity initialized');
+    // // // // console.log('📱 Multi-device continuity initialized');
   }
 
   /**
@@ -91,7 +91,9 @@ class DeviceContinuityService {
     playerId?: string,
     features: string[] = [],
   ): Promise<void> {
-    if (!this.currentSession) {return;}
+    if (!this.currentSession) {
+      return;
+    }
 
     this.currentSession.lastActivity = Date.now();
     this.currentSession.currentPage = page;
@@ -155,10 +157,9 @@ class DeviceContinuityService {
         this.onContinuityDataCallback(continuityData);
       }
 
-      // // console.log('🔄 Application state restored from another device');
-
+      // // // // console.log('🔄 Application state restored from another device');
     } catch (_error) {
-      console.error('❌ Failed to restore application state:', error);
+      console.error('❌ Failed to restore application state:', _error);
     }
   }
 
@@ -166,7 +167,9 @@ class DeviceContinuityService {
    * Request handoff to another device
    */
   async requestHandoff(targetDeviceId: string): Promise<void> {
-    if (!this.currentSession) {return;}
+    if (!this.currentSession) {
+      return;
+    }
 
     const handoffRequest: HandoffRequest = {
       id: `handoff_${Date.now()}`,
@@ -185,7 +188,7 @@ class DeviceContinuityService {
       {} as RootState,
     );
 
-    // // console.log(`📲 Handoff requested to device: ${targetDeviceId}`);
+    // // // // console.log(`📲 Handoff requested to device: ${targetDeviceId}`);
   }
 
   /**
@@ -193,7 +196,9 @@ class DeviceContinuityService {
    */
   async acceptHandoff(requestId: string): Promise<void> {
     const request = this.handoffRequests.get(requestId);
-    if (!request) {return;}
+    if (!request) {
+      return;
+    }
 
     request.isAccepted = true;
 
@@ -209,7 +214,7 @@ class DeviceContinuityService {
     // Clean up
     this.handoffRequests.delete(requestId);
 
-    // // console.log('✅ Handoff accepted and session restored');
+    // // // // console.log('✅ Handoff accepted and session restored');
   }
 
   /**
@@ -232,15 +237,16 @@ class DeviceContinuityService {
    * Get pending handoff requests
    */
   getPendingHandoffRequests(): HandoffRequest[] {
-    return Array.from(this.handoffRequests.values())
-      .filter(request => !request.isAccepted);
+    return Array.from(this.handoffRequests.values()).filter(request => !request.isAccepted);
   }
 
   /**
    * Optimize state for current device type
    */
   optimizeStateForDevice(state: RootState): RootState {
-    if (!this.currentSession) {return state;}
+    if (!this.currentSession) {
+      return state;
+    }
 
     const optimizedState = { ...state };
 
@@ -307,7 +313,9 @@ class DeviceContinuityService {
   }
 
   private async broadcastSessionUpdate(): Promise<void> {
-    if (!this.currentSession) {return;}
+    if (!this.currentSession) {
+      return;
+    }
 
     try {
       await syncService.syncState(
@@ -315,7 +323,7 @@ class DeviceContinuityService {
         {} as RootState,
       );
     } catch (_error) {
-      console.error('❌ Failed to broadcast session update:', error);
+      console.error('❌ Failed to broadcast session update:', _error);
     }
   }
 
@@ -347,7 +355,9 @@ class DeviceContinuityService {
     // Capture selected players, formations, etc.
     document.querySelectorAll('[data-selected="true"]').forEach(element => {
       const id = element.getAttribute('data-id');
-      if (id) {selected.push(id);}
+      if (id) {
+        selected.push(id);
+      }
     });
 
     return selected;
@@ -363,8 +373,9 @@ class DeviceContinuityService {
 
   private restoreFormState(formState: Record<string, unknown>): void {
     Object.entries(formState).forEach(([key, value]) => {
-      const element = document.getElementById(key) ||
-                    document.querySelector(`[name="${key}"]`) as HTMLInputElement;
+      const element =
+        document.getElementById(key) ||
+        (document.querySelector(`[name="${key}"]`) as HTMLInputElement);
 
       if (element && 'value' in element) {
         element.value = value;
@@ -375,7 +386,7 @@ class DeviceContinuityService {
   private restoreViewState(viewState: ContinuityData['viewState']): void {
     // Would restore zoom, pan, filters, etc.
     // Implementation depends on specific UI framework
-    // // console.log('🔧 View state restoration:', viewState);
+    // // // // console.log('🔧 View state restoration:', viewState);
   }
 
   private handleRemoteStateUpdate(action: unknown): void {
@@ -440,18 +451,22 @@ class DeviceContinuityService {
       if (this.currentSession) {
         this.currentSession.isActive = false;
         // Quick sync before unload
-        navigator.sendBeacon('/api/session/close', JSON.stringify({
-          sessionId: this.currentSession.id,
-          timestamp: Date.now(),
-        }));
+        navigator.sendBeacon(
+          '/api/session/close',
+          JSON.stringify({
+            sessionId: this.currentSession.id,
+            timestamp: Date.now(),
+          }),
+        );
       }
     });
   }
 
   private getDeviceInfo() {
     const userAgent = navigator.userAgent;
-    const deviceId = localStorage.getItem('astral_turf_device_id') ||
-                    `device_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const deviceId =
+      localStorage.getItem('astral_turf_device_id') ||
+      `device_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
     let deviceType: 'desktop' | 'tablet' | 'mobile' = 'desktop';
     let deviceName = 'Unknown Device';
@@ -460,7 +475,11 @@ class DeviceContinuityService {
     if (/tablet|ipad|playbook|silk/i.test(userAgent)) {
       deviceType = 'tablet';
       deviceName = 'Tablet';
-    } else if (/mobile|iphone|ipod|android|blackberry|opera|mini|windows\sce|palm|smartphone|iemobile/i.test(userAgent)) {
+    } else if (
+      /mobile|iphone|ipod|android|blackberry|opera|mini|windows\sce|palm|smartphone|iemobile/i.test(
+        userAgent,
+      )
+    ) {
       deviceType = 'mobile';
       deviceName = 'Mobile Device';
     } else {

@@ -136,7 +136,7 @@ class WebhookService {
     await this.loadWebhookEndpoints();
     await this.loadWebhookReceivers();
     this.setupEventHandlers();
-    // // console.log('🪝 Webhook service initialized');
+    // // // // console.log('🪝 Webhook service initialized');
   }
 
   /**
@@ -196,7 +196,7 @@ class WebhookService {
     // Save to storage
     await this.saveWebhookEndpoint(endpoint);
 
-    // // console.log(`🆕 Webhook endpoint created: ${config.name}`);
+    // // // // console.log(`🆕 Webhook endpoint created: ${config.name}`);
     return endpoint;
   }
 
@@ -235,7 +235,7 @@ class WebhookService {
     this.receivers.set(receiver.id, receiver);
     await this.saveWebhookReceiver(receiver);
 
-    // // console.log(`📥 Webhook receiver created: ${config.name}`);
+    // // // // console.log(`📥 Webhook receiver created: ${config.name}`);
     return receiver;
   }
 
@@ -275,7 +275,7 @@ class WebhookService {
       this.eventQueue.push(event);
     }
 
-    // // console.log(`📡 Webhook event emitted: ${type}`);
+    // // // // console.log(`📡 Webhook event emitted: ${type}`);
   }
 
   /**
@@ -338,12 +338,12 @@ class WebhookService {
         this.onWebhookReceivedCallback(event);
       }
 
-      // // console.log(`📨 Incoming webhook processed: ${event.type}`);
+      // // // // console.log(`📨 Incoming webhook processed: ${event.type}`);
       return { success: true, message: 'Webhook processed successfully' };
 
     } catch (_error) {
-      console.error('❌ Failed to process incoming webhook:', error);
-      return { success: false, message: error.message };
+      console.error('❌ Failed to process incoming webhook:', _error);
+      return { success: false, message: _error.message };
     }
   }
 
@@ -400,11 +400,11 @@ class WebhookService {
 
       endpoint.stats.successfulDeliveries++;
 
-      // // console.log(`✅ Webhook delivery retry successful: ${deliveryId}`);
+      // // // // console.log(`✅ Webhook delivery retry successful: ${deliveryId}`);
 
     } catch (_error) {
       delivery.status = 'failed';
-      delivery.error = error.message;
+      delivery.error = _error.message;
       delivery.nextRetryAt = Date.now() + (delivery.retryCount * 60000); // 1 minute intervals
 
       endpoint.stats.failedDeliveries++;
@@ -421,7 +421,7 @@ class WebhookService {
     if (endpoint) {
       endpoint.isActive = false;
       await this.saveWebhookEndpoint(endpoint);
-      // // console.log(`⏸️ Webhook endpoint paused: ${endpoint.name}`);
+      // // // // console.log(`⏸️ Webhook endpoint paused: ${endpoint.name}`);
     }
   }
 
@@ -433,7 +433,7 @@ class WebhookService {
     if (endpoint) {
       endpoint.isActive = true;
       await this.saveWebhookEndpoint(endpoint);
-      // // console.log(`▶️ Webhook endpoint resumed: ${endpoint.name}`);
+      // // // // console.log(`▶️ Webhook endpoint resumed: ${endpoint.name}`);
     }
   }
 
@@ -484,7 +484,7 @@ class WebhookService {
       try {
         await this.deliverToEndpoint(endpoint, event);
       } catch (_error) {
-        console.error(`❌ Failed to deliver to endpoint ${endpoint.id}:`, error);
+        console.error(`❌ Failed to deliver to endpoint ${endpoint.id}:`, _error);
       }
     }
   }
@@ -508,7 +508,7 @@ class WebhookService {
   private async deliverToEndpoint(endpoint: WebhookEndpoint, event: WebhookEvent): Promise<void> {
     // Check rate limits
     if (!this.checkRateLimit(endpoint)) {
-      // // console.warn(`⚠️ Rate limit exceeded for endpoint: ${endpoint.name}`);
+      // // // // console.warn(`⚠️ Rate limit exceeded for endpoint: ${endpoint.name}`);
       return;
     }
 
@@ -542,7 +542,7 @@ class WebhookService {
       delivery.status = 'success';
       delivery.httpStatus = response.status;
       delivery.responseBody = JSON.stringify(response.data);
-      delivery.responseHeaders = response.headers;
+      delivery.responseHeaders = response.headers as Record<string, string>;
       delivery.responseTime = Date.now() - delivery.sentAt;
 
       endpoint.stats.successfulDeliveries++;
@@ -553,13 +553,14 @@ class WebhookService {
         this.onWebhookDeliveredCallback(delivery);
       }
 
-      // // console.log(`✅ Webhook delivered successfully: ${endpoint.name}`);
+      // // // // console.log(`✅ Webhook delivered successfully: ${endpoint.name}`);
 
-    } catch (_error) {
+    } catch (error: unknown) {
       delivery.status = 'failed';
-      delivery.error = error.message;
-      delivery.httpStatus = error.response?.status;
-      delivery.responseBody = error.response?.data ? JSON.stringify(error.response.data) : undefined;
+      const axiosError = error as { message?: string; response?: { status?: number; data?: unknown } };
+      delivery.error = axiosError.message || 'Unknown error';
+      delivery.httpStatus = axiosError.response?.status;
+      delivery.responseBody = axiosError.response?.data ? JSON.stringify(axiosError.response.data) : undefined;
 
       // Schedule retry
       if (delivery.retryCount < endpoint.retryPolicy.maxAttempts) {
@@ -573,10 +574,10 @@ class WebhookService {
       endpoint.stats.failedDeliveries++;
 
       if (this.onWebhookFailedCallback) {
-        this.onWebhookFailedCallback(delivery, error.message);
+        this.onWebhookFailedCallback(delivery, axiosError.message || 'Unknown error');
       }
 
-      console.error(`❌ Webhook delivery failed: ${endpoint.name}`, error.message);
+      console.error(`❌ Webhook delivery failed: ${endpoint.name}`, axiosError.message || 'Unknown error');
     }
   }
 
@@ -607,15 +608,14 @@ class WebhookService {
       metadata: {
         version: '1.0',
         retry_count: 0,
-        test: true,
       },
     };
 
     try {
       await this.deliverWebhook(endpoint, testEvent);
-      // // console.log(`✅ Webhook endpoint test successful: ${endpoint.name}`);
+      // // // // console.log(`✅ Webhook endpoint test successful: ${endpoint.name}`);
     } catch (_error) {
-      // // console.warn(`⚠️ Webhook endpoint test failed: ${endpoint.name}`, error.message);
+      // // // // console.warn(`⚠️ Webhook endpoint test failed: ${endpoint.name}`, error.message);
       // Don't disable the endpoint, just warn
     }
   }
@@ -651,21 +651,21 @@ class WebhookService {
     transforms.forEach(transform => {
       switch (transform.type) {
         case 'rename_field':
-          this.renameField(transformedEvent, transform.config.from, transform.config.to);
+          this.renameField(transformedEvent, String(transform.config.from), String(transform.config.to));
           break;
 
         case 'add_field':
-          this.setNestedValue(transformedEvent, transform.config.field, transform.config.value);
+          this.setNestedValue(transformedEvent, String(transform.config.field), transform.config.value);
           break;
 
         case 'remove_field':
-          this.removeField(transformedEvent, transform.config.field);
+          this.removeField(transformedEvent, String(transform.config.field));
           break;
 
         case 'format_value': {
-          const currentValue = this.getNestedValue(transformedEvent, transform.config.field);
-          const formattedValue = this.formatValue(currentValue, transform.config.format);
-          this.setNestedValue(transformedEvent, transform.config.field, formattedValue);
+          const currentValue = this.getNestedValue(transformedEvent, String(transform.config.field));
+          const formattedValue = this.formatValue(currentValue, String(transform.config.format));
+          this.setNestedValue(transformedEvent, String(transform.config.field), formattedValue);
           break;
         }
       }
@@ -714,7 +714,7 @@ class WebhookService {
   private generateSignature(event: WebhookEvent, secret: string): string {
     const payload = JSON.stringify(event);
     if (typeof crypto !== 'undefined') {
-      return crypto.HmacSHA256(payload, secret).toString(crypto.enc.Hex);
+      return typeof crypto !== 'undefined' ? crypto.HmacSHA256(payload, secret).toString(typeof crypto !== 'undefined' ? crypto.enc.Hex);
     }
     return 'signature-unavailable';
   }
@@ -723,7 +723,7 @@ class WebhookService {
     if (typeof crypto === 'undefined') {
       return false;
     }
-    const expectedSignature = crypto.HmacSHA256(body, secret).toString(crypto.enc.Hex);
+    const expectedSignature = typeof crypto !== 'undefined' ? crypto.HmacSHA256(body, secret).toString(typeof crypto !== 'undefined' ? crypto.enc.Hex);
     return signature === expectedSignature || signature === `sha256=${expectedSignature}`;
   }
 
@@ -737,7 +737,8 @@ class WebhookService {
 
     // Check allowed event types
     if (validation.allowedEventTypes.length > 0 && !validation.allowedEventTypes.includes('*')) {
-      if (!validation.allowedEventTypes.includes(event.type)) {
+      const eventObj = event as { type?: string };
+      if (!eventObj.type || !validation.allowedEventTypes.includes(eventObj.type)) {
         return false;
       }
     }
@@ -765,16 +766,16 @@ class WebhookService {
   }
 
   private getNestedValue(obj: unknown, path: string): unknown {
-    return path.split('.').reduce((current, key) => current?.[key], obj);
+    return path.split('.').reduce((current: unknown, key) => current?.[key], obj);
   }
 
   private setNestedValue(obj: unknown, path: string, value: unknown): void {
     const keys = path.split('.');
     const lastKey = keys.pop()!;
-    const target = keys.reduce((current, key) => {
+    const target = keys.reduce((current: unknown, key) => {
       if (!current[key]) {current[key] = {};}
       return current[key];
-    }, obj);
+    }, obj as Record<string, unknown>);
     target[lastKey] = value;
   }
 
@@ -785,8 +786,8 @@ class WebhookService {
   private removeField(obj: unknown, path: string): void {
     const keys = path.split('.');
     const lastKey = keys.pop()!;
-    const target = keys.reduce((current, key) => current?.[key], obj);
-    if (target) {delete target[lastKey];}
+    const target = keys.reduce((current: unknown, key) => current?.[key], obj);
+    if (target && typeof target === 'object') {delete target[lastKey];}
   }
 
   private renameField(obj: unknown, fromPath: string, toPath: string): void {
@@ -804,9 +805,9 @@ class WebhookService {
       case 'lowercase':
         return String(value).toLowerCase();
       case 'iso_date':
-        return new Date(value).toISOString();
+        return new Date(value as string | number | Date).toISOString();
       case 'unix_timestamp':
-        return Math.floor(new Date(value).getTime() / 1000);
+        return Math.floor(new Date(value as string | number | Date).getTime() / 1000);
       default:
         return value;
     }
@@ -816,7 +817,7 @@ class WebhookService {
     // Request interceptor
     this.httpClient.interceptors.request.use(
       (config) => {
-        config.metadata = { startTime: Date.now() };
+        (config as any).metadata = { startTime: Date.now() };
         return config;
       },
       (error) => Promise.reject(error),
@@ -825,13 +826,13 @@ class WebhookService {
     // Response interceptor
     this.httpClient.interceptors.response.use(
       (response) => {
-        const duration = Date.now() - response.config.metadata?.startTime;
-        // // console.log(`📈 Webhook request completed in ${duration}ms`);
+        const duration = Date.now() - ((response.config as any).metadata?.startTime || Date.now());
+        // // // // console.log(`📈 Webhook request completed in ${duration}ms`);
         return response;
       },
       (error) => {
         const duration = Date.now() - (error.config?.metadata?.startTime || Date.now());
-        // // console.log(`📉 Webhook request failed after ${duration}ms`);
+        // // // // console.log(`📉 Webhook request failed after ${duration}ms`);
         return Promise.reject(error);
       },
     );
@@ -843,7 +844,7 @@ class WebhookService {
       name: 'Player Update Handler',
       path: '/webhooks/player-update',
       handler: async (event) => {
-        // // console.log(`👤 Player update received: ${JSON.stringify(event.data)}`);
+        // // // // console.log(`👤 Player update received: ${JSON.stringify(event.data)}`);
         // Handle player updates from external systems
       },
       validation: {
@@ -856,7 +857,7 @@ class WebhookService {
       name: 'Match Result Handler',
       path: '/webhooks/match-result',
       handler: async (event) => {
-        // // console.log(`⚽ Match result received: ${JSON.stringify(event.data)}`);
+        // // // // console.log(`⚽ Match result received: ${JSON.stringify(event.data)}`);
         // Handle match results from external systems
       },
       validation: {
@@ -868,22 +869,22 @@ class WebhookService {
 
   private async loadWebhookEndpoints(): Promise<void> {
     // Load webhook endpoints from storage
-    // // console.log('📂 Loading webhook endpoints');
+    // // // // console.log('📂 Loading webhook endpoints');
   }
 
   private async saveWebhookEndpoint(endpoint: WebhookEndpoint): Promise<void> {
     // Save webhook endpoint to storage
-    // // console.log(`💾 Webhook endpoint saved: ${endpoint.name}`);
+    // // // // console.log(`💾 Webhook endpoint saved: ${endpoint.name}`);
   }
 
   private async loadWebhookReceivers(): Promise<void> {
     // Load webhook receivers from storage
-    // // console.log('📂 Loading webhook receivers');
+    // // // // console.log('📂 Loading webhook receivers');
   }
 
   private async saveWebhookReceiver(receiver: WebhookReceiver): Promise<void> {
     // Save webhook receiver to storage
-    // // console.log(`💾 Webhook receiver saved: ${receiver.name}`);
+    // // // // console.log(`💾 Webhook receiver saved: ${receiver.name}`);
   }
 }
 

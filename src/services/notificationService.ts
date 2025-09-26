@@ -24,7 +24,13 @@ export interface NotificationChannel {
 export interface NotificationTemplate {
   id: string;
   name: string;
-  type: 'training_reminder' | 'match_notification' | 'injury_update' | 'contract_expiry' | 'performance_summary' | 'custom';
+  type:
+    | 'training_reminder'
+    | 'match_notification'
+    | 'injury_update'
+    | 'contract_expiry'
+    | 'performance_summary'
+    | 'custom';
   subject: string;
   content: string;
   channels: string[];
@@ -80,7 +86,10 @@ class NotificationService {
   private cronJobs: Map<string, any> = new Map();
 
   // Event callbacks
-  private onNotificationSentCallback?: (notification: ScheduledNotification, success: boolean) => void;
+  private onNotificationSentCallback?: (
+    notification: ScheduledNotification,
+    success: boolean
+  ) => void;
   private onDeliveryStatusCallback?: (delivery: NotificationDelivery) => void;
 
   constructor() {
@@ -95,7 +104,7 @@ class NotificationService {
   async initialize(): Promise<void> {
     await this.loadUserPreferences();
     await this.startScheduledNotifications();
-    // // console.log('🔔 Notification service initialized');
+    // // // // console.log('🔔 Notification service initialized');
   }
 
   /**
@@ -115,7 +124,7 @@ class NotificationService {
     };
 
     this.channels.set(channel.id, channel);
-    // // console.log(`📱 Notification channel configured: ${channel.name}`);
+    // // // // console.log(`📱 Notification channel configured: ${channel.name}`);
   }
 
   /**
@@ -130,7 +139,7 @@ class NotificationService {
     };
 
     this.templates.set(templateId, fullTemplate);
-    // // console.log(`📝 Notification template created: ${template.name}`);
+    // // // // console.log(`📝 Notification template created: ${template.name}`);
 
     return templateId;
   }
@@ -138,7 +147,10 @@ class NotificationService {
   /**
    * Set user notification preferences
    */
-  async setUserPreferences(userId: string, preferences: Partial<NotificationPreference>): Promise<void> {
+  async setUserPreferences(
+    userId: string,
+    preferences: Partial<NotificationPreference>,
+  ): Promise<void> {
     const currentPrefs = this.preferences.get(userId) || {
       userId,
       channels: {
@@ -161,7 +173,7 @@ class NotificationService {
     // Save to localStorage for persistence
     localStorage.setItem(`notification_prefs_${userId}`, JSON.stringify(updatedPrefs));
 
-    // // console.log(`⚙️ Notification preferences updated for user: ${userId}`);
+    // // // // console.log(`⚙️ Notification preferences updated for user: ${userId}`);
   }
 
   /**
@@ -240,7 +252,7 @@ class NotificationService {
     };
 
     this.scheduledNotifications.set(notificationId, notification);
-    // // console.log(`⏰ Notification scheduled for ${scheduledTime.toISOString()}`);
+    // // // // console.log(`⏰ Notification scheduled for ${scheduledTime.toISOString()}`);
 
     return notificationId;
   }
@@ -260,7 +272,7 @@ class NotificationService {
   ): Promise<void> {
     const scheduledTime = new Date(
       new Date(`${trainingDetails.date} ${trainingDetails.time}`).getTime() -
-      (reminderMinutes * 60 * 1000),
+        reminderMinutes * 60 * 1000,
     );
 
     await this.scheduleNotification(
@@ -297,7 +309,7 @@ class NotificationService {
     const matchDateTime = new Date(`${matchDetails.date} ${matchDetails.time}`);
 
     for (const minutes of notificationTimes) {
-      const scheduledTime = new Date(matchDateTime.getTime() - (minutes * 60 * 1000));
+      const scheduledTime = new Date(matchDateTime.getTime() - minutes * 60 * 1000);
 
       for (const playerId of playerIds) {
         await this.scheduleNotification(
@@ -373,7 +385,7 @@ class NotificationService {
       notificationIds.push(notificationId);
     }
 
-    // // console.log(`📢 Bulk notification scheduled for ${userIds.length} users`);
+    // // // // console.log(`📢 Bulk notification scheduled for ${userIds.length} users`);
     return notificationIds;
   }
 
@@ -428,7 +440,9 @@ class NotificationService {
   }
 
   // Event listener setters
-  onNotificationSent(callback: (notification: ScheduledNotification, success: boolean) => void): void {
+  onNotificationSent(
+    callback: (notification: ScheduledNotification, success: boolean) => void,
+  ): void {
     this.onNotificationSentCallback = callback;
   }
 
@@ -459,16 +473,18 @@ class NotificationService {
         this.onNotificationSentCallback(notification, true);
       }
 
-      // // console.log(`✅ Notification sent: ${notification.id}`);
-
+      // // // // console.log(`✅ Notification sent: ${notification.id}`);
     } catch (_error) {
-      console.error(`❌ Failed to send notification ${notification.id}:`, error);
+      console.error(`❌ Failed to send notification ${notification.id}:`, _error);
 
       if (notification.attempts < notification.maxAttempts) {
         // Retry with exponential backoff
-        setTimeout(() => {
-          this.processNotification(notification);
-        }, Math.pow(2, notification.attempts) * 1000);
+        setTimeout(
+          () => {
+            this.processNotification(notification);
+          },
+          Math.pow(2, notification.attempts) * 1000,
+        );
       } else {
         notification.status = 'failed';
 
@@ -517,7 +533,6 @@ class NotificationService {
 
       this.recordDelivery(deliveryId, channelId, 'sent', {});
       channel.currentUsage++;
-
     } catch (_error) {
       this.recordDelivery(deliveryId, channelId, 'failed', { error: error.message });
       throw error;
@@ -530,7 +545,7 @@ class NotificationService {
     content: { subject: string; content: string },
   ): Promise<void> {
     // Implementation would use actual email service (SendGrid, AWS SES, etc.)
-    // // console.log(`📧 Sending email to ${userId}: ${content.subject}`);
+    // // // // console.log(`📧 Sending email to ${userId}: ${content.subject}`);
 
     // Simulate email sending
     await new Promise(resolve => setTimeout(resolve, 100));
@@ -542,7 +557,7 @@ class NotificationService {
     content: { subject: string; content: string },
   ): Promise<void> {
     // Implementation would use SMS service (Twilio, AWS SNS, etc.)
-    // // console.log(`📱 Sending SMS to ${userId}: ${content.content}`);
+    // // // // console.log(`📱 Sending SMS to ${userId}: ${content.content}`);
 
     // Simulate SMS sending
     await new Promise(resolve => setTimeout(resolve, 100));
@@ -554,7 +569,7 @@ class NotificationService {
     content: { subject: string; content: string },
   ): Promise<void> {
     // Implementation would use push service (FCM, APNs, etc.)
-    // // console.log(`🔔 Sending push notification to ${userId}: ${content.subject}`);
+    // // // // console.log(`🔔 Sending push notification to ${userId}: ${content.subject}`);
 
     // Simulate push notification
     await new Promise(resolve => setTimeout(resolve, 50));
@@ -565,20 +580,27 @@ class NotificationService {
     userId: string,
     content: { subject: string; content: string },
   ): Promise<void> {
-    await axios.post(channel.config.url, {
-      userId,
-      subject: content.subject,
-      content: content.content,
-      timestamp: Date.now(),
-    }, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...(channel.config.headers || {}),
+    await axios.post(
+      channel.config.url,
+      {
+        userId,
+        subject: content.subject,
+        content: content.content,
+        timestamp: Date.now(),
       },
-    });
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          ...(channel.config.headers || {}),
+        },
+      },
+    );
   }
 
-  private processTemplate(template: NotificationTemplate, data: Record<string, unknown>): { subject: string; content: string } {
+  private processTemplate(
+    template: NotificationTemplate,
+    data: Record<string, unknown>,
+  ): { subject: string; content: string } {
     let subject = template.subject;
     let content = template.content;
 
@@ -594,11 +616,15 @@ class NotificationService {
 
   private determineChannels(userId: string, templateChannels: string[]): string[] {
     const userPrefs = this.preferences.get(userId);
-    if (!userPrefs) {return templateChannels;}
+    if (!userPrefs) {
+      return templateChannels;
+    }
 
     return templateChannels.filter(channelId => {
       const channel = this.channels.get(channelId);
-      if (!channel) {return false;}
+      if (!channel) {
+        return false;
+      }
 
       switch (channel.type) {
         case 'email':
@@ -617,7 +643,9 @@ class NotificationService {
 
   private canSendNow(userId: string): boolean {
     const userPrefs = this.preferences.get(userId);
-    if (!userPrefs || userPrefs.timing.frequency !== 'immediate') {return false;}
+    if (!userPrefs || userPrefs.timing.frequency !== 'immediate') {
+      return false;
+    }
 
     // Check quiet hours
     const now = new Date();
@@ -636,7 +664,7 @@ class NotificationService {
 
   private checkRateLimit(channel: NotificationChannel): boolean {
     const now = Date.now();
-    const hourAgo = now - (60 * 60 * 1000);
+    const hourAgo = now - 60 * 60 * 1000;
 
     if (channel.lastReset < hourAgo) {
       channel.currentUsage = 0;
@@ -698,7 +726,8 @@ class NotificationService {
         name: 'Training Reminder',
         type: 'training_reminder' as const,
         subject: 'Training Reminder - {{trainingType}}',
-        content: 'Hi {{playerName}}, you have {{trainingType}} training in {{minutesUntil}} minutes at {{trainingLocation}}.',
+        content:
+          'Hi {{playerName}}, you have {{trainingType}} training in {{minutesUntil}} minutes at {{trainingLocation}}.',
         channels: ['email_primary', 'push_primary'],
         variables: ['playerName', 'trainingType', 'minutesUntil', 'trainingLocation'],
         isActive: true,
@@ -707,7 +736,8 @@ class NotificationService {
         name: 'Match Notification',
         type: 'match_notification' as const,
         subject: 'Match Alert - vs {{opponent}}',
-        content: '{{homeAway}} match against {{opponent}} in {{minutesUntil}} minutes at {{venue}}.',
+        content:
+          '{{homeAway}} match against {{opponent}} in {{minutesUntil}} minutes at {{venue}}.',
         channels: ['email_primary', 'sms_primary', 'push_primary'],
         variables: ['opponent', 'homeAway', 'minutesUntil', 'venue'],
         isActive: true,
@@ -716,7 +746,8 @@ class NotificationService {
         name: 'Injury Update',
         type: 'injury_update' as const,
         subject: 'Injury Status Update',
-        content: 'Update on your {{injuryType}} injury: {{severity}}. Treatment: {{treatment}}. Expected return: {{expectedReturn}}',
+        content:
+          'Update on your {{injuryType}} injury: {{severity}}. Treatment: {{treatment}}. Expected return: {{expectedReturn}}',
         channels: ['email_primary', 'push_primary'],
         variables: ['injuryType', 'severity', 'treatment', 'expectedReturn'],
         isActive: true,
@@ -763,11 +794,11 @@ class NotificationService {
 
   private async loadUserPreferences(): Promise<void> {
     // Load preferences from localStorage or API
-    // // console.log('📋 Loading user notification preferences');
+    // // // // console.log('📋 Loading user notification preferences');
   }
 
   private async startScheduledNotifications(): Promise<void> {
-    // // console.log('⏰ Starting scheduled notification processor');
+    // // // // console.log('⏰ Starting scheduled notification processor');
   }
 }
 

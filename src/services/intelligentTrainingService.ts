@@ -1,4 +1,4 @@
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI, Type } from '@google/genai';
 import type {
   Player,
   WeeklySchedule,
@@ -19,7 +19,7 @@ try {
     aiInstance = new GoogleGenAI({ apiKey });
   }
 } catch (_error) {
-  console.error("Error initializing Intelligent Training Service:", error);
+  console.error('Error initializing Intelligent Training Service:', _error);
   aiInstance = null;
 }
 
@@ -80,11 +80,14 @@ export interface TrainingSessionAnalytics {
   participants: string[];
   drillsPerformed: string[];
   intensityLevel: 'low' | 'medium' | 'high';
-  playerFeedback: Record<string, {
-    fatigueLevel: number;
-    enjoymentRating: number;
-    perceivedEffectiveness: number;
-  }>;
+  playerFeedback: Record<
+    string,
+    {
+      fatigueLevel: number;
+      enjoymentRating: number;
+      perceivedEffectiveness: number;
+    }
+  >;
   coachObservations: string[];
   suggestedAdjustments: string[];
   nextSessionRecommendations: string[];
@@ -92,15 +95,17 @@ export interface TrainingSessionAnalytics {
 
 async function generateJson(prompt: string, schema: unknown, systemInstruction: string) {
   const ai = aiInstance;
-  if (!ai) {throw new Error("AI is offline.");}
+  if (!ai) {
+    throw new Error('AI is offline.');
+  }
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: 'gemini-2.5-flash',
       contents: prompt,
       config: {
         systemInstruction,
-        responseMimeType: "application/json",
+        responseMimeType: 'application/json',
         responseSchema: schema,
         temperature: 0.6,
       },
@@ -108,12 +113,12 @@ async function generateJson(prompt: string, schema: unknown, systemInstruction: 
 
     const jsonText = response.text.trim();
     if (!jsonText) {
-      throw new Error("AI returned an empty response.");
+      throw new Error('AI returned an empty response.');
     }
     return JSON.parse(jsonText);
   } catch (_error) {
-    console.error("Error generating JSON from Gemini API:", error);
-    throw new Error("Failed to get a valid JSON response from the AI.");
+    console.error('Error generating JSON from Gemini API:', _error);
+    throw new Error('Failed to get a valid JSON response from the AI.');
   }
 }
 
@@ -139,7 +144,9 @@ export const generateIntelligentTrainingPlan = async (
   teamTactics: TeamTactics,
   personality: AIPersonality = 'balanced',
 ): Promise<IntelligentTrainingPlan> => {
-  if (!aiInstance) {throw new Error("AI is offline.");}
+  if (!aiInstance) {
+    throw new Error('AI is offline.');
+  }
 
   const prompt = `Create a comprehensive, intelligent training plan for this player:
 
@@ -218,8 +225,15 @@ Focus on evidence-based training methods and modern sports science principles.`;
       keyPerformanceIndicators: { type: Type.ARRAY, items: { type: Type.STRING } },
     },
     required: [
-      'playerId', 'playerName', 'planName', 'duration', 'objectives', 'schedule',
-      'adaptiveModifications', 'expectedOutcomes', 'alternativeScenarios',
+      'playerId',
+      'playerName',
+      'planName',
+      'duration',
+      'objectives',
+      'schedule',
+      'adaptiveModifications',
+      'expectedOutcomes',
+      'alternativeScenarios',
       'keyPerformanceIndicators',
     ],
   };
@@ -240,7 +254,9 @@ export const optimizeTeamTraining = async (
   seasonPhase: 'preseason' | 'inseason' | 'postseason',
   personality: AIPersonality = 'balanced',
 ): Promise<TeamTrainingOptimization> => {
-  if (!aiInstance) {throw new Error("AI is offline.");}
+  if (!aiInstance) {
+    throw new Error('AI is offline.');
+  }
 
   const prompt = `Design comprehensive team training optimization:
 
@@ -249,7 +265,9 @@ ${players.map(p => formatPlayerForTraining(p)).join('\n\n')}
 
 TACTICAL SETUP:
 - Formation: ${formation.name}
-- Team Tactics: ${Object.entries(teamTactics).map(([key, value]) => `${key}: ${value}`).join(', ')}
+- Team Tactics: ${Object.entries(teamTactics)
+    .map(([key, value]) => `${key}: ${value}`)
+    .join(', ')}
 
 SEASON CONTEXT:
 - Current Phase: ${seasonPhase}
@@ -300,8 +318,13 @@ Focus on creating synergy between individual development and collective performa
       },
     },
     required: [
-      'teamName', 'formation', 'tacticalFocus', 'playerSpecificPlans',
-      'teamWidePlans', 'periodization', 'loadManagement',
+      'teamName',
+      'formation',
+      'tacticalFocus',
+      'playerSpecificPlans',
+      'teamWidePlans',
+      'periodization',
+      'loadManagement',
     ],
   };
 
@@ -316,7 +339,9 @@ export const analyzeTrainingSession = async (
   coachObservations: string[],
   personality: AIPersonality = 'balanced',
 ): Promise<TrainingSessionAnalytics> => {
-  if (!aiInstance) {throw new Error("AI is offline.");}
+  if (!aiInstance) {
+    throw new Error('AI is offline.');
+  }
 
   const prompt = `Analyze this training session and provide comprehensive feedback:
 
@@ -358,8 +383,14 @@ Focus on actionable insights that improve both performance and wellbeing.`;
       nextSessionRecommendations: { type: Type.ARRAY, items: { type: Type.STRING } },
     },
     required: [
-      'sessionId', 'date', 'participants', 'drillsPerformed', 'intensityLevel',
-      'playerFeedback', 'coachObservations', 'suggestedAdjustments',
+      'sessionId',
+      'date',
+      'participants',
+      'drillsPerformed',
+      'intensityLevel',
+      'playerFeedback',
+      'coachObservations',
+      'suggestedAdjustments',
       'nextSessionRecommendations',
     ],
   };
@@ -386,7 +417,9 @@ export const adaptTrainingPlan = async (
   },
   personality: AIPersonality = 'balanced',
 ): Promise<IntelligentTrainingPlan> => {
-  if (!aiInstance) {throw new Error("AI is offline.");}
+  if (!aiInstance) {
+    throw new Error('AI is offline.');
+  }
 
   const prompt = `Adapt and optimize this training plan based on recent performance data:
 
@@ -431,8 +464,15 @@ Provide an updated, adaptive training plan that responds to the player's current
       keyPerformanceIndicators: { type: Type.ARRAY, items: { type: Type.STRING } },
     },
     required: [
-      'playerId', 'playerName', 'planName', 'duration', 'objectives', 'schedule',
-      'adaptiveModifications', 'expectedOutcomes', 'alternativeScenarios',
+      'playerId',
+      'playerName',
+      'planName',
+      'duration',
+      'objectives',
+      'schedule',
+      'adaptiveModifications',
+      'expectedOutcomes',
+      'alternativeScenarios',
       'keyPerformanceIndicators',
     ],
   };

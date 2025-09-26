@@ -254,8 +254,14 @@ export interface XPMultiplier {
 // Notification Types for Challenge System
 export interface ChallengeNotification {
   id: string;
-  type: 'challenge_available' | 'challenge_expiring' | 'challenge_completed' |
-        'level_up' | 'badge_earned' | 'streak_milestone' | 'leaderboard_change';
+  type:
+    | 'challenge_available'
+    | 'challenge_expiring'
+    | 'challenge_completed'
+    | 'level_up'
+    | 'badge_earned'
+    | 'streak_milestone'
+    | 'leaderboard_change';
   title: string;
   message: string;
   challengeId?: string;

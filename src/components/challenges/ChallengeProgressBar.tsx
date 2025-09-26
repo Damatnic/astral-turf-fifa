@@ -20,16 +20,20 @@ const ChallengeProgressBar: React.FC<ChallengeProgressBarProps> = ({ challenge, 
 
   useEffect(() => {
     const playerProgress = challengeService.getPlayerProgress(playerId);
-    const challengeProgress = playerProgress.find(p =>
-      p.challengeId === challenge.id && p.status === 'active',
+    const challengeProgress = playerProgress.find(
+      p => p.challengeId === challenge.id && p.status === 'active',
     );
     setProgress(challengeProgress || null);
   }, [challenge.id, playerId]);
 
-  if (!progress) {return null;}
+  if (!progress) {
+    return null;
+  }
 
   const calculateOverallProgress = (): number => {
-    if (!challenge.requirements.length) {return 0;}
+    if (!challenge.requirements.length) {
+      return 0;
+    }
 
     let totalProgress = 0;
     challenge.requirements.forEach(req => {
@@ -46,8 +50,8 @@ const ChallengeProgressBar: React.FC<ChallengeProgressBarProps> = ({ challenge, 
 
     // Refresh local progress
     const updatedProgress = challengeService.getPlayerProgress(playerId);
-    const challengeProgress = updatedProgress.find(p =>
-      p.challengeId === challenge.id && p.status === 'active',
+    const challengeProgress = updatedProgress.find(
+      p => p.challengeId === challenge.id && p.status === 'active',
     );
     setProgress(challengeProgress || null);
   };
@@ -78,14 +82,18 @@ const ChallengeProgressBar: React.FC<ChallengeProgressBarProps> = ({ challenge, 
   };
 
   const getTimeRemaining = (): string | null => {
-    if (!challenge.timeLimit || !progress.startedAt) {return null;}
+    if (!challenge.timeLimit || !progress.startedAt) {
+      return null;
+    }
 
     const startTime = new Date(progress.startedAt).getTime();
-    const deadline = startTime + (challenge.timeLimit * 60 * 60 * 1000);
+    const deadline = startTime + challenge.timeLimit * 60 * 60 * 1000;
     const now = Date.now();
     const remaining = deadline - now;
 
-    if (remaining <= 0) {return 'Expired';}
+    if (remaining <= 0) {
+      return 'Expired';
+    }
 
     const hours = Math.floor(remaining / (60 * 60 * 1000));
     const minutes = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000));
@@ -118,7 +126,11 @@ const ChallengeProgressBar: React.FC<ChallengeProgressBarProps> = ({ challenge, 
               fill="currentColor"
               viewBox="0 0 20 20"
             >
-              <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+              <path
+                fillRule="evenodd"
+                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                clipRule="evenodd"
+              />
             </svg>
           </button>
         </div>
@@ -131,9 +143,7 @@ const ChallengeProgressBar: React.FC<ChallengeProgressBarProps> = ({ challenge, 
           </div>
           <div className="w-full bg-gray-600 rounded-full h-2 overflow-hidden">
             <motion.div
-              className={`h-2 rounded-full ${
-                isComplete ? 'bg-green-500' : 'bg-blue-500'
-              }`}
+              className={`h-2 rounded-full ${isComplete ? 'bg-green-500' : 'bg-blue-500'}`}
               initial={{ width: 0 }}
               animate={{ width: `${overallProgress}%` }}
               transition={{ duration: 0.5, ease: 'easeOut' }}
@@ -143,9 +153,11 @@ const ChallengeProgressBar: React.FC<ChallengeProgressBarProps> = ({ challenge, 
 
         {/* Time Remaining */}
         {timeRemaining && (
-          <div className={`text-xs ${
-            timeRemaining === 'Expired' ? 'text-red-400' : 'text-yellow-400'
-          } mb-2`}>
+          <div
+            className={`text-xs ${
+              timeRemaining === 'Expired' ? 'text-red-400' : 'text-yellow-400'
+            } mb-2`}
+          >
             ⏱ {timeRemaining}
           </div>
         )}
@@ -172,8 +184,16 @@ const ChallengeProgressBar: React.FC<ChallengeProgressBarProps> = ({ challenge, 
                         {current}/{req.target} {req.unit}
                       </span>
                       {isReqComplete && (
-                        <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        <svg
+                          className="w-4 h-4 text-green-500"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clipRule="evenodd"
+                          />
                         </svg>
                       )}
                     </div>
@@ -205,7 +225,7 @@ const ChallengeProgressBar: React.FC<ChallengeProgressBarProps> = ({ challenge, 
                       <input
                         type="number"
                         value={current}
-                        onChange={(e) => handleUpdateProgress(req.id, parseInt(e.target.value) || 0)}
+                        onChange={e => handleUpdateProgress(req.id, parseInt(e.target.value) || 0)}
                         className="w-20 px-2 py-1 bg-gray-600 text-white text-xs rounded border border-gray-500 focus:border-blue-500 focus:outline-none"
                         min="0"
                         max={req.target}
@@ -221,13 +241,20 @@ const ChallengeProgressBar: React.FC<ChallengeProgressBarProps> = ({ challenge, 
               <div className="mt-3 pt-3 border-t border-gray-600">
                 <p className="text-xs font-medium text-gray-400 mb-2">Evidence Submitted</p>
                 {progress.evidenceSubmissions.map(evidence => (
-                  <div key={evidence.id} className="flex items-center justify-between p-2 bg-gray-600 rounded mb-1">
+                  <div
+                    key={evidence.id}
+                    className="flex items-center justify-between p-2 bg-gray-600 rounded mb-1"
+                  >
                     <span className="text-xs text-gray-300">{evidence.description}</span>
-                    <span className={`text-xs px-2 py-0.5 rounded ${
-                      evidence.verificationStatus === 'verified' ? 'bg-green-600/20 text-green-400' :
-                      evidence.verificationStatus === 'rejected' ? 'bg-red-600/20 text-red-400' :
-                      'bg-yellow-600/20 text-yellow-400'
-                    }`}>
+                    <span
+                      className={`text-xs px-2 py-0.5 rounded ${
+                        evidence.verificationStatus === 'verified'
+                          ? 'bg-green-600/20 text-green-400'
+                          : evidence.verificationStatus === 'rejected'
+                            ? 'bg-red-600/20 text-red-400'
+                            : 'bg-yellow-600/20 text-yellow-400'
+                      }`}
+                    >
                       {evidence.verificationStatus || 'pending'}
                     </span>
                   </div>
@@ -240,7 +267,7 @@ const ChallengeProgressBar: React.FC<ChallengeProgressBarProps> = ({ challenge, 
         {/* Action Buttons */}
         <div className="flex items-center justify-between mt-3">
           <div className="flex items-center space-x-2">
-            {challenge.rewards.map((reward) => (
+            {challenge.rewards.map(reward => (
               <span key={`${reward.type}-${reward.value}`} className="text-xs text-gray-400">
                 {reward.type === 'xp' && `${reward.value} XP`}
                 {reward.type === 'attribute_points' && `+${reward.value} AP`}
@@ -280,7 +307,7 @@ const ChallengeProgressBar: React.FC<ChallengeProgressBarProps> = ({ challenge, 
 
             <textarea
               value={evidenceText}
-              onChange={(e) => setEvidenceText(e.target.value)}
+              onChange={e => setEvidenceText(e.target.value)}
               placeholder="Describe your completion or paste a link..."
               className="w-full h-32 px-3 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none resize-none"
             />

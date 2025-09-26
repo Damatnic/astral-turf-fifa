@@ -51,7 +51,7 @@ export default [
     },
     plugins: {
       '@typescript-eslint': typescript,
-      'react': react,
+      react: react,
       'react-hooks': reactHooks,
     },
     rules: {
@@ -88,12 +88,12 @@ export default [
       'no-unused-vars': 'off', // Handled by TypeScript
       'prefer-const': 'error',
       'no-var': 'error',
-      'eqeqeq': 'error',
-      'curly': 'error',
+      eqeqeq: 'error',
+      curly: 'error',
       'no-multiple-empty-lines': ['error', { max: 2, maxEOF: 1 }],
       'no-trailing-spaces': 'error',
       'comma-dangle': ['error', 'always-multiline'],
-      'semi': ['error', 'always'],
+      semi: ['error', 'always'],
 
       // Import/Export rules
       'no-duplicate-imports': 'error',

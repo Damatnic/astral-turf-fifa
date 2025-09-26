@@ -5,12 +5,27 @@
 
 // Type imports (these don't affect bundle size)
 import type {
-  Player, Formation, AIInsight, AIComparison, AISuggestedFormation,
-  ChatMessage, TeamTactics, AIOppositionReport, AISubstitutionSuggestion,
-  AIPersonality, AIPostMatchAnalysis, MatchResult, HeadCoach,
-  AIAgentResponse, AIPressConferenceResponse, TransferPlayer,
-  AIScoutReport, AIDevelopmentSummary, PressNarrative,
-  PromiseRequest, AITeamTalkResponse,
+  Player,
+  Formation,
+  AIInsight,
+  AIComparison,
+  AISuggestedFormation,
+  ChatMessage,
+  TeamTactics,
+  AIOppositionReport,
+  AISubstitutionSuggestion,
+  AIPersonality,
+  AIPostMatchAnalysis,
+  MatchResult,
+  HeadCoach,
+  AIAgentResponse,
+  AIPressConferenceResponse,
+  TransferPlayer,
+  AIScoutReport,
+  AIDevelopmentSummary,
+  PressNarrative,
+  PromiseRequest,
+  AITeamTalkResponse,
 } from '../types';
 
 // Cache for the lazy-loaded aiService module
@@ -24,7 +39,7 @@ async function getAIService() {
     try {
       aiServiceModule = await import('./aiService');
     } catch (_error) {
-      console.error('Failed to load AI service:', error);
+      console.error('Failed to load AI service:', _error);
       throw new Error('AI service is currently unavailable');
     }
   }
@@ -43,7 +58,16 @@ export async function getTacticalAdvice(
   coach: HeadCoach | null,
 ): Promise<AIInsight> {
   const aiService = await getAIService();
-  return aiService.getTacticalAdvice(homePlayers, awayPlayers, homeFormation, awayFormation, homeTactics, awayTactics, personality, coach);
+  return aiService.getTacticalAdvice(
+    homePlayers,
+    awayPlayers,
+    homeFormation,
+    awayFormation,
+    homeTactics,
+    awayTactics,
+    personality,
+    coach,
+  );
 }
 
 export async function getAIFormationSuggestion(
@@ -127,7 +151,13 @@ export async function getOppositionAnalysis(
   scoutRating: number,
 ): Promise<AIOppositionReport> {
   const aiService = await getAIService();
-  return aiService.getOppositionAnalysis(opponentName, formation, keyPlayers, personality, scoutRating);
+  return aiService.getOppositionAnalysis(
+    opponentName,
+    formation,
+    keyPlayers,
+    personality,
+    scoutRating,
+  );
 }
 
 export async function generateSocialMediaReactions(
@@ -153,7 +183,13 @@ export async function generateSeasonReview(
   nextSeasonGoals: string[];
 }> {
   const aiService = await getAIService();
-  return aiService.generateSeasonReview(finalPosition, totalTeams, topScorer, seasonHighlights, personality);
+  return aiService.generateSeasonReview(
+    finalPosition,
+    totalTeams,
+    topScorer,
+    seasonHighlights,
+    personality,
+  );
 }
 
 // Communication Functions
@@ -162,7 +198,7 @@ export async function getAIChatResponse(
   playersInFormation: Player[],
   formation: Formation,
   personality: AIPersonality,
-): Promise<{ text: string, playerIdsToHighlight: string[] }> {
+): Promise<{ text: string; playerIdsToHighlight: string[] }> {
   const aiService = await getAIService();
   return aiService.getAIChatResponse(chatHistory, playersInFormation, formation, personality);
 }
@@ -171,7 +207,7 @@ export async function getAIPlayerConversationResponse(
   player: Player,
   userMessage: string,
   personality: AIPersonality,
-): Promise<{ response: string; moraleEffect: number, promiseRequest?: PromiseRequest }> {
+): Promise<{ response: string; moraleEffect: number; promiseRequest?: PromiseRequest }> {
   const aiService = await getAIService();
   return aiService.getAIPlayerConversationResponse(player, userMessage, personality);
 }
@@ -184,7 +220,13 @@ export async function getTeamTalkOptions(
   personality: AIPersonality,
 ): Promise<AITeamTalkResponse> {
   const aiService = await getAIService();
-  return aiService.getTeamTalkOptions(teamPlayers, opponentName, isHalftime, currentScore, personality);
+  return aiService.getTeamTalkOptions(
+    teamPlayers,
+    opponentName,
+    isHalftime,
+    currentScore,
+    personality,
+  );
 }
 
 export async function getPressConferenceQuestions(
@@ -203,7 +245,13 @@ export async function getAgentNegotiationResponse(
   conversationHistory: string,
 ): Promise<AIAgentResponse> {
   const aiService = await getAIService();
-  return aiService.getAgentNegotiationResponse(playerName, playerValue, agentPersonality, userOffer, conversationHistory);
+  return aiService.getAgentNegotiationResponse(
+    playerName,
+    playerValue,
+    agentPersonality,
+    userOffer,
+    conversationHistory,
+  );
 }
 
 // Narrative Generation Functions
@@ -216,7 +264,14 @@ export async function generatePressNarratives(
   playerInPoorForm: Player | null,
 ): Promise<PressNarrative[]> {
   const aiService = await getAIService();
-  return aiService.generatePressNarratives(managerName, lastMatchResult, upcomingOpponent, leaguePosition, topScorer, playerInPoorForm);
+  return aiService.generatePressNarratives(
+    managerName,
+    lastMatchResult,
+    upcomingOpponent,
+    leaguePosition,
+    topScorer,
+    playerInPoorForm,
+  );
 }
 
 export async function generateInjuryReport(

@@ -265,7 +265,7 @@ function trackViolationPattern(violation: CSPViolationReport['csp-report']): voi
 
   // In production, this would be sent to monitoring service
   if (ENVIRONMENT_CONFIG.isDevelopment) {
-    // // console.warn('CSP Violation Pattern:', pattern);
+    // // // // console.warn('CSP Violation Pattern:', pattern);
   }
 }
 

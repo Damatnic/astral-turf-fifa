@@ -43,7 +43,6 @@ export default async function handler(req, res) {
       default:
         return res.status(400).json({ error: 'Invalid action' });
     }
-
   } catch (error) {
     console.error('Auth API error:', error);
 
@@ -71,7 +70,10 @@ async function handleLogin(req, res, { email, password }) {
   try {
     // Input validation
     if (!email || !password) {
-      await logSecurityEvent('LOGIN_FAILURE', 'Missing email or password', { ipAddress, userAgent });
+      await logSecurityEvent('LOGIN_FAILURE', 'Missing email or password', {
+        ipAddress,
+        userAgent,
+      });
       return res.status(400).json({ error: 'Email and password are required' });
     }
 
@@ -154,7 +156,7 @@ async function handleLogin(req, res, { email, password }) {
         role: user.role,
       },
       process.env.JWT_SECRET,
-      { expiresIn: '24h' },
+      { expiresIn: '24h' }
     );
 
     await logSecurityEvent('LOGIN_SUCCESS', 'User login successful', {
@@ -177,7 +179,6 @@ async function handleLogin(req, res, { email, password }) {
       token,
       sessionId,
     });
-
   } catch (error) {
     console.error('Login error:', error);
     await logSecurityEvent('LOGIN_ERROR', error.message, { ipAddress, userAgent });
@@ -253,7 +254,6 @@ async function handleRegister(req, res, { email, password, firstName, lastName, 
 
     // Auto-login after registration
     return await handleLogin(req, res, { email, password });
-
   } catch (error) {
     console.error('Registration error:', error);
     await logSecurityEvent('REGISTRATION_ERROR', error.message, { ipAddress, userAgent });
@@ -308,7 +308,6 @@ async function handleVerify(req, res) {
         lastLoginAt: session.user.lastLoginAt,
       },
     });
-
   } catch (error) {
     if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
       return res.status(401).json({ error: 'Invalid or expired token' });

@@ -36,15 +36,15 @@ export interface HistoricalSeasonRecord {
   season: number;
   champions: string;
   userPosition: number;
-  topScorer: { name: string, goals: number } | null;
+  topScorer: { name: string; goals: number } | null;
 }
 
 export interface SeasonAwards {
   champion: string;
   userPosition: number;
-  playerOfTheSeason: { id: string, name: string };
-  youngPlayerOfTheSeason: { id: string, name: string };
-  topScorer: { id: string, name: string, goals: number };
+  playerOfTheSeason: { id: string; name: string };
+  youngPlayerOfTheSeason: { id: string; name: string };
+  topScorer: { id: string; name: string; goals: number };
   teamOfTheSeason: (string | null)[]; // Array of player IDs for a 4-4-2
 }
 

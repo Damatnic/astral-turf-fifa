@@ -3,12 +3,14 @@
 /* CSS Custom Properties from Design Tokens */
 :root {
   /* Colors will be set dynamically by ThemeContext */
-  
+
   /* Typography */
-  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-sans:
+    'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', Monaco, 'Cascadia Code', 'Segoe UI Mono', monospace;
-  --font-display: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  
+  --font-display:
+    'Poppins', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
   /* Shadows */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-base: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
@@ -16,13 +18,13 @@
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
   --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
-  
+
   /* Transitions */
   --transition-fast: 150ms ease-in-out;
   --transition-normal: 250ms ease-in-out;
   --transition-slow: 350ms ease-in-out;
   --transition-slower: 500ms ease-in-out;
-  
+
   /* Z-Index */
   --z-dropdown: 1000;
   --z-sticky: 1100;
@@ -48,7 +50,9 @@ body {
   margin: 0;
   padding: 0;
   line-height: 1.5;
-  transition: background-color var(--transition-normal), color var(--transition-normal);
+  transition:
+    background-color var(--transition-normal),
+    color var(--transition-normal);
 }
 
 /* Focus Management */
@@ -354,7 +358,8 @@ body.density-spacious {
 }
 
 @keyframes gradientShift {
-  0%, 100% {
+  0%,
+  100% {
     background-position: 0% 50%;
   }
   50% {
@@ -456,11 +461,11 @@ body.density-spacious {
     border-radius: var(--radius-lg);
     max-height: 90vh;
   }
-  
+
   .enhanced-button {
     padding: 0.75rem 1rem;
   }
-  
+
   .enhanced-card {
     margin: 0.5rem;
   }
@@ -470,7 +475,7 @@ body.density-spacious {
   body {
     font-size: 14px;
   }
-  
+
   .enhanced-card {
     padding: 1rem;
   }
@@ -481,13 +486,13 @@ body.density-spacious {
   .no-print {
     display: none !important;
   }
-  
+
   * {
     color: black !important;
     background: white !important;
     box-shadow: none !important;
   }
-  
+
   .enhanced-card {
     border: 1px solid black !important;
   }
@@ -575,9 +580,13 @@ body.density-spacious {
   padding: 1px;
   background: var(--gradient-primary);
   border-radius: inherit;
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
   mask-composite: subtract;
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
   -webkit-mask-composite: subtract;
 }
 

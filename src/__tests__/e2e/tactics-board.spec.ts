@@ -36,13 +36,15 @@ test.describe('Tactics Board E2E Tests', () => {
 
   test('should handle formation selection', async ({ page }) => {
     // Look for formation controls
-    const formationSelector = page.locator(
-      '[data-testid*="formation"], select:has(option[value*="4-4-2"]), button:has-text("4-4-2")',
-    ).first();
+    const formationSelector = page
+      .locator(
+        '[data-testid*="formation"], select:has(option[value*="4-4-2"]), button:has-text("4-4-2")',
+      )
+      .first();
 
     if (await formationSelector.isVisible()) {
       // Try to select a different formation
-      if (await formationSelector.getAttribute('tagName') === 'SELECT') {
+      if ((await formationSelector.getAttribute('tagName')) === 'SELECT') {
         await formationSelector.selectOption('4-3-3');
       } else {
         await formationSelector.click();
@@ -86,9 +88,9 @@ test.describe('Tactics Board E2E Tests', () => {
       await page.waitForTimeout(500);
 
       // Should show player details or selection
-      const playerInfo = page.locator(
-        '[data-testid*="player-info"], .player-details, .player-stats',
-      ).first();
+      const playerInfo = page
+        .locator('[data-testid*="player-info"], .player-details, .player-stats')
+        .first();
 
       if (await playerInfo.isVisible()) {
         await expect(playerInfo).toBeVisible();
@@ -98,9 +100,7 @@ test.describe('Tactics Board E2E Tests', () => {
 
   test('should handle tactical tools', async ({ page }) => {
     // Look for tactical toolbar
-    const toolbar = page.locator(
-      '[data-testid="tactical-toolbar"], .toolbar, .tools',
-    ).first();
+    const toolbar = page.locator('[data-testid="tactical-toolbar"], .toolbar, .tools').first();
 
     if (await toolbar.isVisible()) {
       await expect(toolbar).toBeVisible();
@@ -154,9 +154,11 @@ test.describe('Tactics Board E2E Tests', () => {
 
   test('should handle team switching', async ({ page }) => {
     // Look for team selection controls
-    const teamSelector = page.locator(
-      '[data-testid*="team"], button:has-text("Home"), button:has-text("Away"), .team-toggle',
-    ).first();
+    const teamSelector = page
+      .locator(
+        '[data-testid*="team"], button:has-text("Home"), button:has-text("Away"), .team-toggle',
+      )
+      .first();
 
     if (await teamSelector.isVisible()) {
       const originalTeam = await teamSelector.textContent();
@@ -179,7 +181,9 @@ test.describe('Tactics Board E2E Tests', () => {
 
     // Get field bounding box
     const fieldBox = await field.boundingBox();
-    if (!fieldBox) {return;}
+    if (!fieldBox) {
+      return;
+    }
 
     const centerX = fieldBox.x + fieldBox.width / 2;
     const centerY = fieldBox.y + fieldBox.height / 2;
@@ -216,17 +220,15 @@ test.describe('Tactics Board E2E Tests', () => {
       await page.waitForTimeout(1000);
 
       // Look for modal
-      const modal = page.locator(
-        '[data-testid*="modal"], .modal, [role="dialog"], .popup',
-      ).first();
+      const modal = page.locator('[data-testid*="modal"], .modal, [role="dialog"], .popup').first();
 
       if (await modal.isVisible()) {
         await expect(modal).toBeVisible();
 
         // Try to close modal
-        const closeButton = page.locator(
-          'button:has-text("Close"), button:has-text("×"), [data-testid="close"]',
-        ).first();
+        const closeButton = page
+          .locator('button:has-text("Close"), button:has-text("×"), [data-testid="close"]')
+          .first();
 
         if (await closeButton.isVisible()) {
           await closeButton.click();
@@ -305,18 +307,16 @@ test.describe('Mobile Tactics Board', () => {
     await page.waitForLoadState('networkidle');
 
     // Look for mobile menu/hamburger button
-    const menuButton = page.locator(
-      '[data-testid="menu-button"], button:has-text("☰"), .hamburger, .menu-toggle',
-    ).first();
+    const menuButton = page
+      .locator('[data-testid="menu-button"], button:has-text("☰"), .hamburger, .menu-toggle')
+      .first();
 
     if (await menuButton.isVisible()) {
       await menuButton.click();
       await page.waitForTimeout(500);
 
       // Should show mobile navigation
-      const mobileNav = page.locator(
-        '[data-testid="mobile-nav"], .mobile-menu, .drawer',
-      ).first();
+      const mobileNav = page.locator('[data-testid="mobile-nav"], .mobile-menu, .drawer').first();
 
       if (await mobileNav.isVisible()) {
         await expect(mobileNav).toBeVisible();

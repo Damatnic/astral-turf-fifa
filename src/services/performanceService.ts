@@ -25,7 +25,7 @@ class PerformanceService {
 
   async initialize(): Promise<void> {
     if (!this.isClient) {
-      // // console.log('⚡ Performance Service: Server-side, skipping initialization');
+      // // // // console.log('⚡ Performance Service: Server-side, skipping initialization');
       return;
     }
 
@@ -34,20 +34,22 @@ class PerformanceService {
       this.setupWebVitalsTracking();
       this.trackInitialMetrics();
 
-      // // console.log('⚡ Performance Service initialized');
+      // // // // console.log('⚡ Performance Service initialized');
     } catch (_error) {
-      console.error('❌ Performance Service initialization failed:', error);
+      console.error('❌ Performance Service initialization failed:', _error);
     }
   }
 
   private setupPerformanceObserver(): void {
-    if (!this.isClient || !('PerformanceObserver' in window)) {return;}
+    if (!this.isClient || !('PerformanceObserver' in window)) {
+      return;
+    }
 
     try {
-      this.observer = new PerformanceObserver((list) => {
+      this.observer = new PerformanceObserver(list => {
         const entries = list.getEntries();
 
-        entries.forEach((entry) => {
+        entries.forEach(entry => {
           this.recordMetric({
             name: entry.name,
             value: entry.duration || entry.startTime,
@@ -65,21 +67,23 @@ class PerformanceService {
 
       // Observe different performance entry types
       const entryTypes = ['navigation', 'resource', 'measure', 'paint'];
-      entryTypes.forEach((type) => {
+      entryTypes.forEach(type => {
         try {
           this.observer?.observe({ entryTypes: [type] });
-        } catch (_e) {
+        } catch (__e) {
           // Some entry types may not be supported in all browsers
-          // // console.debug(`Performance entry type ${type} not supported`);
+          // // // // console.debug(`Performance entry type ${type} not supported`);
         }
       });
     } catch (_error) {
-      console.error('Failed to setup performance observer:', error);
+      console.error('Failed to setup performance observer:', _error);
     }
   }
 
   private setupWebVitalsTracking(): void {
-    if (!this.isClient) {return;}
+    if (!this.isClient) {
+      return;
+    }
 
     // Track Core Web Vitals using the web-vitals library pattern
     this.trackLCP();
@@ -93,7 +97,7 @@ class PerformanceService {
     // Largest Contentful Paint
     if ('PerformanceObserver' in window) {
       try {
-        const observer = new PerformanceObserver((list) => {
+        const observer = new PerformanceObserver(list => {
           const entries = list.getEntries();
           const lastEntry = entries[entries.length - 1] as PerformanceEntry;
 
@@ -107,8 +111,8 @@ class PerformanceService {
         });
 
         observer.observe({ entryTypes: ['largest-contentful-paint'] });
-      } catch (_e) {
-        // // console.debug('LCP tracking not supported');
+      } catch (__e) {
+        // // // // console.debug('LCP tracking not supported');
       }
     }
   }
@@ -117,10 +121,10 @@ class PerformanceService {
     // First Input Delay
     if ('PerformanceObserver' in window) {
       try {
-        const observer = new PerformanceObserver((list) => {
+        const observer = new PerformanceObserver(list => {
           const entries = list.getEntries() as PerformanceEventTiming[];
 
-          entries.forEach((entry) => {
+          entries.forEach(entry => {
             const delay = entry.processingStart - entry.startTime;
 
             this.recordWebVital({
@@ -134,8 +138,8 @@ class PerformanceService {
         });
 
         observer.observe({ entryTypes: ['first-input'] });
-      } catch (_e) {
-        // // console.debug('FID tracking not supported');
+      } catch (__e) {
+        // // // // console.debug('FID tracking not supported');
       }
     }
   }
@@ -145,7 +149,7 @@ class PerformanceService {
     if ('PerformanceObserver' in window) {
       try {
         let clsValue = 0;
-        const observer = new PerformanceObserver((list) => {
+        const observer = new PerformanceObserver(list => {
           const entries = list.getEntries() as PerformanceEntry[];
 
           entries.forEach((entry: unknown) => {
@@ -164,8 +168,8 @@ class PerformanceService {
         });
 
         observer.observe({ entryTypes: ['layout-shift'] });
-      } catch (_e) {
-        // // console.debug('CLS tracking not supported');
+      } catch (__e) {
+        // // // // console.debug('CLS tracking not supported');
       }
     }
   }
@@ -174,7 +178,7 @@ class PerformanceService {
     // First Contentful Paint
     if ('PerformanceObserver' in window) {
       try {
-        const observer = new PerformanceObserver((list) => {
+        const observer = new PerformanceObserver(list => {
           const entries = list.getEntries();
           const fcpEntry = entries.find(entry => entry.name === 'first-contentful-paint');
 
@@ -190,8 +194,8 @@ class PerformanceService {
         });
 
         observer.observe({ entryTypes: ['paint'] });
-      } catch (_e) {
-        // // console.debug('FCP tracking not supported');
+      } catch (__e) {
+        // // // // console.debug('FCP tracking not supported');
       }
     }
   }
@@ -199,7 +203,9 @@ class PerformanceService {
   private trackTTFB(): void {
     // Time to First Byte
     if (this.isClient && 'performance' in window && 'getEntriesByType' in performance) {
-      const navigationEntries = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
+      const navigationEntries = performance.getEntriesByType(
+        'navigation',
+      ) as PerformanceNavigationTiming[];
 
       if (navigationEntries.length > 0) {
         const ttfb = navigationEntries[0].responseStart - navigationEntries[0].requestStart;
@@ -216,12 +222,16 @@ class PerformanceService {
   }
 
   private trackInitialMetrics(): void {
-    if (!this.isClient || !('performance' in window)) {return;}
+    if (!this.isClient || !('performance' in window)) {
+      return;
+    }
 
     // Track initial page load metrics
     window.addEventListener('load', () => {
       setTimeout(() => {
-        const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+        const navigation = performance.getEntriesByType(
+          'navigation',
+        )[0] as PerformanceNavigationTiming;
 
         if (navigation) {
           this.recordMetric({
@@ -254,7 +264,7 @@ class PerformanceService {
   }
 
   private recordWebVital(vital: WebVital): void {
-    // // console.log(`🎯 Web Vital - ${vital.name}:`, {
+    // // // // console.log(`🎯 Web Vital - ${vital.name}:`, {
     //   value: Math.round(vital.value),
     //   rating: vital.rating,
     // });
@@ -280,8 +290,12 @@ class PerformanceService {
     };
 
     const threshold = thresholds[metric];
-    if (value <= threshold.good) {return 'good';}
-    if (value <= threshold.poor) {return 'needs-improvement';}
+    if (value <= threshold.good) {
+      return 'good';
+    }
+    if (value <= threshold.poor) {
+      return 'needs-improvement';
+    }
     return 'poor';
   }
 
@@ -293,7 +307,7 @@ class PerformanceService {
     // In a real app, send to your analytics service
     // For now, just log in production
     if (import.meta.env.PROD) {
-      // // console.debug('📊 Performance metric:', metric);
+      // // // // console.debug('📊 Performance metric:', metric);
     }
   }
 
@@ -325,9 +339,7 @@ class PerformanceService {
     const report: Record<string, PerformanceMetric | undefined> = {};
 
     vitals.forEach(vital => {
-      report[vital] = this.metrics
-        .filter(m => m.name === `web-vital-${vital}`)
-        .pop(); // Get the latest measurement
+      report[vital] = this.metrics.filter(m => m.name === `web-vital-${vital}`).pop(); // Get the latest measurement
     });
 
     return report;
@@ -339,7 +351,7 @@ class PerformanceService {
       this.observer = null;
     }
     this.metrics = [];
-    // // console.log('⚡ Performance Service destroyed');
+    // // // // console.log('⚡ Performance Service destroyed');
   }
 }
 

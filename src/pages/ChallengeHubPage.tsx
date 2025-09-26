@@ -13,7 +13,8 @@ type ViewMode = 'grid' | 'list';
 type TabType = 'all' | 'daily' | 'weekly' | 'special' | 'team' | 'leaderboard';
 
 const ChallengeHubPage: React.FC = () => {
-  const { state, loadChallenges, getAvailableChallenges, startChallenge, updateLeaderboard } = useChallengeContext();
+  const { state, loadChallenges, getAvailableChallenges, startChallenge, updateLeaderboard } =
+    useChallengeContext();
   const { tacticsState } = useTacticsContext();
   const { authState } = useAuthContext();
 
@@ -68,10 +69,18 @@ const ChallengeHubPage: React.FC = () => {
   const availableChallenges = selectedPlayer
     ? getAvailableChallenges(selectedPlayer.id).filter(c => {
         // Apply additional client-side filters if needed
-        if (activeTab === 'daily' && c.frequency !== 'daily') {return false;}
-        if (activeTab === 'weekly' && c.frequency !== 'weekly') {return false;}
-        if (activeTab === 'special' && c.frequency !== 'special') {return false;}
-        if (activeTab === 'team' && !c.teamChallenge) {return false;}
+        if (activeTab === 'daily' && c.frequency !== 'daily') {
+          return false;
+        }
+        if (activeTab === 'weekly' && c.frequency !== 'weekly') {
+          return false;
+        }
+        if (activeTab === 'special' && c.frequency !== 'special') {
+          return false;
+        }
+        if (activeTab === 'team' && !c.teamChallenge) {
+          return false;
+        }
         return true;
       })
     : [];
@@ -120,7 +129,9 @@ const ChallengeHubPage: React.FC = () => {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-3xl font-bold text-white mb-2">Challenge Hub</h1>
-              <p className="text-gray-400">Complete challenges to earn XP and improve your skills</p>
+              <p className="text-gray-400">
+                Complete challenges to earn XP and improve your skills
+              </p>
             </div>
 
             {/* Player Selector */}
@@ -128,7 +139,7 @@ const ChallengeHubPage: React.FC = () => {
               <label className="text-sm text-gray-400">Active Player:</label>
               <select
                 value={selectedPlayer?.id || ''}
-                onChange={(e) => {
+                onChange={e => {
                   const player = tacticsState.players.find(p => p.id === e.target.value);
                   setSelectedPlayer(player || null);
                 }}
@@ -146,19 +157,21 @@ const ChallengeHubPage: React.FC = () => {
           {/* Tab Navigation */}
           <div className="flex items-center justify-between">
             <div className="flex space-x-1">
-              {(['all', 'daily', 'weekly', 'special', 'team', 'leaderboard'] as TabType[]).map(tab => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors capitalize ${
-                    activeTab === tab
-                      ? 'bg-blue-600 text-white'
-                      : 'text-gray-400 hover:text-white hover:bg-gray-700'
-                  }`}
-                >
-                  {tab === 'all' ? 'All Challenges' : tab}
-                </button>
-              ))}
+              {(['all', 'daily', 'weekly', 'special', 'team', 'leaderboard'] as TabType[]).map(
+                tab => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={`px-4 py-2 rounded-lg font-medium transition-colors capitalize ${
+                      activeTab === tab
+                        ? 'bg-blue-600 text-white'
+                        : 'text-gray-400 hover:text-white hover:bg-gray-700'
+                    }`}
+                  >
+                    {tab === 'all' ? 'All Challenges' : tab}
+                  </button>
+                ),
+              )}
             </div>
 
             {/* View Mode Toggle */}
@@ -177,7 +190,11 @@ const ChallengeHubPage: React.FC = () => {
                   className={`p-2 rounded ${viewMode === 'list' ? 'bg-gray-700 text-white' : 'text-gray-500 hover:text-white'}`}
                 >
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+                    <path
+                      fillRule="evenodd"
+                      d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                 </button>
               </div>
@@ -195,11 +212,21 @@ const ChallengeHubPage: React.FC = () => {
                     type="text"
                     placeholder="Search challenges..."
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={e => setSearchQuery(e.target.value)}
                     className="w-full px-4 py-2 pl-10 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
                   />
-                  <svg className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  <svg
+                    className="absolute left-3 top-2.5 w-5 h-5 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
                   </svg>
                 </div>
               </div>
@@ -209,15 +236,25 @@ const ChallengeHubPage: React.FC = () => {
                   onClick={() => setShowFilters(!showFilters)}
                   className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors flex items-center"
                 >
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                  <svg
+                    className="w-5 h-5 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
+                    />
                   </svg>
                   Filters
                 </button>
 
                 <select
                   value={filters.sortBy || 'newest'}
-                  onChange={(e) => handleSortChange(e.target.value as ChallengeFilters['sortBy'])}
+                  onChange={e => handleSortChange(e.target.value as ChallengeFilters['sortBy'])}
                   className="px-3 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
                 >
                   <option value="newest">Newest</option>
@@ -227,7 +264,7 @@ const ChallengeHubPage: React.FC = () => {
                   <option value="expiring">Expiring Soon</option>
                 </select>
 
-                {(filters.categories?.length || filters.difficulties?.length || searchQuery) ? (
+                {filters.categories?.length || filters.difficulties?.length || searchQuery ? (
                   <button
                     onClick={clearFilters}
                     className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
@@ -269,7 +306,9 @@ const ChallengeHubPage: React.FC = () => {
 
                   {/* Difficulty Filters */}
                   <div>
-                    <label className="text-sm font-medium text-gray-400 mb-2 block">Difficulty</label>
+                    <label className="text-sm font-medium text-gray-400 mb-2 block">
+                      Difficulty
+                    </label>
                     <div className="flex flex-wrap gap-2">
                       {difficulties.map(difficulty => (
                         <button
@@ -277,10 +316,13 @@ const ChallengeHubPage: React.FC = () => {
                           onClick={() => handleDifficultyFilter(difficulty)}
                           className={`px-3 py-1 rounded-full text-sm font-medium transition-colors capitalize ${
                             filters.difficulties?.includes(difficulty)
-                              ? difficulty === 'easy' ? 'bg-green-600 text-white' :
-                                difficulty === 'medium' ? 'bg-blue-600 text-white' :
-                                difficulty === 'hard' ? 'bg-orange-600 text-white' :
-                                'bg-red-600 text-white'
+                              ? difficulty === 'easy'
+                                ? 'bg-green-600 text-white'
+                                : difficulty === 'medium'
+                                  ? 'bg-blue-600 text-white'
+                                  : difficulty === 'hard'
+                                    ? 'bg-orange-600 text-white'
+                                    : 'bg-red-600 text-white'
                               : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                           }`}
                         >
@@ -321,10 +363,13 @@ const ChallengeHubPage: React.FC = () => {
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
                 </div>
               ) : availableChallenges.length > 0 ? (
-                <div className={viewMode === 'grid'
-                  ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
-                  : 'space-y-4'
-                }>
+                <div
+                  className={
+                    viewMode === 'grid'
+                      ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
+                      : 'space-y-4'
+                  }
+                >
                   {availableChallenges.map(challenge => (
                     <ChallengeCard
                       key={challenge.id}
@@ -337,10 +382,22 @@ const ChallengeHubPage: React.FC = () => {
                 </div>
               ) : (
                 <div className="bg-gray-800 rounded-lg p-12 text-center border border-gray-700">
-                  <svg className="w-16 h-16 mx-auto text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  <svg
+                    className="w-16 h-16 mx-auto text-gray-600 mb-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                    />
                   </svg>
-                  <h3 className="text-xl font-semibold text-gray-300 mb-2">No Challenges Available</h3>
+                  <h3 className="text-xl font-semibold text-gray-300 mb-2">
+                    No Challenges Available
+                  </h3>
                   <p className="text-gray-500">
                     {searchQuery || filters.categories?.length || filters.difficulties?.length
                       ? 'Try adjusting your filters to see more challenges'
@@ -359,28 +416,34 @@ const ChallengeHubPage: React.FC = () => {
               <div className="flex items-center space-x-6">
                 <div>
                   <p className="text-xs text-gray-500">Active Challenges</p>
-                  <p className="text-lg font-bold text-white">{state.currentPlayerProfile.challengesActive.length}</p>
+                  <p className="text-lg font-bold text-white">
+                    {state.currentPlayerProfile.challengesActive.length}
+                  </p>
                 </div>
                 <div>
                   <p className="text-xs text-gray-500">Completed Today</p>
                   <p className="text-lg font-bold text-green-400">
-                    {state.currentPlayerProfile.weeklyProgress.dailyActivity.filter(d =>
-                      new Date(d.date).toDateString() === new Date().toDateString(),
+                    {state.currentPlayerProfile.weeklyProgress.dailyActivity.filter(
+                      d => new Date(d.date).toDateString() === new Date().toDateString(),
                     )[0]?.challengesCompleted.length || 0}
                   </p>
                 </div>
                 <div>
                   <p className="text-xs text-gray-500">Current Streak</p>
-                  <p className="text-lg font-bold text-blue-400">{state.currentPlayerProfile.streakDays} days</p>
+                  <p className="text-lg font-bold text-blue-400">
+                    {state.currentPlayerProfile.streakDays} days
+                  </p>
                 </div>
                 <div>
                   <p className="text-xs text-gray-500">Weekly XP</p>
-                  <p className="text-lg font-bold text-purple-400">{state.currentPlayerProfile.weeklyProgress.xpEarned}</p>
+                  <p className="text-lg font-bold text-purple-400">
+                    {state.currentPlayerProfile.weeklyProgress.xpEarned}
+                  </p>
                 </div>
               </div>
 
               <button
-                onClick={() => window.location.href = `/player-ranking/${selectedPlayer.id}`}
+                onClick={() => (window.location.href = `/player-ranking/${selectedPlayer.id}`)}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 View Full Profile

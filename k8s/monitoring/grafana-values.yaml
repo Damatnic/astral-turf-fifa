@@ -9,7 +9,7 @@ replicas: 2
 # Image configuration
 image:
   repository: grafana/grafana
-  tag: "10.1.0"
+  tag: '10.1.0'
   pullPolicy: IfNotPresent
 
 # Security context
@@ -52,20 +52,20 @@ service:
   port: 80
   targetPort: 3000
   annotations:
-    prometheus.io/scrape: "true"
-    prometheus.io/port: "3000"
-    prometheus.io/path: "/metrics"
+    prometheus.io/scrape: 'true'
+    prometheus.io/port: '3000'
+    prometheus.io/path: '/metrics'
 
 # Ingress configuration
 ingress:
   enabled: true
   ingressClassName: nginx
   annotations:
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
-    nginx.ingress.kubernetes.io/rate-limit: "100"
-    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+    nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+    nginx.ingress.kubernetes.io/force-ssl-redirect: 'true'
+    cert-manager.io/cluster-issuer: 'letsencrypt-prod'
+    nginx.ingress.kubernetes.io/rate-limit: '100'
+    nginx.ingress.kubernetes.io/rate-limit-window: '1m'
   hosts:
     - grafana.astral-turf.com
   tls:
@@ -75,40 +75,40 @@ ingress:
 
 # Environment variables
 env:
-  GF_INSTALL_PLUGINS: "grafana-piechart-panel,grafana-worldmap-panel,grafana-clock-panel,vonage-status-panel,btplc-status-dot-panel"
-  GF_FEATURE_TOGGLES_ENABLE: "publicDashboards,lokiExperimentalStreaming"
+  GF_INSTALL_PLUGINS: 'grafana-piechart-panel,grafana-worldmap-panel,grafana-clock-panel,vonage-status-panel,btplc-status-dot-panel'
+  GF_FEATURE_TOGGLES_ENABLE: 'publicDashboards,lokiExperimentalStreaming'
 
 # Grafana configuration
 grafana.ini:
   # Server settings
   server:
     protocol: http
-    http_addr: ""
+    http_addr: ''
     http_port: 3000
     domain: grafana.astral-turf.com
     enforce_domain: false
-    root_url: "https://grafana.astral-turf.com"
+    root_url: 'https://grafana.astral-turf.com'
     serve_from_sub_path: false
     router_logging: false
     static_root_path: public
     enable_gzip: true
-    cert_file: ""
-    cert_key: ""
-    socket: ""
+    cert_file: ''
+    cert_key: ''
+    socket: ''
 
   # Database settings
   database:
     type: sqlite3
-    host: ""
+    host: ''
     name: grafana
-    user: ""
-    password: ""
-    url: ""
+    user: ''
+    password: ''
+    url: ''
     ssl_mode: disable
-    ca_cert_path: ""
-    client_key_path: ""
-    client_cert_path: ""
-    server_cert_name: ""
+    ca_cert_path: ''
+    client_key_path: ''
+    client_cert_path: ''
+    server_cert_name: ''
     path: grafana.db
     max_idle_conn: 2
     max_open_conn: 0
@@ -121,10 +121,10 @@ grafana.ini:
   security:
     disable_initial_admin_creation: false
     admin_user: admin
-    admin_password: "${GRAFANA_ADMIN_PASSWORD}"
+    admin_password: '${GRAFANA_ADMIN_PASSWORD}'
     secret_key: SW2YcwTIb9zpOOhoPsMm
     disable_gravatar: true
-    data_source_proxy_whitelist: ""
+    data_source_proxy_whitelist: ''
     disable_brute_force_login_protection: false
     cookie_secure: true
     cookie_samesite: strict
@@ -136,7 +136,7 @@ grafana.ini:
     x_content_type_options: true
     x_xss_protection: true
     content_security_policy: true
-    content_security_policy_template: ""
+    content_security_policy_template: ''
 
   # Users settings
   users:
@@ -146,26 +146,26 @@ grafana.ini:
     auto_assign_org_id: 1
     auto_assign_org_role: Viewer
     verify_email_enabled: false
-    login_hint: "email or username"
-    password_hint: "password"
+    login_hint: 'email or username'
+    password_hint: 'password'
     default_theme: dark
-    external_manage_link_url: ""
-    external_manage_link_name: ""
-    external_manage_info: ""
+    external_manage_link_url: ''
+    external_manage_link_name: ''
+    external_manage_info: ''
     viewers_can_edit: false
     editors_can_admin: false
     user_invite_max_lifetime_duration: 24h
-    hidden_users: ""
+    hidden_users: ''
 
   # Auth settings
   auth:
     login_cookie_name: grafana_session
-    login_maximum_inactive_lifetime_duration: ""
-    login_maximum_lifetime_duration: ""
+    login_maximum_inactive_lifetime_duration: ''
+    login_maximum_lifetime_duration: ''
     token_rotation_interval_minutes: 10
     disable_login_form: false
     disable_signout_menu: false
-    signout_redirect_url: ""
+    signout_redirect_url: ''
     oauth_auto_login: false
     oauth_state_cookie_max_age: 600
     api_key_max_seconds_to_live: -1
@@ -181,7 +181,7 @@ grafana.ini:
   log:
     mode: console
     level: info
-    filters: ""
+    filters: ''
 
   # Metrics
   metrics:
@@ -193,8 +193,8 @@ grafana.ini:
   analytics:
     reporting_enabled: false
     check_for_updates: false
-    google_analytics_ua_id: ""
-    google_tag_manager_id: ""
+    google_analytics_ua_id: ''
+    google_tag_manager_id: ''
 
   # Alerting
   alerting:
@@ -212,14 +212,14 @@ grafana.ini:
     enabled: true
     host: smtp.astral-turf.com:587
     user: alerts@astral-turf.com
-    password: "${SMTP_PASSWORD}"
-    cert_file: ""
-    key_file: ""
+    password: '${SMTP_PASSWORD}'
+    cert_file: ''
+    key_file: ''
     skip_verify: false
     from_address: alerts@astral-turf.com
     from_name: Astral Turf Grafana
     ehlo_identity: grafana.astral-turf.com
-    startTLS_policy: ""
+    startTLS_policy: ''
 
 # Data sources
 datasources:
@@ -240,7 +240,7 @@ datasources:
           manageAlerts: true
           prometheusType: Prometheus
           prometheusVersion: 2.40.0
-      
+
       - name: Loki
         type: loki
         url: http://loki.monitoring.svc.cluster.local:3100
@@ -250,8 +250,8 @@ datasources:
             - datasourceUid: prometheus-uid
               matcherRegex: "trace_id=(\\w+)"
               name: TraceID
-              url: "$${__value.raw}"
-      
+              url: '$${__value.raw}'
+
       - name: Jaeger
         type: jaeger
         url: http://jaeger-query.monitoring.svc.cluster.local:16686
@@ -271,7 +271,7 @@ dashboardProviders:
         allowUiUpdates: true
         options:
           path: /var/lib/grafana/dashboards/astral-turf
-      
+
       - name: 'kubernetes'
         orgId: 1
         folder: 'Kubernetes'
@@ -281,7 +281,7 @@ dashboardProviders:
         allowUiUpdates: true
         options:
           path: /var/lib/grafana/dashboards/kubernetes
-      
+
       - name: 'infrastructure'
         orgId: 1
         folder: 'Infrastructure'
@@ -299,44 +299,44 @@ dashboards:
       gnetId: 15758
       revision: 1
       datasource: Prometheus
-    
+
     application-performance:
       gnetId: 14314
       revision: 2
       datasource: Prometheus
-    
+
     user-analytics:
       gnetId: 13504
       revision: 1
       datasource: Prometheus
-  
+
   kubernetes:
     kubernetes-cluster-monitoring:
       gnetId: 7249
       revision: 1
       datasource: Prometheus
-    
+
     kubernetes-deployment:
       gnetId: 8588
       revision: 1
       datasource: Prometheus
-    
+
     kubernetes-pods:
       gnetId: 6417
       revision: 1
       datasource: Prometheus
-  
+
   infrastructure:
     node-exporter:
       gnetId: 1860
       revision: 29
       datasource: Prometheus
-    
+
     nginx-ingress:
       gnetId: 9614
       revision: 1
       datasource: Prometheus
-    
+
     postgres-database:
       gnetId: 9628
       revision: 7
@@ -347,7 +347,7 @@ sidecar:
   dashboards:
     enabled: true
     label: grafana_dashboard
-    labelValue: "1"
+    labelValue: '1'
     folder: /tmp/dashboards
     defaultFolderName: General
     searchNamespace: ALL
@@ -355,11 +355,11 @@ sidecar:
       allowUiUpdates: true
       disableDelete: false
       foldersFromFilesStructure: true
-  
+
   datasources:
     enabled: true
     label: grafana_datasource
-    labelValue: "1"
+    labelValue: '1'
     searchNamespace: ALL
 
 # Service account
@@ -403,7 +403,7 @@ notifiers:
         settings:
           addresses: 'alerts@astral-turf.com'
           subject: 'Grafana Alert - {{ .Title }}'
-    
+
     delete_notifiers:
       - name: 'slack-notifier'
         uid: 'slack1'
@@ -414,6 +414,6 @@ imageRenderer:
   enabled: true
   image:
     repository: grafana/grafana-image-renderer
-    tag: "3.6.1"
+    tag: '3.6.1'
   service:
     port: 8081

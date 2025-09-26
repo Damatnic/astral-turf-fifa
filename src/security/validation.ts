@@ -15,26 +15,42 @@ import type { UserRole } from '../types';
 export const emailSchema = z
   .string()
   .min(1, 'Email is required')
-  .max(VALIDATION_CONFIG.MAX_EMAIL_LENGTH, `Email must be less than ${VALIDATION_CONFIG.MAX_EMAIL_LENGTH} characters`)
-  .email('Invalid email format')
-  .refine(
-    (email) => VALIDATION_CONFIG.EMAIL_REGEX.test(email),
-    'Invalid email format',
+  .max(
+    VALIDATION_CONFIG.MAX_EMAIL_LENGTH,
+    `Email must be less than ${VALIDATION_CONFIG.MAX_EMAIL_LENGTH} characters`,
   )
-  .transform((email) => email.toLowerCase().trim());
+  .email('Invalid email format')
+  .refine(email => VALIDATION_CONFIG.EMAIL_REGEX.test(email), 'Invalid email format')
+  .transform(email => email.toLowerCase().trim());
 
 export const passwordSchema = z
   .string()
-  .min(PASSWORD_CONFIG.MIN_LENGTH, `Password must be at least ${PASSWORD_CONFIG.MIN_LENGTH} characters`)
-  .max(PASSWORD_CONFIG.MAX_LENGTH, `Password must be less than ${PASSWORD_CONFIG.MAX_LENGTH} characters`)
+  .min(
+    PASSWORD_CONFIG.MIN_LENGTH,
+    `Password must be at least ${PASSWORD_CONFIG.MIN_LENGTH} characters`,
+  )
+  .max(
+    PASSWORD_CONFIG.MAX_LENGTH,
+    `Password must be less than ${PASSWORD_CONFIG.MAX_LENGTH} characters`,
+  )
   .refine(
-    (password) => {
-      if (PASSWORD_CONFIG.REQUIRE_UPPERCASE && !/[A-Z]/.test(password)) {return false;}
-      if (PASSWORD_CONFIG.REQUIRE_LOWERCASE && !/[a-z]/.test(password)) {return false;}
-      if (PASSWORD_CONFIG.REQUIRE_NUMBERS && !/\d/.test(password)) {return false;}
+    password => {
+      if (PASSWORD_CONFIG.REQUIRE_UPPERCASE && !/[A-Z]/.test(password)) {
+        return false;
+      }
+      if (PASSWORD_CONFIG.REQUIRE_LOWERCASE && !/[a-z]/.test(password)) {
+        return false;
+      }
+      if (PASSWORD_CONFIG.REQUIRE_NUMBERS && !/\d/.test(password)) {
+        return false;
+      }
       if (PASSWORD_CONFIG.REQUIRE_SPECIAL_CHARS) {
-        const specialCharsRegex = new RegExp(`[${PASSWORD_CONFIG.SPECIAL_CHARS.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}]`);
-        if (!specialCharsRegex.test(password)) {return false;}
+        const specialCharsRegex = new RegExp(
+          `[${PASSWORD_CONFIG.SPECIAL_CHARS.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}]`,
+        );
+        if (!specialCharsRegex.test(password)) {
+          return false;
+        }
       }
       return true;
     },
@@ -46,35 +62,41 @@ export const passwordSchema = z
 export const nameSchema = z
   .string()
   .min(1, 'Name is required')
-  .max(VALIDATION_CONFIG.MAX_NAME_LENGTH, `Name must be less than ${VALIDATION_CONFIG.MAX_NAME_LENGTH} characters`)
-  .refine(
-    (name) => VALIDATION_CONFIG.NAME_REGEX.test(name),
-    'Name contains invalid characters',
+  .max(
+    VALIDATION_CONFIG.MAX_NAME_LENGTH,
+    `Name must be less than ${VALIDATION_CONFIG.MAX_NAME_LENGTH} characters`,
   )
-  .transform((name) => name.trim());
+  .refine(name => VALIDATION_CONFIG.NAME_REGEX.test(name), 'Name contains invalid characters')
+  .transform(name => name.trim());
 
 export const phoneSchema = z
   .string()
   .optional()
   .refine(
-    (phone) => !phone || VALIDATION_CONFIG.PHONE_REGEX.test(phone),
+    phone => !phone || VALIDATION_CONFIG.PHONE_REGEX.test(phone),
     'Invalid phone number format',
   )
-  .transform((phone) => phone?.trim());
+  .transform(phone => phone?.trim());
 
 export const userRoleSchema = z.enum(['coach', 'player', 'family'] as const);
 
 export const messageSchema = z
   .string()
   .min(1, 'Message is required')
-  .max(VALIDATION_CONFIG.MAX_MESSAGE_LENGTH, `Message must be less than ${VALIDATION_CONFIG.MAX_MESSAGE_LENGTH} characters`)
-  .transform((message) => message.trim());
+  .max(
+    VALIDATION_CONFIG.MAX_MESSAGE_LENGTH,
+    `Message must be less than ${VALIDATION_CONFIG.MAX_MESSAGE_LENGTH} characters`,
+  )
+  .transform(message => message.trim());
 
 export const descriptionSchema = z
   .string()
-  .max(VALIDATION_CONFIG.MAX_DESCRIPTION_LENGTH, `Description must be less than ${VALIDATION_CONFIG.MAX_DESCRIPTION_LENGTH} characters`)
+  .max(
+    VALIDATION_CONFIG.MAX_DESCRIPTION_LENGTH,
+    `Description must be less than ${VALIDATION_CONFIG.MAX_DESCRIPTION_LENGTH} characters`,
+  )
   .optional()
-  .transform((description) => description?.trim());
+  .transform(description => description?.trim());
 
 // Authentication schemas
 export const loginSchema = z.object({
@@ -82,49 +104,46 @@ export const loginSchema = z.object({
   password: z.string().min(1, 'Password is required'),
 });
 
-export const signupSchema = z.object({
-  email: emailSchema,
-  password: passwordSchema,
-  confirmPassword: z.string(),
-  firstName: nameSchema.optional(),
-  lastName: nameSchema.optional(),
-  role: userRoleSchema,
-  phoneNumber: phoneSchema,
-}).refine(
-  (data) => data.password === data.confirmPassword,
-  {
+export const signupSchema = z
+  .object({
+    email: emailSchema,
+    password: passwordSchema,
+    confirmPassword: z.string(),
+    firstName: nameSchema.optional(),
+    lastName: nameSchema.optional(),
+    role: userRoleSchema,
+    phoneNumber: phoneSchema,
+  })
+  .refine(data => data.password === data.confirmPassword, {
     message: "Passwords don't match",
-    path: ["confirmPassword"],
-  },
-);
+    path: ['confirmPassword'],
+  });
 
 export const passwordResetRequestSchema = z.object({
   email: emailSchema,
 });
 
-export const passwordResetSchema = z.object({
-  token: z.string().min(1, 'Reset token is required'),
-  password: passwordSchema,
-  confirmPassword: z.string(),
-}).refine(
-  (data) => data.password === data.confirmPassword,
-  {
+export const passwordResetSchema = z
+  .object({
+    token: z.string().min(1, 'Reset token is required'),
+    password: passwordSchema,
+    confirmPassword: z.string(),
+  })
+  .refine(data => data.password === data.confirmPassword, {
     message: "Passwords don't match",
-    path: ["confirmPassword"],
-  },
-);
+    path: ['confirmPassword'],
+  });
 
-export const changePasswordSchema = z.object({
-  currentPassword: z.string().min(1, 'Current password is required'),
-  newPassword: passwordSchema,
-  confirmPassword: z.string(),
-}).refine(
-  (data) => data.newPassword === data.confirmPassword,
-  {
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, 'Current password is required'),
+    newPassword: passwordSchema,
+    confirmPassword: z.string(),
+  })
+  .refine(data => data.newPassword === data.confirmPassword, {
     message: "Passwords don't match",
-    path: ["confirmPassword"],
-  },
-);
+    path: ['confirmPassword'],
+  });
 
 // Player-related schemas
 export const playerAttributeSchema = z.object({
@@ -182,22 +201,22 @@ export const formationSchema = z.object({
 
 // File upload schema
 export const fileUploadSchema = z.object({
-  file: z.instanceof(File).refine(
-    (file) => file.size <= VALIDATION_CONFIG.MAX_FILE_SIZE,
-    `File size must be less than ${VALIDATION_CONFIG.MAX_FILE_SIZE / 1024 / 1024}MB`,
-  ).refine(
-    (file) => VALIDATION_CONFIG.ALLOWED_FILE_TYPES.includes(file.type),
-    'Invalid file type',
-  ),
+  file: z
+    .instanceof(File)
+    .refine(
+      file => file.size <= VALIDATION_CONFIG.MAX_FILE_SIZE,
+      `File size must be less than ${VALIDATION_CONFIG.MAX_FILE_SIZE / 1024 / 1024}MB`,
+    )
+    .refine(file => VALIDATION_CONFIG.ALLOWED_FILE_TYPES.includes(file.type), 'Invalid file type'),
 });
 
 // Search and filter schemas
 export const searchQuerySchema = z
   .string()
   .max(100, 'Search query too long')
-  .transform((query) => query.trim())
+  .transform(query => query.trim())
   .refine(
-    (query) => !/[<>"]/.test(query), // Prevent basic XSS attempts
+    query => !/[<>"]/.test(query), // Prevent basic XSS attempts
     'Search query contains invalid characters',
   );
 
@@ -211,13 +230,16 @@ export const formationIdSchema = z.string().min(1, 'Formation ID is required');
  */
 
 // Validate and sanitize input data
-export function validateInput<T>(schema: z.ZodSchema<T>, data: unknown): { success: true; data: T } | { success: false; errors: string[] } {
+export function validateInput<T>(
+  schema: z.ZodSchema<T>,
+  data: unknown,
+): { success: true; data: T } | { success: false; errors: string[] } {
   try {
     const result = schema.parse(data);
     return { success: true, data: result };
   } catch (_error) {
     if (error instanceof z.ZodError) {
-      const errors = error.errors.map((err) => `${err.path.join('.')}: ${err.message}`);
+      const errors = error.errors.map(err => `${err.path.join('.')}: ${err.message}`);
 
       securityLogger.warn('Input validation failed', {
         errors,
@@ -237,10 +259,14 @@ export function validateInput<T>(schema: z.ZodSchema<T>, data: unknown): { succe
 
 // Validate email format with additional security checks
 export function validateEmail(email: string): boolean {
-  if (!email || typeof email !== 'string') {return false;}
+  if (!email || typeof email !== 'string') {
+    return false;
+  }
 
   // Use validator.js for robust email validation
-  if (!validator.isEmail(email)) {return false;}
+  if (!validator.isEmail(email)) {
+    return false;
+  }
 
   // Additional checks for security
   const trimmedEmail = email.trim().toLowerCase();
@@ -265,7 +291,9 @@ export function validateEmail(email: string): boolean {
 
 // Validate URL format
 export function validateUrl(url: string): boolean {
-  if (!url || typeof url !== 'string') {return false;}
+  if (!url || typeof url !== 'string') {
+    return false;
+  }
 
   try {
     const urlObj = new URL(url);
@@ -287,7 +315,11 @@ export function validateUrl(url: string): boolean {
 }
 
 // Validate JSON input
-export function validateJson(jsonString: string): { valid: boolean; data?: unknown; error?: string } {
+export function validateJson(jsonString: string): {
+  valid: boolean;
+  data?: unknown;
+  error?: string;
+} {
   if (!jsonString || typeof jsonString !== 'string') {
     return { valid: false, error: 'Invalid JSON input' };
   }
@@ -319,16 +351,24 @@ export function generateRateLimitKey(identifier: string, action: string): string
 
 // Validate rate limiting parameters
 export function validateRateLimit(key: string, maxRequests: number, windowMs: number): boolean {
-  if (!key || typeof key !== 'string') {return false;}
-  if (!Number.isInteger(maxRequests) || maxRequests <= 0) {return false;}
-  if (!Number.isInteger(windowMs) || windowMs <= 0) {return false;}
+  if (!key || typeof key !== 'string') {
+    return false;
+  }
+  if (!Number.isInteger(maxRequests) || maxRequests <= 0) {
+    return false;
+  }
+  if (!Number.isInteger(windowMs) || windowMs <= 0) {
+    return false;
+  }
 
   return true;
 }
 
 // SQL injection detection (basic patterns)
 export function detectSqlInjection(input: string): boolean {
-  if (!input || typeof input !== 'string') {return false;}
+  if (!input || typeof input !== 'string') {
+    return false;
+  }
 
   const sqlPatterns = [
     /(\bunion\b|\bselect\b|\binsert\b|\bdelete\b|\bupdate\b|\bdrop\b|\btruncate\b|\balter\b)/i,
@@ -352,7 +392,9 @@ export function detectSqlInjection(input: string): boolean {
 
 // XSS detection (basic patterns)
 export function detectXss(input: string): boolean {
-  if (!input || typeof input !== 'string') {return false;}
+  if (!input || typeof input !== 'string') {
+    return false;
+  }
 
   const xssPatterns = [
     /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
@@ -377,7 +419,9 @@ export function detectXss(input: string): boolean {
 
 // Comprehensive input sanitization
 export function sanitizeInput(input: string): string {
-  if (!input || typeof input !== 'string') {return '';}
+  if (!input || typeof input !== 'string') {
+    return '';
+  }
 
   // Remove null bytes
   let sanitized = input.replace(/\0/g, '');

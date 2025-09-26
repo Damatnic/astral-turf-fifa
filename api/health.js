@@ -56,11 +56,7 @@ export default async function handler(req, res) {
     }
 
     // Environment variables check
-    const requiredEnvVars = [
-      'DATABASE_URL',
-      'JWT_SECRET',
-      'GEMINI_API_KEY',
-    ];
+    const requiredEnvVars = ['DATABASE_URL', 'JWT_SECRET', 'GEMINI_API_KEY'];
 
     const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
 
@@ -105,11 +101,9 @@ export default async function handler(req, res) {
     }
 
     // Set appropriate HTTP status code
-    const statusCode = health.status === 'healthy' ? 200 :
-                      health.status === 'degraded' ? 200 : 503;
+    const statusCode = health.status === 'healthy' ? 200 : health.status === 'degraded' ? 200 : 503;
 
     res.status(statusCode).json(health);
-
   } catch (error) {
     console.error('Health check error:', error);
 

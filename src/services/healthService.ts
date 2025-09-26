@@ -311,11 +311,7 @@ class HealthService {
    * Check environment variables
    */
   private async checkEnvironmentVariables(): Promise<ComponentHealth> {
-    const requiredVars = [
-      'DATABASE_URL',
-      'JWT_SECRET',
-      'NODE_ENV',
-    ];
+    const requiredVars = ['DATABASE_URL', 'JWT_SECRET', 'NODE_ENV'];
 
     const missingVars = requiredVars.filter(varName => !process.env[varName]);
 
@@ -358,8 +354,8 @@ class HealthService {
         }
       }
 
-      const status = issues.length === 0 ? 'healthy' :
-                    issues.length <= 2 ? 'degraded' : 'unhealthy';
+      const status =
+        issues.length === 0 ? 'healthy' : issues.length <= 2 ? 'degraded' : 'unhealthy';
 
       return {
         status,
@@ -427,7 +423,9 @@ class HealthService {
   /**
    * Determine overall status from individual check statuses
    */
-  private determineOverallStatus(statuses: Array<'healthy' | 'degraded' | 'unhealthy'>): 'healthy' | 'degraded' | 'unhealthy' {
+  private determineOverallStatus(
+    statuses: Array<'healthy' | 'degraded' | 'unhealthy'>,
+  ): 'healthy' | 'degraded' | 'unhealthy' {
     if (statuses.includes('unhealthy')) {
       return 'unhealthy';
     } else if (statuses.includes('degraded')) {

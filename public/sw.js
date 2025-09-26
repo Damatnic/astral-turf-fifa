@@ -8,12 +8,7 @@ const CACHE_NAME = 'astral-turf-v2';
 const STATIC_CACHE_NAME = 'astral-turf-static-v2';
 
 // Resources to cache immediately on install
-const STATIC_RESOURCES = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/favicon.svg',
-];
+const STATIC_RESOURCES = ['/', '/index.html', '/manifest.json', '/favicon.svg'];
 
 // Runtime caching patterns
 const RUNTIME_CACHE_PATTERNS = {
@@ -28,42 +23,44 @@ const RUNTIME_CACHE_PATTERNS = {
 };
 
 // Install event - cache static resources
-self.addEventListener('install', (event) => {
+self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(STATIC_CACHE_NAME)
-      .then((cache) => {
+    caches
+      .open(STATIC_CACHE_NAME)
+      .then(cache => {
         return cache.addAll(STATIC_RESOURCES);
       })
       .then(() => {
         return self.skipWaiting();
       })
-      .catch((_error) => {
+      .catch(_error => {
         // Silently handle cache errors
-      }),
+      })
   );
 });
 
 // Activate event - clean up old caches
-self.addEventListener('activate', (event) => {
+self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys()
-      .then((cacheNames) => {
+    caches
+      .keys()
+      .then(cacheNames => {
         return Promise.all(
-          cacheNames.map((cacheName) => {
+          cacheNames.map(cacheName => {
             if (cacheName !== CACHE_NAME && cacheName !== STATIC_CACHE_NAME) {
               return caches.delete(cacheName);
             }
-          }),
+          })
         );
       })
       .then(() => {
         return self.clients.claim();
-      }),
+      })
   );
 });
 
 // Fetch event - implement caching strategies
-self.addEventListener('fetch', (event) => {
+self.addEventListener('fetch', event => {
   const { request } = event;
   const url = new URL(request.url);
 
@@ -82,9 +79,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  event.respondWith(
-    handleRequest(request),
-  );
+  event.respondWith(handleRequest(request));
 });
 
 async function handleRequest(request) {
@@ -93,7 +88,10 @@ async function handleRequest(request) {
 
   try {
     // Strategy 1: Cache First for static assets (JS, CSS, images, fonts)
-    if (RUNTIME_CACHE_PATTERNS.assets.test(pathname) || RUNTIME_CACHE_PATTERNS.scripts.test(pathname)) {
+    if (
+      RUNTIME_CACHE_PATTERNS.assets.test(pathname) ||
+      RUNTIME_CACHE_PATTERNS.scripts.test(pathname)
+    ) {
       return await cacheFirst(request);
     }
 
@@ -114,7 +112,6 @@ async function handleRequest(request) {
 
     // Default: Network with cache fallback
     return await networkWithCacheFallback(request);
-
   } catch {
     // Fallback to network request
     return fetch(request);
@@ -140,7 +137,7 @@ async function cacheFirst(request) {
 async function staleWhileRevalidate(request) {
   const cached = await caches.match(request);
 
-  const networkPromise = fetch(request).then((response) => {
+  const networkPromise = fetch(request).then(response => {
     if (response.ok) {
       const cache = caches.open(CACHE_NAME);
       cache.then(c => c.put(request, response.clone()));
@@ -148,7 +145,7 @@ async function staleWhileRevalidate(request) {
     return response;
   });
 
-  return cached || await networkPromise;
+  return cached || (await networkPromise);
 }
 
 async function networkFirst(request) {
@@ -203,7 +200,7 @@ async function networkWithCacheFallback(request) {
 }
 
 // Background sync for offline functionality (future enhancement)
-self.addEventListener('sync', (event) => {
+self.addEventListener('sync', event => {
   if (event.tag === 'background-sync') {
     event.waitUntil(doBackgroundSync());
   }
@@ -214,7 +211,7 @@ async function doBackgroundSync() {
 }
 
 // Push notifications (future enhancement)
-self.addEventListener('push', (event) => {
+self.addEventListener('push', event => {
   const options = {
     body: event.data?.text() || 'New update available!',
     icon: '/favicon.svg',
@@ -226,9 +223,7 @@ self.addEventListener('push', (event) => {
     },
   };
 
-  event.waitUntil(
-    self.registration.showNotification('Astral Turf', options),
-  );
+  event.waitUntil(self.registration.showNotification('Astral Turf', options));
 });
 
 // Service worker script loaded

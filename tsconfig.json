@@ -41,19 +41,6 @@
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true
   },
-  "include": [
-    "src",
-    "*.ts",
-    "*.tsx",
-    "**/*.ts",
-    "**/*.tsx"
-  ],
-  "exclude": [
-    "node_modules", 
-    "src-tauri", 
-    "dist", 
-    "backup_*",
-    "build",
-    "coverage"
-  ]
+  "include": ["src", "*.ts", "*.tsx", "**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules", "src-tauri", "dist", "backup_*", "build", "coverage"]
 }

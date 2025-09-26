@@ -1,7 +1,12 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme, designTokens, ThemeMode } from '../../context/ThemeContext';
-import { EnhancedButton, EnhancedCard, EnhancedInput, EnhancedSwitch } from './InteractiveComponents';
+import {
+  EnhancedButton,
+  EnhancedCard,
+  EnhancedInput,
+  EnhancedSwitch,
+} from './InteractiveComponents';
 import { AccessibleModal } from './AccessibilityComponents';
 
 // Personalization Types
@@ -130,7 +135,7 @@ export const PersonalizationProvider: React.FC<{ children: ReactNode }> = ({ chi
       const imported = JSON.parse(data);
       setPreferences({ ...defaultPreferences, ...imported });
     } catch (_error) {
-      console.error('Failed to import preferences:', error);
+      console.error('Failed to import preferences:', _error);
     }
   };
 
@@ -142,14 +147,16 @@ export const PersonalizationProvider: React.FC<{ children: ReactNode }> = ({ chi
   };
 
   return (
-    <PersonalizationContext.Provider value={{
-      preferences,
-      updatePreferences,
-      resetPreferences,
-      exportPreferences,
-      importPreferences,
-      getPreferenceValue,
-    }}>
+    <PersonalizationContext.Provider
+      value={{
+        preferences,
+        updatePreferences,
+        resetPreferences,
+        exportPreferences,
+        importPreferences,
+        getPreferenceValue,
+      }}
+    >
       {children}
     </PersonalizationContext.Provider>
   );
@@ -220,7 +227,7 @@ export const ThemeCustomizer: React.FC<ThemeCustomizerProps> = ({ isOpen, onClos
             Theme Mode
           </h4>
           <div className="grid grid-cols-3 gap-3">
-            {(['light', 'dark', 'system'] as ThemeMode[]).map((mode) => (
+            {(['light', 'dark', 'system'] as ThemeMode[]).map(mode => (
               <EnhancedButton
                 key={mode}
                 variant={themeMode === mode ? 'primary' : 'secondary'}
@@ -239,13 +246,16 @@ export const ThemeCustomizer: React.FC<ThemeCustomizerProps> = ({ isOpen, onClos
             Primary Color
           </h4>
           <div className="grid grid-cols-4 gap-3 mb-4">
-            {presetColors.map((color) => (
+            {presetColors.map(color => (
               <button
                 key={color.name}
                 className="relative w-full aspect-square rounded-lg border-2 focus:outline-none focus:ring-2 focus:ring-offset-2"
                 style={{
                   backgroundColor: color.value,
-                  borderColor: customColors.primary === color.value ? theme.colors.text.primary : 'transparent',
+                  borderColor:
+                    customColors.primary === color.value
+                      ? theme.colors.text.primary
+                      : 'transparent',
                   focusRingColor: theme.colors.accent.primary,
                 }}
                 onClick={() => handleColorChange('primary', color.value)}
@@ -254,7 +264,11 @@ export const ThemeCustomizer: React.FC<ThemeCustomizerProps> = ({ isOpen, onClos
                 {customColors.primary === color.value && (
                   <div className="absolute inset-0 flex items-center justify-center">
                     <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   </div>
                 )}
@@ -264,7 +278,7 @@ export const ThemeCustomizer: React.FC<ThemeCustomizerProps> = ({ isOpen, onClos
           <EnhancedInput
             type="color"
             value={customColors.primary}
-            onChange={(e) => handleColorChange('primary', e.target.value)}
+            onChange={e => handleColorChange('primary', e.target.value)}
             label="Custom Primary Color"
             className="w-full"
           />
@@ -276,13 +290,14 @@ export const ThemeCustomizer: React.FC<ThemeCustomizerProps> = ({ isOpen, onClos
             Accent Color
           </h4>
           <div className="grid grid-cols-4 gap-3 mb-4">
-            {presetColors.map((color) => (
+            {presetColors.map(color => (
               <button
                 key={color.name}
                 className="relative w-full aspect-square rounded-lg border-2 focus:outline-none focus:ring-2 focus:ring-offset-2"
                 style={{
                   backgroundColor: color.value,
-                  borderColor: customColors.accent === color.value ? theme.colors.text.primary : 'transparent',
+                  borderColor:
+                    customColors.accent === color.value ? theme.colors.text.primary : 'transparent',
                   focusRingColor: theme.colors.accent.primary,
                 }}
                 onClick={() => handleColorChange('accent', color.value)}
@@ -291,7 +306,11 @@ export const ThemeCustomizer: React.FC<ThemeCustomizerProps> = ({ isOpen, onClos
                 {customColors.accent === color.value && (
                   <div className="absolute inset-0 flex items-center justify-center">
                     <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   </div>
                 )}
@@ -301,14 +320,17 @@ export const ThemeCustomizer: React.FC<ThemeCustomizerProps> = ({ isOpen, onClos
           <EnhancedInput
             type="color"
             value={customColors.accent}
-            onChange={(e) => handleColorChange('accent', e.target.value)}
+            onChange={e => handleColorChange('accent', e.target.value)}
             label="Custom Accent Color"
             className="w-full"
           />
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end space-x-3 pt-6 border-t" style={{ borderColor: theme.colors.border.primary }}>
+        <div
+          className="flex justify-end space-x-3 pt-6 border-t"
+          style={{ borderColor: theme.colors.border.primary }}
+        >
           <EnhancedButton variant="secondary" onClick={onClose}>
             Close
           </EnhancedButton>
@@ -355,17 +377,19 @@ export const LayoutPreferences: React.FC<LayoutPreferencesProps> = ({ isOpen, on
             Interface Density
           </h4>
           <div className="space-y-3">
-            {densityOptions.map((option) => (
+            {densityOptions.map(option => (
               <label
                 key={option.value}
                 className="flex items-center space-x-3 cursor-pointer p-3 rounded-lg border"
                 style={{
-                  borderColor: preferences.layout.density === option.value
-                    ? theme.colors.accent.primary
-                    : theme.colors.border.primary,
-                  backgroundColor: preferences.layout.density === option.value
-                    ? `${theme.colors.accent.primary}10`
-                    : 'transparent',
+                  borderColor:
+                    preferences.layout.density === option.value
+                      ? theme.colors.accent.primary
+                      : theme.colors.border.primary,
+                  backgroundColor:
+                    preferences.layout.density === option.value
+                      ? `${theme.colors.accent.primary}10`
+                      : 'transparent',
                 }}
               >
                 <input
@@ -373,7 +397,7 @@ export const LayoutPreferences: React.FC<LayoutPreferencesProps> = ({ isOpen, on
                   name="density"
                   value={option.value}
                   checked={preferences.layout.density === option.value}
-                  onChange={(e) => handleLayoutChange('density', e.target.value)}
+                  onChange={e => handleLayoutChange('density', e.target.value)}
                   className="sr-only"
                 />
                 <div
@@ -406,7 +430,7 @@ export const LayoutPreferences: React.FC<LayoutPreferencesProps> = ({ isOpen, on
             Sidebar Position
           </h4>
           <div className="grid grid-cols-2 gap-3">
-            {(['left', 'right'] as const).map((position) => (
+            {(['left', 'right'] as const).map(position => (
               <EnhancedButton
                 key={position}
                 variant={preferences.layout.sidebarPosition === position ? 'primary' : 'secondary'}
@@ -427,19 +451,22 @@ export const LayoutPreferences: React.FC<LayoutPreferencesProps> = ({ isOpen, on
 
           <EnhancedSwitch
             checked={preferences.layout.showAnimations}
-            onChange={(checked) => handleLayoutChange('showAnimations', checked)}
+            onChange={checked => handleLayoutChange('showAnimations', checked)}
             label="Enable Animations"
           />
 
           <EnhancedSwitch
             checked={preferences.layout.reduceMotion}
-            onChange={(checked) => handleLayoutChange('reduceMotion', checked)}
+            onChange={checked => handleLayoutChange('reduceMotion', checked)}
             label="Reduce Motion (for accessibility)"
           />
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end space-x-3 pt-6 border-t" style={{ borderColor: theme.colors.border.primary }}>
+        <div
+          className="flex justify-end space-x-3 pt-6 border-t"
+          style={{ borderColor: theme.colors.border.primary }}
+        >
           <EnhancedButton variant="secondary" onClick={onClose}>
             Close
           </EnhancedButton>
@@ -455,11 +482,17 @@ interface AccessibilityPreferencesProps {
   onClose: () => void;
 }
 
-export const AccessibilityPreferences: React.FC<AccessibilityPreferencesProps> = ({ isOpen, onClose }) => {
+export const AccessibilityPreferences: React.FC<AccessibilityPreferencesProps> = ({
+  isOpen,
+  onClose,
+}) => {
   const { theme } = useTheme();
   const { preferences, updatePreferences } = usePersonalization();
 
-  const handleAccessibilityChange = (key: keyof UserPreferences['accessibility'], value: unknown) => {
+  const handleAccessibilityChange = (
+    key: keyof UserPreferences['accessibility'],
+    value: unknown,
+  ) => {
     updatePreferences({
       accessibility: { ...preferences.accessibility, [key]: value },
     });
@@ -487,17 +520,19 @@ export const AccessibilityPreferences: React.FC<AccessibilityPreferencesProps> =
             Font Size
           </h4>
           <div className="grid grid-cols-2 gap-3">
-            {fontSizeOptions.map((option) => (
+            {fontSizeOptions.map(option => (
               <button
                 key={option.value}
                 className="p-3 rounded-lg border text-left focus:outline-none focus:ring-2 focus:ring-offset-2"
                 style={{
-                  borderColor: preferences.accessibility.fontSize === option.value
-                    ? theme.colors.accent.primary
-                    : theme.colors.border.primary,
-                  backgroundColor: preferences.accessibility.fontSize === option.value
-                    ? `${theme.colors.accent.primary}10`
-                    : theme.colors.background.secondary,
+                  borderColor:
+                    preferences.accessibility.fontSize === option.value
+                      ? theme.colors.accent.primary
+                      : theme.colors.border.primary,
+                  backgroundColor:
+                    preferences.accessibility.fontSize === option.value
+                      ? `${theme.colors.accent.primary}10`
+                      : theme.colors.background.secondary,
                   focusRingColor: theme.colors.accent.primary,
                 }}
                 onClick={() => handleAccessibilityChange('fontSize', option.value)}
@@ -521,31 +556,34 @@ export const AccessibilityPreferences: React.FC<AccessibilityPreferencesProps> =
 
           <EnhancedSwitch
             checked={preferences.accessibility.highContrast}
-            onChange={(checked) => handleAccessibilityChange('highContrast', checked)}
+            onChange={checked => handleAccessibilityChange('highContrast', checked)}
             label="High Contrast Mode"
           />
 
           <EnhancedSwitch
             checked={preferences.accessibility.focusIndicators}
-            onChange={(checked) => handleAccessibilityChange('focusIndicators', checked)}
+            onChange={checked => handleAccessibilityChange('focusIndicators', checked)}
             label="Enhanced Focus Indicators"
           />
 
           <EnhancedSwitch
             checked={preferences.accessibility.screenReaderOptimizations}
-            onChange={(checked) => handleAccessibilityChange('screenReaderOptimizations', checked)}
+            onChange={checked => handleAccessibilityChange('screenReaderOptimizations', checked)}
             label="Screen Reader Optimizations"
           />
 
           <EnhancedSwitch
             checked={preferences.accessibility.keyboardNavigation}
-            onChange={(checked) => handleAccessibilityChange('keyboardNavigation', checked)}
+            onChange={checked => handleAccessibilityChange('keyboardNavigation', checked)}
             label="Enhanced Keyboard Navigation"
           />
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end space-x-3 pt-6 border-t" style={{ borderColor: theme.colors.border.primary }}>
+        <div
+          className="flex justify-end space-x-3 pt-6 border-t"
+          style={{ borderColor: theme.colors.border.primary }}
+        >
           <EnhancedButton variant="secondary" onClick={onClose}>
             Close
           </EnhancedButton>
@@ -584,7 +622,9 @@ export const PreferencesBackup: React.FC<PreferencesBackupProps> = ({ isOpen, on
   };
 
   const handleReset = () => {
-    if (confirm('Are you sure you want to reset all preferences to default? This cannot be undone.')) {
+    if (
+      confirm('Are you sure you want to reset all preferences to default? This cannot be undone.')
+    ) {
       resetPreferences();
       onClose();
     }
@@ -634,7 +674,7 @@ export const PreferencesBackup: React.FC<PreferencesBackupProps> = ({ isOpen, on
           </p>
           <textarea
             value={importData}
-            onChange={(e) => setImportData(e.target.value)}
+            onChange={e => setImportData(e.target.value)}
             placeholder="Paste exported preferences JSON here..."
             className="w-full h-32 p-3 rounded-lg border font-mono text-xs mb-4"
             style={{
@@ -643,11 +683,7 @@ export const PreferencesBackup: React.FC<PreferencesBackupProps> = ({ isOpen, on
               color: theme.colors.text.primary,
             }}
           />
-          <EnhancedButton
-            onClick={handleImport}
-            disabled={!importData.trim()}
-            variant="primary"
-          >
+          <EnhancedButton onClick={handleImport} disabled={!importData.trim()} variant="primary">
             Import Preferences
           </EnhancedButton>
         </div>
@@ -666,7 +702,10 @@ export const PreferencesBackup: React.FC<PreferencesBackupProps> = ({ isOpen, on
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end space-x-3 pt-6 border-t" style={{ borderColor: theme.colors.border.primary }}>
+        <div
+          className="flex justify-end space-x-3 pt-6 border-t"
+          style={{ borderColor: theme.colors.border.primary }}
+        >
           <EnhancedButton variant="secondary" onClick={onClose}>
             Close
           </EnhancedButton>

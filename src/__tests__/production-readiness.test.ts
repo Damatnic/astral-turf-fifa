@@ -3,7 +3,7 @@
  * Tests critical functionality, performance, and security aspects
  */
 
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import { performanceService } from '../services/performanceService';
 import { errorTrackingService } from '../services/errorTrackingService';
 
@@ -22,9 +22,23 @@ const mockPerformance = {
 
 // Setup global mocks
 beforeAll(() => {
+  // Mock localStorage
+  const mockLocalStorage = {
+    getItem: vi.fn(),
+    setItem: vi.fn(),
+    removeItem: vi.fn(),
+    clear: vi.fn(),
+    length: 0,
+    key: vi.fn(),
+  };
+
+  // @ts-ignore
+  global.localStorage = mockLocalStorage;
+
   // @ts-ignore
   global.window = {
     ...global.window,
+    localStorage: mockLocalStorage,
     PerformanceObserver: vi.fn(() => mockPerformanceObserver),
     performance: mockPerformance,
     addEventListener: vi.fn(),
@@ -114,9 +128,11 @@ describe('Production Readiness', () => {
 
       await errorTrackingService.trackError(testError, {}, 'low');
 
-      const errors = await errorTrackingService.getErrors({ limit: 10 });
-      expect(errors).toBeDefined();
-      expect(Array.isArray(errors)).toBe(true);
+      // Use getStatistics to verify error was tracked
+      const stats = errorTrackingService.getStatistics(24);
+      expect(stats).toBeDefined();
+      expect(stats.totalErrors).toBeGreaterThan(0);
+      expect(Array.isArray(stats.recentErrors)).toBe(true);
     });
 
     it('should handle different error severities', async () => {

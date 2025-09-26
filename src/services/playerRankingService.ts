@@ -53,7 +53,8 @@ class PlayerRankingService {
           type: 'badge' as const,
           value: `level-${level}`,
           description: `Level ${level} Badge`,
-          rarity: level >= 80 ? 'legendary' : level >= 60 ? 'epic' : level >= 40 ? 'rare' : 'uncommon',
+          rarity:
+            level >= 80 ? 'legendary' : level >= 60 ? 'epic' : level >= 40 ? 'rare' : 'uncommon',
         });
       }
 
@@ -198,7 +199,7 @@ class PlayerRankingService {
         });
       }
     } catch (_error) {
-      console.error('Failed to load player rankings:', error);
+      console.error('Failed to load player rankings:', _error);
     }
   }
 
@@ -211,7 +212,7 @@ class PlayerRankingService {
       });
       localStorage.setItem('astralTurf_playerRankings', JSON.stringify(profilesObj));
     } catch (_error) {
-      console.error('Failed to save player rankings:', error);
+      console.error('Failed to save player rankings:', _error);
     }
   }
 
@@ -447,7 +448,9 @@ class PlayerRankingService {
     this.checkMilestoneBadges(playerId);
 
     // Update weekly goals
-    const challengeGoal = profile.weeklyProgress.weeklyGoals.find(g => g.id === 'weekly-challenges');
+    const challengeGoal = profile.weeklyProgress.weeklyGoals.find(
+      g => g.id === 'weekly-challenges',
+    );
     if (challengeGoal && !challengeGoal.completed) {
       challengeGoal.current++;
       if (challengeGoal.current >= challengeGoal.target) {
@@ -460,14 +463,13 @@ class PlayerRankingService {
 
     // Update favorite category
     const categories = Object.entries(profile.totalStats.categoryBreakdown);
-    const favorite = categories.reduce((a, b) => a[1] > b[1] ? a : b);
+    const favorite = categories.reduce((a, b) => (a[1] > b[1] ? a : b));
     profile.totalStats.favoriteCategory = favorite[0] as ChallengeCategory;
 
     // Update completion rate
     const totalAttempted = profile.challengesCompleted.length + profile.challengesFailed.length;
-    profile.totalStats.completionRate = totalAttempted > 0
-      ? (profile.challengesCompleted.length / totalAttempted) * 100
-      : 0;
+    profile.totalStats.completionRate =
+      totalAttempted > 0 ? (profile.challengesCompleted.length / totalAttempted) * 100 : 0;
 
     profile.updatedAt = new Date().toISOString();
     this.saveToStorage();
@@ -491,7 +493,9 @@ class PlayerRankingService {
     }
 
     if (lastCompletion) {
-      const daysSinceLastCompletion = Math.floor((now.getTime() - lastCompletion.getTime()) / (24 * 60 * 60 * 1000));
+      const daysSinceLastCompletion = Math.floor(
+        (now.getTime() - lastCompletion.getTime()) / (24 * 60 * 60 * 1000),
+      );
 
       if (daysSinceLastCompletion === 1) {
         // Streak continues
@@ -529,8 +533,8 @@ class PlayerRankingService {
     }
 
     // Add to daily activity
-    let todayActivity = profile.weeklyProgress.dailyActivity.find(d =>
-      new Date(d.date).toDateString() === today,
+    let todayActivity = profile.weeklyProgress.dailyActivity.find(
+      d => new Date(d.date).toDateString() === today,
     );
 
     if (!todayActivity) {
@@ -553,7 +557,9 @@ class PlayerRankingService {
     const profile = this.getProfile(playerId);
     const badgeDefinition = this.badges.get(badgeId);
 
-    if (!badgeDefinition) {return false;}
+    if (!badgeDefinition) {
+      return false;
+    }
 
     // Check if already has badge
     if (profile.badges.some(b => b.badgeId === badgeId)) {
@@ -699,11 +705,17 @@ class PlayerRankingService {
         level: profileA.currentLevel - profileB.currentLevel,
         totalXP: profileA.totalXP - profileB.totalXP,
         badges: profileA.badges.length - profileB.badges.length,
-        challengesCompleted: profileA.challengesCompleted.length - profileB.challengesCompleted.length,
+        challengesCompleted:
+          profileA.challengesCompleted.length - profileB.challengesCompleted.length,
         streak: profileA.streakDays - profileB.streakDays,
         attributePoints: profileA.unspentAttributePoints - profileB.unspentAttributePoints,
       },
-      winner: profileA.totalXP > profileB.totalXP ? 'A' : profileA.totalXP < profileB.totalXP ? 'B' : 'tie',
+      winner:
+        profileA.totalXP > profileB.totalXP
+          ? 'A'
+          : profileA.totalXP < profileB.totalXP
+            ? 'B'
+            : 'tie',
     };
   }
 
@@ -764,22 +776,28 @@ class PlayerRankingService {
     const availableChallenges = challengeService.getAvailableChallenges(playerId);
 
     // Prioritize favorite category
-    const favoriteCategory = availableChallenges.filter(c =>
-      c.category === profile.totalStats.favoriteCategory,
+    const favoriteCategory = availableChallenges.filter(
+      c => c.category === profile.totalStats.favoriteCategory,
     );
     recommendations.push(...favoriteCategory.slice(0, 2).map(c => c.id));
 
     // Add variety from other categories
-    const otherCategories = availableChallenges.filter(c =>
-      c.category !== profile.totalStats.favoriteCategory,
+    const otherCategories = availableChallenges.filter(
+      c => c.category !== profile.totalStats.favoriteCategory,
     );
     recommendations.push(...otherCategories.slice(0, 2).map(c => c.id));
 
     // Prioritize challenges that match player level
     const levelAppropriate = availableChallenges.filter(c => {
-      if (profile.currentLevel < 20) {return c.difficulty === 'easy';}
-      if (profile.currentLevel < 40) {return c.difficulty === 'medium';}
-      if (profile.currentLevel < 60) {return c.difficulty === 'hard';}
+      if (profile.currentLevel < 20) {
+        return c.difficulty === 'easy';
+      }
+      if (profile.currentLevel < 40) {
+        return c.difficulty === 'medium';
+      }
+      if (profile.currentLevel < 60) {
+        return c.difficulty === 'hard';
+      }
       return c.difficulty === 'elite';
     });
     recommendations.push(...levelAppropriate.slice(0, 1).map(c => c.id));

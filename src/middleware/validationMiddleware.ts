@@ -34,7 +34,13 @@ export interface ValidationResult<T = any> {
 }
 
 export interface ThreatDetection {
-  type: 'xss' | 'sql_injection' | 'path_traversal' | 'command_injection' | 'script_injection' | 'html_injection';
+  type:
+    | 'xss'
+    | 'sql_injection'
+    | 'path_traversal'
+    | 'command_injection'
+    | 'script_injection'
+    | 'html_injection';
   severity: 'low' | 'medium' | 'high' | 'critical';
   field: string;
   originalValue: string;
@@ -103,7 +109,7 @@ class ValidationService {
         const rateLimitResult = await rateLimit.check(
           `validation:${context.ipAddress}`,
           100, // 100 validation requests
-          60,   // per minute
+          60, // per minute
         );
 
         if (!rateLimitResult.allowed) {
@@ -154,7 +160,8 @@ class ValidationService {
 
       // Step 4: Performance logging
       const duration = Date.now() - startTime;
-      if (duration > 100) { // Log slow validations
+      if (duration > 100) {
+        // Log slow validations
         log.performance('Input validation', duration, {
           userId: context?.userId,
           endpoint: context?.endpoint,
@@ -164,7 +171,6 @@ class ValidationService {
       }
 
       return result;
-
     } catch (_error) {
       log.error('Validation service error', {
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -211,11 +217,7 @@ class ValidationService {
   /**
    * Process string values for threats and sanitization
    */
-  private processStringValue(
-    value: string,
-    fieldPath: string,
-    threats: ThreatDetection[],
-  ): string {
+  private processStringValue(value: string, fieldPath: string, threats: ThreatDetection[]): string {
     let sanitizedValue = value;
     const originalValue = value;
 
@@ -432,7 +434,10 @@ class ValidationService {
         confirmPassword: Joi.string().valid(Joi.ref('password')).required(),
         firstName: Joi.string().min(1).max(50).required(),
         lastName: Joi.string().min(1).max(50).required(),
-        phoneNumber: Joi.string().pattern(/^[+]?[\d\s\-\(\)]+$/).max(20).optional(),
+        phoneNumber: Joi.string()
+          .pattern(/^[+]?[\d\s\-\(\)]+$/)
+          .max(20)
+          .optional(),
         acceptedTerms: Joi.boolean().valid(true).required(),
         acceptedPrivacyPolicy: Joi.boolean().valid(true).required(),
         marketingConsent: Joi.boolean().optional(),
@@ -449,7 +454,10 @@ class ValidationService {
       profileUpdate: Joi.object({
         firstName: Joi.string().min(1).max(50).optional(),
         lastName: Joi.string().min(1).max(50).optional(),
-        phoneNumber: Joi.string().pattern(/^[+]?[\d\s\-\(\)]+$/).max(20).optional(),
+        phoneNumber: Joi.string()
+          .pattern(/^[+]?[\d\s\-\(\)]+$/)
+          .max(20)
+          .optional(),
         timezone: Joi.string().max(50).optional(),
         language: Joi.string().max(10).optional(),
       }),
@@ -469,16 +477,23 @@ class ValidationService {
 
       // File upload schema
       fileUpload: Joi.object({
-        filename: Joi.string().pattern(/^[a-zA-Z0-9._-]+$/).max(255).required(),
-        mimetype: Joi.string().valid(
-          'image/jpeg',
-          'image/png',
-          'image/gif',
-          'image/webp',
-          'application/pdf',
-          'text/plain',
-        ).required(),
-        size: Joi.number().max(10 * 1024 * 1024).required(), // 10MB max
+        filename: Joi.string()
+          .pattern(/^[a-zA-Z0-9._-]+$/)
+          .max(255)
+          .required(),
+        mimetype: Joi.string()
+          .valid(
+            'image/jpeg',
+            'image/png',
+            'image/gif',
+            'image/webp',
+            'application/pdf',
+            'text/plain',
+          )
+          .required(),
+        size: Joi.number()
+          .max(10 * 1024 * 1024)
+          .required(), // 10MB max
       }),
 
       // Search query schema

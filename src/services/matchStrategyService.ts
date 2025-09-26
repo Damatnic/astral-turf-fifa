@@ -1,4 +1,4 @@
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI, Type } from '@google/genai';
 import type {
   Player,
   Formation,
@@ -18,7 +18,7 @@ try {
     aiInstance = new GoogleGenAI({ apiKey });
   }
 } catch (_error) {
-  console.error("Error initializing Match Strategy Service:", error);
+  console.error('Error initializing Match Strategy Service:', _error);
   aiInstance = null;
 }
 
@@ -28,11 +28,14 @@ export interface MatchStrategyPlan {
   difficulty: 'easy' | 'medium' | 'hard' | 'very_hard';
   recommendedFormation: string;
   recommendedTactics: TeamTactics;
-  playerInstructions: Record<string, {
-    role: string;
-    specificInstructions: string[];
-    keyFocus: string;
-  }>;
+  playerInstructions: Record<
+    string,
+    {
+      role: string;
+      specificInstructions: string[];
+      keyFocus: string;
+    }
+  >;
   gamePhaseStrategies: {
     firstHalf: {
       mentality: string;
@@ -73,12 +76,15 @@ export interface LiveMatchAnalysis {
   currentScore: { home: number; away: number };
   gameState: 'dominating' | 'balanced' | 'under_pressure' | 'desperate';
   keyEvents: MatchEvent[];
-  currentPerformance: Record<string, {
-    playerId: string;
-    rating: number;
-    keyStats: Record<string, number>;
-    recommendedAction: 'continue' | 'substitute' | 'change_instruction';
-  }>;
+  currentPerformance: Record<
+    string,
+    {
+      playerId: string;
+      rating: number;
+      keyStats: Record<string, number>;
+      recommendedAction: 'continue' | 'substitute' | 'change_instruction';
+    }
+  >;
   tacticalAdjustments: {
     urgent: string[];
     recommended: string[];
@@ -135,15 +141,17 @@ export interface OppositionAnalysisReport {
 
 async function generateJson(prompt: string, schema: unknown, systemInstruction: string) {
   const ai = aiInstance;
-  if (!ai) {throw new Error("AI is offline.");}
+  if (!ai) {
+    throw new Error('AI is offline.');
+  }
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: 'gemini-2.5-flash',
       contents: prompt,
       config: {
         systemInstruction,
-        responseMimeType: "application/json",
+        responseMimeType: 'application/json',
         responseSchema: schema,
         temperature: 0.7,
       },
@@ -151,12 +159,12 @@ async function generateJson(prompt: string, schema: unknown, systemInstruction: 
 
     const jsonText = response.text.trim();
     if (!jsonText) {
-      throw new Error("AI returned an empty response.");
+      throw new Error('AI returned an empty response.');
     }
     return JSON.parse(jsonText);
   } catch (_error) {
-    console.error("Error generating JSON from Gemini API:", error);
-    throw new Error("Failed to get a valid JSON response from the AI.");
+    console.error('Error generating JSON from Gemini API:', _error);
+    throw new Error('Failed to get a valid JSON response from the AI.');
   }
 }
 
@@ -175,17 +183,24 @@ export const generateMatchStrategy = async (
   },
   personality: AIPersonality = 'balanced',
 ): Promise<MatchStrategyPlan> => {
-  if (!aiInstance) {throw new Error("AI is offline.");}
+  if (!aiInstance) {
+    throw new Error('AI is offline.');
+  }
 
   const prompt = `Create a comprehensive match strategy plan:
 
 OUR TEAM ANALYSIS:
-Squad: ${ourTeam.players.map(p =>
-  `${p.name} (${p.roleId}) - Rating: ${p.currentPotential}, Form: ${p.form}, Fitness: ${matchContext.playerFitness[p.id] || 100}%`,
-).join('\n')}
+Squad: ${ourTeam.players
+    .map(
+      p =>
+        `${p.name} (${p.roleId}) - Rating: ${p.currentPotential}, Form: ${p.form}, Fitness: ${matchContext.playerFitness[p.id] || 100}%`,
+    )
+    .join('\n')}
 
 Available Formations: ${ourTeam.availableFormations.map(f => f.name).join(', ')}
-Current Tactics: ${Object.entries(ourTeam.currentTactics).map(([k, v]) => `${k}: ${v}`).join(', ')}
+Current Tactics: ${Object.entries(ourTeam.currentTactics)
+    .map(([k, v]) => `${k}: ${v}`)
+    .join(', ')}
 
 OPPONENT ANALYSIS:
 ${JSON.stringify(opponentAnalysis, null, 2)}
@@ -253,9 +268,16 @@ Focus on tactical intelligence and adaptive thinking.`;
       predictionConfidence: { type: Type.NUMBER, minimum: 0, maximum: 100 },
     },
     required: [
-      'matchId', 'opponent', 'difficulty', 'recommendedFormation', 'recommendedTactics',
-      'playerInstructions', 'gamePhaseStrategies', 'contingencyPlans',
-      'setPlayStrategies', 'predictionConfidence',
+      'matchId',
+      'opponent',
+      'difficulty',
+      'recommendedFormation',
+      'recommendedTactics',
+      'playerInstructions',
+      'gamePhaseStrategies',
+      'contingencyPlans',
+      'setPlayStrategies',
+      'predictionConfidence',
     ],
   };
 
@@ -277,7 +299,9 @@ export const analyzeLiveMatch = async (
   currentTactics: TeamTactics,
   personality: AIPersonality = 'balanced',
 ): Promise<LiveMatchAnalysis> => {
-  if (!aiInstance) {throw new Error("AI is offline.");}
+  if (!aiInstance) {
+    throw new Error('AI is offline.');
+  }
 
   const prompt = `Provide live match analysis and tactical recommendations:
 
@@ -287,19 +311,27 @@ MATCH STATUS:
 - Score: ${currentScore.home} - ${currentScore.away}
 
 RECENT EVENTS:
-${events.slice(-10).map(e => `${e.minute}': ${e.type} - ${e.playerName} (${e.team}) - ${e.description}`).join('\n')}
+${events
+  .slice(-10)
+  .map(e => `${e.minute}': ${e.type} - ${e.playerName} (${e.team}) - ${e.description}`)
+  .join('\n')}
 
 OUR TEAM ON FIELD:
-${ourPlayers.map(p =>
-  `${p.name} (${p.roleId}) - Form: ${p.form}, Stamina: ${p.stamina}%, Rating: ${p.currentPotential}`,
-).join('\n')}
+${ourPlayers
+  .map(
+    p =>
+      `${p.name} (${p.roleId}) - Form: ${p.form}, Stamina: ${p.stamina}%, Rating: ${p.currentPotential}`,
+  )
+  .join('\n')}
 
 AVAILABLE SUBSTITUTES:
-${benchPlayers.map(p =>
-  `${p.name} (${p.roleId}) - Form: ${p.form}, Fresh: Yes, Rating: ${p.currentPotential}`,
-).join('\n')}
+${benchPlayers
+  .map(p => `${p.name} (${p.roleId}) - Form: ${p.form}, Fresh: Yes, Rating: ${p.currentPotential}`)
+  .join('\n')}
 
-CURRENT TACTICS: ${Object.entries(currentTactics).map(([k, v]) => `${k}: ${v}`).join(', ')}
+CURRENT TACTICS: ${Object.entries(currentTactics)
+    .map(([k, v]) => `${k}: ${v}`)
+    .join(', ')}
 
 Provide:
 1. Assessment of current game state and momentum
@@ -326,7 +358,10 @@ Focus on actionable insights for immediate tactical decisions.`;
           away: { type: Type.NUMBER },
         },
       },
-      gameState: { type: Type.STRING, enum: ['dominating', 'balanced', 'under_pressure', 'desperate'] },
+      gameState: {
+        type: Type.STRING,
+        enum: ['dominating', 'balanced', 'under_pressure', 'desperate'],
+      },
       keyEvents: { type: Type.ARRAY },
       currentPerformance: { type: Type.OBJECT },
       tacticalAdjustments: {
@@ -346,8 +381,15 @@ Focus on actionable insights for immediate tactical decisions.`;
       },
     },
     required: [
-      'matchId', 'currentMinute', 'currentScore', 'gameState', 'keyEvents',
-      'currentPerformance', 'tacticalAdjustments', 'substitutionRecommendations', 'nextTenMinutes',
+      'matchId',
+      'currentMinute',
+      'currentScore',
+      'gameState',
+      'keyEvents',
+      'currentPerformance',
+      'tacticalAdjustments',
+      'substitutionRecommendations',
+      'nextTenMinutes',
     ],
   };
 
@@ -371,7 +413,9 @@ export const generateOppositionReport = async (
   },
   personality: AIPersonality = 'balanced',
 ): Promise<OppositionAnalysisReport> => {
-  if (!aiInstance) {throw new Error("AI is offline.");}
+  if (!aiInstance) {
+    throw new Error('AI is offline.');
+  }
 
   const prompt = `Generate comprehensive opposition analysis report:
 
@@ -435,8 +479,14 @@ Use realistic soccer knowledge and tactical understanding.`;
       recommendedApproach: { type: Type.STRING },
     },
     required: [
-      'opponentName', 'overallThreatLevel', 'tacticalProfile', 'keyPlayers',
-      'teamStrengths', 'teamWeaknesses', 'recentForm', 'tacticalVulnerabilities',
+      'opponentName',
+      'overallThreatLevel',
+      'tacticalProfile',
+      'keyPlayers',
+      'teamStrengths',
+      'teamWeaknesses',
+      'recentForm',
+      'tacticalVulnerabilities',
       'recommendedApproach',
     ],
   };
@@ -477,20 +527,32 @@ export const predictMatchOutcome = async (
   keyFactors: string[];
   confidenceLevel: number;
 }> => {
-  if (!aiInstance) {throw new Error("AI is offline.");}
+  if (!aiInstance) {
+    throw new Error('AI is offline.');
+  }
 
   const prompt = `Predict match outcome with detailed probability analysis:
 
 HOME TEAM: ${homeTeam.name}
 Formation: ${homeTeam.formation.name}
-Tactics: ${Object.entries(homeTeam.tactics).map(([k, v]) => `${k}: ${v}`).join(', ')}
-Key Players: ${homeTeam.players.slice(0, 5).map(p => `${p.name} (${p.currentPotential})`).join(', ')}
+Tactics: ${Object.entries(homeTeam.tactics)
+    .map(([k, v]) => `${k}: ${v}`)
+    .join(', ')}
+Key Players: ${homeTeam.players
+    .slice(0, 5)
+    .map(p => `${p.name} (${p.currentPotential})`)
+    .join(', ')}
 Recent Form: ${homeTeam.recentForm.join(', ')} (last 5 matches)
 
 AWAY TEAM: ${awayTeam.name}
 Formation: ${awayTeam.formation.name}  
-Tactics: ${Object.entries(awayTeam.tactics).map(([k, v]) => `${k}: ${v}`).join(', ')}
-Key Players: ${awayTeam.players.slice(0, 5).map(p => `${p.name} (${p.currentPotential})`).join(', ')}
+Tactics: ${Object.entries(awayTeam.tactics)
+    .map(([k, v]) => `${k}: ${v}`)
+    .join(', ')}
+Key Players: ${awayTeam.players
+    .slice(0, 5)
+    .map(p => `${p.name} (${p.currentPotential})`)
+    .join(', ')}
 Recent Form: ${awayTeam.recentForm.join(', ')} (last 5 matches)
 
 MATCH CONTEXT:
@@ -520,8 +582,12 @@ Provide realistic match prediction with probabilities, expected score, key deter
       confidenceLevel: { type: Type.NUMBER, minimum: 0, maximum: 100 },
     },
     required: [
-      'homeWinProbability', 'drawProbability', 'awayWinProbability',
-      'expectedScore', 'keyFactors', 'confidenceLevel',
+      'homeWinProbability',
+      'drawProbability',
+      'awayWinProbability',
+      'expectedScore',
+      'keyFactors',
+      'confidenceLevel',
     ],
   };
 

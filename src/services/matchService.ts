@@ -170,7 +170,7 @@ export const generateMatchCommentary = (
 
   commentary.push({
     minute: 90,
-    text: "Full time! An exciting match comes to an end.",
+    text: 'Full time! An exciting match comes to an end.',
   });
 
   return commentary.sort((a, b) => a.minute - b.minute);
@@ -213,10 +213,12 @@ export const calculateMatchRating = (
   }
 
   // Team performance affects individual ratings
-  const teamWon = (player.team === 'home' && result.homeScore > result.awayScore) ||
-                  (player.team === 'away' && result.awayScore > result.homeScore);
-  const teamLost = (player.team === 'home' && result.homeScore < result.awayScore) ||
-                   (player.team === 'away' && result.awayScore < result.homeScore);
+  const teamWon =
+    (player.team === 'home' && result.homeScore > result.awayScore) ||
+    (player.team === 'away' && result.awayScore > result.homeScore);
+  const teamLost =
+    (player.team === 'home' && result.homeScore < result.awayScore) ||
+    (player.team === 'away' && result.awayScore < result.homeScore);
 
   if (teamWon) {
     rating += 0.5;
@@ -225,8 +227,14 @@ export const calculateMatchRating = (
   }
 
   // Apply form and morale modifiers
-  const formMultipliers = { 'Excellent': 1.1, 'Good': 1.05, 'Average': 1.0, 'Poor': 0.95, 'Very Poor': 0.9 };
-  const moraleMultipliers = { 'Excellent': 1.1, 'Good': 1.05, 'Okay': 1.0, 'Poor': 0.95, 'Very Poor': 0.9 };
+  const formMultipliers = {
+    Excellent: 1.1,
+    Good: 1.05,
+    Average: 1.0,
+    Poor: 0.95,
+    'Very Poor': 0.9,
+  };
+  const moraleMultipliers = { Excellent: 1.1, Good: 1.05, Okay: 1.0, Poor: 0.95, 'Very Poor': 0.9 };
 
   rating *= formMultipliers[player.form] * moraleMultipliers[player.morale];
 
@@ -263,7 +271,9 @@ export const generateMatchReport = (
   goals.forEach(goal => {
     const teamName = goal.team === 'home' ? homeTeam : awayTeam;
     if (goal.assisterName) {
-      keyMoments.push(`${goal.minute}' - ${goal.playerName} scores for ${teamName}, assisted by ${goal.assisterName}`);
+      keyMoments.push(
+        `${goal.minute}' - ${goal.playerName} scores for ${teamName}, assisted by ${goal.assisterName}`,
+      );
     } else {
       keyMoments.push(`${goal.minute}' - ${goal.playerName} scores for ${teamName}`);
     }
@@ -313,8 +323,8 @@ export const simulateAIMatch = (
   const adjustedHomeDiff = strengthDiff + homeAdvantage;
 
   // Calculate basic score probabilities
-  let homeGoalExpectancy = 1.5 + (adjustedHomeDiff / 50);
-  let awayGoalExpectancy = 1.5 - (adjustedHomeDiff / 50);
+  let homeGoalExpectancy = 1.5 + adjustedHomeDiff / 50;
+  let awayGoalExpectancy = 1.5 - adjustedHomeDiff / 50;
 
   // Ensure minimum goal expectancy
   homeGoalExpectancy = Math.max(0.3, homeGoalExpectancy);
@@ -389,17 +399,16 @@ export const getRecentResults = (
     );
   }
 
-  const fixturesWithResults = recentFixtures
-    .slice(-count)
-    .map(fixture => {
-      const result = matchHistory.find(
-        match => match &&
+  const fixturesWithResults = recentFixtures.slice(-count).map(fixture => {
+    const result = matchHistory.find(
+      match =>
+        match &&
         // You might need to add additional matching logic here
         // This is a simplified version
         true,
-      );
-      return { ...fixture, result };
-    });
+    );
+    return { ...fixture, result };
+  });
 
   return fixturesWithResults;
 };

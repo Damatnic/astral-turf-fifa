@@ -15,79 +15,79 @@ spec:
   podSelector:
     matchLabels:
       app.kubernetes.io/name: astral-turf
-  
+
   policyTypes:
-  - Ingress
-  - Egress
-  
+    - Ingress
+    - Egress
+
   # Ingress rules - allow traffic from specific sources
   ingress:
-  # Allow traffic from nginx load balancer
-  - from:
-    - podSelector:
-        matchLabels:
-          app.kubernetes.io/name: nginx
-    ports:
-    - protocol: TCP
-      port: 3000
-  
-  # Allow traffic from monitoring namespace
-  - from:
-    - namespaceSelector:
-        matchLabels:
-          name: monitoring
-    ports:
-    - protocol: TCP
-      port: 9090  # Metrics endpoint
-  
-  # Allow traffic from ingress controller
-  - from:
-    - namespaceSelector:
-        matchLabels:
-          name: ingress-nginx
-    ports:
-    - protocol: TCP
-      port: 3000
-  
+    # Allow traffic from nginx load balancer
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: nginx
+      ports:
+        - protocol: TCP
+          port: 3000
+
+    # Allow traffic from monitoring namespace
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
+      ports:
+        - protocol: TCP
+          port: 9090 # Metrics endpoint
+
+    # Allow traffic from ingress controller
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 3000
+
   # Egress rules - allow traffic to specific destinations
   egress:
-  # Allow DNS resolution
-  - to: []
-    ports:
-    - protocol: UDP
-      port: 53
-    - protocol: TCP
-      port: 53
-  
-  # Allow HTTPS traffic to external APIs
-  - to: []
-    ports:
-    - protocol: TCP
-      port: 443
-  
-  # Allow HTTP traffic for health checks
-  - to: []
-    ports:
-    - protocol: TCP
-      port: 80
-  
-  # Allow traffic to PostgreSQL
-  - to:
-    - podSelector:
-        matchLabels:
-          app: postgres
-    ports:
-    - protocol: TCP
-      port: 5432
-  
-  # Allow traffic to Redis
-  - to:
-    - podSelector:
-        matchLabels:
-          app: redis
-    ports:
-    - protocol: TCP
-      port: 6379
+    # Allow DNS resolution
+    - to: []
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+
+    # Allow HTTPS traffic to external APIs
+    - to: []
+      ports:
+        - protocol: TCP
+          port: 443
+
+    # Allow HTTP traffic for health checks
+    - to: []
+      ports:
+        - protocol: TCP
+          port: 80
+
+    # Allow traffic to PostgreSQL
+    - to:
+        - podSelector:
+            matchLabels:
+              app: postgres
+      ports:
+        - protocol: TCP
+          port: 5432
+
+    # Allow traffic to Redis
+    - to:
+        - podSelector:
+            matchLabels:
+              app: redis
+      ports:
+        - protocol: TCP
+          port: 6379
 
 ---
 apiVersion: networking.k8s.io/v1
@@ -102,36 +102,36 @@ spec:
   podSelector:
     matchLabels:
       app.kubernetes.io/name: nginx
-  
+
   policyTypes:
-  - Ingress
-  - Egress
-  
+    - Ingress
+    - Egress
+
   ingress:
-  # Allow traffic from anywhere (load balancer)
-  - ports:
-    - protocol: TCP
-      port: 80
-    - protocol: TCP
-      port: 443
-  
+    # Allow traffic from anywhere (load balancer)
+    - ports:
+        - protocol: TCP
+          port: 80
+        - protocol: TCP
+          port: 443
+
   egress:
-  # Allow traffic to application pods
-  - to:
-    - podSelector:
-        matchLabels:
-          app.kubernetes.io/name: astral-turf
-    ports:
-    - protocol: TCP
-      port: 3000
-  
-  # Allow DNS resolution
-  - to: []
-    ports:
-    - protocol: UDP
-      port: 53
-    - protocol: TCP
-      port: 53
+    # Allow traffic to application pods
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: astral-turf
+      ports:
+        - protocol: TCP
+          port: 3000
+
+    # Allow DNS resolution
+    - to: []
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
 
 ---
 apiVersion: networking.k8s.io/v1
@@ -145,5 +145,5 @@ metadata:
 spec:
   podSelector: {}
   policyTypes:
-  - Ingress
-  - Egress
+    - Ingress
+    - Egress

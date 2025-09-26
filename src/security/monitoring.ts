@@ -187,7 +187,11 @@ class AnomalyDetector {
   private userBehaviors = new Map<string, UserBehavior>();
 
   // Detect anomalies in user behavior
-  detectAnomalies(userId: string, action: string, metadata: Record<string, unknown>): SecurityIncident[] {
+  detectAnomalies(
+    userId: string,
+    action: string,
+    metadata: Record<string, unknown>,
+  ): SecurityIncident[] {
     const incidents: SecurityIncident[] = [];
     const baseline = this.getUserBehavior(userId);
 
@@ -195,30 +199,34 @@ class AnomalyDetector {
     if (action === 'login' && metadata.timestamp) {
       const hour = new Date(metadata.timestamp).getHours();
       if (baseline && !baseline.typicalLoginTimes.includes(hour)) {
-        incidents.push(this.createIncident({
-          threatType: ThreatType.ANOMALOUS_BEHAVIOR,
-          severity: ThreatSeverity.LOW,
-          description: `User ${userId} logged in at unusual hour: ${hour}`,
-          affectedUsers: [userId],
-          sourceIp: metadata.ipAddress,
-          userAgent: metadata.userAgent,
-          metadata: { hour, typicalHours: baseline.typicalLoginTimes },
-        }));
+        incidents.push(
+          this.createIncident({
+            threatType: ThreatType.ANOMALOUS_BEHAVIOR,
+            severity: ThreatSeverity.LOW,
+            description: `User ${userId} logged in at unusual hour: ${hour}`,
+            affectedUsers: [userId],
+            sourceIp: metadata.ipAddress,
+            userAgent: metadata.userAgent,
+            metadata: { hour, typicalHours: baseline.typicalLoginTimes },
+          }),
+        );
       }
     }
 
     // Check for unusual IP addresses
     if (metadata.ipAddress && baseline) {
       if (!baseline.commonIpAddresses.includes(metadata.ipAddress)) {
-        incidents.push(this.createIncident({
-          threatType: ThreatType.SUSPICIOUS_ACTIVITY,
-          severity: ThreatSeverity.MEDIUM,
-          description: `User ${userId} accessed from new IP: ${metadata.ipAddress}`,
-          affectedUsers: [userId],
-          sourceIp: metadata.ipAddress,
-          userAgent: metadata.userAgent,
-          metadata: { newIp: metadata.ipAddress, knownIps: baseline.commonIpAddresses },
-        }));
+        incidents.push(
+          this.createIncident({
+            threatType: ThreatType.SUSPICIOUS_ACTIVITY,
+            severity: ThreatSeverity.MEDIUM,
+            description: `User ${userId} accessed from new IP: ${metadata.ipAddress}`,
+            affectedUsers: [userId],
+            sourceIp: metadata.ipAddress,
+            userAgent: metadata.userAgent,
+            metadata: { newIp: metadata.ipAddress, knownIps: baseline.commonIpAddresses },
+          }),
+        );
       }
     }
 
@@ -400,7 +408,7 @@ class AutomatedResponse {
 
   private setupResponses(): void {
     // Brute force response
-    this.responses.set(ThreatType.BRUTE_FORCE, (incident) => {
+    this.responses.set(ThreatType.BRUTE_FORCE, incident => {
       if (incident.sourceIp) {
         threatIntelligence.blockIp(incident.sourceIp);
         incident.mitigationActions.push(`Blocked IP: ${incident.sourceIp}`);
@@ -408,20 +416,20 @@ class AutomatedResponse {
     });
 
     // Account takeover response
-    this.responses.set(ThreatType.ACCOUNT_TAKEOVER, (incident) => {
+    this.responses.set(ThreatType.ACCOUNT_TAKEOVER, incident => {
       // In a real system, this would lock the affected accounts
       incident.mitigationActions.push('Account security review initiated');
     });
 
     // Data exfiltration response
-    this.responses.set(ThreatType.DATA_EXFILTRATION, (incident) => {
+    this.responses.set(ThreatType.DATA_EXFILTRATION, incident => {
       incident.mitigationActions.push('Data access monitoring increased');
       // Alert security team immediately
       this.alertSecurityTeam(incident);
     });
 
     // Injection attack response
-    this.responses.set(ThreatType.INJECTION_ATTACK, (incident) => {
+    this.responses.set(ThreatType.INJECTION_ATTACK, incident => {
       if (incident.sourceIp) {
         threatIntelligence.blockIp(incident.sourceIp);
         incident.mitigationActions.push(`Blocked IP: ${incident.sourceIp}`);
@@ -475,11 +483,7 @@ class SecurityMonitor {
 
     // Anomaly detection
     if (metadata.userId) {
-      const anomalies = this.anomalyDetector.detectAnomalies(
-        metadata.userId,
-        eventType,
-        metadata,
-      );
+      const anomalies = this.anomalyDetector.detectAnomalies(metadata.userId, eventType, metadata);
 
       anomalies.forEach(incident => {
         this.recordIncident(incident);
@@ -601,9 +605,7 @@ class SecurityMonitor {
 
   // Get all active incidents
   getActiveIncidents(): SecurityIncident[] {
-    return Array.from(this.incidents.values()).filter(
-      incident => incident.status === 'active',
-    );
+    return Array.from(this.incidents.values()).filter(incident => incident.status === 'active');
   }
 
   // Get incident by ID
@@ -625,10 +627,9 @@ class SecurityMonitor {
     this.rateLimit.cleanup();
 
     // Remove resolved incidents older than 30 days
-    const cutoff = Date.now() - (30 * 24 * 60 * 60 * 1000);
+    const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000;
     for (const [id, incident] of this.incidents.entries()) {
-      if (incident.status === 'resolved' &&
-          new Date(incident.timestamp).getTime() < cutoff) {
+      if (incident.status === 'resolved' && new Date(incident.timestamp).getTime() < cutoff) {
         this.incidents.delete(id);
       }
     }
@@ -652,7 +653,10 @@ export function resetRateLimit(key: string): void {
 }
 
 // Security monitoring utilities
-export function monitorSecurityEvent(eventType: SecurityEventType, metadata: Record<string, unknown>): void {
+export function monitorSecurityEvent(
+  eventType: SecurityEventType,
+  metadata: Record<string, unknown>,
+): void {
   securityMonitor.monitorEvent(eventType, metadata);
 }
 
@@ -667,9 +671,12 @@ export function resolveSecurityIncident(id: string): void {
 // Initialize security monitoring
 export function initializeSecurityMonitoring(): void {
   // Start cleanup interval
-  setInterval(() => {
-    securityMonitor.cleanup();
-  }, 60 * 60 * 1000); // Every hour
+  setInterval(
+    () => {
+      securityMonitor.cleanup();
+    },
+    60 * 60 * 1000,
+  ); // Every hour
 
   securityLogger.info('Security monitoring system initialized', {
     features: ['rate_limiting', 'anomaly_detection', 'threat_intelligence', 'automated_response'],
@@ -677,9 +684,4 @@ export function initializeSecurityMonitoring(): void {
 }
 
 // Export additional types and utilities (ThreatSeverity and ThreatType already exported with enum declarations)
-export type {
-  SecurityIncident,
-  RateLimit,
-  AnomalyPattern,
-  UserBehavior,
-};
+export type { SecurityIncident, RateLimit, AnomalyPattern, UserBehavior };

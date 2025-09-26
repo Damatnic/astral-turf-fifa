@@ -169,7 +169,9 @@ export const canAccessRoute = (
 ): { canAccess: boolean; fallbackPath?: string } => {
   // Find matching route permission (exact match first, then pattern match)
   const permission = ROUTE_PERMISSIONS.find(p => {
-    if (p.path === path) {return true;}
+    if (p.path === path) {
+      return true;
+    }
     // Handle dynamic routes like /player/:playerId
     const pattern = p.path.replace(/:[^/]+/g, '[^/]+');
     const regex = new RegExp(`^${pattern}$`);
@@ -191,8 +193,8 @@ export const canAccessRoute = (
 
   // Check required permissions if specified
   if (permission.requiredPermissions && userPermissions) {
-    const hasRequiredPermissions = permission.requiredPermissions.every(
-      perm => userPermissions.includes(perm),
+    const hasRequiredPermissions = permission.requiredPermissions.every(perm =>
+      userPermissions.includes(perm),
     );
     if (!hasRequiredPermissions) {
       return {
@@ -209,20 +211,23 @@ export const canAccessRoute = (
  * Get available routes for a specific user role
  */
 export const getAvailableRoutes = (userRole: UserRole): string[] => {
-  return ROUTE_PERMISSIONS
-    .filter(permission => permission.allowedRoles.includes(userRole))
-    .map(permission => permission.path);
+  return ROUTE_PERMISSIONS.filter(permission => permission.allowedRoles.includes(userRole)).map(
+    permission => permission.path,
+  );
 };
 
 /**
  * Role-specific navigation menu configuration
  */
-export const ROLE_NAVIGATION: Record<UserRole, Array<{
-  path: string;
-  label: string;
-  icon?: string;
-  group?: string;
-}>> = {
+export const ROLE_NAVIGATION: Record<
+  UserRole,
+  Array<{
+    path: string;
+    label: string;
+    icon?: string;
+    group?: string;
+  }>
+> = {
   coach: [
     { path: '/dashboard', label: 'Dashboard', icon: 'dashboard', group: 'main' },
     { path: '/tactics', label: 'Tactics Board', icon: 'tactics', group: 'main' },
@@ -235,7 +240,12 @@ export const ROLE_NAVIGATION: Record<UserRole, Array<{
     { path: '/mentoring', label: 'Mentoring', icon: 'mentoring', group: 'development' },
     { path: '/medical-center', label: 'Medical Center', icon: 'medical', group: 'team' },
     { path: '/league-table', label: 'League Table', icon: 'league', group: 'competition' },
-    { path: '/opposition-analysis', label: 'Opposition Analysis', icon: 'analysis', group: 'competition' },
+    {
+      path: '/opposition-analysis',
+      label: 'Opposition Analysis',
+      icon: 'analysis',
+      group: 'competition',
+    },
     { path: '/press-conference', label: 'Press Conference', icon: 'press', group: 'media' },
     { path: '/news-feed', label: 'News Feed', icon: 'news', group: 'media' },
     { path: '/inbox', label: 'Inbox', icon: 'inbox', group: 'communication' },
@@ -246,7 +256,12 @@ export const ROLE_NAVIGATION: Record<UserRole, Array<{
     { path: '/my-development', label: 'Development', icon: 'development', group: 'development' },
     { path: '/my-schedule', label: 'Schedule', icon: 'schedule', group: 'main' },
     { path: '/analytics', label: 'My Performance', icon: 'analytics', group: 'performance' },
-    { path: '/skill-challenges', label: 'Skill Challenges', icon: 'challenges', group: 'development' },
+    {
+      path: '/skill-challenges',
+      label: 'Skill Challenges',
+      icon: 'challenges',
+      group: 'development',
+    },
     { path: '/medical-center', label: 'Medical Center', icon: 'medical', group: 'health' },
     { path: '/league-table', label: 'League Table', icon: 'league', group: 'team' },
     { path: '/news-feed', label: 'Team News', icon: 'news', group: 'team' },
@@ -258,7 +273,12 @@ export const ROLE_NAVIGATION: Record<UserRole, Array<{
     { path: '/child-overview', label: 'Child Overview', icon: 'overview', group: 'main' },
     { path: '/analytics', label: 'Performance', icon: 'analytics', group: 'performance' },
     { path: '/my-schedule', label: 'Schedule', icon: 'schedule', group: 'main' },
-    { path: '/family-communication', label: 'Communication', icon: 'communication', group: 'communication' },
+    {
+      path: '/family-communication',
+      label: 'Communication',
+      icon: 'communication',
+      group: 'communication',
+    },
     { path: '/fee-management', label: 'Fees & Payments', icon: 'payments', group: 'admin' },
     { path: '/medical-center', label: 'Medical Center', icon: 'medical', group: 'health' },
     { path: '/league-table', label: 'League Table', icon: 'league', group: 'team' },

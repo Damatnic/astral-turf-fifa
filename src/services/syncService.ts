@@ -9,7 +9,7 @@
 const isClientSide = typeof window !== 'undefined';
 
 // Only import socket.io on client side or if available
-let io: unknown = null;
+const io: unknown = null;
 
 // Define Socket interface for type safety
 interface Socket {
@@ -73,9 +73,10 @@ class SyncService {
   async initialize(userId: string, authToken: string): Promise<void> {
     this.userId = userId;
 
-    const syncServerUrl = process.env.NODE_ENV === 'production'
-      ? 'https://sync.astralturf.com'
-      : 'http://localhost:3001';
+    const syncServerUrl =
+      process.env.NODE_ENV === 'production'
+        ? 'https://sync.astralturf.com'
+        : 'http://localhost:3001';
 
     this.socket = io(syncServerUrl, {
       auth: {
@@ -97,13 +98,13 @@ class SyncService {
       }
 
       this.socket.on('connect', () => {
-        // // console.log('🔄 Real-time sync connected');
+        // // // // console.log('🔄 Real-time sync connected');
         this.isConnected = true;
         this.processSyncQueue();
         resolve();
       });
 
-      this.socket.on('connect_error', (error) => {
+      this.socket.on('connect_error', error => {
         console.error('❌ Sync connection error:', error);
         reject(error);
       });
@@ -147,9 +148,8 @@ class SyncService {
       });
 
       this.lastSyncTimestamp = syncEvent.timestamp;
-
     } catch (_error) {
-      console.error('❌ Failed to sync state:', error);
+      console.error('❌ Failed to sync state:', _error);
       this.queueSyncEvent('STATE_UPDATE', { action, state });
     }
   }
@@ -179,9 +179,8 @@ class SyncService {
         ...syncEvent,
         payload: encryptedPayload,
       });
-
     } catch (_error) {
-      console.error('❌ Failed to sync player update:', error);
+      console.error('❌ Failed to sync player update:', _error);
       this.queueSyncEvent('PLAYER_UPDATE', { playerId, playerData });
     }
   }
@@ -211,9 +210,8 @@ class SyncService {
         ...syncEvent,
         payload: encryptedPayload,
       });
-
     } catch (_error) {
-      console.error('❌ Failed to sync tactical update:', error);
+      console.error('❌ Failed to sync tactical update:', _error);
       this.queueSyncEvent('TACTICAL_UPDATE', { formationId, tacticsData });
     }
   }
@@ -230,7 +228,7 @@ class SyncService {
 
       this.socket.emit('request_full_sync', { deviceId: this.deviceId });
 
-      this.socket.once('full_sync_response', async (data) => {
+      this.socket.once('full_sync_response', async data => {
         try {
           const decryptedData = await decrypt(data.state);
           const state = JSON.parse(decryptedData);
@@ -251,7 +249,9 @@ class SyncService {
    */
   async resolveConflict(conflictId: string, strategy: 'local' | 'remote' | 'merge'): Promise<void> {
     const conflict = this.conflictQueue.find(c => c.id === conflictId);
-    if (!conflict || !this.socket) {return;}
+    if (!conflict || !this.socket) {
+      return;
+    }
 
     let resolvedData: unknown;
 
@@ -332,7 +332,9 @@ class SyncService {
   // Private methods
 
   private setupSocketEventListeners(): void {
-    if (!this.socket) {return;}
+    if (!this.socket) {
+      return;
+    }
 
     // Handle incoming state updates from other devices
     this.socket.on('state_update', async (data: SyncEvent) => {
@@ -344,7 +346,7 @@ class SyncService {
           this.onStateUpdateCallback(payload.action);
         }
       } catch (_error) {
-        console.error('❌ Failed to process incoming state update:', error);
+        console.error('❌ Failed to process incoming state update:', _error);
       }
     });
 
@@ -370,13 +372,13 @@ class SyncService {
 
     // Handle reconnection
     this.socket.on('reconnect', () => {
-      // // console.log('🔄 Sync reconnected, processing queued events');
+      // // // // console.log('🔄 Sync reconnected, processing queued events');
       this.processSyncQueue();
     });
 
     // Handle disconnect
-    this.socket.on('disconnect', (reason) => {
-      // // console.log('⚠️ Sync disconnected:', reason);
+    this.socket.on('disconnect', reason => {
+      // // // // console.log('⚠️ Sync disconnected:', reason);
       this.isConnected = false;
     });
   }
@@ -416,7 +418,7 @@ class SyncService {
           payload: encryptedPayload,
         });
       } catch (_error) {
-        console.error('❌ Failed to process queued sync event:', error);
+        console.error('❌ Failed to process queued sync event:', _error);
         // Re-queue failed events
         this.syncQueue.push(event);
       }
@@ -432,7 +434,12 @@ class SyncService {
 
       case 'SET_ACTIVE_FORMATION':
       case 'ASSIGN_PLAYER_TO_SLOT':
-        return { tactics: { activeFormationIds: state.tactics.activeFormationIds, formations: state.tactics.formations } };
+        return {
+          tactics: {
+            activeFormationIds: state.tactics.activeFormationIds,
+            formations: state.tactics.formations,
+          },
+        };
 
       case 'SET_TEAM_TACTIC':
         return { tactics: { teamTactics: state.tactics.teamTactics } };

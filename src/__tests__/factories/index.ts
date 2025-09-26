@@ -6,9 +6,9 @@ import type {
   AuthState,
   TacticsState,
   UIState,
-  UserRole,
   PositionRole,
 } from '../../types';
+import type { UserRole } from '../../types/auth';
 
 // Factory function to create consistent test data
 export const createMockUser = (overrides: Partial<User> = {}): User => ({
@@ -82,6 +82,7 @@ export const createMockPlayer = (overrides: Partial<Player> = {}): Player => ({
   },
   historyStats: [],
   injuryHistory: [],
+  attributeHistory: [],
   personalityTags: ['professional'],
   strengthsWeaknesses: {
     strengths: ['Passing'],
@@ -98,27 +99,139 @@ export const createMockFormation = (overrides: Partial<Formation> = {}): Formati
   category: 'Balanced',
   positions: [
     // GK
-    { x: 50, y: 10, role: { id: 'gk', name: 'Goalkeeper', abbreviation: 'GK', category: 'GK', description: 'Goalkeeper' }},
+    {
+      x: 50,
+      y: 10,
+      role: {
+        id: 'gk',
+        name: 'Goalkeeper',
+        abbreviation: 'GK',
+        category: 'GK',
+        description: 'Goalkeeper',
+      },
+    },
     // Defense
-    { x: 20, y: 30, role: { id: 'lb', name: 'Left Back', abbreviation: 'LB', category: 'DF', description: 'Left back' }},
-    { x: 40, y: 25, role: { id: 'cb', name: 'Centre Back', abbreviation: 'CB', category: 'DF', description: 'Centre back' }},
-    { x: 60, y: 25, role: { id: 'cb', name: 'Centre Back', abbreviation: 'CB', category: 'DF', description: 'Centre back' }},
-    { x: 80, y: 30, role: { id: 'rb', name: 'Right Back', abbreviation: 'RB', category: 'DF', description: 'Right back' }},
+    {
+      x: 20,
+      y: 30,
+      role: {
+        id: 'lb',
+        name: 'Left Back',
+        abbreviation: 'LB',
+        category: 'DF',
+        description: 'Left back',
+      },
+    },
+    {
+      x: 40,
+      y: 25,
+      role: {
+        id: 'cb',
+        name: 'Centre Back',
+        abbreviation: 'CB',
+        category: 'DF',
+        description: 'Centre back',
+      },
+    },
+    {
+      x: 60,
+      y: 25,
+      role: {
+        id: 'cb',
+        name: 'Centre Back',
+        abbreviation: 'CB',
+        category: 'DF',
+        description: 'Centre back',
+      },
+    },
+    {
+      x: 80,
+      y: 30,
+      role: {
+        id: 'rb',
+        name: 'Right Back',
+        abbreviation: 'RB',
+        category: 'DF',
+        description: 'Right back',
+      },
+    },
     // Midfield
-    { x: 20, y: 60, role: { id: 'lm', name: 'Left Midfielder', abbreviation: 'LM', category: 'MF', description: 'Left midfielder' }},
-    { x: 40, y: 50, role: { id: 'cm', name: 'Central Midfielder', abbreviation: 'CM', category: 'MF', description: 'Central midfielder' }},
-    { x: 60, y: 50, role: { id: 'cm', name: 'Central Midfielder', abbreviation: 'CM', category: 'MF', description: 'Central midfielder' }},
-    { x: 80, y: 60, role: { id: 'rm', name: 'Right Midfielder', abbreviation: 'RM', category: 'MF', description: 'Right midfielder' }},
+    {
+      x: 20,
+      y: 60,
+      role: {
+        id: 'lm',
+        name: 'Left Midfielder',
+        abbreviation: 'LM',
+        category: 'MF',
+        description: 'Left midfielder',
+      },
+    },
+    {
+      x: 40,
+      y: 50,
+      role: {
+        id: 'cm',
+        name: 'Central Midfielder',
+        abbreviation: 'CM',
+        category: 'MF',
+        description: 'Central midfielder',
+      },
+    },
+    {
+      x: 60,
+      y: 50,
+      role: {
+        id: 'cm',
+        name: 'Central Midfielder',
+        abbreviation: 'CM',
+        category: 'MF',
+        description: 'Central midfielder',
+      },
+    },
+    {
+      x: 80,
+      y: 60,
+      role: {
+        id: 'rm',
+        name: 'Right Midfielder',
+        abbreviation: 'RM',
+        category: 'MF',
+        description: 'Right midfielder',
+      },
+    },
     // Attack
-    { x: 35, y: 85, role: { id: 'st', name: 'Striker', abbreviation: 'ST', category: 'FW', description: 'Striker' }},
-    { x: 65, y: 85, role: { id: 'st', name: 'Striker', abbreviation: 'ST', category: 'FW', description: 'Striker' }},
+    {
+      x: 35,
+      y: 85,
+      role: {
+        id: 'st',
+        name: 'Striker',
+        abbreviation: 'ST',
+        category: 'FW',
+        description: 'Striker',
+      },
+    },
+    {
+      x: 65,
+      y: 85,
+      role: {
+        id: 'st',
+        name: 'Striker',
+        abbreviation: 'ST',
+        category: 'FW',
+        description: 'Striker',
+      },
+    },
   ],
   isCustom: false,
   createdAt: '2024-01-01T00:00:00Z',
   ...overrides,
 });
 
-export const createMockPlayerAttributes = (overrides: Partial<PlayerAttributes> = {}): PlayerAttributes => ({
+export const createMockPlayerAttributes = (
+  overrides: Partial<PlayerAttributes> = {},
+): PlayerAttributes => ({
   speed: 80,
   passing: 85,
   tackling: 70,
@@ -131,21 +244,37 @@ export const createMockPlayerAttributes = (overrides: Partial<PlayerAttributes> 
 
 export const createMockAuthState = (overrides: Partial<AuthState> = {}): AuthState => ({
   user: null,
-  isLoading: false,
   error: null,
   isAuthenticated: false,
+  familyAssociations: [],
   ...overrides,
 });
 
 export const createMockTacticsState = (overrides: Partial<TacticsState> = {}): TacticsState => ({
   players: [createMockPlayer()],
-  formations: [createMockFormation()],
-  activeFormationIds: [],
+  formations: { '4-4-2': createMockFormation() },
+  playbook: {},
+  activeFormationIds: { home: '4-4-2', away: '4-4-2' },
+  teamTactics: {
+    home: {
+      mentality: 'balanced',
+      pressing: 'medium',
+      defensiveLine: 'medium',
+      attackingWidth: 'medium',
+    },
+    away: {
+      mentality: 'balanced',
+      pressing: 'medium',
+      defensiveLine: 'medium',
+      attackingWidth: 'medium',
+    },
+  },
+  drawings: [],
   selectedPlayers: [],
-  captainIds: [],
-  isEditingFormation: false,
-  draggedPlayer: null,
-  fieldDimensions: { width: 800, height: 500 },
+  tacticalFamiliarity: { '4-4-2': 50 },
+  chemistry: {},
+  captainIds: { home: null, away: null },
+  setPieceTakers: { home: {}, away: {} },
   ...overrides,
 });
 
@@ -157,6 +286,7 @@ export const createMockUIState = (overrides: Partial<UIState> = {}): UIState => 
   isExportingLineup: false,
   isPresentationMode: false,
   drawingTool: 'select',
+  simulationTimeline: [],
   tutorial: {
     isActive: false,
     currentStep: 0,

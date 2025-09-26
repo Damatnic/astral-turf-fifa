@@ -120,7 +120,7 @@ export const authService = {
 
       return response.user;
     } catch (_error) {
-      throw error;
+      throw _error;
     }
   },
 
@@ -133,7 +133,10 @@ export const authService = {
         acceptedPrivacyPolicy: signupData.acceptedPrivacyPolicy || false,
       };
 
-      const response: SecureLoginResponse = await secureAuthService.signup(secureSignupData, context);
+      const response: SecureLoginResponse = await secureAuthService.signup(
+        secureSignupData,
+        context,
+      );
 
       // Store tokens securely
       localStorage.setItem('accessToken', response.tokens.accessToken);
@@ -142,7 +145,7 @@ export const authService = {
 
       return response.user;
     } catch (_error) {
-      throw error;
+      throw _error;
     }
   },
 
@@ -154,7 +157,7 @@ export const authService = {
         await secureAuthService.logout(token, context);
       }
     } catch (_error) {
-      // // console.warn('Logout error:', error);
+      // // // // console.warn('Logout error:', error);
     } finally {
       // Always clear local storage
       localStorage.removeItem('authUser');
@@ -192,7 +195,7 @@ export const authService = {
           // Try again with new token
           return await secureAuthService.getCurrentUser(newTokens.accessToken, context);
         }
-      } catch (_refreshError) {
+      } catch (__refreshError) {
         // Refresh failed, clear all auth data
         localStorage.removeItem('authUser');
         localStorage.removeItem('accessToken');
@@ -209,7 +212,7 @@ export const authService = {
     if (userStr) {
       try {
         return JSON.parse(userStr) as User;
-      } catch (_e) {
+      } catch (__e) {
         return null;
       }
     }
@@ -255,7 +258,7 @@ export const authService = {
           return;
         }
         // In a real app, this would send an email
-        // // console.log(`Password reset email sent to ${email}`);
+        // // // // console.log(`Password reset email sent to ${email}`);
         resolve();
       }, 500);
     });
@@ -381,7 +384,7 @@ export const authService = {
 
   // Get all users for admin management (coach only)
   getAllUsers: async (): Promise<User[]> => {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       setTimeout(() => {
         resolve([...FAKE_USERS]);
       }, 300);
@@ -406,7 +409,7 @@ export const authService = {
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('authUser');
     } catch (_error) {
-      throw error;
+      throw _error;
     }
   },
 
@@ -414,7 +417,9 @@ export const authService = {
   validateToken: async (): Promise<boolean> => {
     try {
       const token = localStorage.getItem('accessToken');
-      if (!token) {return false;}
+      if (!token) {
+        return false;
+      }
 
       const context = getLoginContext();
       const user = await secureAuthService.getCurrentUser(token, context);
@@ -425,13 +430,25 @@ export const authService = {
   },
 
   // Add permission check utility
-  checkPermission: async (permission: string, resource: string, targetUserId?: string): Promise<boolean> => {
+  checkPermission: async (
+    permission: string,
+    resource: string,
+    targetUserId?: string,
+  ): Promise<boolean> => {
     try {
       const token = localStorage.getItem('accessToken');
-      if (!token) {return false;}
+      if (!token) {
+        return false;
+      }
 
       const context = getLoginContext();
-      return await secureAuthService.checkPermission(token, permission as any, resource as any, context, targetUserId);
+      return await secureAuthService.checkPermission(
+        token,
+        permission as any,
+        resource as any,
+        context,
+        targetUserId,
+      );
     } catch (_error) {
       return false;
     }

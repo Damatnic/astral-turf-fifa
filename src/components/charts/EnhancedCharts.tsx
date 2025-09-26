@@ -82,7 +82,7 @@ export const EnhancedLineChart: React.FC<EnhancedLineChartProps> = ({
   subtitle,
   height = 300,
   loading = false,
-  error,
+  _error,
   className = '',
   animated = true,
   showPoints = true,
@@ -96,7 +96,12 @@ export const EnhancedLineChart: React.FC<EnhancedLineChartProps> = ({
   // Create gradient backgrounds
   const createGradient = (ctx: CanvasRenderingContext2D, color: string, alpha = 0.1) => {
     const gradient = ctx.createLinearGradient(0, 0, 0, height);
-    gradient.addColorStop(0, `${color}${Math.round(alpha * 255).toString(16).padStart(2, '0')}`);
+    gradient.addColorStop(
+      0,
+      `${color}${Math.round(alpha * 255)
+        .toString(16)
+        .padStart(2, '0')}`,
+    );
     gradient.addColorStop(1, `${color}00`);
     return gradient;
   };
@@ -105,18 +110,19 @@ export const EnhancedLineChart: React.FC<EnhancedLineChartProps> = ({
 
   const chartData = {
     labels: data.labels,
-    datasets: data.datasets.map((dataset) => {
+    datasets: data.datasets.map(dataset => {
       const color = dataset.color || theme.colors.accent.primary;
       return {
         label: dataset.label,
         data: dataset.data,
         borderColor: color,
-        backgroundColor: dataset.fill || dataset.gradient
-          ? (context: ScriptableContext<"line">) => {
-              const ctx = context.chart.ctx;
-              return createGradient(ctx, color, 0.1);
-            }
-          : color,
+        backgroundColor:
+          dataset.fill || dataset.gradient
+            ? (context: ScriptableContext<'line'>) => {
+                const ctx = context.chart.ctx;
+                return createGradient(ctx, color, 0.1);
+              }
+            : color,
         borderWidth: 3,
         pointRadius: showPoints ? 4 : 0,
         pointHoverRadius: showPoints ? 6 : 0,
@@ -133,11 +139,13 @@ export const EnhancedLineChart: React.FC<EnhancedLineChartProps> = ({
   const options: ChartOptions<'line'> = {
     responsive: true,
     maintainAspectRatio: false,
-    animation: animated ? {
-      duration: 1500,
-      easing: 'easeInOutQuart',
-      delay: (context) => context.dataIndex * 50,
-    } : false,
+    animation: animated
+      ? {
+          duration: 1500,
+          easing: 'easeInOutQuart',
+          delay: context => context.dataIndex * 50,
+        }
+      : false,
     plugins: {
       legend: {
         position: 'top' as const,
@@ -212,7 +220,7 @@ export const EnhancedLineChart: React.FC<EnhancedLineChartProps> = ({
       <div className={`flex items-center justify-center ${className}`} style={{ height }}>
         <motion.div
           animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
           className="w-8 h-8 border-2 border-t-transparent rounded-full"
           style={{ borderColor: theme.colors.accent.primary }}
         />
@@ -250,17 +258,8 @@ export const EnhancedLineChart: React.FC<EnhancedLineChartProps> = ({
         </div>
       )}
 
-      <motion.div
-        variants={chartVariants}
-        initial="hidden"
-        animate="visible"
-        style={{ height }}
-      >
-        <Line
-          ref={chartRef}
-          data={chartData}
-          options={options}
-        />
+      <motion.div variants={chartVariants} initial="hidden" animate="visible" style={{ height }}>
+        <Line ref={chartRef} data={chartData} options={options} />
       </motion.div>
     </AnimatedContainer>
   );
@@ -287,7 +286,7 @@ export const EnhancedBarChart: React.FC<EnhancedBarChartProps> = ({
   subtitle,
   height = 300,
   loading = false,
-  error,
+  _error,
   className = '',
   animated = true,
   horizontal = false,
@@ -298,13 +297,13 @@ export const EnhancedBarChart: React.FC<EnhancedBarChartProps> = ({
 
   const chartData = {
     labels: data.labels,
-    datasets: data.datasets.map((dataset) => {
+    datasets: data.datasets.map(dataset => {
       const color = dataset.color || theme.colors.accent.primary;
       return {
         label: dataset.label,
         data: dataset.data,
         backgroundColor: dataset.gradient
-          ? (context: ScriptableContext<"bar">) => {
+          ? (context: ScriptableContext<'bar'>) => {
               const ctx = context.chart.ctx;
               const gradient = ctx.createLinearGradient(0, 0, 0, height);
               gradient.addColorStop(0, color);
@@ -323,12 +322,14 @@ export const EnhancedBarChart: React.FC<EnhancedBarChartProps> = ({
   const options: ChartOptions<'bar'> = {
     responsive: true,
     maintainAspectRatio: false,
-    indexAxis: horizontal ? 'y' as const : 'x' as const,
-    animation: animated ? {
-      duration: 1200,
-      easing: 'easeOutQuart',
-      delay: (context) => context.dataIndex * 80,
-    } : false,
+    indexAxis: horizontal ? ('y' as const) : ('x' as const),
+    animation: animated
+      ? {
+          duration: 1200,
+          easing: 'easeOutQuart',
+          delay: context => context.dataIndex * 80,
+        }
+      : false,
     plugins: {
       legend: {
         position: 'top' as const,
@@ -389,7 +390,7 @@ export const EnhancedBarChart: React.FC<EnhancedBarChartProps> = ({
       <div className={`flex items-center justify-center ${className}`} style={{ height }}>
         <motion.div
           animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
           className="w-8 h-8 border-2 border-t-transparent rounded-full"
           style={{ borderColor: theme.colors.accent.primary }}
         />
@@ -414,17 +415,8 @@ export const EnhancedBarChart: React.FC<EnhancedBarChartProps> = ({
         </div>
       )}
 
-      <motion.div
-        variants={chartVariants}
-        initial="hidden"
-        animate="visible"
-        style={{ height }}
-      >
-        <Bar
-          ref={chartRef}
-          data={chartData}
-          options={options}
-        />
+      <motion.div variants={chartVariants} initial="hidden" animate="visible" style={{ height }}>
+        <Bar ref={chartRef} data={chartData} options={options} />
       </motion.div>
     </AnimatedContainer>
   );
@@ -447,7 +439,7 @@ export const EnhancedDoughnutChart: React.FC<EnhancedDoughnutChartProps> = ({
   subtitle,
   height = 300,
   loading = false,
-  error,
+  _error,
   className = '',
   animated = true,
   showPercentage = true,
@@ -484,12 +476,14 @@ export const EnhancedDoughnutChart: React.FC<EnhancedDoughnutChartProps> = ({
     responsive: true,
     maintainAspectRatio: false,
     cutout,
-    animation: animated ? {
-      animateRotate: true,
-      animateScale: true,
-      duration: 1000,
-      easing: 'easeOutQuart',
-    } : false,
+    animation: animated
+      ? {
+          animateRotate: true,
+          animateScale: true,
+          duration: 1000,
+          easing: 'easeOutQuart',
+        }
+      : false,
     plugins: {
       legend: {
         position: 'right' as const,
@@ -502,7 +496,7 @@ export const EnhancedDoughnutChart: React.FC<EnhancedDoughnutChartProps> = ({
           },
           usePointStyle: true,
           padding: 15,
-          generateLabels: (chart) => {
+          generateLabels: chart => {
             const dataset = chart.data.datasets[0];
             return data.labels.map((label, index) => {
               const value = dataset.data[index] as number;
@@ -541,7 +535,7 @@ export const EnhancedDoughnutChart: React.FC<EnhancedDoughnutChartProps> = ({
       <div className={`flex items-center justify-center ${className}`} style={{ height }}>
         <motion.div
           animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
           className="w-8 h-8 border-2 border-t-transparent rounded-full"
           style={{ borderColor: theme.colors.accent.primary }}
         />
@@ -566,17 +560,8 @@ export const EnhancedDoughnutChart: React.FC<EnhancedDoughnutChartProps> = ({
         </div>
       )}
 
-      <motion.div
-        variants={chartVariants}
-        initial="hidden"
-        animate="visible"
-        style={{ height }}
-      >
-        <Doughnut
-          ref={chartRef}
-          data={chartData}
-          options={options}
-        />
+      <motion.div variants={chartVariants} initial="hidden" animate="visible" style={{ height }}>
+        <Doughnut ref={chartRef} data={chartData} options={options} />
       </motion.div>
     </AnimatedContainer>
   );
@@ -602,7 +587,7 @@ export const EnhancedRadarChart: React.FC<EnhancedRadarChartProps> = ({
   subtitle,
   height = 300,
   loading = false,
-  error,
+  _error,
   className = '',
   animated = true,
   scale,
@@ -612,7 +597,7 @@ export const EnhancedRadarChart: React.FC<EnhancedRadarChartProps> = ({
 
   const chartData = {
     labels: data.labels,
-    datasets: data.datasets.map((dataset) => {
+    datasets: data.datasets.map(dataset => {
       const color = dataset.color || theme.colors.accent.primary;
       return {
         label: dataset.label,
@@ -633,10 +618,12 @@ export const EnhancedRadarChart: React.FC<EnhancedRadarChartProps> = ({
   const options: ChartOptions<'radar'> = {
     responsive: true,
     maintainAspectRatio: false,
-    animation: animated ? {
-      duration: 1000,
-      easing: 'easeOutQuart',
-    } : false,
+    animation: animated
+      ? {
+          duration: 1000,
+          easing: 'easeOutQuart',
+        }
+      : false,
     plugins: {
       legend: {
         position: 'top' as const,
@@ -698,7 +685,7 @@ export const EnhancedRadarChart: React.FC<EnhancedRadarChartProps> = ({
       <div className={`flex items-center justify-center ${className}`} style={{ height }}>
         <motion.div
           animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
           className="w-8 h-8 border-2 border-t-transparent rounded-full"
           style={{ borderColor: theme.colors.accent.primary }}
         />
@@ -723,17 +710,8 @@ export const EnhancedRadarChart: React.FC<EnhancedRadarChartProps> = ({
         </div>
       )}
 
-      <motion.div
-        variants={chartVariants}
-        initial="hidden"
-        animate="visible"
-        style={{ height }}
-      >
-        <Radar
-          ref={chartRef}
-          data={chartData}
-          options={options}
-        />
+      <motion.div variants={chartVariants} initial="hidden" animate="visible" style={{ height }}>
+        <Radar ref={chartRef} data={chartData} options={options} />
       </motion.div>
     </AnimatedContainer>
   );

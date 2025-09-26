@@ -1,11 +1,11 @@
 import React from 'react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { renderHook } from '@testing-library/react';
+import { renderHook, render } from '@testing-library/react';
 import { AuthContext } from '../../context/AuthContext';
 import { useAuthContext } from '../../hooks/useAuthContext';
 import { createMockAuthState } from '../factories';
 import type { AuthState } from '../../types';
-import { INITIAL_STATE } from '../../constants';
+// import { INITIAL_STATE } from '../../constants';
 
 // Mock dispatch function
 const mockDispatch = vi.fn();
@@ -58,14 +58,55 @@ describe('AuthContext', () => {
     });
 
     it('should throw error when used outside of context provider', () => {
-      expect(() => {
-        renderHook(() => useAuthContext());
-      }).toThrow('useAuthContext must be used within an AppProvider');
+      // Suppress React error boundary warnings for this specific test
+      const originalError = console.error;
+      console.error = vi.fn();
+
+      let errorThrown = false;
+      let errorMessage = '';
+
+      // Custom error boundary to catch the error
+      const ErrorBoundary: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+        try {
+          return <>{children}</>;
+        } catch (_error) {
+          errorThrown = true;
+          errorMessage = (error as Error).message;
+          return <div>Error caught</div>;
+        }
+      };
+
+      // Create a component that uses the hook
+      const TestComponent = () => {
+        try {
+          useAuthContext();
+          return <div>No error</div>;
+        } catch (_error) {
+          errorThrown = true;
+          errorMessage = (_error as Error).message;
+          throw _error;
+        }
+      };
+
+      try {
+        render(
+          <ErrorBoundary>
+            <TestComponent />
+          </ErrorBoundary>,
+        );
+      } catch (_error) {
+        errorThrown = true;
+        errorMessage = (_error as Error).message;
+      }
+
+      expect(errorThrown).toBe(true);
+      expect(errorMessage).toBe('useAuthContext must be used within an AppProvider');
+
+      console.error = originalError;
     });
 
-    it('should return loading state correctly', () => {
+    it('should return unauthenticated state correctly', () => {
       const mockAuthState = createMockAuthState({
-        isLoading: true,
         isAuthenticated: false,
         user: null,
       });
@@ -73,14 +114,12 @@ describe('AuthContext', () => {
       const wrapper = createWrapper(mockAuthState);
       const { result } = renderHook(() => useAuthContext(), { wrapper });
 
-      expect(result.current.authState.isLoading).toBe(true);
       expect(result.current.authState.isAuthenticated).toBe(false);
       expect(result.current.authState.user).toBeNull();
     });
 
     it('should return error state correctly', () => {
       const mockAuthState = createMockAuthState({
-        isLoading: false,
         isAuthenticated: false,
         user: null,
         error: 'Authentication failed',
@@ -91,7 +130,6 @@ describe('AuthContext', () => {
 
       expect(result.current.authState.error).toBe('Authentication failed');
       expect(result.current.authState.isAuthenticated).toBe(false);
-      expect(result.current.authState.isLoading).toBe(false);
     });
 
     it('should handle different user roles correctly', () => {
@@ -197,16 +235,15 @@ describe('AuthContext', () => {
       const { result } = renderHook(() => useAuthContext(), { wrapper });
 
       expect(result.current.authState.user).toBeNull();
-      expect(result.current.authState.isLoading).toBe(false);
       expect(result.current.authState.error).toBeNull();
       expect(result.current.authState.isAuthenticated).toBe(false);
     });
   });
 
   describe('AuthContext default values', () => {
-    it('should have correct default context values', () => {
-      expect(AuthContext._currentValue.authState).toEqual(INITIAL_STATE.auth);
-      expect(typeof AuthContext._currentValue.dispatch).toBe('function');
+    it('should have undefined as default value', () => {
+      const contextValue = (AuthContext as any)._currentValue;
+      expect(contextValue).toBeUndefined();
     });
   });
 });

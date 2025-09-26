@@ -24,7 +24,8 @@ interface SEOHeadProps {
 
 const DEFAULT_SEO = {
   title: 'Astral Turf - AI-Powered Soccer Management',
-  description: 'Professional soccer tactical planner and franchise simulator. Create formations, manage players, and get AI-driven insights for your team.',
+  description:
+    'Professional soccer tactical planner and franchise simulator. Create formations, manage players, and get AI-driven insights for your team.',
   keywords: [
     'soccer management',
     'football tactics',
@@ -65,9 +66,10 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
   const seoAuthor = author || DEFAULT_SEO.author;
 
   // Get current URL for canonical and Open Graph
-  const currentUrl = typeof window !== 'undefined'
-    ? window.location.href
-    : canonicalUrl || 'https://astral-turf.vercel.app';
+  const currentUrl =
+    typeof window !== 'undefined'
+      ? window.location.href
+      : canonicalUrl || 'https://astral-turf.vercel.app';
 
   const robotsContent = [
     noIndex ? 'noindex' : 'index',
@@ -161,9 +163,7 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
       <link rel="dns-prefetch" href="https://vitejs.dev" />
 
       {/* Structured Data (JSON-LD) */}
-      <script type="application/ld+json">
-        {JSON.stringify(structuredData, null, 2)}
-      </script>
+      <script type="application/ld+json">{JSON.stringify(structuredData, null, 2)}</script>
 
       {/* Additional performance hints */}
       <meta httpEquiv="x-dns-prefetch-control" content="on" />

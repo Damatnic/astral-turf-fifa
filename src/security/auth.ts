@@ -121,7 +121,9 @@ export function validatePasswordStrength(password: string): { isValid: boolean; 
   }
 
   if (PASSWORD_CONFIG.REQUIRE_SPECIAL_CHARS) {
-    const specialCharsRegex = new RegExp(`[${PASSWORD_CONFIG.SPECIAL_CHARS.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}]`);
+    const specialCharsRegex = new RegExp(
+      `[${PASSWORD_CONFIG.SPECIAL_CHARS.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}]`,
+    );
     if (!specialCharsRegex.test(password)) {
       errors.push('Password must contain at least one special character');
     }
@@ -138,7 +140,9 @@ export async function hashPassword(password: string): Promise<string> {
   try {
     return await bcrypt.hash(password, PASSWORD_CONFIG.BCRYPT_ROUNDS);
   } catch (_error) {
-    securityLogger.error('Password hashing failed', { error: error instanceof Error ? error.message : 'Unknown error' });
+    securityLogger.error('Password hashing failed', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
     throw new Error('Password hashing failed');
   }
 }
@@ -148,55 +152,93 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
   try {
     return await bcrypt.compare(password, hash);
   } catch (_error) {
-    securityLogger.error('Password verification failed', { error: error instanceof Error ? error.message : 'Unknown error' });
+    securityLogger.error('Password verification failed', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
     return false;
   }
 }
 
 // Check if password was used before
-export function isPasswordPreviouslyUsed(password: string, passwordHistory: string[]): Promise<boolean> {
-  return Promise.all(
-    passwordHistory.map(hash => verifyPassword(password, hash)),
-  ).then(results => results.some(Boolean));
+export function isPasswordPreviouslyUsed(
+  password: string,
+  passwordHistory: string[],
+): Promise<boolean> {
+  return Promise.all(passwordHistory.map(hash => verifyPassword(password, hash))).then(results =>
+    results.some(Boolean),
+  );
 }
 
 /**
  * JWT Token Management
  */
 
-// Generate JWT token pair
-export async function generateTokenPair(user: SecureUser, sessionId: string): Promise<TokenPair> {
+// Generate JWT token pair with enhanced security
+export async function generateTokenPair(
+  user: SecureUser,
+  sessionId: string,
+  options?: { rotateRefresh?: boolean },
+): Promise<TokenPair> {
+  const now = Math.floor(Date.now() / 1000);
+  const jti = generateSecureToken(16); // Unique token ID for revocation
+
   const payload = {
     userId: user.id,
     email: user.email,
     role: user.role,
     sessionId,
+    jti,
+    deviceFingerprint: generateDeviceFingerprint(sessionId),
+    permissions: getUserPermissions(user.role),
     iss: JWT_CONFIG.ISSUER,
     aud: JWT_CONFIG.AUDIENCE,
+    iat: now,
   };
 
   try {
     if (typeof TextEncoder === 'undefined') {
       throw new Error('TextEncoder not available');
     }
-    const secret = new TextEncoder().encode(JWT_CONFIG.SECRET);
-    const refreshSecret = new TextEncoder().encode(JWT_CONFIG.REFRESH_SECRET);
+    const secret =
+      typeof TextEncoder !== 'undefined'
+        ? new TextEncoder().encode(JWT_CONFIG.SECRET)
+        : new Uint8Array();
+    const refreshSecret =
+      typeof TextEncoder !== 'undefined'
+        ? new TextEncoder().encode(JWT_CONFIG.REFRESH_SECRET)
+        : new Uint8Array();
 
+    // Enhanced access token with security claims
     const accessToken = await new jose.SignJWT(payload)
-      .setProtectedHeader({ alg: 'HS256' })
-      .setIssuedAt()
-      .setExpirationTime('15m')
+      .setProtectedHeader({
+        alg: 'HS256',
+        typ: 'JWT',
+        kid: 'access-key-1', // Key identifier for rotation
+      })
+      .setIssuedAt(now)
+      .setExpirationTime(now + 15 * 60) // 15 minutes
+      .setNotBefore(now) // Token not valid before now
       .setIssuer(JWT_CONFIG.ISSUER)
       .setAudience(JWT_CONFIG.AUDIENCE)
       .sign(secret);
 
+    // Enhanced refresh token with rotation support
+    const refreshJti = generateSecureToken(16);
     const refreshToken = await new jose.SignJWT({
       ...payload,
+      jti: refreshJti,
       type: 'refresh',
+      parentJti: options?.rotateRefresh ? payload.jti : undefined,
+      rotationCount: user.refreshTokens.length + 1,
     })
-      .setProtectedHeader({ alg: 'HS256' })
-      .setIssuedAt()
-      .setExpirationTime('7d')
+      .setProtectedHeader({
+        alg: 'HS256',
+        typ: 'JWT',
+        kid: 'refresh-key-1',
+      })
+      .setIssuedAt(now)
+      .setExpirationTime(now + 7 * 24 * 60 * 60) // 7 days
+      .setNotBefore(now)
       .setIssuer(JWT_CONFIG.ISSUER)
       .setAudience(JWT_CONFIG.AUDIENCE)
       .sign(refreshSecret);
@@ -204,10 +246,13 @@ export async function generateTokenPair(user: SecureUser, sessionId: string): Pr
     // Calculate expiration time in seconds
     const expiresIn = 15 * 60; // 15 minutes in seconds
 
-    securityLogger.info('Token pair generated', {
+    securityLogger.info('Enhanced token pair generated', {
       userId: user.id,
       sessionId,
+      jti,
+      refreshJti,
       expiresIn,
+      rotated: options?.rotateRefresh || false,
     });
 
     return {
@@ -219,28 +264,67 @@ export async function generateTokenPair(user: SecureUser, sessionId: string): Pr
   } catch (_error) {
     securityLogger.error('Token generation failed', {
       userId: user.id,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: _error instanceof Error ? _error.message : 'Unknown error',
     });
     throw new Error('Token generation failed');
   }
 }
 
+// Generate device fingerprint for additional security
+function generateDeviceFingerprint(sessionId: string): string {
+  const fingerprint =
+    typeof crypto !== 'undefined' && crypto.SHA256
+      ? crypto.SHA256(sessionId + Date.now().toString()).toString()
+      : sessionId + Date.now().toString();
+  return fingerprint.substring(0, 16);
+}
+
+// Get user permissions based on role
+function getUserPermissions(role: string): string[] {
+  const permissionMap = {
+    coach: ['read:all', 'write:players', 'write:formations', 'admin:users'],
+    player: ['read:own', 'write:own'],
+    family: ['read:associated', 'write:own'],
+  };
+  return permissionMap[role] || ['read:own'];
+}
+
+// Generate secure random token
+function generateSecureToken(length: number = 32): string {
+  const array = new Uint8Array(length);
+  if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+    crypto.getRandomValues(array);
+  } else {
+    // Fallback for environments without crypto.getRandomValues
+    for (let i = 0; i < array.length; i++) {
+      array[i] = Math.floor(Math.random() * 256);
+    }
+  }
+  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+}
+
 // Verify JWT token
-export async function verifyToken(token: string, isRefreshToken = false): Promise<JWTPayload | null> {
+export async function verifyToken(
+  token: string,
+  isRefreshToken = false,
+): Promise<JWTPayload | null> {
   try {
     // Check if token is blacklisted
     if (blacklistedTokens.has(token)) {
-      securityLogger.warn('Attempted use of blacklisted token', { token: token.substring(0, 20) + '...' });
+      securityLogger.warn('Attempted use of blacklisted token', {
+        token: token.substring(0, 20) + '...',
+      });
       return null;
     }
 
     if (typeof TextEncoder === 'undefined') {
       throw new Error('TextEncoder not available');
     }
-    
-    const secret = new TextEncoder().encode(
-      isRefreshToken ? JWT_CONFIG.REFRESH_SECRET : JWT_CONFIG.SECRET
-    );
+
+    const secret =
+      typeof TextEncoder !== 'undefined'
+        ? new TextEncoder().encode(isRefreshToken ? JWT_CONFIG.REFRESH_SECRET : JWT_CONFIG.SECRET)
+        : new Uint8Array();
 
     const { payload } = await jose.jwtVerify(token, secret, {
       issuer: JWT_CONFIG.ISSUER,
@@ -262,35 +346,115 @@ export async function verifyToken(token: string, isRefreshToken = false): Promis
   }
 }
 
-// Refresh access token using refresh token
-export async function refreshAccessToken(refreshToken: string): Promise<TokenPair | null> {
+// Enhanced refresh access token with automatic rotation
+export async function refreshAccessToken(
+  refreshToken: string,
+  options?: { userAgent?: string; ipAddress?: string },
+): Promise<TokenPair | null> {
   const payload = await verifyToken(refreshToken, true);
   if (!payload) {
+    securityLogger.warn('Invalid refresh token during refresh', {
+      token: refreshToken.substring(0, 20) + '...',
+    });
     return null;
   }
 
   const user = users.get(payload.userId);
   if (!user || !user.refreshTokens.includes(refreshToken)) {
-    securityLogger.warn('Invalid refresh token used', { userId: payload.userId });
+    securityLogger.warn('Refresh token not found in user tokens', {
+      userId: payload.userId,
+      tokenCount: user?.refreshTokens.length || 0,
+    });
     return null;
   }
 
-  // Generate new token pair
-  const newTokenPair = await generateTokenPair(user, payload.sessionId);
+  // Security checks for refresh token
+  if (!payload.jti || !payload.sessionId) {
+    securityLogger.warn('Refresh token missing security claims', { userId: payload.userId });
+    return null;
+  }
 
-  // Remove old refresh token and add new one
+  // Check for token replay attacks
+  if (blacklistedTokens.has(refreshToken)) {
+    securityLogger.warn('Attempted reuse of blacklisted refresh token', {
+      userId: payload.userId,
+      jti: payload.jti,
+    });
+    // Revoke all user tokens on potential compromise
+    revokeAllUserTokens(payload.userId);
+    return null;
+  }
+
+  // Verify session is still active
+  const session = activeSessions.get(payload.sessionId);
+  if (!session || !session.isActive) {
+    securityLogger.warn('Refresh attempted with inactive session', {
+      userId: payload.userId,
+      sessionId: payload.sessionId,
+    });
+    return null;
+  }
+
+  // Security validation: Check for suspicious activity
+  if (options?.ipAddress && session.ipAddress !== options.ipAddress) {
+    securityLogger.warn('Refresh token used from different IP', {
+      userId: payload.userId,
+      originalIp: session.ipAddress,
+      newIp: options.ipAddress,
+    });
+    // Allow but log for monitoring
+  }
+
+  // Generate new token pair with rotation
+  const newTokenPair = await generateTokenPair(user, payload.sessionId, { rotateRefresh: true });
+
+  // Implement secure token rotation
   user.refreshTokens = user.refreshTokens.filter(token => token !== refreshToken);
   user.refreshTokens.push(newTokenPair.refreshToken);
 
-  // Blacklist old refresh token
+  // Blacklist old refresh token immediately
   blacklistedTokens.add(refreshToken);
 
-  securityLogger.info('Access token refreshed', {
+  // Update session activity
+  updateSessionActivity(payload.sessionId);
+
+  securityLogger.info('Access token refreshed with rotation', {
     userId: payload.userId,
     sessionId: payload.sessionId,
+    oldJti: payload.jti,
+    rotationCount: payload.rotationCount || 1,
   });
 
   return newTokenPair;
+}
+
+// Revoke all tokens for a user (security breach response)
+export function revokeAllUserTokens(userId: string): void {
+  const user = users.get(userId);
+  if (!user) {
+    return;
+  }
+
+  // Blacklist all refresh tokens
+  user.refreshTokens.forEach(token => {
+    blacklistedTokens.add(token);
+  });
+
+  // Clear user tokens
+  user.refreshTokens = [];
+
+  // Terminate all sessions
+  user.activeSessions.forEach(session => {
+    if (session.isActive) {
+      terminateSession(userId, session.id);
+    }
+  });
+
+  securityLogger.warn('All user tokens revoked due to security concern', {
+    userId,
+    tokensRevoked: user.refreshTokens.length,
+    sessionsTerminated: user.activeSessions.length,
+  });
 }
 
 // Revoke token (logout)
@@ -323,8 +487,16 @@ export async function revokeToken(token: string): Promise<void> {
  */
 
 // Create new session
-export function createSession(user: SecureUser, deviceInfo: string, ipAddress: string, userAgent: string): SessionInfo {
-  const sessionId = typeof crypto !== 'undefined' ? crypto.lib.WordArray.random(16).toString() : Math.random().toString(36);
+export function createSession(
+  user: SecureUser,
+  deviceInfo: string,
+  ipAddress: string,
+  userAgent: string,
+): SessionInfo {
+  const sessionId =
+    typeof crypto !== 'undefined' && crypto.getRandomValues
+      ? generateSecureToken(16)
+      : Math.random().toString(36);
 
   const session: SessionInfo = {
     id: sessionId,
@@ -409,7 +581,13 @@ export function cleanupExpiredSessions(): void {
  */
 
 // Record login attempt
-export function recordLoginAttempt(email: string, ipAddress: string, userAgent: string, success: boolean, failureReason?: string): void {
+export function recordLoginAttempt(
+  email: string,
+  ipAddress: string,
+  userAgent: string,
+  success: boolean,
+  failureReason?: string,
+): void {
   const attempt: LoginAttempt = {
     email,
     ipAddress,
@@ -424,7 +602,7 @@ export function recordLoginAttempt(email: string, ipAddress: string, userAgent: 
   attempts.push(attempt);
 
   // Keep only recent attempts
-  const cutoff = Date.now() - (24 * 60 * 60 * 1000); // 24 hours
+  const cutoff = Date.now() - 24 * 60 * 60 * 1000; // 24 hours
   const recentAttempts = attempts.filter(a => new Date(a.timestamp).getTime() > cutoff);
 
   loginAttempts.set(key, recentAttempts);
@@ -443,7 +621,7 @@ export function shouldLockAccount(email: string, ipAddress: string): boolean {
   const attempts = loginAttempts.get(key) || [];
 
   // Count failed attempts in the last window
-  const windowStart = Date.now() - (15 * 60 * 1000); // 15 minutes
+  const windowStart = Date.now() - 15 * 60 * 1000; // 15 minutes
   const recentFailures = attempts.filter(
     a => !a.success && new Date(a.timestamp).getTime() > windowStart,
   );
@@ -504,7 +682,61 @@ export function initializeSecurity(): void {
 // Export user management functions for migration from existing auth service
 export { users };
 
-// Export types for use in services
+// Multi-Factor Authentication Support
+export interface MFAConfiguration {
+  enabled: boolean;
+  secret?: string;
+  backupCodes: string[];
+  lastUsed?: string;
+  method: 'totp' | 'sms' | 'email';
+}
+
+// Enhanced JWT payload with security features
+export interface EnhancedJWTPayload extends JWTPayload {
+  jti: string; // JWT ID for revocation
+  deviceFingerprint: string;
+  permissions: string[];
+  mfaVerified?: boolean;
+  riskLevel?: 'low' | 'medium' | 'high';
+}
+
+// Token security metadata
+export interface TokenSecurityInfo {
+  issuedAt: number;
+  expiresAt: number;
+  deviceFingerprint: string;
+  ipAddress: string;
+  userAgent: string;
+  riskScore: number;
+}
+
+// Security audit trail
+export interface SecurityAuditEvent {
+  id: string;
+  userId: string;
+  eventType: string;
+  timestamp: string;
+  ipAddress: string;
+  userAgent: string;
+  resource: string;
+  action: string;
+  result: 'success' | 'failure' | 'blocked';
+  metadata: Record<string, unknown>;
+}
+
+// Add MFA to SecureUser interface
+export interface EnhancedSecureUser extends SecureUser {
+  mfaConfig: MFAConfiguration;
+  securityEvents: SecurityAuditEvent[];
+  lastSecurityReview?: string;
+  riskProfile: {
+    score: number;
+    factors: string[];
+    lastAssessment: string;
+  };
+}
+
+// Export enhanced types for use in services
 export type {
   SecureUser,
   TokenPair,
@@ -512,4 +744,9 @@ export type {
   SessionInfo,
   SecurityQuestion,
   LoginAttempt,
+  MFAConfiguration,
+  EnhancedJWTPayload,
+  TokenSecurityInfo,
+  SecurityAuditEvent,
+  EnhancedSecureUser,
 };

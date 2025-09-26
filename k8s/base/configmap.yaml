@@ -13,41 +13,41 @@ metadata:
     app.kubernetes.io/component: config
 data:
   # Application Configuration
-  NODE_ENV: "production"
-  PORT: "3000"
-  LOG_LEVEL: "info"
-  
+  NODE_ENV: 'production'
+  PORT: '3000'
+  LOG_LEVEL: 'info'
+
   # Feature Flags
-  ENABLE_ANALYTICS: "true"
-  ENABLE_AI_FEATURES: "true"
-  ENABLE_COLLABORATIVE_BOARD: "true"
-  ENABLE_REAL_TIME_UPDATES: "true"
-  
+  ENABLE_ANALYTICS: 'true'
+  ENABLE_AI_FEATURES: 'true'
+  ENABLE_COLLABORATIVE_BOARD: 'true'
+  ENABLE_REAL_TIME_UPDATES: 'true'
+
   # Performance Settings
-  CACHE_TTL: "3600"
-  API_RATE_LIMIT: "1000"
-  MAX_CONCURRENT_CONNECTIONS: "100"
-  
+  CACHE_TTL: '3600'
+  API_RATE_LIMIT: '1000'
+  MAX_CONCURRENT_CONNECTIONS: '100'
+
   # Database Configuration
-  DB_POOL_MIN: "2"
-  DB_POOL_MAX: "10"
-  DB_CONNECTION_TIMEOUT: "30000"
-  DB_IDLE_TIMEOUT: "600000"
-  
+  DB_POOL_MIN: '2'
+  DB_POOL_MAX: '10'
+  DB_CONNECTION_TIMEOUT: '30000'
+  DB_IDLE_TIMEOUT: '600000'
+
   # Redis Configuration
-  REDIS_MAX_RETRIES: "3"
-  REDIS_RETRY_DELAY: "100"
-  REDIS_KEY_PREFIX: "astral:"
-  
+  REDIS_MAX_RETRIES: '3'
+  REDIS_RETRY_DELAY: '100'
+  REDIS_KEY_PREFIX: 'astral:'
+
   # Security Settings
-  CORS_ORIGINS: "https://astral-turf.com,https://app.astral-turf.com"
-  CSRF_PROTECTION: "true"
-  RATE_LIMIT_WINDOW: "900000"
-  
+  CORS_ORIGINS: 'https://astral-turf.com,https://app.astral-turf.com'
+  CSRF_PROTECTION: 'true'
+  RATE_LIMIT_WINDOW: '900000'
+
   # Monitoring
-  METRICS_ENABLED: "true"
-  HEALTH_CHECK_INTERVAL: "30"
-  
+  METRICS_ENABLED: 'true'
+  HEALTH_CHECK_INTERVAL: '30'
+
 ---
 apiVersion: v1
 kind: ConfigMap

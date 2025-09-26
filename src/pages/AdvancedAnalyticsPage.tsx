@@ -23,8 +23,8 @@ const AdvancedAnalyticsPage: React.FC = () => {
               Advanced AI Analytics
             </h1>
             <p className="text-gray-400 mt-2 max-w-2xl">
-              Unlock the power of artificial intelligence to analyze player development,
-              predict match outcomes, and optimize your tactical approach with cutting-edge analytics.
+              Unlock the power of artificial intelligence to analyze player development, predict
+              match outcomes, and optimize your tactical approach with cutting-edge analytics.
             </p>
           </div>
           <div className="text-right">
@@ -81,7 +81,9 @@ const AdvancedAnalyticsPage: React.FC = () => {
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-400">Formations Analyzed</span>
-                <span className="text-purple-400 font-semibold">{Object.keys(formations).length}</span>
+                <span className="text-purple-400 font-semibold">
+                  {Object.keys(formations).length}
+                </span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-400">Win Rate Improvement</span>
@@ -96,8 +98,8 @@ const AdvancedAnalyticsPage: React.FC = () => {
               <h3 className="text-lg font-semibold text-white">Match Prediction</h3>
             </div>
             <p className="text-gray-400 text-sm mb-4">
-              Sophisticated algorithms analyze team strength, player form, tactical setups,
-              and historical data to predict match outcomes with remarkable accuracy.
+              Sophisticated algorithms analyze team strength, player form, tactical setups, and
+              historical data to predict match outcomes with remarkable accuracy.
             </p>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
@@ -117,7 +119,9 @@ const AdvancedAnalyticsPage: React.FC = () => {
             <span className="text-3xl mr-3">🤖</span>
             <div>
               <h3 className="text-xl font-semibold text-white">AI-Powered Soccer Intelligence</h3>
-              <p className="text-blue-200">Next-generation analytics for professional soccer management</p>
+              <p className="text-blue-200">
+                Next-generation analytics for professional soccer management
+              </p>
             </div>
           </div>
 

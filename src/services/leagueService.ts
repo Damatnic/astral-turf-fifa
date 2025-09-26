@@ -30,7 +30,9 @@ export const createLeagueTable = (teams: LeagueTeam[]): Record<string, LeagueTab
   return table;
 };
 
-export const getSortedLeagueTable = (leagueTable: Record<string, LeagueTableEntry>): LeagueTableEntry[] => {
+export const getSortedLeagueTable = (
+  leagueTable: Record<string, LeagueTableEntry>,
+): LeagueTableEntry[] => {
   return Object.values(leagueTable).sort((a, b) => {
     // Sort by points first
     if (b.points !== a.points) {
@@ -52,9 +54,14 @@ export const getSortedLeagueTable = (leagueTable: Record<string, LeagueTableEntr
   });
 };
 
-export const getCurrentPosition = (leagueTable: Record<string, LeagueTableEntry>, teamName?: string): number => {
+export const getCurrentPosition = (
+  leagueTable: Record<string, LeagueTableEntry>,
+  teamName?: string,
+): number => {
   const userTeam = teamName || Object.values(leagueTable).find(entry => entry.isUserTeam);
-  if (!userTeam) {return -1;}
+  if (!userTeam) {
+    return -1;
+  }
 
   const sortedTable = getSortedLeagueTable(leagueTable);
   const teamNameToFind = typeof userTeam === 'string' ? userTeam : userTeam.teamName;
@@ -70,9 +77,11 @@ export const getNextFixture = (
   const upcomingFixtures = fixtures.filter(fixture => fixture.week >= currentWeek);
 
   if (teamName) {
-    return upcomingFixtures.find(
-      fixture => fixture.homeTeam === teamName || fixture.awayTeam === teamName,
-    ) || null;
+    return (
+      upcomingFixtures.find(
+        fixture => fixture.homeTeam === teamName || fixture.awayTeam === teamName,
+      ) || null
+    );
   }
 
   return upcomingFixtures[0] || null;
@@ -85,9 +94,10 @@ export const getTeamForm = (
   games: number = 5,
 ): ('W' | 'D' | 'L')[] => {
   const recentFixtures = fixtures
-    .filter(fixture =>
-      (fixture.homeTeam === teamName || fixture.awayTeam === teamName) &&
-      fixture.week < new Date().getTime(), // Assuming played fixtures
+    .filter(
+      fixture =>
+        (fixture.homeTeam === teamName || fixture.awayTeam === teamName) &&
+        fixture.week < new Date().getTime(), // Assuming played fixtures
     )
     .slice(-games);
 
@@ -119,13 +129,15 @@ export const calculateLeagueStats = (leagueTable: Record<string, LeagueTableEntr
   const averageGoalsPerGame = totalMatches > 0 ? totalGoals / totalMatches : 0;
 
   // Find top scorer (this would need to be tracked separately in real implementation)
-  const topScoringTeam = entries.reduce((top, entry) =>
-    entry.goalsFor > top.goalsFor ? entry : top, entries[0] || { goalsFor: 0 },
+  const topScoringTeam = entries.reduce(
+    (top, entry) => (entry.goalsFor > top.goalsFor ? entry : top),
+    entries[0] || { goalsFor: 0 },
   );
 
   // Best defense
-  const bestDefense = entries.reduce((best, entry) =>
-    entry.goalsAgainst < best.goalsAgainst ? entry : best, entries[0] || { goalsAgainst: 999 },
+  const bestDefense = entries.reduce(
+    (best, entry) => (entry.goalsAgainst < best.goalsAgainst ? entry : best),
+    entries[0] || { goalsAgainst: 999 },
   );
 
   return {
@@ -162,21 +174,38 @@ export const generateSeasonAwards = (
   const teamOfSeason: (string | null)[] = new Array(11).fill(null);
   const bestPlayersByPosition = {
     GK: allPlayers.filter(p => p.roleId === 'gk').sort((a, b) => b.stats.saves - a.stats.saves)[0],
-    DF: allPlayers.filter(p => ['cb', 'fb'].includes(p.roleId)).sort((a, b) => b.stats.tacklesWon - a.stats.tacklesWon).slice(0, 4),
-    MF: allPlayers.filter(p => ['dm', 'cm', 'wm', 'am'].includes(p.roleId)).sort((a, b) => b.stats.assists - a.stats.assists).slice(0, 4),
-    FW: allPlayers.filter(p => ['w', 'st'].includes(p.roleId)).sort((a, b) => b.stats.goals - a.stats.goals).slice(0, 2),
+    DF: allPlayers
+      .filter(p => ['cb', 'fb'].includes(p.roleId))
+      .sort((a, b) => b.stats.tacklesWon - a.stats.tacklesWon)
+      .slice(0, 4),
+    MF: allPlayers
+      .filter(p => ['dm', 'cm', 'wm', 'am'].includes(p.roleId))
+      .sort((a, b) => b.stats.assists - a.stats.assists)
+      .slice(0, 4),
+    FW: allPlayers
+      .filter(p => ['w', 'st'].includes(p.roleId))
+      .sort((a, b) => b.stats.goals - a.stats.goals)
+      .slice(0, 2),
   };
 
   let index = 0;
-  if (bestPlayersByPosition.GK) {teamOfSeason[index++] = bestPlayersByPosition.GK.id;}
+  if (bestPlayersByPosition.GK) {
+    teamOfSeason[index++] = bestPlayersByPosition.GK.id;
+  }
   bestPlayersByPosition.DF.forEach(player => {
-    if (player && index < 5) {teamOfSeason[index++] = player.id;}
+    if (player && index < 5) {
+      teamOfSeason[index++] = player.id;
+    }
   });
   bestPlayersByPosition.MF.forEach(player => {
-    if (player && index < 9) {teamOfSeason[index++] = player.id;}
+    if (player && index < 9) {
+      teamOfSeason[index++] = player.id;
+    }
   });
   bestPlayersByPosition.FW.forEach(player => {
-    if (player && index < 11) {teamOfSeason[index++] = player.id;}
+    if (player && index < 11) {
+      teamOfSeason[index++] = player.id;
+    }
   });
 
   return {
@@ -309,7 +338,9 @@ export const calculatePointsNeededForSafety = (
   const relegationZoneStart = totalTeams - 3; // Assuming 3 teams get relegated
 
   const team = leagueTable[teamName];
-  if (!team) {return 0;}
+  if (!team) {
+    return 0;
+  }
 
   // Estimate points needed for safety (typically around 40 points in most leagues)
   const estimatedSafetyPoints = 40;

@@ -6,11 +6,11 @@
 # Prometheus Operator Configuration
 prometheus-operator:
   enabled: true
-  
+
   # Prometheus configuration
   prometheus:
     enabled: true
-    
+
     # Resource configuration
     prometheusSpec:
       # Storage configuration
@@ -18,15 +18,15 @@ prometheus-operator:
         volumeClaimTemplate:
           spec:
             storageClassName: ssd
-            accessModes: ["ReadWriteOnce"]
+            accessModes: ['ReadWriteOnce']
             resources:
               requests:
                 storage: 100Gi
-      
+
       # Retention configuration
       retention: 30d
       retentionSize: 90GB
-      
+
       # Resource limits
       resources:
         requests:
@@ -35,103 +35,103 @@ prometheus-operator:
         limits:
           memory: 4Gi
           cpu: 2000m
-      
+
       # Security context
       securityContext:
         runAsNonRoot: true
         runAsUser: 65534
         fsGroup: 65534
-      
+
       # Service account
       serviceAccountName: prometheus
-      
+
       # External labels
       externalLabels:
         cluster: astral-turf
         environment: production
         region: us-east-1
-      
+
       # Remote write configuration (for long-term storage)
       remoteWrite:
-      - url: "https://prometheus.astral-turf.com/api/v1/write"
-        headers:
-          X-Custom-Header: "astral-turf-metrics"
-        writeRelabelConfigs:
-        - sourceLabels: [__name__]
-          regex: 'astral_.*'
-          action: keep
-      
+        - url: 'https://prometheus.astral-turf.com/api/v1/write'
+          headers:
+            X-Custom-Header: 'astral-turf-metrics'
+          writeRelabelConfigs:
+            - sourceLabels: [__name__]
+              regex: 'astral_.*'
+              action: keep
+
       # Rule selector
       ruleSelector:
         matchLabels:
           app: astral-turf
           prometheus: kube-prometheus
-      
+
       # Service monitor selector
       serviceMonitorSelector:
         matchLabels:
           release: prometheus
-      
+
       # Pod monitor selector
       podMonitorSelector:
         matchLabels:
           release: prometheus
-      
+
       # Alertmanager configuration
       alerting:
         alertmanagers:
-        - namespace: monitoring
-          name: alertmanager
-          port: web
-      
+          - namespace: monitoring
+            name: alertmanager
+            port: web
+
       # Additional scrape configs
       additionalScrapeConfigs:
-      - job_name: 'astral-turf-custom'
-        kubernetes_sd_configs:
-        - role: pod
-          namespaces:
-            names:
-            - astral-turf
-        relabel_configs:
-        - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
-          action: keep
-          regex: true
-        - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
-          action: replace
-          target_label: __metrics_path__
-          regex: (.+)
-        - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
-          action: replace
-          regex: ([^:]+)(?::\d+)?;(\d+)
-          replacement: $1:$2
-          target_label: __address__
-      
+        - job_name: 'astral-turf-custom'
+          kubernetes_sd_configs:
+            - role: pod
+              namespaces:
+                names:
+                  - astral-turf
+          relabel_configs:
+            - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+              action: keep
+              regex: true
+            - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+              action: replace
+              target_label: __metrics_path__
+              regex: (.+)
+            - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+              action: replace
+              regex: ([^:]+)(?::\d+)?;(\d+)
+              replacement: $1:$2
+              target_label: __address__
+
       # Node selector for specific nodes
       nodeSelector:
         node-type: monitoring
-      
+
       # Tolerations
       tolerations:
-      - key: monitoring
-        operator: Equal
-        value: "true"
-        effect: NoSchedule
+        - key: monitoring
+          operator: Equal
+          value: 'true'
+          effect: NoSchedule
 
 # Alertmanager Configuration
 alertmanager:
   enabled: true
-  
+
   alertmanagerSpec:
     # Storage configuration
     storage:
       volumeClaimTemplate:
         spec:
           storageClassName: ssd
-          accessModes: ["ReadWriteOnce"]
+          accessModes: ['ReadWriteOnce']
           resources:
             requests:
               storage: 10Gi
-    
+
     # Resource configuration
     resources:
       requests:
@@ -140,13 +140,13 @@ alertmanager:
       limits:
         memory: 512Mi
         cpu: 200m
-    
+
     # Security context
     securityContext:
       runAsNonRoot: true
       runAsUser: 65534
       fsGroup: 65534
-    
+
     # Configuration
     config:
       global:
@@ -154,7 +154,7 @@ alertmanager:
         smtp_from: 'alerts@astral-turf.com'
         smtp_auth_username: 'alerts@astral-turf.com'
         smtp_auth_password: 'SMTP_PASSWORD_HERE'
-      
+
       route:
         group_by: ['alertname', 'cluster', 'service']
         group_wait: 10s
@@ -162,53 +162,53 @@ alertmanager:
         repeat_interval: 1h
         receiver: 'web.hook'
         routes:
-        - match:
-            alertname: 'DeadMansSwitch'
-          receiver: 'null'
-        - match_re:
-            severity: 'critical|warning'
-          receiver: 'critical-alerts'
-        - match:
-            severity: 'info'
-          receiver: 'info-alerts'
-      
+          - match:
+              alertname: 'DeadMansSwitch'
+            receiver: 'null'
+          - match_re:
+              severity: 'critical|warning'
+            receiver: 'critical-alerts'
+          - match:
+              severity: 'info'
+            receiver: 'info-alerts'
+
       receivers:
-      - name: 'null'
-      - name: 'web.hook'
-        webhook_configs:
-        - url: 'http://webhook-service:8080/webhook'
-      - name: 'critical-alerts'
-        email_configs:
-        - to: 'critical@astral-turf.com'
-          subject: 'Critical Alert: {{ .GroupLabels.alertname }}'
-          body: |
-            {{ range .Alerts }}
-            Alert: {{ .Annotations.summary }}
-            Description: {{ .Annotations.description }}
-            {{ end }}
-        slack_configs:
-        - api_url: 'SLACK_WEBHOOK_URL_HERE'
-          channel: '#critical-alerts'
-          title: 'Critical Alert'
-          text: '{{ range .Alerts }}{{ .Annotations.summary }}{{ end }}'
-      - name: 'info-alerts'
-        email_configs:
-        - to: 'info@astral-turf.com'
-          subject: 'Info Alert: {{ .GroupLabels.alertname }}'
+        - name: 'null'
+        - name: 'web.hook'
+          webhook_configs:
+            - url: 'http://webhook-service:8080/webhook'
+        - name: 'critical-alerts'
+          email_configs:
+            - to: 'critical@astral-turf.com'
+              subject: 'Critical Alert: {{ .GroupLabels.alertname }}'
+              body: |
+                {{ range .Alerts }}
+                Alert: {{ .Annotations.summary }}
+                Description: {{ .Annotations.description }}
+                {{ end }}
+          slack_configs:
+            - api_url: 'SLACK_WEBHOOK_URL_HERE'
+              channel: '#critical-alerts'
+              title: 'Critical Alert'
+              text: '{{ range .Alerts }}{{ .Annotations.summary }}{{ end }}'
+        - name: 'info-alerts'
+          email_configs:
+            - to: 'info@astral-turf.com'
+              subject: 'Info Alert: {{ .GroupLabels.alertname }}'
 
 # Grafana Configuration
 grafana:
   enabled: true
-  
+
   # Admin credentials
   adminPassword: 'GRAFANA_ADMIN_PASSWORD_HERE'
-  
+
   # Persistence
   persistence:
     enabled: true
     storageClassName: ssd
     size: 10Gi
-  
+
   # Resource configuration
   resources:
     requests:
@@ -217,61 +217,61 @@ grafana:
     limits:
       memory: 512Mi
       cpu: 200m
-  
+
   # Configuration
   grafana.ini:
     server:
-      root_url: "https://grafana.astral-turf.com"
-    
+      root_url: 'https://grafana.astral-turf.com'
+
     security:
       disable_gravatar: true
       cookie_secure: true
       cookie_samesite: strict
-    
+
     auth:
       disable_login_form: false
       disable_signout_menu: false
-    
+
     auth.anonymous:
       enabled: false
-    
+
     analytics:
       reporting_enabled: false
       check_for_updates: false
-    
+
     log:
       mode: console
       level: info
-  
+
   # Datasources
   datasources:
     datasources.yaml:
       apiVersion: 1
       datasources:
-      - name: Prometheus
-        type: prometheus
-        url: http://prometheus:9090
-        access: proxy
-        isDefault: true
-      - name: Loki
-        type: loki
-        url: http://loki:3100
-        access: proxy
-  
+        - name: Prometheus
+          type: prometheus
+          url: http://prometheus:9090
+          access: proxy
+          isDefault: true
+        - name: Loki
+          type: loki
+          url: http://loki:3100
+          access: proxy
+
   # Dashboards
   dashboardProviders:
     dashboardproviders.yaml:
       apiVersion: 1
       providers:
-      - name: 'default'
-        orgId: 1
-        folder: ''
-        type: file
-        disableDeletion: false
-        updateIntervalSeconds: 10
-        options:
-          path: /var/lib/grafana/dashboards/default
-  
+        - name: 'default'
+          orgId: 1
+          folder: ''
+          type: file
+          disableDeletion: false
+          updateIntervalSeconds: 10
+          options:
+            path: /var/lib/grafana/dashboards/default
+
   dashboards:
     default:
       astral-turf-overview:
@@ -284,17 +284,17 @@ grafana:
 # Node Exporter
 nodeExporter:
   enabled: true
-  
+
   # Service monitor
   serviceMonitor:
     enabled: true
     relabelings:
-    - sourceLabels: [__meta_kubernetes_pod_node_name]
-      separator: ;
-      regex: ^(.*)$
-      targetLabel: nodename
-      replacement: ${1}
-      action: replace
+      - sourceLabels: [__meta_kubernetes_pod_node_name]
+        separator: ;
+        regex: ^(.*)$
+        targetLabel: nodename
+        replacement: ${1}
+        action: replace
 
 # Kube State Metrics
 kubeStateMetrics:
@@ -325,6 +325,6 @@ kubelet:
   enabled: true
   serviceMonitor:
     metricRelabelings:
-    - sourceLabels: [__name__]
-      regex: 'kubelet_(pod_worker_latency_microseconds|pod_start_latency_microseconds|cgroup_manager_latency_microseconds|pod_worker_start_latency_microseconds|pleg_relist_latency_microseconds|pleg_relist_interval_microseconds|runtime_operations|runtime_operations_latency_microseconds|runtime_operations_errors|eviction_stats_age_microseconds|device_plugin_registration_count|device_plugin_alloc_latency_microseconds|network_plugin_operations_latency_microseconds)'
-      action: drop
+      - sourceLabels: [__name__]
+        regex: 'kubelet_(pod_worker_latency_microseconds|pod_start_latency_microseconds|cgroup_manager_latency_microseconds|pod_worker_start_latency_microseconds|pleg_relist_latency_microseconds|pleg_relist_interval_microseconds|runtime_operations|runtime_operations_latency_microseconds|runtime_operations_errors|eviction_stats_age_microseconds|device_plugin_registration_count|device_plugin_alloc_latency_microseconds|network_plugin_operations_latency_microseconds)'
+        action: drop

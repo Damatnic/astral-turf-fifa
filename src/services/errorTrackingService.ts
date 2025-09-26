@@ -113,7 +113,6 @@ class ErrorTrackingService {
           alertRulesCount: this.alertRules.size,
         },
       });
-
     } catch (_error) {
       log.error('Failed to initialize error tracking service', {
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -190,7 +189,6 @@ class ErrorTrackingService {
       await this.cacheRecentError(trackedError);
 
       return trackedError.id;
-
     } catch (_trackingError) {
       log.error('Failed to track error', {
         error: trackingError instanceof Error ? trackingError.message : 'Unknown error',
@@ -254,8 +252,9 @@ class ErrorTrackingService {
    */
   getStatistics(timeRangeHours = 24): ErrorStatistics {
     const cutoffTime = new Date(Date.now() - timeRangeHours * 60 * 60 * 1000);
-    const recentErrors = Array.from(this.errors.values())
-      .filter(error => error.lastOccurrence > cutoffTime);
+    const recentErrors = Array.from(this.errors.values()).filter(
+      error => error.lastOccurrence > cutoffTime,
+    );
 
     const errorsByType: Record<string, number> = {};
     const errorsBySeverity: Record<string, number> = {};
@@ -263,7 +262,8 @@ class ErrorTrackingService {
 
     for (const error of recentErrors) {
       errorsByType[error.type] = (errorsByType[error.type] || 0) + error.occurrenceCount;
-      errorsBySeverity[error.severity] = (errorsBySeverity[error.severity] || 0) + error.occurrenceCount;
+      errorsBySeverity[error.severity] =
+        (errorsBySeverity[error.severity] || 0) + error.occurrenceCount;
 
       const component = error.context.component || 'unknown';
       errorsByComponent[component] = (errorsByComponent[component] || 0) + error.occurrenceCount;
@@ -414,17 +414,23 @@ class ErrorTrackingService {
    */
   private async checkAlertRules(error: TrackedError): Promise<void> {
     for (const rule of this.alertRules.values()) {
-      if (!rule.enabled) {continue;}
+      if (!rule.enabled) {
+        continue;
+      }
 
       // Check cooldown
       const lastTriggered = this.alertCooldowns.get(rule.id);
       if (lastTriggered) {
         const cooldownEnd = new Date(lastTriggered.getTime() + rule.cooldownMinutes * 60 * 1000);
-        if (new Date() < cooldownEnd) {continue;}
+        if (new Date() < cooldownEnd) {
+          continue;
+        }
       }
 
       // Check conditions
-      if (!this.matchesAlertCondition(error, rule.condition)) {continue;}
+      if (!this.matchesAlertCondition(error, rule.condition)) {
+        continue;
+      }
 
       // Trigger alert
       await this.triggerAlert(rule, error);
@@ -707,9 +713,12 @@ class ErrorTrackingService {
    * Start cleanup interval for old errors
    */
   private startCleanupInterval(): void {
-    setInterval(() => {
-      this.cleanupOldErrors();
-    }, 60 * 60 * 1000); // Run every hour
+    setInterval(
+      () => {
+        this.cleanupOldErrors();
+      },
+      60 * 60 * 1000,
+    ); // Run every hour
   }
 
   /**
@@ -745,11 +754,10 @@ class ErrorTrackingService {
       recentErrorRate: number;
     };
   } {
-    const recentErrors = Array.from(this.errors.values())
-      .filter(error => {
-        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-        return error.lastOccurrence > oneHourAgo;
-      });
+    const recentErrors = Array.from(this.errors.values()).filter(error => {
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+      return error.lastOccurrence > oneHourAgo;
+    });
 
     const recentErrorRate = recentErrors.reduce((sum, error) => sum + error.occurrenceCount, 0);
 
@@ -800,12 +808,8 @@ export function setupGlobalErrorHandler(): void {
   });
 
   // Uncaught exceptions
-  process.on('uncaughtException', (error) => {
-    errorTrackingService.trackError(
-      error,
-      { component: 'global' },
-      'critical',
-    );
+  process.on('uncaughtException', error => {
+    errorTrackingService.trackError(error, { component: 'global' }, 'critical');
 
     // Give some time for error to be tracked before exiting
     setTimeout(() => {
@@ -816,5 +820,6 @@ export function setupGlobalErrorHandler(): void {
 
 // Convenience functions
 export const trackError = errorTrackingService.trackError.bind(errorTrackingService);
-export const trackSecurityIncident = errorTrackingService.trackSecurityIncident.bind(errorTrackingService);
+export const trackSecurityIncident =
+  errorTrackingService.trackSecurityIncident.bind(errorTrackingService);
 export const getErrorStatistics = errorTrackingService.getStatistics.bind(errorTrackingService);

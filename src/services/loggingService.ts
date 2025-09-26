@@ -142,10 +142,7 @@ class LoggingService {
       // Security logger
       this.securityLogger = winston.createLogger({
         level: 'info',
-        format: winston.format.combine(
-          baseFormat,
-          winston.format.label({ label: 'SECURITY' }),
-        ),
+        format: winston.format.combine(baseFormat, winston.format.label({ label: 'SECURITY' })),
         defaultMeta: {
           service: 'astral-turf-security',
           environment: process.env.NODE_ENV || 'development',
@@ -170,10 +167,7 @@ class LoggingService {
       // Audit logger
       this.auditLogger = winston.createLogger({
         level: 'info',
-        format: winston.format.combine(
-          baseFormat,
-          winston.format.label({ label: 'AUDIT' }),
-        ),
+        format: winston.format.combine(baseFormat, winston.format.label({ label: 'AUDIT' })),
         defaultMeta: {
           service: 'astral-turf-audit',
           environment: process.env.NODE_ENV || 'development',
@@ -194,10 +188,7 @@ class LoggingService {
       // Performance logger
       this.performanceLogger = winston.createLogger({
         level: 'info',
-        format: winston.format.combine(
-          baseFormat,
-          winston.format.label({ label: 'PERFORMANCE' }),
-        ),
+        format: winston.format.combine(baseFormat, winston.format.label({ label: 'PERFORMANCE' })),
         defaultMeta: {
           service: 'astral-turf-performance',
           environment: process.env.NODE_ENV || 'development',
@@ -227,7 +218,7 @@ class LoggingService {
         environment: process.env.NODE_ENV,
       });
     } catch (_error) {
-      console.error('Failed to initialize logging service:', error);
+      console.error('Failed to initialize logging service:', _error);
       // Fallback to console logging
       this.createFallbackLogger();
     }
@@ -240,7 +231,7 @@ class LoggingService {
     const loggers = [this.logger, this.securityLogger, this.auditLogger, this.performanceLogger];
 
     loggers.forEach((logger, index) => {
-      logger.on('error', (error) => {
+      logger.on('error', error => {
         console.error(`Logger ${index} error:`, error);
       });
     });
@@ -253,9 +244,7 @@ class LoggingService {
     this.logger = winston.createLogger({
       level: 'info',
       format: winston.format.simple(),
-      transports: [
-        new winston.transports.Console(),
-      ],
+      transports: [new winston.transports.Console()],
     });
 
     this.securityLogger = this.logger;
@@ -314,10 +303,8 @@ class LoggingService {
       }
 
       // Store critical logs in database for long-term storage
-      const criticalLogs = logsToFlush.filter(log =>
-        log.level === 'error' ||
-        log.securityEventType ||
-        log.metadata?.critical,
+      const criticalLogs = logsToFlush.filter(
+        log => log.level === 'error' || log.securityEventType || log.metadata?.critical,
       );
 
       if (criticalLogs.length > 0) {
@@ -387,28 +374,36 @@ class LoggingService {
    */
 
   error(message: string, context?: LogContext): void {
-    if (!this.initialized) {return;}
+    if (!this.initialized) {
+      return;
+    }
 
     this.logger.error(message, context);
     this.addToBuffer('error', message, context);
   }
 
   warn(message: string, context?: LogContext): void {
-    if (!this.initialized) {return;}
+    if (!this.initialized) {
+      return;
+    }
 
     this.logger.warn(message, context);
     this.addToBuffer('warn', message, context);
   }
 
   info(message: string, context?: LogContext): void {
-    if (!this.initialized) {return;}
+    if (!this.initialized) {
+      return;
+    }
 
     this.logger.info(message, context);
     this.addToBuffer('info', message, context);
   }
 
   debug(message: string, context?: LogContext): void {
-    if (!this.initialized) {return;}
+    if (!this.initialized) {
+      return;
+    }
 
     this.logger.debug(message, context);
 
@@ -427,7 +422,9 @@ class LoggingService {
     message: string,
     context: Partial<SecurityLogContext> = {},
   ): void {
-    if (!this.initialized) {return;}
+    if (!this.initialized) {
+      return;
+    }
 
     const securityContext: SecurityLogContext = {
       securityEventType: eventType,
@@ -451,7 +448,9 @@ class LoggingService {
    */
 
   logAuditEvent(message: string, context: LogContext): void {
-    if (!this.initialized) {return;}
+    if (!this.initialized) {
+      return;
+    }
 
     const auditContext = {
       ...context,
@@ -472,7 +471,9 @@ class LoggingService {
     duration: number,
     context: Partial<LogContext> = {},
   ): void {
-    if (!this.initialized) {return;}
+    if (!this.initialized) {
+      return;
+    }
 
     const performanceContext: LogContext = {
       ...context,
@@ -502,7 +503,9 @@ class LoggingService {
     duration: number,
     context: Partial<LogContext> = {},
   ): void {
-    if (!this.initialized) {return;}
+    if (!this.initialized) {
+      return;
+    }
 
     const level = statusCode >= 400 ? 'warn' : 'info';
     const message = `${method} ${url} ${statusCode} - ${duration}ms`;
@@ -622,17 +625,18 @@ class LoggingService {
       const loggers = [this.logger, this.securityLogger, this.auditLogger, this.performanceLogger];
 
       await Promise.all(
-        loggers.map(logger =>
-          new Promise<void>((resolve) => {
-            logger.close(() => resolve());
-          }),
+        loggers.map(
+          logger =>
+            new Promise<void>(resolve => {
+              logger.close(() => resolve());
+            }),
         ),
       );
 
       this.initialized = false;
-      // // console.log('Logging service shut down successfully');
+      // // // // console.log('Logging service shut down successfully');
     } catch (_error) {
-      console.error('Error during logging service shutdown:', error);
+      console.error('Error during logging service shutdown:', _error);
     }
   }
 
@@ -682,13 +686,21 @@ export const log = {
   warn: (message: string, context?: LogContext) => loggingService.warn(message, context),
   info: (message: string, context?: LogContext) => loggingService.info(message, context),
   debug: (message: string, context?: LogContext) => loggingService.debug(message, context),
-  security: (eventType: SecurityEventType, message: string, context?: Partial<SecurityLogContext>) =>
-    loggingService.logSecurityEvent(eventType, message, context),
+  security: (
+    eventType: SecurityEventType,
+    message: string,
+    context?: Partial<SecurityLogContext>,
+  ) => loggingService.logSecurityEvent(eventType, message, context),
   audit: (message: string, context: LogContext) => loggingService.logAuditEvent(message, context),
   performance: (operation: string, duration: number, context?: Partial<LogContext>) =>
     loggingService.logPerformanceMetric(operation, duration, context),
-  http: (method: string, url: string, statusCode: number, duration: number, context?: Partial<LogContext>) =>
-    loggingService.logHttpRequest(method, url, statusCode, duration, context),
+  http: (
+    method: string,
+    url: string,
+    statusCode: number,
+    duration: number,
+    context?: Partial<LogContext>,
+  ) => loggingService.logHttpRequest(method, url, statusCode, duration, context),
 };
 
 export default loggingService;

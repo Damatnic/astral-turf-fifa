@@ -19,8 +19,11 @@ const RankingComparison: React.FC<RankingComparisonProps> = ({
 }) => {
   const { state } = useChallengeContext();
 
-  const profileA = state.playerProfiles.get(playerA.id) || playerRankingService.getProfile(playerA.id);
-  const profileB = playerB ? (state.playerProfiles.get(playerB.id) || playerRankingService.getProfile(playerB.id)) : null;
+  const profileA =
+    state.playerProfiles.get(playerA.id) || playerRankingService.getProfile(playerA.id);
+  const profileB = playerB
+    ? state.playerProfiles.get(playerB.id) || playerRankingService.getProfile(playerB.id)
+    : null;
 
   const comparison = profileB ? playerRankingService.compareProfiles(playerA.id, playerB.id) : null;
 
@@ -42,7 +45,7 @@ const RankingComparison: React.FC<RankingComparisonProps> = ({
           <p className="text-sm text-gray-400 mb-2">Player B</p>
           <select
             value={playerB?.id || ''}
-            onChange={(e) => onSelectPlayerB(e.target.value)}
+            onChange={e => onSelectPlayerB(e.target.value)}
             className="w-full px-4 py-3 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
           >
             <option value="">Select a player...</option>
@@ -77,10 +80,16 @@ const RankingComparison: React.FC<RankingComparisonProps> = ({
           <div className="space-y-3">
             {Object.entries({
               'Total XP': [profileA.totalXP, profileB.totalXP],
-              'Challenges': [profileA.challengesCompleted.length, profileB.challengesCompleted.length],
-              'Badges': [profileA.badges.length, profileB.badges.length],
-              'Streak': [profileA.streakDays, profileB.streakDays],
-              'Attribute Points': [profileA.unspentAttributePoints, profileB.unspentAttributePoints],
+              Challenges: [
+                profileA.challengesCompleted.length,
+                profileB.challengesCompleted.length,
+              ],
+              Badges: [profileA.badges.length, profileB.badges.length],
+              Streak: [profileA.streakDays, profileB.streakDays],
+              'Attribute Points': [
+                profileA.unspentAttributePoints,
+                profileB.unspentAttributePoints,
+              ],
             }).map(([label, [valueA, valueB]]) => {
               const percentage = valueA + valueB > 0 ? (valueA / (valueA + valueB)) * 100 : 50;
 

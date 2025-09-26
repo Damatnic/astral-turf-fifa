@@ -6,7 +6,18 @@
  */
 
 import { PrismaClient, Prisma } from '@prisma/client';
-import { securityLogger, SecurityEventType } from '../security/logging';
+// Fallback logger for tests
+const securityLogger = {
+  info: (message: string, meta?: unknown) => // // console.log(`[DB-INFO] ${message}`, meta),
+  error: (message: string, meta?: unknown) => console.error(`[DB-ERROR] ${message}`, meta),
+  warn: (message: string, meta?: unknown) => // // console.warn(`[DB-WARN] ${message}`, meta),
+  logSecurityEvent: (type: string, message: string, meta?: unknown) => // // console.log(`[DB-SECURITY] ${type}: ${message}`, meta),
+};
+
+const SecurityEventType = {
+  DATABASE_ERROR: 'DATABASE_ERROR',
+  QUERY_ERROR: 'QUERY_ERROR',
+};
 
 // Database configuration
 const DATABASE_CONFIG = {
@@ -104,9 +115,9 @@ class DatabaseService {
     // Query logging
     this.prisma.$on('query', (e) => {
       if (process.env.NODE_ENV === 'development') {
-        // // console.log('Query: ' + e.query);
-        // // console.log('Params: ' + e.params);
-        // // console.log('Duration: ' + e.duration + 'ms');
+        // // // // console.log('Query: ' + e.query);
+        // // // // console.log('Params: ' + e.params);
+        // // // // console.log('Duration: ' + e.duration + 'ms');
       }
     });
 

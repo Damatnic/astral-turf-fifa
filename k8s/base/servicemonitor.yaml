@@ -17,29 +17,29 @@ spec:
     matchLabels:
       app.kubernetes.io/name: astral-turf
       app.kubernetes.io/component: application
-  
+
   endpoints:
-  - port: metrics
-    path: /metrics
-    interval: 30s
-    scrapeTimeout: 10s
-    honorLabels: true
-    
-    # Metric relabeling
-    metricRelabelings:
-    - sourceLabels: [__name__]
-      regex: 'go_.*'
-      action: drop
-    - sourceLabels: [__name__]
-      regex: 'process_.*'
-      action: drop
-    
-    # Target relabeling
-    relabelings:
-    - sourceLabels: [__meta_kubernetes_pod_name]
-      targetLabel: pod
-    - sourceLabels: [__meta_kubernetes_pod_node_name]
-      targetLabel: node
+    - port: metrics
+      path: /metrics
+      interval: 30s
+      scrapeTimeout: 10s
+      honorLabels: true
+
+      # Metric relabeling
+      metricRelabelings:
+        - sourceLabels: [__name__]
+          regex: 'go_.*'
+          action: drop
+        - sourceLabels: [__name__]
+          regex: 'process_.*'
+          action: drop
+
+      # Target relabeling
+      relabelings:
+        - sourceLabels: [__meta_kubernetes_pod_name]
+          targetLabel: pod
+        - sourceLabels: [__meta_kubernetes_pod_node_name]
+          targetLabel: node
 
 ---
 apiVersion: monitoring.coreos.com/v1
@@ -56,18 +56,18 @@ spec:
     matchLabels:
       app.kubernetes.io/name: nginx
       app.kubernetes.io/component: loadbalancer
-  
+
   endpoints:
-  - port: metrics
-    path: /metrics
-    interval: 30s
-    scrapeTimeout: 10s
-    
-    relabelings:
-    - sourceLabels: [__meta_kubernetes_pod_name]
-      targetLabel: pod
-    - sourceLabels: [__meta_kubernetes_pod_node_name]
-      targetLabel: node
+    - port: metrics
+      path: /metrics
+      interval: 30s
+      scrapeTimeout: 10s
+
+      relabelings:
+        - sourceLabels: [__meta_kubernetes_pod_name]
+          targetLabel: pod
+        - sourceLabels: [__meta_kubernetes_pod_node_name]
+          targetLabel: node
 
 ---
 apiVersion: monitoring.coreos.com/v1
@@ -83,19 +83,19 @@ spec:
   selector:
     matchLabels:
       k8s-app: metrics-server
-  
+
   namespaceSelector:
     matchNames:
-    - kube-system
-  
+      - kube-system
+
   endpoints:
-  - port: https
-    path: /metrics
-    scheme: https
-    interval: 30s
-    tlsConfig:
-      insecureSkipVerify: true
-    bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+    - port: https
+      path: /metrics
+      scheme: https
+      interval: 30s
+      tlsConfig:
+        insecureSkipVerify: true
+      bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
 
 ---
 apiVersion: v1
@@ -111,8 +111,8 @@ spec:
     app.kubernetes.io/name: astral-turf
     app.kubernetes.io/component: application
   ports:
-  - name: metrics
-    port: 9090
-    targetPort: 9090
-    protocol: TCP
+    - name: metrics
+      port: 9090
+      targetPort: 9090
+      protocol: TCP
   type: ClusterIP

@@ -15,41 +15,41 @@ spec:
   acme:
     # Let's Encrypt production server
     server: https://acme-v02.api.letsencrypt.org/directory
-    
+
     # Email for notifications
     email: ssl@astral-turf.com
-    
+
     # Secret to store private key
     privateKeySecretRef:
       name: letsencrypt-prod-private-key
-    
+
     # Solvers for domain validation
     solvers:
-    # HTTP-01 solver for most domains
-    - http01:
-        ingress:
-          class: nginx
-          podTemplate:
-            spec:
-              nodeSelector:
-                "kubernetes.io/os": linux
-              tolerations:
-              - key: node-role.kubernetes.io/master
-                operator: Equal
-                effect: NoSchedule
-    
-    # DNS-01 solver for wildcard certificates
-    - dns01:
-        route53:
-          region: us-east-1
-          accessKeyID: AKIAIOSFODNN7EXAMPLE
-          secretAccessKeySecretRef:
-            name: route53-credentials
-            key: secret-access-key
-        selector:
-          dnsNames:
-          - '*.astral-turf.com'
-          - 'astral-turf.com'
+      # HTTP-01 solver for most domains
+      - http01:
+          ingress:
+            class: nginx
+            podTemplate:
+              spec:
+                nodeSelector:
+                  'kubernetes.io/os': linux
+                tolerations:
+                  - key: node-role.kubernetes.io/master
+                    operator: Equal
+                    effect: NoSchedule
+
+      # DNS-01 solver for wildcard certificates
+      - dns01:
+          route53:
+            region: us-east-1
+            accessKeyID: AKIAIOSFODNN7EXAMPLE
+            secretAccessKeySecretRef:
+              name: route53-credentials
+              key: secret-access-key
+          selector:
+            dnsNames:
+              - '*.astral-turf.com'
+              - 'astral-turf.com'
 
 ---
 # Let's Encrypt Staging Cluster Issuer (for testing)
@@ -64,26 +64,26 @@ spec:
   acme:
     # Let's Encrypt staging server
     server: https://acme-staging-v02.api.letsencrypt.org/directory
-    
+
     # Email for notifications
     email: ssl@astral-turf.com
-    
+
     # Secret to store private key
     privateKeySecretRef:
       name: letsencrypt-staging-private-key
-    
+
     # Solvers
     solvers:
-    - http01:
-        ingress:
-          class: nginx
-    - dns01:
-        route53:
-          region: us-east-1
-          accessKeyID: AKIAIOSFODNN7EXAMPLE
-          secretAccessKeySecretRef:
-            name: route53-credentials
-            key: secret-access-key
+      - http01:
+          ingress:
+            class: nginx
+      - dns01:
+          route53:
+            region: us-east-1
+            accessKeyID: AKIAIOSFODNN7EXAMPLE
+            secretAccessKeySecretRef:
+              name: route53-credentials
+              key: secret-access-key
 
 ---
 # Self-Signed Cluster Issuer (for development)
@@ -125,21 +125,21 @@ spec:
   issuerRef:
     name: selfsigned-issuer
     kind: ClusterIssuer
-  commonName: "Astral Turf Root CA"
+  commonName: 'Astral Turf Root CA'
   duration: 8760h # 1 year
   renewBefore: 720h # 30 days
   isCA: true
   subject:
     organizationalUnits:
-    - Infrastructure Team
+      - Infrastructure Team
     organizations:
-    - Astral Turf
+      - Astral Turf
     countries:
-    - US
+      - US
     localities:
-    - San Francisco
+      - San Francisco
     provinces:
-    - CA
+      - CA
 
 ---
 # Wildcard Certificate for astral-turf.com
@@ -157,8 +157,8 @@ spec:
     name: letsencrypt-prod
     kind: ClusterIssuer
   dnsNames:
-  - astral-turf.com
-  - '*.astral-turf.com'
+    - astral-turf.com
+    - '*.astral-turf.com'
   duration: 2160h # 90 days
   renewBefore: 720h # 30 days before expiry
 
@@ -178,7 +178,7 @@ spec:
     name: letsencrypt-prod
     kind: ClusterIssuer
   dnsNames:
-  - api.astral-turf.com
+    - api.astral-turf.com
   duration: 2160h # 90 days
   renewBefore: 720h # 30 days before expiry
 
@@ -198,9 +198,9 @@ spec:
     name: letsencrypt-prod
     kind: ClusterIssuer
   dnsNames:
-  - grafana.astral-turf.com
-  - prometheus.astral-turf.com
-  - alertmanager.astral-turf.com
+    - grafana.astral-turf.com
+    - prometheus.astral-turf.com
+    - alertmanager.astral-turf.com
   duration: 2160h # 90 days
   renewBefore: 720h # 30 days before expiry
 
@@ -236,10 +236,10 @@ spec:
       app.kubernetes.io/name: cert-manager
       app.kubernetes.io/component: controller
   endpoints:
-  - port: tcp-prometheus-servicemonitor
-    interval: 60s
-    path: /metrics
-    honorLabels: true
+    - port: tcp-prometheus-servicemonitor
+      interval: 60s
+      path: /metrics
+      honorLabels: true
 
 ---
 # Certificate Expiry Alert
@@ -255,29 +255,29 @@ metadata:
     role: alert-rules
 spec:
   groups:
-  - name: cert-manager
-    interval: 60s
-    rules:
-    - alert: CertManagerCertificateExpirySoon
-      expr: |
-        certmanager_certificate_expiration_timestamp_seconds - time() < 604800
-      for: 1h
-      labels:
-        severity: warning
-        component: cert-manager
-      annotations:
-        summary: "Certificate will expire soon"
-        description: "Certificate {{ $labels.name }} in namespace {{ $labels.namespace }} will expire in less than 7 days"
-        runbook_url: "https://docs.astral-turf.com/runbooks/certificate-expiry"
-    
-    - alert: CertManagerCertificateNotReady
-      expr: |
-        certmanager_certificate_ready_status == 0
-      for: 10m
-      labels:
-        severity: critical
-        component: cert-manager
-      annotations:
-        summary: "Certificate is not ready"
-        description: "Certificate {{ $labels.name }} in namespace {{ $labels.namespace }} is not ready"
-        runbook_url: "https://docs.astral-turf.com/runbooks/certificate-not-ready"
+    - name: cert-manager
+      interval: 60s
+      rules:
+        - alert: CertManagerCertificateExpirySoon
+          expr: |
+            certmanager_certificate_expiration_timestamp_seconds - time() < 604800
+          for: 1h
+          labels:
+            severity: warning
+            component: cert-manager
+          annotations:
+            summary: 'Certificate will expire soon'
+            description: 'Certificate {{ $labels.name }} in namespace {{ $labels.namespace }} will expire in less than 7 days'
+            runbook_url: 'https://docs.astral-turf.com/runbooks/certificate-expiry'
+
+        - alert: CertManagerCertificateNotReady
+          expr: |
+            certmanager_certificate_ready_status == 0
+          for: 10m
+          labels:
+            severity: critical
+            component: cert-manager
+          annotations:
+            summary: 'Certificate is not ready'
+            description: 'Certificate {{ $labels.name }} in namespace {{ $labels.namespace }} is not ready'
+            runbook_url: 'https://docs.astral-turf.com/runbooks/certificate-not-ready'

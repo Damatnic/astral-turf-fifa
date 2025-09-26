@@ -1,10 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import type {
-  Player,
-  Formation,
-  TeamTactics,
-  AIPersonality,
-} from '../../types';
+import type { Player, Formation, TeamTactics, AIPersonality } from '../../types';
 import {
   matchStrategyService,
   MatchStrategyPlan,
@@ -49,10 +44,13 @@ const SmartLineupOptimizer: React.FC<SmartLineupOptimizerProps> = ({
   } | null>(null);
 
   const [playerFitness, setPlayerFitness] = useState<Record<string, number>>(
-    availablePlayers.reduce((acc, player) => {
-      acc[player.id] = Math.max(100 - player.fatigue, 20); // Convert fatigue to fitness
-      return acc;
-    }, {} as Record<string, number>),
+    availablePlayers.reduce(
+      (acc, player) => {
+        acc[player.id] = Math.max(100 - player.fatigue, 20); // Convert fatigue to fitness
+        return acc;
+      },
+      {} as Record<string, number>,
+    ),
   );
 
   const optimizeLineup = async () => {
@@ -97,9 +95,9 @@ const SmartLineupOptimizer: React.FC<SmartLineupOptimizerProps> = ({
       );
 
       // Step 3: Find recommended formation
-      const recommendedFormation = availableFormations.find(
-        f => f.name === strategy.recommendedFormation,
-      ) || availableFormations[0];
+      const recommendedFormation =
+        availableFormations.find(f => f.name === strategy.recommendedFormation) ||
+        availableFormations[0];
 
       // Step 4: Select best players for each position
       const selectedPlayers = selectOptimalPlayers(
@@ -130,9 +128,8 @@ const SmartLineupOptimizer: React.FC<SmartLineupOptimizerProps> = ({
           strategy,
         });
       }
-
     } catch (_error) {
-      console.error('Failed to optimize lineup:', error);
+      console.error('Failed to optimize lineup:', _error);
       alert('Failed to optimize lineup. Please try again.');
     } finally {
       setLoading(false);
@@ -148,12 +145,17 @@ const SmartLineupOptimizer: React.FC<SmartLineupOptimizerProps> = ({
     const selectedPlayers: Player[] = [];
 
     // Sort players by role compatibility and current form
-    const playersByRole = players.reduce((acc, player) => {
-      const role = getPlayerPositionCategory(player.roleId);
-      if (!acc[role]) {acc[role] = [];}
-      acc[role].push(player);
-      return acc;
-    }, {} as Record<string, Player[]>);
+    const playersByRole = players.reduce(
+      (acc, player) => {
+        const role = getPlayerPositionCategory(player.roleId);
+        if (!acc[role]) {
+          acc[role] = [];
+        }
+        acc[role].push(player);
+        return acc;
+      },
+      {} as Record<string, Player[]>,
+    );
 
     // Sort each role by fitness, form, and rating
     Object.keys(playersByRole).forEach(role => {
@@ -170,9 +172,8 @@ const SmartLineupOptimizer: React.FC<SmartLineupOptimizerProps> = ({
       const availablePlayers = playersByRole[roleCategory] || [];
 
       // Find best available player for this position
-      const selectedPlayer = availablePlayers.find(player =>
-        !selectedPlayers.includes(player) &&
-        playerFitness[player.id] > 30, // Minimum fitness threshold
+      const selectedPlayer = availablePlayers.find(
+        player => !selectedPlayers.includes(player) && playerFitness[player.id] > 30, // Minimum fitness threshold
       );
 
       if (selectedPlayer) {
@@ -184,10 +185,18 @@ const SmartLineupOptimizer: React.FC<SmartLineupOptimizerProps> = ({
   };
 
   const getPlayerPositionCategory = (roleId: string): string => {
-    if (['gk', 'sk'].includes(roleId)) {return 'GK';}
-    if (['cb', 'bpd', 'ncb', 'fb', 'wb'].includes(roleId)) {return 'DF';}
-    if (['dm', 'dlp', 'cm', 'b2b', 'ap', 'wm'].includes(roleId)) {return 'MF';}
-    if (['w', 'iw', 'p', 'tf', 'cf'].includes(roleId)) {return 'FW';}
+    if (['gk', 'sk'].includes(roleId)) {
+      return 'GK';
+    }
+    if (['cb', 'bpd', 'ncb', 'fb', 'wb'].includes(roleId)) {
+      return 'DF';
+    }
+    if (['dm', 'dlp', 'cm', 'b2b', 'ap', 'wm'].includes(roleId)) {
+      return 'MF';
+    }
+    if (['w', 'iw', 'p', 'tf', 'cf'].includes(roleId)) {
+      return 'FW';
+    }
     return 'MF'; // Default
   };
 
@@ -199,37 +208,43 @@ const SmartLineupOptimizer: React.FC<SmartLineupOptimizerProps> = ({
     let score = player.currentPotential; // Base rating
 
     // Form bonus/penalty
-    const formMultiplier = {
-      'Excellent': 1.2,
-      'Good': 1.1,
-      'Average': 1.0,
-      'Poor': 0.9,
-      'Very Poor': 0.8,
-    }[player.form] || 1.0;
+    const formMultiplier =
+      {
+        Excellent: 1.2,
+        Good: 1.1,
+        Average: 1.0,
+        Poor: 0.9,
+        'Very Poor': 0.8,
+      }[player.form] || 1.0;
 
     score *= formMultiplier;
 
     // Fitness consideration
-    score *= (playerFitness[player.id] / 100);
+    score *= playerFitness[player.id] / 100;
 
     // Morale bonus
-    const moraleBonus = {
-      'Excellent': 5,
-      'Good': 2,
-      'Okay': 0,
-      'Poor': -3,
-      'Very Poor': -6,
-    }[player.morale] || 0;
+    const moraleBonus =
+      {
+        Excellent: 5,
+        Good: 2,
+        Okay: 0,
+        Poor: -3,
+        'Very Poor': -6,
+      }[player.morale] || 0;
 
     score += moraleBonus;
 
     // Role-specific bonuses based on strategy
     if (strategy.difficulty === 'hard' || strategy.difficulty === 'very_hard') {
       // Favor experienced players for difficult matches
-      if (player.age >= 25) {score += 5;}
+      if (player.age >= 25) {
+        score += 5;
+      }
 
       // Favor players with leadership traits
-      if (player.traits.includes('Leader')) {score += 8;}
+      if (player.traits.includes('Leader')) {
+        score += 8;
+      }
     }
 
     // Tactical fit bonus
@@ -237,13 +252,17 @@ const SmartLineupOptimizer: React.FC<SmartLineupOptimizerProps> = ({
       score += 5;
     }
 
-    if (strategy.recommendedTactics.mentality === 'attacking' &&
-        ['w', 'iw', 'cf', 'ap'].includes(player.roleId)) {
+    if (
+      strategy.recommendedTactics.mentality === 'attacking' &&
+      ['w', 'iw', 'cf', 'ap'].includes(player.roleId)
+    ) {
       score += 5;
     }
 
-    if (strategy.recommendedTactics.mentality === 'defensive' &&
-        ['cb', 'dm', 'ncb'].includes(player.roleId)) {
+    if (
+      strategy.recommendedTactics.mentality === 'defensive' &&
+      ['cb', 'dm', 'ncb'].includes(player.roleId)
+    ) {
       score += 5;
     }
 
@@ -258,33 +277,27 @@ const SmartLineupOptimizer: React.FC<SmartLineupOptimizerProps> = ({
             <span className="text-2xl mr-3">🧠</span>
             Smart Lineup Optimizer
           </h2>
-          <p className="text-gray-400 mt-1">
-            AI-powered tactical analysis and lineup optimization
-          </p>
+          <p className="text-gray-400 mt-1">AI-powered tactical analysis and lineup optimization</p>
         </div>
 
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Opponent
-              </label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Opponent</label>
               <input
                 type="text"
                 value={opponent}
-                onChange={(e) => setOpponent(e.target.value)}
+                onChange={e => setOpponent(e.target.value)}
                 placeholder="Enter opponent name..."
                 className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Venue
-              </label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Venue</label>
               <select
                 value={venue}
-                onChange={(e) => setVenue(e.target.value as any)}
+                onChange={e => setVenue(e.target.value as any)}
                 className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-blue-500"
               >
                 <option value="home">Home</option>
@@ -294,12 +307,10 @@ const SmartLineupOptimizer: React.FC<SmartLineupOptimizerProps> = ({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Importance
-              </label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Importance</label>
               <select
                 value={importance}
-                onChange={(e) => setImportance(e.target.value as any)}
+                onChange={e => setImportance(e.target.value as any)}
                 className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-blue-500"
               >
                 <option value="low">Low</option>
@@ -310,12 +321,10 @@ const SmartLineupOptimizer: React.FC<SmartLineupOptimizerProps> = ({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Weather
-              </label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Weather</label>
               <select
                 value={weather}
-                onChange={(e) => setWeather(e.target.value)}
+                onChange={e => setWeather(e.target.value)}
                 className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-blue-500"
               >
                 <option value="Clear">Clear</option>
@@ -372,7 +381,9 @@ const SmartLineupOptimizer: React.FC<SmartLineupOptimizerProps> = ({
                       <div className="flex-1 bg-gray-600 rounded-full h-2 mr-3">
                         <div
                           className="bg-red-500 h-2 rounded-full"
-                          style={{ width: `${optimizationResult.oppositionReport.overallThreatLevel * 10}%` }}
+                          style={{
+                            width: `${optimizationResult.oppositionReport.overallThreatLevel * 10}%`,
+                          }}
                         ></div>
                       </div>
                       <span className="text-white font-semibold">
@@ -415,26 +426,46 @@ const SmartLineupOptimizer: React.FC<SmartLineupOptimizerProps> = ({
                   <div>
                     <h4 className="font-medium text-white mb-2">Formation & Tactics</h4>
                     <div className="space-y-2 text-sm text-gray-300">
-                      <p><strong>Formation:</strong> {optimizationResult.strategy.recommendedFormation}</p>
-                      <p><strong>Mentality:</strong> {optimizationResult.strategy.recommendedTactics.mentality}</p>
-                      <p><strong>Pressing:</strong> {optimizationResult.strategy.recommendedTactics.pressing}</p>
-                      <p><strong>Defensive Line:</strong> {optimizationResult.strategy.recommendedTactics.defensiveLine}</p>
+                      <p>
+                        <strong>Formation:</strong>{' '}
+                        {optimizationResult.strategy.recommendedFormation}
+                      </p>
+                      <p>
+                        <strong>Mentality:</strong>{' '}
+                        {optimizationResult.strategy.recommendedTactics.mentality}
+                      </p>
+                      <p>
+                        <strong>Pressing:</strong>{' '}
+                        {optimizationResult.strategy.recommendedTactics.pressing}
+                      </p>
+                      <p>
+                        <strong>Defensive Line:</strong>{' '}
+                        {optimizationResult.strategy.recommendedTactics.defensiveLine}
+                      </p>
                     </div>
                   </div>
                   <div>
                     <h4 className="font-medium text-white mb-2">Match Difficulty</h4>
                     <div className="flex items-center mb-2">
-                      <span className={`px-3 py-1 rounded text-sm font-semibold ${
-                        optimizationResult.strategy.difficulty === 'easy' ? 'bg-green-600' :
-                        optimizationResult.strategy.difficulty === 'medium' ? 'bg-yellow-600' :
-                        optimizationResult.strategy.difficulty === 'hard' ? 'bg-orange-600' :
-                        'bg-red-600'
-                      }`}>
+                      <span
+                        className={`px-3 py-1 rounded text-sm font-semibold ${
+                          optimizationResult.strategy.difficulty === 'easy'
+                            ? 'bg-green-600'
+                            : optimizationResult.strategy.difficulty === 'medium'
+                              ? 'bg-yellow-600'
+                              : optimizationResult.strategy.difficulty === 'hard'
+                                ? 'bg-orange-600'
+                                : 'bg-red-600'
+                        }`}
+                      >
                         {optimizationResult.strategy.difficulty.toUpperCase()}
                       </span>
                     </div>
                     <div className="text-sm text-gray-300">
-                      <p><strong>Confidence:</strong> {optimizationResult.strategy.predictionConfidence}%</p>
+                      <p>
+                        <strong>Confidence:</strong>{' '}
+                        {optimizationResult.strategy.predictionConfidence}%
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -452,18 +483,28 @@ const SmartLineupOptimizer: React.FC<SmartLineupOptimizerProps> = ({
                           <div className="text-sm text-gray-300">{player.roleId.toUpperCase()}</div>
                         </div>
                         <div className="text-right">
-                          <div className="text-lg font-bold text-blue-400">{player.currentPotential}</div>
-                          <div className="text-xs text-gray-400">Fitness: {playerFitness[player.id]}%</div>
+                          <div className="text-lg font-bold text-blue-400">
+                            {player.currentPotential}
+                          </div>
+                          <div className="text-xs text-gray-400">
+                            Fitness: {playerFitness[player.id]}%
+                          </div>
                         </div>
                       </div>
                       <div className="mt-2 text-xs">
-                        <span className={`px-2 py-1 rounded ${
-                          player.form === 'Excellent' ? 'bg-green-600' :
-                          player.form === 'Good' ? 'bg-blue-600' :
-                          player.form === 'Average' ? 'bg-gray-600' :
-                          player.form === 'Poor' ? 'bg-orange-600' :
-                          'bg-red-600'
-                        }`}>
+                        <span
+                          className={`px-2 py-1 rounded ${
+                            player.form === 'Excellent'
+                              ? 'bg-green-600'
+                              : player.form === 'Good'
+                                ? 'bg-blue-600'
+                                : player.form === 'Average'
+                                  ? 'bg-gray-600'
+                                  : player.form === 'Poor'
+                                    ? 'bg-orange-600'
+                                    : 'bg-red-600'
+                          }`}
+                        >
                           {player.form}
                         </span>
                       </div>

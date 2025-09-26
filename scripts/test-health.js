@@ -32,8 +32,7 @@ async function testHealthEndpoints() {
     // Show component statuses
     console.log('\n   Component Status:');
     Object.entries(health.checks).forEach(([component, status]) => {
-      const icon = status.status === 'healthy' ? '✅' :
-                   status.status === 'degraded' ? '⚠️' : '❌';
+      const icon = status.status === 'healthy' ? '✅' : status.status === 'degraded' ? '⚠️' : '❌';
       console.log(`   ${icon} ${component}: ${status.status.toUpperCase()}`);
       if (status.latency) {
         console.log(`      Latency: ${status.latency}ms`);
@@ -72,7 +71,6 @@ async function testHealthEndpoints() {
     }
 
     console.log('\n🎉 All health checks completed successfully!');
-
   } catch (error) {
     console.error('\n❌ Health check test failed:', error.message);
     console.error(error.stack);

@@ -81,7 +81,7 @@ class BundleAnalyzer {
         size: stats.size,
         gzippedSize: gzipped.length,
         type: this.getFileType(filePath),
-        compressionRatio: ((stats.size - gzipped.length) / stats.size * 100).toFixed(1),
+        compressionRatio: (((stats.size - gzipped.length) / stats.size) * 100).toFixed(1),
       };
 
       this.results.files.push(fileInfo);
@@ -115,9 +115,13 @@ class BundleAnalyzer {
 
       if (file.type === 'JavaScript') {
         if (sizeKB > THRESHOLDS.JS_CHUNK_ERROR) {
-          this.results.errors.push(`JavaScript chunk too large: ${file.name} (${sizeKB.toFixed(1)}KB)`);
+          this.results.errors.push(
+            `JavaScript chunk too large: ${file.name} (${sizeKB.toFixed(1)}KB)`
+          );
         } else if (sizeKB > THRESHOLDS.JS_CHUNK_WARNING) {
-          this.results.warnings.push(`Large JavaScript chunk: ${file.name} (${sizeKB.toFixed(1)}KB)`);
+          this.results.warnings.push(
+            `Large JavaScript chunk: ${file.name} (${sizeKB.toFixed(1)}KB)`
+          );
         }
       }
 
@@ -145,10 +149,12 @@ class BundleAnalyzer {
 
     const totalJsSize = jsFiles.reduce((sum, f) => sum + f.size, 0);
     const totalSize = this.results.totalSize;
-    const jsPercentage = (totalJsSize / totalSize * 100).toFixed(1);
+    const jsPercentage = ((totalJsSize / totalSize) * 100).toFixed(1);
 
     if (parseFloat(jsPercentage) > 80) {
-      this.results.recommendations.push('JavaScript represents a large portion of the bundle - consider tree shaking');
+      this.results.recommendations.push(
+        'JavaScript represents a large portion of the bundle - consider tree shaking'
+      );
     }
 
     const fontFiles = this.results.files.filter(f => f.type === 'Font');
@@ -156,8 +162,9 @@ class BundleAnalyzer {
       this.results.recommendations.push('Consider reducing the number of font variants');
     }
 
-    const avgCompressionRatio = this.results.files
-      .reduce((sum, f) => sum + parseFloat(f.compressionRatio), 0) / this.results.files.length;
+    const avgCompressionRatio =
+      this.results.files.reduce((sum, f) => sum + parseFloat(f.compressionRatio), 0) /
+      this.results.files.length;
 
     if (avgCompressionRatio < 60) {
       this.results.recommendations.push('Enable gzip/brotli compression on your server');
@@ -172,7 +179,9 @@ class BundleAnalyzer {
     console.log('📈 Summary:');
     console.log(`   Total Size: ${this.formatSize(this.results.totalSize)}`);
     console.log(`   Gzipped Size: ${this.formatSize(this.results.gzippedSize)}`);
-    console.log(`   Compression Ratio: ${((this.results.totalSize - this.results.gzippedSize) / this.results.totalSize * 100).toFixed(1)}%`);
+    console.log(
+      `   Compression Ratio: ${(((this.results.totalSize - this.results.gzippedSize) / this.results.totalSize) * 100).toFixed(1)}%`
+    );
     console.log(`   Number of Files: ${this.results.files.length}\n`);
 
     // File breakdown
@@ -181,7 +190,9 @@ class BundleAnalyzer {
       const sizeStr = this.formatSize(file.size);
       const gzippedStr = this.formatSize(file.gzippedSize);
       console.log(`   ${index + 1}. ${file.name} (${file.type})`);
-      console.log(`      Size: ${sizeStr} | Gzipped: ${gzippedStr} | Compression: ${file.compressionRatio}%`);
+      console.log(
+        `      Size: ${sizeStr} | Gzipped: ${gzippedStr} | Compression: ${file.compressionRatio}%`
+      );
     });
     console.log();
 
@@ -189,7 +200,9 @@ class BundleAnalyzer {
     const typeStats = this.getTypeStatistics();
     console.log('📊 File Type Breakdown:');
     Object.entries(typeStats).forEach(([type, stats]) => {
-      console.log(`   ${type}: ${stats.count} files, ${this.formatSize(stats.size)} (${stats.percentage}%)`);
+      console.log(
+        `   ${type}: ${stats.count} files, ${this.formatSize(stats.size)} (${stats.percentage}%)`
+      );
     });
     console.log();
 
@@ -215,8 +228,12 @@ class BundleAnalyzer {
     }
 
     // Overall status
-    const status = this.results.errors.length > 0 ? '❌ FAILED' :
-                   this.results.warnings.length > 0 ? '⚠️  WARNINGS' : '✅ PASSED';
+    const status =
+      this.results.errors.length > 0
+        ? '❌ FAILED'
+        : this.results.warnings.length > 0
+          ? '⚠️  WARNINGS'
+          : '✅ PASSED';
     console.log(`🎯 Overall Status: ${status}\n`);
 
     // Exit with error if there are critical issues
@@ -245,7 +262,9 @@ class BundleAnalyzer {
   }
 
   formatSize(bytes) {
-    if (bytes === 0) {return '0 B';}
+    if (bytes === 0) {
+      return '0 B';
+    }
     const k = 1024;
     const sizes = ['B', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));

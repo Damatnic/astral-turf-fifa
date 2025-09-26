@@ -4,7 +4,7 @@
 const net = require('net');
 
 function checkPort(port) {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     const server = net.createServer();
 
     server.listen(port, () => {

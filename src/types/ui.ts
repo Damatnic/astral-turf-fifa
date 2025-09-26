@@ -1,6 +1,12 @@
 // UI and application state types
 
-import type { PositionRole, Team, TransferMarketFilters, AdvancedRosterFilters, ChatMessage } from './player';
+import type {
+  PositionRole,
+  Team,
+  TransferMarketFilters,
+  AdvancedRosterFilters,
+  ChatMessage,
+} from './player';
 
 // Theme and general UI
 export type AppTheme = 'light' | 'dark';
@@ -15,7 +21,25 @@ export interface Notification {
 }
 
 // Modal types
-export type ModalType = 'editPlayer' | 'comparePlayer' | 'slotActionMenu' | 'chat' | 'customFormationEditor' | 'loadProject' | 'matchSimulator' | 'postMatchReport' | 'contractNegotiation' | 'pressConference' | 'aiSubSuggestion' | 'playerConversation' | 'interactiveTutorial' | 'scouting' | 'sponsorships' | 'teamTalk' | 'seasonEndSummary' | 'playbookLibrary';
+export type ModalType =
+  | 'editPlayer'
+  | 'comparePlayer'
+  | 'slotActionMenu'
+  | 'chat'
+  | 'customFormationEditor'
+  | 'loadProject'
+  | 'matchSimulator'
+  | 'postMatchReport'
+  | 'contractNegotiation'
+  | 'pressConference'
+  | 'aiSubSuggestion'
+  | 'playerConversation'
+  | 'interactiveTutorial'
+  | 'scouting'
+  | 'sponsorships'
+  | 'teamTalk'
+  | 'seasonEndSummary'
+  | 'playbookLibrary';
 
 // Slot action menu
 export type SlotActionMenuTrigger = 'click' | 'drag';
@@ -34,14 +58,22 @@ export type DrawingTool = 'select' | 'arrow' | 'zone' | 'pen' | 'line' | 'text';
 export interface DrawingShape {
   id: string;
   tool: DrawingTool;
+  type?: string; // Optional type for drawing shapes
   color: string;
   points: readonly { x: number; y: number }[];
   text?: string;
 }
 
 // Playbook and animations
-export const PLAY_CATEGORIES = ['General', 'Attacking Corner', 'Defending Corner', 'Attacking Free Kick', 'Defending Free Kick', 'Throw-in'] as const;
-export type PlayCategory = typeof PLAY_CATEGORIES[number];
+export const PLAY_CATEGORIES = [
+  'General',
+  'Attacking Corner',
+  'Defending Corner',
+  'Attacking Free Kick',
+  'Defending Free Kick',
+  'Throw-in',
+] as const;
+export type PlayCategory = (typeof PLAY_CATEGORIES)[number];
 
 export interface PlaybookEvent {
   type: 'Goal' | 'Yellow Card' | 'Red Card';
@@ -53,8 +85,8 @@ export interface PlaybookStep {
   playerPositions: Record<string, { x: number; y: number }>;
   drawings: DrawingShape[];
   event?: PlaybookEvent;
-  playerRuns?: { playerId: string, points: { x: number, y: number }[] }[];
-  ballPath?: { points: { x: number, y: number }[] };
+  playerRuns?: { playerId: string; points: { x: number; y: number }[] }[];
+  ballPath?: { points: { x: number; y: number }[] };
 }
 
 export interface PlaybookItem {
@@ -105,7 +137,7 @@ export interface UIState {
   saveSlots: Record<string, SaveSlot>;
   activeSaveSlotId: string | null;
   isExportingLineup: boolean;
-  teamKits: { home: unknown, away: unknown }; // TeamKit when imported
+  teamKits: { home: unknown; away: unknown }; // TeamKit when imported
   notifications: Notification[];
   activeTeamContext: TeamView;
 
@@ -127,8 +159,10 @@ export interface UIState {
   activeStepIndex: number | null;
   isAnimating: boolean;
   isPaused: boolean;
-  playerInitialPositions: Record<string, { x: number, y: number }> | null;
-  animationTrails: readonly { playerId: string, points: readonly {x: number, y: number}[], color: string }[] | null;
+  playerInitialPositions: Record<string, { x: number; y: number }> | null;
+  animationTrails:
+    | readonly { playerId: string; points: readonly { x: number; y: number }[]; color: string }[]
+    | null;
   isPresentationMode: boolean;
   setPieceEditor: SetPieceEditor;
 

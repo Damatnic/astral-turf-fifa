@@ -1,5 +1,11 @@
-
-import React, { createContext, useReducer, useContext, type ReactNode, type Dispatch, useCallback } from 'react';
+import React, {
+  createContext,
+  useReducer,
+  useContext,
+  type ReactNode,
+  type Dispatch,
+  useCallback,
+} from 'react';
 import type {
   UIState,
   Action,
@@ -207,9 +213,12 @@ export const UIProvider: React.FC<UIProviderProps> = ({ children }) => {
     dispatch({ type: 'CLEAR_ROSTER_FILTERS' });
   }, []);
 
-  const setTransferMarketFilter = useCallback((filter: keyof TransferMarketFilters, value: unknown) => {
-    dispatch({ type: 'SET_TRANSFER_MARKET_FILTER', payload: { filter, value } });
-  }, []);
+  const setTransferMarketFilter = useCallback(
+    (filter: keyof TransferMarketFilters, value: unknown) => {
+      dispatch({ type: 'SET_TRANSFER_MARKET_FILTER', payload: { filter, value } });
+    },
+    [],
+  );
 
   // AI settings
   const setAIPersonality = useCallback((personality: AIPersonality) => {
@@ -316,11 +325,7 @@ export const UIProvider: React.FC<UIProviderProps> = ({ children }) => {
     error,
   };
 
-  return (
-    <UIEnhancedContext.Provider value={value}>
-      {children}
-    </UIEnhancedContext.Provider>
-  );
+  return <UIEnhancedContext.Provider value={value}>{children}</UIEnhancedContext.Provider>;
 };
 
 export const useUI = (): UIContextType => {

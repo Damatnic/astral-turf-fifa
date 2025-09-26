@@ -14,18 +14,18 @@ import {
   EnhancedDoughnutChart,
   EnhancedRadarChart,
 } from '../components/charts/EnhancedCharts';
-import {
-  SwipeArea,
-  Draggable,
-  SortableList,
-} from '../components/ui/GestureSystem';
+import { SwipeArea, Draggable, SortableList } from '../components/ui/GestureSystem';
 import {
   ThemeCustomizer,
   LayoutPreferences,
   AccessibilityPreferences,
   PreferencesBackup,
 } from '../components/ui/PersonalizationSystem';
-import { AnimatedContainer, LoadingAnimation, SuccessAnimation } from '../components/ui/AnimationSystem';
+import {
+  AnimatedContainer,
+  LoadingAnimation,
+  SuccessAnimation,
+} from '../components/ui/AnimationSystem';
 
 const UIDemoPage: React.FC = () => {
   const { theme, tokens } = useTheme();
@@ -94,11 +94,11 @@ const UIDemoPage: React.FC = () => {
   ]);
 
   const handleSwipe = (event: unknown) => {
-    // // console.log('Swipe detected:', event);
+    // // // // console.log('Swipe detected:', event);
   };
 
   const handleDrag = (event: unknown) => {
-    // // console.log('Drag detected:', event);
+    // // // // console.log('Drag detected:', event);
   };
 
   const simulateLoading = () => {
@@ -112,7 +112,10 @@ const UIDemoPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen p-6 space-y-8" style={{ backgroundColor: theme.colors.background.primary }}>
+    <div
+      className="min-h-screen p-6 space-y-8"
+      style={{ backgroundColor: theme.colors.background.primary }}
+    >
       {/* Header */}
       <AnimatedContainer variant="fade">
         <div className="text-center mb-12">
@@ -140,18 +143,10 @@ const UIDemoPage: React.FC = () => {
             🎛️ Personalization Controls
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <EnhancedButton
-              variant="primary"
-              onClick={() => setActiveModal('theme')}
-              fullWidth
-            >
+            <EnhancedButton variant="primary" onClick={() => setActiveModal('theme')} fullWidth>
               🎨 Theme Customizer
             </EnhancedButton>
-            <EnhancedButton
-              variant="secondary"
-              onClick={() => setActiveModal('layout')}
-              fullWidth
-            >
+            <EnhancedButton variant="secondary" onClick={() => setActiveModal('layout')} fullWidth>
               📐 Layout Preferences
             </EnhancedButton>
             <EnhancedButton
@@ -161,11 +156,7 @@ const UIDemoPage: React.FC = () => {
             >
               ♿ Accessibility
             </EnhancedButton>
-            <EnhancedButton
-              variant="ghost"
-              onClick={() => setActiveModal('backup')}
-              fullWidth
-            >
+            <EnhancedButton variant="ghost" onClick={() => setActiveModal('backup')} fullWidth>
               💾 Backup & Restore
             </EnhancedButton>
           </div>
@@ -182,13 +173,25 @@ const UIDemoPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Buttons */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium" style={{ color: theme.colors.text.primary }}>Buttons</h3>
+              <h3 className="text-lg font-medium" style={{ color: theme.colors.text.primary }}>
+                Buttons
+              </h3>
               <div className="space-y-3">
-                <EnhancedButton variant="primary" fullWidth>Primary Button</EnhancedButton>
-                <EnhancedButton variant="secondary" fullWidth>Secondary Button</EnhancedButton>
-                <EnhancedButton variant="tertiary" fullWidth>Tertiary Button</EnhancedButton>
-                <EnhancedButton variant="ghost" fullWidth>Ghost Button</EnhancedButton>
-                <EnhancedButton variant="danger" fullWidth>Danger Button</EnhancedButton>
+                <EnhancedButton variant="primary" fullWidth>
+                  Primary Button
+                </EnhancedButton>
+                <EnhancedButton variant="secondary" fullWidth>
+                  Secondary Button
+                </EnhancedButton>
+                <EnhancedButton variant="tertiary" fullWidth>
+                  Tertiary Button
+                </EnhancedButton>
+                <EnhancedButton variant="ghost" fullWidth>
+                  Ghost Button
+                </EnhancedButton>
+                <EnhancedButton variant="danger" fullWidth>
+                  Danger Button
+                </EnhancedButton>
                 <EnhancedButton
                   variant="primary"
                   loading={demoStates.loading}
@@ -202,13 +205,15 @@ const UIDemoPage: React.FC = () => {
 
             {/* Inputs */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium" style={{ color: theme.colors.text.primary }}>Inputs</h3>
+              <h3 className="text-lg font-medium" style={{ color: theme.colors.text.primary }}>
+                Inputs
+              </h3>
               <div className="space-y-3">
                 <EnhancedInput
                   label="Player Name"
                   placeholder="Enter player name..."
                   value={demoStates.inputValue}
-                  onChange={(e) => setDemoStates(prev => ({ ...prev, inputValue: e.target.value }))}
+                  onChange={e => setDemoStates(prev => ({ ...prev, inputValue: e.target.value }))}
                 />
                 <EnhancedInput
                   label="Email Address"
@@ -216,11 +221,7 @@ const UIDemoPage: React.FC = () => {
                   placeholder="player@example.com"
                   error={demoStates.error}
                 />
-                <EnhancedInput
-                  label="Password"
-                  type="password"
-                  placeholder="Enter password..."
-                />
+                <EnhancedInput label="Password" type="password" placeholder="Enter password..." />
                 <EnhancedInput
                   label="Team Formation"
                   placeholder="4-4-2"
@@ -231,16 +232,18 @@ const UIDemoPage: React.FC = () => {
 
             {/* Switches */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium" style={{ color: theme.colors.text.primary }}>Switches</h3>
+              <h3 className="text-lg font-medium" style={{ color: theme.colors.text.primary }}>
+                Switches
+              </h3>
               <div className="space-y-3">
                 <EnhancedSwitch
                   checked={demoStates.switch1}
-                  onChange={(checked) => setDemoStates(prev => ({ ...prev, switch1: checked }))}
+                  onChange={checked => setDemoStates(prev => ({ ...prev, switch1: checked }))}
                   label="Enable Notifications"
                 />
                 <EnhancedSwitch
                   checked={demoStates.switch2}
-                  onChange={(checked) => setDemoStates(prev => ({ ...prev, switch2: checked }))}
+                  onChange={checked => setDemoStates(prev => ({ ...prev, switch2: checked }))}
                   label="Auto-save Changes"
                   color="success"
                 />
@@ -258,20 +261,28 @@ const UIDemoPage: React.FC = () => {
           <div className="mt-8 flex items-center justify-center space-x-8">
             <div className="text-center">
               <LoadingAnimation type="spinner" size="lg" />
-              <p className="mt-2 text-sm" style={{ color: theme.colors.text.secondary }}>Spinner</p>
+              <p className="mt-2 text-sm" style={{ color: theme.colors.text.secondary }}>
+                Spinner
+              </p>
             </div>
             <div className="text-center">
               <LoadingAnimation type="dots" size="lg" />
-              <p className="mt-2 text-sm" style={{ color: theme.colors.text.secondary }}>Dots</p>
+              <p className="mt-2 text-sm" style={{ color: theme.colors.text.secondary }}>
+                Dots
+              </p>
             </div>
             <div className="text-center">
               <LoadingAnimation type="pulse" size="lg" />
-              <p className="mt-2 text-sm" style={{ color: theme.colors.text.secondary }}>Pulse</p>
+              <p className="mt-2 text-sm" style={{ color: theme.colors.text.secondary }}>
+                Pulse
+              </p>
             </div>
             {demoStates.success && (
               <div className="text-center">
                 <SuccessAnimation size="lg" />
-                <p className="mt-2 text-sm" style={{ color: theme.colors.status.success }}>Success!</p>
+                <p className="mt-2 text-sm" style={{ color: theme.colors.status.success }}>
+                  Success!
+                </p>
               </div>
             )}
           </div>
@@ -342,9 +353,7 @@ const UIDemoPage: React.FC = () => {
                   backgroundColor: theme.colors.background.secondary,
                 }}
               >
-                <p style={{ color: theme.colors.text.secondary }}>
-                  👆 Swipe in any direction
-                </p>
+                <p style={{ color: theme.colors.text.secondary }}>👆 Swipe in any direction</p>
               </SwipeArea>
             </div>
 
@@ -357,10 +366,7 @@ const UIDemoPage: React.FC = () => {
                 className="relative h-32 border-2 border-dashed rounded-lg"
                 style={{ borderColor: theme.colors.border.primary }}
               >
-                <Draggable
-                  config={{ onDrag: handleDrag }}
-                  className="absolute top-4 left-4"
-                >
+                <Draggable config={{ onDrag: handleDrag }} className="absolute top-4 left-4">
                   <div
                     className="w-16 h-16 rounded-lg flex items-center justify-center text-2xl cursor-grab"
                     style={{ backgroundColor: theme.colors.accent.primary }}
@@ -376,10 +382,7 @@ const UIDemoPage: React.FC = () => {
               <h3 className="text-lg font-medium mb-3" style={{ color: theme.colors.text.primary }}>
                 Sortable List
               </h3>
-              <SortableList
-                items={sortableItems}
-                onReorder={setSortableItems}
-              />
+              <SortableList items={sortableItems} onReorder={setSortableItems} />
             </div>
           </div>
         </EnhancedCard>
@@ -397,36 +400,28 @@ const UIDemoPage: React.FC = () => {
               <h3 className="font-semibold mb-2" style={{ color: theme.colors.text.primary }}>
                 Default Card
               </h3>
-              <p style={{ color: theme.colors.text.secondary }}>
-                Standard card with subtle shadow
-              </p>
+              <p style={{ color: theme.colors.text.secondary }}>Standard card with subtle shadow</p>
             </EnhancedCard>
 
             <EnhancedCard variant="elevated" padding="md">
               <h3 className="font-semibold mb-2" style={{ color: theme.colors.text.primary }}>
                 Elevated Card
               </h3>
-              <p style={{ color: theme.colors.text.secondary }}>
-                Card with prominent shadow
-              </p>
+              <p style={{ color: theme.colors.text.secondary }}>Card with prominent shadow</p>
             </EnhancedCard>
 
             <EnhancedCard variant="outlined" padding="md">
               <h3 className="font-semibold mb-2" style={{ color: theme.colors.text.primary }}>
                 Outlined Card
               </h3>
-              <p style={{ color: theme.colors.text.secondary }}>
-                Card with border only
-              </p>
+              <p style={{ color: theme.colors.text.secondary }}>Card with border only</p>
             </EnhancedCard>
 
             <EnhancedCard variant="glass" padding="md">
               <h3 className="font-semibold mb-2" style={{ color: theme.colors.text.primary }}>
                 Glass Card
               </h3>
-              <p style={{ color: theme.colors.text.secondary }}>
-                Card with glass morphism effect
-              </p>
+              <p style={{ color: theme.colors.text.secondary }}>Card with glass morphism effect</p>
             </EnhancedCard>
           </div>
         </EnhancedCard>
@@ -435,11 +430,7 @@ const UIDemoPage: React.FC = () => {
       {/* Interactive Cards */}
       <AnimatedContainer variant="fade">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <EnhancedCard
-            interactive
-            padding="lg"
-            onClick={() => alert('Player card clicked!')}
-          >
+          <EnhancedCard interactive padding="lg" onClick={() => alert('Player card clicked!')}>
             <div className="text-center">
               <div
                 className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center text-2xl"
@@ -447,20 +438,17 @@ const UIDemoPage: React.FC = () => {
               >
                 👤
               </div>
-              <h3 className="text-lg font-semibold mb-2" style={{ color: theme.colors.text.primary }}>
+              <h3
+                className="text-lg font-semibold mb-2"
+                style={{ color: theme.colors.text.primary }}
+              >
                 Player Profile
               </h3>
-              <p style={{ color: theme.colors.text.secondary }}>
-                Click to view player details
-              </p>
+              <p style={{ color: theme.colors.text.secondary }}>Click to view player details</p>
             </div>
           </EnhancedCard>
 
-          <EnhancedCard
-            interactive
-            padding="lg"
-            onClick={() => alert('Match card clicked!')}
-          >
+          <EnhancedCard interactive padding="lg" onClick={() => alert('Match card clicked!')}>
             <div className="text-center">
               <div
                 className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center text-2xl"
@@ -468,20 +456,17 @@ const UIDemoPage: React.FC = () => {
               >
                 ⚽
               </div>
-              <h3 className="text-lg font-semibold mb-2" style={{ color: theme.colors.text.primary }}>
+              <h3
+                className="text-lg font-semibold mb-2"
+                style={{ color: theme.colors.text.primary }}
+              >
                 Match Results
               </h3>
-              <p style={{ color: theme.colors.text.secondary }}>
-                View recent match statistics
-              </p>
+              <p style={{ color: theme.colors.text.secondary }}>View recent match statistics</p>
             </div>
           </EnhancedCard>
 
-          <EnhancedCard
-            interactive
-            padding="lg"
-            onClick={() => alert('Training card clicked!')}
-          >
+          <EnhancedCard interactive padding="lg" onClick={() => alert('Training card clicked!')}>
             <div className="text-center">
               <div
                 className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center text-2xl"
@@ -489,34 +474,26 @@ const UIDemoPage: React.FC = () => {
               >
                 🏃
               </div>
-              <h3 className="text-lg font-semibold mb-2" style={{ color: theme.colors.text.primary }}>
+              <h3
+                className="text-lg font-semibold mb-2"
+                style={{ color: theme.colors.text.primary }}
+              >
                 Training Sessions
               </h3>
-              <p style={{ color: theme.colors.text.secondary }}>
-                Manage team training
-              </p>
+              <p style={{ color: theme.colors.text.secondary }}>Manage team training</p>
             </div>
           </EnhancedCard>
         </div>
       </AnimatedContainer>
 
       {/* Personalization Modals */}
-      <ThemeCustomizer
-        isOpen={activeModal === 'theme'}
-        onClose={() => setActiveModal(null)}
-      />
-      <LayoutPreferences
-        isOpen={activeModal === 'layout'}
-        onClose={() => setActiveModal(null)}
-      />
+      <ThemeCustomizer isOpen={activeModal === 'theme'} onClose={() => setActiveModal(null)} />
+      <LayoutPreferences isOpen={activeModal === 'layout'} onClose={() => setActiveModal(null)} />
       <AccessibilityPreferences
         isOpen={activeModal === 'accessibility'}
         onClose={() => setActiveModal(null)}
       />
-      <PreferencesBackup
-        isOpen={activeModal === 'backup'}
-        onClose={() => setActiveModal(null)}
-      />
+      <PreferencesBackup isOpen={activeModal === 'backup'} onClose={() => setActiveModal(null)} />
     </div>
   );
 };

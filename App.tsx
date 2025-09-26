@@ -1,4 +1,3 @@
-
 import React, { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
@@ -66,25 +65,37 @@ const AppContent: React.FC = () => {
               <Route
                 path="/"
                 element={
-                  authState.isAuthenticated ?
-                    <Navigate to="/dashboard" /> :
-                    <PageTransition><LandingPage /></PageTransition>
+                  authState.isAuthenticated ? (
+                    <Navigate to="/dashboard" />
+                  ) : (
+                    <PageTransition>
+                      <LandingPage />
+                    </PageTransition>
+                  )
                 }
               />
               <Route
                 path="/login"
                 element={
-                  authState.isAuthenticated ?
-                    <Navigate to="/dashboard" /> :
-                    <PageTransition><LoginPage /></PageTransition>
+                  authState.isAuthenticated ? (
+                    <Navigate to="/dashboard" />
+                  ) : (
+                    <PageTransition>
+                      <LoginPage />
+                    </PageTransition>
+                  )
                 }
               />
               <Route
                 path="/signup"
                 element={
-                  authState.isAuthenticated ?
-                    <Navigate to="/dashboard" /> :
-                    <PageTransition><SignupPage /></PageTransition>
+                  authState.isAuthenticated ? (
+                    <Navigate to="/dashboard" />
+                  ) : (
+                    <PageTransition>
+                      <SignupPage />
+                    </PageTransition>
+                  )
                 }
               />
 
@@ -93,119 +104,235 @@ const AppContent: React.FC = () => {
                 <Route path="/*" element={<Layout />}>
                   <Route
                     path="dashboard"
-                    element={<PageTransition><DashboardPage /></PageTransition>}
+                    element={
+                      <PageTransition>
+                        <DashboardPage />
+                      </PageTransition>
+                    }
                   />
                   <Route
                     path="tactics"
-                    element={<PageTransition><TacticsBoardPage /></PageTransition>}
+                    element={
+                      <PageTransition>
+                        <TacticsBoardPage />
+                      </PageTransition>
+                    }
                   />
                   <Route
                     path="finances"
-                    element={<PageTransition><FinancesPage /></PageTransition>}
+                    element={
+                      <PageTransition>
+                        <FinancesPage />
+                      </PageTransition>
+                    }
                   />
                   <Route
                     path="transfers"
-                    element={<PageTransition><TransfersPage /></PageTransition>}
+                    element={
+                      <PageTransition>
+                        <TransfersPage />
+                      </PageTransition>
+                    }
                   />
                   <Route
                     path="training"
-                    element={<PageTransition><TrainingPage /></PageTransition>}
+                    element={
+                      <PageTransition>
+                        <TrainingPage />
+                      </PageTransition>
+                    }
                   />
                   <Route
                     path="inbox"
-                    element={<PageTransition><InboxPage /></PageTransition>}
+                    element={
+                      <PageTransition>
+                        <InboxPage />
+                      </PageTransition>
+                    }
                   />
                   <Route
                     path="analytics"
-                    element={<PageTransition><AnalyticsPage /></PageTransition>}
+                    element={
+                      <PageTransition>
+                        <AnalyticsPage />
+                      </PageTransition>
+                    }
                   />
                   <Route
                     path="settings"
-                    element={<PageTransition><SettingsPage /></PageTransition>}
+                    element={
+                      <PageTransition>
+                        <SettingsPage />
+                      </PageTransition>
+                    }
                   />
                   <Route
                     path="youth-academy"
-                    element={<PageTransition><YouthAcademyPage /></PageTransition>}
+                    element={
+                      <PageTransition>
+                        <YouthAcademyPage />
+                      </PageTransition>
+                    }
                   />
                   <Route
                     path="staff"
-                    element={<PageTransition><StaffPage /></PageTransition>}
+                    element={
+                      <PageTransition>
+                        <StaffPage />
+                      </PageTransition>
+                    }
                   />
                   <Route
                     path="stadium"
-                    element={<PageTransition><StadiumPage /></PageTransition>}
+                    element={
+                      <PageTransition>
+                        <StadiumPage />
+                      </PageTransition>
+                    }
                   />
                   <Route
                     path="sponsorships"
-                    element={<PageTransition><SponsorshipsPage /></PageTransition>}
+                    element={
+                      <PageTransition>
+                        <SponsorshipsPage />
+                      </PageTransition>
+                    }
                   />
                   <Route
                     path="league-table"
-                    element={<PageTransition><LeagueTablePage /></PageTransition>}
+                    element={
+                      <PageTransition>
+                        <LeagueTablePage />
+                      </PageTransition>
+                    }
                   />
                   <Route
                     path="board-objectives"
-                    element={<PageTransition><BoardObjectivesPage /></PageTransition>}
+                    element={
+                      <PageTransition>
+                        <BoardObjectivesPage />
+                      </PageTransition>
+                    }
                   />
                   <Route
                     path="news-feed"
-                    element={<PageTransition><NewsFeedPage /></PageTransition>}
+                    element={
+                      <PageTransition>
+                        <NewsFeedPage />
+                      </PageTransition>
+                    }
                   />
                   <Route
                     path="club-history"
-                    element={<PageTransition><ClubHistoryPage /></PageTransition>}
+                    element={
+                      <PageTransition>
+                        <ClubHistoryPage />
+                      </PageTransition>
+                    }
                   />
                   <Route
                     path="medical-center"
-                    element={<PageTransition><MedicalCenterPage /></PageTransition>}
+                    element={
+                      <PageTransition>
+                        <MedicalCenterPage />
+                      </PageTransition>
+                    }
                   />
                   <Route
                     path="job-security"
-                    element={<PageTransition><JobSecurityPage /></PageTransition>}
+                    element={
+                      <PageTransition>
+                        <JobSecurityPage />
+                      </PageTransition>
+                    }
                   />
                   <Route
                     path="international-management"
-                    element={<PageTransition><InternationalManagementPage /></PageTransition>}
+                    element={
+                      <PageTransition>
+                        <InternationalManagementPage />
+                      </PageTransition>
+                    }
                   />
                   <Route
                     path="opposition-analysis"
-                    element={<PageTransition><OppositionAnalysisPage /></PageTransition>}
+                    element={
+                      <PageTransition>
+                        <OppositionAnalysisPage />
+                      </PageTransition>
+                    }
                   />
                   <Route
                     path="press-conference"
-                    element={<PageTransition><PressConferencePage /></PageTransition>}
+                    element={
+                      <PageTransition>
+                        <PressConferencePage />
+                      </PageTransition>
+                    }
                   />
                   <Route
                     path="player/:playerId"
-                    element={<PageTransition><PlayerProfilePage /></PageTransition>}
+                    element={
+                      <PageTransition>
+                        <PlayerProfilePage />
+                      </PageTransition>
+                    }
                   />
                   <Route
                     path="skill-challenges"
-                    element={<PageTransition><SkillChallengesPage /></PageTransition>}
+                    element={
+                      <PageTransition>
+                        <SkillChallengesPage />
+                      </PageTransition>
+                    }
                   />
                   <Route
                     path="mentoring"
-                    element={<PageTransition><MentoringPage /></PageTransition>}
+                    element={
+                      <PageTransition>
+                        <MentoringPage />
+                      </PageTransition>
+                    }
                   />
                   <Route
                     path="advanced-analytics"
-                    element={<PageTransition><AdvancedAnalyticsPage /></PageTransition>}
+                    element={
+                      <PageTransition>
+                        <AdvancedAnalyticsPage />
+                      </PageTransition>
+                    }
                   />
                   <Route
                     path="player-ranking"
-                    element={<PageTransition><MyPlayerRankingPage /></PageTransition>}
+                    element={
+                      <PageTransition>
+                        <MyPlayerRankingPage />
+                      </PageTransition>
+                    }
                   />
                   <Route
                     path="player-ranking/:playerId"
-                    element={<PageTransition><MyPlayerRankingPage /></PageTransition>}
+                    element={
+                      <PageTransition>
+                        <MyPlayerRankingPage />
+                      </PageTransition>
+                    }
                   />
                   <Route
                     path="challenge-hub"
-                    element={<PageTransition><ChallengeHubPage /></PageTransition>}
+                    element={
+                      <PageTransition>
+                        <ChallengeHubPage />
+                      </PageTransition>
+                    }
                   />
                   <Route
                     path="challenge-manager"
-                    element={<PageTransition><CoachChallengeManagerPage /></PageTransition>}
+                    element={
+                      <PageTransition>
+                        <CoachChallengeManagerPage />
+                      </PageTransition>
+                    }
                   />
                   <Route index element={<Navigate to="dashboard" replace />} />
                   <Route path="*" element={<Navigate to="dashboard" replace />} />

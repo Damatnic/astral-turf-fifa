@@ -2,11 +2,13 @@ import React, { useState, useRef } from 'react';
 import { motion, useMotionValue, useTransform, useSpring } from 'framer-motion';
 
 // Define our own HTMLMotionProps equivalent since it's not exported in v12+
-type HTMLMotionProps<T extends keyof React.JSX.IntrinsicElements> = React.ComponentProps<typeof motion[T]>;
+type HTMLMotionProps<T extends keyof React.JSX.IntrinsicElements> = React.ComponentProps<
+  (typeof motion)[T]
+>;
 import { useTheme } from '../../context/ThemeContext';
 
 // Enhanced Button Component
-interface EnhancedButtonProps extends Omit<HTMLMotionProps<"button">, 'variants'> {
+interface EnhancedButtonProps extends Omit<HTMLMotionProps<'button'>, 'variants'> {
   variant?: 'primary' | 'secondary' | 'tertiary' | 'ghost' | 'danger';
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   loading?: boolean;
@@ -34,11 +36,26 @@ export const EnhancedButton: React.FC<EnhancedButtonProps> = ({
   const shadowScale = useTransform(scale, [1, 0.95], [1, 0.8]);
 
   const sizeStyles = {
-    xs: { padding: `${tokens.spacing[1]} ${tokens.spacing[2]}`, fontSize: tokens.typography.fontSizes.xs },
-    sm: { padding: `${tokens.spacing[2]} ${tokens.spacing[3]}`, fontSize: tokens.typography.fontSizes.sm },
-    md: { padding: `${tokens.spacing[3]} ${tokens.spacing[4]}`, fontSize: tokens.typography.fontSizes.sm },
-    lg: { padding: `${tokens.spacing[4]} ${tokens.spacing[6]}`, fontSize: tokens.typography.fontSizes.base },
-    xl: { padding: `${tokens.spacing[5]} ${tokens.spacing[8]}`, fontSize: tokens.typography.fontSizes.lg },
+    xs: {
+      padding: `${tokens.spacing[1]} ${tokens.spacing[2]}`,
+      fontSize: tokens.typography.fontSizes.xs,
+    },
+    sm: {
+      padding: `${tokens.spacing[2]} ${tokens.spacing[3]}`,
+      fontSize: tokens.typography.fontSizes.sm,
+    },
+    md: {
+      padding: `${tokens.spacing[3]} ${tokens.spacing[4]}`,
+      fontSize: tokens.typography.fontSizes.sm,
+    },
+    lg: {
+      padding: `${tokens.spacing[4]} ${tokens.spacing[6]}`,
+      fontSize: tokens.typography.fontSizes.base,
+    },
+    xl: {
+      padding: `${tokens.spacing[5]} ${tokens.spacing[8]}`,
+      fontSize: tokens.typography.fontSizes.lg,
+    },
   };
 
   const variantStyles = {
@@ -89,18 +106,26 @@ export const EnhancedButton: React.FC<EnhancedButtonProps> = ({
         overflow: 'hidden',
         ...props.style,
       }}
-      whileHover={!disabled && !loading ? {
-        scale: 1.02,
-        boxShadow: tokens.shadows.lg,
-      } : {}}
-      whileTap={!disabled && !loading ? {
-        scale: 0.98,
-      } : {}}
+      whileHover={
+        !disabled && !loading
+          ? {
+              scale: 1.02,
+              boxShadow: tokens.shadows.lg,
+            }
+          : {}
+      }
+      whileTap={
+        !disabled && !loading
+          ? {
+              scale: 0.98,
+            }
+          : {}
+      }
       onTapStart={() => setIsPressed(true)}
       onTap={() => setIsPressed(false)}
       onTapCancel={() => setIsPressed(false)}
       transition={{
-        type: "spring",
+        type: 'spring',
         stiffness: 400,
         damping: 25,
       }}
@@ -119,7 +144,7 @@ export const EnhancedButton: React.FC<EnhancedButtonProps> = ({
       {loading && (
         <motion.div
           animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
           className="w-4 h-4 border-2 border-current border-t-transparent rounded-full"
         />
       )}
@@ -132,7 +157,7 @@ export const EnhancedButton: React.FC<EnhancedButtonProps> = ({
 };
 
 // Enhanced Card Component
-interface EnhancedCardProps extends HTMLMotionProps<"div"> {
+interface EnhancedCardProps extends HTMLMotionProps<'div'> {
   variant?: 'default' | 'elevated' | 'outlined' | 'glass';
   padding?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
   interactive?: boolean;
@@ -174,9 +199,7 @@ export const EnhancedCard: React.FC<EnhancedCardProps> = ({
       boxShadow: 'none',
     },
     glass: {
-      backgroundColor: theme.isDark
-        ? 'rgba(255, 255, 255, 0.05)'
-        : 'rgba(255, 255, 255, 0.7)',
+      backgroundColor: theme.isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.7)',
       border: `1px solid ${theme.colors.border.secondary}`,
       backdropFilter: 'blur(10px)',
       boxShadow: tokens.shadows.sm,
@@ -194,15 +217,23 @@ export const EnhancedCard: React.FC<EnhancedCardProps> = ({
         cursor: interactive ? 'pointer' : 'default',
         ...props.style,
       }}
-      whileHover={interactive ? {
-        y: -2,
-        boxShadow: tokens.shadows.xl,
-        transition: { duration: 0.2 },
-      } : {}}
-      whileTap={interactive ? {
-        scale: 0.98,
-        transition: { duration: 0.1 },
-      } : {}}
+      whileHover={
+        interactive
+          ? {
+              y: -2,
+              boxShadow: tokens.shadows.xl,
+              transition: { duration: 0.2 },
+            }
+          : {}
+      }
+      whileTap={
+        interactive
+          ? {
+              scale: 0.98,
+              transition: { duration: 0.1 },
+            }
+          : {}
+      }
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
     >
@@ -250,9 +281,18 @@ export const EnhancedInput: React.FC<EnhancedInputProps> = ({
   const [hasValue, setHasValue] = useState(false);
 
   const sizeStyles = {
-    sm: { padding: `${tokens.spacing[2]} ${tokens.spacing[3]}`, fontSize: tokens.typography.fontSizes.sm },
-    md: { padding: `${tokens.spacing[3]} ${tokens.spacing[4]}`, fontSize: tokens.typography.fontSizes.base },
-    lg: { padding: `${tokens.spacing[4]} ${tokens.spacing[5]}`, fontSize: tokens.typography.fontSizes.lg },
+    sm: {
+      padding: `${tokens.spacing[2]} ${tokens.spacing[3]}`,
+      fontSize: tokens.typography.fontSizes.sm,
+    },
+    md: {
+      padding: `${tokens.spacing[3]} ${tokens.spacing[4]}`,
+      fontSize: tokens.typography.fontSizes.base,
+    },
+    lg: {
+      padding: `${tokens.spacing[4]} ${tokens.spacing[5]}`,
+      fontSize: tokens.typography.fontSizes.lg,
+    },
   };
 
   const variantStyles = {
@@ -304,20 +344,26 @@ export const EnhancedInput: React.FC<EnhancedInputProps> = ({
             borderRadius: tokens.borderRadius.lg,
             color: theme.colors.text.primary,
             width: '100%',
-            paddingLeft: icon && iconPosition === 'left' ? tokens.spacing[10] : sizeStyles[size].padding.split(' ')[1],
-            paddingRight: icon && iconPosition === 'right' ? tokens.spacing[10] : sizeStyles[size].padding.split(' ')[1],
+            paddingLeft:
+              icon && iconPosition === 'left'
+                ? tokens.spacing[10]
+                : sizeStyles[size].padding.split(' ')[1],
+            paddingRight:
+              icon && iconPosition === 'right'
+                ? tokens.spacing[10]
+                : sizeStyles[size].padding.split(' ')[1],
             outline: 'none',
             transition: `all ${tokens.transitions.normal} ease-in-out`,
           }}
-          onFocus={(e) => {
+          onFocus={e => {
             setIsFocused(true);
             props.onFocus?.(e);
           }}
-          onBlur={(e) => {
+          onBlur={e => {
             setIsFocused(false);
             props.onBlur?.(e);
           }}
-          onChange={(e) => {
+          onChange={e => {
             setHasValue(e.target.value.length > 0);
             props.onChange?.(e);
           }}
@@ -419,7 +465,7 @@ export const EnhancedSwitch: React.FC<EnhancedSwitchProps> = ({
             x: checked ? `calc(${width} - ${thumbSize} - 4px)` : 0,
           }}
           transition={{
-            type: "spring",
+            type: 'spring',
             stiffness: 500,
             damping: 30,
           }}
@@ -487,10 +533,30 @@ export const EnhancedTooltip: React.FC<EnhancedTooltipProps> = ({
   };
 
   const placementStyles = {
-    top: { bottom: '100%', left: '50%', transform: 'translateX(-50%)', marginBottom: tokens.spacing[2] },
-    bottom: { top: '100%', left: '50%', transform: 'translateX(-50%)', marginTop: tokens.spacing[2] },
-    left: { right: '100%', top: '50%', transform: 'translateY(-50%)', marginRight: tokens.spacing[2] },
-    right: { left: '100%', top: '50%', transform: 'translateY(-50%)', marginLeft: tokens.spacing[2] },
+    top: {
+      bottom: '100%',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      marginBottom: tokens.spacing[2],
+    },
+    bottom: {
+      top: '100%',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      marginTop: tokens.spacing[2],
+    },
+    left: {
+      right: '100%',
+      top: '50%',
+      transform: 'translateY(-50%)',
+      marginRight: tokens.spacing[2],
+    },
+    right: {
+      left: '100%',
+      top: '50%',
+      transform: 'translateY(-50%)',
+      marginLeft: tokens.spacing[2],
+    },
   };
 
   return (
@@ -531,9 +597,10 @@ export const EnhancedTooltip: React.FC<EnhancedTooltipProps> = ({
                   bottom: placement === 'top' ? '-4px' : 'auto',
                   left: placement === 'right' ? '-4px' : placement === 'left' ? 'auto' : '50%',
                   right: placement === 'left' ? '-4px' : 'auto',
-                  transform: placement === 'left' || placement === 'right'
-                    ? 'translateY(-50%) rotate(45deg)'
-                    : 'translateX(-50%) rotate(45deg)',
+                  transform:
+                    placement === 'left' || placement === 'right'
+                      ? 'translateY(-50%) rotate(45deg)'
+                      : 'translateX(-50%) rotate(45deg)',
                 },
               }}
             />

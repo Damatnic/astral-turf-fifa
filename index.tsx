@@ -1,4 +1,3 @@
-
 /* eslint-env browser */
 import React from 'react';
 import ReactDOM from 'react-dom/client';
@@ -8,8 +7,7 @@ import { HashRouter } from 'react-router-dom';
 import SecurityProvider from './src/components/security/SecurityProvider';
 import SecurityErrorBoundary from './src/components/security/SecurityErrorBoundary';
 
-// Import enhanced UI styles
-import './src/styles/enhanced-ui.css';
+// Enhanced UI styles now embedded in index.html inline
 
 // Performance optimizations
 function registerServiceWorker() {
@@ -43,7 +41,7 @@ function registerServiceWorker() {
 
 // Resource preloading for critical assets
 function preloadCriticalResources() {
-  const criticalResources: Array<{ href: string; as?: string }> = [
+  const criticalResources: Array<{ href: string; as?: string; crossorigin?: string }> = [
     // Critical CSS and JS will be handled by Vite automatically
     // We can preload specific assets if needed
   ];
@@ -52,8 +50,12 @@ function preloadCriticalResources() {
     const link = document.createElement('link');
     link.rel = 'preload';
     link.href = resource.href;
-    link.as = resource.as;
-    if (resource.crossorigin) {link.crossOrigin = resource.crossorigin;}
+    if (resource.as) {
+      link.as = resource.as;
+    }
+    if (resource.crossorigin) {
+      link.crossOrigin = resource.crossorigin;
+    }
     document.head.appendChild(link);
   });
 }
@@ -64,7 +66,7 @@ preloadCriticalResources();
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
-  throw new Error("Could not find root element to mount to");
+  throw new Error('Could not find root element to mount to');
 }
 
 const root = ReactDOM.createRoot(rootElement);
@@ -79,5 +81,5 @@ root.render(
         </HashRouter>
       </SecurityProvider>
     </SecurityErrorBoundary>
-  </React.StrictMode>,
+  </React.StrictMode>
 );

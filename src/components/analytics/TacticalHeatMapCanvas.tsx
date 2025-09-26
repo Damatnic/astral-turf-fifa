@@ -20,10 +20,14 @@ const TacticalHeatMapCanvas: React.FC<TacticalHeatMapCanvasProps> = ({
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) {return;}
+    if (!canvas) {
+      return;
+    }
 
     const ctx = canvas.getContext('2d');
-    if (!ctx) {return;}
+    if (!ctx) {
+      return;
+    }
 
     // Set canvas size
     canvas.width = width;
@@ -49,7 +53,6 @@ const TacticalHeatMapCanvas: React.FC<TacticalHeatMapCanvasProps> = ({
     if (showInfluenceZones && heatMapData.influenceZones.length > 0) {
       drawInfluenceZones(ctx, heatMapData.influenceZones, width, height);
     }
-
   }, [heatMapData, width, height, showMovementPatterns, showInfluenceZones]);
 
   const drawField = (ctx: CanvasRenderingContext2D, w: number, h: number) => {
@@ -82,36 +85,16 @@ const TacticalHeatMapCanvas: React.FC<TacticalHeatMapCanvasProps> = ({
     const goalAreaHeight = 80;
 
     // Top penalty area
-    ctx.strokeRect(
-      (w - penaltyWidth) / 2,
-      10,
-      penaltyWidth,
-      penaltyHeight,
-    );
+    ctx.strokeRect((w - penaltyWidth) / 2, 10, penaltyWidth, penaltyHeight);
 
     // Top goal area
-    ctx.strokeRect(
-      (w - goalAreaWidth) / 2,
-      10,
-      goalAreaWidth,
-      goalAreaHeight,
-    );
+    ctx.strokeRect((w - goalAreaWidth) / 2, 10, goalAreaWidth, goalAreaHeight);
 
     // Bottom penalty area
-    ctx.strokeRect(
-      (w - penaltyWidth) / 2,
-      h - 10 - penaltyHeight,
-      penaltyWidth,
-      penaltyHeight,
-    );
+    ctx.strokeRect((w - penaltyWidth) / 2, h - 10 - penaltyHeight, penaltyWidth, penaltyHeight);
 
     // Bottom goal area
-    ctx.strokeRect(
-      (w - goalAreaWidth) / 2,
-      h - 10 - goalAreaHeight,
-      goalAreaWidth,
-      goalAreaHeight,
-    );
+    ctx.strokeRect((w - goalAreaWidth) / 2, h - 10 - goalAreaHeight, goalAreaWidth, goalAreaHeight);
   };
 
   const drawPositionHeatMap = (
@@ -232,9 +215,15 @@ const TacticalHeatMapCanvas: React.FC<TacticalHeatMapCanvasProps> = ({
     // Draw arrowhead
     ctx.beginPath();
     ctx.moveTo(toX, toY);
-    ctx.lineTo(toX - headlen * Math.cos(angle - Math.PI / 6), toY - headlen * Math.sin(angle - Math.PI / 6));
+    ctx.lineTo(
+      toX - headlen * Math.cos(angle - Math.PI / 6),
+      toY - headlen * Math.sin(angle - Math.PI / 6),
+    );
     ctx.moveTo(toX, toY);
-    ctx.lineTo(toX - headlen * Math.cos(angle + Math.PI / 6), toY - headlen * Math.sin(angle + Math.PI / 6));
+    ctx.lineTo(
+      toX - headlen * Math.cos(angle + Math.PI / 6),
+      toY - headlen * Math.sin(angle + Math.PI / 6),
+    );
     ctx.stroke();
   };
 
@@ -242,15 +231,13 @@ const TacticalHeatMapCanvas: React.FC<TacticalHeatMapCanvasProps> = ({
     <div className={`tactical-heatmap ${className}`}>
       <div className="bg-gray-800 rounded-lg p-4">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-white">
-            Tactical Heat Map - Player Analysis
-          </h3>
+          <h3 className="text-lg font-semibold text-white">Tactical Heat Map - Player Analysis</h3>
           <div className="flex space-x-4 text-sm">
             <label className="flex items-center text-gray-300">
               <input
                 type="checkbox"
                 checked={showMovementPatterns}
-                onChange={(e) => setShowMovementPatterns(e.target.checked)}
+                onChange={e => setShowMovementPatterns(e.target.checked)}
                 className="mr-2"
               />
               Movement Patterns
@@ -259,7 +246,7 @@ const TacticalHeatMapCanvas: React.FC<TacticalHeatMapCanvasProps> = ({
               <input
                 type="checkbox"
                 checked={showInfluenceZones}
-                onChange={(e) => setShowInfluenceZones(e.target.checked)}
+                onChange={e => setShowInfluenceZones(e.target.checked)}
                 className="mr-2"
               />
               Influence Zones
@@ -316,7 +303,7 @@ const TacticalHeatMapCanvas: React.FC<TacticalHeatMapCanvasProps> = ({
             <div className="bg-gray-700 p-4 rounded">
               <h4 className="font-semibold text-yellow-400 mb-2">Key Insights</h4>
               <div className="text-sm text-gray-300 space-y-1">
-                <p>• Position frequency shows player's primary operating zones</p>
+                <p>• Position frequency shows player&apos;s primary operating zones</p>
                 <p>• Movement patterns reveal tactical discipline and creativity</p>
                 <p>• Influence zones indicate areas of maximum impact</p>
                 <p>• Heat intensity correlates with effectiveness in each area</p>

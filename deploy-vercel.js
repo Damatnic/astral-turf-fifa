@@ -57,7 +57,7 @@ function runCommand(command, args = [], options = {}) {
       ...options,
     });
 
-    child.on('close', (code) => {
+    child.on('close', code => {
       if (code === 0) {
         resolve(code);
       } else {
@@ -78,15 +78,15 @@ function runCommandWithOutput(command, args = []) {
     let stdout = '';
     let stderr = '';
 
-    child.stdout.on('data', (data) => {
+    child.stdout.on('data', data => {
       stdout += data.toString();
     });
 
-    child.stderr.on('data', (data) => {
+    child.stderr.on('data', data => {
       stderr += data.toString();
     });
 
-    child.on('close', (code) => {
+    child.on('close', code => {
       if (code === 0) {
         resolve(stdout.trim());
       } else {
@@ -100,15 +100,20 @@ function runCommandWithOutput(command, args = []) {
 const ENV_VARS = {
   NODE_ENV: 'production',
   APP_VERSION: '8.0.0',
-  DATABASE_URL: 'postgresql://neondb_owner:npg_z3tIi9kCFDxB@ep-twilight-poetry-adqdke5a-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require',
-  DATABASE_URL_UNPOOLED: 'postgresql://neondb_owner:npg_z3tIi9kCFDxB@ep-twilight-poetry-adqdke5a.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require',
-  POSTGRES_URL: 'postgresql://neondb_owner:npg_z3tIi9kCFDxB@ep-twilight-poetry-adqdke5a-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require',
-  POSTGRES_URL_NON_POOLING: 'postgresql://neondb_owner:npg_z3tIi9kCFDxB@ep-twilight-poetry-adqdke5a.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require',
+  DATABASE_URL:
+    'postgresql://neondb_owner:npg_z3tIi9kCFDxB@ep-twilight-poetry-adqdke5a-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require',
+  DATABASE_URL_UNPOOLED:
+    'postgresql://neondb_owner:npg_z3tIi9kCFDxB@ep-twilight-poetry-adqdke5a.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require',
+  POSTGRES_URL:
+    'postgresql://neondb_owner:npg_z3tIi9kCFDxB@ep-twilight-poetry-adqdke5a-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require',
+  POSTGRES_URL_NON_POOLING:
+    'postgresql://neondb_owner:npg_z3tIi9kCFDxB@ep-twilight-poetry-adqdke5a.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require',
   POSTGRES_USER: 'neondb_owner',
   POSTGRES_HOST: 'ep-twilight-poetry-adqdke5a-pooler.c-2.us-east-1.aws.neon.tech',
   POSTGRES_PASSWORD: 'npg_z3tIi9kCFDxB',
   POSTGRES_DATABASE: 'neondb',
-  POSTGRES_PRISMA_URL: 'postgresql://neondb_owner:npg_z3tIi9kCFDxB@ep-twilight-poetry-adqdke5a.c-2.us-east-1.aws.neon.tech/neondb?connect_timeout=15&sslmode=require',
+  POSTGRES_PRISMA_URL:
+    'postgresql://neondb_owner:npg_z3tIi9kCFDxB@ep-twilight-poetry-adqdke5a.c-2.us-east-1.aws.neon.tech/neondb?connect_timeout=15&sslmode=require',
   JWT_SECRET: 'astral-turf-super-secure-jwt-secret-key-2024-production-v8',
   JWT_ROTATION_INTERVAL_HOURS: '24',
   JWT_GRACE_PERIOD_HOURS: '2',
@@ -214,7 +219,9 @@ async function setEnvironmentVariables() {
   for (const [key, value] of Object.entries(ENV_VARS)) {
     try {
       // Remove existing env var first (ignore errors)
-      await runCommand('vercel', ['env', 'rm', key, 'production'], { stdio: 'pipe' }).catch(() => {});
+      await runCommand('vercel', ['env', 'rm', key, 'production'], { stdio: 'pipe' }).catch(
+        () => {}
+      );
 
       // Add new env var
       await runCommand('vercel', ['env', 'add', key, 'production'], {
@@ -223,7 +230,9 @@ async function setEnvironmentVariables() {
       });
 
       successCount++;
-      process.stdout.write(`\r${colors.blue}Setting environment variables... ${successCount}/${envCount}${colors.reset}`);
+      process.stdout.write(
+        `\r${colors.blue}Setting environment variables... ${successCount}/${envCount}${colors.reset}`
+      );
     } catch (error) {
       logWarning(`Failed to set ${key}: ${error.message}`);
     }
@@ -282,7 +291,6 @@ async function testDeployment() {
     }
 
     return deploymentUrl;
-
   } catch (error) {
     logWarning(`Could not test deployment: ${error.message}`);
     return null;
@@ -290,11 +298,14 @@ async function testDeployment() {
 }
 
 async function main() {
-  log(`
+  log(
+    `
 🌟 ================================== 🌟
    ASTRAL TURF VERCEL DEPLOYMENT
 🌟 ================================== 🌟
-`, colors.blue);
+`,
+    colors.blue
+  );
 
   try {
     await checkPrerequisites();
@@ -304,7 +315,8 @@ async function main() {
     await deployToVercel();
     const deploymentUrl = await testDeployment();
 
-    log(`
+    log(
+      `
 🎉 DEPLOYMENT SUCCESSFUL! 🎉
 
 📱 Application URL: ${deploymentUrl || 'Check Vercel dashboard'}
@@ -319,8 +331,9 @@ async function main() {
 4. Test all application features
 
 📋 Vercel Dashboard: https://vercel.com/dashboard
-`, colors.green);
-
+`,
+      colors.green
+    );
   } catch (error) {
     logError(`Deployment failed: ${error.message}`);
     process.exit(1);

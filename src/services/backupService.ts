@@ -66,12 +66,12 @@ class BackupService {
 
   async initialize(): Promise<void> {
     if (this.isClient) {
-      // // console.log('🔄 Backup Service: Client-side, skipping initialization');
+      // // // // console.log('🔄 Backup Service: Client-side, skipping initialization');
       return;
     }
 
     try {
-      // // console.log('🔄 Backup Service initializing...');
+      // // // // console.log('🔄 Backup Service initializing...');
 
       await this.validateConfiguration();
       await this.setupBackupDirectories();
@@ -79,12 +79,12 @@ class BackupService {
 
       if (this.config.enabled) {
         await this.scheduleBackups();
-        // // console.log('✅ Backup Service initialized with scheduling enabled');
+        // // // // console.log('✅ Backup Service initialized with scheduling enabled');
       } else {
-        // // console.log('✅ Backup Service initialized (scheduling disabled)');
+        // // // // console.log('✅ Backup Service initialized (scheduling disabled)');
       }
     } catch (_error) {
-      console.error('❌ Backup Service initialization failed:', error);
+      console.error('❌ Backup Service initialization failed:', _error);
       throw error;
     }
   }
@@ -95,7 +95,8 @@ class BackupService {
     }
 
     // Validate cron expressions (basic validation)
-    const cronPattern = /^(\*|[0-9]{1,2}|[0-9]{1,2}-[0-9]{1,2}|[0-9]{1,2}\/[0-9]{1,2}|\*\/[0-9]{1,2}) (\*|[0-9]{1,2}|[0-9]{1,2}-[0-9]{1,2}|[0-9]{1,2}\/[0-9]{1,2}|\*\/[0-9]{1,2}) (\*|[0-9]{1,2}|[0-9]{1,2}-[0-9]{1,2}|[0-9]{1,2}\/[0-9]{1,2}|\*\/[0-9]{1,2}) (\*|[0-9]{1,2}|[0-9]{1,2}-[0-9]{1,2}|[0-9]{1,2}\/[0-9]{1,2}|\*\/[0-9]{1,2}) (\*|[0-7]|[0-7]-[0-7]|[0-7]\/[0-7]|\*\/[0-7])$/;
+    const cronPattern =
+      /^(\*|[0-9]{1,2}|[0-9]{1,2}-[0-9]{1,2}|[0-9]{1,2}\/[0-9]{1,2}|\*\/[0-9]{1,2}) (\*|[0-9]{1,2}|[0-9]{1,2}-[0-9]{1,2}|[0-9]{1,2}\/[0-9]{1,2}|\*\/[0-9]{1,2}) (\*|[0-9]{1,2}|[0-9]{1,2}-[0-9]{1,2}|[0-9]{1,2}\/[0-9]{1,2}|\*\/[0-9]{1,2}) (\*|[0-9]{1,2}|[0-9]{1,2}-[0-9]{1,2}|[0-9]{1,2}\/[0-9]{1,2}|\*\/[0-9]{1,2}) (\*|[0-7]|[0-7]-[0-7]|[0-7]\/[0-7]|\*\/[0-7])$/;
 
     if (!cronPattern.test(this.config.schedule.full)) {
       throw new Error('Invalid full backup cron expression');
@@ -108,7 +109,7 @@ class BackupService {
 
   private async setupBackupDirectories(): Promise<void> {
     // In a real implementation, this would create the backup directories
-    // // console.log('📁 Setting up backup directories...');
+    // // // // console.log('📁 Setting up backup directories...');
 
     const directories = [
       this.config.storage.primary,
@@ -120,27 +121,27 @@ class BackupService {
 
     // Simulate directory creation
     directories.forEach(dir => {
-      // // console.log(`  📁 Directory: ${dir}`);
+      // // // // console.log(`  📁 Directory: ${dir}`);
     });
   }
 
   private async loadBackupHistory(): Promise<void> {
     // In a real implementation, this would load backup history from storage
-    // // console.log('📚 Loading backup history...');
+    // // // // console.log('📚 Loading backup history...');
     this.backupHistory = [];
   }
 
   private async scheduleBackups(): Promise<void> {
-    // // console.log('⏰ Scheduling automated backups...');
+    // // // // console.log('⏰ Scheduling automated backups...');
 
     // In a real implementation, this would set up cron jobs or use a job scheduler
-    // // console.log(`  📅 Full backups: ${this.config.schedule.full}`);
-    // // console.log(`  📅 Incremental backups: ${this.config.schedule.incremental}`);
+    // // // // console.log(`  📅 Full backups: ${this.config.schedule.full}`);
+    // // // // console.log(`  📅 Incremental backups: ${this.config.schedule.incremental}`);
 
     // Simulate scheduling
     if (typeof process !== 'undefined' && process.env.NODE_ENV === 'production') {
       // In production, you would use a proper job scheduler like node-cron
-      // // console.log('  ✅ Backup scheduling configured');
+      // // // // console.log('  ✅ Backup scheduling configured');
     }
   }
 
@@ -164,7 +165,7 @@ class BackupService {
     };
 
     try {
-      // // console.log(`🔄 Starting ${type} backup: ${backupId}`);
+      // // // // console.log(`🔄 Starting ${type} backup: ${backupId}`);
       backup.status = 'in_progress';
 
       // Simulate backup process
@@ -176,7 +177,7 @@ class BackupService {
 
       this.backupHistory.push(backup);
 
-      // // console.log(`✅ Backup completed: ${backupId} (${this.formatSize(backup.size)})`);
+      // // // // console.log(`✅ Backup completed: ${backupId} (${this.formatSize(backup.size)})`);
 
       // Clean up old backups based on retention policy
       await this.cleanupOldBackups();
@@ -186,14 +187,14 @@ class BackupService {
       backup.status = 'failed';
       backup.error = error instanceof Error ? error.message : 'Unknown error';
 
-      console.error(`❌ Backup failed: ${backupId}`, error);
+      console.error(`❌ Backup failed: ${backupId}`, _error);
       throw error;
     }
   }
 
   private async performBackup(backup: BackupMetadata): Promise<void> {
     // Simulate backup process
-    // // console.log(`  📦 Creating ${backup.type} backup...`);
+    // // // // console.log(`  📦 Creating ${backup.type} backup...`);
 
     // In a real implementation, this would:
     // 1. Connect to the database
@@ -204,8 +205,15 @@ class BackupService {
 
     // Simulate database tables
     const tables = [
-      'users', 'tactics', 'players', 'matches', 'teams',
-      'formations', 'analytics', 'system_logs', 'sessions',
+      'users',
+      'tactics',
+      'players',
+      'matches',
+      'teams',
+      'formations',
+      'analytics',
+      'system_logs',
+      'sessions',
     ];
 
     backup.tables = tables;
@@ -214,7 +222,7 @@ class BackupService {
     const backupTime = backup.type === 'full' ? 5000 : 2000;
     await new Promise(resolve => setTimeout(resolve, backupTime));
 
-    // // console.log(`  ✅ Backup data captured for ${tables.length} tables`);
+    // // // // console.log(`  ✅ Backup data captured for ${tables.length} tables`);
   }
 
   async restoreBackup(options: RestoreOptions): Promise<void> {
@@ -222,7 +230,7 @@ class BackupService {
       throw new Error('Restore operations are not available on the client side');
     }
 
-    // // console.log(`🔄 Starting restore from backup: ${options.backupId}`);
+    // // // // console.log(`🔄 Starting restore from backup: ${options.backupId}`);
 
     const backup = this.backupHistory.find(b => b.id === options.backupId);
     if (!backup) {
@@ -235,13 +243,13 @@ class BackupService {
 
     try {
       if (options.validateOnly) {
-        // // console.log('🔍 Validating backup integrity...');
+        // // // // console.log('🔍 Validating backup integrity...');
         await this.validateBackup(backup);
-        // // console.log('✅ Backup validation passed');
+        // // // // console.log('✅ Backup validation passed');
         return;
       }
 
-      // // console.log('⚠️  WARNING: This will overwrite existing data!');
+      // // // // console.log('⚠️  WARNING: This will overwrite existing data!');
 
       // In a real implementation, this would:
       // 1. Verify backup integrity
@@ -253,25 +261,25 @@ class BackupService {
 
       await this.performRestore(backup, options);
 
-      // // console.log(`✅ Restore completed from backup: ${options.backupId}`);
+      // // // // console.log(`✅ Restore completed from backup: ${options.backupId}`);
     } catch (_error) {
-      console.error(`❌ Restore failed: ${options.backupId}`, error);
+      console.error(`❌ Restore failed: ${options.backupId}`, _error);
       throw error;
     }
   }
 
   private async performRestore(backup: BackupMetadata, options: RestoreOptions): Promise<void> {
-    // // console.log('  🔄 Restoring database...');
+    // // // // console.log('  🔄 Restoring database...');
 
     // Simulate restore process
     const restoreTime = backup.type === 'full' ? 8000 : 4000;
     await new Promise(resolve => setTimeout(resolve, restoreTime));
 
-    // // console.log(`  ✅ Restored ${backup.tables.length} tables`);
+    // // // // console.log(`  ✅ Restored ${backup.tables.length} tables`);
   }
 
   private async validateBackup(backup: BackupMetadata): Promise<void> {
-    // // console.log('  🔍 Checking backup file integrity...');
+    // // // // console.log('  🔍 Checking backup file integrity...');
 
     // Simulate validation
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -288,12 +296,16 @@ class BackupService {
   }
 
   private async cleanupOldBackups(): Promise<void> {
-    // // console.log('🧹 Cleaning up old backups based on retention policy...');
+    // // // // console.log('🧹 Cleaning up old backups based on retention policy...');
 
     const now = new Date();
     const cutoffDaily = new Date(now.getTime() - this.config.retention.daily * 24 * 60 * 60 * 1000);
-    const cutoffWeekly = new Date(now.getTime() - this.config.retention.weekly * 7 * 24 * 60 * 60 * 1000);
-    const cutoffMonthly = new Date(now.getTime() - this.config.retention.monthly * 30 * 24 * 60 * 60 * 1000);
+    const cutoffWeekly = new Date(
+      now.getTime() - this.config.retention.weekly * 7 * 24 * 60 * 60 * 1000,
+    );
+    const cutoffMonthly = new Date(
+      now.getTime() - this.config.retention.monthly * 30 * 24 * 60 * 60 * 1000,
+    );
 
     // In a real implementation, this would remove old backup files
     let removedCount = 0;
@@ -302,20 +314,26 @@ class BackupService {
       const backupDate = new Date(backup.timestamp);
 
       // Keep all backups within daily retention
-      if (backupDate > cutoffDaily) {return true;}
+      if (backupDate > cutoffDaily) {
+        return true;
+      }
 
       // Keep weekly backups within weekly retention
-      if (backupDate > cutoffWeekly && this.isWeeklyBackup(backupDate)) {return true;}
+      if (backupDate > cutoffWeekly && this.isWeeklyBackup(backupDate)) {
+        return true;
+      }
 
       // Keep monthly backups within monthly retention
-      if (backupDate > cutoffMonthly && this.isMonthlyBackup(backupDate)) {return true;}
+      if (backupDate > cutoffMonthly && this.isMonthlyBackup(backupDate)) {
+        return true;
+      }
 
       removedCount++;
       return false;
     });
 
     if (removedCount > 0) {
-      // // console.log(`  🗑️  Removed ${removedCount} old backups`);
+      // // // // console.log(`  🗑️  Removed ${removedCount} old backups`);
     }
   }
 
@@ -362,19 +380,19 @@ class BackupService {
 
   async testBackupSystem(): Promise<boolean> {
     try {
-      // // console.log('🧪 Testing backup system...');
+      // // // // console.log('🧪 Testing backup system...');
 
       // Test configuration
       await this.validateConfiguration();
 
       // Test backup creation (dry run)
-      // // console.log('  ✅ Configuration valid');
-      // // console.log('  ✅ Storage accessible');
-      // // console.log('  ✅ Backup system ready');
+      // // // // console.log('  ✅ Configuration valid');
+      // // // // console.log('  ✅ Storage accessible');
+      // // // // console.log('  ✅ Backup system ready');
 
       return true;
     } catch (_error) {
-      console.error('❌ Backup system test failed:', error);
+      console.error('❌ Backup system test failed:', _error);
       return false;
     }
   }
@@ -385,13 +403,13 @@ class BackupService {
 
   async updateConfiguration(updates: Partial<BackupConfiguration>): Promise<void> {
     this.config = { ...this.config, ...updates };
-    // // console.log('⚙️  Backup configuration updated');
+    // // // // console.log('⚙️  Backup configuration updated');
   }
 
   async destroy(): Promise<void> {
-    // // console.log('🔄 Backup Service shutting down...');
+    // // // // console.log('🔄 Backup Service shutting down...');
     this.backupHistory = [];
-    // // console.log('✅ Backup Service destroyed');
+    // // // // console.log('✅ Backup Service destroyed');
   }
 }
 

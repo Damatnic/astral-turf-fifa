@@ -39,7 +39,14 @@ export const generateRandomPlayer = (
   const potentialMax = potentialMin + Math.floor(Math.random() * 15) + 5;
 
   const traits: PlayerTrait[] = [];
-  const traitPool: PlayerTrait[] = ['Leader', 'Ambitious', 'Loyal', 'Injury Prone', 'Consistent', 'Temperamental'];
+  const traitPool: PlayerTrait[] = [
+    'Leader',
+    'Ambitious',
+    'Loyal',
+    'Injury Prone',
+    'Consistent',
+    'Temperamental',
+  ];
   const numTraits = Math.floor(Math.random() * 3); // 0-2 traits
 
   for (let i = 0; i < numTraits; i++) {
@@ -105,19 +112,87 @@ export const generateRandomPlayer = (
 export const calculatePlayerOverall = (attributes: PlayerAttributes, roleId: string): number => {
   // Different positions weight attributes differently
   const roleWeights: Record<string, Partial<Record<keyof PlayerAttributes, number>>> = {
-    'gk': { positioning: 0.4, speed: 0.2, passing: 0.1, tackling: 0.1, shooting: 0.1, dribbling: 0.1 },
-    'cb': { tackling: 0.3, positioning: 0.3, speed: 0.2, passing: 0.1, shooting: 0.05, dribbling: 0.05 },
-    'fb': { speed: 0.25, tackling: 0.2, positioning: 0.2, passing: 0.15, dribbling: 0.15, shooting: 0.05 },
-    'dm': { tackling: 0.25, passing: 0.25, positioning: 0.25, speed: 0.15, dribbling: 0.05, shooting: 0.05 },
-    'cm': { passing: 0.3, positioning: 0.2, speed: 0.15, tackling: 0.15, dribbling: 0.15, shooting: 0.05 },
-    'wm': { speed: 0.25, dribbling: 0.2, passing: 0.2, positioning: 0.15, shooting: 0.1, tackling: 0.1 },
-    'am': { passing: 0.25, dribbling: 0.25, shooting: 0.2, positioning: 0.15, speed: 0.1, tackling: 0.05 },
-    'w': { speed: 0.3, dribbling: 0.25, shooting: 0.2, passing: 0.15, positioning: 0.05, tackling: 0.05 },
-    'st': { shooting: 0.35, positioning: 0.25, speed: 0.15, dribbling: 0.15, passing: 0.05, tackling: 0.05 },
+    gk: {
+      positioning: 0.4,
+      speed: 0.2,
+      passing: 0.1,
+      tackling: 0.1,
+      shooting: 0.1,
+      dribbling: 0.1,
+    },
+    cb: {
+      tackling: 0.3,
+      positioning: 0.3,
+      speed: 0.2,
+      passing: 0.1,
+      shooting: 0.05,
+      dribbling: 0.05,
+    },
+    fb: {
+      speed: 0.25,
+      tackling: 0.2,
+      positioning: 0.2,
+      passing: 0.15,
+      dribbling: 0.15,
+      shooting: 0.05,
+    },
+    dm: {
+      tackling: 0.25,
+      passing: 0.25,
+      positioning: 0.25,
+      speed: 0.15,
+      dribbling: 0.05,
+      shooting: 0.05,
+    },
+    cm: {
+      passing: 0.3,
+      positioning: 0.2,
+      speed: 0.15,
+      tackling: 0.15,
+      dribbling: 0.15,
+      shooting: 0.05,
+    },
+    wm: {
+      speed: 0.25,
+      dribbling: 0.2,
+      passing: 0.2,
+      positioning: 0.15,
+      shooting: 0.1,
+      tackling: 0.1,
+    },
+    am: {
+      passing: 0.25,
+      dribbling: 0.25,
+      shooting: 0.2,
+      positioning: 0.15,
+      speed: 0.1,
+      tackling: 0.05,
+    },
+    w: {
+      speed: 0.3,
+      dribbling: 0.25,
+      shooting: 0.2,
+      passing: 0.15,
+      positioning: 0.05,
+      tackling: 0.05,
+    },
+    st: {
+      shooting: 0.35,
+      positioning: 0.25,
+      speed: 0.15,
+      dribbling: 0.15,
+      passing: 0.05,
+      tackling: 0.05,
+    },
   };
 
   const weights = roleWeights[roleId] || {
-    speed: 1/6, passing: 1/6, tackling: 1/6, shooting: 1/6, dribbling: 1/6, positioning: 1/6,
+    speed: 1 / 6,
+    passing: 1 / 6,
+    tackling: 1 / 6,
+    shooting: 1 / 6,
+    dribbling: 1 / 6,
+    positioning: 1 / 6,
   };
 
   let overall = 0;
@@ -145,7 +220,7 @@ export const calculatePlayerValue = (player: Player): number => {
 
   // Potential adjustments
   const potentialBonus = (potential - overall) / 10;
-  value *= (1 + potentialBonus);
+  value *= 1 + potentialBonus;
 
   // Contract situation
   const contractYearsLeft = (player.contract.expires || 2025) - new Date().getFullYear();
@@ -154,18 +229,30 @@ export const calculatePlayerValue = (player: Player): number => {
   }
 
   // Morale and form adjustments
-  const moraleMultipliers = { 'Excellent': 1.1, 'Good': 1.0, 'Okay': 0.95, 'Poor': 0.9, 'Very Poor': 0.8 };
+  const moraleMultipliers = { Excellent: 1.1, Good: 1.0, Okay: 0.95, Poor: 0.9, 'Very Poor': 0.8 };
   value *= moraleMultipliers[player.morale];
 
   // Trait adjustments
   player.traits.forEach(trait => {
     switch (trait) {
-      case 'Leader': value *= 1.1; break;
-      case 'Ambitious': value *= 1.05; break;
-      case 'Loyal': value *= 0.95; break; // Slightly less valuable in transfer market
-      case 'Injury Prone': value *= 0.8; break;
-      case 'Consistent': value *= 1.1; break;
-      case 'Temperamental': value *= 0.9; break;
+      case 'Leader':
+        value *= 1.1;
+        break;
+      case 'Ambitious':
+        value *= 1.05;
+        break;
+      case 'Loyal':
+        value *= 0.95;
+        break; // Slightly less valuable in transfer market
+      case 'Injury Prone':
+        value *= 0.8;
+        break;
+      case 'Consistent':
+        value *= 1.1;
+        break;
+      case 'Temperamental':
+        value *= 0.9;
+        break;
     }
   });
 
@@ -178,25 +265,30 @@ export const suggestTrainingFocus = (player: Player): IndividualTrainingFocus | 
 
   // Find the weakest relevant attribute for the player's role
   const roleImportance: Record<string, (keyof PlayerAttributes)[]> = {
-    'gk': ['positioning'],
-    'cb': ['tackling', 'positioning', 'speed'],
-    'fb': ['speed', 'tackling', 'positioning', 'passing'],
-    'dm': ['tackling', 'passing', 'positioning'],
-    'cm': ['passing', 'positioning', 'speed', 'tackling'],
-    'wm': ['speed', 'dribbling', 'passing', 'positioning'],
-    'am': ['passing', 'dribbling', 'shooting', 'positioning'],
-    'w': ['speed', 'dribbling', 'shooting'],
-    'st': ['shooting', 'positioning', 'speed', 'dribbling'],
+    gk: ['positioning'],
+    cb: ['tackling', 'positioning', 'speed'],
+    fb: ['speed', 'tackling', 'positioning', 'passing'],
+    dm: ['tackling', 'passing', 'positioning'],
+    cm: ['passing', 'positioning', 'speed', 'tackling'],
+    wm: ['speed', 'dribbling', 'passing', 'positioning'],
+    am: ['passing', 'dribbling', 'shooting', 'positioning'],
+    w: ['speed', 'dribbling', 'shooting'],
+    st: ['shooting', 'positioning', 'speed', 'dribbling'],
   };
 
-  const relevantAttributes = roleImportance[roleId] || Object.keys(attributes) as (keyof PlayerAttributes)[];
+  const relevantAttributes =
+    roleImportance[roleId] || (Object.keys(attributes) as (keyof PlayerAttributes)[]);
 
   // Find the attribute with the most room for improvement
   let lowestAttribute: keyof PlayerAttributes | null = null;
   let lowestValue = 100;
 
   relevantAttributes.forEach(attr => {
-    if (attr !== 'stamina' && attributes[attr] < lowestValue && attributes[attr] < player.currentPotential - 5) {
+    if (
+      attr !== 'stamina' &&
+      attributes[attr] < lowestValue &&
+      attributes[attr] < player.currentPotential - 5
+    ) {
       lowestValue = attributes[attr];
       lowestAttribute = attr;
     }
@@ -215,9 +307,42 @@ export const suggestTrainingFocus = (player: Player): IndividualTrainingFocus | 
 export const generateTransferPlayers = (count: number): TransferPlayer[] => {
   const players: TransferPlayer[] = [];
 
-  const firstNames = ['Alex', 'Carlos', 'David', 'Erik', 'Franco', 'Gabriel', 'Hassan', 'Ivan', 'Jorge', 'Kevin'];
-  const lastNames = ['Silva', 'Rodriguez', 'Johnson', 'Anderson', 'Martinez', 'Wilson', 'Brown', 'Davis', 'Miller', 'Garcia'];
-  const nationalities = ['Brazil', 'Argentina', 'Spain', 'England', 'France', 'Germany', 'Italy', 'Portugal', 'Netherlands', 'Belgium'];
+  const firstNames = [
+    'Alex',
+    'Carlos',
+    'David',
+    'Erik',
+    'Franco',
+    'Gabriel',
+    'Hassan',
+    'Ivan',
+    'Jorge',
+    'Kevin',
+  ];
+  const lastNames = [
+    'Silva',
+    'Rodriguez',
+    'Johnson',
+    'Anderson',
+    'Martinez',
+    'Wilson',
+    'Brown',
+    'Davis',
+    'Miller',
+    'Garcia',
+  ];
+  const nationalities = [
+    'Brazil',
+    'Argentina',
+    'Spain',
+    'England',
+    'France',
+    'Germany',
+    'Italy',
+    'Portugal',
+    'Netherlands',
+    'Belgium',
+  ];
   const roles = ['gk', 'cb', 'fb', 'dm', 'cm', 'wm', 'am', 'w', 'st'];
 
   for (let i = 0; i < count; i++) {
@@ -275,11 +400,15 @@ export const simulateTrainingSession = (
   baseGain *= potentialFactor;
 
   // Facility bonus
-  baseGain *= (1 + (facilityLevel - 1) * 0.1);
+  baseGain *= 1 + (facilityLevel - 1) * 0.1;
 
   // Individual training focus bonus
-  const focusBonus = player.individualTrainingFocus?.intensity === 'high' ? 2.5 :
-                    player.individualTrainingFocus?.intensity === 'normal' ? 1.5 : 1;
+  const focusBonus =
+    player.individualTrainingFocus?.intensity === 'high'
+      ? 2.5
+      : player.individualTrainingFocus?.intensity === 'normal'
+        ? 1.5
+        : 1;
 
   // Apply gains to primary attributes
   drill.primaryAttributes.forEach(attr => {
@@ -303,7 +432,9 @@ export const simulateTrainingSession = (
     }
   });
 
-  const fatigueIncrease = drill.fatigueEffect * (drill.intensity === 'high' ? 1.5 : drill.intensity === 'medium' ? 1.2 : 1);
+  const fatigueIncrease =
+    drill.fatigueEffect *
+    (drill.intensity === 'high' ? 1.5 : drill.intensity === 'medium' ? 1.2 : 1);
   const injuryRisk = drill.injuryRisk * (player.traits.includes('Injury Prone') ? 1.5 : 1);
   const moraleChange = drill.moraleEffect;
 

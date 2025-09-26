@@ -22,16 +22,15 @@ export async function healthEndpoint(): Promise<HealthEndpointResponse> {
   try {
     const health: HealthStatus = await healthService.getHealth();
 
-    const statusCode = health.status === 'healthy' ? 200 :
-                      health.status === 'degraded' ? 200 : 503;
+    const statusCode = health.status === 'healthy' ? 200 : health.status === 'degraded' ? 200 : 503;
 
     return {
       status: statusCode,
       headers: {
         'Content-Type': 'application/json',
         'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0',
+        Pragma: 'no-cache',
+        Expires: '0',
       },
       body: health,
     };
@@ -136,8 +135,8 @@ export async function metricsEndpoint(): Promise<HealthEndpointResponse> {
 # HELP astralturf_health_status Application health status (1=healthy, 0.5=degraded, 0=unhealthy)
 # TYPE astralturf_health_status gauge
 astralturf_health_status{version="${health.version}",environment="${health.environment}"} ${
-  health.status === 'healthy' ? 1 : health.status === 'degraded' ? 0.5 : 0
-}
+      health.status === 'healthy' ? 1 : health.status === 'degraded' ? 0.5 : 0
+    }
 
 # HELP astralturf_uptime_seconds Application uptime in seconds
 # TYPE astralturf_uptime_seconds counter
@@ -146,20 +145,20 @@ astralturf_uptime_seconds{version="${health.version}",environment="${health.envi
 # HELP astralturf_database_status Database connection status (1=healthy, 0=unhealthy)
 # TYPE astralturf_database_status gauge
 astralturf_database_status{version="${health.version}",environment="${health.environment}"} ${
-  health.checks.database?.status === 'healthy' ? 1 : 0
-}
+      health.checks.database?.status === 'healthy' ? 1 : 0
+    }
 
 # HELP astralturf_database_latency_ms Database query latency in milliseconds
 # TYPE astralturf_database_latency_ms gauge
 astralturf_database_latency_ms{version="${health.version}",environment="${health.environment}"} ${
-  health.checks.database?.latency || 0
-}
+      health.checks.database?.latency || 0
+    }
 
 # HELP astralturf_memory_usage_percent Memory usage percentage
 # TYPE astralturf_memory_usage_percent gauge
 astralturf_memory_usage_percent{version="${health.version}",environment="${health.environment}"} ${
-  health.checks.memory?.details?.usagePercent || 0
-}
+      health.checks.memory?.details?.usagePercent || 0
+    }
 `.trim();
 
     return {

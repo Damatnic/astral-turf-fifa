@@ -1,4 +1,4 @@
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI, Type } from '@google/genai';
 import type {
   Player,
   PlayerAttributes,
@@ -116,21 +116,23 @@ try {
     aiInstance = new GoogleGenAI({ apiKey });
   }
 } catch (_error) {
-  console.error("Error initializing Advanced AI Service:", error);
+  console.error('Error initializing Advanced AI Service:', _error);
   aiInstance = null;
 }
 
 async function generateJson(prompt: string, schema: unknown, systemInstruction: string) {
   const ai = aiInstance;
-  if (!ai) {throw new Error("AI is offline.");}
+  if (!ai) {
+    throw new Error('AI is offline.');
+  }
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: 'gemini-2.5-flash',
       contents: prompt,
       config: {
         systemInstruction,
-        responseMimeType: "application/json",
+        responseMimeType: 'application/json',
         responseSchema: schema,
         temperature: 0.7,
       },
@@ -138,12 +140,12 @@ async function generateJson(prompt: string, schema: unknown, systemInstruction: 
 
     const jsonText = response.text.trim();
     if (!jsonText) {
-      throw new Error("AI returned an empty response.");
+      throw new Error('AI returned an empty response.');
     }
     return JSON.parse(jsonText);
   } catch (_error) {
-    console.error("Error generating JSON from Gemini API:", error);
-    throw new Error("Failed to get a valid JSON response from the AI.");
+    console.error('Error generating JSON from Gemini API:', _error);
+    throw new Error('Failed to get a valid JSON response from the AI.');
   }
 }
 
@@ -173,7 +175,9 @@ export const generatePlayerDevelopmentPrediction = async (
   trainingSchedule: WeeklySchedule,
   personality: AIPersonality = 'balanced',
 ): Promise<PlayerDevelopmentPrediction> => {
-  if (!aiInstance) {throw new Error("AI is offline.");}
+  if (!aiInstance) {
+    throw new Error('AI is offline.');
+  }
 
   const prompt = `Analyze this player's development trajectory and provide detailed predictions:
 
@@ -192,9 +196,10 @@ DEVELOPMENT HISTORY:
 ${formatPlayerHistory(player)}
 
 CURRENT TRAINING FOCUS:
-${player.individualTrainingFocus ?
-  `${player.individualTrainingFocus.attribute} (${player.individualTrainingFocus.intensity})` :
-  'No specific focus'
+${
+  player.individualTrainingFocus
+    ? `${player.individualTrainingFocus.attribute} (${player.individualTrainingFocus.intensity})`
+    : 'No specific focus'
 }
 
 Provide comprehensive development predictions with personalized training recommendations.`;
@@ -229,10 +234,19 @@ Provide comprehensive development predictions with personalized training recomme
       optimalPlayingTime: { type: Type.NUMBER },
     },
     required: [
-      'playerId', 'currentRating', 'projectedRatingIn6Months', 'projectedRatingIn1Year',
-      'projectedRatingIn2Years', 'peakPotentialAge', 'developmentTrajectory',
-      'keyStrengths', 'developmentBottlenecks', 'recommendedTrainingFocus',
-      'personalizedTrainingPlan', 'riskFactors', 'optimalPlayingTime',
+      'playerId',
+      'currentRating',
+      'projectedRatingIn6Months',
+      'projectedRatingIn1Year',
+      'projectedRatingIn2Years',
+      'peakPotentialAge',
+      'developmentTrajectory',
+      'keyStrengths',
+      'developmentBottlenecks',
+      'recommendedTrainingFocus',
+      'personalizedTrainingPlan',
+      'riskFactors',
+      'optimalPlayingTime',
     ],
   };
 
@@ -249,23 +263,26 @@ export const generateFormationEffectivenessAnalysis = async (
   opponentFormations: string[],
   personality: AIPersonality = 'balanced',
 ): Promise<FormationEffectivenessAnalysis> => {
-  if (!aiInstance) {throw new Error("AI is offline.");}
+  if (!aiInstance) {
+    throw new Error('AI is offline.');
+  }
 
-  const assignedPlayers = players.filter(p =>
-    formation.slots.some(slot => slot.playerId === p.id),
-  );
+  const assignedPlayers = players.filter(p => formation.slots.some(slot => slot.playerId === p.id));
 
   const prompt = `Analyze the effectiveness of this formation with the assigned players:
 
 FORMATION: ${formation.name}
-FORMATION SLOTS: ${formation.slots.map(slot =>
-  `${slot.role} (${slot.defaultPosition.x}, ${slot.defaultPosition.y})${slot.playerId ? ` - ${players.find(p => p.id === slot.playerId)?.name}` : ' - Empty'}`,
-).join('\n')}
+FORMATION SLOTS: ${formation.slots
+    .map(
+      slot =>
+        `${slot.role} (${slot.defaultPosition.x}, ${slot.defaultPosition.y})${slot.playerId ? ` - ${players.find(p => p.id === slot.playerId)?.name}` : ' - Empty'}`,
+    )
+    .join('\n')}
 
 ASSIGNED PLAYERS:
-${assignedPlayers.map(player =>
-  `${player.name} (${player.roleId}): ${formatPlayerAttributes(player.attributes)}`,
-).join('\n')}
+${assignedPlayers
+  .map(player => `${player.name} (${player.roleId}): ${formatPlayerAttributes(player.attributes)}`)
+  .join('\n')}
 
 OPPONENT FORMATIONS TO ANALYZE: ${opponentFormations.join(', ')}
 
@@ -303,8 +320,12 @@ Provide comprehensive tactical analysis including strengths, weaknesses, and opt
       },
     },
     required: [
-      'formationId', 'effectivenessScore', 'strengthsAgainstFormations',
-      'weaknessesAgainstFormations', 'optimalPlayerRoles', 'tacticalInsights',
+      'formationId',
+      'effectivenessScore',
+      'strengthsAgainstFormations',
+      'weaknessesAgainstFormations',
+      'optimalPlayerRoles',
+      'tacticalInsights',
     ],
   };
 
@@ -333,23 +354,25 @@ export const generateMatchPrediction = async (
   },
   personality: AIPersonality = 'balanced',
 ): Promise<MatchPrediction> => {
-  if (!aiInstance) {throw new Error("AI is offline.");}
+  if (!aiInstance) {
+    throw new Error('AI is offline.');
+  }
 
   const prompt = `Predict the outcome of this match with detailed analysis:
 
 HOME TEAM:
 Formation: ${homeTeam.formation.name}
 Tactics: Mentality ${homeTeam.tactics.mentality}, Pressing ${homeTeam.tactics.pressing}
-Players: ${homeTeam.players.map(p =>
-  `${p.name} (${p.roleId}) - ${p.currentPotential} rating, Form: ${p.form}`,
-).join('\n')}
+Players: ${homeTeam.players
+    .map(p => `${p.name} (${p.roleId}) - ${p.currentPotential} rating, Form: ${p.form}`)
+    .join('\n')}
 
 AWAY TEAM:
 Formation: ${awayTeam.formation.name}
 Tactics: Mentality ${awayTeam.tactics.mentality}, Pressing ${awayTeam.tactics.pressing}
-Players: ${awayTeam.players.map(p =>
-  `${p.name} (${p.roleId}) - ${p.currentPotential} rating, Form: ${p.form}`,
-).join('\n')}
+Players: ${awayTeam.players
+    .map(p => `${p.name} (${p.roleId}) - ${p.currentPotential} rating, Form: ${p.form}`)
+    .join('\n')}
 
 MATCH CONTEXT:
 Venue: ${matchContext.venue}
@@ -397,8 +420,12 @@ Provide detailed match prediction with probabilities, expected goals, key matchu
       },
     },
     required: [
-      'homeWinProbability', 'drawProbability', 'awayWinProbability',
-      'expectedGoals', 'keyMatchups', 'tacticalRecommendations',
+      'homeWinProbability',
+      'drawProbability',
+      'awayWinProbability',
+      'expectedGoals',
+      'keyMatchups',
+      'tacticalRecommendations',
     ],
   };
 
@@ -411,7 +438,9 @@ export const generateTacticalHeatMap = async (
   formation: Formation,
   personality: AIPersonality = 'balanced',
 ): Promise<TacticalHeatMap> => {
-  if (!aiInstance) {throw new Error("AI is offline.");}
+  if (!aiInstance) {
+    throw new Error('AI is offline.');
+  }
 
   const prompt = `Generate a tactical heat map analysis for this player:
 
@@ -498,7 +527,9 @@ export const generateAdvancedPlayerMetrics = async (
   recentMatches: MatchResult[],
   personality: AIPersonality = 'balanced',
 ): Promise<PlayerPerformanceMetrics> => {
-  if (!aiInstance) {throw new Error("AI is offline.");}
+  if (!aiInstance) {
+    throw new Error('AI is offline.');
+  }
 
   const prompt = `Calculate advanced performance metrics for this player:
 
@@ -531,9 +562,17 @@ based on the player's role, attributes, and current performance level.`;
       consistencyRating: { type: Type.NUMBER },
     },
     required: [
-      'playerId', 'expectedGoals', 'expectedAssists', 'passCompletionRate',
-      'progressivePasses', 'defensiveActions', 'aerialDuelsWon',
-      'pressureResistance', 'creativeIndex', 'workRateIndex', 'consistencyRating',
+      'playerId',
+      'expectedGoals',
+      'expectedAssists',
+      'passCompletionRate',
+      'progressivePasses',
+      'defensiveActions',
+      'aerialDuelsWon',
+      'pressureResistance',
+      'creativeIndex',
+      'workRateIndex',
+      'consistencyRating',
     ],
   };
 

@@ -3,35 +3,71 @@ import { render, RenderOptions } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { vi } from 'vitest';
 import type { User, Player, Formation, AuthState, TacticsState, UIState } from '../../types';
-import { DEMO_USERS, DEMO_PLAYERS, DEMO_FORMATIONS, INITIAL_STATE } from '../../constants';
-import AppProvider from '../../context/AppProvider';
+import { AppProvider } from '../../context/AppProvider';
+import {
+  createMockUser,
+  createMockPlayer,
+  createMockFormation,
+  createMockPlayers,
+} from '../factories';
 
 // Mock data for testing
-export const mockUser: User = {
-  ...DEMO_USERS[0], // Use first demo user as default
-};
+export const mockUser: User = createMockUser();
 
-export const mockPlayers: Player[] = DEMO_PLAYERS.slice(0, 5); // Use first 5 players
+export const mockPlayers: Player[] = createMockPlayers(5); // Create 5 mock players
 
-export const mockFormation: Formation = {
-  ...DEMO_FORMATIONS[0], // Use first demo formation
-};
+export const mockFormation: Formation = createMockFormation();
 
 // Mock states for testing
 export const createMockAuthState = (overrides: Partial<AuthState> = {}): AuthState => ({
-  ...INITIAL_STATE.auth,
+  user: null,
+  error: null,
+  isAuthenticated: false,
+  familyAssociations: [],
   ...overrides,
 });
 
 export const createMockTacticsState = (overrides: Partial<TacticsState> = {}): TacticsState => ({
-  ...INITIAL_STATE.tactics,
   players: mockPlayers,
-  formations: [mockFormation],
+  formations: { '4-4-2': mockFormation },
+  playbook: {},
+  activeFormationIds: { home: '4-4-2', away: '4-4-2' },
+  teamTactics: {
+    home: {
+      mentality: 'balanced',
+      pressing: 'medium',
+      defensiveLine: 'medium',
+      attackingWidth: 'medium',
+    },
+    away: {
+      mentality: 'balanced',
+      pressing: 'medium',
+      defensiveLine: 'medium',
+      attackingWidth: 'medium',
+    },
+  },
+  drawings: [],
+  selectedPlayers: [],
+  tacticalFamiliarity: { '4-4-2': 50 },
+  chemistry: {},
+  captainIds: { home: null, away: null },
+  setPieceTakers: { home: {}, away: {} },
   ...overrides,
 });
 
 export const createMockUIState = (overrides: Partial<UIState> = {}): UIState => ({
-  ...INITIAL_STATE.ui,
+  theme: 'dark',
+  activeModal: null,
+  sidebarExpanded: true,
+  notifications: [],
+  isExportingLineup: false,
+  isPresentationMode: false,
+  drawingTool: 'select',
+  tutorial: {
+    isActive: false,
+    currentStep: 0,
+    completedSteps: [],
+  },
   ...overrides,
 });
 
@@ -45,15 +81,8 @@ interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
   withRouter?: boolean;
 }
 
-export const renderWithProviders = (
-  ui: React.ReactElement,
-  options: CustomRenderOptions = {},
-) => {
-  const {
-    initialState = {},
-    withRouter = true,
-    ...renderOptions
-  } = options;
+export const renderWithProviders = (ui: React.ReactElement, options: CustomRenderOptions = {}) => {
+  const { initialState = {}, withRouter = true, ...renderOptions } = options;
 
   // Create wrapper component with providers
   const Wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -137,7 +166,10 @@ export const createMockDragEvent = (type: string, data: Record<string, unknown> 
 };
 
 // Mock touch events for mobile testing
-export const createMockTouchEvent = (type: string, touches: Array<{ clientX: number; clientY: number }> = []) => {
+export const createMockTouchEvent = (
+  type: string,
+  touches: Array<{ clientX: number; clientY: number }> = [],
+) => {
   const event = new Event(type) as any;
   event.touches = touches.map((touch, index) => ({
     identifier: index,

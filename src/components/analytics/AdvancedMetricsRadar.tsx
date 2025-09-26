@@ -27,10 +27,14 @@ const AdvancedMetricsRadar: React.FC<AdvancedMetricsRadarProps> = ({
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) {return;}
+    if (!canvas) {
+      return;
+    }
 
     const ctx = canvas.getContext('2d');
-    if (!ctx) {return;}
+    if (!ctx) {
+      return;
+    }
 
     // Set canvas size
     canvas.width = width;
@@ -149,7 +153,6 @@ const AdvancedMetricsRadar: React.FC<AdvancedMetricsRadarProps> = ({
 
       drawRadarChart(ctx, comparisonData, width, height, true);
     }
-
   }, [playerMetrics, comparisonMetrics, width, height]);
 
   const drawRadarChart = (
@@ -262,12 +265,8 @@ const AdvancedMetricsRadar: React.FC<AdvancedMetricsRadarProps> = ({
     <div className={`advanced-metrics-radar ${className}`}>
       <div className="bg-gray-800 rounded-lg p-4">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-white">
-            Advanced Performance Radar
-          </h3>
-          <div className="text-sm text-gray-400">
-            Expected values and efficiency metrics
-          </div>
+          <h3 className="text-lg font-semibold text-white">Advanced Performance Radar</h3>
+          <div className="text-sm text-gray-400">Expected values and efficiency metrics</div>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-4">
@@ -364,11 +363,23 @@ const AdvancedMetricsRadar: React.FC<AdvancedMetricsRadarProps> = ({
             <div className="bg-gray-700 p-4 rounded">
               <h4 className="font-semibold text-blue-400 mb-2">Metric Explanations</h4>
               <div className="text-xs text-gray-300 space-y-1">
-                <p><strong>xG:</strong> Expected goals based on shot quality and position</p>
-                <p><strong>xA:</strong> Expected assists from pass quality and recipient position</p>
-                <p><strong>Creative Index:</strong> Combines key passes, through balls, and chance creation</p>
-                <p><strong>Work Rate:</strong> Defensive actions + distance covered + pressing intensity</p>
-                <p><strong>Consistency:</strong> Performance variance across matches and situations</p>
+                <p>
+                  <strong>xG:</strong> Expected goals based on shot quality and position
+                </p>
+                <p>
+                  <strong>xA:</strong> Expected assists from pass quality and recipient position
+                </p>
+                <p>
+                  <strong>Creative Index:</strong> Combines key passes, through balls, and chance
+                  creation
+                </p>
+                <p>
+                  <strong>Work Rate:</strong> Defensive actions + distance covered + pressing
+                  intensity
+                </p>
+                <p>
+                  <strong>Consistency:</strong> Performance variance across matches and situations
+                </p>
               </div>
             </div>
           </div>

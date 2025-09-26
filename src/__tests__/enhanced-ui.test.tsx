@@ -6,7 +6,10 @@ import userEvent from '@testing-library/user-event';
 
 // Import enhanced UI components
 import { ThemeProvider, useTheme } from '../context/ThemeContext';
-import { PersonalizationProvider, usePersonalization } from '../components/ui/PersonalizationSystem';
+import {
+  PersonalizationProvider,
+  usePersonalization,
+} from '../components/ui/PersonalizationSystem';
 import { AccessibilityProvider } from '../components/ui/AccessibilityComponents';
 import {
   EnhancedButton,
@@ -20,19 +23,13 @@ import {
   EnhancedDoughnutChart,
   EnhancedRadarChart,
 } from '../components/charts/EnhancedCharts';
-import {
-  SwipeArea,
-  Draggable,
-  SortableList,
-} from '../components/ui/GestureSystem';
+import { SwipeArea, Draggable, SortableList } from '../components/ui/GestureSystem';
 
 // Test wrapper component
 const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <ThemeProvider defaultMode="light">
     <PersonalizationProvider>
-      <AccessibilityProvider>
-        {children}
-      </AccessibilityProvider>
+      <AccessibilityProvider>{children}</AccessibilityProvider>
     </PersonalizationProvider>
   </ThemeProvider>
 );
@@ -68,10 +65,7 @@ describe('Enhanced UI Components', () => {
         return (
           <div>
             <span data-testid="current-mode">{themeMode}</span>
-            <button
-              data-testid="switch-dark"
-              onClick={() => setThemeMode('dark')}
-            >
+            <button data-testid="switch-dark" onClick={() => setThemeMode('dark')}>
               Switch to Dark
             </button>
           </div>
@@ -224,11 +218,7 @@ describe('Enhanced UI Components', () => {
 
       render(
         <TestWrapper>
-          <EnhancedCard
-            interactive
-            onClick={handleClick}
-            data-testid="interactive-card"
-          >
+          <EnhancedCard interactive onClick={handleClick} data-testid="interactive-card">
             Interactive Card
           </EnhancedCard>
         </TestWrapper>,
@@ -245,11 +235,7 @@ describe('Enhanced UI Components', () => {
     it('should render correctly', () => {
       render(
         <TestWrapper>
-          <EnhancedInput
-            label="Test Input"
-            placeholder="Enter text..."
-            data-testid="test-input"
-          />
+          <EnhancedInput label="Test Input" placeholder="Enter text..." data-testid="test-input" />
         </TestWrapper>,
       );
 
@@ -262,11 +248,7 @@ describe('Enhanced UI Components', () => {
 
       render(
         <TestWrapper>
-          <EnhancedInput
-            label="Test Input"
-            onChange={handleChange}
-            data-testid="test-input"
-          />
+          <EnhancedInput label="Test Input" onChange={handleChange} data-testid="test-input" />
         </TestWrapper>,
       );
 
@@ -298,11 +280,7 @@ describe('Enhanced UI Components', () => {
     it('should render correctly', () => {
       render(
         <TestWrapper>
-          <EnhancedSwitch
-            checked={false}
-            onChange={jest.fn()}
-            label="Test Switch"
-          />
+          <EnhancedSwitch checked={false} onChange={jest.fn()} label="Test Switch" />
         </TestWrapper>,
       );
 
@@ -317,11 +295,7 @@ describe('Enhanced UI Components', () => {
 
       render(
         <TestWrapper>
-          <EnhancedSwitch
-            checked={false}
-            onChange={handleChange}
-            label="Test Switch"
-          />
+          <EnhancedSwitch checked={false} onChange={handleChange} label="Test Switch" />
         </TestWrapper>,
       );
 
@@ -335,10 +309,12 @@ describe('Enhanced UI Components', () => {
   describe('Chart Components', () => {
     const mockChartData = {
       labels: ['Jan', 'Feb', 'Mar', 'Apr'],
-      datasets: [{
-        label: 'Test Data',
-        data: [10, 20, 30, 40],
-      }],
+      datasets: [
+        {
+          label: 'Test Data',
+          data: [10, 20, 30, 40],
+        },
+      ],
     };
 
     const mockDoughnutData = {
@@ -349,11 +325,7 @@ describe('Enhanced UI Components', () => {
     it('should render EnhancedLineChart with loading state', () => {
       render(
         <TestWrapper>
-          <EnhancedLineChart
-            data={mockChartData}
-            loading={true}
-            title="Test Chart"
-          />
+          <EnhancedLineChart data={mockChartData} loading={true} title="Test Chart" />
         </TestWrapper>,
       );
 
@@ -363,11 +335,7 @@ describe('Enhanced UI Components', () => {
     it('should render EnhancedBarChart with error state', () => {
       render(
         <TestWrapper>
-          <EnhancedBarChart
-            data={mockChartData}
-            error="Failed to load data"
-            title="Bar Chart"
-          />
+          <EnhancedBarChart data={mockChartData} error="Failed to load data" title="Bar Chart" />
         </TestWrapper>,
       );
 
@@ -378,10 +346,7 @@ describe('Enhanced UI Components', () => {
     it('should render EnhancedDoughnutChart', () => {
       render(
         <TestWrapper>
-          <EnhancedDoughnutChart
-            data={mockDoughnutData}
-            title="Doughnut Chart"
-          />
+          <EnhancedDoughnutChart data={mockDoughnutData} title="Doughnut Chart" />
         </TestWrapper>,
       );
 
@@ -410,10 +375,7 @@ describe('Enhanced UI Components', () => {
 
       render(
         <TestWrapper>
-          <Draggable
-            config={{ onDrag: handleDrag }}
-            data-testid="draggable"
-          >
+          <Draggable config={{ onDrag: handleDrag }} data-testid="draggable">
             <div>Draggable Content</div>
           </Draggable>
         </TestWrapper>,
@@ -433,10 +395,7 @@ describe('Enhanced UI Components', () => {
 
       render(
         <TestWrapper>
-          <SortableList
-            items={items}
-            onReorder={handleReorder}
-          />
+          <SortableList items={items} onReorder={handleReorder} />
         </TestWrapper>,
       );
 
@@ -451,7 +410,9 @@ describe('Enhanced UI Components', () => {
       render(
         <TestWrapper>
           <div>
-            <a href="#main" className="sr-only focus:not-sr-only">Skip to main content</a>
+            <a href="#main" className="sr-only focus:not-sr-only">
+              Skip to main content
+            </a>
             <div id="main">Main Content</div>
           </div>
         </TestWrapper>,
@@ -614,34 +575,42 @@ describe('Integration Tests', () => {
 });
 
 // Mock Chart.js for testing
-jest.mock('chart.js', () => ({
-  Chart: jest.fn().mockImplementation(() => ({
-    destroy: jest.fn(),
-    update: jest.fn(),
+vi.mock('chart.js', () => ({
+  Chart: vi.fn().mockImplementation(() => ({
+    destroy: vi.fn(),
+    update: vi.fn(),
     data: { datasets: [] },
   })),
-  CategoryScale: jest.fn(),
-  LinearScale: jest.fn(),
-  PointElement: jest.fn(),
-  LineElement: jest.fn(),
-  BarElement: jest.fn(),
-  ArcElement: jest.fn(),
-  RadialLinearScale: jest.fn(),
-  Title: jest.fn(),
-  Tooltip: jest.fn(),
-  Legend: jest.fn(),
-  Filler: jest.fn(),
+  CategoryScale: vi.fn(),
+  LinearScale: vi.fn(),
+  PointElement: vi.fn(),
+  LineElement: vi.fn(),
+  BarElement: vi.fn(),
+  ArcElement: vi.fn(),
+  RadialLinearScale: vi.fn(),
+  Title: vi.fn(),
+  Tooltip: vi.fn(),
+  Legend: vi.fn(),
+  Filler: vi.fn(),
 }));
 
-jest.mock('react-chartjs-2', () => ({
-  Line: ({ data }: unknown) => <div data-testid="line-chart">Line Chart: {data.labels?.join(', ')}</div>,
-  Bar: ({ data }: unknown) => <div data-testid="bar-chart">Bar Chart: {data.labels?.join(', ')}</div>,
-  Doughnut: ({ data }: unknown) => <div data-testid="doughnut-chart">Doughnut Chart: {data.labels?.join(', ')}</div>,
-  Radar: ({ data }: unknown) => <div data-testid="radar-chart">Radar Chart: {data.labels?.join(', ')}</div>,
+vi.mock('react-chartjs-2', () => ({
+  Line: ({ data }: unknown) => (
+    <div data-testid="line-chart">Line Chart: {data.labels?.join(', ')}</div>
+  ),
+  Bar: ({ data }: unknown) => (
+    <div data-testid="bar-chart">Bar Chart: {data.labels?.join(', ')}</div>
+  ),
+  Doughnut: ({ data }: unknown) => (
+    <div data-testid="doughnut-chart">Doughnut Chart: {data.labels?.join(', ')}</div>
+  ),
+  Radar: ({ data }: unknown) => (
+    <div data-testid="radar-chart">Radar Chart: {data.labels?.join(', ')}</div>
+  ),
 }));
 
 // Mock framer-motion for testing
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: unknown) => <div {...props}>{children}</div>,
     button: ({ children, ...props }: unknown) => <button {...props}>{children}</button>,

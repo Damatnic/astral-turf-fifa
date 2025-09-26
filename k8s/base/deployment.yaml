@@ -12,10 +12,10 @@ metadata:
     app.kubernetes.io/name: astral-turf
     app.kubernetes.io/component: application
     app.kubernetes.io/part-of: astral-turf-platform
-    app.kubernetes.io/version: "8.0.0"
+    app.kubernetes.io/version: '8.0.0'
   annotations:
-    deployment.kubernetes.io/revision: "1"
-    kubernetes.io/change-cause: "Initial production deployment"
+    deployment.kubernetes.io/revision: '1'
+    kubernetes.io/change-cause: 'Initial production deployment'
 spec:
   replicas: 5
   strategy:
@@ -32,11 +32,11 @@ spec:
       labels:
         app.kubernetes.io/name: astral-turf
         app.kubernetes.io/component: application
-        app.kubernetes.io/version: "8.0.0"
+        app.kubernetes.io/version: '8.0.0'
       annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "3000"
-        prometheus.io/path: "/metrics"
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '3000'
+        prometheus.io/path: '/metrics'
     spec:
       # Security context
       securityContext:
@@ -44,174 +44,174 @@ spec:
         runAsUser: 1001
         runAsGroup: 1001
         fsGroup: 1001
-      
+
       # Service account
       serviceAccountName: astral-turf-sa
-      
+
       # Image pull secrets
       imagePullSecrets:
         - name: registry-secret
-      
+
       # Advanced affinity rules for 99.99% uptime
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: app.kubernetes.io/name
-                operator: In
-                values:
-                - astral-turf
-            topologyKey: kubernetes.io/hostname
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
+            - labelSelector:
                 matchExpressions:
-                - key: app.kubernetes.io/name
-                  operator: In
-                  values:
-                  - astral-turf
-              topologyKey: topology.kubernetes.io/zone
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                      - astral-turf
+              topologyKey: kubernetes.io/hostname
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app.kubernetes.io/name
+                      operator: In
+                      values:
+                        - astral-turf
+                topologyKey: topology.kubernetes.io/zone
         nodeAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            preference:
-              matchExpressions:
-              - key: node.kubernetes.io/instance-type
-                operator: In
-                values: ["c5.xlarge", "c5.2xlarge", "c5.4xlarge"]
-          - weight: 80
-            preference:
-              matchExpressions:
-              - key: karpenter.sh/capacity-type
-                operator: In
-                values: ["on-demand"]
-      
+            - weight: 100
+              preference:
+                matchExpressions:
+                  - key: node.kubernetes.io/instance-type
+                    operator: In
+                    values: ['c5.xlarge', 'c5.2xlarge', 'c5.4xlarge']
+            - weight: 80
+              preference:
+                matchExpressions:
+                  - key: karpenter.sh/capacity-type
+                    operator: In
+                    values: ['on-demand']
+
       # Multi-level topology spread for ultimate reliability
       topologySpreadConstraints:
-      - maxSkew: 1
-        topologyKey: kubernetes.io/hostname
-        whenUnsatisfiable: DoNotSchedule
-        labelSelector:
-          matchLabels:
-            app.kubernetes.io/name: astral-turf
-      - maxSkew: 2
-        topologyKey: topology.kubernetes.io/zone
-        whenUnsatisfiable: DoNotSchedule
-        labelSelector:
-          matchLabels:
-            app.kubernetes.io/name: astral-turf
-      - maxSkew: 5
-        topologyKey: karpenter.sh/nodepool
-        whenUnsatisfiable: ScheduleAnyway
-        labelSelector:
-          matchLabels:
-            app.kubernetes.io/name: astral-turf
-      
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: astral-turf
+        - maxSkew: 2
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: astral-turf
+        - maxSkew: 5
+          topologyKey: karpenter.sh/nodepool
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: astral-turf
+
       containers:
-      - name: astral-turf
-        image: astral-turf:latest
-        imagePullPolicy: Always
-        
-        ports:
-        - name: http
-          containerPort: 3000
-          protocol: TCP
-        - name: metrics
-          containerPort: 9090
-          protocol: TCP
-        
-        # Environment variables
-        envFrom:
-        - configMapRef:
-            name: astral-turf-config
-        - secretRef:
-            name: astral-turf-secrets
-        
-        # Resource requirements - optimized for high performance
-        resources:
-          requests:
-            cpu: 500m
-            memory: 1Gi
-            ephemeral-storage: 2Gi
-          limits:
-            cpu: 2000m
-            memory: 4Gi
-            ephemeral-storage: 10Gi
-        
-        # Health checks
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: http
-            scheme: HTTP
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          timeoutSeconds: 5
-          successThreshold: 1
-          failureThreshold: 3
-        
-        readinessProbe:
-          httpGet:
-            path: /ready
-            port: http
-            scheme: HTTP
-          initialDelaySeconds: 5
-          periodSeconds: 5
-          timeoutSeconds: 3
-          successThreshold: 1
-          failureThreshold: 3
-        
-        startupProbe:
-          httpGet:
-            path: /health
-            port: http
-            scheme: HTTP
-          initialDelaySeconds: 10
-          periodSeconds: 10
-          timeoutSeconds: 5
-          successThreshold: 1
-          failureThreshold: 30
-        
-        # Security context
-        securityContext:
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
-          capabilities:
-            drop:
-            - ALL
-        
-        # Volume mounts
-        volumeMounts:
-        - name: tmp-volume
-          mountPath: /tmp
-        - name: cache-volume
-          mountPath: /app/.cache
-        - name: app-data
-          mountPath: /app/data
-      
+        - name: astral-turf
+          image: astral-turf:latest
+          imagePullPolicy: Always
+
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+            - name: metrics
+              containerPort: 9090
+              protocol: TCP
+
+          # Environment variables
+          envFrom:
+            - configMapRef:
+                name: astral-turf-config
+            - secretRef:
+                name: astral-turf-secrets
+
+          # Resource requirements - optimized for high performance
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+              ephemeral-storage: 2Gi
+            limits:
+              cpu: 2000m
+              memory: 4Gi
+              ephemeral-storage: 10Gi
+
+          # Health checks
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+
+          startupProbe:
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 30
+
+          # Security context
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+
+          # Volume mounts
+          volumeMounts:
+            - name: tmp-volume
+              mountPath: /tmp
+            - name: cache-volume
+              mountPath: /app/.cache
+            - name: app-data
+              mountPath: /app/data
+
       # Volumes
       volumes:
-      - name: tmp-volume
-        emptyDir: {}
-      - name: cache-volume
-        emptyDir: {}
-      - name: app-data
-        persistentVolumeClaim:
-          claimName: astral-turf-pvc
-      
+        - name: tmp-volume
+          emptyDir: {}
+        - name: cache-volume
+          emptyDir: {}
+        - name: app-data
+          persistentVolumeClaim:
+            claimName: astral-turf-pvc
+
       # DNS configuration
       dnsPolicy: ClusterFirst
       dnsConfig:
         options:
-        - name: ndots
-          value: "2"
-        - name: edns0
-      
+          - name: ndots
+            value: '2'
+          - name: edns0
+
       # Termination settings
       terminationGracePeriodSeconds: 30
-      
+
       # Restart policy
       restartPolicy: Always
 
