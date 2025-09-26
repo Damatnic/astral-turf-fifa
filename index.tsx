@@ -13,17 +13,8 @@ import { HelmetProvider } from 'react-helmet-async';
 // Import process polyfill for browser compatibility
 import './src/utils/processPolyfill';
 
-// Import only essential Inter font weights to reduce bundle size
-import '@fontsource/inter/400.css'; // Regular
-import '@fontsource/inter/600.css'; // Semi-bold
-import '@fontsource/inter/700.css'; // Bold
-// Removed 500 and 800 weights to optimize loading
-
-// Import TailwindCSS
-import './src/styles/tailwind.css';
-
-// Import enhanced UI styles
-import './src/styles/enhanced-ui.css';
+// Fonts and TailwindCSS now loaded via CDN in index.html
+// Enhanced UI styles are inlined in index.html
 
 // Performance optimizations
 function registerServiceWorker() {
