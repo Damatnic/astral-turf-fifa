@@ -30,11 +30,15 @@
     
     <title>Astral Turf</title>
     
-    <!-- TailwindCSS is loaded locally via PostCSS plugin -->
+    <!-- Performance optimizations -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
     
-    <!-- Fonts are now loaded locally via @fontsource/inter -->
-    <!-- Critical CSS will be handled by Vite build -->
+    <!-- Critical CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
       
       /* MOBILE-FIRST RESPONSIVE DESIGN VARIABLES */
       :root {
@@ -99,12 +103,6 @@
     /* Clean SVG defaults - allow Tailwind sizing to work properly */
     svg {
       flex-shrink: 0;
-    }
-    
-    /* Gentle logo sizing helper */
-    .logo-container svg {
-      width: inherit;
-      height: inherit;
     }
 
     /* Animations */
