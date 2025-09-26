@@ -26,7 +26,7 @@ const PlayerToken: React.FC<PlayerTokenProps> = ({
   onDrag,
   onDragEnd,
   onSelect,
-  isMobile
+  isMobile,
 }) => {
   const tokenRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
@@ -46,10 +46,10 @@ const PlayerToken: React.FC<PlayerTokenProps> = ({
 
   // Performance rating color
   const getRatingColor = (rating: number) => {
-    if (rating >= 90) return '#10b981'; // green-500
-    if (rating >= 80) return '#3b82f6'; // blue-500
-    if (rating >= 70) return '#f59e0b'; // amber-500
-    if (rating >= 60) return '#ef4444'; // red-500
+    if (rating >= 90) {return '#10b981';} // green-500
+    if (rating >= 80) {return '#3b82f6';} // blue-500
+    if (rating >= 70) {return '#f59e0b';} // amber-500
+    if (rating >= 60) {return '#ef4444';} // red-500
     return '#6b7280'; // gray-500
   };
 
@@ -63,7 +63,7 @@ const PlayerToken: React.FC<PlayerTokenProps> = ({
   const handleDragEndInternal = useCallback((event: any, info: PanInfo) => {
     onDragEnd(info);
     setShowStats(false);
-    
+
     // Reset motion values
     x.set(0);
     y.set(0);
@@ -77,9 +77,9 @@ const PlayerToken: React.FC<PlayerTokenProps> = ({
 
   // Long press handler for mobile
   useEffect(() => {
-    if (!isMobile || !tokenRef.current) return;
+    if (!isMobile || !tokenRef.current) {return;}
 
-    let pressTimer: NodeJS.Timeout;
+    let pressTimer: any;
     const element = tokenRef.current;
 
     const startPress = () => {
@@ -118,7 +118,7 @@ const PlayerToken: React.FC<PlayerTokenProps> = ({
           left: `${position.x}%`,
           top: `${position.y}%`,
           transform: 'translate(-50%, -50%)',
-          zIndex: isDragging ? 50 : isSelected ? 20 : 10
+          zIndex: isDragging ? 50 : isSelected ? 20 : 10,
         }}
         onMouseEnter={() => !isMobile && setIsHovered(true)}
         onMouseLeave={() => !isMobile && setIsHovered(false)}
@@ -140,17 +140,17 @@ const PlayerToken: React.FC<PlayerTokenProps> = ({
           whileTap={{ scale: 0.95 }}
           animate={{
             scale: isSelected ? 1.1 : 1,
-            rotateZ: isDragging ? 5 : 0
+            rotateZ: isDragging ? 5 : 0,
           }}
           transition={{
             type: "spring",
             stiffness: 300,
-            damping: 30
+            damping: 30,
           }}
           style={{
             scale,
             rotateX,
-            rotateY
+            rotateY,
           }}
         >
           {/* Token Shadow */}
@@ -159,10 +159,10 @@ const PlayerToken: React.FC<PlayerTokenProps> = ({
             animate={{
               scale: isDragging ? 1.2 : 1,
               opacity: isDragging ? 0.6 : 0.3,
-              y: isDragging ? 8 : 4
+              y: isDragging ? 8 : 4,
             }}
             style={{
-              transform: 'translate(2px, 2px)'
+              transform: 'translate(2px, 2px)',
             }}
           />
 
@@ -171,8 +171,8 @@ const PlayerToken: React.FC<PlayerTokenProps> = ({
             className={`
               relative w-14 h-14 rounded-full border-2 cursor-pointer
               transition-all duration-200 ease-out
-              ${isSelected 
-                ? 'border-yellow-400 shadow-lg shadow-yellow-400/50' 
+              ${isSelected
+                ? 'border-yellow-400 shadow-lg shadow-yellow-400/50'
                 : 'border-white/60 shadow-md'
               }
               ${!isValid && isDragging ? 'border-red-400 shadow-red-400/50' : ''}
@@ -191,16 +191,16 @@ const PlayerToken: React.FC<PlayerTokenProps> = ({
                 )
               `,
               backdropFilter: 'blur(8px)',
-              boxShadow: isSelected 
+              boxShadow: isSelected
                 ? `0 0 20px ${roleColor}66, inset 0 2px 4px rgba(255,255,255,0.2)`
-                : `0 4px 12px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.1)`
+                : `0 4px 12px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.1)`,
             }}
             animate={{
-              boxShadow: isDragging 
+              boxShadow: isDragging
                 ? `0 8px 32px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255,255,255,0.2)`
-                : isSelected 
+                : isSelected
                   ? `0 0 20px ${roleColor}66, inset 0 2px 4px rgba(255,255,255,0.2)`
-                  : `0 4px 12px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.1)`
+                  : `0 4px 12px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.1)`,
             }}
           >
             {/* Player Number */}
@@ -211,7 +211,7 @@ const PlayerToken: React.FC<PlayerTokenProps> = ({
             </div>
 
             {/* Role Indicator */}
-            <div 
+            <div
               className="absolute -top-1 -right-1 w-4 h-4 rounded-full border border-white/50 text-xs flex items-center justify-center text-white font-bold"
               style={{ backgroundColor: roleColor }}
             >
@@ -219,7 +219,7 @@ const PlayerToken: React.FC<PlayerTokenProps> = ({
             </div>
 
             {/* Performance Rating */}
-            <div 
+            <div
               className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full border border-white/50 text-xs flex items-center justify-center text-white font-bold"
               style={{ backgroundColor: getRatingColor(player.rating || 75) }}
             >
@@ -232,12 +232,12 @@ const PlayerToken: React.FC<PlayerTokenProps> = ({
                 className="absolute inset-0 rounded-full border-2 border-yellow-400"
                 animate={{
                   scale: [1, 1.2, 1],
-                  opacity: [1, 0.5, 1]
+                  opacity: [1, 0.5, 1],
                 }}
                 transition={{
                   duration: 2,
                   repeat: Infinity,
-                  ease: "easeInOut"
+                  ease: "easeInOut",
                 }}
               />
             )}
@@ -248,11 +248,11 @@ const PlayerToken: React.FC<PlayerTokenProps> = ({
                 className="absolute inset-0 rounded-full border-2 border-red-400 bg-red-400/20"
                 animate={{
                   scale: [1, 1.1, 1],
-                  opacity: [0.8, 0.4, 0.8]
+                  opacity: [0.8, 0.4, 0.8],
                 }}
                 transition={{
                   duration: 0.5,
-                  repeat: Infinity
+                  repeat: Infinity,
                 }}
               />
             )}
@@ -270,7 +270,7 @@ const PlayerToken: React.FC<PlayerTokenProps> = ({
           style={{
             left: `${position.x}%`,
             top: `${position.y - 12}%`,
-            transform: 'translate(-50%, -100%)'
+            transform: 'translate(-50%, -100%)',
           }}
         >
           {/* Player Info */}
@@ -279,7 +279,7 @@ const PlayerToken: React.FC<PlayerTokenProps> = ({
             <div className="text-xs text-slate-300 mb-2">
               {playerRole?.name || 'Unknown Position'}
             </div>
-            
+
             {/* Quick Stats */}
             <div className="grid grid-cols-2 gap-2 text-xs">
               <div>

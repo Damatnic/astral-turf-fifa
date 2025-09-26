@@ -1,16 +1,16 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  BarChart3, 
-  TrendingUp, 
-  Target, 
-  Users, 
+import {
+  BarChart3,
+  TrendingUp,
+  Target,
+  Users,
   Zap,
   Shield,
   Activity,
   Eye,
   X,
-  Info
+  Info,
 } from 'lucide-react';
 import { type Formation, type Player } from '../../types';
 import { tacticalIntegrationService, type TacticalAnalysis } from '../../services/tacticalIntegrationService';
@@ -42,7 +42,7 @@ const TacticalAnalyticsPanel: React.FC<TacticalAnalyticsPanelProps> = ({
   formation,
   players = [],
   isOpen,
-  onClose
+  onClose,
 }) => {
   const [analysis, setAnalysis] = useState<TacticalAnalysis | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -50,42 +50,42 @@ const TacticalAnalyticsPanel: React.FC<TacticalAnalyticsPanelProps> = ({
 
   // Calculate formation metrics
   const formationMetrics = useMemo((): FormationMetrics | null => {
-    if (!formation || !formation.positions) return null;
+    if (!formation || !formation.positions) {return null;}
 
     const positions = Object.values(formation.positions);
-    if (positions.length === 0) return null;
+    if (positions.length === 0) {return null;}
 
     // Calculate various tactical metrics
     const avgX = positions.reduce((sum, pos) => sum + pos.x, 0) / positions.length;
     const avgY = positions.reduce((sum, pos) => sum + pos.y, 0) / positions.length;
-    
+
     const spreadX = Math.max(...positions.map(p => p.x)) - Math.min(...positions.map(p => p.x));
     const spreadY = Math.max(...positions.map(p => p.y)) - Math.min(...positions.map(p => p.y));
-    
+
     const attackingPlayers = positions.filter(p => p.y > 60).length;
     const defensivePlayers = positions.filter(p => p.y < 40).length;
-    
+
     return {
       balance: Math.max(0, 100 - Math.abs(avgX - 50) * 2),
       width: Math.min(100, (spreadX / 100) * 100),
       depth: Math.min(100, (spreadY / 100) * 100),
       compactness: Math.max(0, 100 - (spreadX + spreadY) / 2),
       attacking: (attackingPlayers / positions.length) * 100,
-      defensive: (defensivePlayers / positions.length) * 100
+      defensive: (defensivePlayers / positions.length) * 100,
     };
   }, [formation]);
 
   // Calculate player chemistry metrics
   const playerMetrics = useMemo((): PlayerMetrics | null => {
-    if (!formation || players.length === 0) return null;
+    if (!formation || players.length === 0) {return null;}
 
     const chemistry = tacticalIntegrationService.calculatePlayerChemistry(players, formation);
-    
+
     // Calculate positioning score based on player-position match
     const positioningScore = players.reduce((sum, player) => {
       const formationPos = formation.positions[player.id];
-      if (!formationPos) return sum;
-      
+      if (!formationPos) {return sum;}
+
       // Simplified position matching score
       const positionMatch = player.position ? 80 : 60; // Better if player has preferred position
       return sum + positionMatch;
@@ -93,12 +93,12 @@ const TacticalAnalyticsPanel: React.FC<TacticalAnalyticsPanelProps> = ({
 
     // Calculate field coverage
     const heatMapData = tacticalIntegrationService.generateHeatMapData(formation, players);
-    
+
     return {
       chemistry: chemistry.overall,
       positioning: positioningScore,
       coverage: heatMapData.coverage,
-      effectiveness: (chemistry.overall + positioningScore + heatMapData.coverage) / 3
+      effectiveness: (chemistry.overall + positioningScore + heatMapData.coverage) / 3,
     };
   }, [formation, players]);
 
@@ -113,7 +113,7 @@ const TacticalAnalyticsPanel: React.FC<TacticalAnalyticsPanelProps> = ({
     }
   }, [isOpen, formation, players]);
 
-  if (!isOpen) return null;
+  if (!isOpen) {return null;}
 
   const MetricCard: React.FC<{
     title: string;
@@ -136,7 +136,7 @@ const TacticalAnalyticsPanel: React.FC<TacticalAnalyticsPanelProps> = ({
           <span className="text-xs text-slate-400">%</span>
         </div>
       </div>
-      
+
       <div className="w-full bg-slate-700/50 rounded-full h-2 mb-2">
         <motion.div
           initial={{ width: 0 }}
@@ -145,7 +145,7 @@ const TacticalAnalyticsPanel: React.FC<TacticalAnalyticsPanelProps> = ({
           className={`h-2 rounded-full ${color.replace('text-', 'bg-')}`}
         />
       </div>
-      
+
       <p className="text-xs text-slate-400">{description}</p>
     </motion.div>
   );
@@ -174,7 +174,7 @@ const TacticalAnalyticsPanel: React.FC<TacticalAnalyticsPanelProps> = ({
                 <span className="text-sm text-slate-400">• {formation.name}</span>
               )}
             </div>
-            
+
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -210,7 +210,7 @@ const TacticalAnalyticsPanel: React.FC<TacticalAnalyticsPanelProps> = ({
                       <Target className="w-5 h-5 text-blue-400" />
                       Formation Metrics
                     </h3>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       <MetricCard
                         title="Balance"
@@ -219,7 +219,7 @@ const TacticalAnalyticsPanel: React.FC<TacticalAnalyticsPanelProps> = ({
                         color="text-blue-400"
                         description="Left-right positional balance"
                       />
-                      
+
                       <MetricCard
                         title="Width"
                         value={formationMetrics.width}
@@ -227,7 +227,7 @@ const TacticalAnalyticsPanel: React.FC<TacticalAnalyticsPanelProps> = ({
                         color="text-green-400"
                         description="Formation width coverage"
                       />
-                      
+
                       <MetricCard
                         title="Depth"
                         value={formationMetrics.depth}
@@ -235,7 +235,7 @@ const TacticalAnalyticsPanel: React.FC<TacticalAnalyticsPanelProps> = ({
                         color="text-purple-400"
                         description="Attacking depth variation"
                       />
-                      
+
                       <MetricCard
                         title="Compactness"
                         value={formationMetrics.compactness}
@@ -243,7 +243,7 @@ const TacticalAnalyticsPanel: React.FC<TacticalAnalyticsPanelProps> = ({
                         color="text-orange-400"
                         description="Team compactness level"
                       />
-                      
+
                       <MetricCard
                         title="Attacking Focus"
                         value={formationMetrics.attacking}
@@ -251,7 +251,7 @@ const TacticalAnalyticsPanel: React.FC<TacticalAnalyticsPanelProps> = ({
                         color="text-red-400"
                         description="Forward player positioning"
                       />
-                      
+
                       <MetricCard
                         title="Defensive Solidity"
                         value={formationMetrics.defensive}
@@ -270,7 +270,7 @@ const TacticalAnalyticsPanel: React.FC<TacticalAnalyticsPanelProps> = ({
                       <Users className="w-5 h-5 text-green-400" />
                       Player Performance
                     </h3>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                       <MetricCard
                         title="Chemistry"
@@ -279,7 +279,7 @@ const TacticalAnalyticsPanel: React.FC<TacticalAnalyticsPanelProps> = ({
                         color="text-pink-400"
                         description="Player compatibility score"
                       />
-                      
+
                       <MetricCard
                         title="Positioning"
                         value={playerMetrics.positioning}
@@ -287,7 +287,7 @@ const TacticalAnalyticsPanel: React.FC<TacticalAnalyticsPanelProps> = ({
                         color="text-yellow-400"
                         description="Position-player match quality"
                       />
-                      
+
                       <MetricCard
                         title="Coverage"
                         value={playerMetrics.coverage}
@@ -295,7 +295,7 @@ const TacticalAnalyticsPanel: React.FC<TacticalAnalyticsPanelProps> = ({
                         color="text-indigo-400"
                         description="Field area coverage"
                       />
-                      
+
                       <MetricCard
                         title="Overall Effectiveness"
                         value={playerMetrics.effectiveness}
@@ -314,7 +314,7 @@ const TacticalAnalyticsPanel: React.FC<TacticalAnalyticsPanelProps> = ({
                       <Info className="w-5 h-5 text-yellow-400" />
                       AI Tactical Analysis
                     </h3>
-                    
+
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                       {/* Strengths */}
                       <div className="bg-green-900/20 border border-green-700/50 rounded-lg p-4">
@@ -380,7 +380,7 @@ const TacticalAnalyticsPanel: React.FC<TacticalAnalyticsPanelProps> = ({
                           </span>
                         </div>
                       </div>
-                      
+
                       <div className="w-full bg-slate-700/50 rounded-full h-3">
                         <motion.div
                           initial={{ width: 0 }}

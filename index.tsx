@@ -75,7 +75,7 @@ root.render(
   <React.StrictMode>
     <SecurityErrorBoundary>
       <SecurityProvider>
-        <HashRouter>
+        <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <AppProvider>
             <App />
           </AppProvider>

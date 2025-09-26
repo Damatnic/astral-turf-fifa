@@ -1,14 +1,14 @@
 import React, { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  TrendingUp, 
-  Activity, 
-  Zap, 
-  Shield, 
+import {
+  TrendingUp,
+  Activity,
+  Zap,
+  Shield,
   Target,
   Eye,
   BarChart3,
-  MapPin
+  MapPin,
 } from 'lucide-react';
 import { type Player, type Formation } from '../../types';
 import { tacticalIntegrationService } from '../../services/tacticalIntegrationService';
@@ -50,17 +50,17 @@ const PlayerStatsOverlay: React.FC<PlayerStatsOverlayProps> = ({
   selectedPlayer,
   showHeatMap = false,
   showPlayerStats = false,
-  fieldDimensions
+  fieldDimensions,
 }) => {
   const [hoveredPlayer, setHoveredPlayer] = useState<string | null>(null);
 
   // Calculate player statistics
   const playerStats = useMemo((): PlayerStats[] => {
-    if (!formation || players.length === 0) return [];
+    if (!formation || players.length === 0) {return [];}
 
     return players.map(player => {
       const position = formation.positions[player.id];
-      if (!position) return null;
+      if (!position) {return null;}
 
       // Calculate various player metrics
       const performance = Math.min(100, (player.currentPotential || 70) + Math.random() * 10);
@@ -78,32 +78,32 @@ const PlayerStatsOverlay: React.FC<PlayerStatsOverlayProps> = ({
           positioning,
           influence,
           workrate,
-          chemistry
+          chemistry,
         },
-        heatIntensity: (performance + influence) / 200
+        heatIntensity: (performance + influence) / 200,
       };
     }).filter(Boolean) as PlayerStats[];
   }, [formation, players]);
 
   // Generate heat map zones
   const heatZones = useMemo((): HeatZone[] => {
-    if (!formation || !showHeatMap) return [];
+    if (!formation || !showHeatMap) {return [];}
 
     const heatMapData = tacticalIntegrationService.generateHeatMapData(formation, players);
-    
+
     return heatMapData.zones.map(zone => ({
       x: (zone.x / 100) * fieldDimensions.width,
       y: (zone.y / 100) * fieldDimensions.height,
       intensity: zone.intensity,
       type: zone.type,
-      radius: 40 + (zone.intensity * 30)
+      radius: 40 + (zone.intensity * 30),
     }));
   }, [formation, players, showHeatMap, fieldDimensions]);
 
   // Get heat map color based on zone type and intensity
   const getHeatColor = (zone: HeatZone): string => {
     const alpha = Math.max(0.1, zone.intensity * 0.6);
-    
+
     switch (zone.type) {
       case 'attack':
         return `rgba(239, 68, 68, ${alpha})`; // Red
@@ -117,10 +117,10 @@ const PlayerStatsOverlay: React.FC<PlayerStatsOverlayProps> = ({
   };
 
   // Player performance indicator component
-  const PlayerIndicator: React.FC<{ stats: PlayerStats; isSelected: boolean; isHovered: boolean }> = ({ 
-    stats, 
-    isSelected, 
-    isHovered 
+  const PlayerIndicator: React.FC<{ stats: PlayerStats; isSelected: boolean; isHovered: boolean }> = ({
+    stats,
+    isSelected,
+    isHovered,
   }) => (
     <motion.div
       initial={{ opacity: 0, scale: 0 }}
@@ -128,14 +128,14 @@ const PlayerStatsOverlay: React.FC<PlayerStatsOverlayProps> = ({
       className="absolute transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
       style={{
         left: (stats.position.x / 100) * fieldDimensions.width,
-        top: (stats.position.y / 100) * fieldDimensions.height
+        top: (stats.position.y / 100) * fieldDimensions.height,
       }}
     >
       {/* Performance Ring */}
       <motion.div
         animate={{
           scale: isSelected || isHovered ? 1.3 : 1,
-          opacity: isSelected || isHovered ? 1 : 0.7
+          opacity: isSelected || isHovered ? 1 : 0.7,
         }}
         className="relative"
       >
@@ -160,7 +160,7 @@ const PlayerStatsOverlay: React.FC<PlayerStatsOverlayProps> = ({
             className="transition-all duration-500"
           />
         </svg>
-        
+
         {/* Performance Score */}
         <div className="absolute -top-1 -left-1 w-8 h-8 bg-slate-900/80 rounded-full flex items-center justify-center">
           <span className="text-xs font-bold text-white">
@@ -179,7 +179,7 @@ const PlayerStatsOverlay: React.FC<PlayerStatsOverlayProps> = ({
             className="absolute top-6 left-1/2 transform -translate-x-1/2 bg-slate-900/95 backdrop-blur-md border border-slate-700/50 rounded-lg p-3 min-w-[200px] z-10"
           >
             <div className="text-white font-semibold text-sm mb-2">{stats.name}</div>
-            
+
             <div className="space-y-1">
               <div className="flex items-center justify-between text-xs">
                 <span className="text-slate-400 flex items-center gap-1">
@@ -188,7 +188,7 @@ const PlayerStatsOverlay: React.FC<PlayerStatsOverlayProps> = ({
                 </span>
                 <span className="text-white font-medium">{Math.round(stats.metrics.performance)}%</span>
               </div>
-              
+
               <div className="flex items-center justify-between text-xs">
                 <span className="text-slate-400 flex items-center gap-1">
                   <Target className="w-3 h-3" />
@@ -196,7 +196,7 @@ const PlayerStatsOverlay: React.FC<PlayerStatsOverlayProps> = ({
                 </span>
                 <span className="text-white font-medium">{Math.round(stats.metrics.positioning)}%</span>
               </div>
-              
+
               <div className="flex items-center justify-between text-xs">
                 <span className="text-slate-400 flex items-center gap-1">
                   <Zap className="w-3 h-3" />
@@ -204,7 +204,7 @@ const PlayerStatsOverlay: React.FC<PlayerStatsOverlayProps> = ({
                 </span>
                 <span className="text-white font-medium">{Math.round(stats.metrics.influence)}%</span>
               </div>
-              
+
               <div className="flex items-center justify-between text-xs">
                 <span className="text-slate-400 flex items-center gap-1">
                   <Activity className="w-3 h-3" />
@@ -212,7 +212,7 @@ const PlayerStatsOverlay: React.FC<PlayerStatsOverlayProps> = ({
                 </span>
                 <span className="text-white font-medium">{Math.round(stats.metrics.workrate)}%</span>
               </div>
-              
+
               <div className="flex items-center justify-between text-xs">
                 <span className="text-slate-400 flex items-center gap-1">
                   <Shield className="w-3 h-3" />
@@ -232,7 +232,7 @@ const PlayerStatsOverlay: React.FC<PlayerStatsOverlayProps> = ({
     </motion.div>
   );
 
-  if (!formation || players.length === 0) return null;
+  if (!formation || players.length === 0) {return null;}
 
   return (
     <div className="absolute inset-0 pointer-events-none">
@@ -245,8 +245,8 @@ const PlayerStatsOverlay: React.FC<PlayerStatsOverlayProps> = ({
             exit={{ opacity: 0 }}
             className="absolute inset-0"
           >
-            <svg 
-              width={fieldDimensions.width} 
+            <svg
+              width={fieldDimensions.width}
               height={fieldDimensions.height}
               className="absolute inset-0"
             >
@@ -259,7 +259,7 @@ const PlayerStatsOverlay: React.FC<PlayerStatsOverlayProps> = ({
                   </radialGradient>
                 ))}
               </defs>
-              
+
               {heatZones.map((zone, index) => (
                 <motion.circle
                   key={index}
@@ -279,7 +279,7 @@ const PlayerStatsOverlay: React.FC<PlayerStatsOverlayProps> = ({
                 <BarChart3 className="w-4 h-4" />
                 Heat Map
               </h4>
-              
+
               <div className="space-y-1 text-xs">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full bg-red-500/60" />
@@ -333,18 +333,18 @@ const PlayerStatsOverlay: React.FC<PlayerStatsOverlayProps> = ({
               <Eye className="w-4 h-4 text-blue-400" />
               Player Analysis
             </h3>
-            
+
             {(() => {
               const stats = playerStats.find(s => s.id === selectedPlayer.id);
-              if (!stats) return null;
-              
+              if (!stats) {return null;}
+
               return (
                 <div className="space-y-3">
                   <div className="text-center">
                     <div className="text-lg font-bold text-white">{stats.name}</div>
                     <div className="text-sm text-slate-400">{selectedPlayer.position || 'No Position'}</div>
                   </div>
-                  
+
                   <div className="space-y-2">
                     {Object.entries(stats.metrics).map(([key, value]) => (
                       <div key={key} className="flex items-center justify-between">
@@ -369,7 +369,7 @@ const PlayerStatsOverlay: React.FC<PlayerStatsOverlayProps> = ({
                       </div>
                     ))}
                   </div>
-                  
+
                   <div className="pt-2 border-t border-slate-700/50">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-slate-400">Overall Rating</span>

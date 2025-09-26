@@ -19,11 +19,11 @@ const FieldMarkings: React.FC<FieldMarkingsProps> = ({ showGrid, viewMode }) => 
           <stop offset="50%" stopColor="rgba(255,255,255,1)" />
           <stop offset="100%" stopColor="rgba(255,255,255,0.7)" />
         </linearGradient>
-        
+
         <filter id="fieldLineShadow" x="-50%" y="-50%" width="200%" height="200%">
           <feDropShadow dx="0" dy="1" stdDeviation="0.5" floodColor="rgba(0,0,0,0.4)" />
         </filter>
-        
+
         <filter id="fieldLineGlow" x="-50%" y="-50%" width="200%" height="200%">
           <feGaussianBlur stdDeviation="0.8" result="coloredBlur"/>
           <feMerge>

@@ -8,7 +8,7 @@ interface PlayerDragLayerProps {
 }
 
 const PlayerDragLayer: React.FC<PlayerDragLayerProps> = ({ isDragging, currentPlayer }) => {
-  if (!isDragging || !currentPlayer) return null;
+  if (!isDragging || !currentPlayer) {return null;}
 
   return (
     <AnimatePresence>
@@ -20,7 +20,7 @@ const PlayerDragLayer: React.FC<PlayerDragLayerProps> = ({ isDragging, currentPl
       >
         {/* Drag Overlay */}
         <div className="absolute inset-0 bg-slate-900/20 backdrop-blur-[1px]" />
-        
+
         {/* Player Info Card */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8, y: 20 }}

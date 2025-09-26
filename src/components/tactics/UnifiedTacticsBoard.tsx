@@ -7,10 +7,10 @@ import { ContextualToolbar } from './ContextualToolbar';
 import { SmartSidebar } from './SmartSidebar';
 import { PlayerDragLayer } from './PlayerDragLayer';
 import { type Player, type Formation } from '../../types';
-import { 
-  Users, 
-  Zap, 
-  Brain, 
+import {
+  Users,
+  Zap,
+  Brain,
   Settings,
   Maximize2,
   Minimize2,
@@ -19,7 +19,7 @@ import {
   Save,
   Share2,
   Activity,
-  Eye
+  Eye,
 } from 'lucide-react';
 
 // Lazy load heavy components for better performance
@@ -39,12 +39,12 @@ interface UnifiedTacticsBoardProps {
 type ViewMode = 'standard' | 'fullscreen' | 'presentation';
 type PanelState = 'collapsed' | 'peek' | 'expanded';
 
-const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({ 
+const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
   className,
   onSimulateMatch,
   onSaveFormation,
   onAnalyticsView,
-  onExportFormation
+  onExportFormation,
 }) => {
   const { tacticsState, dispatch } = useTacticsContext();
   const { uiState } = useUIContext();
@@ -62,7 +62,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
   const [isDragging, setIsDragging] = useState(false);
   const [showHeatMap, setShowHeatMap] = useState(false);
   const [showPlayerStats, setShowPlayerStats] = useState(false);
-  
+
   // Performance optimizations
   const fieldRef = useRef<HTMLDivElement>(null);
   const animationFrameRef = useRef<number | null>(null);
@@ -91,13 +91,13 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
   // Enhanced player movement handler
   const handlePlayerMove = useCallback((playerId: string, position: { x: number; y: number }) => {
     if (animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current);
+      (window as any).cancelAnimationFrame(animationFrameRef.current);
     }
 
-    animationFrameRef.current = requestAnimationFrame(() => {
+    animationFrameRef.current = (window as any).requestAnimationFrame(() => {
       dispatch({
         type: 'UPDATE_PLAYER_POSITION',
-        payload: { playerId, position }
+        payload: { playerId, position },
       });
     });
   }, [dispatch]);
@@ -106,7 +106,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
   const handleFormationChange = useCallback((formation: Formation) => {
     dispatch({
       type: 'UPDATE_FORMATION',
-      payload: formation
+      payload: formation,
     });
   }, [dispatch]);
 
@@ -121,16 +121,16 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
   // Smart panel toggle
   const toggleLeftPanel = useCallback(() => {
     setLeftPanelState(prev => {
-      if (prev === 'collapsed') return 'peek';
-      if (prev === 'peek') return 'expanded';
+      if (prev === 'collapsed') {return 'peek';}
+      if (prev === 'peek') {return 'expanded';}
       return 'collapsed';
     });
   }, []);
 
   const toggleRightPanel = useCallback(() => {
     setRightPanelState(prev => {
-      if (prev === 'collapsed') return 'peek';
-      if (prev === 'peek') return 'expanded';
+      if (prev === 'collapsed') {return 'peek';}
+      if (prev === 'peek') {return 'expanded';}
       return 'collapsed';
     });
   }, []);
@@ -157,7 +157,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
       icon: Users,
       label: 'Formations',
       action: () => setShowFormationTemplates(true),
-      isActive: showFormationTemplates
+      isActive: showFormationTemplates,
     },
     {
       id: 'simulate',
@@ -168,7 +168,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
           onSimulateMatch(currentFormation);
         }
       },
-      disabled: !currentFormation || !onSimulateMatch
+      disabled: !currentFormation || !onSimulateMatch,
     },
     {
       id: 'analytics',
@@ -179,14 +179,14 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
           onAnalyticsView();
         }
       },
-      disabled: !onAnalyticsView
+      disabled: !onAnalyticsView,
     },
     {
       id: 'playbook',
       icon: Save,
       label: 'Tactical Playbook',
       action: () => setShowTacticalPlaybook(true),
-      isActive: showTacticalPlaybook
+      isActive: showTacticalPlaybook,
     },
     {
       id: 'export',
@@ -197,75 +197,75 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
           onExportFormation(currentFormation);
         }
       },
-      disabled: !currentFormation || !onExportFormation
+      disabled: !currentFormation || !onExportFormation,
     },
     {
       id: 'ai-assistant',
       icon: Brain,
       label: 'AI Assistant',
       action: () => setShowAIAssistant(true),
-      isActive: showAIAssistant
+      isActive: showAIAssistant,
     },
     {
       id: 'heatmap',
       icon: Activity,
       label: 'Heat Map',
       action: () => setShowHeatMap(!showHeatMap),
-      isActive: showHeatMap
+      isActive: showHeatMap,
     },
     {
       id: 'player-stats',
       icon: Eye,
       label: 'Player Stats',
       action: () => setShowPlayerStats(!showPlayerStats),
-      isActive: showPlayerStats
+      isActive: showPlayerStats,
     },
     {
       id: 'analysis',
       icon: Zap,
       label: 'Live Analysis',
       action: () => setShowAnalyticsPanel(true),
-      isActive: showAnalyticsPanel
+      isActive: showAnalyticsPanel,
     },
     {
       id: 'fullscreen',
       icon: viewMode === 'fullscreen' ? Minimize2 : Maximize2,
       label: viewMode === 'fullscreen' ? 'Exit Fullscreen' : 'Fullscreen',
-      action: viewMode === 'fullscreen' ? exitFullscreen : enterFullscreen
-    }
+      action: viewMode === 'fullscreen' ? exitFullscreen : enterFullscreen,
+    },
   ], [
-    showFormationTemplates, 
-    showAIAssistant, 
+    showFormationTemplates,
+    showAIAssistant,
     showTacticalPlaybook,
     showAnalyticsPanel,
     showHeatMap,
     showPlayerStats,
-    viewMode, 
+    viewMode,
     currentFormation,
     onSimulateMatch,
     onAnalyticsView,
     onSaveFormation,
     onExportFormation,
-    dispatch, 
-    enterFullscreen, 
-    exitFullscreen
+    dispatch,
+    enterFullscreen,
+    exitFullscreen,
   ]);
 
   // Layout calculations
   const layoutClasses = useMemo(() => {
     const leftWidth = leftPanelState === 'expanded' ? 'w-80' : leftPanelState === 'peek' ? 'w-16' : 'w-0';
     const rightWidth = rightPanelState === 'expanded' ? 'w-80' : rightPanelState === 'peek' ? 'w-16' : 'w-0';
-    
+
     return {
       leftPanel: `${leftWidth} transition-all duration-300 ease-out`,
       rightPanel: `${rightWidth} transition-all duration-300 ease-out`,
       mainArea: 'flex-1 min-w-0',
-      container: viewMode === 'fullscreen' ? 'fixed inset-0 z-50' : 'h-full'
+      container: viewMode === 'fullscreen' ? 'fixed inset-0 z-50' : 'h-full',
     };
   }, [leftPanelState, rightPanelState, viewMode]);
 
   return (
-    <div 
+    <div
       ref={fieldRef}
       className={`
         ${layoutClasses.container} 
@@ -279,20 +279,20 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
       tabIndex={-1}
     >
       {/* Background Effects */}
-      <div 
+      <div
         className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-emerald-900/10 via-slate-900/50 to-slate-950"
         aria-hidden="true"
       />
-      
+
       <div className="relative z-10 h-full flex">
         {/* Smart Left Sidebar */}
         <AnimatePresence mode="wait">
           {leftPanelState !== 'collapsed' && (
             <motion.aside
               initial={{ width: 0, opacity: 0 }}
-              animate={{ 
-                width: leftPanelState === 'expanded' ? 320 : 64, 
-                opacity: 1 
+              animate={{
+                width: leftPanelState === 'expanded' ? 320 : 64,
+                opacity: 1,
               }}
               exit={{ width: 0, opacity: 0 }}
               transition={{ duration: 0.3, ease: "easeOut" }}
@@ -329,7 +329,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
           </header>
 
           {/* Field Container */}
-          <main 
+          <main
             className="flex-1 relative overflow-hidden"
             role="main"
             aria-label="Tactical field workspace"
@@ -348,7 +348,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
             />
 
             {/* Quick Actions Panel */}
-            <nav 
+            <nav
               aria-label="Quick actions"
               role="navigation"
             >
@@ -371,9 +371,9 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
           {rightPanelState !== 'collapsed' && (
             <motion.aside
               initial={{ width: 0, opacity: 0 }}
-              animate={{ 
-                width: rightPanelState === 'expanded' ? 320 : 64, 
-                opacity: 1 
+              animate={{
+                width: rightPanelState === 'expanded' ? 320 : 64,
+                opacity: 1,
               }}
               exit={{ width: 0, opacity: 0 }}
               transition={{ duration: 0.3, ease: "easeOut" }}
@@ -398,7 +398,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
       <AnimatePresence>
         {showFormationTemplates && (
           <Suspense fallback={
-            <div 
+            <div
               className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center"
               aria-live="polite"
               aria-label="Loading formation templates"
@@ -418,7 +418,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
 
         {showAIAssistant && (
           <Suspense fallback={
-            <div 
+            <div
               className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center"
               aria-live="polite"
               aria-label="Loading AI assistant"
@@ -442,7 +442,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
 
         {showTacticalPlaybook && (
           <Suspense fallback={
-            <div 
+            <div
               className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center"
               aria-live="polite"
               aria-label="Loading tactical playbook"
@@ -465,7 +465,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
 
         {showAnalyticsPanel && (
           <Suspense fallback={
-            <div 
+            <div
               className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center"
               aria-live="polite"
               aria-label="Loading tactical analytics"

@@ -55,12 +55,12 @@ const SmartLineupOptimizer: React.FC<SmartLineupOptimizerProps> = ({
 
   const optimizeLineup = async () => {
     if (!opponent.trim()) {
-      alert('Please enter an opponent name');
+      console.log('Please enter an opponent name');
       return;
     }
 
     if (!matchStrategyService.isAIAvailable()) {
-      alert('AI service is not available. Please configure your API key.');
+      console.log('AI service is not available. Please configure your API key.');
       return;
     }
 

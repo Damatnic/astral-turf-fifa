@@ -20,7 +20,7 @@ const QuickActionsPanel: React.FC<QuickActionsPanelProps> = ({ actions, position
   const positionClasses = {
     'bottom-right': 'bottom-6 right-6',
     'bottom-center': 'bottom-6 left-1/2 transform -translate-x-1/2',
-    'bottom-left': 'bottom-6 left-6'
+    'bottom-left': 'bottom-6 left-6',
   };
 
   return (
@@ -54,7 +54,7 @@ const QuickActionsPanel: React.FC<QuickActionsPanelProps> = ({ actions, position
               title={action.disabled ? `${action.label} (unavailable)` : action.label}
             >
               <IconComponent className="w-5 h-5" />
-              
+
               {/* Tooltip */}
               <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                 <div className="bg-slate-900/95 text-white text-xs px-2 py-1 rounded border border-slate-700/50 whitespace-nowrap">

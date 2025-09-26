@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  BookOpen, 
-  Save, 
-  Trash2, 
-  Download, 
+import {
+  BookOpen,
+  Save,
+  Trash2,
+  Download,
   Upload,
   Star,
   Calendar,
@@ -12,7 +12,7 @@ import {
   Target,
   X,
   Search,
-  Filter
+  Filter,
 } from 'lucide-react';
 import { type Formation, type Player } from '../../types';
 import { type FormationExport, tacticalIntegrationService } from '../../services/tacticalIntegrationService';
@@ -30,7 +30,7 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
   currentPlayers,
   onLoadFormation,
   onClose,
-  isOpen
+  isOpen,
 }) => {
   const [savedFormations, setSavedFormations] = useState<FormationExport[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -54,7 +54,7 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
         setSavedFormations(JSON.parse(saved));
       }
     } catch (error) {
-      console.error('Failed to load saved formations:', error);
+      // console.error('Failed to load saved formations:', error);
     }
   };
 
@@ -65,7 +65,7 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
         setFavorites(new Set(JSON.parse(favs)));
       }
     } catch (error) {
-      console.error('Failed to load favorites:', error);
+      // console.error('Failed to load favorites:', error);
     }
   };
 
@@ -74,30 +74,30 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
       localStorage.setItem('favoriteFormations', JSON.stringify([...newFavorites]));
       setFavorites(newFavorites);
     } catch (error) {
-      console.error('Failed to save favorites:', error);
+      // console.error('Failed to save favorites:', error);
     }
   };
 
   const handleSaveCurrentFormation = async () => {
-    if (!currentFormation || !formationName.trim()) return;
+    if (!currentFormation || !formationName.trim()) {return;}
 
     try {
       const players = currentPlayers || [];
       const analysis = await tacticalIntegrationService.analyzeFormation(currentFormation, players);
       const exportData = tacticalIntegrationService.exportFormation(
-        { ...currentFormation, name: formationName.trim() }, 
-        players, 
-        analysis
+        { ...currentFormation, name: formationName.trim() },
+        players,
+        analysis,
       );
 
       const updatedFormations = [...savedFormations, exportData];
       setSavedFormations(updatedFormations);
       localStorage.setItem('savedFormations', JSON.stringify(updatedFormations));
-      
+
       setShowSaveDialog(false);
       setFormationName('');
     } catch (error) {
-      console.error('Failed to save formation:', error);
+      // console.error('Failed to save formation:', error);
     }
   };
 
@@ -105,7 +105,7 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
     const updatedFormations = savedFormations.filter(f => f.id !== id);
     setSavedFormations(updatedFormations);
     localStorage.setItem('savedFormations', JSON.stringify(updatedFormations));
-    
+
     // Remove from favorites if exists
     if (favorites.has(id)) {
       const newFavorites = new Set(favorites);
@@ -131,7 +131,7 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
     input.onchange = (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (file) {
-        const reader = new FileReader();
+        const reader = new (window as any).FileReader();
         reader.onload = (e) => {
           try {
             const importedData = JSON.parse(e.target?.result as string);
@@ -141,7 +141,7 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
               localStorage.setItem('savedFormations', JSON.stringify(updatedFormations));
             }
           } catch (error) {
-            console.error('Failed to import formation:', error);
+            // console.error('Failed to import formation:', error);
           }
         };
         reader.readAsText(file);
@@ -151,7 +151,7 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
   };
 
   const handleExportFormation = (formation: FormationExport) => {
-    const blob = new Blob([JSON.stringify(formation, null, 2)], { type: 'application/json' });
+    const blob = new (window as any).Blob([JSON.stringify(formation, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
@@ -169,7 +169,7 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
     // Apply search filter
     if (searchTerm) {
       filtered = filtered.filter(formation =>
-        formation.name.toLowerCase().includes(searchTerm.toLowerCase())
+        formation.name.toLowerCase().includes(searchTerm.toLowerCase()),
       );
     }
 
@@ -188,7 +188,7 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
     return filtered;
   }, [savedFormations, searchTerm, filterBy, favorites]);
 
-  if (!isOpen) return null;
+  if (!isOpen) {return null;}
 
   return (
     <AnimatePresence>
@@ -212,7 +212,7 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
               <h2 className="text-xl font-bold text-white">Tactical Playbook</h2>
               <span className="text-sm text-slate-400">({filteredFormations.length} formations)</span>
             </div>
-            
+
             <div className="flex items-center gap-2">
               <motion.button
                 whileHover={{ scale: 1.05 }}
@@ -224,7 +224,7 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
                 <Save className="w-4 h-4" />
                 Save Current
               </motion.button>
-              
+
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -234,7 +234,7 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
                 <Upload className="w-4 h-4" />
                 Import
               </motion.button>
-              
+
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -259,12 +259,12 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
                   className="w-full pl-10 pr-4 py-2 bg-slate-800/50 border border-slate-700/50 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-blue-500/50"
                 />
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <Filter className="w-4 h-4 text-slate-400" />
                 <select
                   value={filterBy}
-                  onChange={(e) => setFilterBy(e.target.value as any)}
+                  onChange={(e) => setFilterBy(e.target.value as 'all' | 'favorite' | 'recent')}
                   className="bg-slate-800/50 border border-slate-700/50 rounded-lg text-white px-3 py-2 focus:outline-none focus:border-blue-500/50"
                 >
                   <option value="all">All</option>
@@ -296,7 +296,7 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
                   >
                     <div className="flex items-start justify-between mb-3">
                       <h3 className="font-semibold text-white truncate">{formation.name}</h3>
-                      
+
                       <div className="flex items-center gap-1">
                         <motion.button
                           whileHover={{ scale: 1.1 }}
@@ -306,7 +306,7 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
                         >
                           <Star className="w-4 h-4" fill={favorites.has(formation.id) ? 'currentColor' : 'none'} />
                         </motion.button>
-                        
+
                         <motion.button
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
@@ -315,7 +315,7 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
                         >
                           <Download className="w-4 h-4" />
                         </motion.button>
-                        
+
                         <motion.button
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
@@ -332,12 +332,12 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
                         <Users className="w-3 h-3" />
                         <span>{formation.players.length} players</span>
                       </div>
-                      
+
                       <div className="flex items-center gap-2 text-sm text-slate-400">
                         <Target className="w-3 h-3" />
                         <span>Effectiveness: {formation.analysis.effectiveness}%</span>
                       </div>
-                      
+
                       <div className="flex items-center gap-2 text-sm text-slate-400">
                         <Calendar className="w-3 h-3" />
                         <span>{new Date(formation.timestamp).toLocaleDateString()}</span>
@@ -381,7 +381,7 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
                 className="bg-slate-900/95 border border-slate-700/50 rounded-xl p-6 w-full max-w-md"
               >
                 <h3 className="text-lg font-semibold text-white mb-4">Save Formation</h3>
-                
+
                 <input
                   type="text"
                   placeholder="Enter formation name..."
@@ -390,7 +390,7 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
                   className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700/50 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-blue-500/50 mb-4"
                   autoFocus
                 />
-                
+
                 <div className="flex items-center gap-3">
                   <motion.button
                     whileHover={{ scale: 1.05 }}
@@ -401,7 +401,7 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
                   >
                     Save Formation
                   </motion.button>
-                  
+
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}

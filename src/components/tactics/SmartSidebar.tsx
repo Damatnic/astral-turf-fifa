@@ -1,14 +1,14 @@
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Users, 
-  Search, 
-  Filter, 
-  Star, 
-  BarChart3, 
+import {
+  Users,
+  Search,
+  Filter,
+  Star,
+  BarChart3,
   Target,
   ChevronRight,
-  ChevronDown
+  ChevronDown,
 } from 'lucide-react';
 import { type Formation, type Player } from '../../types';
 
@@ -29,7 +29,7 @@ const SmartSidebar: React.FC<SmartSidebarProps> = ({
   formation,
   selectedPlayer,
   onPlayerSelect,
-  side
+  side,
 }) => {
   const [activeContent, setActiveContent] = useState<SidebarContent>('players');
   const [searchQuery, setSearchQuery] = useState('');
@@ -47,14 +47,14 @@ const SmartSidebar: React.FC<SmartSidebarProps> = ({
     { id: '8', name: 'Viktor Petrov', roleId: 'left-winger', rating: 84, age: 23, pace: 92, technical: 85 },
     { id: '9', name: 'Roberto Santos', roleId: 'striker', rating: 90, age: 28, pace: 88, technical: 87 },
     { id: '10', name: 'James Thompson', roleId: 'right-winger', rating: 83, age: 22, pace: 90, technical: 82 },
-    { id: '11', name: 'Luca Bianchi', roleId: 'striker', rating: 86, age: 30, pace: 78, technical: 89 }
+    { id: '11', name: 'Luca Bianchi', roleId: 'striker', rating: 86, age: 30, pace: 78, technical: 89 },
   ], []);
 
   // Filtered players
   const filteredPlayers = useMemo(() => {
     return allPlayers.filter(player =>
       player.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      player.roleId.toLowerCase().includes(searchQuery.toLowerCase())
+      player.roleId.toLowerCase().includes(searchQuery.toLowerCase()),
     );
   }, [allPlayers, searchQuery]);
 
@@ -62,15 +62,15 @@ const SmartSidebar: React.FC<SmartSidebarProps> = ({
   const groupedPlayers = useMemo(() => {
     const groups = {
       goalkeeper: filteredPlayers.filter(p => p.roleId === 'goalkeeper'),
-      defense: filteredPlayers.filter(p => 
-        p.roleId.includes('back') || p.roleId.includes('center-back')
+      defense: filteredPlayers.filter(p =>
+        p.roleId.includes('back') || p.roleId.includes('center-back'),
       ),
-      midfield: filteredPlayers.filter(p => 
-        p.roleId.includes('midfielder') && !p.roleId.includes('attacking')
+      midfield: filteredPlayers.filter(p =>
+        p.roleId.includes('midfielder') && !p.roleId.includes('attacking'),
       ),
-      attack: filteredPlayers.filter(p => 
-        p.roleId.includes('winger') || p.roleId.includes('striker') || p.roleId.includes('attacking-midfielder')
-      )
+      attack: filteredPlayers.filter(p =>
+        p.roleId.includes('winger') || p.roleId.includes('striker') || p.roleId.includes('attacking-midfielder'),
+      ),
     };
     return groups;
   }, [filteredPlayers]);
@@ -79,7 +79,7 @@ const SmartSidebar: React.FC<SmartSidebarProps> = ({
     { id: 'players', name: 'Players', icon: Users, count: allPlayers.length },
     { id: 'formations', name: 'Formations', icon: Target, count: 5 },
     { id: 'analytics', name: 'Analytics', icon: BarChart3, count: 0 },
-    { id: 'tools', name: 'Tools', icon: Star, count: 0 }
+    { id: 'tools', name: 'Tools', icon: Star, count: 0 },
   ];
 
   const toggleSection = (section: string) => {
@@ -113,7 +113,7 @@ const SmartSidebar: React.FC<SmartSidebarProps> = ({
       onClick={() => onPlayerSelect(player)}
     >
       <div className="flex items-center gap-3">
-        <div 
+        <div
           className={`
             w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm
             ${isAssigned ? 'bg-green-600' : 'bg-blue-600'}
@@ -121,7 +121,7 @@ const SmartSidebar: React.FC<SmartSidebarProps> = ({
         >
           {player.number || player.name.charAt(0)}
         </div>
-        
+
         {state === 'expanded' && (
           <div className="flex-1 min-w-0">
             <div className="text-white font-medium text-sm truncate">
@@ -146,7 +146,7 @@ const SmartSidebar: React.FC<SmartSidebarProps> = ({
     </motion.div>
   );
 
-  if (state === 'collapsed') return null;
+  if (state === 'collapsed') {return null;}
 
   return (
     <div className="h-full flex flex-col">
@@ -155,7 +155,7 @@ const SmartSidebar: React.FC<SmartSidebarProps> = ({
         {state === 'expanded' ? (
           <div>
             <h3 className="text-white font-semibold mb-3">Tactical Manager</h3>
-            
+
             {/* Content Tabs */}
             <div className="grid grid-cols-2 gap-1 bg-slate-800/50 rounded-lg p-1">
               {sidebarContent.slice(0, 2).map(content => {
@@ -229,10 +229,10 @@ const SmartSidebar: React.FC<SmartSidebarProps> = ({
 
             {/* Player Groups */}
             {Object.entries(groupedPlayers).map(([group, players]) => {
-              if (players.length === 0) return null;
-              
+              if (players.length === 0) {return null;}
+
               const isExpanded = expandedSections.has(group);
-              
+
               return (
                 <div key={group}>
                   {state === 'expanded' && (
@@ -250,7 +250,7 @@ const SmartSidebar: React.FC<SmartSidebarProps> = ({
                       )}
                     </button>
                   )}
-                  
+
                   <AnimatePresence>
                     {(state === 'peek' || isExpanded) && (
                       <motion.div

@@ -2,13 +2,13 @@ import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { type Formation, type Player } from '../../types';
 import { aiCoachingService, type CoachingRecommendation } from '../../services/aiCoachingService';
-import { 
-  Brain, 
-  X, 
-  Zap, 
-  Target, 
-  Shield, 
-  TrendingUp, 
+import {
+  Brain,
+  X,
+  Zap,
+  Target,
+  Shield,
+  TrendingUp,
   AlertTriangle,
   CheckCircle,
   Lightbulb,
@@ -17,7 +17,7 @@ import {
   Star,
   Clock,
   Users,
-  Settings
+  Settings,
 } from 'lucide-react';
 
 interface IntelligentAssistantProps {
@@ -57,7 +57,7 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
   onFormationChange,
   onPlayerSelect,
   onClose,
-  players = []
+  players = [],
 }) => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
@@ -68,20 +68,20 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
 
   // Generate AI coaching recommendations
   const generateCoachingRecommendations = useCallback(async () => {
-    if (!currentFormation || players.length === 0) return;
+    if (!currentFormation || players.length === 0) {return;}
 
     setIsAnalyzing(true);
-    
+
     try {
       const recommendations = await aiCoachingService.generateCoachingRecommendations(
-        currentFormation, 
+        currentFormation,
         players,
         {
           gamePhase: 'mid',
-          gameState: 'normal'
-        }
+          gameState: 'normal',
+        },
       );
-      
+
       setCoachingRecommendations(recommendations);
     } catch (error) {
       console.error('Failed to generate coaching recommendations:', error);
@@ -92,10 +92,10 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
 
   // Analyze current formation (legacy)
   const analyzeFormation = useCallback(async () => {
-    if (!currentFormation) return;
+    if (!currentFormation) {return;}
 
     setIsAnalyzing(true);
-    
+
     // Simulate AI analysis delay
     await new Promise(resolve => setTimeout(resolve, 1500));
 
@@ -109,12 +109,12 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
       strengths: [
         'Good positional balance',
         'Strong midfield presence',
-        'Adequate defensive coverage'
+        'Adequate defensive coverage',
       ],
       weaknesses: [
         'Limited attacking width',
         'Potential midfield overload',
-        'Vulnerable to counter-attacks'
+        'Vulnerable to counter-attacks',
       ],
       suggestions: [
         {
@@ -123,7 +123,7 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
           title: 'Improve Formation Balance',
           description: 'Consider moving players to create better spacing between lines',
           confidence: 85,
-          priority: 'medium'
+          priority: 'medium',
         },
         {
           id: 'player-roles',
@@ -131,7 +131,7 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
           title: 'Optimize Player Roles',
           description: 'Some players may be better suited for different positions',
           confidence: 72,
-          priority: 'low'
+          priority: 'low',
         },
         {
           id: 'tactical-adjustment',
@@ -139,14 +139,14 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
           title: 'Tactical Weakness Detected',
           description: 'Your right flank appears vulnerable to attacks. Consider defensive reinforcement.',
           confidence: 91,
-          priority: 'high'
-        }
+          priority: 'high',
+        },
       ],
       formationBalance: {
         attack: Math.round(60 + Math.random() * 30),
         midfield: Math.round(70 + Math.random() * 25),
-        defense: Math.round(75 + Math.random() * 20)
-      }
+        defense: Math.round(75 + Math.random() * 20),
+      },
     };
 
     setAnalysisResult(analysis);
@@ -160,12 +160,12 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
 
   // Handle chat message sending
   const handleSendMessage = useCallback(() => {
-    if (!chatInput.trim()) return;
+    if (!chatInput.trim()) {return;}
 
     const userMessage = {
       id: Date.now().toString(),
       type: 'user' as const,
-      content: chatInput.trim()
+      content: chatInput.trim(),
     };
 
     setChatMessages(prev => [...prev, userMessage]);
@@ -176,7 +176,7 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
       const aiResponse = {
         id: (Date.now() + 1).toString(),
         type: 'ai' as const,
-        content: generateAIResponse(userMessage.content)
+        content: generateAIResponse(userMessage.content),
       };
       setChatMessages(prev => [...prev, aiResponse]);
     }, 1000);
@@ -185,7 +185,7 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
   // Generate AI response based on user input
   const generateAIResponse = useCallback((userInput: string) => {
     const lowerInput = userInput.toLowerCase();
-    
+
     if (lowerInput.includes('formation')) {
       return "Based on your current setup, I'd recommend maintaining the 4-3-3 structure but adjusting the midfield positioning for better ball retention. The wide forwards should track back more to help with defensive transitions.";
     } else if (lowerInput.includes('player') || lowerInput.includes('position')) {
@@ -201,10 +201,10 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
 
   // Suggestion priority icons
   const getSuggestionIcon = useCallback((type: Suggestion['type'], priority: Suggestion['priority']) => {
-    if (priority === 'high') return AlertTriangle;
-    if (type === 'formation') return Target;
-    if (type === 'player') return Zap;
-    if (type === 'tactical') return TrendingUp;
+    if (priority === 'high') {return AlertTriangle;}
+    if (type === 'formation') {return Target;}
+    if (type === 'player') {return Zap;}
+    if (type === 'tactical') {return TrendingUp;}
     return Lightbulb;
   }, []);
 
@@ -257,7 +257,7 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
             {[
               { id: 'coaching', name: 'AI Coaching', icon: Brain },
               { id: 'analysis', name: 'Analysis', icon: Target },
-              { id: 'chat', name: 'Chat', icon: MessageCircle }
+              { id: 'chat', name: 'Chat', icon: MessageCircle },
             ].map(tab => {
               const IconComponent = tab.icon;
               return (
@@ -326,14 +326,14 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
                         critical: 'border-red-500/50 bg-red-900/20',
                         high: 'border-orange-500/50 bg-orange-900/20',
                         medium: 'border-yellow-500/50 bg-yellow-900/20',
-                        low: 'border-blue-500/50 bg-blue-900/20'
+                        low: 'border-blue-500/50 bg-blue-900/20',
                       };
 
                       const impactIcons = {
                         'game-changing': Star,
                         'significant': TrendingUp,
                         'moderate': Target,
-                        'minor': Settings
+                        'minor': Settings,
                       };
 
                       const ImpactIcon = impactIcons[recommendation.impact] || Settings;
@@ -357,7 +357,7 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
                                 <p className="text-slate-400 text-xs italic">{recommendation.reasoning}</p>
                               </div>
                             </div>
-                            
+
                             <div className="flex flex-col items-end gap-2">
                               <span className={`px-2 py-1 rounded text-xs font-medium uppercase ${
                                 recommendation.priority === 'critical' ? 'bg-red-600 text-white' :
@@ -367,7 +367,7 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
                               }`}>
                                 {recommendation.priority}
                               </span>
-                              
+
                               <div className="flex items-center gap-1 text-xs text-slate-400">
                                 <Clock className="w-3 h-3" />
                                 {recommendation.confidence}% confidence
@@ -394,7 +394,7 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
                               <span>Impact: {recommendation.impact.replace('-', ' ')}</span>
                               <span>Type: {recommendation.type}</span>
                             </div>
-                            
+
                             <button
                               onClick={() => aiCoachingService.storeRecommendation(recommendation)}
                               className="px-3 py-1 bg-slate-700/50 text-slate-300 rounded text-xs hover:bg-slate-700 transition-colors"
@@ -435,7 +435,7 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
                           {analysisResult.overallRating}/100
                         </div>
                       </div>
-                      
+
                       {/* Balance Meters */}
                       <div className="grid grid-cols-3 gap-4">
                         {Object.entries(analysisResult.formationBalance).map(([area, rating]) => (
@@ -492,7 +492,7 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
                 {analysisResult.suggestions.map(suggestion => {
                   const IconComponent = getSuggestionIcon(suggestion.type, suggestion.priority);
                   const colorClasses = getSuggestionColor(suggestion.priority);
-                  
+
                   return (
                     <motion.div
                       key={suggestion.id}
@@ -536,7 +536,7 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
                       <p className="text-sm mt-2">I can help with formations, player positioning, and tactical strategies.</p>
                     </div>
                   )}
-                  
+
                   {chatMessages.map(message => (
                     <motion.div
                       key={message.id}
@@ -591,7 +591,7 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
               <Zap className="w-4 h-4" />
               {isAnalyzing ? 'Analyzing...' : 'Re-analyze Formation'}
             </button>
-            
+
             <div className="text-sm text-slate-400">
               AI analysis based on professional tactical principles
             </div>

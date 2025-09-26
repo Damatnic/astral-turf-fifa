@@ -37,18 +37,18 @@ const ModernField: React.FC<ModernFieldProps> = ({
   viewMode,
   players = [],
   showHeatMap = false,
-  showPlayerStats = false
+  showPlayerStats = false,
 }) => {
   const fieldRef = useRef<HTMLDivElement>(null);
   const { isMobile, isTablet } = useResponsive();
-  
+
   const [dragState, setDragState] = useState<DragState>({
     playerId: null,
     startPosition: null,
     currentPosition: null,
-    isValid: true
+    isValid: true,
   });
-  
+
   const [fieldDimensions, setFieldDimensions] = useState({ width: 0, height: 0 });
   const [hoveredSlot, setHoveredSlot] = useState<string | null>(null);
   const [showGrid, setShowGrid] = useState(false);
@@ -63,7 +63,7 @@ const ModernField: React.FC<ModernFieldProps> = ({
     };
 
     updateDimensions();
-    const resizeObserver = new ResizeObserver(updateDimensions);
+    const resizeObserver = new (window as any).ResizeObserver(updateDimensions);
     if (fieldRef.current) {
       resizeObserver.observe(fieldRef.current);
     }
@@ -78,12 +78,12 @@ const ModernField: React.FC<ModernFieldProps> = ({
 
   // Convert screen coordinates to field percentage
   const screenToFieldPosition = useCallback((clientX: number, clientY: number) => {
-    if (!fieldRef.current) return null;
-    
+    if (!fieldRef.current) {return null;}
+
     const rect = fieldRef.current.getBoundingClientRect();
     const x = ((clientX - rect.left) / rect.width) * 100;
     const y = ((clientY - rect.top) / rect.height) * 100;
-    
+
     return { x: Math.max(0, Math.min(100, x)), y: Math.max(0, Math.min(100, y)) };
   }, []);
 
@@ -93,29 +93,29 @@ const ModernField: React.FC<ModernFieldProps> = ({
       playerId: player.id,
       startPosition: startPos,
       currentPosition: startPos,
-      isValid: true
+      isValid: true,
     });
     setIsDragging(true);
     onPlayerSelect(player);
-    
+
     // Enable grid during drag
     setShowGrid(true);
   }, [setIsDragging, onPlayerSelect]);
 
   // Enhanced drag handler with haptic feedback
   const handleDrag = useCallback((info: PanInfo) => {
-    if (!dragState.playerId || !fieldRef.current) return;
+    if (!dragState.playerId || !fieldRef.current) {return;}
 
     const rect = fieldRef.current.getBoundingClientRect();
     const x = ((info.point.x - rect.left) / rect.width) * 100;
     const y = ((info.point.y - rect.top) / rect.height) * 100;
-    
+
     const isValid = validatePosition(x, y);
-    
+
     setDragState(prev => ({
       ...prev,
       currentPosition: { x, y },
-      isValid
+      isValid,
     }));
 
     // Haptic feedback for mobile devices
@@ -135,16 +135,16 @@ const ModernField: React.FC<ModernFieldProps> = ({
         playerId: null,
         startPosition: null,
         currentPosition: null,
-        isValid: true
+        isValid: true,
       });
       return;
     }
 
     const { x, y } = dragState.currentPosition;
-    
+
     if (dragState.isValid && validatePosition(x, y)) {
       onPlayerMove(dragState.playerId, { x, y });
-      
+
       // Success haptic feedback
       if (isMobile && 'vibrate' in navigator) {
         navigator.vibrate([50, 50, 50]); // Triple pulse for success
@@ -157,20 +157,20 @@ const ModernField: React.FC<ModernFieldProps> = ({
       playerId: null,
       startPosition: null,
       currentPosition: null,
-      isValid: true
+      isValid: true,
     });
   }, [dragState, validatePosition, onPlayerMove, setIsDragging, isMobile]);
 
   // Touch-friendly field tap handler
   const handleFieldTap = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
-    if (isDragging) return;
+    if (isDragging) {return;}
 
     const position = screenToFieldPosition(event.clientX, event.clientY);
-    if (!position || !selectedPlayer) return;
+    if (!position || !selectedPlayer) {return;}
 
     if (validatePosition(position.x, position.y)) {
       onPlayerMove(selectedPlayer.id, position);
-      
+
       // Tap feedback
       if (isMobile && 'vibrate' in navigator) {
         navigator.vibrate(30);
@@ -180,25 +180,25 @@ const ModernField: React.FC<ModernFieldProps> = ({
 
   // Memoized formation slots
   const formationSlots = useMemo(() => {
-    if (!formation?.slots) return [];
-    return formation.slots.filter(slot => 
-      slot?.position && 
-      typeof slot.position.x === 'number' && 
-      typeof slot.position.y === 'number'
+    if (!formation?.slots) {return [];}
+    return formation.slots.filter(slot =>
+      slot?.position &&
+      typeof slot.position.x === 'number' &&
+      typeof slot.position.y === 'number',
     );
   }, [formation?.slots]);
 
   // Render player tokens
   const renderPlayers = useCallback(() => {
     return formationSlots.map(slot => {
-      if (!slot.playerId) return null;
+      if (!slot.playerId) {return null;}
 
       const player = formation?.players?.find(p => p.id === slot.playerId);
-      if (!player) return null;
+      if (!player) {return null;}
 
       const isDraggingThis = dragState.playerId === player.id;
-      const position = isDraggingThis && dragState.currentPosition 
-        ? dragState.currentPosition 
+      const position = isDraggingThis && dragState.currentPosition
+        ? dragState.currentPosition
         : slot.position;
 
       return (
@@ -218,15 +218,15 @@ const ModernField: React.FC<ModernFieldProps> = ({
       );
     });
   }, [
-    formationSlots, 
-    formation?.players, 
-    dragState, 
-    selectedPlayer?.id, 
-    handleDragStart, 
-    handleDrag, 
-    handleDragEnd, 
+    formationSlots,
+    formation?.players,
+    dragState,
+    selectedPlayer?.id,
+    handleDragStart,
+    handleDrag,
+    handleDragEnd,
     onPlayerSelect,
-    isMobile
+    isMobile,
   ]);
 
   return (
@@ -253,7 +253,7 @@ const ModernField: React.FC<ModernFieldProps> = ({
             inset 0 0 100px rgba(0, 0, 0, 0.3),
             inset 0 0 50px rgba(34, 197, 94, 0.1),
             ${viewMode !== 'fullscreen' ? '0 20px 40px rgba(0, 0, 0, 0.2)' : ''}
-          `
+          `,
         }}
       >
         {/* Stadium Lighting */}
@@ -269,7 +269,7 @@ const ModernField: React.FC<ModernFieldProps> = ({
         />
 
         {/* Field Markings */}
-        <FieldMarkings 
+        <FieldMarkings
           showGrid={showGrid}
           viewMode={viewMode}
         />
@@ -293,15 +293,15 @@ const ModernField: React.FC<ModernFieldProps> = ({
                     width: '60px',
                     height: '60px',
                     transform: 'translate(-50%, -50%)',
-                    borderColor: slot.playerId ? 'rgba(59, 130, 246, 0.4)' : 'rgba(255, 255, 255, 0.3)'
+                    borderColor: slot.playerId ? 'rgba(59, 130, 246, 0.4)' : 'rgba(255, 255, 255, 0.3)',
                   }}
                   animate={{
                     scale: hoveredSlot === slot.id ? 1.2 : 1,
-                    borderColor: hoveredSlot === slot.id 
-                      ? 'rgba(59, 130, 246, 0.8)' 
-                      : slot.playerId 
-                        ? 'rgba(59, 130, 246, 0.4)' 
-                        : 'rgba(255, 255, 255, 0.3)'
+                    borderColor: hoveredSlot === slot.id
+                      ? 'rgba(59, 130, 246, 0.8)'
+                      : slot.playerId
+                        ? 'rgba(59, 130, 246, 0.4)'
+                        : 'rgba(255, 255, 255, 0.3)',
                   }}
                   onMouseEnter={() => setHoveredSlot(slot.id)}
                   onMouseLeave={() => setHoveredSlot(null)}

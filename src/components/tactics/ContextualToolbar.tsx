@@ -1,17 +1,17 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Menu, 
-  Sidebar, 
-  User, 
-  Settings, 
-  Eye, 
-  EyeOff, 
-  Grid3X3, 
+import {
+  Menu,
+  Sidebar,
+  User,
+  Settings,
+  Eye,
+  EyeOff,
+  Grid3X3,
   Save,
   Share2,
   Undo,
-  Redo
+  Redo,
 } from 'lucide-react';
 import { type Formation, type Player } from '../../types';
 
@@ -34,7 +34,7 @@ const ContextualToolbar: React.FC<ContextualToolbarProps> = ({
   rightPanelState,
   onToggleLeftPanel,
   onToggleRightPanel,
-  viewMode
+  viewMode,
 }) => {
   return (
     <div className="flex items-center justify-between p-4 bg-slate-900/80 backdrop-blur-sm border-b border-slate-700/50">

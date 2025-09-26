@@ -57,14 +57,14 @@ class AICoachingService {
    * Generate comprehensive coaching recommendations
    */
   async generateCoachingRecommendations(
-    formation: Formation, 
+    formation: Formation,
     players: Player[],
     context?: {
       gamePhase?: string;
       score?: { home: number; away: number };
       gameState?: string;
       opposition?: Formation;
-    }
+    },
   ): Promise<CoachingRecommendation[]> {
     try {
       const recommendations: CoachingRecommendation[] = [];
@@ -89,7 +89,7 @@ class AICoachingService {
       return recommendations.sort((a, b) => {
         const priorityOrder = { critical: 4, high: 3, medium: 2, low: 1 };
         const priorityDiff = priorityOrder[b.priority] - priorityOrder[a.priority];
-        if (priorityDiff !== 0) return priorityDiff;
+        if (priorityDiff !== 0) {return priorityDiff;}
         return b.confidence - a.confidence;
       });
 
@@ -104,14 +104,13 @@ class AICoachingService {
    */
   private async analyzeFormationStructure(formation: Formation, players: Player[]): Promise<CoachingRecommendation[]> {
     const recommendations: CoachingRecommendation[] = [];
-    
-    if (!formation.positions || players.length === 0) return recommendations;
+
+    if (!formation.positions || players.length === 0) {return recommendations;}
 
     const positions = Object.values(formation.positions);
-    
+
     // Analyze width and depth
     const avgX = positions.reduce((sum, pos) => sum + pos.x, 0) / positions.length;
-    const avgY = positions.reduce((sum, pos) => sum + pos.y, 0) / positions.length;
     const spreadX = Math.max(...positions.map(p => p.x)) - Math.min(...positions.map(p => p.x));
     const spreadY = Math.max(...positions.map(p => p.y)) - Math.min(...positions.map(p => p.y));
 
@@ -129,8 +128,8 @@ class AICoachingService {
         actions: [{
           type: 'adjust_tactics',
           description: 'Reposition players for better lateral balance',
-          parameters: { targetBalance: 50, currentBalance: avgX }
-        }]
+          parameters: { targetBalance: 50, currentBalance: avgX },
+        }],
       });
     }
 
@@ -148,8 +147,8 @@ class AICoachingService {
         actions: [{
           type: 'adjust_tactics',
           description: 'Bring lines closer together',
-          parameters: { currentSpread: spreadY, targetSpread: 70 }
-        }]
+          parameters: { currentSpread: spreadY, targetSpread: 70 },
+        }],
       });
     }
 
@@ -167,8 +166,8 @@ class AICoachingService {
         actions: [{
           type: 'adjust_tactics',
           description: 'Position wingers and fullbacks wider',
-          parameters: { currentWidth: spreadX, recommendedWidth: 75 }
-        }]
+          parameters: { currentWidth: spreadX, recommendedWidth: 75 },
+        }],
       });
     }
 
@@ -183,10 +182,10 @@ class AICoachingService {
 
     for (const player of players) {
       const position = formation.positions[player.id];
-      if (!position) continue;
+      if (!position) {continue;}
 
       const analysis = this.analyzePlayerPosition(player, position, formation);
-      
+
       if (analysis.suitability < 70) {
         recommendations.push({
           id: `player-position-${player.id}`,
@@ -200,12 +199,12 @@ class AICoachingService {
           actions: [{
             type: 'move_player',
             description: `Move to ${analysis.alternatives[0]?.position || 'better position'}`,
-            parameters: { 
-              playerId: player.id, 
-              currentPosition: position, 
-              suggestedPosition: analysis.alternatives[0]?.position 
-            }
-          }]
+            parameters: {
+              playerId: player.id,
+              currentPosition: position,
+              suggestedPosition: analysis.alternatives[0]?.position,
+            },
+          }],
         });
       }
     }
@@ -217,16 +216,16 @@ class AICoachingService {
    * Generate tactical advice based on game context
    */
   private async generateTacticalAdvice(
-    formation: Formation, 
-    players: Player[], 
-    context?: any
+    formation: Formation,
+    players: Player[],
+    context?: any,
   ): Promise<CoachingRecommendation[]> {
     const recommendations: CoachingRecommendation[] = [];
 
     // Analyze based on game phase
     if (context?.gamePhase === 'late' && context?.score) {
       const { home, away } = context.score;
-      
+
       if (home < away) { // Losing
         recommendations.push({
           id: 'tactical-urgent-attack',
@@ -240,8 +239,8 @@ class AICoachingService {
           actions: [{
             type: 'adjust_tactics',
             description: 'Move defensive players higher up the pitch',
-            parameters: { urgency: 'high', focus: 'attack' }
-          }]
+            parameters: { urgency: 'high', focus: 'attack' },
+          }],
         });
       } else if (home > away) { // Winning
         recommendations.push({
@@ -256,8 +255,8 @@ class AICoachingService {
           actions: [{
             type: 'adjust_tactics',
             description: 'Drop deeper and focus on defensive solidity',
-            parameters: { urgency: 'low', focus: 'defense' }
-          }]
+            parameters: { urgency: 'low', focus: 'defense' },
+          }],
         });
       }
     }
@@ -269,13 +268,13 @@ class AICoachingService {
    * Get AI-powered recommendations using OpenAI
    */
   private async getAIRecommendations(
-    formation: Formation, 
-    players: Player[], 
-    context?: any
+    formation: Formation,
+    players: Player[],
+    context?: any,
   ): Promise<CoachingRecommendation[]> {
     try {
       const formationAnalysis = await tacticalIntegrationService.analyzeFormation(formation, players);
-      
+
       const prompt = `As an expert football tactical analyst, analyze this formation and provide specific coaching recommendations:
 
 Formation: ${formation.name}
@@ -304,7 +303,7 @@ Provide 2-3 specific, actionable coaching recommendations in JSON format:
 
       const response = await openAiService.generateContent(prompt);
       const aiAnalysis = JSON.parse(response);
-      
+
       return aiAnalysis.recommendations.map((rec: any, index: number) => ({
         id: `ai-recommendation-${index}`,
         type: 'tactical' as const,
@@ -317,8 +316,8 @@ Provide 2-3 specific, actionable coaching recommendations in JSON format:
         actions: [{
           type: 'adjust_tactics',
           description: rec.description,
-          parameters: { source: 'ai', recommendation: rec }
-        }]
+          parameters: { source: 'ai', recommendation: rec },
+        }],
       }));
 
     } catch (error) {
@@ -330,20 +329,20 @@ Provide 2-3 specific, actionable coaching recommendations in JSON format:
   /**
    * Analyze individual player position suitability
    */
-  private analyzePlayerPosition(player: Player, position: { x: number; y: number }, formation: Formation): PlayerAnalysis {
+  private analyzePlayerPosition(player: Player, position: { x: number; y: number }, _formation: Formation): PlayerAnalysis {
     // Simplified analysis - in a real app, this would use comprehensive player attributes
     const baseScore = player.currentPotential || 70;
-    
+
     // Position-based modifiers
     let positionSuitability = baseScore;
-    
+
     // Determine position type based on field coordinates
     const positionType = this.getPositionType(position);
-    
+
     // Mock player preferred position matching
     const preferredPosition = player.position || 'CM';
     const positionMatch = this.calculatePositionMatch(preferredPosition, positionType);
-    
+
     positionSuitability = Math.min(100, baseScore * (positionMatch / 100));
 
     return {
@@ -354,8 +353,8 @@ Provide 2-3 specific, actionable coaching recommendations in JSON format:
       performance: {
         positioning: positionSuitability,
         chemistry: 70 + Math.random() * 30,
-        effectiveness: (positionSuitability + baseScore) / 2
-      }
+        effectiveness: (positionSuitability + baseScore) / 2,
+      },
     };
   }
 
@@ -364,11 +363,11 @@ Provide 2-3 specific, actionable coaching recommendations in JSON format:
    */
   private getPositionType(position: { x: number; y: number }): string {
     const { x, y } = position;
-    
-    if (y < 25) return 'Defender';
-    if (y > 75) return 'Attacker';
-    if (x < 25) return 'Left Wing';
-    if (x > 75) return 'Right Wing';
+
+    if (y < 25) {return 'Defender';}
+    if (y > 75) {return 'Attacker';}
+    if (x < 25) {return 'Left Wing';}
+    if (x > 75) {return 'Right Wing';}
     return 'Midfielder';
   }
 
@@ -387,7 +386,7 @@ Provide 2-3 specific, actionable coaching recommendations in JSON format:
       'LW': ['Left Wing', 'Attacker'],
       'RW': ['Right Wing', 'Attacker'],
       'ST': ['Attacker'],
-      'CF': ['Attacker']
+      'CF': ['Attacker'],
     };
 
     const preferredRoles = positionMap[preferred] || ['Midfielder'];
@@ -410,13 +409,13 @@ Provide 2-3 specific, actionable coaching recommendations in JSON format:
       alternatives.push({
         position: 'Midfielder',
         suitability: Math.min(100, baseScore + 10),
-        reason: 'Player has good passing ability for midfield role'
+        reason: 'Player has good passing ability for midfield role',
       });
     } else { // Attacking half
       alternatives.push({
         position: 'Support Striker',
         suitability: Math.min(100, baseScore + 5),
-        reason: 'Player could provide good support in advanced position'
+        reason: 'Player could provide good support in advanced position',
       });
     }
 
@@ -426,7 +425,7 @@ Provide 2-3 specific, actionable coaching recommendations in JSON format:
   /**
    * Fallback recommendations when AI analysis fails
    */
-  private getFallbackRecommendations(formation: Formation, players: Player[]): CoachingRecommendation[] {
+  private getFallbackRecommendations(_formation: Formation, _players: Player[]): CoachingRecommendation[] {
     return [
       {
         id: 'fallback-balance',
@@ -436,7 +435,7 @@ Provide 2-3 specific, actionable coaching recommendations in JSON format:
         reasoning: 'Balanced formations provide stability in both attacking and defensive phases.',
         confidence: 75,
         priority: 'medium',
-        impact: 'moderate'
+        impact: 'moderate',
       },
       {
         id: 'fallback-chemistry',
@@ -446,8 +445,8 @@ Provide 2-3 specific, actionable coaching recommendations in JSON format:
         reasoning: 'Players perform better when positioned according to their strengths.',
         confidence: 80,
         priority: 'medium',
-        impact: 'significant'
-      }
+        impact: 'significant',
+      },
     ];
   }
 
@@ -457,7 +456,7 @@ Provide 2-3 specific, actionable coaching recommendations in JSON format:
   storeRecommendation(recommendation: CoachingRecommendation): void {
     this.coachingHistory.push({
       ...recommendation,
-      id: `${recommendation.id}-${Date.now()}`
+      id: `${recommendation.id}-${Date.now()}`,
     });
 
     // Keep only last 50 recommendations

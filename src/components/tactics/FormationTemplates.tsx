@@ -56,10 +56,10 @@ const FormationTemplates: React.FC<FormationTemplatesProps> = ({ onSelect, onClo
           // Attack
           { id: 'lw', position: { x: 25, y: 25 }, roleId: 'left-winger' },
           { id: 'st', position: { x: 50, y: 20 }, roleId: 'striker' },
-          { id: 'rw', position: { x: 75, y: 25 }, roleId: 'right-winger' }
+          { id: 'rw', position: { x: 75, y: 25 }, roleId: 'right-winger' },
         ],
-        players: []
-      }
+        players: [],
+      },
     },
     {
       id: '4-4-2',
@@ -88,10 +88,10 @@ const FormationTemplates: React.FC<FormationTemplatesProps> = ({ onSelect, onClo
           { id: 'cam', position: { x: 50, y: 35 }, roleId: 'attacking-midfielder' },
           // Attack
           { id: 'st1', position: { x: 40, y: 20 }, roleId: 'striker' },
-          { id: 'st2', position: { x: 60, y: 20 }, roleId: 'striker' }
+          { id: 'st2', position: { x: 60, y: 20 }, roleId: 'striker' },
         ],
-        players: []
-      }
+        players: [],
+      },
     },
     {
       id: '3-5-2',
@@ -120,10 +120,10 @@ const FormationTemplates: React.FC<FormationTemplatesProps> = ({ onSelect, onClo
           { id: 'rwb', position: { x: 85, y: 55 }, roleId: 'right-wing-back' },
           // Attack
           { id: 'st1', position: { x: 40, y: 25 }, roleId: 'striker' },
-          { id: 'st2', position: { x: 60, y: 25 }, roleId: 'striker' }
+          { id: 'st2', position: { x: 60, y: 25 }, roleId: 'striker' },
         ],
-        players: []
-      }
+        players: [],
+      },
     },
     {
       id: '5-3-2',
@@ -152,10 +152,10 @@ const FormationTemplates: React.FC<FormationTemplatesProps> = ({ onSelect, onClo
           { id: 'cm3', position: { x: 60, y: 50 }, roleId: 'central-midfielder' },
           // Attack
           { id: 'st1', position: { x: 40, y: 25 }, roleId: 'striker' },
-          { id: 'st2', position: { x: 60, y: 25 }, roleId: 'striker' }
+          { id: 'st2', position: { x: 60, y: 25 }, roleId: 'striker' },
         ],
-        players: []
-      }
+        players: [],
+      },
     },
     {
       id: '4-2-3-1',
@@ -185,11 +185,11 @@ const FormationTemplates: React.FC<FormationTemplatesProps> = ({ onSelect, onClo
           { id: 'cam', position: { x: 50, y: 30 }, roleId: 'attacking-midfielder' },
           { id: 'ram', position: { x: 75, y: 35 }, roleId: 'right-attacking-midfielder' },
           // Attack
-          { id: 'st', position: { x: 50, y: 15 }, roleId: 'striker' }
+          { id: 'st', position: { x: 50, y: 15 }, roleId: 'striker' },
         ],
-        players: []
-      }
-    }
+        players: [],
+      },
+    },
   ], []);
 
   // Category filters
@@ -198,7 +198,7 @@ const FormationTemplates: React.FC<FormationTemplatesProps> = ({ onSelect, onClo
     { id: 'popular', name: 'Popular', icon: Star, count: formationTemplates.filter(f => f.category === 'popular').length },
     { id: 'attacking', name: 'Attacking', icon: TrendingUp, count: formationTemplates.filter(f => f.category === 'attacking').length },
     { id: 'balanced', name: 'Balanced', icon: Zap, count: formationTemplates.filter(f => f.category === 'balanced').length },
-    { id: 'defensive', name: 'Defensive', icon: Shield, count: formationTemplates.filter(f => f.category === 'defensive').length }
+    { id: 'defensive', name: 'Defensive', icon: Shield, count: formationTemplates.filter(f => f.category === 'defensive').length },
   ];
 
   // Filtered templates
@@ -207,7 +207,7 @@ const FormationTemplates: React.FC<FormationTemplatesProps> = ({ onSelect, onClo
       const matchesSearch = template.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           template.description.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory = selectedCategory === 'all' || template.category === selectedCategory;
-      
+
       return matchesSearch && matchesCategory;
     });
   }, [formationTemplates, searchQuery, selectedCategory]);

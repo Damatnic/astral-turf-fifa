@@ -7,7 +7,7 @@ interface DrawingCanvasProps {
 }
 
 const DrawingCanvas: React.FC<DrawingCanvasProps> = ({ fieldRef }) => {
-  const { uiState, dispatch: uiDispatch } = useUIContext();
+  const { uiState } = useUIContext();
   const { tacticsState, dispatch: tacticsDispatch } = useTacticsContext();
   const { drawingTool, drawingColor, isPresentationMode } = uiState;
   const { drawings } = tacticsState;
@@ -34,7 +34,7 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({ fieldRef }) => {
   };
 
   const getSvgPointerPosition = (
-    e: ReactMouseEvent<SVGSVGElement>,
+    e: ReactMouseEvent<SVGSVGElement>
   ): { x: number; y: number } | null => {
     const svg = e.currentTarget;
     if (!svg) {
@@ -163,7 +163,9 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({ fieldRef }) => {
 
     switch (tool) {
       case 'arrow': {
-        if (points.length < 2 || !points[0] || !points[1]) {
+        if (points.length < 2 || !points[0] || !points[1] || 
+            typeof points[0].x !== 'number' || typeof points[0].y !== 'number' ||
+            typeof points[1].x !== 'number' || typeof points[1].y !== 'number') {
           return null;
         }
         const p0 = points[0];
@@ -182,7 +184,9 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({ fieldRef }) => {
         );
       }
       case 'line': {
-        if (points.length < 2 || !points[0] || !points[1]) {
+        if (points.length < 2 || !points[0] || !points[1] || 
+            typeof points[0].x !== 'number' || typeof points[0].y !== 'number' ||
+            typeof points[1].x !== 'number' || typeof points[1].y !== 'number') {
           return null;
         }
         const p0 = points[0];
@@ -200,7 +204,9 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({ fieldRef }) => {
         );
       }
       case 'zone': {
-        if (points.length < 2 || !points[0] || !points[1]) {
+        if (points.length < 2 || !points[0] || !points[1] || 
+            typeof points[0].x !== 'number' || typeof points[0].y !== 'number' ||
+            typeof points[1].x !== 'number' || typeof points[1].y !== 'number') {
           return null;
         }
         const p0 = points[0];
@@ -222,15 +228,15 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({ fieldRef }) => {
           />
         );
       }
-      case 'pen':
+      case 'pen': {
         if (points.length < 2) {
           return null;
         }
         const pathData =
           'M ' +
           points
-            .filter(p => p)
-            .map(p => `${p!.x} ${p!.y}`)
+            .filter(p => p && typeof p.x === 'number' && typeof p.y === 'number')
+            .map(p => `${p.x} ${p.y}`)
             .join(' L ');
         return (
           <path
@@ -243,15 +249,17 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({ fieldRef }) => {
             strokeLinejoin="round"
           />
         );
+      }
       case 'text':
-        if (!text || points.length < 1 || !points[0]) {
+        if (!text || points.length < 1 || !points[0] || 
+            typeof points[0].x !== 'number' || typeof points[0].y !== 'number') {
           return null;
         }
         return (
           <text
             key={id}
-            x={points[0]!.x}
-            y={points[0]!.y}
+            x={points[0].x}
+            y={points[0].y}
             fill={color ?? '#ffffff'}
             fontSize="2.5"
             fontWeight="bold"
