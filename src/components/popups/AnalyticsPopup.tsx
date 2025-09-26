@@ -128,7 +128,7 @@ const AnalyticsPopup: React.FC = () => {
   const teamStats = {
     totalGoals: homeTeamPlayers.reduce((sum, p) => sum + p.stats.goals, 0),
     totalAssists: homeTeamPlayers.reduce((sum, p) => sum + p.stats.assists, 0),
-    totalMatches: Math.max(...homeTeamPlayers.map(p => p.stats.matchesPlayed)),
+    totalMatches: homeTeamPlayers.length > 0 ? Math.max(...homeTeamPlayers.map(p => p.stats.matchesPlayed)) : 0,
     averageAge: Math.round(
       homeTeamPlayers.reduce((sum, p) => sum + p.age, 0) / homeTeamPlayers.length,
     ),

@@ -316,12 +316,25 @@ const VectorShapeRenderer: React.FC<{
       case 'pen': {
         if (points.length < 2) return null;
         
+        // Validate first point before accessing properties
+        if (!points[0] || typeof points[0].x !== 'number' || typeof points[0].y !== 'number') {
+          return null;
+        }
+        
         // Create smooth curve using quadratic bezier
         let pathData = `M ${points[0].x} ${points[0].y}`;
         
         for (let i = 1; i < points.length - 1; i++) {
           const current = points[i];
           const next = points[i + 1];
+          
+          // Validate current and next points before accessing properties
+          if (!current || !next || 
+              typeof current.x !== 'number' || typeof current.y !== 'number' ||
+              typeof next.x !== 'number' || typeof next.y !== 'number') {
+            continue;
+          }
+          
           const controlX = (current.x + next.x) / 2;
           const controlY = (current.y + next.y) / 2;
           
@@ -330,7 +343,9 @@ const VectorShapeRenderer: React.FC<{
         
         if (points.length > 1) {
           const lastPoint = points[points.length - 1];
-          pathData += ` L ${lastPoint.x} ${lastPoint.y}`;
+          if (lastPoint && typeof lastPoint.x === 'number' && typeof lastPoint.y === 'number') {
+            pathData += ` L ${lastPoint.x} ${lastPoint.y}`;
+          }
         }
         
         return (

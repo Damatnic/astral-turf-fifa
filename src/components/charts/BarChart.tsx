@@ -11,7 +11,7 @@ const BarChart: React.FC<BarChartProps> = ({
   color = 'var(--accent-secondary)',
   height = 200,
 }) => {
-  const maxValue = Math.max(...data.map(d => d.value), 1);
+  const maxValue = data.length > 0 ? Math.max(...data.map(d => d.value), 1) : 1;
   const chartHeight = height - 40; // leave space for labels
   const barWidth = 40;
   const gap = 20;
