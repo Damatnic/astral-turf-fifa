@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { findSlotById, isValidPlayer, isValidFormation, getFormationSlots } from '../../utils/tacticalDataGuards';
 import type { Player, Formation, DrawingShape, User } from '../../types';
 
 interface CollaborationState {
@@ -156,8 +157,15 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
   };
 
   const drawPlayers = (ctx: CanvasRenderingContext2D) => {
+    if (!isValidFormation(formation) || !Array.isArray(players)) {
+      return;
+    }
+    
     players.forEach(player => {
-      const slot = formation.slots.find(s => s.playerId === player.id);
+      if (!isValidPlayer(player)) return;
+      
+      const validSlots = getFormationSlots(formation);
+      const slot = validSlots.find(s => s.playerId === player.id);
       if (!slot) {
         return;
       }

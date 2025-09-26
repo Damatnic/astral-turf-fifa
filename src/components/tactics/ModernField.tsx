@@ -6,6 +6,7 @@ import { FieldMarkings } from './FieldMarkings';
 import { DragIndicator } from './DragIndicator';
 import { PlayerStatsOverlay } from './PlayerStatsOverlay';
 import { useResponsive } from '../../hooks';
+import { isValidFormation, getFormationSlots, isValidPlayer } from '../../utils/tacticalDataGuards';
 
 interface ModernFieldProps {
   formation: Formation | undefined;
@@ -180,21 +181,26 @@ const ModernField: React.FC<ModernFieldProps> = ({
 
   // Memoized formation slots
   const formationSlots = useMemo(() => {
-    if (!formation?.slots) {return [];}
-    return formation.slots.filter(slot =>
-      slot?.position &&
-      typeof slot.position.x === 'number' &&
-      typeof slot.position.y === 'number',
-    );
-  }, [formation?.slots]);
+    if (!isValidFormation(formation)) {
+      return [];
+    }
+    return getFormationSlots(formation);
+  }, [formation]);
 
   // Render player tokens
   const renderPlayers = useCallback(() => {
     return formationSlots.map(slot => {
       if (!slot.playerId) {return null;}
 
-      const player = formation?.players?.find(p => p.id === slot.playerId);
-      if (!player) {return null;}
+      const players = formation?.players;
+      if (!Array.isArray(players)) {
+        return null;
+      }
+      
+      const player = players.find(p => p?.id === slot.playerId);
+      if (!isValidPlayer(player)) {
+        return null;
+      }
 
       const isDraggingThis = dragState.playerId === player.id;
       const position = isDraggingThis && dragState.currentPosition
@@ -219,7 +225,7 @@ const ModernField: React.FC<ModernFieldProps> = ({
     });
   }, [
     formationSlots,
-    formation?.players,
+    formation,
     dragState,
     selectedPlayer?.id,
     handleDragStart,

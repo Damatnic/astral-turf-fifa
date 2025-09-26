@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useUIContext, useTacticsContext } from '../../hooks';
 import { CloseIcon, BrainCircuitIcon, LoadingSpinner, SwapIcon } from '../ui/icons';
 import { getAISubstitutionSuggestion } from '../../services/aiServiceLoader';
+import { getFormationPlayerIds, isValidFormation } from '../../utils/tacticalDataGuards';
 
 const AISubstitutionSuggestionPopup: React.FC = () => {
   const { uiState, dispatch } = useUIContext();
@@ -20,9 +21,9 @@ const AISubstitutionSuggestionPopup: React.FC = () => {
         dispatch({ type: 'GET_AI_SUB_SUGGESTION_FAILURE' });
         return;
       }
-      const onFieldIds = new Set(formation.slots.map(s => s.playerId).filter(Boolean));
-      const onFieldPlayers = players.filter(p => onFieldIds.has(p.id));
-      const benchedPlayers = players.filter(p => p.team === activeTeam && !onFieldIds.has(p.id));
+      const onFieldIds = getFormationPlayerIds(formation);
+      const onFieldPlayers = players.filter(p => p && onFieldIds.has(p.id));
+      const benchedPlayers = players.filter(p => p && p.team === activeTeam && !onFieldIds.has(p.id));
 
       getAISubstitutionSuggestion(onFieldPlayers, benchedPlayers, settings.aiPersonality)
         .then(data => dispatch({ type: 'GET_AI_SUB_SUGGESTION_SUCCESS', payload: data }))

@@ -251,12 +251,11 @@ const FormationStrengthOverlay: React.FC = () => {
   }
 
   const points = (formation?.slots ?? [])
-    .filter(s => s?.playerId)
-    .map(s =>
-      activeTeam === 'away'
-        ? mirrorPosition(s?.defaultPosition ?? { x: 50, y: 50 })
-        : (s?.defaultPosition ?? { x: 50, y: 50 }),
-    );
+    .filter(s => s && s.playerId && s.defaultPosition)
+    .map(s => {
+      const position = s.defaultPosition ?? { x: 50, y: 50 };
+      return activeTeam === 'away' ? mirrorPosition(position) : position;
+    });
 
   if (points.length < 3) {
     return null;
@@ -264,6 +263,7 @@ const FormationStrengthOverlay: React.FC = () => {
 
   // Create a color stop for each player position
   const colorStops = points
+    .filter(p => p && typeof p.x === 'number' && typeof p.y === 'number')
     .map(
       p =>
         `radial-gradient(circle at ${p.x}% ${p.y}%, rgba(45, 212, 191, 0.25) 0%, transparent 20%)`,
@@ -312,10 +312,10 @@ const SoccerField: React.FC = () => {
   const activePlaybookItem = activePlaybookItemId ? playbook?.[activePlaybookItemId] : null;
 
   const uniqueTrailColors = useMemo(() => {
-    if (!animationTrails) {
+    if (!animationTrails || !Array.isArray(animationTrails)) {
       return [];
     }
-    return [...new Set(animationTrails.map(t => t?.color).filter(Boolean))];
+    return [...new Set(animationTrails.filter(t => t && t.color).map(t => t.color))];
   }, [animationTrails]);
 
   const getChemistryLinks = (formation: Formation, team: Team) => {
@@ -329,40 +329,42 @@ const SoccerField: React.FC = () => {
       opacity: number;
       score: number;
     }[] = [];
-    const slotsWithPlayers = (formation?.slots ?? []).filter(s => s?.playerId);
+    const slotsWithPlayers = (formation?.slots ?? []).filter(s => s && s.playerId && s.defaultPosition);
     const checkedPairs = new Set<string>();
     const shouldMirror = team === 'away';
 
     for (const slotA of slotsWithPlayers) {
-      const playerA = players?.find(p => p?.id === slotA?.playerId);
-      if (!playerA) {
+      if (!slotA || !slotA.playerId || !slotA.defaultPosition) continue;
+      
+      const playerA = players?.find(p => p?.id === slotA.playerId);
+      if (!playerA || !playerA.position) {
         continue;
       }
 
       for (const slotB of slotsWithPlayers) {
-        if (slotA?.id === slotB?.id) {
+        if (!slotB || !slotB.playerId || !slotB.defaultPosition || slotA.id === slotB.id) {
           continue;
         }
 
-        const pairKey = [slotA?.id, slotB?.id].sort().join('-');
+        const pairKey = [slotA.id, slotB.id].sort().join('-');
         if (checkedPairs.has(pairKey)) {
           continue;
         }
         checkedPairs.add(pairKey);
 
-        const playerB = players?.find(p => p?.id === slotB?.playerId);
-        if (!playerB) {
+        const playerB = players?.find(p => p?.id === slotB.playerId);
+        if (!playerB || !playerB.position) {
           continue;
         }
 
-        const posA = slotA?.defaultPosition ?? { x: 0, y: 0 };
-        const posB = slotB?.defaultPosition ?? { x: 0, y: 0 };
+        const posA = slotA.defaultPosition;
+        const posB = slotB.defaultPosition;
         const dist = Math.sqrt(Math.pow(posA.x - posB.x, 2) + Math.pow(posA.y - posB.y, 2));
 
         if (dist < 30) {
           // Adjacency threshold
-          let posA = playerA?.position ?? { x: 50, y: 50 };
-          let posB = playerB?.position ?? { x: 50, y: 50 };
+          let posA = playerA.position;
+          let posB = playerB.position;
 
           if (shouldMirror) {
             posA = mirrorPosition(posA);
@@ -529,22 +531,24 @@ const SoccerField: React.FC = () => {
     const shouldMirror = team === 'away';
 
     // Get all players from this team
-    const allTeamPlayers = (players ?? []).filter(p => p?.team === team);
+    const allTeamPlayers = (players ?? []).filter(p => p && p.team === team && p.position);
 
     // Map players to include their slot (if any) and position
     const teamPlayers = allTeamPlayers.map(player => {
-      const slot = (formation?.slots ?? []).find(s => s?.playerId === player?.id);
-      const playerPosition = player?.position ?? { x: 50, y: 50 };
+      const slot = (formation?.slots ?? []).find(s => s && s.playerId === player.id);
+      const playerPosition = player.position;
       const position = shouldMirror ? mirrorPosition(playerPosition) : playerPosition;
       return { player, slot, position };
     });
 
-    const teamSlots = (formation?.slots ?? []).map(slot => ({
-      ...slot,
-      defaultPosition: shouldMirror
-        ? mirrorPosition(slot?.defaultPosition ?? { x: 50, y: 50 })
-        : (slot?.defaultPosition ?? { x: 50, y: 50 }),
-    }));
+    const teamSlots = (formation?.slots ?? [])
+      .filter(slot => slot && slot.defaultPosition)
+      .map(slot => ({
+        ...slot,
+        defaultPosition: shouldMirror
+          ? mirrorPosition(slot.defaultPosition)
+          : slot.defaultPosition,
+      }));
 
     return (
       <>
@@ -676,18 +680,24 @@ const SoccerField: React.FC = () => {
           </g>
 
           {animationTrails &&
-            animationTrails.map(trail => (
-              <polyline
-                key={trail.playerId}
-                points={trail.points.map(p => `${p.x},${p.y}`).join(' ')}
-                fill="none"
-                stroke={trail.color}
-                strokeWidth="0.5"
-                strokeDasharray="2 2"
-                markerEnd={`url(#arrowhead-trail-${trail.color.replace('#', '')})`}
-                markerMid={`url(#dot-trail-${trail.color.replace('#', '')})`}
-              />
-            ))}
+            Array.isArray(animationTrails) &&
+            animationTrails
+              .filter(trail => trail && trail.points && Array.isArray(trail.points) && trail.color)
+              .map(trail => (
+                <polyline
+                  key={trail.playerId}
+                  points={trail.points
+                    .filter(p => p && typeof p.x === 'number' && typeof p.y === 'number')
+                    .map(p => `${p.x},${p.y}`)
+                    .join(' ')}
+                  fill="none"
+                  stroke={trail.color}
+                  strokeWidth="0.5"
+                  strokeDasharray="2 2"
+                  markerEnd={`url(#arrowhead-trail-${trail.color.replace('#', '')})`}
+                  markerMid={`url(#dot-trail-${trail.color.replace('#', '')})`}
+                />
+              ))}
         </svg>
 
         {(activeTeamContext === 'home' || activeTeamContext === 'both') && renderTeam('home')}

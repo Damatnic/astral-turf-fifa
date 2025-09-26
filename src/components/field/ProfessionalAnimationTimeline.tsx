@@ -162,6 +162,7 @@ const AnimationTrailRenderer: React.FC<{
 
     // Create path for trail
     const pathData = visiblePoints
+      .filter(point => point && typeof point.x === 'number' && typeof point.y === 'number' && !isNaN(point.x) && !isNaN(point.y))
       .map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`)
       .join(' ');
 

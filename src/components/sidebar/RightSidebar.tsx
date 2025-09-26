@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { useTacticsContext, useUIContext, useFranchiseContext } from '../../hooks';
 import { getTacticalAdvice } from '../../services/aiServiceLoader';
+import { getFormationPlayerIds, isValidFormation } from '../../utils/tacticalDataGuards';
 import type {
   Player,
   Formation,
@@ -158,8 +159,8 @@ const AIInsights: React.FC = () => {
     }
     dispatch({ type: 'GENERATE_AI_INSIGHT_START' });
     try {
-      const homePlayerIds = new Set(homeFormation.slots.map(s => s.playerId).filter(Boolean));
-      const awayPlayerIds = new Set(awayFormation.slots.map(s => s.playerId).filter(Boolean));
+      const homePlayerIds = getFormationPlayerIds(homeFormation);
+      const awayPlayerIds = getFormationPlayerIds(awayFormation);
 
       const homePlayers = players.filter(p => homePlayerIds.has(p.id));
       const awayPlayers = players.filter(p => awayPlayerIds.has(p.id));

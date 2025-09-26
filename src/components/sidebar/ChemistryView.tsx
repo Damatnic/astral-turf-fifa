@@ -3,6 +3,7 @@ import { useTacticsContext, useFranchiseContext } from '../../hooks';
 import type { Team } from '../../types';
 import { calculateChemistryScore } from '../../services/chemistryService';
 import { HeartIcon, SwordsIcon } from '../ui/icons';
+import { getFormationPlayerIds, isValidFormation } from '../../utils/tacticalDataGuards';
 
 interface ChemistryViewProps {
   team: Team;
@@ -19,8 +20,8 @@ const ChemistryView: React.FC<ChemistryViewProps> = ({ team }) => {
     if (!formation) {
       return [];
     }
-    const playerIdsOnField = new Set(formation.slots.map(s => s.playerId).filter(Boolean));
-    return players.filter(p => playerIdsOnField.has(p.id));
+    const playerIdsOnField = getFormationPlayerIds(formation);
+    return players.filter(p => p && playerIdsOnField.has(p.id));
   }, [formation, players]);
 
   const chemistryPairs = useMemo(() => {
