@@ -1,64 +1,60 @@
 {
   "deployment": {
-    "url": "https://astral-turf-fresh-9e3q2gamc-astral-productions.vercel.app",
-    "status": "successful",
-    "timestamp": "2025-09-26T16:56:00.000Z",
+    "url": "https://astral-turf-fresh.vercel.app",
+    "status": "partially_successful",
+    "timestamp": "2025-09-26T17:09:43.000Z",
     "platform": "Vercel",
     "framework": "Vite",
-    "buildTime": "37s",
+    "buildTime": "9.46s",
     "region": "iad1",
     "projectName": "astral-turf-fresh",
     "buildSuccessful": true,
-    "note": "Build completed successfully but deployment may have access restrictions"
+    "deploymentStatus": "Build completed but secondary install failed",
+    "note": "Application accessible but with potential AI service limitations"
   },
   "github": {
     "repository": "https://github.com/Damatnic/ASTRAL_TURF",
     "branch": "master",
-    "lastCommit": "bcbbfe4"
+    "lastCommit": "7ae43a4"
   },
   "application": {
     "name": "Astral Turf",
     "version": "8.0.0",
     "description": "Enterprise-grade football management application",
-    "features": [
-      "Interactive tactics board with real-time collaboration",
-      "AI-powered tactical analysis and player management",
-      "Comprehensive training and development systems",
-      "Advanced analytics and performance tracking",
-      "Multi-language support and mobile optimization",
-      "Banking-grade security with zero vulnerabilities",
-      "Production-ready infrastructure with Kubernetes deployment",
-      "Modern React 18 + TypeScript architecture",
-      "Tailwind CSS 4.x design system"
-    ]
+    "aiService": "OpenAI (configured but needs testing)"
   },
   "build": {
     "bundleSize": {
-      "total": "~2.1MB (697kB vendor + 283kB pages + 235kB GenAI)",
+      "total": "~2.2MB (932kB vendor + 283kB pages + 104kB OpenAI)",
       "gzipped": "~400kB total",
       "chunks": [
-        "vendor-D2IzyJjg.js: 697.02 kB (231.98 kB gzipped)",
-        "pages-CgBBhS0Q.js: 283.40 kB (51.44 kB gzipped)",
-        "google-genai-C7RYCuas.js: 234.58 kB (39.45 kB gzipped)"
+        "vendor-BxY7jfdD.js: 932.15 kB (271.45 kB gzipped)",
+        "pages-CnxNqq4O.js: 283.40 kB (51.44 kB gzipped)",
+        "openai-vendor-Cdb2XbZ7.js: 103.69 kB (28.26 kB gzipped)",
+        "openAiService-ZRDkK7Mk.js: 6.00 kB (2.44 kB gzipped)"
       ]
     },
-    "buildWarnings": "Some chunks larger than 250kB - consider code splitting",
-    "cssFiles": [
-      "index-8PE4CHJ_.css: 114.33 kB (16.41 kB gzipped)",
-      "Layout-ByebWjtv.css: 7.03 kB (1.84 kB gzipped)"
-    ]
+    "aiMigration": "Successfully switched from Google GenAI to OpenAI",
+    "buildWarnings": "Some chunks larger than 250kB - consider code splitting"
   },
   "configuration": {
-    "vercelJson": "Minimal configuration with SPA routing",
-    "environment": "Production ready with demo API keys",
-    "tailwindCDN": "Removed - using bundled CSS",
-    "reactContext": "Fixed with proper vendor chunking"
+    "vercelJson": "Configured with legacy-peer-deps install",
+    "environment": "OpenAI API key configured via Vercel env vars",
+    "apiKeys": {
+      "OPENAI_API_KEY": "✅ Set",
+      "VITE_OPENAI_API_KEY": "✅ Set", 
+      "API_KEY": "✅ Set"
+    }
+  },
+  "issues": {
+    "buildDependencies": "zod version conflict during secondary install",
+    "resolution": "Build succeeds but may have runtime dependency issues",
+    "recommendation": "Monitor AI functionality and resolve zod conflict if needed"
   },
   "nextSteps": [
-    "Configure production API keys",
-    "Set up custom domain",
-    "Configure environment variables in Vercel dashboard",
-    "Set up database connections",
-    "Review access permissions if needed"
+    "Test OpenAI API functionality",
+    "Monitor AI features in production",
+    "Resolve zod dependency conflict if AI features fail",
+    "Consider removing Google GenAI package entirely"
   ]
 }
