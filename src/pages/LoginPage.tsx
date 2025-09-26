@@ -168,7 +168,7 @@ const LoginPage: React.FC = () => {
           text-center 
           ${isMobile ? 'mb-6' : 'mb-8'}
         `}>
-          <LogoIcon className={`mx-auto text-teal-400 ${isMobile ? 'w-12 h-12' : 'w-16 h-16'}`} />
+          <LogoIcon className={`login-logo mx-auto text-teal-400 ${isMobile ? 'w-12 h-12' : 'w-16 h-16'}`} style={{ width: isMobile ? '3rem' : '4rem', height: isMobile ? '3rem' : '4rem', maxWidth: isMobile ? '3rem' : '4rem', maxHeight: isMobile ? '3rem' : '4rem' }} />
           <h1 className={`
             font-bold mt-2 tracking-wider text-white
             ${isMobile ? 'text-2xl' : 'text-3xl'}

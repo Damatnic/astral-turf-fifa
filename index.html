@@ -96,9 +96,16 @@
       overflow: hidden;
     }
 
-    /* Clean SVG defaults - let Tailwind handle sizing */
+    /* Clean SVG defaults - allow Tailwind sizing to work properly */
     svg {
-      display: block;
+      flex-shrink: 0;
+    }
+    
+    /* Failsafe for login logo sizing */
+    .login-logo {
+      flex-shrink: 0 !important;
+      min-width: 0 !important;
+      min-height: 0 !important;
     }
 
     /* Animations */
