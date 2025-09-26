@@ -1,0 +1,297 @@
+# ==================================================================
+# QUANTUM'S RBAC SECURITY CONFIGURATION
+# Zero-trust access control with principle of least privilege
+# ==================================================================
+
+# Service Account for Astral Turf Application
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: astral-turf-app
+  namespace: astral-turf
+  labels:
+    app.kubernetes.io/name: astral-turf
+    app.kubernetes.io/component: security
+automountServiceAccountToken: false
+
+---
+# Cluster Role for Application (minimal permissions)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: astral-turf-app-role
+  labels:
+    app.kubernetes.io/name: astral-turf
+    app.kubernetes.io/component: security
+rules:
+# Read-only access to nodes for resource monitoring
+- apiGroups: [""]
+  resources: ["nodes"]
+  verbs: ["get", "list"]
+
+# Read-only access to pods for health checking
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list"]
+
+# Access to own namespace resources
+- apiGroups: [""]
+  resources: ["services", "endpoints", "configmaps"]
+  verbs: ["get", "list", "watch"]
+
+---
+# Cluster Role Binding
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: astral-turf-app-binding
+  labels:
+    app.kubernetes.io/name: astral-turf
+    app.kubernetes.io/component: security
+subjects:
+- kind: ServiceAccount
+  name: astral-turf-app
+  namespace: astral-turf
+roleRef:
+  kind: ClusterRole
+  name: astral-turf-app-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# Role for namespace-specific operations
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: astral-turf
+  name: astral-turf-namespace-role
+  labels:
+    app.kubernetes.io/name: astral-turf
+    app.kubernetes.io/component: security
+rules:
+# Read access to secrets (only specific ones)
+- apiGroups: [""]
+  resources: ["secrets"]
+  resourceNames: ["astral-turf-secrets", "tls-secret"]
+  verbs: ["get"]
+
+# Read/write access to configmaps
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "list", "watch", "create", "update", "patch"]
+
+# Read access to persistent volume claims
+- apiGroups: [""]
+  resources: ["persistentvolumeclaims"]
+  verbs: ["get", "list", "watch"]
+
+---
+# Role Binding for namespace operations
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: astral-turf-namespace-binding
+  namespace: astral-turf
+  labels:
+    app.kubernetes.io/name: astral-turf
+    app.kubernetes.io/component: security
+subjects:
+- kind: ServiceAccount
+  name: astral-turf-app
+  namespace: astral-turf
+roleRef:
+  kind: Role
+  name: astral-turf-namespace-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# Service Account for Monitoring
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: prometheus-operator
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/component: security
+
+---
+# Cluster Role for Prometheus Operator
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: prometheus-operator-role
+  labels:
+    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/component: security
+rules:
+# Full access to monitoring resources
+- apiGroups: ["monitoring.coreos.com"]
+  resources: ["*"]
+  verbs: ["*"]
+
+# Read access to cluster resources for monitoring
+- apiGroups: [""]
+  resources: ["nodes", "nodes/metrics", "services", "endpoints", "pods"]
+  verbs: ["get", "list", "watch"]
+
+# Access to config maps and secrets for configuration
+- apiGroups: [""]
+  resources: ["configmaps", "secrets"]
+  verbs: ["get", "list", "watch"]
+
+# Access to deployments for monitoring
+- apiGroups: ["apps"]
+  resources: ["deployments", "replicasets", "daemonsets", "statefulsets"]
+  verbs: ["get", "list", "watch"]
+
+# Access to ingresses for monitoring
+- apiGroups: ["networking.k8s.io"]
+  resources: ["ingresses"]
+  verbs: ["get", "list", "watch"]
+
+---
+# Cluster Role Binding for Prometheus
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: prometheus-operator-binding
+  labels:
+    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/component: security
+subjects:
+- kind: ServiceAccount
+  name: prometheus-operator
+  namespace: monitoring
+roleRef:
+  kind: ClusterRole
+  name: prometheus-operator-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# Service Account for Grafana
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: grafana
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/component: security
+
+---
+# Role for Grafana (namespace-specific)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: monitoring
+  name: grafana-role
+  labels:
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/component: security
+rules:
+# Access to own configmaps and secrets
+- apiGroups: [""]
+  resources: ["configmaps", "secrets"]
+  verbs: ["get", "list", "watch"]
+
+# Access to services for datasource discovery
+- apiGroups: [""]
+  resources: ["services"]
+  verbs: ["get", "list", "watch"]
+
+---
+# Role Binding for Grafana
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: grafana-binding
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/component: security
+subjects:
+- kind: ServiceAccount
+  name: grafana
+  namespace: monitoring
+roleRef:
+  kind: Role
+  name: grafana-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# Service Account for NGINX Ingress Controller
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: nginx-ingress-controller
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: nginx-ingress
+    app.kubernetes.io/component: security
+
+---
+# Cluster Role for NGINX Ingress Controller
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: nginx-ingress-controller-role
+  labels:
+    app.kubernetes.io/name: nginx-ingress
+    app.kubernetes.io/component: security
+rules:
+# Access to ingress resources
+- apiGroups: ["networking.k8s.io"]
+  resources: ["ingresses", "ingressclasses"]
+  verbs: ["get", "list", "watch"]
+
+- apiGroups: ["networking.k8s.io"]
+  resources: ["ingresses/status"]
+  verbs: ["update"]
+
+# Access to services and endpoints
+- apiGroups: [""]
+  resources: ["services", "endpoints"]
+  verbs: ["get", "list", "watch"]
+
+# Access to secrets for TLS
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "list", "watch"]
+
+# Access to configmaps
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "list", "watch", "update", "create"]
+
+# Access to pods for readiness
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch"]
+
+# Access to events for logging
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["create", "patch"]
+
+# Access to nodes for node selection
+- apiGroups: [""]
+  resources: ["nodes"]
+  verbs: ["get", "list", "watch"]
+
+---
+# Cluster Role Binding for NGINX Ingress
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: nginx-ingress-controller-binding
+  labels:
+    app.kubernetes.io/name: nginx-ingress
+    app.kubernetes.io/component: security
+subjects:
+- kind: ServiceAccount
+  name: nginx-ingress-controller
+  namespace: ingress-nginx
+roleRef:
+  kind: ClusterRole
+  name: nginx-ingress-controller-role
+  apiGroup: rbac.authorization.k8s.io

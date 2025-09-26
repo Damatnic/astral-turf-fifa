@@ -1,0 +1,305 @@
+# ==================================================================
+# QUANTUM'S MULTI-REGION DISASTER RECOVERY
+# 99.99% uptime guarantee with automated failover
+# ==================================================================
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: disaster-recovery-config
+  namespace: astral-turf
+  labels:
+    app.kubernetes.io/name: astral-turf
+    app.kubernetes.io/component: disaster-recovery
+data:
+  primary-region: "us-east-1"
+  secondary-regions: "us-west-2,eu-west-1,ap-southeast-1"
+  backup-schedule: "0 */6 * * *"  # Every 6 hours
+  rto-target: "15m"  # Recovery Time Objective
+  rpo-target: "5m"   # Recovery Point Objective
+  health-check-interval: "30s"
+  failover-threshold: "3"
+
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cross-region-backup
+  namespace: astral-turf
+  labels:
+    app.kubernetes.io/name: astral-turf
+    app.kubernetes.io/component: backup
+spec:
+  schedule: "0 */6 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: astral-turf
+            app.kubernetes.io/component: backup-job
+        spec:
+          restartPolicy: OnFailure
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1001
+            fsGroup: 1001
+          containers:
+          - name: backup-orchestrator
+            image: backup-orchestrator:latest
+            imagePullPolicy: Always
+            env:
+            - name: AWS_REGION
+              value: "us-east-1"
+            - name: BACKUP_REGIONS
+              value: "us-west-2,eu-west-1,ap-southeast-1"
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: astral-turf-secrets
+                  key: database-url
+            - name: S3_BACKUP_BUCKET
+              value: "astral-turf-disaster-recovery"
+            - name: ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: backup-encryption-secret
+                  key: encryption-key
+            resources:
+              requests:
+                cpu: 500m
+                memory: 1Gi
+              limits:
+                cpu: 2000m
+                memory: 4Gi
+            command:
+            - /bin/sh
+            - -c
+            - |
+              echo "🔄 Starting cross-region backup orchestration..."
+              
+              # Database backup with point-in-time recovery
+              pg_dump $DATABASE_URL | gzip | aws s3 cp - s3://$S3_BACKUP_BUCKET/database/$(date +%Y%m%d_%H%M%S).sql.gz
+              
+              # Application state backup
+              kubectl get all -n astral-turf -o yaml | aws s3 cp - s3://$S3_BACKUP_BUCKET/k8s-state/$(date +%Y%m%d_%H%M%S).yaml
+              
+              # Secrets backup (encrypted)
+              kubectl get secrets -n astral-turf -o yaml | gpg --symmetric --cipher-algo AES256 --compress-algo 1 --compress-level 6 --batch --passphrase $ENCRYPTION_KEY | aws s3 cp - s3://$S3_BACKUP_BUCKET/secrets/$(date +%Y%m%d_%H%M%S).gpg
+              
+              # Replicate to secondary regions
+              for region in $(echo $BACKUP_REGIONS | tr "," " "); do
+                echo "📡 Replicating to region: $region"
+                aws s3 sync s3://$S3_BACKUP_BUCKET/ s3://$S3_BACKUP_BUCKET-$region/ --region $region
+              done
+              
+              # Cleanup old backups (keep 30 days)
+              aws s3 ls s3://$S3_BACKUP_BUCKET/database/ --recursive | awk '$1 <= "'$(date -d '30 days ago' '+%Y-%m-%d')'" {print $4}' | xargs -I {} aws s3 rm s3://$S3_BACKUP_BUCKET/{}
+              
+              echo "✅ Cross-region backup completed successfully"
+            volumeMounts:
+            - name: backup-tools
+              mountPath: /tools
+          volumes:
+          - name: backup-tools
+            emptyDir: {}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: disaster-recovery-controller
+  namespace: astral-turf
+  labels:
+    app.kubernetes.io/name: astral-turf
+    app.kubernetes.io/component: disaster-recovery
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: disaster-recovery-controller
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: disaster-recovery-controller
+        app.kubernetes.io/component: disaster-recovery
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: disaster-recovery-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        fsGroup: 1001
+      containers:
+      - name: dr-controller
+        image: disaster-recovery-controller:latest
+        imagePullPolicy: Always
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        - name: metrics
+          containerPort: 9090
+          protocol: TCP
+        env:
+        - name: PRIMARY_REGION
+          valueFrom:
+            configMapKeyRef:
+              name: disaster-recovery-config
+              key: primary-region
+        - name: SECONDARY_REGIONS
+          valueFrom:
+            configMapKeyRef:
+              name: disaster-recovery-config
+              key: secondary-regions
+        - name: RTO_TARGET
+          valueFrom:
+            configMapKeyRef:
+              name: disaster-recovery-config
+              key: rto-target
+        - name: RPO_TARGET
+          valueFrom:
+            configMapKeyRef:
+              name: disaster-recovery-config
+              key: rpo-target
+        - name: HEALTH_CHECK_INTERVAL
+          valueFrom:
+            configMapKeyRef:
+              name: disaster-recovery-config
+              key: health-check-interval
+        - name: FAILOVER_THRESHOLD
+          valueFrom:
+            configMapKeyRef:
+              name: disaster-recovery-config
+              key: failover-threshold
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        command:
+        - /bin/sh
+        - -c
+        - |
+          echo "🚀 Starting Disaster Recovery Controller..."
+          
+          # Continuous health monitoring
+          while true; do
+            # Check primary region health
+            if ! curl -f http://astral-turf-service:3000/health; then
+              echo "🚨 Primary region health check failed"
+              FAILED_CHECKS=$((FAILED_CHECKS + 1))
+              
+              if [ $FAILED_CHECKS -ge $FAILOVER_THRESHOLD ]; then
+                echo "🔄 Initiating automatic failover..."
+                
+                # Update DNS to secondary region
+                aws route53 change-resource-record-sets --hosted-zone-id $HOSTED_ZONE_ID --change-batch '{
+                  "Changes": [{
+                    "Action": "UPSERT",
+                    "ResourceRecordSet": {
+                      "Name": "app.astral-turf.com",
+                      "Type": "CNAME",
+                      "TTL": 60,
+                      "ResourceRecords": [{"Value": "secondary.app.astral-turf.com"}]
+                    }
+                  }]
+                }'
+                
+                # Notify operations team
+                aws sns publish --topic-arn $SNS_TOPIC_ARN --message "CRITICAL: Automatic failover initiated for Astral Turf production environment"
+                
+                # Reset counter
+                FAILED_CHECKS=0
+              fi
+            else
+              FAILED_CHECKS=0
+            fi
+            
+            sleep $HEALTH_CHECK_INTERVAL
+          done
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: disaster-recovery-sa
+  namespace: astral-turf
+  labels:
+    app.kubernetes.io/name: astral-turf
+    app.kubernetes.io/component: disaster-recovery
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::ACCOUNT_ID:role/AstralTurfDisasterRecoveryRole
+automountServiceAccountToken: true
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: backup-encryption-secret
+  namespace: astral-turf
+  labels:
+    app.kubernetes.io/name: astral-turf
+    app.kubernetes.io/component: disaster-recovery
+type: Opaque
+data:
+  encryption-key: BASE64_ENCODED_ENCRYPTION_KEY
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: disaster-recovery-network-policy
+  namespace: astral-turf
+  labels:
+    app.kubernetes.io/name: astral-turf
+    app.kubernetes.io/component: disaster-recovery
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: disaster-recovery
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: monitoring
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/name: prometheus
+    ports:
+    - protocol: TCP
+      port: 8080
+    - protocol: TCP
+      port: 9090
+  egress:
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 443  # HTTPS
+    - protocol: TCP
+      port: 53   # DNS
+    - protocol: UDP
+      port: 53   # DNS

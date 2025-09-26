@@ -1,0 +1,65 @@
+# ==================================================================
+# QUANTUM'S VERTICAL POD AUTOSCALER
+# Intelligent resource optimization for perfect performance
+# ==================================================================
+
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: astral-turf-vpa
+  namespace: astral-turf
+  labels:
+    app.kubernetes.io/name: astral-turf
+    app.kubernetes.io/component: vpa
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: astral-turf-app
+  
+  updatePolicy:
+    updateMode: "Auto"
+    minReplicas: 5
+  
+  resourcePolicy:
+    containerPolicies:
+    - containerName: astral-turf
+      minAllowed:
+        cpu: 250m
+        memory: 512Mi
+      maxAllowed:
+        cpu: 4000m
+        memory: 8Gi
+      controlledResources: ["cpu", "memory"]
+      controlledValues: RequestsAndLimits
+
+---
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: nginx-vpa
+  namespace: astral-turf
+  labels:
+    app.kubernetes.io/name: nginx
+    app.kubernetes.io/component: vpa
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nginx-deployment
+  
+  updatePolicy:
+    updateMode: "Auto"
+    minReplicas: 2
+  
+  resourcePolicy:
+    containerPolicies:
+    - containerName: nginx
+      minAllowed:
+        cpu: 100m
+        memory: 128Mi
+      maxAllowed:
+        cpu: 1000m
+        memory: 1Gi
+      controlledResources: ["cpu", "memory"]
+      controlledValues: RequestsAndLimits

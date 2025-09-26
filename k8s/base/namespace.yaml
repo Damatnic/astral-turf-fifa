@@ -1,0 +1,48 @@
+# ==================================================================
+# QUANTUM'S KUBERNETES NAMESPACE
+# Isolated environment for Astral Turf
+# ==================================================================
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: astral-turf
+  labels:
+    app.kubernetes.io/name: astral-turf
+    app.kubernetes.io/component: namespace
+    app.kubernetes.io/part-of: astral-turf-platform
+    environment: production
+  annotations:
+    kubernetes.io/managed-by: "quantum-infrastructure"
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: astral-turf-quota
+  namespace: astral-turf
+spec:
+  hard:
+    requests.cpu: "10"
+    requests.memory: 20Gi
+    limits.cpu: "20"
+    limits.memory: 40Gi
+    persistentvolumeclaims: "10"
+    pods: "50"
+    services: "20"
+    secrets: "50"
+    configmaps: "50"
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: astral-turf-limits
+  namespace: astral-turf
+spec:
+  limits:
+  - default:
+      cpu: 500m
+      memory: 512Mi
+    defaultRequest:
+      cpu: 100m
+      memory: 128Mi
+    type: Container

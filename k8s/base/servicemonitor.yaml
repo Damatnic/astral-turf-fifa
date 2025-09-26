@@ -1,0 +1,118 @@
+# ==================================================================
+# QUANTUM'S SERVICE MONITORS
+# Prometheus monitoring configuration for all services
+# ==================================================================
+
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: astral-turf-metrics
+  namespace: astral-turf
+  labels:
+    app.kubernetes.io/name: astral-turf
+    app.kubernetes.io/component: monitoring
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: astral-turf
+      app.kubernetes.io/component: application
+  
+  endpoints:
+  - port: metrics
+    path: /metrics
+    interval: 30s
+    scrapeTimeout: 10s
+    honorLabels: true
+    
+    # Metric relabeling
+    metricRelabelings:
+    - sourceLabels: [__name__]
+      regex: 'go_.*'
+      action: drop
+    - sourceLabels: [__name__]
+      regex: 'process_.*'
+      action: drop
+    
+    # Target relabeling
+    relabelings:
+    - sourceLabels: [__meta_kubernetes_pod_name]
+      targetLabel: pod
+    - sourceLabels: [__meta_kubernetes_pod_node_name]
+      targetLabel: node
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: nginx-metrics
+  namespace: astral-turf
+  labels:
+    app.kubernetes.io/name: nginx
+    app.kubernetes.io/component: monitoring
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nginx
+      app.kubernetes.io/component: loadbalancer
+  
+  endpoints:
+  - port: metrics
+    path: /metrics
+    interval: 30s
+    scrapeTimeout: 10s
+    
+    relabelings:
+    - sourceLabels: [__meta_kubernetes_pod_name]
+      targetLabel: pod
+    - sourceLabels: [__meta_kubernetes_pod_node_name]
+      targetLabel: node
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: kubernetes-system-metrics
+  namespace: astral-turf
+  labels:
+    app.kubernetes.io/name: kubernetes
+    app.kubernetes.io/component: monitoring
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      k8s-app: metrics-server
+  
+  namespaceSelector:
+    matchNames:
+    - kube-system
+  
+  endpoints:
+  - port: https
+    path: /metrics
+    scheme: https
+    interval: 30s
+    tlsConfig:
+      insecureSkipVerify: true
+    bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: astral-turf-metrics-service
+  namespace: astral-turf
+  labels:
+    app.kubernetes.io/name: astral-turf
+    app.kubernetes.io/component: metrics
+spec:
+  selector:
+    app.kubernetes.io/name: astral-turf
+    app.kubernetes.io/component: application
+  ports:
+  - name: metrics
+    port: 9090
+    targetPort: 9090
+    protocol: TCP
+  type: ClusterIP

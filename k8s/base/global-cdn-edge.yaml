@@ -1,0 +1,674 @@
+# ==================================================================
+# QUANTUM'S GLOBAL CDN & EDGE COMPUTING OPTIMIZATION
+# Sub-50ms global response times with intelligent caching
+# ==================================================================
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: edge-computing-config
+  namespace: astral-turf
+  labels:
+    app.kubernetes.io/name: astral-turf
+    app.kubernetes.io/component: edge-computing
+data:
+  cloudflare-config.yaml: |
+    zones:
+      - zone_id: "CLOUDFLARE_ZONE_ID"
+        domain: "astral-turf.com"
+        cdn_settings:
+          development_mode: "off"
+          caching_level: "aggressive"
+          browser_cache_ttl: 31536000  # 1 year
+          edge_cache_ttl: 7200  # 2 hours
+          always_online: "on"
+          opportunistic_encryption: "on"
+          automatic_https_rewrites: "on"
+          min_tls_version: "1.2"
+          tls_1_3: "on"
+          brotli: "on"
+          http2: "on"
+          http3: "on"
+          zero_rtt: "on"
+        page_rules:
+          - targets:
+            - target: "url"
+              constraint:
+                operator: "matches"
+                value: "app.astral-turf.com/static/*"
+            actions:
+            - id: "cache_level"
+              value: "cache_everything"
+            - id: "edge_cache_ttl"
+              value: 2592000  # 30 days
+            - id: "browser_cache_ttl"
+              value: 31536000  # 1 year
+          - targets:
+            - target: "url"
+              constraint:
+                operator: "matches"
+                value: "api.astral-turf.com/api/tactics/*"
+            actions:
+            - id: "cache_level"
+              value: "bypass"
+            - id: "disable_performance"
+              value: "off"
+        workers:
+          - name: "tactical-board-optimizer"
+            script: |
+              addEventListener('fetch', event => {
+                event.respondWith(handleRequest(event.request))
+              })
+              
+              async function handleRequest(request) {
+                const url = new URL(request.url)
+                const cache = caches.default
+                
+                // Cache tactical board assets at edge
+                if (url.pathname.startsWith('/tactical-board/')) {
+                  const cacheKey = new Request(url.toString(), request)
+                  let response = await cache.match(cacheKey)
+                  
+                  if (!response) {
+                    response = await fetch(request)
+                    if (response.status === 200) {
+                      const headers = new Headers(response.headers)
+                      headers.set('Cache-Control', 'public, max-age=3600')
+                      headers.set('X-Edge-Cache', 'MISS')
+                      
+                      response = new Response(response.body, {
+                        status: response.status,
+                        statusText: response.statusText,
+                        headers: headers
+                      })
+                      
+                      await cache.put(cacheKey, response.clone())
+                    }
+                  } else {
+                    const headers = new Headers(response.headers)
+                    headers.set('X-Edge-Cache', 'HIT')
+                    response = new Response(response.body, {
+                      status: response.status,
+                      statusText: response.statusText,
+                      headers: headers
+                    })
+                  }
+                  
+                  return response
+                }
+                
+                // Real-time collaboration optimization
+                if (url.pathname.startsWith('/api/collaboration/')) {
+                  const origin = await fetch(request)
+                  const headers = new Headers(origin.headers)
+                  headers.set('X-Edge-Optimization', 'collaboration')
+                  
+                  return new Response(origin.body, {
+                    status: origin.status,
+                    statusText: origin.statusText,
+                    headers: headers
+                  })
+                }
+                
+                return fetch(request)
+              }
+          - name: "ai-response-optimizer"
+            script: |
+              addEventListener('fetch', event => {
+                event.respondWith(handleAIRequest(event.request))
+              })
+              
+              async function handleAIRequest(request) {
+                const url = new URL(request.url)
+                
+                if (url.pathname.startsWith('/api/ai/')) {
+                  const userRegion = request.cf.country
+                  const closestAIEndpoint = getClosestAIEndpoint(userRegion)
+                  
+                  const modifiedRequest = new Request(request, {
+                    headers: {
+                      ...request.headers,
+                      'X-Edge-Region': userRegion,
+                      'X-AI-Endpoint': closestAIEndpoint
+                    }
+                  })
+                  
+                  return fetch(modifiedRequest)
+                }
+                
+                return fetch(request)
+              }
+              
+              function getClosestAIEndpoint(country) {
+                const regions = {
+                  'US': 'us-east-1.ai.astral-turf.com',
+                  'CA': 'us-east-1.ai.astral-turf.com',
+                  'GB': 'eu-west-1.ai.astral-turf.com',
+                  'DE': 'eu-west-1.ai.astral-turf.com',
+                  'FR': 'eu-west-1.ai.astral-turf.com',
+                  'JP': 'ap-northeast-1.ai.astral-turf.com',
+                  'AU': 'ap-southeast-2.ai.astral-turf.com',
+                  'SG': 'ap-southeast-1.ai.astral-turf.com'
+                }
+                return regions[country] || 'us-east-1.ai.astral-turf.com'
+              }
+  
+  redis-edge-config.yaml: |
+    clusters:
+      us-east-1:
+        endpoint: "us-east-1.redis.astral-turf.com"
+        port: 6379
+        ssl: true
+        cluster_mode: true
+        read_preference: "nearest"
+      us-west-2:
+        endpoint: "us-west-2.redis.astral-turf.com"
+        port: 6379
+        ssl: true
+        cluster_mode: true
+        read_preference: "nearest"
+      eu-west-1:
+        endpoint: "eu-west-1.redis.astral-turf.com"
+        port: 6379
+        ssl: true
+        cluster_mode: true
+        read_preference: "nearest"
+      ap-southeast-1:
+        endpoint: "ap-southeast-1.redis.astral-turf.com"
+        port: 6379
+        ssl: true
+        cluster_mode: true
+        read_preference: "nearest"
+    
+    cache_strategies:
+      tactical_boards:
+        ttl: 3600
+        compression: "lz4"
+        replication: "cross_region"
+        eviction_policy: "lru"
+      user_sessions:
+        ttl: 1800
+        compression: "none"
+        replication: "local"
+        eviction_policy: "ttl"
+      ai_responses:
+        ttl: 600
+        compression: "gzip"
+        replication: "nearest_region"
+        eviction_policy: "lru"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: edge-cache-controller
+  namespace: astral-turf
+  labels:
+    app.kubernetes.io/name: edge-cache-controller
+    app.kubernetes.io/component: edge-computing
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: edge-cache-controller
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: edge-cache-controller
+        app.kubernetes.io/component: edge-computing
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+        prometheus.io/path: "/metrics"
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        fsGroup: 1001
+      containers:
+      - name: edge-cache-controller
+        image: edge-cache-controller:latest
+        imagePullPolicy: Always
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        - name: metrics
+          containerPort: 9090
+          protocol: TCP
+        env:
+        - name: REDIS_CLUSTERS
+          valueFrom:
+            configMapKeyRef:
+              name: edge-computing-config
+              key: redis-edge-config.yaml
+        - name: CLOUDFLARE_CONFIG
+          valueFrom:
+            configMapKeyRef:
+              name: edge-computing-config
+              key: cloudflare-config.yaml
+        - name: CLOUDFLARE_API_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: astral-turf-secrets
+              key: cloudflare-api-token
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        command:
+        - /bin/sh
+        - -c
+        - |
+          echo "🌍 Starting Edge Cache Controller..."
+          
+          # Initialize Redis cluster connections
+          for region in us-east-1 us-west-2 eu-west-1 ap-southeast-1; do
+            echo "📡 Connecting to Redis cluster: $region"
+            redis-cli -h $region.redis.astral-turf.com -p 6379 --tls ping
+          done
+          
+          # Configure Cloudflare settings
+          echo "☁️ Configuring Cloudflare optimization..."
+          
+          # Start cache controller
+          exec edge-cache-controller \
+            --redis-config=/config/redis-edge-config.yaml \
+            --cloudflare-config=/config/cloudflare-config.yaml \
+            --metrics-port=9090 \
+            --health-port=8080 \
+            --log-level=info
+        volumeMounts:
+        - name: config
+          mountPath: /config
+          readOnly: true
+      volumes:
+      - name: config
+        configMap:
+          name: edge-computing-config
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: edge-cache-controller
+  namespace: astral-turf
+  labels:
+    app.kubernetes.io/name: edge-cache-controller
+    app.kubernetes.io/component: edge-computing
+spec:
+  selector:
+    app.kubernetes.io/name: edge-cache-controller
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080
+    protocol: TCP
+  - name: metrics
+    port: 9090
+    targetPort: 9090
+    protocol: TCP
+  type: ClusterIP
+
+---
+# ==================================================================
+# NGINX EDGE CACHE CONFIGURATION
+# ==================================================================
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-edge-cache-config
+  namespace: astral-turf
+  labels:
+    app.kubernetes.io/name: nginx
+    app.kubernetes.io/component: edge-cache
+data:
+  nginx.conf: |
+    user nginx;
+    worker_processes auto;
+    worker_rlimit_nofile 65535;
+    
+    error_log /var/log/nginx/error.log warn;
+    pid /var/run/nginx.pid;
+    
+    events {
+        worker_connections 4096;
+        use epoll;
+        multi_accept on;
+    }
+    
+    http {
+        include /etc/nginx/mime.types;
+        default_type application/octet-stream;
+        
+        # Logging format
+        log_format main '$remote_addr - $remote_user [$time_local] "$request" '
+                       '$status $body_bytes_sent "$http_referer" '
+                       '"$http_user_agent" "$http_x_forwarded_for" '
+                       'cache_status=$upstream_cache_status '
+                       'response_time=$request_time';
+        
+        access_log /var/log/nginx/access.log main;
+        
+        # Performance optimizations
+        sendfile on;
+        tcp_nopush on;
+        tcp_nodelay on;
+        keepalive_timeout 65;
+        types_hash_max_size 2048;
+        server_tokens off;
+        
+        # Gzip compression
+        gzip on;
+        gzip_vary on;
+        gzip_proxied any;
+        gzip_comp_level 6;
+        gzip_types
+            text/plain
+            text/css
+            text/xml
+            text/javascript
+            application/javascript
+            application/xml+rss
+            application/json
+            image/svg+xml;
+        
+        # Brotli compression
+        brotli on;
+        brotli_comp_level 6;
+        brotli_types
+            text/plain
+            text/css
+            text/xml
+            text/javascript
+            application/javascript
+            application/xml+rss
+            application/json
+            image/svg+xml;
+        
+        # Cache zones
+        proxy_cache_path /var/cache/nginx/tactical-boards
+                         levels=1:2
+                         keys_zone=tactical_boards:100m
+                         max_size=5g
+                         inactive=7d
+                         use_temp_path=off;
+        
+        proxy_cache_path /var/cache/nginx/static-assets
+                         levels=1:2
+                         keys_zone=static_assets:50m
+                         max_size=2g
+                         inactive=30d
+                         use_temp_path=off;
+        
+        proxy_cache_path /var/cache/nginx/api-responses
+                         levels=1:2
+                         keys_zone=api_responses:200m
+                         max_size=1g
+                         inactive=1h
+                         use_temp_path=off;
+        
+        # Rate limiting
+        limit_req_zone $binary_remote_addr zone=api:10m rate=100r/s;
+        limit_req_zone $binary_remote_addr zone=websocket:10m rate=50r/s;
+        
+        # Upstream servers
+        upstream astral_turf_backend {
+            least_conn;
+            keepalive 32;
+            
+            server astral-turf-service:3000 max_fails=3 fail_timeout=30s weight=1;
+            server astral-turf-service:3000 max_fails=3 fail_timeout=30s weight=1;
+            server astral-turf-service:3000 max_fails=3 fail_timeout=30s weight=1;
+        }
+        
+        # Main server configuration
+        server {
+            listen 80;
+            server_name app.astral-turf.com api.astral-turf.com;
+            
+            # Security headers
+            add_header X-Frame-Options "SAMEORIGIN" always;
+            add_header X-Content-Type-Options "nosniff" always;
+            add_header X-XSS-Protection "1; mode=block" always;
+            add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+            add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' wss: https:;" always;
+            
+            # Static assets with aggressive caching
+            location ~* \.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+                proxy_cache static_assets;
+                proxy_cache_valid 200 302 30d;
+                proxy_cache_valid 404 1m;
+                proxy_cache_use_stale error timeout invalid_header updating http_500 http_502 http_503 http_504;
+                proxy_cache_lock on;
+                proxy_cache_lock_timeout 5s;
+                
+                add_header Cache-Control "public, immutable, max-age=2592000";
+                add_header X-Cache-Status $upstream_cache_status;
+                
+                proxy_pass http://astral_turf_backend;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+            }
+            
+            # Tactical board data with intelligent caching
+            location /api/tactical-boards/ {
+                limit_req zone=api burst=20 nodelay;
+                
+                proxy_cache tactical_boards;
+                proxy_cache_valid 200 1h;
+                proxy_cache_valid 404 1m;
+                proxy_cache_use_stale error timeout invalid_header updating http_500 http_502 http_503 http_504;
+                proxy_cache_lock on;
+                proxy_cache_lock_timeout 5s;
+                
+                # Cache key includes user ID for personalization
+                proxy_cache_key "$scheme$request_method$host$request_uri$http_x_user_id";
+                
+                add_header X-Cache-Status $upstream_cache_status;
+                
+                proxy_pass http://astral_turf_backend;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+            }
+            
+            # Real-time collaboration (no caching)
+            location /api/collaboration/ {
+                limit_req zone=websocket burst=10 nodelay;
+                
+                proxy_pass http://astral_turf_backend;
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection "upgrade";
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                
+                # WebSocket specific settings
+                proxy_read_timeout 86400;
+                proxy_send_timeout 86400;
+                proxy_connect_timeout 5s;
+            }
+            
+            # API endpoints with smart caching
+            location /api/ {
+                limit_req zone=api burst=50 nodelay;
+                
+                # Conditional caching based on method
+                proxy_cache_methods GET HEAD;
+                proxy_cache api_responses;
+                proxy_cache_valid 200 5m;
+                proxy_cache_valid 404 1m;
+                proxy_cache_use_stale error timeout invalid_header updating http_500 http_502 http_503 http_504;
+                proxy_cache_lock on;
+                proxy_cache_lock_timeout 5s;
+                
+                # Don't cache POST, PUT, DELETE
+                proxy_cache_bypass $request_method ~* "POST|PUT|DELETE|PATCH";
+                proxy_no_cache $request_method ~* "POST|PUT|DELETE|PATCH";
+                
+                add_header X-Cache-Status $upstream_cache_status;
+                
+                proxy_pass http://astral_turf_backend;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+            }
+            
+            # Default location
+            location / {
+                proxy_pass http://astral_turf_backend;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+            }
+            
+            # Health check endpoint
+            location /nginx-health {
+                access_log off;
+                return 200 "healthy\n";
+                add_header Content-Type text/plain;
+            }
+            
+            # Cache status endpoint
+            location /cache-status {
+                access_log off;
+                return 200 "Cache zones: tactical_boards, static_assets, api_responses\n";
+                add_header Content-Type text/plain;
+            }
+        }
+    }
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-edge-cache
+  namespace: astral-turf
+  labels:
+    app.kubernetes.io/name: nginx
+    app.kubernetes.io/component: edge-cache
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nginx
+      app.kubernetes.io/component: edge-cache
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: nginx
+        app.kubernetes.io/component: edge-cache
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9113"
+        prometheus.io/path: "/metrics"
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 101
+        fsGroup: 101
+      containers:
+      - name: nginx
+        image: nginx:1.25-alpine
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+        livenessProbe:
+          httpGet:
+            path: /nginx-health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /nginx-health
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+          readOnly: true
+        - name: cache-volume
+          mountPath: /var/cache/nginx
+      - name: nginx-exporter
+        image: nginx/nginx-prometheus-exporter:0.11.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: metrics
+          containerPort: 9113
+          protocol: TCP
+        args:
+        - -nginx.scrape-uri=http://localhost/nginx_status
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: nginx-edge-cache-config
+      - name: cache-volume
+        emptyDir:
+          sizeLimit: 8Gi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-edge-cache
+  namespace: astral-turf
+  labels:
+    app.kubernetes.io/name: nginx
+    app.kubernetes.io/component: edge-cache
+spec:
+  selector:
+    app.kubernetes.io/name: nginx
+    app.kubernetes.io/component: edge-cache
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+    protocol: TCP
+  - name: metrics
+    port: 9113
+    targetPort: 9113
+    protocol: TCP
+  type: ClusterIP

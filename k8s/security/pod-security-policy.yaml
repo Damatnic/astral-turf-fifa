@@ -1,0 +1,241 @@
+# ==================================================================
+# QUANTUM'S POD SECURITY STANDARDS
+# Comprehensive security policies for all workloads
+# ==================================================================
+
+# Pod Security Policy for Astral Turf Application
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: astral-turf-psp
+  labels:
+    app.kubernetes.io/name: astral-turf
+    app.kubernetes.io/component: security
+  annotations:
+    seccomp.security.alpha.kubernetes.io/allowedProfileNames: 'runtime/default'
+    seccomp.security.alpha.kubernetes.io/defaultProfileName: 'runtime/default'
+    apparmor.security.beta.kubernetes.io/allowedProfileNames: 'runtime/default'
+    apparmor.security.beta.kubernetes.io/defaultProfileName: 'runtime/default'
+spec:
+  # Privilege and access controls
+  privileged: false
+  allowPrivilegeEscalation: false
+  
+  # Required security context
+  requiredDropCapabilities:
+    - ALL
+  
+  # Disallow adding capabilities
+  allowedCapabilities: []
+  defaultAddCapabilities: []
+  
+  # Volume restrictions
+  volumes:
+    - 'configMap'
+    - 'emptyDir'
+    - 'projected'
+    - 'secret'
+    - 'downwardAPI'
+    - 'persistentVolumeClaim'
+  
+  # Host network restrictions
+  hostNetwork: false
+  hostIPC: false
+  hostPID: false
+  
+  # Host path restrictions
+  allowedHostPaths: []
+  
+  # User restrictions
+  runAsUser:
+    rule: 'MustRunAsNonRoot'
+  
+  runAsGroup:
+    rule: 'MustRunAs'
+    ranges:
+      - min: 1000
+        max: 65535
+  
+  # Supplemental groups
+  supplementalGroups:
+    rule: 'MustRunAs'
+    ranges:
+      - min: 1000
+        max: 65535
+  
+  # File system restrictions
+  fsGroup:
+    rule: 'MustRunAs'
+    ranges:
+      - min: 1000
+        max: 65535
+  
+  # Read-only root filesystem
+  readOnlyRootFilesystem: true
+  
+  # SELinux
+  seLinux:
+    rule: 'RunAsAny'
+  
+  # Forbidden sysctls
+  forbiddenSysctls:
+    - '*'
+
+---
+# Cluster Role for PSP usage
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: astral-turf-psp-user
+  labels:
+    app.kubernetes.io/name: astral-turf
+    app.kubernetes.io/component: security
+rules:
+- apiGroups: ['policy']
+  resources: ['podsecuritypolicies']
+  verbs: ['use']
+  resourceNames:
+  - astral-turf-psp
+
+---
+# Cluster Role Binding for PSP
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: astral-turf-psp-binding
+  labels:
+    app.kubernetes.io/name: astral-turf
+    app.kubernetes.io/component: security
+roleRef:
+  kind: ClusterRole
+  name: astral-turf-psp-user
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+- kind: ServiceAccount
+  name: astral-turf-app
+  namespace: astral-turf
+
+---
+# Pod Security Policy for Privileged Workloads (monitoring, ingress)
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: privileged-psp
+  labels:
+    app.kubernetes.io/component: security
+  annotations:
+    seccomp.security.alpha.kubernetes.io/allowedProfileNames: '*'
+spec:
+  privileged: true
+  allowPrivilegeEscalation: true
+  allowedCapabilities:
+  - '*'
+  volumes:
+  - '*'
+  hostNetwork: true
+  hostPorts:
+  - min: 0
+    max: 65535
+  hostIPC: true
+  hostPID: true
+  runAsUser:
+    rule: 'RunAsAny'
+  seLinux:
+    rule: 'RunAsAny'
+  supplementalGroups:
+    rule: 'RunAsAny'
+  fsGroup:
+    rule: 'RunAsAny'
+
+---
+# Cluster Role for Privileged PSP
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: privileged-psp-user
+  labels:
+    app.kubernetes.io/component: security
+rules:
+- apiGroups: ['policy']
+  resources: ['podsecuritypolicies']
+  verbs: ['use']
+  resourceNames:
+  - privileged-psp
+
+---
+# Cluster Role Binding for Privileged Workloads
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: privileged-psp-binding
+  labels:
+    app.kubernetes.io/component: security
+roleRef:
+  kind: ClusterRole
+  name: privileged-psp-user
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+# NGINX Ingress Controller
+- kind: ServiceAccount
+  name: nginx-ingress-controller
+  namespace: ingress-nginx
+# Prometheus Node Exporter
+- kind: ServiceAccount
+  name: prometheus-node-exporter
+  namespace: monitoring
+# Kube-proxy
+- kind: ServiceAccount
+  name: kube-proxy
+  namespace: kube-system
+
+---
+# Pod Security Standards (for Kubernetes 1.23+)
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: astral-turf
+  labels:
+    # Enforce baseline security standards
+    pod-security.kubernetes.io/enforce: baseline
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/warn: restricted
+    
+    # Exempt system workloads
+    pod-security.kubernetes.io/enforce-version: latest
+    pod-security.kubernetes.io/audit-version: latest
+    pod-security.kubernetes.io/warn-version: latest
+
+---
+# Network Security Context for namespace
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: astral-turf-security-limits
+  namespace: astral-turf
+  labels:
+    app.kubernetes.io/name: astral-turf
+    app.kubernetes.io/component: security
+spec:
+  limits:
+  # Pod-level limits
+  - default:
+      cpu: "500m"
+      memory: "512Mi"
+      ephemeral-storage: "1Gi"
+    defaultRequest:
+      cpu: "100m"
+      memory: "128Mi"
+      ephemeral-storage: "100Mi"
+    type: Container
+  
+  # Container-level limits
+  - max:
+      cpu: "2"
+      memory: "4Gi"
+      ephemeral-storage: "10Gi"
+    type: Container
+  
+  # PVC limits
+  - max:
+      storage: "100Gi"
+    type: PersistentVolumeClaim

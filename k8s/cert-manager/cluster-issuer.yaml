@@ -1,0 +1,283 @@
+# ==================================================================
+# QUANTUM'S CERT-MANAGER CONFIGURATION
+# Automated SSL/TLS certificate management
+# ==================================================================
+
+# Let's Encrypt Production Cluster Issuer
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+  labels:
+    app.kubernetes.io/name: cert-manager
+    app.kubernetes.io/component: cluster-issuer
+spec:
+  acme:
+    # Let's Encrypt production server
+    server: https://acme-v02.api.letsencrypt.org/directory
+    
+    # Email for notifications
+    email: ssl@astral-turf.com
+    
+    # Secret to store private key
+    privateKeySecretRef:
+      name: letsencrypt-prod-private-key
+    
+    # Solvers for domain validation
+    solvers:
+    # HTTP-01 solver for most domains
+    - http01:
+        ingress:
+          class: nginx
+          podTemplate:
+            spec:
+              nodeSelector:
+                "kubernetes.io/os": linux
+              tolerations:
+              - key: node-role.kubernetes.io/master
+                operator: Equal
+                effect: NoSchedule
+    
+    # DNS-01 solver for wildcard certificates
+    - dns01:
+        route53:
+          region: us-east-1
+          accessKeyID: AKIAIOSFODNN7EXAMPLE
+          secretAccessKeySecretRef:
+            name: route53-credentials
+            key: secret-access-key
+        selector:
+          dnsNames:
+          - '*.astral-turf.com'
+          - 'astral-turf.com'
+
+---
+# Let's Encrypt Staging Cluster Issuer (for testing)
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+  labels:
+    app.kubernetes.io/name: cert-manager
+    app.kubernetes.io/component: cluster-issuer
+spec:
+  acme:
+    # Let's Encrypt staging server
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    
+    # Email for notifications
+    email: ssl@astral-turf.com
+    
+    # Secret to store private key
+    privateKeySecretRef:
+      name: letsencrypt-staging-private-key
+    
+    # Solvers
+    solvers:
+    - http01:
+        ingress:
+          class: nginx
+    - dns01:
+        route53:
+          region: us-east-1
+          accessKeyID: AKIAIOSFODNN7EXAMPLE
+          secretAccessKeySecretRef:
+            name: route53-credentials
+            key: secret-access-key
+
+---
+# Self-Signed Cluster Issuer (for development)
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: selfsigned-issuer
+  labels:
+    app.kubernetes.io/name: cert-manager
+    app.kubernetes.io/component: cluster-issuer
+spec:
+  selfSigned: {}
+
+---
+# CA Cluster Issuer (for internal services)
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: ca-issuer
+  labels:
+    app.kubernetes.io/name: cert-manager
+    app.kubernetes.io/component: cluster-issuer
+spec:
+  ca:
+    secretName: ca-key-pair
+
+---
+# Root CA Certificate (self-signed)
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: ca-certificate
+  namespace: cert-manager
+  labels:
+    app.kubernetes.io/name: cert-manager
+    app.kubernetes.io/component: ca-certificate
+spec:
+  secretName: ca-key-pair
+  issuerRef:
+    name: selfsigned-issuer
+    kind: ClusterIssuer
+  commonName: "Astral Turf Root CA"
+  duration: 8760h # 1 year
+  renewBefore: 720h # 30 days
+  isCA: true
+  subject:
+    organizationalUnits:
+    - Infrastructure Team
+    organizations:
+    - Astral Turf
+    countries:
+    - US
+    localities:
+    - San Francisco
+    provinces:
+    - CA
+
+---
+# Wildcard Certificate for astral-turf.com
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wildcard-astral-turf-com
+  namespace: astral-turf
+  labels:
+    app.kubernetes.io/name: cert-manager
+    app.kubernetes.io/component: certificate
+spec:
+  secretName: wildcard-astral-turf-tls
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+  - astral-turf.com
+  - '*.astral-turf.com'
+  duration: 2160h # 90 days
+  renewBefore: 720h # 30 days before expiry
+
+---
+# Certificate for API subdomain
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: api-astral-turf-com
+  namespace: astral-turf
+  labels:
+    app.kubernetes.io/name: cert-manager
+    app.kubernetes.io/component: certificate
+spec:
+  secretName: api-astral-turf-tls
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+  - api.astral-turf.com
+  duration: 2160h # 90 days
+  renewBefore: 720h # 30 days before expiry
+
+---
+# Certificate for monitoring (Grafana)
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: monitoring-astral-turf-com
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/name: cert-manager
+    app.kubernetes.io/component: certificate
+spec:
+  secretName: monitoring-astral-turf-tls
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+  - grafana.astral-turf.com
+  - prometheus.astral-turf.com
+  - alertmanager.astral-turf.com
+  duration: 2160h # 90 days
+  renewBefore: 720h # 30 days before expiry
+
+---
+# AWS Route53 Credentials Secret
+apiVersion: v1
+kind: Secret
+metadata:
+  name: route53-credentials
+  namespace: cert-manager
+  labels:
+    app.kubernetes.io/name: cert-manager
+    app.kubernetes.io/component: dns-credentials
+type: Opaque
+data:
+  # Base64 encoded AWS secret access key
+  secret-access-key: V0hBVEVWRVJfWU9VUl9BV1NfU0VDUkVUX0FDQ0VTU19LRVlfSVNfSEVSRQ==
+
+---
+# Service Monitor for cert-manager metrics
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: cert-manager-metrics
+  namespace: cert-manager
+  labels:
+    app.kubernetes.io/name: cert-manager
+    app.kubernetes.io/component: monitoring
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cert-manager
+      app.kubernetes.io/component: controller
+  endpoints:
+  - port: tcp-prometheus-servicemonitor
+    interval: 60s
+    path: /metrics
+    honorLabels: true
+
+---
+# Certificate Expiry Alert
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: cert-manager-alerts
+  namespace: cert-manager
+  labels:
+    app.kubernetes.io/name: cert-manager
+    app.kubernetes.io/component: monitoring
+    prometheus: kube-prometheus
+    role: alert-rules
+spec:
+  groups:
+  - name: cert-manager
+    interval: 60s
+    rules:
+    - alert: CertManagerCertificateExpirySoon
+      expr: |
+        certmanager_certificate_expiration_timestamp_seconds - time() < 604800
+      for: 1h
+      labels:
+        severity: warning
+        component: cert-manager
+      annotations:
+        summary: "Certificate will expire soon"
+        description: "Certificate {{ $labels.name }} in namespace {{ $labels.namespace }} will expire in less than 7 days"
+        runbook_url: "https://docs.astral-turf.com/runbooks/certificate-expiry"
+    
+    - alert: CertManagerCertificateNotReady
+      expr: |
+        certmanager_certificate_ready_status == 0
+      for: 10m
+      labels:
+        severity: critical
+        component: cert-manager
+      annotations:
+        summary: "Certificate is not ready"
+        description: "Certificate {{ $labels.name }} in namespace {{ $labels.namespace }} is not ready"
+        runbook_url: "https://docs.astral-turf.com/runbooks/certificate-not-ready"

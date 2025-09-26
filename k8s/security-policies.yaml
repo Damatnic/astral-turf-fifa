@@ -1,0 +1,587 @@
+# ================================
+# FORTRESS-LEVEL KUBERNETES SECURITY POLICIES
+# Banking-grade security for Astral Turf deployment
+# ================================
+
+---
+# Pod Security Policy (Legacy) - For clusters that still use PSP
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: astral-turf-fortress-psp
+  annotations:
+    seccomp.security.alpha.kubernetes.io/allowedProfileNames: 'runtime/default'
+    seccomp.security.alpha.kubernetes.io/defaultProfileName: 'runtime/default'
+    apparmor.security.beta.kubernetes.io/allowedProfileNames: 'runtime/default'
+    apparmor.security.beta.kubernetes.io/defaultProfileName: 'runtime/default'
+spec:
+  # Security: No privileged containers
+  privileged: false
+  
+  # Security: No privilege escalation
+  allowPrivilegeEscalation: false
+  
+  # Security: No host access
+  hostNetwork: false
+  hostIPC: false
+  hostPID: false
+  
+  # Security: No host ports
+  hostPorts:
+  - min: 0
+    max: 0
+  
+  # Security: Drop all capabilities
+  requiredDropCapabilities:
+    - ALL
+  
+  # Security: Only allow specific capabilities
+  allowedCapabilities:
+    - NET_BIND_SERVICE
+  
+  # Security: Run as non-root
+  runAsUser:
+    rule: 'MustRunAsNonRoot'
+    ranges:
+      - min: 1001
+        max: 65534
+  
+  runAsGroup:
+    rule: 'MustRunAs'
+    ranges:
+      - min: 1001
+        max: 65534
+  
+  # Security: No setuid/setgid
+  fsGroup:
+    rule: 'RunAsAny'
+  
+  # Security: Read-only root filesystem
+  readOnlyRootFilesystem: true
+  
+  # Security: Allowed volume types
+  volumes:
+    - 'configMap'
+    - 'emptyDir'
+    - 'projected'
+    - 'secret'
+    - 'downwardAPI'
+    - 'persistentVolumeClaim'
+  
+  # Security: SELinux
+  seLinux:
+    rule: 'RunAsAny'
+
+---
+# Pod Security Standards (Current) - For modern clusters
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: astral-turf-production
+  labels:
+    name: astral-turf-production
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/warn: restricted
+    security.level: banking-grade
+
+---
+# Network Policy - Fortress-level network isolation
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: astral-turf-fortress-network-policy
+  namespace: astral-turf-production
+spec:
+  podSelector:
+    matchLabels:
+      app: astral-turf
+  
+  policyTypes:
+    - Ingress
+    - Egress
+  
+  ingress:
+    # Allow traffic from load balancer only
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-system
+        - podSelector:
+            matchLabels:
+              app: nginx-ingress
+      ports:
+        - protocol: TCP
+          port: 3000
+    
+    # Allow traffic from monitoring systems
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring-system
+        - podSelector:
+            matchLabels:
+              app: prometheus
+      ports:
+        - protocol: TCP
+          port: 3000
+  
+  egress:
+    # Allow DNS resolution
+    - to: []
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    
+    # Allow HTTPS to external APIs
+    - to: []
+      ports:
+        - protocol: TCP
+          port: 443
+    
+    # Allow database connections
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: database-system
+      ports:
+        - protocol: TCP
+          port: 5432
+    
+    # Allow Redis connections
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: cache-system
+      ports:
+        - protocol: TCP
+          port: 6379
+
+---
+# Service Account with minimal permissions
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: astral-turf-service-account
+  namespace: astral-turf-production
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::ACCOUNT:role/astral-turf-k8s-role
+automountServiceAccountToken: false
+
+---
+# Role with minimal required permissions
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: astral-turf-role
+  namespace: astral-turf-production
+rules:
+  # Minimal permissions for the application
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list"]
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get"]
+
+---
+# Role binding
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: astral-turf-role-binding
+  namespace: astral-turf-production
+subjects:
+  - kind: ServiceAccount
+    name: astral-turf-service-account
+    namespace: astral-turf-production
+roleRef:
+  kind: Role
+  name: astral-turf-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# Security Context Constraints (OpenShift)
+apiVersion: security.openshift.io/v1
+kind: SecurityContextConstraints
+metadata:
+  name: astral-turf-fortress-scc
+allowHostDirVolumePlugin: false
+allowHostIPC: false
+allowHostNetwork: false
+allowHostPID: false
+allowHostPorts: false
+allowPrivilegeEscalation: false
+allowPrivilegedContainer: false
+allowedCapabilities:
+  - NET_BIND_SERVICE
+defaultAddCapabilities: null
+fsGroup:
+  type: MustRunAs
+  ranges:
+    - min: 1001
+      max: 65534
+groups: []
+priority: null
+readOnlyRootFilesystem: true
+requiredDropCapabilities:
+  - ALL
+runAsUser:
+  type: MustRunAsNonRoot
+  uidRangeMin: 1001
+  uidRangeMax: 65534
+seLinuxContext:
+  type: MustRunAs
+supplementalGroups:
+  type: MustRunAs
+  ranges:
+    - min: 1001
+      max: 65534
+users: []
+volumes:
+  - configMap
+  - downwardAPI
+  - emptyDir
+  - persistentVolumeClaim
+  - projected
+  - secret
+
+---
+# Admission Controller Configuration
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionWebhook
+metadata:
+  name: astral-turf-security-validator
+webhooks:
+  - name: security.astral-turf.io
+    clientConfig:
+      service:
+        name: astral-turf-security-webhook
+        namespace: astral-turf-production
+        path: "/validate"
+    rules:
+      - operations: ["CREATE", "UPDATE"]
+        apiGroups: [""]
+        apiVersions: ["v1"]
+        resources: ["pods"]
+    admissionReviewVersions: ["v1", "v1beta1"]
+    sideEffects: None
+    failurePolicy: Fail
+
+---
+# Resource Quotas for security
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: astral-turf-security-quota
+  namespace: astral-turf-production
+spec:
+  hard:
+    requests.cpu: "1"
+    requests.memory: 1Gi
+    limits.cpu: "2"
+    limits.memory: 2Gi
+    persistentvolumeclaims: "5"
+    services: "10"
+    secrets: "10"
+    configmaps: "10"
+    pods: "10"
+
+---
+# Limit Ranges for security constraints
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: astral-turf-security-limits
+  namespace: astral-turf-production
+spec:
+  limits:
+    - type: Container
+      default:
+        cpu: 200m
+        memory: 256Mi
+      defaultRequest:
+        cpu: 100m
+        memory: 128Mi
+      max:
+        cpu: 500m
+        memory: 512Mi
+      min:
+        cpu: 50m
+        memory: 64Mi
+    - type: Pod
+      max:
+        cpu: "1"
+        memory: 1Gi
+      min:
+        cpu: 100m
+        memory: 128Mi
+
+---
+# Deployment with fortress-level security
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: astral-turf-fortress
+  namespace: astral-turf-production
+  labels:
+    app: astral-turf
+    version: v8.0.0
+    security.level: banking-grade
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: astral-turf
+  template:
+    metadata:
+      labels:
+        app: astral-turf
+        version: v8.0.0
+        security.level: banking-grade
+      annotations:
+        # Security annotations
+        container.apparmor.security.beta.kubernetes.io/astral-turf: runtime/default
+        seccomp.security.alpha.kubernetes.io/pod: runtime/default
+        # Monitoring annotations
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "3000"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: astral-turf-service-account
+      automountServiceAccountToken: false
+      
+      # Security: Pod-level security context
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+        seccompProfile:
+          type: RuntimeDefault
+      
+      # Security: Node affinity for secure nodes
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: security.level
+                    operator: In
+                    values: ["high", "banking-grade"]
+      
+      # Security: Tolerations for tainted security nodes
+      tolerations:
+        - key: "security-zone"
+          operator: "Equal"
+          value: "restricted"
+          effect: "NoSchedule"
+      
+      containers:
+        - name: astral-turf
+          image: astral-turf:8.0.0-fortress
+          imagePullPolicy: Always
+          
+          # Security: Container-level security context
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1001
+            runAsGroup: 1001
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - NET_BIND_SERVICE
+            seccompProfile:
+              type: RuntimeDefault
+          
+          ports:
+            - containerPort: 3000
+              protocol: TCP
+              name: http
+          
+          # Security: Resource limits
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+              ephemeral-storage: 100Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+              ephemeral-storage: 1Gi
+          
+          # Security: Environment variables from secrets
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: SECURITY_HEADERS_ENABLED
+              value: "true"
+            - name: RATE_LIMITING_ENABLED
+              value: "true"
+            - name: AUDIT_LOGGING_ENABLED
+              value: "true"
+          
+          envFrom:
+            - secretRef:
+                name: astral-turf-secrets
+            - configMapRef:
+                name: astral-turf-config
+          
+          # Security: Writable volumes
+          volumeMounts:
+            - name: tmp-volume
+              mountPath: /tmp
+            - name: app-logs
+              mountPath: /app/logs
+            - name: app-temp
+              mountPath: /app/temp
+            - name: app-cache
+              mountPath: /app/cache
+          
+          # Health checks
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 3000
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 3000
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 30
+      
+      # Security: Volumes with security constraints
+      volumes:
+        - name: tmp-volume
+          emptyDir:
+            sizeLimit: 100Mi
+        - name: app-logs
+          emptyDir:
+            sizeLimit: 100Mi
+        - name: app-temp
+          emptyDir:
+            sizeLimit: 50Mi
+        - name: app-cache
+          emptyDir:
+            sizeLimit: 50Mi
+      
+      # Security: DNS policy
+      dnsPolicy: ClusterFirst
+      
+      # Security: Restart policy
+      restartPolicy: Always
+      
+      # Security: Termination grace period
+      terminationGracePeriodSeconds: 30
+      
+      # Security: Image pull secrets
+      imagePullSecrets:
+        - name: astral-turf-registry-secret
+
+---
+# Horizontal Pod Autoscaler with security constraints
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: astral-turf-hpa
+  namespace: astral-turf-production
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: astral-turf-fortress
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Percent
+          value: 10
+          periodSeconds: 60
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+        - type: Percent
+          value: 50
+          periodSeconds: 60
+
+---
+# Pod Disruption Budget for availability
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: astral-turf-pdb
+  namespace: astral-turf-production
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: astral-turf
+
+---
+# Service with security annotations
+apiVersion: v1
+kind: Service
+metadata:
+  name: astral-turf-service
+  namespace: astral-turf-production
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "arn:aws:acm:region:account:certificate/cert-id"
+    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "443"
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
+spec:
+  type: LoadBalancer
+  selector:
+    app: astral-turf
+  ports:
+    - name: https
+      port: 443
+      targetPort: 3000
+      protocol: TCP
+    - name: http
+      port: 80
+      targetPort: 3000
+      protocol: TCP

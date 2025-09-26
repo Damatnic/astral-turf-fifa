@@ -1,0 +1,370 @@
+# ==================================================================
+# QUANTUM'S PROMETHEUS ALERTING RULES
+# Comprehensive alerting for production monitoring
+# ==================================================================
+
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: astral-turf-alerts
+  namespace: monitoring
+  labels:
+    app: astral-turf
+    prometheus: kube-prometheus
+    role: alert-rules
+spec:
+  groups:
+  # ==================================================================
+  # APPLICATION PERFORMANCE ALERTS
+  # ==================================================================
+  - name: astral-turf-application
+    interval: 30s
+    rules:
+    
+    # High error rate
+    - alert: HighErrorRate
+      expr: |
+        (
+          sum(rate(http_requests_total{job="astral-turf", status=~"5.."}[5m])) /
+          sum(rate(http_requests_total{job="astral-turf"}[5m]))
+        ) > 0.05
+      for: 2m
+      labels:
+        severity: critical
+        service: astral-turf
+      annotations:
+        summary: "High error rate detected"
+        description: "Error rate is {{ $value | humanizePercentage }} for the last 5 minutes"
+        runbook_url: "https://docs.astral-turf.com/runbooks/high-error-rate"
+    
+    # High response time
+    - alert: HighResponseTime
+      expr: |
+        histogram_quantile(0.95, 
+          sum(rate(http_request_duration_seconds_bucket{job="astral-turf"}[5m])) by (le)
+        ) > 2
+      for: 5m
+      labels:
+        severity: warning
+        service: astral-turf
+      annotations:
+        summary: "High response time detected"
+        description: "95th percentile response time is {{ $value }}s"
+        runbook_url: "https://docs.astral-turf.com/runbooks/high-response-time"
+    
+    # Low throughput
+    - alert: LowThroughput
+      expr: |
+        sum(rate(http_requests_total{job="astral-turf"}[5m])) < 10
+      for: 10m
+      labels:
+        severity: warning
+        service: astral-turf
+      annotations:
+        summary: "Low request throughput"
+        description: "Request rate is {{ $value }} requests/second"
+        runbook_url: "https://docs.astral-turf.com/runbooks/low-throughput"
+    
+    # Application down
+    - alert: ApplicationDown
+      expr: |
+        up{job="astral-turf"} == 0
+      for: 1m
+      labels:
+        severity: critical
+        service: astral-turf
+      annotations:
+        summary: "Application is down"
+        description: "{{ $labels.instance }} has been down for more than 1 minute"
+        runbook_url: "https://docs.astral-turf.com/runbooks/application-down"
+
+  # ==================================================================
+  # INFRASTRUCTURE ALERTS
+  # ==================================================================
+  - name: astral-turf-infrastructure
+    interval: 30s
+    rules:
+    
+    # High CPU usage
+    - alert: HighCPUUsage
+      expr: |
+        100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+      for: 5m
+      labels:
+        severity: warning
+        component: infrastructure
+      annotations:
+        summary: "High CPU usage"
+        description: "CPU usage is {{ $value }}% on {{ $labels.instance }}"
+        runbook_url: "https://docs.astral-turf.com/runbooks/high-cpu"
+    
+    # High memory usage
+    - alert: HighMemoryUsage
+      expr: |
+        (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
+      for: 5m
+      labels:
+        severity: warning
+        component: infrastructure
+      annotations:
+        summary: "High memory usage"
+        description: "Memory usage is {{ $value }}% on {{ $labels.instance }}"
+        runbook_url: "https://docs.astral-turf.com/runbooks/high-memory"
+    
+    # High disk usage
+    - alert: HighDiskUsage
+      expr: |
+        (1 - (node_filesystem_avail_bytes{fstype!="tmpfs"} / node_filesystem_size_bytes{fstype!="tmpfs"})) * 100 > 90
+      for: 5m
+      labels:
+        severity: critical
+        component: infrastructure
+      annotations:
+        summary: "High disk usage"
+        description: "Disk usage is {{ $value }}% on {{ $labels.instance }} for {{ $labels.mountpoint }}"
+        runbook_url: "https://docs.astral-turf.com/runbooks/high-disk"
+    
+    # Node down
+    - alert: NodeDown
+      expr: |
+        up{job="node-exporter"} == 0
+      for: 2m
+      labels:
+        severity: critical
+        component: infrastructure
+      annotations:
+        summary: "Node is down"
+        description: "Node {{ $labels.instance }} has been down for more than 2 minutes"
+        runbook_url: "https://docs.astral-turf.com/runbooks/node-down"
+
+  # ==================================================================
+  # KUBERNETES ALERTS
+  # ==================================================================
+  - name: astral-turf-kubernetes
+    interval: 30s
+    rules:
+    
+    # Pod crash looping
+    - alert: PodCrashLooping
+      expr: |
+        rate(kube_pod_container_status_restarts_total{namespace="astral-turf"}[5m]) * 60 * 5 > 0
+      for: 5m
+      labels:
+        severity: warning
+        component: kubernetes
+      annotations:
+        summary: "Pod is crash looping"
+        description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} is crash looping"
+        runbook_url: "https://docs.astral-turf.com/runbooks/pod-crash-loop"
+    
+    # Pod not ready
+    - alert: PodNotReady
+      expr: |
+        kube_pod_status_ready{condition="false", namespace="astral-turf"} == 1
+      for: 5m
+      labels:
+        severity: warning
+        component: kubernetes
+      annotations:
+        summary: "Pod is not ready"
+        description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} is not ready"
+        runbook_url: "https://docs.astral-turf.com/runbooks/pod-not-ready"
+    
+    # Deployment has no available replicas
+    - alert: DeploymentNoReplicas
+      expr: |
+        kube_deployment_status_replicas_available{namespace="astral-turf"} == 0
+      for: 5m
+      labels:
+        severity: critical
+        component: kubernetes
+      annotations:
+        summary: "Deployment has no available replicas"
+        description: "Deployment {{ $labels.deployment }} in namespace {{ $labels.namespace }} has no available replicas"
+        runbook_url: "https://docs.astral-turf.com/runbooks/deployment-no-replicas"
+    
+    # HPA at maximum replicas
+    - alert: HPAMaxReplicas
+      expr: |
+        kube_horizontalpodautoscaler_status_current_replicas{namespace="astral-turf"} == kube_horizontalpodautoscaler_spec_max_replicas{namespace="astral-turf"}
+      for: 10m
+      labels:
+        severity: warning
+        component: kubernetes
+      annotations:
+        summary: "HPA has reached maximum replicas"
+        description: "HPA {{ $labels.horizontalpodautoscaler }} has reached maximum replicas ({{ $value }})"
+        runbook_url: "https://docs.astral-turf.com/runbooks/hpa-max-replicas"
+
+  # ==================================================================
+  # DATABASE ALERTS
+  # ==================================================================
+  - name: astral-turf-database
+    interval: 30s
+    rules:
+    
+    # Database connection issues
+    - alert: DatabaseConnectionFailed
+      expr: |
+        increase(database_connection_errors_total[5m]) > 5
+      for: 2m
+      labels:
+        severity: critical
+        component: database
+      annotations:
+        summary: "Database connection failures"
+        description: "Database connection failures increased by {{ $value }} in the last 5 minutes"
+        runbook_url: "https://docs.astral-turf.com/runbooks/database-connection"
+    
+    # High query execution time
+    - alert: HighQueryExecutionTime
+      expr: |
+        histogram_quantile(0.95, 
+          sum(rate(database_query_duration_seconds_bucket[5m])) by (le)
+        ) > 1
+      for: 5m
+      labels:
+        severity: warning
+        component: database
+      annotations:
+        summary: "High database query execution time"
+        description: "95th percentile query execution time is {{ $value }}s"
+        runbook_url: "https://docs.astral-turf.com/runbooks/high-query-time"
+    
+    # Too many active connections
+    - alert: TooManyDatabaseConnections
+      expr: |
+        database_active_connections / database_max_connections > 0.8
+      for: 5m
+      labels:
+        severity: warning
+        component: database
+      annotations:
+        summary: "Too many database connections"
+        description: "Database connection usage is {{ $value | humanizePercentage }}"
+        runbook_url: "https://docs.astral-turf.com/runbooks/too-many-connections"
+
+  # ==================================================================
+  # REDIS ALERTS
+  # ==================================================================
+  - name: astral-turf-redis
+    interval: 30s
+    rules:
+    
+    # Redis memory usage high
+    - alert: RedisHighMemoryUsage
+      expr: |
+        redis_memory_used_bytes / redis_memory_max_bytes > 0.9
+      for: 5m
+      labels:
+        severity: warning
+        component: redis
+      annotations:
+        summary: "Redis memory usage is high"
+        description: "Redis memory usage is {{ $value | humanizePercentage }}"
+        runbook_url: "https://docs.astral-turf.com/runbooks/redis-memory"
+    
+    # Redis connection issues
+    - alert: RedisConnectionFailed
+      expr: |
+        redis_connected_clients < 1
+      for: 2m
+      labels:
+        severity: critical
+        component: redis
+      annotations:
+        summary: "Redis connection failed"
+        description: "No clients connected to Redis for more than 2 minutes"
+        runbook_url: "https://docs.astral-turf.com/runbooks/redis-connection"
+
+  # ==================================================================
+  # SECURITY ALERTS
+  # ==================================================================
+  - name: astral-turf-security
+    interval: 30s
+    rules:
+    
+    # Multiple failed login attempts
+    - alert: MultipleFailedLogins
+      expr: |
+        increase(auth_failed_attempts_total[5m]) > 10
+      for: 2m
+      labels:
+        severity: warning
+        component: security
+      annotations:
+        summary: "Multiple failed login attempts"
+        description: "{{ $value }} failed login attempts in the last 5 minutes"
+        runbook_url: "https://docs.astral-turf.com/runbooks/failed-logins"
+    
+    # Suspicious API usage
+    - alert: SuspiciousAPIUsage
+      expr: |
+        rate(http_requests_total{status="429"}[5m]) > 0.1
+      for: 5m
+      labels:
+        severity: warning
+        component: security
+      annotations:
+        summary: "High rate limiting events"
+        description: "Rate limiting triggered {{ $value }} times per second"
+        runbook_url: "https://docs.astral-turf.com/runbooks/rate-limiting"
+
+  # ==================================================================
+  # BUSINESS METRICS ALERTS
+  # ==================================================================
+  - name: astral-turf-business
+    interval: 30s
+    rules:
+    
+    # Low user activity
+    - alert: LowUserActivity
+      expr: |
+        sum(rate(user_sessions_started_total[1h])) < 10
+      for: 30m
+      labels:
+        severity: info
+        component: business
+      annotations:
+        summary: "Low user activity"
+        description: "User session start rate is {{ $value }} per hour"
+        runbook_url: "https://docs.astral-turf.com/runbooks/low-activity"
+    
+    # High error rate in critical user flows
+    - alert: CriticalFlowErrors
+      expr: |
+        (
+          sum(rate(user_flow_errors_total{flow="tactics_creation"}[5m])) /
+          sum(rate(user_flow_total{flow="tactics_creation"}[5m]))
+        ) > 0.02
+      for: 5m
+      labels:
+        severity: critical
+        component: business
+      annotations:
+        summary: "High error rate in tactics creation flow"
+        description: "Error rate in tactics creation is {{ $value | humanizePercentage }}"
+        runbook_url: "https://docs.astral-turf.com/runbooks/tactics-errors"
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: deadman-switch
+  namespace: monitoring
+  labels:
+    app: astral-turf
+    prometheus: kube-prometheus
+    role: alert-rules
+spec:
+  groups:
+  - name: deadman-switch
+    interval: 30s
+    rules:
+    - alert: DeadMansSwitch
+      expr: vector(1)
+      labels:
+        severity: none
+      annotations:
+        summary: "Deadman switch"
+        description: "This is a deadman switch meant to ensure that the entire alerting pipeline is functional."

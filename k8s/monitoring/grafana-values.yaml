@@ -1,0 +1,419 @@
+# ==================================================================
+# QUANTUM'S GRAFANA CONFIGURATION
+# Advanced dashboard and visualization platform
+# ==================================================================
+
+# Grafana Configuration
+replicas: 2
+
+# Image configuration
+image:
+  repository: grafana/grafana
+  tag: "10.1.0"
+  pullPolicy: IfNotPresent
+
+# Security context
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 472
+  runAsGroup: 472
+  fsGroup: 472
+  fsGroupChangePolicy: OnRootMismatch
+
+# Pod security context
+podSecurityContext:
+  seccompProfile:
+    type: RuntimeDefault
+
+# Resources
+resources:
+  requests:
+    cpu: 200m
+    memory: 512Mi
+  limits:
+    cpu: 500m
+    memory: 1Gi
+
+# Persistence
+persistence:
+  enabled: true
+  type: pvc
+  storageClassName: ssd
+  accessModes:
+    - ReadWriteOnce
+  size: 20Gi
+  finalizers:
+    - kubernetes.io/pvc-protection
+
+# Service configuration
+service:
+  enabled: true
+  type: ClusterIP
+  port: 80
+  targetPort: 3000
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "3000"
+    prometheus.io/path: "/metrics"
+
+# Ingress configuration
+ingress:
+  enabled: true
+  ingressClassName: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+  hosts:
+    - grafana.astral-turf.com
+  tls:
+    - secretName: grafana-tls
+      hosts:
+        - grafana.astral-turf.com
+
+# Environment variables
+env:
+  GF_INSTALL_PLUGINS: "grafana-piechart-panel,grafana-worldmap-panel,grafana-clock-panel,vonage-status-panel,btplc-status-dot-panel"
+  GF_FEATURE_TOGGLES_ENABLE: "publicDashboards,lokiExperimentalStreaming"
+
+# Grafana configuration
+grafana.ini:
+  # Server settings
+  server:
+    protocol: http
+    http_addr: ""
+    http_port: 3000
+    domain: grafana.astral-turf.com
+    enforce_domain: false
+    root_url: "https://grafana.astral-turf.com"
+    serve_from_sub_path: false
+    router_logging: false
+    static_root_path: public
+    enable_gzip: true
+    cert_file: ""
+    cert_key: ""
+    socket: ""
+
+  # Database settings
+  database:
+    type: sqlite3
+    host: ""
+    name: grafana
+    user: ""
+    password: ""
+    url: ""
+    ssl_mode: disable
+    ca_cert_path: ""
+    client_key_path: ""
+    client_cert_path: ""
+    server_cert_name: ""
+    path: grafana.db
+    max_idle_conn: 2
+    max_open_conn: 0
+    conn_max_lifetime: 14400
+    log_queries: false
+    query_retries: 0
+    transaction_retries: 5
+
+  # Security settings
+  security:
+    disable_initial_admin_creation: false
+    admin_user: admin
+    admin_password: "${GRAFANA_ADMIN_PASSWORD}"
+    secret_key: SW2YcwTIb9zpOOhoPsMm
+    disable_gravatar: true
+    data_source_proxy_whitelist: ""
+    disable_brute_force_login_protection: false
+    cookie_secure: true
+    cookie_samesite: strict
+    allow_embedding: false
+    strict_transport_security: true
+    strict_transport_security_max_age_seconds: 86400
+    strict_transport_security_preload: false
+    strict_transport_security_subdomains: false
+    x_content_type_options: true
+    x_xss_protection: true
+    content_security_policy: true
+    content_security_policy_template: ""
+
+  # Users settings
+  users:
+    allow_sign_up: false
+    allow_org_create: false
+    auto_assign_org: true
+    auto_assign_org_id: 1
+    auto_assign_org_role: Viewer
+    verify_email_enabled: false
+    login_hint: "email or username"
+    password_hint: "password"
+    default_theme: dark
+    external_manage_link_url: ""
+    external_manage_link_name: ""
+    external_manage_info: ""
+    viewers_can_edit: false
+    editors_can_admin: false
+    user_invite_max_lifetime_duration: 24h
+    hidden_users: ""
+
+  # Auth settings
+  auth:
+    login_cookie_name: grafana_session
+    login_maximum_inactive_lifetime_duration: ""
+    login_maximum_lifetime_duration: ""
+    token_rotation_interval_minutes: 10
+    disable_login_form: false
+    disable_signout_menu: false
+    signout_redirect_url: ""
+    oauth_auto_login: false
+    oauth_state_cookie_max_age: 600
+    api_key_max_seconds_to_live: -1
+
+  # Anonymous auth
+  auth.anonymous:
+    enabled: false
+    org_name: Main Org.
+    org_role: Viewer
+    hide_version: false
+
+  # Logging
+  log:
+    mode: console
+    level: info
+    filters: ""
+
+  # Metrics
+  metrics:
+    enabled: true
+    interval_seconds: 10
+    disable_total_stats: false
+
+  # Analytics
+  analytics:
+    reporting_enabled: false
+    check_for_updates: false
+    google_analytics_ua_id: ""
+    google_tag_manager_id: ""
+
+  # Alerting
+  alerting:
+    enabled: true
+    execute_alerts: true
+    error_or_timeout: alerting
+    nodata_or_nullvalues: no_data
+    concurrent_render_limit: 5
+    evaluation_timeout_seconds: 30
+    notification_timeout_seconds: 30
+    max_attempts: 3
+
+  # SMTP settings
+  smtp:
+    enabled: true
+    host: smtp.astral-turf.com:587
+    user: alerts@astral-turf.com
+    password: "${SMTP_PASSWORD}"
+    cert_file: ""
+    key_file: ""
+    skip_verify: false
+    from_address: alerts@astral-turf.com
+    from_name: Astral Turf Grafana
+    ehlo_identity: grafana.astral-turf.com
+    startTLS_policy: ""
+
+# Data sources
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    deleteDatasources:
+      - name: Prometheus
+        orgId: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        url: http://prometheus-server.monitoring.svc.cluster.local:80
+        access: proxy
+        isDefault: true
+        jsonData:
+          timeInterval: 30s
+          httpMethod: POST
+          manageAlerts: true
+          prometheusType: Prometheus
+          prometheusVersion: 2.40.0
+      
+      - name: Loki
+        type: loki
+        url: http://loki.monitoring.svc.cluster.local:3100
+        access: proxy
+        jsonData:
+          derivedFields:
+            - datasourceUid: prometheus-uid
+              matcherRegex: "trace_id=(\\w+)"
+              name: TraceID
+              url: "$${__value.raw}"
+      
+      - name: Jaeger
+        type: jaeger
+        url: http://jaeger-query.monitoring.svc.cluster.local:16686
+        access: proxy
+
+# Dashboard providers
+dashboardProviders:
+  dashboardproviders.yaml:
+    apiVersion: 1
+    providers:
+      - name: 'astral-turf'
+        orgId: 1
+        folder: 'Astral Turf'
+        type: file
+        disableDeletion: false
+        updateIntervalSeconds: 10
+        allowUiUpdates: true
+        options:
+          path: /var/lib/grafana/dashboards/astral-turf
+      
+      - name: 'kubernetes'
+        orgId: 1
+        folder: 'Kubernetes'
+        type: file
+        disableDeletion: false
+        updateIntervalSeconds: 10
+        allowUiUpdates: true
+        options:
+          path: /var/lib/grafana/dashboards/kubernetes
+      
+      - name: 'infrastructure'
+        orgId: 1
+        folder: 'Infrastructure'
+        type: file
+        disableDeletion: false
+        updateIntervalSeconds: 10
+        allowUiUpdates: true
+        options:
+          path: /var/lib/grafana/dashboards/infrastructure
+
+# Dashboards
+dashboards:
+  astral-turf:
+    astral-turf-overview:
+      gnetId: 15758
+      revision: 1
+      datasource: Prometheus
+    
+    application-performance:
+      gnetId: 14314
+      revision: 2
+      datasource: Prometheus
+    
+    user-analytics:
+      gnetId: 13504
+      revision: 1
+      datasource: Prometheus
+  
+  kubernetes:
+    kubernetes-cluster-monitoring:
+      gnetId: 7249
+      revision: 1
+      datasource: Prometheus
+    
+    kubernetes-deployment:
+      gnetId: 8588
+      revision: 1
+      datasource: Prometheus
+    
+    kubernetes-pods:
+      gnetId: 6417
+      revision: 1
+      datasource: Prometheus
+  
+  infrastructure:
+    node-exporter:
+      gnetId: 1860
+      revision: 29
+      datasource: Prometheus
+    
+    nginx-ingress:
+      gnetId: 9614
+      revision: 1
+      datasource: Prometheus
+    
+    postgres-database:
+      gnetId: 9628
+      revision: 7
+      datasource: Prometheus
+
+# Sidecar configuration
+sidecar:
+  dashboards:
+    enabled: true
+    label: grafana_dashboard
+    labelValue: "1"
+    folder: /tmp/dashboards
+    defaultFolderName: General
+    searchNamespace: ALL
+    provider:
+      allowUiUpdates: true
+      disableDelete: false
+      foldersFromFilesStructure: true
+  
+  datasources:
+    enabled: true
+    label: grafana_datasource
+    labelValue: "1"
+    searchNamespace: ALL
+
+# Service account
+serviceAccount:
+  create: true
+  name: grafana
+  autoMount: true
+
+# Service monitor for Prometheus
+serviceMonitor:
+  enabled: true
+  namespace: monitoring
+  labels:
+    release: prometheus
+  interval: 30s
+  scrapeTimeout: 10s
+  path: /metrics
+
+# Plugins
+plugins:
+  - grafana-piechart-panel
+  - grafana-worldmap-panel
+  - grafana-clock-panel
+  - vonage-status-panel
+  - btplc-status-dot-panel
+  - grafana-polystat-panel
+  - grafana-flowcharting
+
+# Notifiers (for legacy alerting)
+notifiers:
+  notifiers.yaml:
+    notifiers:
+      - name: 'email-notifier'
+        type: 'email'
+        uid: 'email1'
+        org_id: 1
+        is_default: true
+        send_reminder: true
+        frequency: '10m'
+        disable_resolve_message: false
+        settings:
+          addresses: 'alerts@astral-turf.com'
+          subject: 'Grafana Alert - {{ .Title }}'
+    
+    delete_notifiers:
+      - name: 'slack-notifier'
+        uid: 'slack1'
+        org_id: 1
+
+# Image renderer (for PDF reports)
+imageRenderer:
+  enabled: true
+  image:
+    repository: grafana/grafana-image-renderer
+    tag: "3.6.1"
+  service:
+    port: 8081
