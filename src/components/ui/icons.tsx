@@ -8,13 +8,12 @@ export const LoadingSpinner: React.FC<{ className?: string }> = ({ className = "
     </svg>
 );
 
-export const LogoIcon: React.FC<{ className?: string; style?: React.CSSProperties }> = ({ className, style }) => (
+export const LogoIcon: React.FC<{ className?: string }> = ({ className }) => (
     <svg
         className={className}
         viewBox="0 0 100 100"
         xmlns="http://www.w3.org/2000/svg"
         fill="currentColor"
-        style={{ width: '100%', height: '100%', maxWidth: '100%', maxHeight: '100%', display: 'block', flexShrink: 0, ...style }}
       >
         {/* Soccer Ball */}
         <circle cx="50" cy="50" r="45" fill="currentColor" stroke="none" />
