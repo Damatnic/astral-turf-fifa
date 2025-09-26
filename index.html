@@ -30,15 +30,11 @@
     
     <title>Astral Turf</title>
     
-    <!-- Performance optimizations -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <!-- TailwindCSS is loaded locally via PostCSS plugin -->
     
-    <!-- Critical CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fonts are now loaded locally via @fontsource/inter -->
+    <!-- Critical CSS will be handled by Vite build -->
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
       
       /* MOBILE-FIRST RESPONSIVE DESIGN VARIABLES */
       :root {
@@ -76,22 +72,134 @@
         --text-3xl: 1.875rem; /* 30px */
         --text-4xl: 2.25rem;  /* 36px - Mobile large */
         
-        /* MOBILE LAYOUT DIMENSIONS */
-        --header-height-mobile: 56px; /* 3.5rem */
-        --header-height-tablet: 64px;  /* 4rem */
-        --sidebar-width-mobile: 280px; /* Mobile drawer width */
-        --sidebar-width-tablet: 320px; /* Tablet sidebar width */
-        --modal-padding-mobile: var(--spacing-md);
-        --modal-padding-tablet: var(--spacing-lg);
-      }
-      .light {
-        --bg-primary: #f8fafc; /* slate-50 */
-        --bg-secondary: #f1f5f9; /* slate-100 */
-        --bg-tertiary: #e2e8f0; /* slate-200 */
-        --border-primary: #cbd5e1; /* slate-300 */
-        --text-primary: #1e293b; /* slate-800 */
-        --text-secondary: #64748b; /* slate-500 */
-      }
+      /* MOBILE LAYOUT DIMENSIONS */
+      --header-height-mobile: 56px; /* 3.5rem */
+      --header-height-tablet: 64px;  /* 4rem */
+      --sidebar-width-mobile: 280px; /* Mobile drawer width */
+      --sidebar-width-tablet: 320px; /* Tablet sidebar width */
+      --modal-padding-mobile: var(--spacing-md);
+      --modal-padding-tablet: var(--spacing-lg);
+    }
+    .light {
+      --bg-primary: #f8fafc; /* slate-50 */
+      --bg-secondary: #f1f5f9; /* slate-100 */
+      --bg-tertiary: #e2e8f0; /* slate-200 */
+      --border-primary: #cbd5e1; /* slate-300 */
+      --text-primary: #1e293b; /* slate-800 */
+      --text-secondary: #64748b; /* slate-500 */
+    }
+    
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      overflow: hidden;
+    }
+
+    /* Clean SVG defaults - let Tailwind handle sizing */
+    svg {
+      display: block;
+    }
+
+    /* Animations */
+    @keyframes fadeInScale {
+      from { opacity: 0; transform: scale(0.95) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .animate-fade-in-scale { animation: fadeInScale 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+
+    /* Auth page background */
+    @keyframes gradient-animation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    body.auth-bg {
+      background: linear-gradient(-45deg, #0f172a, #1e293b, #334155, #0f172a);
+      background-size: 400% 400%;
+      animation: gradient-animation 15s ease infinite;
+    }
+
+    /* ===== MOBILE-FIRST RESPONSIVE DESIGN SYSTEM ===== */
+    
+    /* MOBILE BASE STYLES (320px+) */
+    .mobile-container {
+      width: 100%;
+      max-width: 100%;
+      padding: var(--spacing-md);
+    }
+    
+    /* MOBILE TOUCH-FRIENDLY BUTTONS */
+    .btn-mobile {
+      min-height: var(--touch-target-md);
+      min-width: var(--touch-target-md);
+      padding: var(--spacing-sm) var(--spacing-md);
+      font-size: var(--text-sm);
+      border-radius: 0.5rem;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    .btn-mobile:active {
+      transform: scale(0.98);
+      transition: transform 0.1s ease-in-out;
+    }
+    
+    /* MOBILE LAYOUT HELPERS */
+    .mobile-full-height { height: 100vh; height: 100dvh; }
+    .mobile-safe-area { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+    
+    /* MOBILE GRID SYSTEM */
+    .mobile-grid {
+      display: grid;
+      gap: var(--spacing-md);
+    }
+    
+    .mobile-grid-1 { grid-template-columns: 1fr; }
+    .mobile-grid-2 { grid-template-columns: 1fr 1fr; }
+    
+    /* MOBILE SPACING UTILITIES */
+    .mobile-p-1 { padding: var(--spacing-xs); }
+    .mobile-p-2 { padding: var(--spacing-sm); }
+    .mobile-p-3 { padding: var(--spacing-md); }
+    .mobile-p-4 { padding: var(--spacing-lg); }
+    
+    .mobile-m-1 { margin: var(--spacing-xs); }
+    .mobile-m-2 { margin: var(--spacing-sm); }
+    .mobile-m-3 { margin: var(--spacing-md); }
+    .mobile-m-4 { margin: var(--spacing-lg); }
+    
+    /* Remove default touch callouts and highlights */
+    * {
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+    
+    /* Allow text selection for specific elements */
+    input, textarea, [contenteditable], .selectable-text {
+      -webkit-user-select: text;
+      -khtml-user-select: text;
+      -moz-user-select: text;
+      -ms-user-select: text;
+      user-select: text;
+    }
+    
+    /* Touch feedback for interactive elements */
+    button, .btn, [role="button"], a, .clickable {
+      cursor: pointer;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    
+    button:active, .btn:active, [role="button"]:active, a:active, .clickable:active {
+      transform: scale(0.98);
+      opacity: 0.8;
+    }
       
       body {
         background-color: var(--bg-primary);
