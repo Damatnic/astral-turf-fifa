@@ -404,3 +404,14 @@ export async function generateTeamTalk(
     };
   }
 }
+
+// Export the service object
+export const openAiService = {
+  generateTacticalAnalysis,
+  generateFormationSuggestion,
+  getFormationAnalysis,
+  getPlayerComparison,
+  optimizeFormation,
+  generateChat,
+  generateTeamTalk,
+};

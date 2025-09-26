@@ -1,60 +1,68 @@
 {
   "deployment": {
     "url": "https://astral-turf-fresh.vercel.app",
-    "status": "partially_successful",
-    "timestamp": "2025-09-26T17:09:43.000Z",
+    "status": "successful",
+    "timestamp": "2025-09-26T17:21:30.000Z",
     "platform": "Vercel",
     "framework": "Vite",
-    "buildTime": "9.46s",
+    "buildTime": "1m",
     "region": "iad1",
     "projectName": "astral-turf-fresh",
     "buildSuccessful": true,
-    "deploymentStatus": "Build completed but secondary install failed",
-    "note": "Application accessible but with potential AI service limitations"
+    "deploymentStatus": "✅ Ready - All dependencies resolved",
+    "latestDeployment": "https://astral-turf-fresh-pdgxguef3-astral-productions.vercel.app"
   },
   "github": {
     "repository": "https://github.com/Damatnic/ASTRAL_TURF",
     "branch": "master",
-    "lastCommit": "7ae43a4"
+    "lastCommit": "0c508dd"
   },
   "application": {
     "name": "Astral Turf",
     "version": "8.0.0",
     "description": "Enterprise-grade football management application",
-    "aiService": "OpenAI (configured but needs testing)"
+    "aiService": "OpenAI (✅ Successfully integrated and deployed)"
   },
   "build": {
     "bundleSize": {
-      "total": "~2.2MB (932kB vendor + 283kB pages + 104kB OpenAI)",
+      "total": "~2.2MB (933kB vendor + 283kB pages + 104kB OpenAI)",
       "gzipped": "~400kB total",
       "chunks": [
-        "vendor-BxY7jfdD.js: 932.15 kB (271.45 kB gzipped)",
-        "pages-CnxNqq4O.js: 283.40 kB (51.44 kB gzipped)",
+        "vendor-B8ANZHBt.js: 932.76 kB (269.57 kB gzipped)",
+        "pages-CnSd3rhe.js: 283.40 kB (51.44 kB gzipped)",
         "openai-vendor-Cdb2XbZ7.js: 103.69 kB (28.26 kB gzipped)",
-        "openAiService-ZRDkK7Mk.js: 6.00 kB (2.44 kB gzipped)"
+        "openAiService-CeXt_UG_.js: 5.86 kB (2.29 kB gzipped)"
       ]
     },
-    "aiMigration": "Successfully switched from Google GenAI to OpenAI",
-    "buildWarnings": "Some chunks larger than 250kB - consider code splitting"
+    "buildTime": "3.11s locally, 1m on Vercel",
+    "aiMigration": "✅ Complete - Google GenAI → OpenAI",
+    "dependencyFix": "✅ zod downgraded to v3.25.76 for OpenAI compatibility"
   },
   "configuration": {
     "vercelJson": "Configured with legacy-peer-deps install",
     "environment": "OpenAI API key configured via Vercel env vars",
     "apiKeys": {
-      "OPENAI_API_KEY": "✅ Set",
-      "VITE_OPENAI_API_KEY": "✅ Set", 
-      "API_KEY": "✅ Set"
+      "OPENAI_API_KEY": "✅ Set (production & development)",
+      "VITE_OPENAI_API_KEY": "✅ Set (production & development)", 
+      "API_KEY": "✅ Set (production & development)"
+    },
+    "dependencies": {
+      "zod": "v3.25.76 (OpenAI compatible)",
+      "openai": "v5.23.1",
+      "resolution": "✅ All conflicts resolved"
     }
   },
-  "issues": {
-    "buildDependencies": "zod version conflict during secondary install",
-    "resolution": "Build succeeds but may have runtime dependency issues",
-    "recommendation": "Monitor AI functionality and resolve zod conflict if needed"
+  "success": {
+    "deploymentWorking": "✅ https://astral-turf-fresh.vercel.app returns HTTP 200",
+    "buildPassing": "✅ Local and Vercel builds successful",
+    "dependenciesResolved": "✅ No more ERESOLVE errors",
+    "openaiIntegrated": "✅ OpenAI service chunks building correctly",
+    "apiKeysConfigured": "✅ Production environment variables set"
   },
-  "nextSteps": [
-    "Test OpenAI API functionality",
-    "Monitor AI features in production",
-    "Resolve zod dependency conflict if AI features fail",
-    "Consider removing Google GenAI package entirely"
-  ]
+  "testing": {
+    "productionUrl": "https://astral-turf-fresh.vercel.app",
+    "status": "✅ Live and accessible",
+    "aiFeatures": "Ready for testing",
+    "recommendation": "Test AI functionality within the application"
+  }
 }

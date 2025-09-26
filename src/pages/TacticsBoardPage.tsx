@@ -2,11 +2,12 @@ import React from 'react';
 import { useTacticsContext } from '../hooks/useTacticsContext';
 import { LeftSidebar } from '../components/sidebar/LeftSidebar';
 import { RightSidebar } from '../components/sidebar/RightSidebar';
-import EnhancedSoccerField from '../components/field/EnhancedSoccerField';
+import Modern3DSoccerField from '../components/field/Modern3DSoccerField';
 import Dugout from '../components/field/Dugout';
-import EnhancedTacticalToolbar from '../components/field/EnhancedTacticalToolbar';
-import PresentationControls from '../components/field/PresentationControls';
+import GlassMorphismTacticalToolbar from '../components/field/GlassMorphismTacticalToolbar';
+import ProfessionalPresentationMode from '../components/field/ProfessionalPresentationMode';
 import ChatButton from '../components/ui/ChatButton';
+import AITacticalAnalyzer from '../components/analysis/AITacticalAnalyzer';
 import { useUIContext, useResponsive, useResponsiveNavigation } from '../hooks';
 import { TacticsErrorBoundary } from '../components/boundaries/TacticsErrorBoundary';
 import { LoadingFallback } from '../components/ErrorFallback';
@@ -84,28 +85,28 @@ const TacticsBoardPage: React.FC = React.memo(() => {
             `}
             ></div>
 
-            {/* Enhanced Soccer Field Component */}
+            {/* Modern 3D Soccer Field Component */}
             <div className="relative z-10 w-full h-full">
               <TacticsErrorBoundary
-                componentName="EnhancedSoccerField"
+                componentName="Modern3DSoccerField"
                 showDetails={import.meta.env.DEV}
                 onError={(error, errorInfo) => {
                   console.error('Soccer Field Error:', error);
                   console.error('Error Info:', errorInfo);
                 }}
               >
-                <EnhancedSoccerField />
+                <Modern3DSoccerField />
               </TacticsErrorBoundary>
             </div>
           </div>
 
-          {/* Enhanced Tactical Toolbar - Mobile Positioned */}
+          {/* Glass Morphism Tactical Toolbar - Mobile Positioned */}
           {!isPresentationMode && (
             <TacticsErrorBoundary
-              componentName="EnhancedTacticalToolbar"
+              componentName="GlassMorphismTacticalToolbar"
               showDetails={import.meta.env.DEV}
             >
-              <EnhancedTacticalToolbar />
+              <GlassMorphismTacticalToolbar />
             </TacticsErrorBoundary>
           )}
         </div>
@@ -124,13 +125,13 @@ const TacticsBoardPage: React.FC = React.memo(() => {
           </div>
         )}
 
-        {/* Presentation Controls */}
+        {/* Professional Presentation Mode */}
         {isPresentationMode && (
           <TacticsErrorBoundary
-            componentName="PresentationControls"
+            componentName="ProfessionalPresentationMode"
             showDetails={import.meta.env.DEV}
           >
-            <PresentationControls />
+            <ProfessionalPresentationMode />
           </TacticsErrorBoundary>
         )}
       </main>
@@ -162,6 +163,13 @@ const TacticsBoardPage: React.FC = React.memo(() => {
             </button>
           </div>
         </div>
+      )}
+
+      {/* AI Tactical Analyzer */}
+      {!isPresentationMode && (
+        <TacticsErrorBoundary componentName="AITacticalAnalyzer" showDetails={import.meta.env.DEV}>
+          <AITacticalAnalyzer />
+        </TacticsErrorBoundary>
       )}
 
       {/* Mobile-Optimized Chat Button */}
