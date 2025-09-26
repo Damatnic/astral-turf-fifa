@@ -32,10 +32,19 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
       return { xScale: () => 0, yScale: () => 0, points: [] };
     }
 
-    const xMin = Math.min(...data.map(d => d.x), 0);
-    const xMax = Math.max(...data.map(d => d.x));
-    const yMin = Math.min(...data.map(d => d.y), 0);
-    const yMax = Math.max(...data.map(d => d.y));
+    // Filter out invalid data points and ensure valid coordinates
+    const validData = data.filter(d => d && typeof d.x === 'number' && typeof d.y === 'number' && !isNaN(d.x) && !isNaN(d.y));
+    
+    if (validData.length === 0) {
+      return { xScale: () => 0, yScale: () => 0, points: [] };
+    }
+
+    const xCoordinates = validData.map(d => d.x);
+    const yCoordinates = validData.map(d => d.y);
+    const xMin = Math.min(...xCoordinates, 0);
+    const xMax = Math.max(...xCoordinates);
+    const yMin = Math.min(...yCoordinates, 0);
+    const yMax = Math.max(...yCoordinates);
 
     const xScale = (x: number) =>
       padding.left + ((x - xMin) / (xMax - xMin || 1)) * (width - padding.left - padding.right);
@@ -44,16 +53,29 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
       padding.bottom -
       ((y - yMin) / (yMax - yMin || 1)) * (height - padding.top - padding.bottom);
 
-    const points = data.map(d => ({ ...d, cx: xScale(d.x), cy: yScale(d.y) }));
+    const points = validData.map(d => ({ ...d, cx: xScale(d.x), cy: yScale(d.y) }));
 
     return { xScale, yScale, points };
   }, [data, width, height, padding]);
 
   const axisTicks = useMemo(() => {
-    const xMin = Math.min(...data.map(d => d.x), 0);
-    const xMax = Math.max(...data.map(d => d.x));
-    const yMin = Math.min(...data.map(d => d.y), 0);
-    const yMax = Math.max(...data.map(d => d.y));
+    if (!data || data.length === 0) {
+      return { xTicks: [], yTicks: [] };
+    }
+    
+    // Filter out invalid data points and ensure valid coordinates
+    const validData = data.filter(d => d && typeof d.x === 'number' && typeof d.y === 'number' && !isNaN(d.x) && !isNaN(d.y));
+    
+    if (validData.length === 0) {
+      return { xTicks: [], yTicks: [] };
+    }
+    
+    const xCoordinates = validData.map(d => d.x);
+    const yCoordinates = validData.map(d => d.y);
+    const xMin = Math.min(...xCoordinates, 0);
+    const xMax = Math.max(...xCoordinates);
+    const yMin = Math.min(...yCoordinates, 0);
+    const yMax = Math.max(...yCoordinates);
 
     const xTicks = [];
     for (let i = 0; i <= 5; i++) {

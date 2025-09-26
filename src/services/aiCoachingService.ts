@@ -108,11 +108,18 @@ class AICoachingService {
     if (!formation.positions || players.length === 0) {return recommendations;}
 
     const positions = Object.values(formation.positions);
+    
+    // Filter out null/undefined positions and ensure valid coordinates
+    const validPositions = positions.filter(pos => pos && typeof pos.x === 'number' && typeof pos.y === 'number');
+    
+    if (validPositions.length === 0) {return recommendations;}
 
     // Analyze width and depth
-    const avgX = positions.reduce((sum, pos) => sum + pos.x, 0) / positions.length;
-    const spreadX = Math.max(...positions.map(p => p.x)) - Math.min(...positions.map(p => p.x));
-    const spreadY = Math.max(...positions.map(p => p.y)) - Math.min(...positions.map(p => p.y));
+    const avgX = validPositions.reduce((sum, pos) => sum + pos.x, 0) / validPositions.length;
+    const xCoordinates = validPositions.map(p => p.x);
+    const yCoordinates = validPositions.map(p => p.y);
+    const spreadX = Math.max(...xCoordinates) - Math.min(...xCoordinates);
+    const spreadY = Math.max(...yCoordinates) - Math.min(...yCoordinates);
 
     // Check for formation imbalances
     if (Math.abs(avgX - 50) > 15) {

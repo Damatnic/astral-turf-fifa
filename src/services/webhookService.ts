@@ -714,7 +714,7 @@ class WebhookService {
   private generateSignature(event: WebhookEvent, secret: string): string {
     const payload = JSON.stringify(event);
     if (typeof crypto !== 'undefined') {
-      return typeof crypto !== 'undefined' ? crypto.HmacSHA256(payload, secret).toString(typeof crypto !== 'undefined' ? crypto.enc.Hex);
+      return crypto.HmacSHA256(payload, secret).toString(crypto.enc.Hex);
     }
     return 'signature-unavailable';
   }
@@ -723,7 +723,7 @@ class WebhookService {
     if (typeof crypto === 'undefined') {
       return false;
     }
-    const expectedSignature = typeof crypto !== 'undefined' ? crypto.HmacSHA256(body, secret).toString(typeof crypto !== 'undefined' ? crypto.enc.Hex);
+    const expectedSignature = crypto.HmacSHA256(body, secret).toString(crypto.enc.Hex);
     return signature === expectedSignature || signature === `sha256=${expectedSignature}`;
   }
 

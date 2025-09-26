@@ -287,8 +287,8 @@ export function debounce<T extends (...args: unknown[]) => any>(
   delay: number,
   options: { leading?: boolean; trailing?: boolean; maxWait?: number } = {}
 ): T {
-  let timeoutId: // NodeJS.Timeout | null = null;
-  let maxTimeoutId: // NodeJS.Timeout | null = null;
+  let timeoutId: ReturnType<typeof setTimeout> | null = null;
+  let maxTimeoutId: ReturnType<typeof setTimeout> | null = null;
   let lastCallTime = 0;
   let lastInvokeTime = 0;
   

@@ -55,23 +55,30 @@ const TacticalAnalyticsPanel: React.FC<TacticalAnalyticsPanelProps> = ({
     const positions = Object.values(formation.positions);
     if (positions.length === 0) {return null;}
 
+    // Filter out null/undefined positions and ensure valid coordinates
+    const validPositions = positions.filter(pos => pos && typeof pos.x === 'number' && typeof pos.y === 'number');
+    
+    if (validPositions.length === 0) {return null;}
+
     // Calculate various tactical metrics
-    const avgX = positions.reduce((sum, pos) => sum + pos.x, 0) / positions.length;
-    const avgY = positions.reduce((sum, pos) => sum + pos.y, 0) / positions.length;
+    const avgX = validPositions.reduce((sum, pos) => sum + pos.x, 0) / validPositions.length;
+    const avgY = validPositions.reduce((sum, pos) => sum + pos.y, 0) / validPositions.length;
 
-    const spreadX = Math.max(...positions.map(p => p.x)) - Math.min(...positions.map(p => p.x));
-    const spreadY = Math.max(...positions.map(p => p.y)) - Math.min(...positions.map(p => p.y));
+    const xCoordinates = validPositions.map(p => p.x);
+    const yCoordinates = validPositions.map(p => p.y);
+    const spreadX = Math.max(...xCoordinates) - Math.min(...xCoordinates);
+    const spreadY = Math.max(...yCoordinates) - Math.min(...yCoordinates);
 
-    const attackingPlayers = positions.filter(p => p.y > 60).length;
-    const defensivePlayers = positions.filter(p => p.y < 40).length;
+    const attackingPlayers = validPositions.filter(p => p.y > 60).length;
+    const defensivePlayers = validPositions.filter(p => p.y < 40).length;
 
     return {
       balance: Math.max(0, 100 - Math.abs(avgX - 50) * 2),
       width: Math.min(100, (spreadX / 100) * 100),
       depth: Math.min(100, (spreadY / 100) * 100),
       compactness: Math.max(0, 100 - (spreadX + spreadY) / 2),
-      attacking: (attackingPlayers / positions.length) * 100,
-      defensive: (defensivePlayers / positions.length) * 100,
+      attacking: (attackingPlayers / validPositions.length) * 100,
+      defensive: (defensivePlayers / validPositions.length) * 100,
     };
   }, [formation]);
 

@@ -470,7 +470,7 @@ export async function quickQualityCheck(): Promise<void> {
     // // console.log('✅ Quick quality check passed!');
   } else {
     // // console.warn(`⚠️ Quality issues found (Score: ${result.score}/100):`);
-    result.criticalIssues.forEach(issue => // // console.warn(`  • ${issue}`));
+    result.criticalIssues.forEach(issue => console.warn(`  • ${issue}`));
   }
 }
 

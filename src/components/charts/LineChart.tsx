@@ -24,10 +24,19 @@ const LineChart: React.FC<LineChartProps> = ({
       return { xScale: () => 0, yScale: () => 0, path: '', points: [] };
     }
 
-    const xMin = Math.min(...data.map(d => d.x));
-    const xMax = Math.max(...data.map(d => d.x));
-    const yMin = Math.min(...data.map(d => d.y));
-    const yMax = Math.max(...data.map(d => d.y));
+    // Filter out invalid data points and ensure valid coordinates
+    const validData = data.filter(d => d && typeof d.x === 'number' && typeof d.y === 'number' && !isNaN(d.x) && !isNaN(d.y));
+    
+    if (validData.length === 0) {
+      return { xScale: () => 0, yScale: () => 0, path: '', points: [] };
+    }
+
+    const xCoordinates = validData.map(d => d.x);
+    const yCoordinates = validData.map(d => d.y);
+    const xMin = Math.min(...xCoordinates);
+    const xMax = Math.max(...xCoordinates);
+    const yMin = Math.min(...yCoordinates);
+    const yMax = Math.max(...yCoordinates);
 
     const xScale = (x: number) =>
       padding.left + ((x - xMin) / (xMax - xMin || 1)) * (width - padding.left - padding.right);
@@ -36,11 +45,11 @@ const LineChart: React.FC<LineChartProps> = ({
       padding.bottom -
       ((y - yMin) / (yMax - yMin || 1)) * (height - padding.top - padding.bottom);
 
-    const path = data
+    const path = validData
       .map((d, i) => `${i === 0 ? 'M' : 'L'} ${xScale(d.x)} ${yScale(d.y)}`)
       .join(' ');
 
-    const points = data.map(d => ({
+    const points = validData.map(d => ({
       x: xScale(d.x),
       y: yScale(d.y),
       originalX: d.x,
@@ -54,8 +63,17 @@ const LineChart: React.FC<LineChartProps> = ({
     if (!data || data.length === 0) {
       return [];
     }
-    const yMin = Math.min(...data.map(d => d.y));
-    const yMax = Math.max(...data.map(d => d.y));
+    
+    // Filter out invalid data points and ensure valid coordinates
+    const validData = data.filter(d => d && typeof d.x === 'number' && typeof d.y === 'number' && !isNaN(d.x) && !isNaN(d.y));
+    
+    if (validData.length === 0) {
+      return [];
+    }
+    
+    const yCoordinates = validData.map(d => d.y);
+    const yMin = Math.min(...yCoordinates);
+    const yMax = Math.max(...yCoordinates);
     const ticks = [];
     for (let i = 0; i <= 4; i++) {
       const value = Math.round(yMin + (i / 4) * (yMax - yMin));
@@ -68,7 +86,15 @@ const LineChart: React.FC<LineChartProps> = ({
     if (!data || data.length === 0) {
       return [];
     }
-    const xValues = data.map(d => d.x);
+    
+    // Filter out invalid data points and ensure valid coordinates
+    const validData = data.filter(d => d && typeof d.x === 'number' && typeof d.y === 'number' && !isNaN(d.x) && !isNaN(d.y));
+    
+    if (validData.length === 0) {
+      return [];
+    }
+    
+    const xValues = validData.map(d => d.x);
     const uniqueX = [...new Set(xValues)];
     return uniqueX.map(val => ({ value: val, x: xScale(val) }));
   }, [data, xScale]);

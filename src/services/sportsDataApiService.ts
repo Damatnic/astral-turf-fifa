@@ -559,7 +559,7 @@ class SportsDataApiService {
 
       // WebSocket connection for live data
       const wsUrl = `${provider.baseUrl.replace('http', 'ws')}/matches/${matchId}/live`;
-      const ws = typeof WebSocket !== 'undefined' ? typeof WebSocket !== 'undefined' ? new WebSocket(wsUrl) : null;
+      const ws = typeof WebSocket !== 'undefined' ? new WebSocket(wsUrl) : null;
 
       if (ws) {
         ws.onmessage = (event) => {
