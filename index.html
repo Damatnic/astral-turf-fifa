@@ -101,11 +101,15 @@
       flex-shrink: 0;
     }
     
-    /* Failsafe for login logo sizing */
-    .login-logo {
+    /* Force login logo sizing */
+    .force-logo-size {
+      width: 3rem !important;
+      height: 3rem !important;
       flex-shrink: 0 !important;
-      min-width: 0 !important;
-      min-height: 0 !important;
+      min-width: 3rem !important;
+      min-height: 3rem !important;
+      max-width: 3rem !important;
+      max-height: 3rem !important;
     }
 
     /* Animations */
