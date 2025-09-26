@@ -4,8 +4,8 @@
  * Provides aggressive caching for improved performance
  */
 
-const CACHE_NAME = 'astral-turf-v1';
-const STATIC_CACHE_NAME = 'astral-turf-static-v1';
+const CACHE_NAME = 'astral-turf-v2';
+const STATIC_CACHE_NAME = 'astral-turf-static-v2';
 
 // Resources to cache immediately on install
 const STATIC_RESOURCES = [
@@ -74,6 +74,11 @@ self.addEventListener('fetch', (event) => {
 
   // Skip Chrome extension requests
   if (url.protocol === 'chrome-extension:' || url.protocol === 'moz-extension:') {
+    return;
+  }
+
+  // Skip external font requests (let browser handle them directly)
+  if (url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com') {
     return;
   }
 

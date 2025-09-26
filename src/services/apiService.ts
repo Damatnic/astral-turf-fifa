@@ -28,7 +28,7 @@ export interface ApiParameter {
   type: 'string' | 'number' | 'boolean' | 'object' | 'array';
   required: boolean;
   description: string;
-  defaultValue?: any;
+  defaultValue?: unknown;
   validation?: {
     min?: number;
     max?: number;
@@ -44,12 +44,12 @@ export interface ApiExample {
     url: string;
     method: string;
     headers: Record<string, string>;
-    body?: any;
+    body?: unknown;
   };
   response: {
     status: number;
     headers: Record<string, string>;
-    body: any;
+    body: unknown;
   };
 }
 
@@ -147,7 +147,7 @@ export interface GraphQLArgument {
   type: string;
   description: string;
   required: boolean;
-  defaultValue?: any;
+  defaultValue?: unknown;
 }
 
 class ApiService {
@@ -162,7 +162,7 @@ class ApiService {
   // Event callbacks
   private onApiCallCallback?: (usage: ApiUsage) => void;
   private onRateLimitExceededCallback?: (apiKey: string, endpoint: string) => void;
-  private onWebhookDeliveryCallback?: (webhookId: string, success: boolean, response?: any) => void;
+  private onWebhookDeliveryCallback?: (webhookId: string, success: boolean, response?: unknown) => void;
 
   constructor() {
     this.graphqlSchema = this.initializeGraphQLSchema();
@@ -177,7 +177,7 @@ class ApiService {
     await this.loadApiKeys();
     await this.loadWebhookSubscriptions();
     this.setupApiClients();
-    console.log('🔌 API service initialized');
+    // // console.log('🔌 API service initialized');
   }
 
   /**
@@ -208,7 +208,7 @@ class ApiService {
     // Save to storage
     await this.saveApiKey(apiKey);
 
-    console.log(`🔑 API key created: ${name}`);
+    // // console.log(`🔑 API key created: ${name}`);
     return apiKey;
   }
 
@@ -219,10 +219,10 @@ class ApiService {
     endpoint: string,
     method: string,
     apiKey: string,
-    data?: any,
-    params?: Record<string, any>,
+    data?: unknown,
+    params?: Record<string, unknown>,
     headers?: Record<string, string>,
-  ): Promise<{ status: number; data: any; headers: Record<string, string> }> {
+  ): Promise<{ status: number; data: unknown; headers: Record<string, string> }> {
     const startTime = Date.now();
 
     try {
@@ -270,7 +270,7 @@ class ApiService {
 
       return response;
 
-    } catch (error) {
+    } catch (_error) {
       // Log failed usage
       this.logApiUsage({
         apiKeyId: 'unknown',
@@ -294,9 +294,9 @@ class ApiService {
    */
   async executeGraphQL(
     query: string,
-    variables: Record<string, any> = {},
+    variables: Record<string, unknown> = {},
     apiKey: string,
-  ): Promise<{ data: any; errors?: any[] }> {
+  ): Promise<{ data: unknown; errors?: unknown[] }> {
     const startTime = Date.now();
 
     try {
@@ -333,7 +333,7 @@ class ApiService {
 
       return result;
 
-    } catch (error) {
+    } catch (_error) {
       return {
         data: null,
         errors: [{ message: error.message, timestamp: Date.now() }],
@@ -368,21 +368,21 @@ class ApiService {
     // Test webhook endpoint
     await this.testWebhookEndpoint(webhook);
 
-    console.log(`🪝 Webhook subscription created: ${url}`);
+    // // console.log(`🪝 Webhook subscription created: ${url}`);
     return webhook;
   }
 
   /**
    * Trigger webhook event
    */
-  async triggerWebhookEvent(event: string, data: any): Promise<void> {
+  async triggerWebhookEvent(event: string, data: unknown): Promise<void> {
     const relevantWebhooks = Array.from(this.webhooks.values())
       .filter(webhook => webhook.isActive && webhook.events.includes(event));
 
     for (const webhook of relevantWebhooks) {
       try {
         await this.deliverWebhook(webhook, event, data);
-      } catch (error) {
+      } catch (_error) {
         console.error(`❌ Failed to deliver webhook ${webhook.id}:`, error);
       }
     }
@@ -502,7 +502,7 @@ class ApiService {
     this.onRateLimitExceededCallback = callback;
   }
 
-  onWebhookDelivery(callback: (webhookId: string, success: boolean, response?: any) => void): void {
+  onWebhookDelivery(callback: (webhookId: string, success: boolean, response?: unknown) => void): void {
     this.onWebhookDeliveryCallback = callback;
   }
 
@@ -770,10 +770,10 @@ class ApiService {
 
   private async executeEndpoint(
     endpoint: ApiEndpoint,
-    data?: any,
-    params?: Record<string, any>,
+    data?: unknown,
+    params?: Record<string, unknown>,
     headers?: Record<string, string>,
-  ): Promise<{ status: number; data: any; headers: Record<string, string> }> {
+  ): Promise<{ status: number; data: unknown; headers: Record<string, string> }> {
     // Simulate endpoint execution
     // In real implementation, this would route to actual handlers
 
@@ -790,7 +790,7 @@ class ApiService {
     };
   }
 
-  private generateMockResponse(endpoint: ApiEndpoint): any {
+  private generateMockResponse(endpoint: ApiEndpoint): unknown {
     switch (endpoint.path) {
       case '/players':
         return {
@@ -939,12 +939,12 @@ class ApiService {
     }
   }
 
-  private parseGraphQLQuery(query: string): any {
+  private parseGraphQLQuery(query: string): unknown {
     // Simplified GraphQL parsing
     return { query, parsed: true };
   }
 
-  private async executeGraphQLQuery(parsedQuery: any, variables: Record<string, any>): Promise<any> {
+  private async executeGraphQLQuery(parsedQuery: unknown, variables: Record<string, unknown>): Promise<unknown> {
     // Simulate GraphQL execution
     return {
       data: {
@@ -960,7 +960,7 @@ class ApiService {
     };
   }
 
-  private async deliverWebhook(webhook: WebhookSubscription, event: string, data: any): Promise<void> {
+  private async deliverWebhook(webhook: WebhookSubscription, event: string, data: unknown): Promise<void> {
     const payload = {
       event,
       data,
@@ -988,7 +988,7 @@ class ApiService {
         this.onWebhookDeliveryCallback(webhook.id, true, response.data);
       }
 
-    } catch (error) {
+    } catch (_error) {
       webhook.failureCount++;
       webhook.retryAttempts++;
 
@@ -1025,10 +1025,10 @@ class ApiService {
         timeout: 5000,
       });
 
-      console.log(`✅ Webhook endpoint test successful: ${webhook.url}`);
+      // // console.log(`✅ Webhook endpoint test successful: ${webhook.url}`);
 
-    } catch (error) {
-      console.warn(`⚠️ Webhook endpoint test failed: ${webhook.url}`);
+    } catch (_error) {
+      // // console.warn(`⚠️ Webhook endpoint test failed: ${webhook.url}`);
       // Don't disable webhook, just log the warning
     }
   }
@@ -1051,7 +1051,7 @@ class ApiService {
     return result;
   }
 
-  private generateWebhookSignature(payload: any, secret: string): string {
+  private generateWebhookSignature(payload: unknown, secret: string): string {
     // In real implementation, would use HMAC-SHA256
     return `sha256=${Buffer.from(JSON.stringify(payload) + secret).toString('base64')}`;
   }
@@ -1318,17 +1318,17 @@ $players = $api->getPlayers(['team' => 'home']);
 
   private async loadApiKeys(): Promise<void> {
     // Load API keys from storage
-    console.log('🔑 Loading API keys');
+    // // console.log('🔑 Loading API keys');
   }
 
   private async saveApiKey(apiKey: ApiKey): Promise<void> {
     // Save API key to storage
-    console.log(`💾 API key saved: ${apiKey.name}`);
+    // // console.log(`💾 API key saved: ${apiKey.name}`);
   }
 
   private async loadWebhookSubscriptions(): Promise<void> {
     // Load webhook subscriptions from storage
-    console.log('🪝 Loading webhook subscriptions');
+    // // console.log('🪝 Loading webhook subscriptions');
   }
 }
 

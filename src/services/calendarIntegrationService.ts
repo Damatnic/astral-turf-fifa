@@ -53,8 +53,8 @@ export interface NotificationPreference {
 
 class CalendarIntegrationService {
   private providers: Map<string, CalendarProvider> = new Map();
-  private googleAuth: any = null;
-  private outlookAuth: any = null;
+  private googleAuth: unknown = null;
+  private outlookAuth: unknown = null;
   private eventCache: Map<string, CalendarEvent[]> = new Map();
   private conflictResolver: Map<string, CalendarConflict> = new Map();
 
@@ -72,7 +72,7 @@ class CalendarIntegrationService {
    */
   async initialize(): Promise<void> {
     await this.loadProviderCredentials();
-    console.log('📅 Calendar integration service initialized');
+    // // console.log('📅 Calendar integration service initialized');
   }
 
   /**
@@ -97,13 +97,13 @@ class CalendarIntegrationService {
         scope: scopes,
       });
 
-      console.log('🔐 Google Calendar auth URL generated:', authUrl);
+      // // console.log('🔐 Google Calendar auth URL generated:', authUrl);
 
       // In a real app, this would open a browser window
       // For now, we'll simulate the connection
       this.simulateOAuthFlow('google', oauth2Client);
 
-    } catch (error) {
+    } catch (_error) {
       console.error('❌ Failed to connect Google Calendar:', error);
       throw error;
     }
@@ -118,12 +118,12 @@ class CalendarIntegrationService {
         `client_id=${clientId}&response_type=code&redirect_uri=http://localhost:3000/auth/outlook/callback&` +
         `scope=https://graph.microsoft.com/calendars.readwrite&state=${uuidv4()}`;
 
-      console.log('🔐 Outlook Calendar auth URL generated:', authUrl);
+      // // console.log('🔐 Outlook Calendar auth URL generated:', authUrl);
 
       // Simulate OAuth flow for demonstration
       this.simulateOutlookConnection(clientId, clientSecret);
 
-    } catch (error) {
+    } catch (_error) {
       console.error('❌ Failed to connect Outlook Calendar:', error);
       throw error;
     }
@@ -164,9 +164,9 @@ class CalendarIntegrationService {
         this.onEventCreatedCallback(event);
       }
 
-      console.log(`📅 Event created across providers: ${createdEvents.join(', ')}`);
+      // // console.log(`📅 Event created across providers: ${createdEvents.join(', ')}`);
 
-    } catch (error) {
+    } catch (_error) {
       console.error('❌ Failed to create calendar event:', error);
       throw error;
     }
@@ -252,9 +252,9 @@ class CalendarIntegrationService {
           this.onSyncCompleteCallback(provider.name, events.length);
         }
 
-        console.log(`🔄 Synced ${events.length} events from ${provider.name}`);
+        // // console.log(`🔄 Synced ${events.length} events from ${provider.name}`);
 
-      } catch (error) {
+      } catch (_error) {
         console.error(`❌ Failed to sync ${provider.name}:`, error);
       }
     }
@@ -334,7 +334,7 @@ class CalendarIntegrationService {
       await this.configureProviderNotifications(preference);
     }
 
-    console.log('🔔 Automated notifications configured');
+    // // console.log('🔔 Automated notifications configured');
   }
 
   /**
@@ -489,7 +489,7 @@ class CalendarIntegrationService {
   private async createAppleEvent(event: CalendarEvent): Promise<void> {
     // Apple Calendar integration would require CalDAV protocol
     // For demonstration, we'll log the event
-    console.log('🍎 Apple Calendar event (CalDAV integration required):', event);
+    // // console.log('🍎 Apple Calendar event (CalDAV integration required):', event);
   }
 
   private async fetchEventsFromProvider(provider: CalendarProvider): Promise<CalendarEvent[]> {
@@ -533,7 +533,7 @@ class CalendarIntegrationService {
             },
           });
 
-          response.data.value?.forEach((item: any) => {
+          response.data.value?.forEach((item: unknown) => {
             events.push({
               id: item.id,
               title: item.subject,
@@ -543,7 +543,7 @@ class CalendarIntegrationService {
               location: item.location?.displayName,
               isAllDay: item.isAllDay,
               type: this.determineEventType(item.subject),
-              attendees: item.attendees?.map((a: any) => a.emailAddress.address) || [],
+              attendees: item.attendees?.map((a: unknown) => a.emailAddress.address) || [],
             });
           });
         }
@@ -592,18 +592,18 @@ class CalendarIntegrationService {
 
   private async detectAllConflicts(): Promise<void> {
     // Implementation for comprehensive conflict detection
-    console.log('🔍 Detecting conflicts across all calendar events');
+    // // console.log('🔍 Detecting conflicts across all calendar events');
   }
 
   private async analyzeAvailabilityPatterns(
     attendees: string[],
     dateRange: { start: string; end: string },
-  ): Promise<any> {
+  ): Promise<unknown> {
     // Analyze historical availability patterns
     return { patterns: 'analyzed' };
   }
 
-  private scoreTimeSlot(timeSlot: string, duration: number, patterns: any): number {
+  private scoreTimeSlot(timeSlot: string, duration: number, patterns: unknown): number {
     // Score based on historical patterns, conflicts, etc.
     return Math.random() * 100; // Simplified scoring
   }
@@ -615,7 +615,7 @@ class CalendarIntegrationService {
   }
 
   private async configureProviderNotifications(preference: NotificationPreference): Promise<void> {
-    console.log('🔔 Configuring notifications for provider:', preference.provider);
+    // // console.log('🔔 Configuring notifications for provider:', preference.provider);
   }
 
   private async createRecurringEvents(
@@ -623,11 +623,11 @@ class CalendarIntegrationService {
     recurrence: 'daily' | 'weekly' | 'monthly',
     endDate: string,
   ): Promise<void> {
-    console.log(`🔄 Creating recurring ${recurrence} events until ${endDate}`);
+    // // console.log(`🔄 Creating recurring ${recurrence} events until ${endDate}`);
   }
 
   // Simulation methods for demonstration
-  private simulateOAuthFlow(provider: string, auth: any): void {
+  private simulateOAuthFlow(provider: string, auth: unknown): void {
     setTimeout(() => {
       this.googleAuth = auth;
       const providerData = this.providers.get(provider);
@@ -637,7 +637,7 @@ class CalendarIntegrationService {
         providerData.syncEnabled = true;
         this.providers.set(provider, providerData);
       }
-      console.log(`✅ ${provider} Calendar connected successfully`);
+      // // console.log(`✅ ${provider} Calendar connected successfully`);
     }, 1000);
   }
 
@@ -651,7 +651,7 @@ class CalendarIntegrationService {
         providerData.syncEnabled = true;
         this.providers.set('outlook', providerData);
       }
-      console.log('✅ Outlook Calendar connected successfully');
+      // // console.log('✅ Outlook Calendar connected successfully');
     }, 1000);
   }
 }

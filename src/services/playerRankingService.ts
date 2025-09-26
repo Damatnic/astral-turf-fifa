@@ -22,7 +22,7 @@ class PlayerRankingService {
   private profiles: Map<string, PlayerRankingProfile> = new Map();
   private levelConfigs: LevelConfig[] = [];
   private badges: Map<string, BadgeDefinition> = new Map();
-  private streakTimers: Map<string, NodeJS.Timeout> = new Map();
+  private streakTimers: Map<string, unknown> = new Map();
 
   constructor() {
     this.initializeLevelConfigs();
@@ -197,7 +197,7 @@ class PlayerRankingService {
           this.profiles.set(playerId, profile as PlayerRankingProfile);
         });
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Failed to load player rankings:', error);
     }
   }
@@ -210,7 +210,7 @@ class PlayerRankingService {
         profilesObj[playerId] = profile;
       });
       localStorage.setItem('astralTurf_playerRankings', JSON.stringify(profilesObj));
-    } catch (error) {
+    } catch (_error) {
       console.error('Failed to save player rankings:', error);
     }
   }
@@ -807,7 +807,7 @@ interface BadgeDefinition {
 
 interface LevelUpResult {
   newLevel: number;
-  rewards: any[];
+  rewards: unknown[];
   title?: string;
   perks?: string[];
 }

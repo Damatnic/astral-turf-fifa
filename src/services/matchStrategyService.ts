@@ -17,7 +17,7 @@ try {
   if (apiKey) {
     aiInstance = new GoogleGenAI({ apiKey });
   }
-} catch (error) {
+} catch (_error) {
   console.error("Error initializing Match Strategy Service:", error);
   aiInstance = null;
 }
@@ -133,7 +133,7 @@ export interface OppositionAnalysisReport {
   recommendedApproach: string;
 }
 
-async function generateJson(prompt: string, schema: any, systemInstruction: string) {
+async function generateJson(prompt: string, schema: unknown, systemInstruction: string) {
   const ai = aiInstance;
   if (!ai) {throw new Error("AI is offline.");}
 
@@ -154,7 +154,7 @@ async function generateJson(prompt: string, schema: any, systemInstruction: stri
       throw new Error("AI returned an empty response.");
     }
     return JSON.parse(jsonText);
-  } catch (error) {
+  } catch (_error) {
     console.error("Error generating JSON from Gemini API:", error);
     throw new Error("Failed to get a valid JSON response from the AI.");
   }

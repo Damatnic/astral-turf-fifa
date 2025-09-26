@@ -59,7 +59,7 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
         aiPersonality,
       );
       setDevelopmentPrediction(prediction);
-    } catch (error) {
+    } catch (_error) {
       console.error('Failed to generate development prediction:', error);
     } finally {
       setLoading(false);
@@ -79,7 +79,7 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
         aiPersonality,
       );
       setFormationAnalysis(analysis);
-    } catch (error) {
+    } catch (_error) {
       console.error('Failed to generate formation analysis:', error);
     } finally {
       setLoading(false);
@@ -109,7 +109,7 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
         aiPersonality,
       );
       setMatchPrediction(prediction);
-    } catch (error) {
+    } catch (_error) {
       console.error('Failed to generate match prediction:', error);
     } finally {
       setLoading(false);
@@ -128,7 +128,7 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
         aiPersonality,
       );
       setTacticalHeatMap(heatMap);
-    } catch (error) {
+    } catch (_error) {
       console.error('Failed to generate heat map:', error);
     } finally {
       setLoading(false);
@@ -146,7 +146,7 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
         aiPersonality,
       );
       setPlayerMetrics(metrics);
-    } catch (error) {
+    } catch (_error) {
       console.error('Failed to generate player metrics:', error);
     } finally {
       setLoading(false);

@@ -5,8 +5,7 @@
  * performance analytics, and industry-standard statistics for benchmarking
  */
 
-import axios from 'axios';
-import type { AxiosInstance } from 'axios';
+import axios, { type AxiosInstance } from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 
 export interface SportsDataProvider {
@@ -147,11 +146,11 @@ export interface BenchmarkData {
 class SportsDataApiService {
   private providers: Map<string, SportsDataProvider> = new Map();
   private apiClients: Map<string, AxiosInstance> = new Map();
-  private dataCache: Map<string, { data: any; expiry: number }> = new Map();
+  private dataCache: Map<string, { data: unknown; expiry: number }> = new Map();
   private performanceBuffer: Map<string, PerformanceMetrics[]> = new Map();
 
   // Event callbacks
-  private onDataUpdateCallback?: (type: string, data: any) => void;
+  private onDataUpdateCallback?: (type: string, data: unknown) => void;
   private onPerformanceDataCallback?: (metrics: PerformanceMetrics) => void;
   private onBenchmarkUpdateCallback?: (benchmark: BenchmarkData) => void;
 
@@ -167,7 +166,7 @@ class SportsDataApiService {
   async initialize(): Promise<void> {
     await this.loadApiCredentials();
     await this.testConnections();
-    console.log('⚽ Sports data API service initialized');
+    // // console.log('⚽ Sports data API service initialized');
   }
 
   /**
@@ -193,7 +192,7 @@ class SportsDataApiService {
       this.setupApiClient(provider);
     }
 
-    console.log(`📊 Sports data provider configured: ${provider.name}`);
+    // // console.log(`📊 Sports data provider configured: ${provider.name}`);
   }
 
   /**
@@ -232,7 +231,7 @@ class SportsDataApiService {
         params: criteria,
       });
 
-      const players: ProfessionalPlayer[] = response.data.players.map((player: any) => ({
+      const players: ProfessionalPlayer[] = response.data.players.map((player: unknown) => ({
         id: player.id,
         name: player.name,
         position: player.position,
@@ -255,7 +254,7 @@ class SportsDataApiService {
       this.setCache(cacheKey, players, 30 * 60 * 1000); // 30 minutes
       return players;
 
-    } catch (error) {
+    } catch (_error) {
       console.error('❌ Failed to search professional players:', error);
       return [];
     }
@@ -288,7 +287,7 @@ class SportsDataApiService {
         name: response.data.league.name,
         country: response.data.league.country,
         season,
-        teams: response.data.standings[0].map((team: any) => ({
+        teams: response.data.standings[0].map((team: unknown) => ({
           id: team.team.id,
           name: team.team.name,
           position: team.rank,
@@ -305,7 +304,7 @@ class SportsDataApiService {
       this.setCache(cacheKey, leagueData, 60 * 60 * 1000); // 1 hour
       return leagueData;
 
-    } catch (error) {
+    } catch (_error) {
       console.error('❌ Failed to get league data:', error);
       return null;
     }
@@ -343,7 +342,7 @@ class SportsDataApiService {
           home: match.goals.home,
           away: match.goals.away,
         },
-        events: match.events?.map((event: any) => ({
+        events: match.events?.map((event: unknown) => ({
           minute: event.time.elapsed,
           type: event.type.toLowerCase(),
           player: event.player?.name || '',
@@ -380,7 +379,7 @@ class SportsDataApiService {
       this.setCache(cacheKey, matchData, 24 * 60 * 60 * 1000); // 24 hours
       return matchData;
 
-    } catch (error) {
+    } catch (_error) {
       console.error('❌ Failed to get match data:', error);
       return null;
     }
@@ -419,9 +418,9 @@ class SportsDataApiService {
           break;
       }
 
-      console.log(`📱 Connected ${deviceType} device for player ${playerId}`);
+      // // console.log(`📱 Connected ${deviceType} device for player ${playerId}`);
 
-    } catch (error) {
+    } catch (_error) {
       console.error(`❌ Failed to connect ${deviceType} device:`, error);
       throw error;
     }
@@ -461,7 +460,7 @@ class SportsDataApiService {
       this.setCache(cacheKey, performanceData, 10 * 60 * 1000); // 10 minutes
       return performanceData;
 
-    } catch (error) {
+    } catch (_error) {
       console.error('❌ Failed to get performance data:', error);
       return [];
     }
@@ -491,11 +490,11 @@ class SportsDataApiService {
       const marketData: MarketData = {
         playerId,
         currentValue: transferData.market_value || 0,
-        valueHistory: transferData.value_history?.map((entry: any) => ({
+        valueHistory: transferData.value_history?.map((entry: unknown) => ({
           date: entry.date,
           value: entry.value,
         })) || [],
-        transferHistory: transferData.transfers?.map((transfer: any) => ({
+        transferHistory: transferData.transfers?.map((transfer: unknown) => ({
           date: transfer.date,
           fromClub: transfer.from?.name || '',
           toClub: transfer.to?.name || '',
@@ -509,7 +508,7 @@ class SportsDataApiService {
       this.setCache(cacheKey, marketData, 24 * 60 * 60 * 1000); // 24 hours
       return marketData;
 
-    } catch (error) {
+    } catch (_error) {
       console.error('❌ Failed to get market data:', error);
       return null;
     }
@@ -542,7 +541,7 @@ class SportsDataApiService {
 
       return benchmarkData;
 
-    } catch (error) {
+    } catch (_error) {
       console.error('❌ Failed to get position benchmarks:', error);
       return null;
     }
@@ -560,23 +559,25 @@ class SportsDataApiService {
 
       // WebSocket connection for live data
       const wsUrl = `${provider.baseUrl.replace('http', 'ws')}/matches/${matchId}/live`;
-      const ws = new WebSocket(wsUrl);
+      const ws = typeof WebSocket !== 'undefined' ? new WebSocket(wsUrl) : null;
 
-      ws.onmessage = (event) => {
+      if (ws) {
+        ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
 
         if (this.onDataUpdateCallback) {
           this.onDataUpdateCallback('live_match', data);
         }
-      };
+        };
 
-      ws.onerror = (error) => {
-        console.error('❌ Live match stream error:', error);
-      };
+        ws.onerror = (error) => {
+          console.error('❌ Live match stream error:', error);
+        };
 
-      console.log(`📡 Started live match stream for match ${matchId}`);
+        // // console.log(`📡 Started live match stream for match ${matchId}`);
+      }
 
-    } catch (error) {
+    } catch (_error) {
       console.error('❌ Failed to start live match stream:', error);
     }
   }
@@ -605,14 +606,14 @@ class SportsDataApiService {
         recommendations: riskFactors.recommendations,
       };
 
-    } catch (error) {
+    } catch (_error) {
       console.error('❌ Failed to generate injury prevention insights:', error);
       return { riskScore: 0, factors: [], recommendations: [] };
     }
   }
 
   // Event listener setters
-  onDataUpdate(callback: (type: string, data: any) => void): void {
+  onDataUpdate(callback: (type: string, data: unknown) => void): void {
     this.onDataUpdateCallback = callback;
   }
 
@@ -746,7 +747,7 @@ class SportsDataApiService {
     }
   }
 
-  private getFromCache(key: string): any {
+  private getFromCache(key: string): unknown {
     const cached = this.dataCache.get(key);
     if (cached && cached.expiry > Date.now()) {
       return cached.data;
@@ -756,7 +757,7 @@ class SportsDataApiService {
     return null;
   }
 
-  private setCache(key: string, data: any, ttl: number): void {
+  private setCache(key: string, data: unknown, ttl: number): void {
     this.dataCache.set(key, {
       data,
       expiry: Date.now() + ttl,
@@ -773,7 +774,7 @@ class SportsDataApiService {
     }
   }
 
-  private extractStatistic(statistics: any[], type: string, team: 'home' | 'away'): number {
+  private extractStatistic(statistics: unknown[], type: string, team: 'home' | 'away'): number {
     const stat = statistics?.find(s => s.type === type);
     if (!stat) {return 0;}
 
@@ -782,30 +783,30 @@ class SportsDataApiService {
   }
 
   private async connectCatapultDevice(provider: SportsDataProvider, deviceId: string, playerId: string): Promise<void> {
-    console.log(`🔗 Connecting Catapult device ${deviceId} for player ${playerId}`);
+    // // console.log(`🔗 Connecting Catapult device ${deviceId} for player ${playerId}`);
     // Catapult-specific connection logic
   }
 
   private async connectStatsSportsDevice(provider: SportsDataProvider, deviceId: string, playerId: string): Promise<void> {
-    console.log(`🔗 Connecting STATSports device ${deviceId} for player ${playerId}`);
+    // // console.log(`🔗 Connecting STATSports device ${deviceId} for player ${playerId}`);
     // STATSports-specific connection logic
   }
 
   private async connectPolarDevice(provider: SportsDataProvider, deviceId: string, playerId: string): Promise<void> {
-    console.log(`🔗 Connecting Polar device ${deviceId} for player ${playerId}`);
+    // // console.log(`🔗 Connecting Polar device ${deviceId} for player ${playerId}`);
     // Polar-specific connection logic
   }
 
   private async connectGarminDevice(provider: SportsDataProvider, deviceId: string, playerId: string): Promise<void> {
-    console.log(`🔗 Connecting Garmin device ${deviceId} for player ${playerId}`);
+    // // console.log(`🔗 Connecting Garmin device ${deviceId} for player ${playerId}`);
     // Garmin-specific connection logic
   }
 
   private async fetchPerformanceFromProvider(
-    provider: SportsDataProvider,
-    playerId: string,
-    startDate: string,
-    endDate: string,
+    _provider: SportsDataProvider,
+    _playerId: string,
+    _startDate: string,
+    _endDate: string,
   ): Promise<PerformanceMetrics[]> {
     // Provider-specific performance data fetching
     return [];
@@ -899,7 +900,7 @@ class SportsDataApiService {
 
   private async loadApiCredentials(): Promise<void> {
     // Load API credentials from secure storage
-    console.log('🔐 Loading API credentials');
+    // // console.log('🔐 Loading API credentials');
   }
 
   private async testConnections(): Promise<void> {
@@ -909,9 +910,9 @@ class SportsDataApiService {
           const client = this.apiClients.get(provider.id);
           if (client) {
             await client.get('/health', { timeout: 5000 });
-            console.log(`✅ ${provider.name} connection successful`);
+            // // console.log(`✅ ${provider.name} connection successful`);
           }
-        } catch (error) {
+        } catch (_error) {
           console.error(`❌ ${provider.name} connection failed:`, error.message);
           provider.isActive = false;
         }

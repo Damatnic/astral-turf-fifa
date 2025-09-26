@@ -14,7 +14,7 @@ import { ENVIRONMENT_CONFIG } from '../../security/config';
 import { sanitizeUserInput } from '../../security/sanitization';
 
 interface SecurityContextType {
-  reportSecurityEvent: (eventType: SecurityEventType, details: any) => void;
+  reportSecurityEvent: (eventType: SecurityEventType, details: unknown) => void;
   getSecurityStatus: () => SecurityStatus;
   handleSecurityViolation: (violation: SecurityViolation) => void;
   isSecurityEnabled: boolean;
@@ -31,7 +31,7 @@ interface SecurityViolation {
   type: 'csp' | 'input' | 'access' | 'rate_limit';
   description: string;
   severity: 'low' | 'medium' | 'high' | 'critical';
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 const SecurityContext = createContext<SecurityContextType | null>(null);
@@ -63,7 +63,7 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
         features: ['monitoring', 'csp', 'error_handling', 'violation_detection'],
         environment: ENVIRONMENT_CONFIG.isDevelopment ? 'development' : 'production',
       });
-    } catch (error) {
+    } catch (_error) {
       securityLogger.error('Failed to initialize security systems', {
         error: error instanceof Error ? error.message : 'Unknown error',
       });
@@ -90,7 +90,7 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
         });
 
         observer.observe({ entryTypes: ['navigation', 'resource', 'measure'] });
-      } catch (error) {
+      } catch (_error) {
         securityLogger.warn('Performance monitoring setup failed', {
           error: error instanceof Error ? error.message : 'Unknown error',
         });
@@ -115,24 +115,28 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
   }, []);
 
   const injectSecurityHeaders = useCallback(() => {
-    // Inject security meta tags if not already present
-    const metaTags = cspUtils.generateSecurityMetaTags();
+    // Skip injecting meta tags - CSP is handled via HTTP headers in vercel.json
+    // // console.log('Security headers handled via HTTP headers, skipping meta tag injection');
+    return;
 
-    metaTags.forEach((metaTag) => {
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = metaTag;
-      const metaElement = tempDiv.firstChild as HTMLMetaElement;
+    // // Inject security meta tags if not already present
+    // const metaTags = cspUtils.generateSecurityMetaTags();
 
-      if (metaElement) {
-        const existingMeta = document.querySelector(
-          `meta[http-equiv="${metaElement.getAttribute('http-equiv')}"], meta[name="${metaElement.getAttribute('name')}"]`,
-        );
+    // metaTags.forEach((metaTag) => {
+    //   const tempDiv = document.createElement('div');
+    //   tempDiv.innerHTML = metaTag;
+    //   const metaElement = tempDiv.firstChild as HTMLMetaElement;
 
-        if (!existingMeta) {
-          document.head.appendChild(metaElement);
-        }
-      }
-    });
+    //   if (metaElement) {
+    //     const existingMeta = document.querySelector(
+    //       `meta[http-equiv="${metaElement.getAttribute('http-equiv')}"], meta[name="${metaElement.getAttribute('name')}"]`,
+    //     );
+
+    //     if (!existingMeta) {
+    //       document.head.appendChild(metaElement);
+    //     }
+    //   }
+    // });
   }, []);
 
   const setupGlobalErrorHandling = useCallback(() => {
@@ -215,14 +219,14 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
     // Cleanup will be handled by individual system destructors
   }, []);
 
-  const reportSecurityEvent = useCallback((eventType: SecurityEventType, details: any) => {
+  const reportSecurityEvent = useCallback((eventType: SecurityEventType, details: unknown) => {
     try {
       monitorSecurityEvent(eventType, {
         ...details,
         reportedBy: 'user_action',
         timestamp: new Date().toISOString(),
       });
-    } catch (error) {
+    } catch (_error) {
       securityLogger.error('Failed to report security event', {
         eventType,
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -291,7 +295,7 @@ export function useSecurityContext(): SecurityContextType {
 export function useSecurityReporting() {
   const { reportSecurityEvent } = useSecurityContext();
 
-  const reportSuspiciousActivity = useCallback((description: string, metadata?: any) => {
+  const reportSuspiciousActivity = useCallback((description: string, metadata?: unknown) => {
     reportSecurityEvent(SecurityEventType.SUSPICIOUS_ACTIVITY, {
       description,
       metadata,
@@ -299,7 +303,7 @@ export function useSecurityReporting() {
     });
   }, [reportSecurityEvent]);
 
-  const reportUnauthorizedAccess = useCallback((resource: string, metadata?: any) => {
+  const reportUnauthorizedAccess = useCallback((resource: string, metadata?: unknown) => {
     reportSecurityEvent(SecurityEventType.UNAUTHORIZED_ACCESS, {
       resource,
       metadata,
@@ -307,7 +311,7 @@ export function useSecurityReporting() {
     });
   }, [reportSecurityEvent]);
 
-  const reportInputThreat = useCallback((input: string, threatType: string, metadata?: any) => {
+  const reportInputThreat = useCallback((input: string, threatType: string, metadata?: unknown) => {
     reportSecurityEvent(SecurityEventType.MALICIOUS_INPUT, {
       input: input.substring(0, 200), // Truncate for security
       threatType,

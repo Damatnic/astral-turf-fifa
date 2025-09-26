@@ -97,7 +97,7 @@ export function generateCSPHeader(): string {
     });
 
     return cspHeader;
-  } catch (error) {
+  } catch (_error) {
     securityLogger.error('Failed to generate CSP header', {
       error: error instanceof Error ? error.message : 'Unknown error',
     });
@@ -265,7 +265,7 @@ function trackViolationPattern(violation: CSPViolationReport['csp-report']): voi
 
   // In production, this would be sent to monitoring service
   if (ENVIRONMENT_CONFIG.isDevelopment) {
-    console.warn('CSP Violation Pattern:', pattern);
+    // // console.warn('CSP Violation Pattern:', pattern);
   }
 }
 
@@ -338,7 +338,9 @@ export function injectCSPIntoHTML(html: string): string {
 // Generate cryptographic nonce for CSP
 export function generateCSPNonce(): string {
   const array = new Uint8Array(16);
-  crypto.getRandomValues(array);
+  if (typeof crypto !== 'undefined') {
+    crypto.getRandomValues(array);
+  }
   return btoa(String.fromCharCode(...array));
 }
 

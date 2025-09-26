@@ -28,12 +28,12 @@ export interface ContinuityData {
   timestamp: number;
   page: string;
   scrollPosition: number;
-  formState: Record<string, any>;
+  formState: Record<string, unknown>;
   selectedItems: string[];
   viewState: {
     zoom: number;
     pan: { x: number; y: number };
-    activeFilters: Record<string, any>;
+    activeFilters: Record<string, unknown>;
   };
 }
 
@@ -79,7 +79,7 @@ class DeviceContinuityService {
     // Start session heartbeat
     this.startSessionHeartbeat();
 
-    console.log('📱 Multi-device continuity initialized');
+    // // console.log('📱 Multi-device continuity initialized');
   }
 
   /**
@@ -155,9 +155,9 @@ class DeviceContinuityService {
         this.onContinuityDataCallback(continuityData);
       }
 
-      console.log('🔄 Application state restored from another device');
+      // // console.log('🔄 Application state restored from another device');
 
-    } catch (error) {
+    } catch (_error) {
       console.error('❌ Failed to restore application state:', error);
     }
   }
@@ -185,7 +185,7 @@ class DeviceContinuityService {
       {} as RootState,
     );
 
-    console.log(`📲 Handoff requested to device: ${targetDeviceId}`);
+    // // console.log(`📲 Handoff requested to device: ${targetDeviceId}`);
   }
 
   /**
@@ -209,7 +209,7 @@ class DeviceContinuityService {
     // Clean up
     this.handoffRequests.delete(requestId);
 
-    console.log('✅ Handoff accepted and session restored');
+    // // console.log('✅ Handoff accepted and session restored');
   }
 
   /**
@@ -314,7 +314,7 @@ class DeviceContinuityService {
         { type: 'SESSION_UPDATE', payload: this.currentSession } as any,
         {} as RootState,
       );
-    } catch (error) {
+    } catch (_error) {
       console.error('❌ Failed to broadcast session update:', error);
     }
   }
@@ -326,8 +326,8 @@ class DeviceContinuityService {
     localStorage.setItem('astral_turf_continuity', JSON.stringify(data));
   }
 
-  private captureFormState(): Record<string, any> {
-    const formState: Record<string, any> = {};
+  private captureFormState(): Record<string, unknown> {
+    const formState: Record<string, unknown> = {};
 
     // Capture form inputs
     document.querySelectorAll('input, select, textarea').forEach((element, index) => {
@@ -361,7 +361,7 @@ class DeviceContinuityService {
     };
   }
 
-  private restoreFormState(formState: Record<string, any>): void {
+  private restoreFormState(formState: Record<string, unknown>): void {
     Object.entries(formState).forEach(([key, value]) => {
       const element = document.getElementById(key) ||
                     document.querySelector(`[name="${key}"]`) as HTMLInputElement;
@@ -375,10 +375,10 @@ class DeviceContinuityService {
   private restoreViewState(viewState: ContinuityData['viewState']): void {
     // Would restore zoom, pan, filters, etc.
     // Implementation depends on specific UI framework
-    console.log('🔧 View state restoration:', viewState);
+    // // console.log('🔧 View state restoration:', viewState);
   }
 
-  private handleRemoteStateUpdate(action: any): void {
+  private handleRemoteStateUpdate(action: unknown): void {
     if (action.type === 'SESSION_UPDATE') {
       const session = action.payload as DeviceSession;
       this.activeSessions.set(session.deviceId, session);
@@ -400,7 +400,7 @@ class DeviceContinuityService {
     }
   }
 
-  private handleDeviceUpdates(devices: any[]): void {
+  private handleDeviceUpdates(devices: unknown[]): void {
     // Update active sessions based on device connectivity
     devices.forEach(device => {
       if (this.activeSessions.has(device.id)) {

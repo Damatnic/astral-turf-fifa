@@ -61,7 +61,7 @@ interface UIContextType {
   toggleRosterRoleFilter: (role: PositionRole) => void;
   setAdvancedRosterFilters: (filters: Partial<AdvancedRosterFilters>) => void;
   clearRosterFilters: () => void;
-  setTransferMarketFilter: (filter: keyof TransferMarketFilters, value: any) => void;
+  setTransferMarketFilter: (filter: keyof TransferMarketFilters, value: unknown) => void;
 
   // AI settings
   setAIPersonality: (personality: AIPersonality) => void;
@@ -207,7 +207,7 @@ export const UIProvider: React.FC<UIProviderProps> = ({ children }) => {
     dispatch({ type: 'CLEAR_ROSTER_FILTERS' });
   }, []);
 
-  const setTransferMarketFilter = useCallback((filter: keyof TransferMarketFilters, value: any) => {
+  const setTransferMarketFilter = useCallback((filter: keyof TransferMarketFilters, value: unknown) => {
     dispatch({ type: 'SET_TRANSFER_MARKET_FILTER', payload: { filter, value } });
   }, []);
 

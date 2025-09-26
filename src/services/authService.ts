@@ -7,6 +7,8 @@ import {
   type LoginContext,
   type PasswordChangeData,
 } from './secureAuthService';
+import { databaseService } from './databaseService';
+import { securityLogger } from '../security/logging';
 
 const FAKE_USERS: User[] = [...DEMO_USERS];
 
@@ -117,7 +119,7 @@ export const authService = {
       localStorage.setItem('authUser', JSON.stringify(response.user));
 
       return response.user;
-    } catch (error) {
+    } catch (_error) {
       throw error;
     }
   },
@@ -139,7 +141,7 @@ export const authService = {
       localStorage.setItem('authUser', JSON.stringify(response.user));
 
       return response.user;
-    } catch (error) {
+    } catch (_error) {
       throw error;
     }
   },
@@ -151,8 +153,8 @@ export const authService = {
         const context = getLoginContext();
         await secureAuthService.logout(token, context);
       }
-    } catch (error) {
-      console.warn('Logout error:', error);
+    } catch (_error) {
+      // // console.warn('Logout error:', error);
     } finally {
       // Always clear local storage
       localStorage.removeItem('authUser');
@@ -177,7 +179,7 @@ export const authService = {
       }
 
       return user;
-    } catch (error) {
+    } catch (_error) {
       // Token might be expired, try to refresh
       try {
         const refreshToken = localStorage.getItem('refreshToken');
@@ -190,7 +192,7 @@ export const authService = {
           // Try again with new token
           return await secureAuthService.getCurrentUser(newTokens.accessToken, context);
         }
-      } catch (refreshError) {
+      } catch (_refreshError) {
         // Refresh failed, clear all auth data
         localStorage.removeItem('authUser');
         localStorage.removeItem('accessToken');
@@ -207,7 +209,7 @@ export const authService = {
     if (userStr) {
       try {
         return JSON.parse(userStr) as User;
-      } catch (e) {
+      } catch (_e) {
         return null;
       }
     }
@@ -253,7 +255,7 @@ export const authService = {
           return;
         }
         // In a real app, this would send an email
-        console.log(`Password reset email sent to ${email}`);
+        // // console.log(`Password reset email sent to ${email}`);
         resolve();
       }, 500);
     });
@@ -403,7 +405,7 @@ export const authService = {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('authUser');
-    } catch (error) {
+    } catch (_error) {
       throw error;
     }
   },
@@ -417,7 +419,7 @@ export const authService = {
       const context = getLoginContext();
       const user = await secureAuthService.getCurrentUser(token, context);
       return !!user;
-    } catch (error) {
+    } catch (_error) {
       return false;
     }
   },
@@ -430,7 +432,7 @@ export const authService = {
 
       const context = getLoginContext();
       return await secureAuthService.checkPermission(token, permission as any, resource as any, context, targetUserId);
-    } catch (error) {
+    } catch (_error) {
       return false;
     }
   },

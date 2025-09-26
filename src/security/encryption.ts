@@ -60,7 +60,9 @@ const MASTER_KEY = process.env.ENCRYPTION_MASTER_KEY || 'astral-turf-master-encr
 // Generate a secure random key
 export function generateKey(length = 32): string {
   const array = new Uint8Array(length);
-  crypto.getRandomValues(array);
+  if (typeof crypto !== 'undefined') {
+    crypto.getRandomValues(array);
+  }
   return btoa(String.fromCharCode(...array));
 }
 
@@ -150,7 +152,7 @@ export function encryptData(
     }
 
     return encryptedData;
-  } catch (error) {
+  } catch (_error) {
     securityLogger.error('Data encryption failed', {
       error: error instanceof Error ? error.message : 'Unknown error',
       classification,
@@ -214,7 +216,7 @@ export function decryptData(
     }
 
     return decryptedText;
-  } catch (error) {
+  } catch (_error) {
     securityLogger.error('Data decryption failed', {
       error: error instanceof Error ? error.message : 'Unknown error',
       classification: encryptedData.classification,
@@ -231,7 +233,7 @@ export function decryptData(
  */
 
 // Encrypt sensitive personal information
-export function encryptPersonalInfo(personalInfo: any, userId?: string): EncryptedData {
+export function encryptPersonalInfo(personalInfo: unknown, userId?: string): EncryptedData {
   const context: EncryptionContext = {
     userId,
     operation: 'encrypt',
@@ -243,7 +245,7 @@ export function encryptPersonalInfo(personalInfo: any, userId?: string): Encrypt
 }
 
 // Decrypt personal information
-export function decryptPersonalInfo(encryptedData: EncryptedData, userId?: string): any {
+export function decryptPersonalInfo(encryptedData: EncryptedData, userId?: string): unknown {
   const context: EncryptionContext = {
     userId,
     operation: 'decrypt',
@@ -256,7 +258,7 @@ export function decryptPersonalInfo(encryptedData: EncryptedData, userId?: strin
 }
 
 // Encrypt medical data (highest security level)
-export function encryptMedicalData(medicalData: any, userId?: string): EncryptedData {
+export function encryptMedicalData(medicalData: unknown, userId?: string): EncryptedData {
   const context: EncryptionContext = {
     userId,
     operation: 'encrypt',
@@ -268,7 +270,7 @@ export function encryptMedicalData(medicalData: any, userId?: string): Encrypted
 }
 
 // Decrypt medical data
-export function decryptMedicalData(encryptedData: EncryptedData, userId?: string): any {
+export function decryptMedicalData(encryptedData: EncryptedData, userId?: string): unknown {
   const context: EncryptionContext = {
     userId,
     operation: 'decrypt',
@@ -281,7 +283,7 @@ export function decryptMedicalData(encryptedData: EncryptedData, userId?: string
 }
 
 // Encrypt financial information
-export function encryptFinancialData(financialData: any, userId?: string): EncryptedData {
+export function encryptFinancialData(financialData: unknown, userId?: string): EncryptedData {
   const context: EncryptionContext = {
     userId,
     operation: 'encrypt',
@@ -293,7 +295,7 @@ export function encryptFinancialData(financialData: any, userId?: string): Encry
 }
 
 // Decrypt financial information
-export function decryptFinancialData(encryptedData: EncryptedData, userId?: string): any {
+export function decryptFinancialData(encryptedData: EncryptedData, userId?: string): unknown {
   const context: EncryptionContext = {
     userId,
     operation: 'decrypt',
@@ -358,7 +360,7 @@ export function maskSensitiveData(data: string, maskChar = '*', visibleChars = 4
 }
 
 // Anonymize personal identifiers
-export function anonymizeData(data: any): any {
+export function anonymizeData(data: unknown): unknown {
   if (!data || typeof data !== 'object') {
     return data;
   }
@@ -384,7 +386,9 @@ export function anonymizeData(data: any): any {
 // Generate cryptographically secure random string
 export function generateSecureRandom(length = 32): string {
   const array = new Uint8Array(length);
-  crypto.getRandomValues(array);
+  if (typeof crypto !== 'undefined') {
+    crypto.getRandomValues(array);
+  }
   return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
 }
 
@@ -407,7 +411,7 @@ export function generateUUID(): string {
  */
 
 // Check if data requires encryption based on content
-export function requiresEncryption(data: any, fieldName?: string): DataClassification | null {
+export function requiresEncryption(data: unknown, fieldName?: string): DataClassification | null {
   if (!data) {return null;}
 
   const restrictedFields = ['ssn', 'medicalRecord', 'diagnosis', 'prescription'];
@@ -445,7 +449,7 @@ export function requiresEncryption(data: any, fieldName?: string): DataClassific
 }
 
 // Secure object deep copy with encryption
-export function secureDeepCopy(obj: any, userId?: string): any {
+export function secureDeepCopy(obj: unknown, userId?: string): unknown {
   if (obj === null || typeof obj !== 'object') {
     return obj;
   }
@@ -458,7 +462,7 @@ export function secureDeepCopy(obj: any, userId?: string): any {
     return obj.map(item => secureDeepCopy(item, userId));
   }
 
-  const copy: any = {};
+  const copy: unknown = {};
   Object.keys(obj).forEach(key => {
     const classification = requiresEncryption(obj[key], key);
 

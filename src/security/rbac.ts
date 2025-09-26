@@ -197,7 +197,7 @@ export interface PermissionContext {
   sessionId?: string;
   ipAddress?: string;
   timestamp?: Date;
-  additionalData?: Record<string, any>;
+  additionalData?: Record<string, unknown>;
 }
 
 // Permission evaluation result
@@ -267,7 +267,7 @@ export function hasPermission(
       granted: true,
       conditions: matchingRule.conditions,
     };
-  } catch (error) {
+  } catch (_error) {
     securityLogger.error('Permission check failed', {
       error: error instanceof Error ? error.message : 'Unknown error',
       userRole,

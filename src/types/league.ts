@@ -66,7 +66,7 @@ export interface Manager {
 export interface ScoutingAssignment {
   opponentName: string;
   dueWeek: number;
-  report: any | null; // AIOppositionReport when AI types are imported
+  report: unknown | null; // AIOppositionReport when AI types are imported
 }
 
 // Press and media

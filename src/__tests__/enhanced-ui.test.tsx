@@ -634,20 +634,20 @@ jest.mock('chart.js', () => ({
 }));
 
 jest.mock('react-chartjs-2', () => ({
-  Line: ({ data }: any) => <div data-testid="line-chart">Line Chart: {data.labels?.join(', ')}</div>,
-  Bar: ({ data }: any) => <div data-testid="bar-chart">Bar Chart: {data.labels?.join(', ')}</div>,
-  Doughnut: ({ data }: any) => <div data-testid="doughnut-chart">Doughnut Chart: {data.labels?.join(', ')}</div>,
-  Radar: ({ data }: any) => <div data-testid="radar-chart">Radar Chart: {data.labels?.join(', ')}</div>,
+  Line: ({ data }: unknown) => <div data-testid="line-chart">Line Chart: {data.labels?.join(', ')}</div>,
+  Bar: ({ data }: unknown) => <div data-testid="bar-chart">Bar Chart: {data.labels?.join(', ')}</div>,
+  Doughnut: ({ data }: unknown) => <div data-testid="doughnut-chart">Doughnut Chart: {data.labels?.join(', ')}</div>,
+  Radar: ({ data }: unknown) => <div data-testid="radar-chart">Radar Chart: {data.labels?.join(', ')}</div>,
 }));
 
 // Mock framer-motion for testing
 jest.mock('framer-motion', () => ({
   motion: {
-    div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
-    button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
-    input: ({ children, ...props }: any) => <input {...props}>{children}</input>,
+    div: ({ children, ...props }: unknown) => <div {...props}>{children}</div>,
+    button: ({ children, ...props }: unknown) => <button {...props}>{children}</button>,
+    input: ({ children, ...props }: unknown) => <input {...props}>{children}</input>,
   },
-  AnimatePresence: ({ children }: any) => children,
+  AnimatePresence: ({ children }: unknown) => children,
   useMotionValue: () => ({ set: jest.fn(), get: jest.fn(() => 0) }),
   useTransform: () => ({ set: jest.fn(), get: jest.fn(() => 0) }),
   useDragControls: () => ({ start: jest.fn() }),

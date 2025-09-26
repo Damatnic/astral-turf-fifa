@@ -14,7 +14,7 @@ export interface NotificationChannel {
   type: 'email' | 'sms' | 'push' | 'in_app' | 'webhook';
   name: string;
   isEnabled: boolean;
-  config: Record<string, any>;
+  config: Record<string, unknown>;
   priority: number;
   rateLimitPerHour: number;
   currentUsage: number;
@@ -53,7 +53,7 @@ export interface ScheduledNotification {
   userId: string;
   templateId: string;
   scheduledTime: number;
-  data: Record<string, any>;
+  data: Record<string, unknown>;
   channels: string[];
   priority: 'low' | 'medium' | 'high' | 'critical';
   status: 'pending' | 'sent' | 'failed' | 'cancelled';
@@ -68,7 +68,7 @@ export interface NotificationDelivery {
   status: 'sent' | 'delivered' | 'opened' | 'clicked' | 'failed';
   timestamp: number;
   errorMessage?: string;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
 }
 
 class NotificationService {
@@ -95,7 +95,7 @@ class NotificationService {
   async initialize(): Promise<void> {
     await this.loadUserPreferences();
     await this.startScheduledNotifications();
-    console.log('🔔 Notification service initialized');
+    // // console.log('🔔 Notification service initialized');
   }
 
   /**
@@ -115,7 +115,7 @@ class NotificationService {
     };
 
     this.channels.set(channel.id, channel);
-    console.log(`📱 Notification channel configured: ${channel.name}`);
+    // // console.log(`📱 Notification channel configured: ${channel.name}`);
   }
 
   /**
@@ -130,7 +130,7 @@ class NotificationService {
     };
 
     this.templates.set(templateId, fullTemplate);
-    console.log(`📝 Notification template created: ${template.name}`);
+    // // console.log(`📝 Notification template created: ${template.name}`);
 
     return templateId;
   }
@@ -161,7 +161,7 @@ class NotificationService {
     // Save to localStorage for persistence
     localStorage.setItem(`notification_prefs_${userId}`, JSON.stringify(updatedPrefs));
 
-    console.log(`⚙️ Notification preferences updated for user: ${userId}`);
+    // // console.log(`⚙️ Notification preferences updated for user: ${userId}`);
   }
 
   /**
@@ -170,7 +170,7 @@ class NotificationService {
   async sendNotification(
     userId: string,
     templateId: string,
-    data: Record<string, any>,
+    data: Record<string, unknown>,
     priority: ScheduledNotification['priority'] = 'medium',
     customChannels?: string[],
   ): Promise<string> {
@@ -214,7 +214,7 @@ class NotificationService {
     userId: string,
     templateId: string,
     scheduledTime: Date,
-    data: Record<string, any>,
+    data: Record<string, unknown>,
     priority: ScheduledNotification['priority'] = 'medium',
   ): Promise<string> {
     const notificationId = uuidv4();
@@ -240,7 +240,7 @@ class NotificationService {
     };
 
     this.scheduledNotifications.set(notificationId, notification);
-    console.log(`⏰ Notification scheduled for ${scheduledTime.toISOString()}`);
+    // // console.log(`⏰ Notification scheduled for ${scheduledTime.toISOString()}`);
 
     return notificationId;
   }
@@ -352,7 +352,7 @@ class NotificationService {
   async sendBulkNotification(
     userIds: string[],
     templateId: string,
-    data: Record<string, any>,
+    data: Record<string, unknown>,
     staggerMinutes: number = 0,
   ): Promise<string[]> {
     const notificationIds: string[] = [];
@@ -373,7 +373,7 @@ class NotificationService {
       notificationIds.push(notificationId);
     }
 
-    console.log(`📢 Bulk notification scheduled for ${userIds.length} users`);
+    // // console.log(`📢 Bulk notification scheduled for ${userIds.length} users`);
     return notificationIds;
   }
 
@@ -459,9 +459,9 @@ class NotificationService {
         this.onNotificationSentCallback(notification, true);
       }
 
-      console.log(`✅ Notification sent: ${notification.id}`);
+      // // console.log(`✅ Notification sent: ${notification.id}`);
 
-    } catch (error) {
+    } catch (_error) {
       console.error(`❌ Failed to send notification ${notification.id}:`, error);
 
       if (notification.attempts < notification.maxAttempts) {
@@ -518,7 +518,7 @@ class NotificationService {
       this.recordDelivery(deliveryId, channelId, 'sent', {});
       channel.currentUsage++;
 
-    } catch (error) {
+    } catch (_error) {
       this.recordDelivery(deliveryId, channelId, 'failed', { error: error.message });
       throw error;
     }
@@ -530,7 +530,7 @@ class NotificationService {
     content: { subject: string; content: string },
   ): Promise<void> {
     // Implementation would use actual email service (SendGrid, AWS SES, etc.)
-    console.log(`📧 Sending email to ${userId}: ${content.subject}`);
+    // // console.log(`📧 Sending email to ${userId}: ${content.subject}`);
 
     // Simulate email sending
     await new Promise(resolve => setTimeout(resolve, 100));
@@ -542,7 +542,7 @@ class NotificationService {
     content: { subject: string; content: string },
   ): Promise<void> {
     // Implementation would use SMS service (Twilio, AWS SNS, etc.)
-    console.log(`📱 Sending SMS to ${userId}: ${content.content}`);
+    // // console.log(`📱 Sending SMS to ${userId}: ${content.content}`);
 
     // Simulate SMS sending
     await new Promise(resolve => setTimeout(resolve, 100));
@@ -554,7 +554,7 @@ class NotificationService {
     content: { subject: string; content: string },
   ): Promise<void> {
     // Implementation would use push service (FCM, APNs, etc.)
-    console.log(`🔔 Sending push notification to ${userId}: ${content.subject}`);
+    // // console.log(`🔔 Sending push notification to ${userId}: ${content.subject}`);
 
     // Simulate push notification
     await new Promise(resolve => setTimeout(resolve, 50));
@@ -578,7 +578,7 @@ class NotificationService {
     });
   }
 
-  private processTemplate(template: NotificationTemplate, data: Record<string, any>): { subject: string; content: string } {
+  private processTemplate(template: NotificationTemplate, data: Record<string, unknown>): { subject: string; content: string } {
     let subject = template.subject;
     let content = template.content;
 
@@ -650,7 +650,7 @@ class NotificationService {
     deliveryId: string,
     channelId: string,
     status: NotificationDelivery['status'],
-    metadata: Record<string, any>,
+    metadata: Record<string, unknown>,
   ): void {
     const delivery: NotificationDelivery = {
       id: deliveryId,
@@ -763,11 +763,11 @@ class NotificationService {
 
   private async loadUserPreferences(): Promise<void> {
     // Load preferences from localStorage or API
-    console.log('📋 Loading user notification preferences');
+    // // console.log('📋 Loading user notification preferences');
   }
 
   private async startScheduledNotifications(): Promise<void> {
-    console.log('⏰ Starting scheduled notification processor');
+    // // console.log('⏰ Starting scheduled notification processor');
   }
 }
 

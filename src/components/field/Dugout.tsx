@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useTacticsContext, useUIContext } from '../../hooks';
-import PlayerToken from './PlayerToken';
+import EnhancedPlayerToken from './EnhancedPlayerToken';
 import type { Player } from '../../types';
 
 interface DugoutSectionProps {
@@ -30,11 +30,15 @@ const DugoutSection: React.FC<DugoutSectionProps> = ({ title, players, team, sel
             <h3 className={`text-xs font-bold uppercase text-center mb-2 ${team === 'home' ? 'text-blue-400' : 'text-red-400'}`}>{title}</h3>
             <div className="flex-grow flex flex-wrap items-start content-start gap-2 p-1 overflow-y-auto">
                 {(players ?? []).map(player => player && (
-                    <PlayerToken
+                    <EnhancedPlayerToken
                         key={player?.id}
                         player={player}
                         isSelected={selectedPlayerId === player?.id}
                         isHighlightedByAI={highlightedPlayerIds?.includes(player?.id) ?? false}
+                        size="small"
+                        showStats={true}
+                        showRole={true}
+                        interactive={true}
                     />
                 ))}
             </div>

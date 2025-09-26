@@ -102,7 +102,7 @@ export const handlers = [
 
   // Catch-all handler for unhandled requests
   http.get('*', ({ request }) => {
-    console.warn(`Unhandled GET request: ${request.url}`);
+    // // console.warn(`Unhandled GET request: ${request.url}`);
     return HttpResponse.json(
       { error: 'Not found' },
       { status: 404 },
@@ -110,7 +110,7 @@ export const handlers = [
   }),
 
   http.post('*', ({ request }) => {
-    console.warn(`Unhandled POST request: ${request.url}`);
+    // // console.warn(`Unhandled POST request: ${request.url}`);
     return HttpResponse.json(
       { error: 'Not found' },
       { status: 404 },

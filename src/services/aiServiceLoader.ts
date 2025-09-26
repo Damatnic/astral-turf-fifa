@@ -14,7 +14,7 @@ import type {
 } from '../types';
 
 // Cache for the lazy-loaded aiService module
-let aiServiceModule: any = null;
+let aiServiceModule: unknown = null;
 
 /**
  * Dynamically imports the aiService module when first needed
@@ -23,7 +23,7 @@ async function getAIService() {
   if (!aiServiceModule) {
     try {
       aiServiceModule = await import('./aiService');
-    } catch (error) {
+    } catch (_error) {
       console.error('Failed to load AI service:', error);
       throw new Error('AI service is currently unavailable');
     }

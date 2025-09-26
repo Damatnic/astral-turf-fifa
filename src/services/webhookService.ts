@@ -5,8 +5,7 @@
  * external system integration, and automated workflow triggers
  */
 
-import axios from 'axios';
-import type { AxiosInstance } from 'axios';
+import axios, { type AxiosInstance } from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import crypto from 'crypto-js';
 
@@ -15,7 +14,7 @@ export interface WebhookEvent {
   type: string;
   source: string;
   timestamp: number;
-  data: Record<string, any>;
+  data: Record<string, unknown>;
   metadata: {
     version: string;
     retry_count: number;
@@ -59,12 +58,12 @@ export interface WebhookEndpoint {
 export interface WebhookFilter {
   field: string;
   operator: 'equals' | 'not_equals' | 'contains' | 'starts_with' | 'ends_with' | 'greater_than' | 'less_than';
-  value: any;
+  value: unknown;
 }
 
 export interface WebhookTransform {
   type: 'rename_field' | 'add_field' | 'remove_field' | 'format_value' | 'custom_script';
-  config: Record<string, any>;
+  config: Record<string, unknown>;
 }
 
 export interface WebhookDelivery {
@@ -137,7 +136,7 @@ class WebhookService {
     await this.loadWebhookEndpoints();
     await this.loadWebhookReceivers();
     this.setupEventHandlers();
-    console.log('🪝 Webhook service initialized');
+    // // console.log('🪝 Webhook service initialized');
   }
 
   /**
@@ -197,7 +196,7 @@ class WebhookService {
     // Save to storage
     await this.saveWebhookEndpoint(endpoint);
 
-    console.log(`🆕 Webhook endpoint created: ${config.name}`);
+    // // console.log(`🆕 Webhook endpoint created: ${config.name}`);
     return endpoint;
   }
 
@@ -236,7 +235,7 @@ class WebhookService {
     this.receivers.set(receiver.id, receiver);
     await this.saveWebhookReceiver(receiver);
 
-    console.log(`📥 Webhook receiver created: ${config.name}`);
+    // // console.log(`📥 Webhook receiver created: ${config.name}`);
     return receiver;
   }
 
@@ -245,7 +244,7 @@ class WebhookService {
    */
   async emitEvent(
     type: string,
-    data: Record<string, any>,
+    data: Record<string, unknown>,
     options: {
       source?: string;
       userId?: string;
@@ -276,7 +275,7 @@ class WebhookService {
       this.eventQueue.push(event);
     }
 
-    console.log(`📡 Webhook event emitted: ${type}`);
+    // // console.log(`📡 Webhook event emitted: ${type}`);
   }
 
   /**
@@ -339,10 +338,10 @@ class WebhookService {
         this.onWebhookReceivedCallback(event);
       }
 
-      console.log(`📨 Incoming webhook processed: ${event.type}`);
+      // // console.log(`📨 Incoming webhook processed: ${event.type}`);
       return { success: true, message: 'Webhook processed successfully' };
 
-    } catch (error) {
+    } catch (_error) {
       console.error('❌ Failed to process incoming webhook:', error);
       return { success: false, message: error.message };
     }
@@ -401,9 +400,9 @@ class WebhookService {
 
       endpoint.stats.successfulDeliveries++;
 
-      console.log(`✅ Webhook delivery retry successful: ${deliveryId}`);
+      // // console.log(`✅ Webhook delivery retry successful: ${deliveryId}`);
 
-    } catch (error) {
+    } catch (_error) {
       delivery.status = 'failed';
       delivery.error = error.message;
       delivery.nextRetryAt = Date.now() + (delivery.retryCount * 60000); // 1 minute intervals
@@ -422,7 +421,7 @@ class WebhookService {
     if (endpoint) {
       endpoint.isActive = false;
       await this.saveWebhookEndpoint(endpoint);
-      console.log(`⏸️ Webhook endpoint paused: ${endpoint.name}`);
+      // // console.log(`⏸️ Webhook endpoint paused: ${endpoint.name}`);
     }
   }
 
@@ -434,7 +433,7 @@ class WebhookService {
     if (endpoint) {
       endpoint.isActive = true;
       await this.saveWebhookEndpoint(endpoint);
-      console.log(`▶️ Webhook endpoint resumed: ${endpoint.name}`);
+      // // console.log(`▶️ Webhook endpoint resumed: ${endpoint.name}`);
     }
   }
 
@@ -484,7 +483,7 @@ class WebhookService {
     for (const endpoint of matchingEndpoints) {
       try {
         await this.deliverToEndpoint(endpoint, event);
-      } catch (error) {
+      } catch (_error) {
         console.error(`❌ Failed to deliver to endpoint ${endpoint.id}:`, error);
       }
     }
@@ -509,7 +508,7 @@ class WebhookService {
   private async deliverToEndpoint(endpoint: WebhookEndpoint, event: WebhookEvent): Promise<void> {
     // Check rate limits
     if (!this.checkRateLimit(endpoint)) {
-      console.warn(`⚠️ Rate limit exceeded for endpoint: ${endpoint.name}`);
+      // // console.warn(`⚠️ Rate limit exceeded for endpoint: ${endpoint.name}`);
       return;
     }
 
@@ -554,9 +553,9 @@ class WebhookService {
         this.onWebhookDeliveredCallback(delivery);
       }
 
-      console.log(`✅ Webhook delivered successfully: ${endpoint.name}`);
+      // // console.log(`✅ Webhook delivered successfully: ${endpoint.name}`);
 
-    } catch (error) {
+    } catch (_error) {
       delivery.status = 'failed';
       delivery.error = error.message;
       delivery.httpStatus = error.response?.status;
@@ -581,7 +580,7 @@ class WebhookService {
     }
   }
 
-  private async deliverWebhook(endpoint: WebhookEndpoint, event: WebhookEvent): Promise<any> {
+  private async deliverWebhook(endpoint: WebhookEndpoint, event: WebhookEvent): Promise<unknown> {
     const signature = this.generateSignature(event, endpoint.secret);
 
     return this.httpClient.post(endpoint.url, event, {
@@ -614,9 +613,9 @@ class WebhookService {
 
     try {
       await this.deliverWebhook(endpoint, testEvent);
-      console.log(`✅ Webhook endpoint test successful: ${endpoint.name}`);
-    } catch (error) {
-      console.warn(`⚠️ Webhook endpoint test failed: ${endpoint.name}`, error.message);
+      // // console.log(`✅ Webhook endpoint test successful: ${endpoint.name}`);
+    } catch (_error) {
+      // // console.warn(`⚠️ Webhook endpoint test failed: ${endpoint.name}`, error.message);
       // Don't disable the endpoint, just warn
     }
   }
@@ -663,11 +662,12 @@ class WebhookService {
           this.removeField(transformedEvent, transform.config.field);
           break;
 
-        case 'format_value':
+        case 'format_value': {
           const currentValue = this.getNestedValue(transformedEvent, transform.config.field);
           const formattedValue = this.formatValue(currentValue, transform.config.format);
           this.setNestedValue(transformedEvent, transform.config.field, formattedValue);
           break;
+        }
       }
     });
 
@@ -713,15 +713,21 @@ class WebhookService {
 
   private generateSignature(event: WebhookEvent, secret: string): string {
     const payload = JSON.stringify(event);
-    return crypto.HmacSHA256(payload, secret).toString(crypto.enc.Hex);
+    if (typeof crypto !== 'undefined') {
+      return crypto.HmacSHA256(payload, secret).toString(crypto.enc.Hex);
+    }
+    return 'signature-unavailable';
   }
 
   private validateWebhookSignature(body: string, signature: string, secret: string): boolean {
+    if (typeof crypto === 'undefined') {
+      return false;
+    }
     const expectedSignature = crypto.HmacSHA256(body, secret).toString(crypto.enc.Hex);
     return signature === expectedSignature || signature === `sha256=${expectedSignature}`;
   }
 
-  private validateEventStructure(event: any, validation: WebhookReceiver['validation']): boolean {
+  private validateEventStructure(event: unknown, validation: WebhookReceiver['validation']): boolean {
     // Check required fields
     for (const field of validation.requiredFields) {
       if (!this.hasNestedField(event, field)) {
@@ -758,11 +764,11 @@ class WebhookService {
     return ((currentAvg * (totalSuccessful - 1)) + newResponseTime) / totalSuccessful;
   }
 
-  private getNestedValue(obj: any, path: string): any {
+  private getNestedValue(obj: unknown, path: string): unknown {
     return path.split('.').reduce((current, key) => current?.[key], obj);
   }
 
-  private setNestedValue(obj: any, path: string, value: any): void {
+  private setNestedValue(obj: unknown, path: string, value: unknown): void {
     const keys = path.split('.');
     const lastKey = keys.pop()!;
     const target = keys.reduce((current, key) => {
@@ -772,18 +778,18 @@ class WebhookService {
     target[lastKey] = value;
   }
 
-  private hasNestedField(obj: any, path: string): boolean {
+  private hasNestedField(obj: unknown, path: string): boolean {
     return this.getNestedValue(obj, path) !== undefined;
   }
 
-  private removeField(obj: any, path: string): void {
+  private removeField(obj: unknown, path: string): void {
     const keys = path.split('.');
     const lastKey = keys.pop()!;
     const target = keys.reduce((current, key) => current?.[key], obj);
     if (target) {delete target[lastKey];}
   }
 
-  private renameField(obj: any, fromPath: string, toPath: string): void {
+  private renameField(obj: unknown, fromPath: string, toPath: string): void {
     const value = this.getNestedValue(obj, fromPath);
     if (value !== undefined) {
       this.setNestedValue(obj, toPath, value);
@@ -791,7 +797,7 @@ class WebhookService {
     }
   }
 
-  private formatValue(value: any, format: string): any {
+  private formatValue(value: unknown, format: string): unknown {
     switch (format) {
       case 'uppercase':
         return String(value).toUpperCase();
@@ -820,12 +826,12 @@ class WebhookService {
     this.httpClient.interceptors.response.use(
       (response) => {
         const duration = Date.now() - response.config.metadata?.startTime;
-        console.log(`📈 Webhook request completed in ${duration}ms`);
+        // // console.log(`📈 Webhook request completed in ${duration}ms`);
         return response;
       },
       (error) => {
         const duration = Date.now() - (error.config?.metadata?.startTime || Date.now());
-        console.log(`📉 Webhook request failed after ${duration}ms`);
+        // // console.log(`📉 Webhook request failed after ${duration}ms`);
         return Promise.reject(error);
       },
     );
@@ -837,7 +843,7 @@ class WebhookService {
       name: 'Player Update Handler',
       path: '/webhooks/player-update',
       handler: async (event) => {
-        console.log(`👤 Player update received: ${JSON.stringify(event.data)}`);
+        // // console.log(`👤 Player update received: ${JSON.stringify(event.data)}`);
         // Handle player updates from external systems
       },
       validation: {
@@ -850,7 +856,7 @@ class WebhookService {
       name: 'Match Result Handler',
       path: '/webhooks/match-result',
       handler: async (event) => {
-        console.log(`⚽ Match result received: ${JSON.stringify(event.data)}`);
+        // // console.log(`⚽ Match result received: ${JSON.stringify(event.data)}`);
         // Handle match results from external systems
       },
       validation: {
@@ -862,22 +868,22 @@ class WebhookService {
 
   private async loadWebhookEndpoints(): Promise<void> {
     // Load webhook endpoints from storage
-    console.log('📂 Loading webhook endpoints');
+    // // console.log('📂 Loading webhook endpoints');
   }
 
   private async saveWebhookEndpoint(endpoint: WebhookEndpoint): Promise<void> {
     // Save webhook endpoint to storage
-    console.log(`💾 Webhook endpoint saved: ${endpoint.name}`);
+    // // console.log(`💾 Webhook endpoint saved: ${endpoint.name}`);
   }
 
   private async loadWebhookReceivers(): Promise<void> {
     // Load webhook receivers from storage
-    console.log('📂 Loading webhook receivers');
+    // // console.log('📂 Loading webhook receivers');
   }
 
   private async saveWebhookReceiver(receiver: WebhookReceiver): Promise<void> {
     // Save webhook receiver to storage
-    console.log(`💾 Webhook receiver saved: ${receiver.name}`);
+    // // console.log(`💾 Webhook receiver saved: ${receiver.name}`);
   }
 }
 

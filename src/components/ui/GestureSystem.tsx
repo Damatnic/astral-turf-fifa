@@ -271,7 +271,7 @@ export const LongPress: React.FC<LongPressProps> = ({
 }) => {
   const [isPressed, setIsPressed] = useState(false);
   const [hasTriggered, setHasTriggered] = useState(false);
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<unknown>();
 
   const startPress = () => {
     if (disabled) {return;}
@@ -496,14 +496,14 @@ export const useGesture = () => {
   const [gestureState, setGestureState] = useState<{
     isGesturing: boolean;
     gestureType: string | null;
-    gestureData: any;
+    gestureData: unknown;
   }>({
     isGesturing: false,
     gestureType: null,
     gestureData: null,
   });
 
-  const startGesture = (type: string, data: any = {}) => {
+  const startGesture = (type: string, data: unknown = {}) => {
     setGestureState({
       isGesturing: true,
       gestureType: type,
@@ -519,7 +519,7 @@ export const useGesture = () => {
     });
   };
 
-  const updateGesture = (data: any) => {
+  const updateGesture = (data: unknown) => {
     setGestureState(prev => ({
       ...prev,
       gestureData: { ...prev.gestureData, ...data },

@@ -5,7 +5,20 @@
  * for the Astral Turf Soccer Management Application
  */
 
-import { io, Socket } from 'socket.io-client';
+// Check if we're on the client side (browser environment)
+const isClientSide = typeof window !== 'undefined';
+
+// Only import socket.io on client side or if available
+let io: unknown = null;
+
+// Define Socket interface for type safety
+interface Socket {
+  on(event: string, callback: (...args: unknown[]) => void): void;
+  emit(event: string, ...args: unknown[]): void;
+  disconnect(): void;
+  connected: boolean;
+}
+
 import type { RootState, Action } from '../types';
 import { encrypt, decrypt } from './securityService';
 import { v4 as uuidv4 } from 'uuid';
@@ -13,7 +26,7 @@ import { v4 as uuidv4 } from 'uuid';
 export interface SyncEvent {
   id: string;
   type: 'STATE_UPDATE' | 'PLAYER_UPDATE' | 'FORMATION_CHANGE' | 'TACTICAL_UPDATE';
-  payload: any;
+  payload: unknown;
   timestamp: number;
   userId: string;
   deviceId: string;
@@ -22,8 +35,8 @@ export interface SyncEvent {
 export interface SyncConflict {
   id: string;
   type: 'MERGE_REQUIRED' | 'VERSION_MISMATCH' | 'DATA_CONFLICT';
-  localData: any;
-  remoteData: any;
+  localData: unknown;
+  remoteData: unknown;
   timestamp: number;
 }
 
@@ -84,7 +97,7 @@ class SyncService {
       }
 
       this.socket.on('connect', () => {
-        console.log('🔄 Real-time sync connected');
+        // // console.log('🔄 Real-time sync connected');
         this.isConnected = true;
         this.processSyncQueue();
         resolve();
@@ -135,7 +148,7 @@ class SyncService {
 
       this.lastSyncTimestamp = syncEvent.timestamp;
 
-    } catch (error) {
+    } catch (_error) {
       console.error('❌ Failed to sync state:', error);
       this.queueSyncEvent('STATE_UPDATE', { action, state });
     }
@@ -144,7 +157,7 @@ class SyncService {
   /**
    * Sync player data changes across devices
    */
-  async syncPlayerUpdate(playerId: string, playerData: any): Promise<void> {
+  async syncPlayerUpdate(playerId: string, playerData: unknown): Promise<void> {
     if (!this.isConnected || !this.socket) {
       this.queueSyncEvent('PLAYER_UPDATE', { playerId, playerData });
       return;
@@ -167,7 +180,7 @@ class SyncService {
         payload: encryptedPayload,
       });
 
-    } catch (error) {
+    } catch (_error) {
       console.error('❌ Failed to sync player update:', error);
       this.queueSyncEvent('PLAYER_UPDATE', { playerId, playerData });
     }
@@ -176,7 +189,7 @@ class SyncService {
   /**
    * Sync formation and tactical changes
    */
-  async syncTacticalUpdate(formationId: string, tacticsData: any): Promise<void> {
+  async syncTacticalUpdate(formationId: string, tacticsData: unknown): Promise<void> {
     if (!this.isConnected || !this.socket) {
       this.queueSyncEvent('TACTICAL_UPDATE', { formationId, tacticsData });
       return;
@@ -199,7 +212,7 @@ class SyncService {
         payload: encryptedPayload,
       });
 
-    } catch (error) {
+    } catch (_error) {
       console.error('❌ Failed to sync tactical update:', error);
       this.queueSyncEvent('TACTICAL_UPDATE', { formationId, tacticsData });
     }
@@ -222,7 +235,7 @@ class SyncService {
           const decryptedData = await decrypt(data.state);
           const state = JSON.parse(decryptedData);
           resolve(state);
-        } catch (error) {
+        } catch (_error) {
           reject(error);
         }
       });
@@ -240,7 +253,7 @@ class SyncService {
     const conflict = this.conflictQueue.find(c => c.id === conflictId);
     if (!conflict || !this.socket) {return;}
 
-    let resolvedData: any;
+    let resolvedData: unknown;
 
     switch (strategy) {
       case 'local':
@@ -330,7 +343,7 @@ class SyncService {
         if (this.onStateUpdateCallback && data.deviceId !== this.deviceId) {
           this.onStateUpdateCallback(payload.action);
         }
-      } catch (error) {
+      } catch (_error) {
         console.error('❌ Failed to process incoming state update:', error);
       }
     });
@@ -357,18 +370,18 @@ class SyncService {
 
     // Handle reconnection
     this.socket.on('reconnect', () => {
-      console.log('🔄 Sync reconnected, processing queued events');
+      // // console.log('🔄 Sync reconnected, processing queued events');
       this.processSyncQueue();
     });
 
     // Handle disconnect
     this.socket.on('disconnect', (reason) => {
-      console.log('⚠️ Sync disconnected:', reason);
+      // // console.log('⚠️ Sync disconnected:', reason);
       this.isConnected = false;
     });
   }
 
-  private queueSyncEvent(type: SyncEvent['type'], payload: any): void {
+  private queueSyncEvent(type: SyncEvent['type'], payload: unknown): void {
     const syncEvent: SyncEvent = {
       id: uuidv4(),
       type,
@@ -402,7 +415,7 @@ class SyncService {
           ...event,
           payload: encryptedPayload,
         });
-      } catch (error) {
+      } catch (_error) {
         console.error('❌ Failed to process queued sync event:', error);
         // Re-queue failed events
         this.syncQueue.push(event);
@@ -429,7 +442,7 @@ class SyncService {
     }
   }
 
-  private mergeConflictData(localData: any, remoteData: any): any {
+  private mergeConflictData(localData: unknown, remoteData: unknown): unknown {
     // Smart merge strategy - prioritize most recent changes
     const merged = { ...localData };
 

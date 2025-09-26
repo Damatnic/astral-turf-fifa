@@ -1,7 +1,7 @@
 import type { FranchiseState, Action, NewsItem, InboxItem, TrainingPlanTemplate } from '../../types';
 
 // Helper function to add an inbox item
-const addInboxItem = (draft: FranchiseState, type: InboxItem['type'], title: string, content: string, payload?: any) => {
+const addInboxItem = (draft: FranchiseState, type: InboxItem['type'], title: string, content: string, payload?: unknown) => {
     draft.inbox.unshift({
         id: `inbox_${Date.now()}_${Math.random()}`,
         week: draft.gameWeek,

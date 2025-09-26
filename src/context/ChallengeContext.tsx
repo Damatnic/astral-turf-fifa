@@ -402,7 +402,7 @@ export const ChallengeProvider: React.FC<ChallengeProviderProps> = ({ children }
       if (filters) {
         dispatch({ type: 'SET_FILTERS', payload: filters });
       }
-    } catch (error) {
+    } catch (_error) {
       dispatch({ type: 'SET_ERROR', payload: 'Failed to load challenges' });
     } finally {
       dispatch({ type: 'SET_LOADING', payload: false });

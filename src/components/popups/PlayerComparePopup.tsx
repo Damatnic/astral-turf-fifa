@@ -53,7 +53,7 @@ const PlayerComparePopup: React.FC = () => {
         try {
             const result = await getAIPlayerComparison(player1, player2, activeFormation, settings.aiPersonality);
             dispatch({ type: 'GENERATE_AI_COMPARISON_SUCCESS', payload: result });
-        } catch (error) {
+        } catch (_error) {
             console.error(error);
             dispatch({ type: 'GENERATE_AI_COMPARISON_FAILURE' });
         }

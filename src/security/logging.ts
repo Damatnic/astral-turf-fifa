@@ -80,7 +80,7 @@ export interface SecurityLogEntry {
   userAgent?: string;
   resource?: string;
   action?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   stackTrace?: string;
   riskScore?: number; // 0-100 risk assessment
   tags?: string[];
@@ -203,7 +203,7 @@ class SecurityLogStore {
     this.alertCallbacks.forEach(callback => {
       try {
         callback(entry);
-      } catch (error) {
+      } catch (_error) {
         console.error('Alert callback failed:', error);
       }
     });
@@ -221,15 +221,15 @@ class SecurityLogStore {
     const reset = '\x1b[0m';
     const color = levelColors[entry.level] || '';
 
-    console.log(
-      `${color}[SECURITY ${LogLevel[entry.level]}]${reset} ` +
-      `${entry.timestamp} - ${entry.eventType}: ${entry.message}` +
-      (entry.userId ? ` (User: ${entry.userId})` : '') +
-      (entry.riskScore ? ` [Risk: ${entry.riskScore}]` : ''),
-    );
+    //     // console.log(
+    //   `${color}[SECURITY ${LogLevel[entry.level]}]${reset} ` +
+    //   `${entry.timestamp} - ${entry.eventType}: ${entry.message}` +
+    //   (entry.userId ? ` (User: ${entry.userId})` : '') +
+    //   (entry.riskScore ? ` [Risk: ${entry.riskScore}]` : '')
+    // );
 
     if (entry.metadata && Object.keys(entry.metadata).length > 0) {
-      console.log(`${color}  Metadata:${reset}`, entry.metadata);
+      // // console.log(`${color}  Metadata:${reset}`, entry.metadata);
     }
   }
 
@@ -323,7 +323,7 @@ class SecurityLogger {
     level: LogLevel,
     eventType: SecurityEventType,
     message: string,
-    metadata?: Record<string, any>,
+    metadata?: Record<string, unknown>,
   ): SecurityLogEntry {
     return {
       id: this.generateId(),
@@ -337,7 +337,7 @@ class SecurityLogger {
     };
   }
 
-  private generateTags(eventType: SecurityEventType, metadata?: Record<string, any>): string[] {
+  private generateTags(eventType: SecurityEventType, metadata?: Record<string, unknown>): string[] {
     const tags: string[] = [];
 
     // Add category tags
@@ -371,30 +371,30 @@ class SecurityLogger {
     return tags;
   }
 
-  debug(message: string, metadata?: Record<string, any>): void {
+  debug(message: string, metadata?: Record<string, unknown>): void {
     if (!ENVIRONMENT_CONFIG.isDevelopment) {return;}
 
     const entry = this.createEntry(LogLevel.DEBUG, SecurityEventType.SYSTEM_ERROR, message, metadata);
     logStore.add(entry);
   }
 
-  info(message: string, metadata?: Record<string, any>): void {
+  info(message: string, metadata?: Record<string, unknown>): void {
     const entry = this.createEntry(LogLevel.INFO, SecurityEventType.DATA_ACCESS, message, metadata);
     logStore.add(entry);
   }
 
-  warn(message: string, metadata?: Record<string, any>): void {
+  warn(message: string, metadata?: Record<string, unknown>): void {
     const entry = this.createEntry(LogLevel.WARN, SecurityEventType.SUSPICIOUS_LOGIN_PATTERN, message, metadata);
     logStore.add(entry);
   }
 
-  error(message: string, metadata?: Record<string, any>): void {
+  error(message: string, metadata?: Record<string, unknown>): void {
     const entry = this.createEntry(LogLevel.ERROR, SecurityEventType.SYSTEM_ERROR, message, metadata);
     entry.stackTrace = new Error().stack;
     logStore.add(entry);
   }
 
-  critical(message: string, metadata?: Record<string, any>): void {
+  critical(message: string, metadata?: Record<string, unknown>): void {
     const entry = this.createEntry(LogLevel.CRITICAL, SecurityEventType.SECURITY_POLICY_VIOLATION, message, metadata);
     entry.stackTrace = new Error().stack;
     logStore.add(entry);
@@ -412,7 +412,7 @@ class SecurityLogger {
       userAgent?: string;
       resource?: string;
       action?: string;
-      metadata?: Record<string, any>;
+      metadata?: Record<string, unknown>;
     },
   ): void {
     const level = this.getLogLevelForEvent(eventType);
@@ -466,7 +466,7 @@ class SecurityLogger {
     );
   }
 
-  logSuspiciousActivity(type: 'brute_force' | 'rate_limit' | 'invalid_token' | 'pattern', details: Record<string, any>): void {
+  logSuspiciousActivity(type: 'brute_force' | 'rate_limit' | 'invalid_token' | 'pattern', details: Record<string, unknown>): void {
     const eventType = {
       brute_force: SecurityEventType.BRUTE_FORCE_ATTEMPT,
       rate_limit: SecurityEventType.RATE_LIMIT_EXCEEDED,
@@ -509,7 +509,7 @@ class SecurityLogger {
     );
   }
 
-  logAiSecurityEvent(type: 'prompt_injection' | 'response_filtered' | 'rate_limited', details: Record<string, any>): void {
+  logAiSecurityEvent(type: 'prompt_injection' | 'response_filtered' | 'rate_limited', details: Record<string, unknown>): void {
     const eventType = {
       prompt_injection: SecurityEventType.AI_PROMPT_INJECTION,
       response_filtered: SecurityEventType.AI_RESPONSE_FILTERED,

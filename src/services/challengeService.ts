@@ -18,7 +18,7 @@ class ChallengeService {
   private challenges: Map<string, Challenge> = new Map();
   private progress: Map<string, ChallengeProgress[]> = new Map();
   private templates: ChallengeTemplate[] = [];
-  private activeTimers: Map<string, NodeJS.Timeout> = new Map();
+  private activeTimers: Map<string, unknown> = new Map();
 
   constructor() {
     this.initializeDefaultChallenges();
@@ -305,7 +305,7 @@ class ChallengeService {
           this.progress.set(playerId, progress as ChallengeProgress[]);
         });
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Failed to load challenge data:', error);
     }
   }
@@ -325,7 +325,7 @@ class ChallengeService {
 
       localStorage.setItem('astralTurf_challenges', JSON.stringify(challengesObj));
       localStorage.setItem('astralTurf_challengeProgress', JSON.stringify(progressObj));
-    } catch (error) {
+    } catch (_error) {
       console.error('Failed to save challenge data:', error);
     }
   }

@@ -64,11 +64,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         if (savedState.version === APP_VERSION) {
             dispatch({ type: 'LOAD_STATE', payload: savedState as RootState });
         } else {
-            console.warn(`Saved state version (${savedState.version}) does not match app version (${APP_VERSION}). Discarding saved state.`);
+            // // console.warn(`Saved state version (${savedState.version}) does not match app version (${APP_VERSION}). Discarding saved state.`);
             localStorage.removeItem('astralTurfActiveState');
         }
       }
-    } catch (error) {
+    } catch (_error) {
       console.error("Failed to load state from localStorage", error);
     }
   }, []);
@@ -106,7 +106,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
       const activeStateToSave = cleanStateForSaving(state);
       localStorage.setItem('astralTurfActiveState', JSON.stringify(activeStateToSave));
-    } catch (error) {
+    } catch (_error) {
       console.error("Failed to save state to localStorage", error);
     }
   }, [state]);

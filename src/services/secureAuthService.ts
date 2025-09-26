@@ -29,13 +29,13 @@ import {
 } from '../security/auth';
 
 import { validateInput, validationSchemas } from '../security/validation';
-import { sanitizeUserInput, sanitizationUtils } from '../security/sanitization';
+import { sanitizeUserInput } from '../security/sanitization';
 import { hasPermission, Permission, Resource, PermissionContext } from '../security/rbac';
 import { securityLogger, SecurityEventType } from '../security/logging';
 import { monitorSecurityEvent, checkRateLimit } from '../security/monitoring';
-import { encryptPersonalInfo, decryptPersonalInfo, generateUUID } from '../security/encryption';
+import { generateUUID } from '../security/encryption';
 
-import type { User, UserRole, FamilyMemberAssociation, NotificationSettings } from '../types';
+import type { User, UserRole } from '../types';
 import { DEMO_USERS } from '../constants';
 
 // Enhanced signup data with security validation
@@ -107,7 +107,7 @@ class SecureAuthenticationService {
 
       this.initialized = true;
       securityLogger.info('Secure authentication service initialized');
-    } catch (error) {
+    } catch (_error) {
       securityLogger.error('Failed to initialize secure authentication service', {
         error: error instanceof Error ? error.message : 'Unknown error',
       });
@@ -141,7 +141,7 @@ class SecureAuthenticationService {
       securityLogger.info('Demo users migrated to secure format', {
         userCount: DEMO_USERS.length,
       });
-    } catch (error) {
+    } catch (_error) {
       securityLogger.error('Demo user migration failed', {
         error: error instanceof Error ? error.message : 'Unknown error',
       });
@@ -279,7 +279,7 @@ class SecureAuthenticationService {
         securityNotices,
       };
 
-    } catch (error) {
+    } catch (_error) {
       const errorMessage = error instanceof Error ? error.message : 'Login failed';
 
       securityLogger.error('Login failed', {
@@ -379,12 +379,6 @@ class SecureAuthenticationService {
 
       // Encrypt sensitive personal data if provided
       if (sanitizedData.phoneNumber || sanitizedData.emergencyContact) {
-        const personalInfo = {
-          phoneNumber: sanitizedData.phoneNumber,
-          emergencyContact: sanitizedData.emergencyContact,
-          marketingConsent: sanitizedData.marketingConsent || false,
-        };
-
         // In a real system, this would be stored encrypted
         secureUser.phoneNumber = sanitizedData.phoneNumber;
       }
@@ -408,7 +402,7 @@ class SecureAuthenticationService {
       // Automatically log in the new user
       return await this.login(sanitizedData.email, sanitizedData.password, context);
 
-    } catch (error) {
+    } catch (_error) {
       securityLogger.error('Signup failed', {
         email: signupData.email,
         role: signupData.role,
@@ -454,7 +448,7 @@ class SecureAuthenticationService {
         ipAddress: context.ipAddress,
       });
 
-    } catch (error) {
+    } catch (_error) {
       securityLogger.error('Logout failed', {
         error: error instanceof Error ? error.message : 'Unknown error',
         ipAddress: context.ipAddress,
@@ -490,7 +484,7 @@ class SecureAuthenticationService {
 
       return newTokens;
 
-    } catch (error) {
+    } catch (_error) {
       securityLogger.error('Token refresh failed', {
         error: error instanceof Error ? error.message : 'Unknown error',
         ipAddress: context.ipAddress,
@@ -571,7 +565,7 @@ class SecureAuthenticationService {
         },
       );
 
-    } catch (error) {
+    } catch (_error) {
       securityLogger.error('Password change failed', {
         userId,
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -603,7 +597,7 @@ class SecureAuthenticationService {
 
       return this.convertToPublicUser(user);
 
-    } catch (error) {
+    } catch (_error) {
       securityLogger.error('Get current user failed', {
         error: error instanceof Error ? error.message : 'Unknown error',
         ipAddress: context.ipAddress,
@@ -655,7 +649,7 @@ class SecureAuthenticationService {
 
       return hasPermissionResult.granted;
 
-    } catch (error) {
+    } catch (_error) {
       securityLogger.error('Permission check failed', {
         permission,
         resource,
@@ -670,7 +664,7 @@ class SecureAuthenticationService {
    */
 
   private convertToPublicUser(secureUser: SecureUser): User {
-    const { passwordHash, passwordHistory, refreshTokens, activeSessions, ...publicUser } = secureUser;
+    const { passwordHash: _passwordHash, passwordHistory: _passwordHistory, refreshTokens: _refreshTokens, activeSessions: _activeSessions, ...publicUser } = secureUser;
     return publicUser as User;
   }
 

@@ -40,7 +40,7 @@ class SecurityService {
     try {
       const encrypted = CryptoJS.AES.encrypt(data, this.encryptionKey).toString();
       return encrypted;
-    } catch (error) {
+    } catch (_error) {
       throw new Error('Encryption failed');
     }
   }
@@ -56,7 +56,7 @@ class SecurityService {
     try {
       const decrypted = CryptoJS.AES.decrypt(encryptedData, this.encryptionKey);
       return decrypted.toString(CryptoJS.enc.Utf8);
-    } catch (error) {
+    } catch (_error) {
       throw new Error('Decryption failed');
     }
   }
@@ -101,7 +101,7 @@ class SecurityService {
   /**
    * Sanitize data for secure transmission
    */
-  sanitizeData(data: any): any {
+  sanitizeData(data: unknown): unknown {
     if (typeof data === 'string') {
       return data.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
     }
@@ -111,7 +111,7 @@ class SecurityService {
     }
 
     if (typeof data === 'object' && data !== null) {
-      const sanitized: any = {};
+      const sanitized: unknown = {};
       for (const key in data) {
         sanitized[key] = this.sanitizeData(data[key]);
       }

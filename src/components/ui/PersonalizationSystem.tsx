@@ -129,7 +129,7 @@ export const PersonalizationProvider: React.FC<{ children: ReactNode }> = ({ chi
     try {
       const imported = JSON.parse(data);
       setPreferences({ ...defaultPreferences, ...imported });
-    } catch (error) {
+    } catch (_error) {
       console.error('Failed to import preferences:', error);
     }
   };
@@ -328,7 +328,7 @@ export const LayoutPreferences: React.FC<LayoutPreferencesProps> = ({ isOpen, on
   const { theme } = useTheme();
   const { preferences, updatePreferences } = usePersonalization();
 
-  const handleLayoutChange = (key: keyof UserPreferences['layout'], value: any) => {
+  const handleLayoutChange = (key: keyof UserPreferences['layout'], value: unknown) => {
     updatePreferences({
       layout: { ...preferences.layout, [key]: value },
     });
@@ -459,7 +459,7 @@ export const AccessibilityPreferences: React.FC<AccessibilityPreferencesProps> =
   const { theme } = useTheme();
   const { preferences, updatePreferences } = usePersonalization();
 
-  const handleAccessibilityChange = (key: keyof UserPreferences['accessibility'], value: any) => {
+  const handleAccessibilityChange = (key: keyof UserPreferences['accessibility'], value: unknown) => {
     updatePreferences({
       accessibility: { ...preferences.accessibility, [key]: value },
     });

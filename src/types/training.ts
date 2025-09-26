@@ -59,6 +59,6 @@ export interface SkillChallenge {
 // Youth development
 export interface YouthAcademy {
   level: number;
-  prospects: any[]; // YouthProspect[] when player types are imported
+  prospects: unknown[]; // YouthProspect[] when player types are imported
   lastGeneratedWeek: number;
 }

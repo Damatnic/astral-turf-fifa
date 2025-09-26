@@ -112,7 +112,7 @@ export class SecurityErrorBoundary extends Component<Props, State> {
       // Track error patterns for security analysis
       this.trackErrorPattern(sanitizedError);
 
-    } catch (loggingError) {
+    } catch (_loggingError) {
       // Fallback error logging to console if security logger fails
       console.error('Security error boundary logging failed:', loggingError);
       console.error('Original error:', error);

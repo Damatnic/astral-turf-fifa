@@ -215,7 +215,7 @@ export function validateInput<T>(schema: z.ZodSchema<T>, data: unknown): { succe
   try {
     const result = schema.parse(data);
     return { success: true, data: result };
-  } catch (error) {
+  } catch (_error) {
     if (error instanceof z.ZodError) {
       const errors = error.errors.map((err) => `${err.path.join('.')}: ${err.message}`);
 
@@ -287,7 +287,7 @@ export function validateUrl(url: string): boolean {
 }
 
 // Validate JSON input
-export function validateJson(jsonString: string): { valid: boolean; data?: any; error?: string } {
+export function validateJson(jsonString: string): { valid: boolean; data?: unknown; error?: string } {
   if (!jsonString || typeof jsonString !== 'string') {
     return { valid: false, error: 'Invalid JSON input' };
   }
@@ -307,7 +307,7 @@ export function validateJson(jsonString: string): { valid: boolean; data?: any; 
     }
 
     return { valid: true, data };
-  } catch (error) {
+  } catch (_error) {
     return { valid: false, error: 'Invalid JSON format' };
   }
 }

@@ -129,7 +129,7 @@ const AIInsights: React.FC = () => {
 
       const insight = await getTacticalAdvice(homePlayers, awayPlayers, homeFormation, awayFormation, teamTactics.home, teamTactics.away, settings.aiPersonality, staff.home.coach);
       dispatch({ type: 'GENERATE_AI_INSIGHT_SUCCESS', payload: insight });
-    } catch (error) {
+    } catch (_error) {
       console.error(error);
       dispatch({ type: 'GENERATE_AI_INSIGHT_FAILURE' });
       dispatch({ type: 'ADD_NOTIFICATION', payload: { message: `AI error: ${error instanceof Error ? error.message : 'Unknown error'}`, type: 'error' } });

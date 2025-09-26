@@ -65,7 +65,7 @@ export function sanitizeHtml(html: string, level: SanitizationLevel = 'strict'):
     }
 
     return sanitized;
-  } catch (error) {
+  } catch (_error) {
     securityLogger.error('HTML sanitization failed', {
       error: error instanceof Error ? error.message : 'Unknown error',
       inputLength: html.length,
@@ -207,7 +207,7 @@ export function sanitizeUrl(url: string): string {
 
     // Return the cleaned URL
     return urlObj.toString();
-  } catch (error) {
+  } catch (_error) {
     securityLogger.warn('Invalid URL format', { url: url.substring(0, 100) });
     return '';
   }
@@ -240,7 +240,7 @@ export function sanitizeFilePath(path: string): string {
  */
 
 // Sanitize JSON data recursively
-export function sanitizeJson(data: any, level: SanitizationLevel = 'strict'): any {
+export function sanitizeJson(data: unknown, level: SanitizationLevel = 'strict'): unknown {
   if (data === null || data === undefined) {
     return data;
   }
@@ -258,7 +258,7 @@ export function sanitizeJson(data: any, level: SanitizationLevel = 'strict'): an
   }
 
   if (typeof data === 'object') {
-    const sanitized: Record<string, any> = {};
+    const sanitized: Record<string, unknown> = {};
 
     for (const [key, value] of Object.entries(data)) {
       // Sanitize keys to prevent prototype pollution
@@ -317,7 +317,7 @@ export function sanitizeQueryParams(params: URLSearchParams): URLSearchParams {
  */
 
 // Sanitize player names and text fields
-export function sanitizePlayerData(playerData: any): any {
+export function sanitizePlayerData(playerData: unknown): unknown {
   if (!playerData || typeof playerData !== 'object') {
     return playerData;
   }
@@ -334,7 +334,7 @@ export function sanitizePlayerData(playerData: any): any {
 
   // Sanitize communication history
   if (Array.isArray(sanitized.conversationHistory)) {
-    sanitized.conversationHistory = sanitized.conversationHistory.map((message: any) => ({
+    sanitized.conversationHistory = sanitized.conversationHistory.map((message: unknown) => ({
       ...message,
       text: typeof message.text === 'string' ? sanitizeHtml(message.text, 'basic') : message.text,
     }));
@@ -342,7 +342,7 @@ export function sanitizePlayerData(playerData: any): any {
 
   // Sanitize development log
   if (Array.isArray(sanitized.developmentLog)) {
-    sanitized.developmentLog = sanitized.developmentLog.map((log: any) => ({
+    sanitized.developmentLog = sanitized.developmentLog.map((log: unknown) => ({
       ...log,
       note: typeof log.note === 'string' ? sanitizeHtml(log.note, 'basic') : log.note,
     }));

@@ -44,7 +44,7 @@ const TransfersPage: React.FC = () => {
         });
     };
 
-    const handleFilterChange = (filter: keyof typeof transferMarketFilters, value: any) => {
+    const handleFilterChange = (filter: keyof typeof transferMarketFilters, value: unknown) => {
         uiDispatch({
             type: 'SET_TRANSFER_MARKET_FILTER',
             payload: { filter, value },

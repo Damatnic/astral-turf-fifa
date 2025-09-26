@@ -137,7 +137,7 @@ export function validatePasswordStrength(password: string): { isValid: boolean; 
 export async function hashPassword(password: string): Promise<string> {
   try {
     return await bcrypt.hash(password, PASSWORD_CONFIG.BCRYPT_ROUNDS);
-  } catch (error) {
+  } catch (_error) {
     securityLogger.error('Password hashing failed', { error: error instanceof Error ? error.message : 'Unknown error' });
     throw new Error('Password hashing failed');
   }
@@ -147,7 +147,7 @@ export async function hashPassword(password: string): Promise<string> {
 export async function verifyPassword(password: string, hash: string): Promise<boolean> {
   try {
     return await bcrypt.compare(password, hash);
-  } catch (error) {
+  } catch (_error) {
     securityLogger.error('Password verification failed', { error: error instanceof Error ? error.message : 'Unknown error' });
     return false;
   }
@@ -176,6 +176,9 @@ export async function generateTokenPair(user: SecureUser, sessionId: string): Pr
   };
 
   try {
+    if (typeof TextEncoder === 'undefined') {
+      throw new Error('TextEncoder not available');
+    }
     const secret = new TextEncoder().encode(JWT_CONFIG.SECRET);
     const refreshSecret = new TextEncoder().encode(JWT_CONFIG.REFRESH_SECRET);
 
@@ -213,7 +216,7 @@ export async function generateTokenPair(user: SecureUser, sessionId: string): Pr
       expiresIn,
       tokenType: 'Bearer',
     };
-  } catch (error) {
+  } catch (_error) {
     securityLogger.error('Token generation failed', {
       userId: user.id,
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -231,8 +234,12 @@ export async function verifyToken(token: string, isRefreshToken = false): Promis
       return null;
     }
 
+    if (typeof TextEncoder === 'undefined') {
+      throw new Error('TextEncoder not available');
+    }
+    
     const secret = new TextEncoder().encode(
-      isRefreshToken ? JWT_CONFIG.REFRESH_SECRET : JWT_CONFIG.SECRET,
+      isRefreshToken ? JWT_CONFIG.REFRESH_SECRET : JWT_CONFIG.SECRET
     );
 
     const { payload } = await jose.jwtVerify(token, secret, {
@@ -241,7 +248,7 @@ export async function verifyToken(token: string, isRefreshToken = false): Promis
     });
 
     return payload as JWTPayload;
-  } catch (error) {
+  } catch (_error) {
     if (error instanceof jose.errors.JWTExpired) {
       securityLogger.info('Token expired', { error: error.message });
     } else if (error instanceof jose.errors.JWTInvalid) {
@@ -317,7 +324,7 @@ export async function revokeToken(token: string): Promise<void> {
 
 // Create new session
 export function createSession(user: SecureUser, deviceInfo: string, ipAddress: string, userAgent: string): SessionInfo {
-  const sessionId = crypto.lib.WordArray.random(16).toString();
+  const sessionId = typeof crypto !== 'undefined' ? crypto.lib.WordArray.random(16).toString() : Math.random().toString(36);
 
   const session: SessionInfo = {
     id: sessionId,

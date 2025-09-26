@@ -38,7 +38,7 @@ const ContractNegotiationPopup: React.FC = () => {
                 negotiationData.conversation.join('\n'),
             );
             franchiseDispatch({ type: 'SEND_NEGOTIATION_OFFER_SUCCESS', payload: { response } });
-        } catch (error) {
+        } catch (_error) {
             franchiseDispatch({ type: 'SEND_NEGOTIATION_OFFER_FAILURE' });
         }
     };

@@ -6,7 +6,7 @@ import type { RootState, Action } from '../../../types';
 
 // Mock immer's produce function
 vi.mock('immer', () => ({
-  produce: (state: any, recipe: any) => {
+  produce: (state: unknown, recipe: unknown) => {
     const draft = JSON.parse(JSON.stringify(state)); // Deep clone for testing
     recipe(draft);
     return draft;
@@ -297,10 +297,10 @@ describe('rootReducer', () => {
       rootReducer(initialState, action);
 
       // Mock sub-reducers should have been called
-      const { tacticsReducer } = require('../../../context/reducers/tacticsReducer');
-      const { franchiseReducer } = require('../../../context/reducers/franchiseReducer');
-      const { uiReducer } = require('../../../context/reducers/uiReducer');
-      const { authReducer } = require('../../../context/reducers/authReducer');
+      const { tacticsReducer } = await import('../../../context/reducers/tacticsReducer');
+      const { franchiseReducer } = await import('../../../context/reducers/franchiseReducer');
+      const { uiReducer } = await import('../../../context/reducers/uiReducer');
+      const { authReducer } = await import('../../../context/reducers/authReducer');
 
       expect(tacticsReducer).toHaveBeenCalledWith(initialState.tactics, action);
       expect(franchiseReducer).toHaveBeenCalledWith(initialState.franchise, action);
@@ -320,7 +320,7 @@ describe('rootReducer', () => {
       // State should remain unchanged for unknown actions
       expect(newState).toBeDefined();
       // But sub-reducers should still be called
-      const { tacticsReducer } = require('../../../context/reducers/tacticsReducer');
+      const { tacticsReducer } = await import('../../../context/reducers/tacticsReducer');
       expect(tacticsReducer).toHaveBeenCalledWith(initialState.tactics, unknownAction);
     });
 

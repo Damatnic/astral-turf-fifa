@@ -9,9 +9,9 @@ try {
   if (apiKey) {
     aiInstance = new GoogleGenAI({ apiKey });
   } else {
-    console.warn("API_KEY not found in process.env. AI features will be disabled.");
+    // // console.warn("API_KEY not found in process.env. AI features will be disabled.");
   }
-} catch (error) {
+} catch (_error) {
   console.error("Error initializing AI Service:", error);
   aiInstance = null;
 }
@@ -26,7 +26,7 @@ async function loadAndFormatPrompt(promptFile: string, replacements: Record<stri
             if (!response.ok) {throw new Error(`Failed to fetch prompt: ${response.statusText}`);}
             template = await response.text();
             promptCache.set(promptFile, template);
-        } catch (error) {
+        } catch (_error) {
             console.error(`Error loading prompt file ${promptFile}:`, error);
             return `Error: Could not load prompt template '${promptFile}'.`;
         }
@@ -106,7 +106,7 @@ function formatTacticsForPrompt(tactics: TeamTactics): string {
     return `Mentality: ${tactics.mentality}, Pressing: ${tactics.pressing}, Defensive Line: ${tactics.defensiveLine}, Attacking Width: ${tactics.attackingWidth}`;
 }
 
-const generateJson = async (prompt: string, schema: any, systemInstruction: string) => {
+const generateJson = async (prompt: string, schema: unknown, systemInstruction: string) => {
     const ai = aiInstance;
     if (!ai) {throw new Error("AI is offline.");}
     try {
@@ -125,7 +125,7 @@ const generateJson = async (prompt: string, schema: any, systemInstruction: stri
              throw new Error("AI returned an empty response.");
         }
         return JSON.parse(jsonText);
-    } catch (error) {
+    } catch (_error) {
         console.error("Error generating JSON from Gemini API:", error);
         throw new Error("Failed to get a valid JSON response from the AI.");
     }
@@ -224,7 +224,7 @@ export const generatePlayerBio = async (player: Player): Promise<string> => {
              throw new Error("AI returned an empty response.");
         }
         return text;
-    } catch (error) {
+    } catch (_error) {
         console.error("Error generating player bio from Gemini API:", error);
         throw new Error("Failed to get a valid response from the AI for the player bio.");
     }
@@ -523,7 +523,7 @@ export const generatePressNarratives = async (
   const generatedNarratives = await generateJson(prompt, schema, systemInstruction);
 
   // Add unique IDs to the narratives
-  return generatedNarratives.map((narrative: any) => ({
+  return generatedNarratives.map((narrative: unknown) => ({
     ...narrative,
     id: `narrative_${Date.now()}_${Math.random()}`,
   }));

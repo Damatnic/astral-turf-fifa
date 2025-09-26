@@ -26,7 +26,7 @@ const LeagueTablePage: React.FC = () => {
         return '';
     };
 
-    const getFormDisplay = (team: any) => {
+    const getFormDisplay = (team: unknown) => {
         // Mock form data - in a real app this would come from match history
         const forms = ['W', 'W', 'D', 'L', 'W'];
         return forms;

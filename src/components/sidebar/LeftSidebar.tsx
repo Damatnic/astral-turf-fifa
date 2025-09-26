@@ -255,7 +255,7 @@ export const LeftSidebar: React.FC = () => {
             const playersForSuggestion = players.filter(p => p.team === activeTeam);
             const suggestion = await getAIFormationSuggestion(playersForSuggestion, settings.aiPersonality);
             uiDispatch({ type: 'SUGGEST_FORMATION_SUCCESS', payload: suggestion });
-        } catch (error) {
+        } catch (_error) {
             console.error(error);
             uiDispatch({ type: 'SUGGEST_FORMATION_FAILURE' });
             uiDispatch({ type: 'ADD_NOTIFICATION', payload: { message: `AI error: ${error instanceof Error ? error.message : 'Unknown error'}`, type: 'error' } });

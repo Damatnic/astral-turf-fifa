@@ -61,7 +61,7 @@ export const FileMenu: React.FC = () => {
 
             if (typeof selected === 'string') {
                 const fileContents = await readTextFile(selected);
-                Papa.parse<any>(fileContents, {
+                Papa.parse<unknown>(fileContents, {
                     header: true,
                     skipEmptyLines: true,
                     complete: (results) => {
@@ -137,7 +137,7 @@ export const FileMenu: React.FC = () => {
                             });
                             tacticsDispatch({ type: 'UPDATE_PLAYERS', payload: [...tacticsState.players, ...newPlayers] });
                             uiDispatch({ type: 'ADD_NOTIFICATION', payload: { message: `${newPlayers.length} players imported successfully.`, type: 'success' } });
-                        } catch (parseErr) {
+                        } catch (_parseErr) {
                              uiDispatch({ type: 'ADD_NOTIFICATION', payload: { message: `Error parsing CSV. ${parseErr instanceof Error ? parseErr.message : ''}`, type: 'error' } });
                         }
                     },
@@ -146,7 +146,7 @@ export const FileMenu: React.FC = () => {
                     },
                 });
             }
-        } catch (err) {
+        } catch (_err) {
             console.error("Error importing roster:", err);
             uiDispatch({ type: 'ADD_NOTIFICATION', payload: { message: `Error importing roster.`, type: 'error' } });
         }
@@ -182,7 +182,7 @@ export const FileMenu: React.FC = () => {
                 await writeTextFile(filePath, csv);
                 uiDispatch({ type: 'ADD_NOTIFICATION', payload: { message: 'Roster exported successfully.', type: 'success' } });
             }
-        } catch (err) {
+        } catch (_err) {
             uiDispatch({ type: 'ADD_NOTIFICATION', payload: { message: `Error exporting roster. ${err instanceof Error ? err.message : ''}`, type: 'error' } });
         }
     };
@@ -199,7 +199,7 @@ export const FileMenu: React.FC = () => {
                 await writeTextFile(filePath, JSON.stringify(tacticsState.playbook, null, 2));
                 uiDispatch({ type: 'ADD_NOTIFICATION', payload: { message: 'Playbook exported successfully.', type: 'success' } });
             }
-        } catch (err) {
+        } catch (_err) {
             console.error("Error exporting playbook:", err);
             uiDispatch({ type: 'ADD_NOTIFICATION', payload: { message: `Error exporting playbook.`, type: 'error' } });
         }
@@ -222,7 +222,7 @@ export const FileMenu: React.FC = () => {
                 tacticsDispatch({ type: 'LOAD_PLAYBOOK', payload: loadedPlaybook });
                 uiDispatch({ type: 'ADD_NOTIFICATION', payload: { message: 'Playbook loaded successfully.', type: 'success' } });
             }
-        } catch (err) {
+        } catch (_err) {
             console.error("Error loading playbook:", err);
             uiDispatch({ type: 'ADD_NOTIFICATION', payload: { message: `Error loading playbook. ${err instanceof Error ? err.message : ''}`, type: 'error' } });
         }

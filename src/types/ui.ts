@@ -105,7 +105,7 @@ export interface UIState {
   saveSlots: Record<string, SaveSlot>;
   activeSaveSlotId: string | null;
   isExportingLineup: boolean;
-  teamKits: { home: any, away: any }; // TeamKit when imported
+  teamKits: { home: unknown, away: unknown }; // TeamKit when imported
   notifications: Notification[];
   activeTeamContext: TeamView;
 
@@ -142,33 +142,33 @@ export interface UIState {
   // AI State
   settings: AISettings;
   isLoadingAI: boolean;
-  aiInsight: any | null; // AIInsight when AI types are imported
+  aiInsight: unknown | null; // AIInsight when AI types are imported
   isComparingAI: boolean;
-  aiComparisonResult: any | null; // AIComparison when imported
+  aiComparisonResult: unknown | null; // AIComparison when imported
   isSuggestingFormation: boolean;
-  aiSuggestedFormation: any | null; // AISuggestedFormation when imported
+  aiSuggestedFormation: unknown | null; // AISuggestedFormation when imported
   chatHistory: ChatMessage[];
   isChatProcessing: boolean;
   highlightedByAIPlayerIds: string[];
   isLoadingOppositionReport: boolean;
-  oppositionReport: any | null; // AIOppositionReport when imported
+  oppositionReport: unknown | null; // AIOppositionReport when imported
   isSimulatingMatch: boolean;
-  simulationTimeline: any[]; // (MatchEvent | MatchCommentary)[] when imported
+  simulationTimeline: unknown[]; // (MatchEvent | MatchCommentary)[] when imported
   isLoadingPostMatchReport: boolean;
-  postMatchReport: any | null; // AIPostMatchAnalysis when imported
+  postMatchReport: unknown | null; // AIPostMatchAnalysis when imported
   isLoadingPressConference: boolean;
-  pressConferenceData: any | null; // AIPressConferenceResponse when imported
+  pressConferenceData: unknown | null; // AIPressConferenceResponse when imported
   isLoadingNegotiation: boolean;
   isLoadingAISubSuggestion: boolean;
-  aiSubSuggestionData: any | null; // AISubstitutionSuggestion when imported
+  aiSubSuggestionData: unknown | null; // AISubstitutionSuggestion when imported
   isScoutingPlayer: boolean;
   scoutedPlayerId: string | null;
-  scoutReport: any | null; // AIScoutReport when imported
+  scoutReport: unknown | null; // AIScoutReport when imported
   isLoadingConversation: boolean;
   selectedPlayerId: string | null;
   isLoadingDevelopmentSummary: boolean;
-  developmentSummary: any | null; // AIDevelopmentSummary when imported
+  developmentSummary: unknown | null; // AIDevelopmentSummary when imported
   isLoadingTeamTalk: boolean;
-  teamTalkData: any | null; // AITeamTalkResponse when imported
-  pendingPromiseRequest: any | null; // PromiseRequest when imported
+  teamTalkData: unknown | null; // AITeamTalkResponse when imported
+  pendingPromiseRequest: unknown | null; // PromiseRequest when imported
 }

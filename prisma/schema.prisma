@@ -1,0 +1,396 @@
+// Astral Turf Database Schema
+// Production-ready PostgreSQL schema with all required tables
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Management
+model User {
+  id                    String    @id @default(cuid())
+  email                 String    @unique
+  passwordHash          String
+  firstName             String
+  lastName              String
+  role                  UserRole
+  isActive              Boolean   @default(true)
+  phoneNumber           String?
+  timezone              String    @default("America/New_York")
+  language              String    @default("en")
+  
+  // Security fields
+  lastLoginAt           DateTime?
+  lastPasswordChangeAt  DateTime  @default(now())
+  accountLocked         Boolean   @default(false)
+  failedLoginAttempts   Int       @default(0)
+  twoFactorEnabled      Boolean   @default(false)
+  
+  // Audit fields
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  
+  // Relationships
+  sessions              UserSession[]
+  passwordHistory       PasswordHistory[]
+  notifications         NotificationSettings?
+  familyAssociations    FamilyMemberAssociation[]
+  auditLogs             AuditLog[]
+  systemLogs            SystemLog[]
+  
+  @@map("users")
+}
+
+model UserSession {
+  id                String    @id @default(cuid())
+  userId            String
+  sessionToken      String    @unique
+  deviceInfo        String
+  ipAddress         String
+  userAgent         String
+  isActive          Boolean   @default(true)
+  expiresAt         DateTime
+  createdAt         DateTime  @default(now())
+  lastActivityAt    DateTime  @default(now())
+  
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("user_sessions")
+}
+
+model PasswordHistory {
+  id           String   @id @default(cuid())
+  userId       String
+  passwordHash String
+  createdAt    DateTime @default(now())
+  
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("password_history")
+}
+
+// System Logging
+model SystemLog {
+  id                String    @id @default(cuid())
+  level             String    // error, warn, info, debug, etc.
+  message           String
+  timestamp         DateTime  @default(now())
+  service           String?   @default("astral-turf")
+  userId            String?
+  sessionId         String?
+  ipAddress         String?
+  userAgent         String?
+  metadata          Json?     // Additional context data
+  securityEventType String?   // For security events
+  createdAt         DateTime  @default(now())
+
+  // Relations
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([timestamp])
+  @@index([level])
+  @@index([userId])
+  @@index([securityEventType])
+  @@map("system_logs")
+}
+
+model NotificationSettings {
+  id                    String  @id @default(cuid())
+  userId                String  @unique
+  email                 Boolean @default(true)
+  sms                   Boolean @default(false)
+  push                  Boolean @default(true)
+  matchUpdates          Boolean @default(true)
+  trainingReminders     Boolean @default(true)
+  emergencyAlerts       Boolean @default(true)
+  paymentReminders      Boolean @default(true)
+  
+  user                  User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("notification_settings")
+}
+
+model FamilyMemberAssociation {
+  id                String                    @id @default(cuid())
+  familyMemberId    String
+  playerId          String
+  relationship      FamilyRelationship
+  approvedByCoach   Boolean                   @default(false)
+  permissions       Json                      // Will store FamilyPermissions JSON
+  createdAt         DateTime                  @default(now())
+  
+  familyMember      User                      @relation(fields: [familyMemberId], references: [id], onDelete: Cascade)
+  
+  @@map("family_member_associations")
+}
+
+// Player Management
+model Player {
+  id                String              @id @default(cuid())
+  name              String
+  age               Int
+  position          PlayerPosition
+  nationality       String?
+  jerseyNumber      Int?
+  
+  // Physical attributes
+  height            Float?
+  weight            Float?
+  preferredFoot     FootPreference?
+  
+  // Game attributes (stored as JSON)
+  attributes        Json                // Will store PlayerAttributes JSON
+  
+  // Contract and status
+  contractValue     Float?
+  contractExpiry    DateTime?
+  isActive          Boolean             @default(true)
+  
+  // Relationships
+  teamId            String?
+  team              Team?               @relation(fields: [teamId], references: [id])
+  statistics        PlayerStatistics[]
+  injuries          PlayerInjury[]
+  trainingRecords   TrainingRecord[]
+  
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  @@map("players")
+}
+
+model Team {
+  id                String              @id @default(cuid())
+  name              String
+  shortName         String
+  logoUrl           String?
+  foundedYear       Int?
+  stadium           String?
+  
+  // Relationships
+  players           Player[]
+  matches           Match[]
+  formations        Formation[]
+  
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  @@map("teams")
+}
+
+model PlayerStatistics {
+  id                String    @id @default(cuid())
+  playerId          String
+  season            String
+  matches           Int       @default(0)
+  goals             Int       @default(0)
+  assists           Int       @default(0)
+  yellowCards       Int       @default(0)
+  redCards          Int       @default(0)
+  minutesPlayed     Int       @default(0)
+  
+  player            Player    @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  @@unique([playerId, season])
+  @@map("player_statistics")
+}
+
+model PlayerInjury {
+  id                String    @id @default(cuid())
+  playerId          String
+  injuryType        String
+  severity          InjurySeverity
+  expectedRecovery  DateTime?
+  isActive          Boolean   @default(true)
+  
+  player            Player    @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  @@map("player_injuries")
+}
+
+// Match Management
+model Match {
+  id                String      @id @default(cuid())
+  homeTeamId        String
+  awayTeamId        String
+  matchDate         DateTime
+  venue             String?
+  competition       String?
+  status            MatchStatus @default(SCHEDULED)
+  
+  // Scores
+  homeScore         Int?
+  awayScore         Int?
+  
+  // Relationships
+  homeTeam          Team        @relation(fields: [homeTeamId], references: [id])
+  events            MatchEvent[]
+  
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  
+  @@map("matches")
+}
+
+model MatchEvent {
+  id                String      @id @default(cuid())
+  matchId           String
+  playerId          String?
+  eventType         EventType
+  minute            Int
+  description       String?
+  
+  match             Match       @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  
+  createdAt         DateTime    @default(now())
+  
+  @@map("match_events")
+}
+
+// Formation and Tactics
+model Formation {
+  id                String              @id @default(cuid())
+  name              String
+  teamId            String?
+  isDefault         Boolean             @default(false)
+  formation         Json                // Will store FormationData JSON
+  
+  team              Team?               @relation(fields: [teamId], references: [id])
+  
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  @@map("formations")
+}
+
+// Training Management
+model TrainingRecord {
+  id                String      @id @default(cuid())
+  playerId          String
+  trainingType      String
+  duration          Int         // in minutes
+  intensity         Int         // 1-10 scale
+  performance       Int?        // 1-10 scale
+  notes             String?
+  
+  player            Player      @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  
+  createdAt         DateTime    @default(now())
+  
+  @@map("training_records")
+}
+
+// Security and Audit
+model AuditLog {
+  id                String              @id @default(cuid())
+  userId            String?
+  action            String
+  resourceType      String
+  resourceId        String?
+  ipAddress         String?
+  userAgent         String?
+  metadata          Json?
+  riskScore         Int?
+  
+  user              User?               @relation(fields: [userId], references: [id])
+  
+  createdAt         DateTime            @default(now())
+  
+  @@map("audit_logs")
+}
+
+model ApiKey {
+  id                String      @id @default(cuid())
+  name              String
+  keyHash           String      @unique
+  userId            String
+  permissions       String[]
+  rateLimitPerHour  Int         @default(1000)
+  isActive          Boolean     @default(true)
+  expiresAt         DateTime?
+  lastUsed          DateTime?
+  usageCount        Int         @default(0)
+  
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  
+  @@map("api_keys")
+}
+
+// Application State Storage
+model AppState {
+  id                String      @id @default(cuid())
+  userId            String
+  stateType         String      // 'tactics', 'ui', 'franchise', etc.
+  stateData         Json
+  version           Int         @default(1)
+  deviceId          String?
+  
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  
+  @@unique([userId, stateType, deviceId])
+  @@map("app_states")
+}
+
+// Enums
+enum UserRole {
+  COACH
+  PLAYER
+  FAMILY
+  ADMIN
+}
+
+enum PlayerPosition {
+  GK
+  DF
+  MF
+  FW
+}
+
+enum FootPreference {
+  LEFT
+  RIGHT
+  BOTH
+}
+
+enum FamilyRelationship {
+  MOTHER
+  FATHER
+  GUARDIAN
+  OTHER
+}
+
+enum InjurySeverity {
+  MINOR
+  MODERATE
+  SEVERE
+  CRITICAL
+}
+
+enum MatchStatus {
+  SCHEDULED
+  LIVE
+  COMPLETED
+  CANCELLED
+  POSTPONED
+}
+
+enum EventType {
+  GOAL
+  ASSIST
+  YELLOW_CARD
+  RED_CARD
+  SUBSTITUTION
+  INJURY
+}

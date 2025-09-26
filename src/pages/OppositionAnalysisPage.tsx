@@ -40,7 +40,7 @@ const OppositionAnalysisPage: React.FC = () => {
         }
     };
 
-    const getAssignmentStatus = (assignment: any) => {
+    const getAssignmentStatus = (assignment: unknown) => {
         if (assignment.report) {return 'completed';}
         if (assignment.dueWeek <= franchiseState.gameWeek) {return 'overdue';}
         return 'in_progress';

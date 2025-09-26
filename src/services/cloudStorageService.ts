@@ -91,7 +91,7 @@ class CloudStorageService {
     // Initialize database
     await this.db.open();
 
-    console.log('☁️ Cloud storage service initialized');
+    // // console.log('☁️ Cloud storage service initialized');
   }
 
   /**
@@ -126,9 +126,9 @@ class CloudStorageService {
         await this.syncToCloud();
       }
 
-      console.log('💾 State saved locally and queued for cloud sync');
+      // // console.log('💾 State saved locally and queued for cloud sync');
 
-    } catch (error) {
+    } catch (_error) {
       console.error('❌ Failed to save state:', error);
       throw error;
     }
@@ -164,7 +164,7 @@ class CloudStorageService {
 
       return localState?.state || null;
 
-    } catch (error) {
+    } catch (_error) {
       console.error('❌ Failed to load state:', error);
       return null;
     }
@@ -195,9 +195,9 @@ class CloudStorageService {
         this.onSyncCompleteCallback(true);
       }
 
-      console.log(`☁️ Synced ${pendingStates.length} states to cloud`);
+      // // console.log(`☁️ Synced ${pendingStates.length} states to cloud`);
 
-    } catch (error) {
+    } catch (_error) {
       await this.logSync('SYNC_TO_CLOUD', false, 0, error.message);
 
       if (this.onSyncCompleteCallback) {
@@ -254,10 +254,10 @@ class CloudStorageService {
         await this.uploadBackupToCloud(backupId, backupData);
       }
 
-      console.log(`💾 Backup created: ${backupId}`);
+      // // console.log(`💾 Backup created: ${backupId}`);
       return backupId;
 
-    } catch (error) {
+    } catch (_error) {
       console.error('❌ Backup creation failed:', error);
       throw error;
     }
@@ -283,7 +283,7 @@ class CloudStorageService {
 
       throw new Error('Backup data not available offline');
 
-    } catch (error) {
+    } catch (_error) {
       console.error('❌ Backup restoration failed:', error);
       throw error;
     }
@@ -336,7 +336,7 @@ class CloudStorageService {
       .and(backup => backup.isAutomatic)
       .delete();
 
-    console.log(`🧹 Cleaned up data older than ${daysToKeep} days`);
+    // // console.log(`🧹 Cleaned up data older than ${daysToKeep} days`);
   }
 
   // Event listener setters
@@ -365,7 +365,7 @@ class CloudStorageService {
       const decryptedState = await decrypt(latestState.state);
       const state = JSON.parse(decryptedState);
       return { state, version: latestState.version };
-    } catch (error) {
+    } catch (_error) {
       console.error('❌ Failed to decrypt local state:', error);
       return null;
     }
@@ -392,7 +392,7 @@ class CloudStorageService {
 
       return { state, version: data.version };
 
-    } catch (error) {
+    } catch (_error) {
       console.error('❌ Failed to load cloud state:', error);
       return null;
     }
@@ -426,7 +426,7 @@ class CloudStorageService {
     await this.db.states.update(storedState.id, { isUploaded: true });
   }
 
-  private async uploadBackupToCloud(backupId: string, backupData: any): Promise<void> {
+  private async uploadBackupToCloud(backupId: string, backupData: unknown): Promise<void> {
     if (!this.config) {return;}
 
     const response = await fetch(`${this.config.endpoint}/backups`, {
@@ -446,7 +446,7 @@ class CloudStorageService {
     }
   }
 
-  private async downloadBackupFromCloud(backupId: string): Promise<any> {
+  private async downloadBackupFromCloud(backupId: string): Promise<unknown> {
     if (!this.config) {throw new Error('Cloud config not available');}
 
     const response = await fetch(`${this.config.endpoint}/backups/${backupId}`, {
@@ -466,6 +466,9 @@ class CloudStorageService {
   }
 
   private async generateChecksum(data: string): Promise<string> {
+    if (typeof TextEncoder === 'undefined' || typeof crypto === 'undefined') {
+      return 'checksum-unavailable';
+    }
     const encoder = new TextEncoder();
     const dataBuffer = encoder.encode(data);
     const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
@@ -501,13 +504,13 @@ class CloudStorageService {
   private setupOnlineDetection(): void {
     window.addEventListener('online', () => {
       this.isOnline = true;
-      console.log('🌐 Connection restored - initiating sync');
+      // // console.log('🌐 Connection restored - initiating sync');
       this.syncToCloud();
     });
 
     window.addEventListener('offline', () => {
       this.isOnline = false;
-      console.log('📡 Connection lost - entering offline mode');
+      // // console.log('📡 Connection lost - entering offline mode');
     });
   }
 

@@ -3,9 +3,9 @@ import React from 'react';
 import { useTacticsContext } from '../hooks/useTacticsContext';
 import { LeftSidebar } from '../components/sidebar/LeftSidebar';
 import { RightSidebar } from '../components/sidebar/RightSidebar';
-import SoccerField from '../components/field/SoccerField';
+import EnhancedSoccerField from '../components/field/EnhancedSoccerField';
 import Dugout from '../components/field/Dugout';
-import TacticalToolbar from '../components/field/TacticalToolbar';
+import EnhancedTacticalToolbar from '../components/field/EnhancedTacticalToolbar';
 import PresentationControls from '../components/field/PresentationControls';
 import ChatButton from '../components/ui/ChatButton';
 import { useUIContext, useResponsive, useResponsiveNavigation } from '../hooks';
@@ -59,19 +59,15 @@ const TacticsBoardPage: React.FC = React.memo(() => {
               ${isMobile ? 'rounded-lg' : 'rounded-lg'}
             `}></div>
 
-            {/* Soccer Field Component */}
+            {/* Enhanced Soccer Field Component */}
             <div className="relative z-10 w-full h-full">
-              <SoccerField />
+              <EnhancedSoccerField />
             </div>
           </div>
 
-          {/* Tactical Toolbar - Mobile Positioned */}
+          {/* Enhanced Tactical Toolbar - Mobile Positioned */}
           {!isPresentationMode && (
-            <div className={`
-              ${isMobile ? 'absolute top-2 left-2 right-2' : 'static'}
-            `}>
-              <TacticalToolbar />
-            </div>
+            <EnhancedTacticalToolbar />
           )}
         </div>
 

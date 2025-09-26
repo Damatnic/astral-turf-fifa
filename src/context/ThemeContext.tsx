@@ -353,7 +353,26 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
   useEffect(() => {
     const root = document.documentElement;
 
-    // Apply color variables
+    // Apply color variables using the expected naming convention
+    // Map background colors to --bg-* variables
+    root.style.setProperty('--bg-primary', theme.colors.background.primary);
+    root.style.setProperty('--bg-secondary', theme.colors.background.secondary);
+    root.style.setProperty('--bg-tertiary', theme.colors.background.tertiary);
+
+    // Map text colors to --text-* variables
+    root.style.setProperty('--text-primary', theme.colors.text.primary);
+    root.style.setProperty('--text-secondary', theme.colors.text.secondary);
+    root.style.setProperty('--text-tertiary', theme.colors.text.tertiary);
+
+    // Map border colors to --border-* variables
+    root.style.setProperty('--border-primary', theme.colors.border.primary);
+    root.style.setProperty('--border-secondary', theme.colors.border.secondary);
+
+    // Map accent colors to --accent-* variables
+    root.style.setProperty('--accent-primary', theme.colors.accent.primary);
+    root.style.setProperty('--accent-secondary', theme.colors.accent.secondary);
+
+    // Apply additional color variables for compatibility
     Object.entries(theme.colors.background).forEach(([key, value]) => {
       root.style.setProperty(`--color-bg-${key}`, value);
     });
@@ -380,13 +399,17 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
     });
 
     // Apply design tokens
-    Object.entries(designTokens.spacing).forEach(([key, value]) => {
-      root.style.setProperty(`--spacing-${key}`, value);
-    });
+    if (designTokens.spacing) {
+      Object.entries(designTokens.spacing).forEach(([key, value]) => {
+        root.style.setProperty(`--spacing-${key}`, value);
+      });
+    }
 
-    Object.entries(designTokens.borderRadius).forEach(([key, value]) => {
-      root.style.setProperty(`--radius-${key}`, value);
-    });
+    if (designTokens.borderRadius) {
+      Object.entries(designTokens.borderRadius).forEach(([key, value]) => {
+        root.style.setProperty(`--radius-${key}`, value);
+      });
+    }
 
     // Set theme class on body
     document.body.className = document.body.className.replace(/theme-\w+/g, '');

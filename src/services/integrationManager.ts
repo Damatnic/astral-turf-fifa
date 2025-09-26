@@ -54,7 +54,7 @@ export interface IntegrationConfig {
   notifications: {
     enabled: boolean;
     channels: {
-      email: { enabled: boolean; smtpConfig?: any };
+      email: { enabled: boolean; smtpConfig?: unknown };
       sms: { enabled: boolean; provider?: string; apiKey?: string };
       push: { enabled: boolean; fcmKey?: string };
       webhook: { enabled: boolean };
@@ -78,8 +78,8 @@ export interface IntegrationConfig {
     providers: {
       footballApi: { enabled: boolean; apiKey?: string };
       sportsRadar: { enabled: boolean; apiKey?: string };
-      catapult: { enabled: boolean; credentials?: any };
-      statsports: { enabled: boolean; credentials?: any };
+      catapult: { enabled: boolean; credentials?: unknown };
+      statsports: { enabled: boolean; credentials?: unknown };
     };
     syncInterval: number;
     benchmarkingEnabled: boolean;
@@ -102,7 +102,7 @@ export interface IntegrationEvent {
   timestamp: number;
   service: string;
   type: 'connection' | 'sync' | 'error' | 'data_update' | 'config_change';
-  data: any;
+  data: unknown;
   severity: 'info' | 'warning' | 'error' | 'critical';
 }
 
@@ -135,7 +135,7 @@ class IntegrationManager {
   private config: IntegrationConfig;
   private serviceStatuses: Map<string, IntegrationStatus> = new Map();
   private eventLog: IntegrationEvent[] = [];
-  private metricsHistory: Map<string, any[]> = new Map();
+  private metricsHistory: Map<string, unknown[]> = new Map();
   private isInitialized = false;
 
   // Event callbacks
@@ -153,12 +153,12 @@ class IntegrationManager {
    */
   async initialize(userId: string, userApiKey: string): Promise<void> {
     if (this.isInitialized) {
-      console.log('⚠️ Integration manager already initialized');
+      // // console.log('⚠️ Integration manager already initialized');
       return;
     }
 
     try {
-      console.log('🚀 Initializing Integration Manager...');
+      // // console.log('🚀 Initializing Integration Manager...');
 
       // Initialize security
       initSecurity(userApiKey);
@@ -187,9 +187,9 @@ class IntegrationManager {
       this.isInitialized = true;
       this.logEvent('integration_manager', 'initialization', 'All services initialized successfully', 'info');
 
-      console.log('✅ Integration Manager initialized successfully');
+      // // console.log('✅ Integration Manager initialized successfully');
 
-    } catch (error) {
+    } catch (_error) {
       this.logEvent('integration_manager', 'error', `Initialization failed: ${error.message}`, 'critical');
       throw error;
     }
@@ -269,9 +269,9 @@ class IntegrationManager {
       await this.applyConfigurationChanges(oldConfig, this.config);
 
       this.logEvent('integration_manager', 'config_change', 'Configuration updated successfully', 'info');
-      console.log('⚙️ Integration configuration updated');
+      // // console.log('⚙️ Integration configuration updated');
 
-    } catch (error) {
+    } catch (_error) {
       this.config = oldConfig; // Rollback
       this.logEvent('integration_manager', 'error', `Configuration update failed: ${error.message}`, 'error');
       throw error;
@@ -331,7 +331,7 @@ class IntegrationManager {
         return { success: false, message: 'Service not properly connected', responseTime };
       }
 
-    } catch (error) {
+    } catch (_error) {
       const responseTime = Date.now() - startTime;
       this.updateServiceStatus(serviceName, {
         status: 'error',
@@ -377,7 +377,7 @@ class IntegrationManager {
 
       this.logEvent(serviceName, 'sync', 'Manual sync completed successfully', 'info');
 
-    } catch (error) {
+    } catch (_error) {
       this.updateServiceStatus(serviceName, {
         status: 'error',
         errorMessage: error.message,
@@ -414,7 +414,7 @@ class IntegrationManager {
     const statuses = this.getIntegrationStatuses();
     const issues: string[] = [];
     const recommendations: string[] = [];
-    const serviceReports: any = {};
+    const serviceReports: unknown = {};
 
     let healthyServices = 0;
     const totalServices = statuses.length;
@@ -560,7 +560,7 @@ class IntegrationManager {
           status: 'connected',
           metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 0, avgResponseTime: 0, uptime: 100 },
         });
-      } catch (error) {
+      } catch (_error) {
         this.updateServiceStatus('sync', {
           service: 'sync',
           name: 'Real-time Sync',
@@ -586,7 +586,7 @@ class IntegrationManager {
           status: 'connected',
           metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 0, avgResponseTime: 0, uptime: 100 },
         });
-      } catch (error) {
+      } catch (_error) {
         this.updateServiceStatus('cloudStorage', {
           service: 'cloudStorage',
           name: 'Cloud Storage',
@@ -606,7 +606,7 @@ class IntegrationManager {
         status: 'connected',
         metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 0, avgResponseTime: 0, uptime: 100 },
       });
-    } catch (error) {
+    } catch (_error) {
       this.updateServiceStatus('deviceContinuity', {
         service: 'deviceContinuity',
         name: 'Device Continuity',
@@ -628,7 +628,7 @@ class IntegrationManager {
           status: 'connected',
           metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 0, avgResponseTime: 0, uptime: 100 },
         });
-      } catch (error) {
+      } catch (_error) {
         this.updateServiceStatus('calendar', {
           service: 'calendar',
           name: 'Calendar Integration',
@@ -649,7 +649,7 @@ class IntegrationManager {
           status: 'connected',
           metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 0, avgResponseTime: 0, uptime: 100 },
         });
-      } catch (error) {
+      } catch (_error) {
         this.updateServiceStatus('notifications', {
           service: 'notifications',
           name: 'Notifications',
@@ -670,7 +670,7 @@ class IntegrationManager {
           status: 'connected',
           metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 0, avgResponseTime: 0, uptime: 100 },
         });
-      } catch (error) {
+      } catch (_error) {
         this.updateServiceStatus('socialMedia', {
           service: 'socialMedia',
           name: 'Social Media',
@@ -693,7 +693,7 @@ class IntegrationManager {
           status: 'connected',
           metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 0, avgResponseTime: 0, uptime: 100 },
         });
-      } catch (error) {
+      } catch (_error) {
         this.updateServiceStatus('sportsData', {
           service: 'sportsData',
           name: 'Sports Data APIs',
@@ -716,7 +716,7 @@ class IntegrationManager {
           status: 'connected',
           metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 0, avgResponseTime: 0, uptime: 100 },
         });
-      } catch (error) {
+      } catch (_error) {
         this.updateServiceStatus('api', {
           service: 'api',
           name: 'Public API',
@@ -737,7 +737,7 @@ class IntegrationManager {
           status: 'connected',
           metrics: { totalOperations: 0, successfulOperations: 0, failedOperations: 0, avgResponseTime: 0, uptime: 100 },
         });
-      } catch (error) {
+      } catch (_error) {
         this.updateServiceStatus('webhooks', {
           service: 'webhooks',
           name: 'Webhooks',
@@ -828,7 +828,7 @@ class IntegrationManager {
         if (!success) {
           this.logEvent(service, 'error', 'Health check failed', 'warning');
         }
-      } catch (error) {
+      } catch (_error) {
         this.logEvent(service, 'error', `Health check error: ${error.message}`, 'error');
       }
     }
@@ -859,7 +859,7 @@ class IntegrationManager {
     this.serviceStatuses.set(serviceName, status);
   }
 
-  private logEvent(service: string, type: IntegrationEvent['type'], data: any, severity: IntegrationEvent['severity']): void {
+  private logEvent(service: string, type: IntegrationEvent['type'], data: unknown, severity: IntegrationEvent['severity']): void {
     const event: IntegrationEvent = {
       id: `event_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       timestamp: Date.now(),
@@ -959,12 +959,12 @@ class IntegrationManager {
 
   private async saveConfiguration(): Promise<void> {
     // In a real implementation, would save to secure storage
-    console.log('💾 Integration configuration saved');
+    // // console.log('💾 Integration configuration saved');
   }
 
   private async applyConfigurationChanges(oldConfig: IntegrationConfig, newConfig: IntegrationConfig): Promise<void> {
     // Apply configuration changes to running services
-    console.log('⚙️ Applying configuration changes');
+    // // console.log('⚙️ Applying configuration changes');
   }
 }
 

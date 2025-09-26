@@ -175,7 +175,7 @@ describe('Login Integration Flow', () => {
 
     it('should show loading state during authentication', async () => {
       // Create a promise that we can control
-      let resolveLogin: (value: any) => void;
+      let resolveLogin: (value: unknown) => void;
       const loginPromise = new Promise((resolve) => {
         resolveLogin = resolve;
       });

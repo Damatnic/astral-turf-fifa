@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { LogoIcon } from '../components/ui/icons';
 import { useResponsive } from '../hooks';
+import { LandingPageSEO } from '../components/SEOHead';
 
 const LandingPage: React.FC = () => {
   const responsive = useResponsive();
@@ -15,22 +16,23 @@ const LandingPage: React.FC = () => {
   }, []);
 
   return (
-    <div className={`
-      mobile-full-height mobile-safe-area w-screen 
-      flex flex-col items-center justify-center
-      ${isMobile ? 'mobile-p-3' : 'p-4'}
-    `}>
+    <>
+      <LandingPageSEO />
+      <div className={`
+        mobile-full-height mobile-safe-area w-screen 
+        flex flex-col items-center justify-center
+        ${isMobile ? 'mobile-p-3' : 'p-4'}
+      `}>
       {/* Mobile-First Hero Content */}
       <div className={`
         text-center animate-fade-in-scale
         ${isMobile ? 'max-w-sm' : isTablet ? 'max-w-lg' : 'max-w-xl'}
         w-full
       `}>
-        {/* Responsive Logo */}
-        <LogoIcon className={`
-          mx-auto text-teal-400
-          ${isMobile ? 'w-16 h-16' : isTablet ? 'w-20 h-20' : 'w-24 h-24'}
-        `} />
+        {/* Fixed Logo - Testing with hardcoded size */}
+        <div className="w-16 h-16 mx-auto">
+          <LogoIcon className="w-full h-full text-teal-400" />
+        </div>
 
         {/* Mobile-First Typography */}
         <h1 className={`
@@ -67,7 +69,7 @@ const LandingPage: React.FC = () => {
             ${isMobile ? '' : 'transform hover:scale-105'}
           `}
         >
-          Login
+          🚀 Start Coaching
         </Link>
         <Link
           to="/signup"
@@ -79,8 +81,27 @@ const LandingPage: React.FC = () => {
             ${isMobile ? '' : 'transform hover:scale-105'}
           `}
         >
-          Sign Up
+          Create Account
         </Link>
+
+        {/* Development Quick Login */}
+        <div className="pt-4 border-t border-slate-600">
+          <p className="text-slate-400 text-sm mb-3 text-center">Development Quick Access:</p>
+          <button
+            onClick={() => {
+              // Quick login as coach for development
+              window.location.href = '/#/login';
+            }}
+            className={`
+              w-full btn-mobile bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700
+              text-white font-medium rounded-lg transition-all duration-200
+              flex items-center justify-center
+              ${isMobile ? 'text-sm py-2' : 'px-6 py-2 text-sm'}
+            `}
+          >
+            🔧 Quick Login (Dev)
+          </button>
+        </div>
       </div>
 
       {/* Mobile-Friendly Features Preview */}
@@ -136,7 +157,8 @@ const LandingPage: React.FC = () => {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 };
 

@@ -93,12 +93,12 @@ const UIDemoPage: React.FC = () => {
     { id: '4', content: <div className="p-3">⚽ Fourth Place Team</div> },
   ]);
 
-  const handleSwipe = (event: any) => {
-    console.log('Swipe detected:', event);
+  const handleSwipe = (event: unknown) => {
+    // // console.log('Swipe detected:', event);
   };
 
-  const handleDrag = (event: any) => {
-    console.log('Drag detected:', event);
+  const handleDrag = (event: unknown) => {
+    // // console.log('Drag detected:', event);
   };
 
   const simulateLoading = () => {

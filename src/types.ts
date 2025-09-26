@@ -918,7 +918,7 @@ export type Action =
   | { type: 'ADD_ATTRIBUTE_FILTER'; payload: AttributeFilter }
   | { type: 'REMOVE_ATTRIBUTE_FILTER'; payload: number }
   | { type: 'CLEAR_ROSTER_FILTERS' }
-  | { type: 'SET_TRANSFER_MARKET_FILTER'; payload: { filter: keyof UIState['transferMarketFilters'], value: any } }
+  | { type: 'SET_TRANSFER_MARKET_FILTER'; payload: { filter: keyof UIState['transferMarketFilters'], value: unknown } }
   // AI Actions
   | { type: 'SET_AI_PERSONALITY'; payload: AIPersonality }
   | { type: 'GENERATE_AI_INSIGHT_START' }
@@ -963,7 +963,7 @@ export type Action =
   | { type: 'SEND_NEGOTIATION_OFFER_START'; payload: { offerText: string } }
   | { type: 'SEND_NEGOTIATION_OFFER_SUCCESS'; payload: { response: AIAgentResponse } }
   | { type: 'SEND_NEGOTIATION_OFFER_FAILURE' }
-  | { type: 'ACCEPT_NEGOTIATION_DEAL'; payload: { playerId: string, newContract: any } }
+  | { type: 'ACCEPT_NEGOTIATION_DEAL'; payload: { playerId: string, newContract: unknown } }
   | { type: 'END_NEGOTIATION' }
   // Franchise Actions
   | { type: 'ADVANCE_WEEK' }
@@ -997,7 +997,7 @@ export type Action =
   | { type: 'ACCEPT_LOAN_OFFER'; payload: { inboxId: string, playerId: string, fee: number, wageContribution: number } }
   | { type: 'INVEST_IN_YOUTH_ACADEMY'; payload: { team: Team } }
   | { type: 'SIGN_YOUTH_PLAYER'; payload: { prospectId: string, team: Team } }
-  | { type: 'HIRE_STAFF'; payload: { staff: any, team: Team, type: 'coach' | 'scout' | 'medicine' | 'assistantManager' | 'gkCoach' | 'fitnessCoach' | 'loanManager' } }
+  | { type: 'HIRE_STAFF'; payload: { staff: unknown, team: Team, type: 'coach' | 'scout' | 'medicine' | 'assistantManager' | 'gkCoach' | 'fitnessCoach' | 'loanManager' } }
   | { type: 'LOAN_PLAYER'; payload: { playerId: string; fee: number; wageContribution: number } }
   | { type: 'RECALL_PLAYER'; payload: { playerId: string } }
   | { type: 'SIGN_LOAN_PLAYER'; payload: { player: Player; fee: number, wageContribution: number } }

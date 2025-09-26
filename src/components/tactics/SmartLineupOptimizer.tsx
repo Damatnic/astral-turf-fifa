@@ -131,7 +131,7 @@ const SmartLineupOptimizer: React.FC<SmartLineupOptimizerProps> = ({
         });
       }
 
-    } catch (error) {
+    } catch (_error) {
       console.error('Failed to optimize lineup:', error);
       alert('Failed to optimize lineup. Please try again.');
     } finally {

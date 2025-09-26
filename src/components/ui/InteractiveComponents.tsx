@@ -471,7 +471,7 @@ export const EnhancedTooltip: React.FC<EnhancedTooltipProps> = ({
 }) => {
   const { theme, tokens } = useTheme();
   const [isVisible, setIsVisible] = useState(false);
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<unknown>();
 
   const handleMouseEnter = () => {
     timeoutRef.current = setTimeout(() => {

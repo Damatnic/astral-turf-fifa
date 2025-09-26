@@ -42,7 +42,7 @@ export interface SocialMediaPost {
     views: number;
     lastUpdated: number;
   };
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
 }
 
 export interface ContentTemplate {
@@ -111,7 +111,7 @@ class SocialMediaIntegrationService {
   async initialize(): Promise<void> {
     await this.loadConnections();
     await this.loadPrivacySettings();
-    console.log('📱 Social media integration service initialized');
+    // // console.log('📱 Social media integration service initialized');
   }
 
   /**
@@ -134,7 +134,7 @@ class SocialMediaIntegrationService {
 
     try {
       const authUrl = await this.generateAuthUrl(platform, credentials);
-      console.log(`🔐 ${platform.name} auth URL generated:`, authUrl);
+      // // console.log(`🔐 ${platform.name} auth URL generated:`, authUrl);
 
       // In a real implementation, this would open OAuth flow
       // For demonstration, we'll simulate the connection
@@ -142,7 +142,7 @@ class SocialMediaIntegrationService {
 
       return authUrl;
 
-    } catch (error) {
+    } catch (_error) {
       console.error(`❌ Failed to connect ${platform.name}:`, error);
       throw error;
     }
@@ -198,12 +198,12 @@ class SocialMediaIntegrationService {
 
         postIds.push(postId);
 
-      } catch (error) {
+      } catch (_error) {
         console.error(`❌ Failed to post to ${platform.name}:`, error);
       }
     }
 
-    console.log(`⚽ Match result shared to ${postIds.length} platforms`);
+    // // console.log(`⚽ Match result shared to ${postIds.length} platforms`);
     return postIds;
   }
 
@@ -224,7 +224,7 @@ class SocialMediaIntegrationService {
     // Check privacy settings first
     const privacy = this.privacySettings.get(playerId);
     if (privacy && !privacy.sharePersonalAchievements) {
-      console.log('🔒 Player achievement sharing disabled by privacy settings');
+      // // console.log('🔒 Player achievement sharing disabled by privacy settings');
       return [];
     }
 
@@ -261,12 +261,12 @@ class SocialMediaIntegrationService {
 
         postIds.push(postId);
 
-      } catch (error) {
+      } catch (_error) {
         console.error(`❌ Failed to post achievement to ${platform.name}:`, error);
       }
     }
 
-    console.log(`🏆 Player achievement shared to ${postIds.length} platforms`);
+    // // console.log(`🏆 Player achievement shared to ${postIds.length} platforms`);
     return postIds;
   }
 
@@ -314,12 +314,12 @@ class SocialMediaIntegrationService {
 
         postIds.push(postId);
 
-      } catch (error) {
+      } catch (_error) {
         console.error(`❌ Failed to post training update to ${platform.name}:`, error);
       }
     }
 
-    console.log(`⚽ Training update shared to ${postIds.length} platforms`);
+    // // console.log(`⚽ Training update shared to ${postIds.length} platforms`);
     return postIds;
   }
 
@@ -367,12 +367,12 @@ class SocialMediaIntegrationService {
 
         postIds.push(postId);
 
-      } catch (error) {
+      } catch (_error) {
         console.error(`❌ Failed to post recruitment to ${platform.name}:`, error);
       }
     }
 
-    console.log(`👥 Recruitment post shared to ${postIds.length} platforms`);
+    // // console.log(`👥 Recruitment post shared to ${postIds.length} platforms`);
     return postIds;
   }
 
@@ -417,7 +417,7 @@ class SocialMediaIntegrationService {
       processed: false,
     });
 
-    console.log(`⏰ Post scheduled for ${scheduledTime.toISOString()}`);
+    // // console.log(`⏰ Post scheduled for ${scheduledTime.toISOString()}`);
     return postId;
   }
 
@@ -506,7 +506,7 @@ class SocialMediaIntegrationService {
     // Save to localStorage
     localStorage.setItem(`social_privacy_${userId}`, JSON.stringify(updatedSettings));
 
-    console.log(`🔒 Privacy settings updated for user: ${userId}`);
+    // // console.log(`🔒 Privacy settings updated for user: ${userId}`);
   }
 
   /**
@@ -547,7 +547,7 @@ class SocialMediaIntegrationService {
     hashtags?: string[];
     mentions?: string[];
     media?: { type: 'image' | 'video'; url: string; alt?: string }[];
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
   }): Promise<string> {
     const postId = uuidv4();
 
@@ -607,7 +607,7 @@ class SocialMediaIntegrationService {
           break;
 
         default:
-          console.log(`📱 Publishing to ${platform.name} (simulated)`);
+          // // console.log(`📱 Publishing to ${platform.name} (simulated)`);
       }
 
       // Simulate some engagement
@@ -615,7 +615,7 @@ class SocialMediaIntegrationService {
         this.simulateEngagement(post.id);
       }, 60000); // After 1 minute
 
-    } catch (error) {
+    } catch (_error) {
       post.status = 'failed';
       throw error;
     }
@@ -623,7 +623,7 @@ class SocialMediaIntegrationService {
 
   private async publishToTwitter(platform: SocialMediaPlatform, post: SocialMediaPost): Promise<void> {
     // Twitter API implementation
-    console.log('🐦 Publishing to Twitter:', post.content.substring(0, 50) + '...');
+    // // console.log('🐦 Publishing to Twitter:', post.content.substring(0, 50) + '...');
 
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 500));
@@ -631,7 +631,7 @@ class SocialMediaIntegrationService {
 
   private async publishToFacebook(platform: SocialMediaPlatform, post: SocialMediaPost): Promise<void> {
     // Facebook API implementation
-    console.log('📘 Publishing to Facebook:', post.content.substring(0, 50) + '...');
+    // // console.log('📘 Publishing to Facebook:', post.content.substring(0, 50) + '...');
 
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 500));
@@ -639,7 +639,7 @@ class SocialMediaIntegrationService {
 
   private async publishToInstagram(platform: SocialMediaPlatform, post: SocialMediaPost): Promise<void> {
     // Instagram API implementation
-    console.log('📷 Publishing to Instagram:', post.content.substring(0, 50) + '...');
+    // // console.log('📷 Publishing to Instagram:', post.content.substring(0, 50) + '...');
 
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 500));
@@ -647,7 +647,7 @@ class SocialMediaIntegrationService {
 
   private async publishToLinkedIn(platform: SocialMediaPlatform, post: SocialMediaPost): Promise<void> {
     // LinkedIn API implementation
-    console.log('💼 Publishing to LinkedIn:', post.content.substring(0, 50) + '...');
+    // // console.log('💼 Publishing to LinkedIn:', post.content.substring(0, 50) + '...');
 
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 500));
@@ -664,7 +664,7 @@ class SocialMediaIntegrationService {
     return processed;
   }
 
-  private async generateAuthUrl(platform: SocialMediaPlatform, credentials: any): Promise<string> {
+  private async generateAuthUrl(platform: SocialMediaPlatform, credentials: unknown): Promise<string> {
     // Generate OAuth URLs for different platforms
     switch (platform.type) {
       case 'twitter':
@@ -684,7 +684,7 @@ class SocialMediaIntegrationService {
     }
   }
 
-  private async simulateOAuthConnection(platformId: string, credentials: any): Promise<void> {
+  private async simulateOAuthConnection(platformId: string, credentials: unknown): Promise<void> {
     setTimeout(() => {
       const platform = this.platforms.get(platformId);
       if (platform) {
@@ -699,7 +699,7 @@ class SocialMediaIntegrationService {
           this.onConnectionStatusCallback(platform);
         }
 
-        console.log(`✅ ${platform.name} connected successfully`);
+        // // console.log(`✅ ${platform.name} connected successfully`);
       }
     }, 1000);
   }
@@ -715,7 +715,7 @@ class SocialMediaIntegrationService {
     post.engagement.views += Math.floor(Math.random() * 200) + 50;
     post.engagement.lastUpdated = Date.now();
 
-    console.log(`📊 Engagement update for post ${postId}: ${post.engagement.likes} likes, ${post.engagement.shares} shares`);
+    // // console.log(`📊 Engagement update for post ${postId}: ${post.engagement.likes} likes, ${post.engagement.shares} shares`);
   }
 
   private initializePlatforms(): void {
@@ -852,7 +852,7 @@ class SocialMediaIntegrationService {
 
   private async loadPrivacySettings(): Promise<void> {
     // Load privacy settings for all users
-    console.log('🔒 Loading privacy settings');
+    // // console.log('🔒 Loading privacy settings');
   }
 }
 

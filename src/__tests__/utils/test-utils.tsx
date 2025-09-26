@@ -121,7 +121,7 @@ export const mockLocalStorage = () => {
 };
 
 // Mock drag and drop events
-export const createMockDragEvent = (type: string, data: Record<string, any> = {}) => {
+export const createMockDragEvent = (type: string, data: Record<string, unknown> = {}) => {
   const event = new Event(type) as any;
   event.dataTransfer = {
     setData: vi.fn(),

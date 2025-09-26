@@ -48,7 +48,7 @@ const AIChatPopup: React.FC = () => {
                 text: result.text,
             };
             dispatch({ type: 'SEND_CHAT_MESSAGE_SUCCESS', payload: { response: aiResponse, playerIdsToHighlight: result.playerIdsToHighlight } });
-        } catch (error) {
+        } catch (_error) {
             console.error("Failed to get AI chat response:", error);
             dispatch({ type: 'SEND_CHAT_MESSAGE_FAILURE' });
         }

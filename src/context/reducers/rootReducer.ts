@@ -13,7 +13,7 @@ const getModifier = (value: Player['form'] | Player['morale']): number => {
     return scale[value] || 1.0;
 };
 
-const addInboxItem = (draft: RootState, type: InboxItem['type'], title: string, content: string, payload?: any) => {
+const addInboxItem = (draft: RootState, type: InboxItem['type'], title: string, content: string, payload?: unknown) => {
     draft.franchise.inbox.unshift({
         id: `inbox_${Date.now()}_${Math.random()}`,
         week: draft.franchise.gameWeek,

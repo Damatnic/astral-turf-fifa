@@ -45,7 +45,7 @@ const StaffPage: React.FC = () => {
         ] as LoanManager[],
     };
 
-    const handleHireStaff = (staffMember: any, type: keyof typeof availableStaff) => {
+    const handleHireStaff = (staffMember: unknown, type: keyof typeof availableStaff) => {
         const staffCost = staffMember.cost;
         if (finances.transferBudget >= staffCost) {
             const staffType = type === 'coaches' ? 'coach' :
@@ -91,7 +91,7 @@ const StaffPage: React.FC = () => {
 
     const StaffCard = ({ title, staffMember, emptyText, children }: {
         title: string;
-        staffMember: any;
+        staffMember: unknown;
         emptyText: string;
         children?: React.ReactNode;
     }) => (

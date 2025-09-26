@@ -45,7 +45,7 @@ export interface SecurityIncident {
   status: 'active' | 'investigating' | 'resolved';
   mitigationActions: string[];
   riskScore: number;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
 }
 
 // Rate limiting tracker
@@ -187,7 +187,7 @@ class AnomalyDetector {
   private userBehaviors = new Map<string, UserBehavior>();
 
   // Detect anomalies in user behavior
-  detectAnomalies(userId: string, action: string, metadata: Record<string, any>): SecurityIncident[] {
+  detectAnomalies(userId: string, action: string, metadata: Record<string, unknown>): SecurityIncident[] {
     const incidents: SecurityIncident[] = [];
     const baseline = this.getUserBehavior(userId);
 
@@ -226,7 +226,7 @@ class AnomalyDetector {
   }
 
   // Update user behavior baseline
-  updateUserBehavior(userId: string, action: string, metadata: Record<string, any>): void {
+  updateUserBehavior(userId: string, action: string, metadata: Record<string, unknown>): void {
     let behavior = this.userBehaviors.get(userId);
 
     if (!behavior) {
@@ -439,7 +439,7 @@ class AutomatedResponse {
           incidentId: incident.id,
           actions: incident.mitigationActions,
         });
-      } catch (error) {
+      } catch (_error) {
         securityLogger.error(`Automated response failed for ${incident.threatType}`, {
           incidentId: incident.id,
           error: error instanceof Error ? error.message : 'Unknown error',
@@ -469,7 +469,7 @@ class SecurityMonitor {
   private automatedResponse = new AutomatedResponse();
 
   // Monitor security events
-  monitorEvent(eventType: SecurityEventType, metadata: Record<string, any>): void {
+  monitorEvent(eventType: SecurityEventType, metadata: Record<string, unknown>): void {
     // Rate limiting checks
     this.checkRateLimits(metadata);
 
@@ -501,7 +501,7 @@ class SecurityMonitor {
     }
   }
 
-  private checkRateLimits(metadata: Record<string, any>): void {
+  private checkRateLimits(metadata: Record<string, unknown>): void {
     if (metadata.ipAddress) {
       // Check login rate limiting
       if (metadata.action === 'login') {
@@ -547,7 +547,7 @@ class SecurityMonitor {
     threatType: ThreatType,
     severity: ThreatSeverity,
     description: string,
-    metadata: Record<string, any>,
+    metadata: Record<string, unknown>,
   ): SecurityIncident {
     return {
       id: `incident_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -652,7 +652,7 @@ export function resetRateLimit(key: string): void {
 }
 
 // Security monitoring utilities
-export function monitorSecurityEvent(eventType: SecurityEventType, metadata: Record<string, any>): void {
+export function monitorSecurityEvent(eventType: SecurityEventType, metadata: Record<string, unknown>): void {
   securityMonitor.monitorEvent(eventType, metadata);
 }
 
