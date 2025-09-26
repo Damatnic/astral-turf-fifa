@@ -8,6 +8,7 @@ interface QuickAction {
   label: string;
   action: () => void;
   isActive?: boolean;
+  disabled?: boolean;
 }
 
 interface QuickActionsPanelProps {
@@ -37,17 +38,20 @@ const QuickActionsPanel: React.FC<QuickActionsPanelProps> = ({ actions, position
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: index * 0.1 }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={action.action}
+              whileHover={{ scale: action.disabled ? 1 : 1.05 }}
+              whileTap={{ scale: action.disabled ? 1 : 0.95 }}
+              onClick={action.disabled ? undefined : action.action}
+              disabled={action.disabled}
               className={`
                 relative p-3 rounded-lg transition-all duration-200 group
-                ${action.isActive
-                  ? 'bg-blue-600/80 text-white shadow-lg shadow-blue-500/25'
-                  : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700/80 hover:text-white'
+                ${action.disabled
+                  ? 'bg-slate-800/40 text-slate-500 cursor-not-allowed'
+                  : action.isActive
+                    ? 'bg-blue-600/80 text-white shadow-lg shadow-blue-500/25'
+                    : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700/80 hover:text-white'
                 }
               `}
-              title={action.label}
+              title={action.disabled ? `${action.label} (unavailable)` : action.label}
             >
               <IconComponent className="w-5 h-5" />
               

@@ -4,6 +4,7 @@ import { type Formation, type Player } from '../../types';
 import { PlayerToken } from './PlayerToken';
 import { FieldMarkings } from './FieldMarkings';
 import { DragIndicator } from './DragIndicator';
+import { PlayerStatsOverlay } from './PlayerStatsOverlay';
 import { useResponsive } from '../../hooks';
 
 interface ModernFieldProps {
@@ -14,6 +15,9 @@ interface ModernFieldProps {
   isDragging: boolean;
   setIsDragging: (dragging: boolean) => void;
   viewMode: 'standard' | 'fullscreen' | 'presentation';
+  players?: Player[];
+  showHeatMap?: boolean;
+  showPlayerStats?: boolean;
 }
 
 interface DragState {
@@ -30,7 +34,10 @@ const ModernField: React.FC<ModernFieldProps> = ({
   onPlayerSelect,
   isDragging,
   setIsDragging,
-  viewMode
+  viewMode,
+  players = [],
+  showHeatMap = false,
+  showPlayerStats = false
 }) => {
   const fieldRef = useRef<HTMLDivElement>(null);
   const { isMobile, isTablet } = useResponsive();
@@ -303,6 +310,16 @@ const ModernField: React.FC<ModernFieldProps> = ({
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Player Statistics Overlay */}
+        <PlayerStatsOverlay
+          formation={formation}
+          players={players}
+          selectedPlayer={selectedPlayer}
+          showHeatMap={showHeatMap}
+          showPlayerStats={showPlayerStats}
+          fieldDimensions={fieldDimensions}
+        />
 
         {/* Player Tokens */}
         <div className="absolute inset-0">

@@ -13,21 +13,39 @@ import {
   Brain, 
   Settings,
   Maximize2,
-  Minimize2
+  Minimize2,
+  Play,
+  BarChart3,
+  Save,
+  Share2,
+  Activity,
+  Eye
 } from 'lucide-react';
 
 // Lazy load heavy components for better performance
 const IntelligentAssistant = lazy(() => import('./IntelligentAssistant'));
 const FormationTemplates = lazy(() => import('./FormationTemplates'));
+const TacticalPlaybook = lazy(() => import('./TacticalPlaybook'));
+const TacticalAnalyticsPanel = lazy(() => import('./TacticalAnalyticsPanel'));
 
 interface UnifiedTacticsBoardProps {
   className?: string;
+  onSimulateMatch?: (formation: Formation) => void;
+  onSaveFormation?: (formation: Formation) => void;
+  onAnalyticsView?: () => void;
+  onExportFormation?: (formation: Formation) => void;
 }
 
 type ViewMode = 'standard' | 'fullscreen' | 'presentation';
 type PanelState = 'collapsed' | 'peek' | 'expanded';
 
-const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({ className }) => {
+const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({ 
+  className,
+  onSimulateMatch,
+  onSaveFormation,
+  onAnalyticsView,
+  onExportFormation
+}) => {
   const { tacticsState, dispatch } = useTacticsContext();
   const { uiState } = useUIContext();
   const { isMobile, isTablet } = useResponsive();
@@ -38,8 +56,12 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({ className }) 
   const [rightPanelState, setRightPanelState] = useState<PanelState>(isMobile ? 'collapsed' : 'peek');
   const [showFormationTemplates, setShowFormationTemplates] = useState(false);
   const [showAIAssistant, setShowAIAssistant] = useState(false);
+  const [showTacticalPlaybook, setShowTacticalPlaybook] = useState(false);
+  const [showAnalyticsPanel, setShowAnalyticsPanel] = useState(false);
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [showHeatMap, setShowHeatMap] = useState(false);
+  const [showPlayerStats, setShowPlayerStats] = useState(false);
   
   // Performance optimizations
   const fieldRef = useRef<HTMLDivElement>(null);
@@ -49,6 +71,11 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({ className }) 
   const currentFormation = useMemo(() => {
     return tacticsState?.formations?.[tacticsState?.activeFormationIds?.home];
   }, [tacticsState?.formations, tacticsState?.activeFormationIds?.home]);
+
+  // Current players data
+  const currentPlayers = useMemo(() => {
+    return tacticsState?.players || [];
+  }, [tacticsState?.players]);
 
   // Responsive panel management
   useEffect(() => {
@@ -133,6 +160,46 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({ className }) 
       isActive: showFormationTemplates
     },
     {
+      id: 'simulate',
+      icon: Play,
+      label: 'Simulate Match',
+      action: () => {
+        if (currentFormation && onSimulateMatch) {
+          onSimulateMatch(currentFormation);
+        }
+      },
+      disabled: !currentFormation || !onSimulateMatch
+    },
+    {
+      id: 'analytics',
+      icon: BarChart3,
+      label: 'Analytics',
+      action: () => {
+        if (onAnalyticsView) {
+          onAnalyticsView();
+        }
+      },
+      disabled: !onAnalyticsView
+    },
+    {
+      id: 'playbook',
+      icon: Save,
+      label: 'Tactical Playbook',
+      action: () => setShowTacticalPlaybook(true),
+      isActive: showTacticalPlaybook
+    },
+    {
+      id: 'export',
+      icon: Share2,
+      label: 'Export & Share',
+      action: () => {
+        if (currentFormation && onExportFormation) {
+          onExportFormation(currentFormation);
+        }
+      },
+      disabled: !currentFormation || !onExportFormation
+    },
+    {
       id: 'ai-assistant',
       icon: Brain,
       label: 'AI Assistant',
@@ -140,13 +207,25 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({ className }) 
       isActive: showAIAssistant
     },
     {
+      id: 'heatmap',
+      icon: Activity,
+      label: 'Heat Map',
+      action: () => setShowHeatMap(!showHeatMap),
+      isActive: showHeatMap
+    },
+    {
+      id: 'player-stats',
+      icon: Eye,
+      label: 'Player Stats',
+      action: () => setShowPlayerStats(!showPlayerStats),
+      isActive: showPlayerStats
+    },
+    {
       id: 'analysis',
       icon: Zap,
-      label: 'Analysis',
-      action: () => {
-        // Trigger analysis mode
-        dispatch({ type: 'TOGGLE_ANALYSIS_MODE' });
-      }
+      label: 'Live Analysis',
+      action: () => setShowAnalyticsPanel(true),
+      isActive: showAnalyticsPanel
     },
     {
       id: 'fullscreen',
@@ -154,7 +233,23 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({ className }) 
       label: viewMode === 'fullscreen' ? 'Exit Fullscreen' : 'Fullscreen',
       action: viewMode === 'fullscreen' ? exitFullscreen : enterFullscreen
     }
-  ], [showFormationTemplates, showAIAssistant, viewMode, dispatch, enterFullscreen, exitFullscreen]);
+  ], [
+    showFormationTemplates, 
+    showAIAssistant, 
+    showTacticalPlaybook,
+    showAnalyticsPanel,
+    showHeatMap,
+    showPlayerStats,
+    viewMode, 
+    currentFormation,
+    onSimulateMatch,
+    onAnalyticsView,
+    onSaveFormation,
+    onExportFormation,
+    dispatch, 
+    enterFullscreen, 
+    exitFullscreen
+  ]);
 
   // Layout calculations
   const layoutClasses = useMemo(() => {
@@ -247,6 +342,9 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({ className }) 
               isDragging={isDragging}
               setIsDragging={setIsDragging}
               viewMode={viewMode}
+              players={currentPlayers}
+              showHeatMap={showHeatMap}
+              showPlayerStats={showPlayerStats}
             />
 
             {/* Quick Actions Panel */}
@@ -337,6 +435,52 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({ className }) 
               onFormationChange={handleFormationChange}
               onPlayerSelect={handlePlayerSelect}
               onClose={() => setShowAIAssistant(false)}
+              players={currentPlayers}
+            />
+          </Suspense>
+        )}
+
+        {showTacticalPlaybook && (
+          <Suspense fallback={
+            <div 
+              className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center"
+              aria-live="polite"
+              aria-label="Loading tactical playbook"
+            >
+              <div className="bg-slate-900/95 rounded-xl p-8 text-white">
+                <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4" />
+                <div>Loading Tactical Playbook...</div>
+              </div>
+            </div>
+          }>
+            <TacticalPlaybook
+              currentFormation={currentFormation}
+              currentPlayers={currentPlayers}
+              onLoadFormation={handleFormationChange}
+              onClose={() => setShowTacticalPlaybook(false)}
+              isOpen={showTacticalPlaybook}
+            />
+          </Suspense>
+        )}
+
+        {showAnalyticsPanel && (
+          <Suspense fallback={
+            <div 
+              className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center"
+              aria-live="polite"
+              aria-label="Loading tactical analytics"
+            >
+              <div className="bg-slate-900/95 rounded-xl p-8 text-white">
+                <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4" />
+                <div>Loading Tactical Analytics...</div>
+              </div>
+            </div>
+          }>
+            <TacticalAnalyticsPanel
+              formation={currentFormation}
+              players={currentPlayers}
+              isOpen={showAnalyticsPanel}
+              onClose={() => setShowAnalyticsPanel(false)}
             />
           </Suspense>
         )}

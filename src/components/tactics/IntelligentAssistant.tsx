@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { type Formation, type Player } from '../../types';
+import { aiCoachingService, type CoachingRecommendation } from '../../services/aiCoachingService';
 import { 
   Brain, 
   X, 
@@ -12,7 +13,11 @@ import {
   CheckCircle,
   Lightbulb,
   MessageCircle,
-  Send
+  Send,
+  Star,
+  Clock,
+  Users,
+  Settings
 } from 'lucide-react';
 
 interface IntelligentAssistantProps {
@@ -21,6 +26,7 @@ interface IntelligentAssistantProps {
   onFormationChange: (formation: Formation) => void;
   onPlayerSelect: (player: Player) => void;
   onClose: () => void;
+  players?: Player[];
 }
 
 interface Suggestion {
@@ -50,15 +56,41 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
   selectedPlayer,
   onFormationChange,
   onPlayerSelect,
-  onClose
+  onClose,
+  players = []
 }) => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
+  const [coachingRecommendations, setCoachingRecommendations] = useState<CoachingRecommendation[]>([]);
   const [chatMessages, setChatMessages] = useState<Array<{id: string, type: 'user' | 'ai', content: string}>>([]);
   const [chatInput, setChatInput] = useState('');
-  const [activeTab, setActiveTab] = useState<'analysis' | 'suggestions' | 'chat'>('analysis');
+  const [activeTab, setActiveTab] = useState<'analysis' | 'coaching' | 'chat'>('coaching');
 
-  // Analyze current formation
+  // Generate AI coaching recommendations
+  const generateCoachingRecommendations = useCallback(async () => {
+    if (!currentFormation || players.length === 0) return;
+
+    setIsAnalyzing(true);
+    
+    try {
+      const recommendations = await aiCoachingService.generateCoachingRecommendations(
+        currentFormation, 
+        players,
+        {
+          gamePhase: 'mid',
+          gameState: 'normal'
+        }
+      );
+      
+      setCoachingRecommendations(recommendations);
+    } catch (error) {
+      console.error('Failed to generate coaching recommendations:', error);
+    } finally {
+      setIsAnalyzing(false);
+    }
+  }, [currentFormation, players]);
+
+  // Analyze current formation (legacy)
   const analyzeFormation = useCallback(async () => {
     if (!currentFormation) return;
 
@@ -123,8 +155,8 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
 
   // Initialize analysis on mount
   useEffect(() => {
-    analyzeFormation();
-  }, [analyzeFormation]);
+    generateCoachingRecommendations();
+  }, [generateCoachingRecommendations]);
 
   // Handle chat message sending
   const handleSendMessage = useCallback(() => {
@@ -223,8 +255,8 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
           {/* Tab Navigation */}
           <div className="flex border-b border-slate-700/50">
             {[
+              { id: 'coaching', name: 'AI Coaching', icon: Brain },
               { id: 'analysis', name: 'Analysis', icon: Target },
-              { id: 'suggestions', name: 'Suggestions', icon: Lightbulb },
               { id: 'chat', name: 'Chat', icon: MessageCircle }
             ].map(tab => {
               const IconComponent = tab.icon;
@@ -242,6 +274,11 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
                 >
                   <IconComponent className="w-4 h-4" />
                   {tab.name}
+                  {tab.id === 'coaching' && coachingRecommendations.length > 0 && (
+                    <span className="bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full min-w-[20px] h-5 flex items-center justify-center">
+                      {coachingRecommendations.length}
+                    </span>
+                  )}
                 </button>
               );
             })}
@@ -249,6 +286,130 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
 
           {/* Tab Content */}
           <div className="flex-1 overflow-y-auto p-6">
+            {/* AI Coaching Tab */}
+            {activeTab === 'coaching' && (
+              <div className="space-y-6">
+                {isAnalyzing ? (
+                  <div className="flex items-center justify-center py-12">
+                    <div className="text-center">
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                        className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"
+                      />
+                      <div className="text-white font-medium mb-2">AI Coach Analyzing...</div>
+                      <div className="text-slate-400 text-sm">Generating personalized coaching recommendations</div>
+                    </div>
+                  </div>
+                ) : coachingRecommendations.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Brain className="w-16 h-16 text-slate-600 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-slate-400 mb-2">No recommendations available</h3>
+                    <p className="text-slate-500">Set up your formation and players to get AI coaching insights.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="text-lg font-semibold text-white">AI Coaching Recommendations</h3>
+                      <button
+                        onClick={generateCoachingRecommendations}
+                        disabled={isAnalyzing}
+                        className="px-4 py-2 bg-blue-600/80 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 flex items-center gap-2 text-sm"
+                      >
+                        <Brain className="w-4 h-4" />
+                        Refresh Analysis
+                      </button>
+                    </div>
+
+                    {coachingRecommendations.map((recommendation, index) => {
+                      const priorityColors = {
+                        critical: 'border-red-500/50 bg-red-900/20',
+                        high: 'border-orange-500/50 bg-orange-900/20',
+                        medium: 'border-yellow-500/50 bg-yellow-900/20',
+                        low: 'border-blue-500/50 bg-blue-900/20'
+                      };
+
+                      const impactIcons = {
+                        'game-changing': Star,
+                        'significant': TrendingUp,
+                        'moderate': Target,
+                        'minor': Settings
+                      };
+
+                      const ImpactIcon = impactIcons[recommendation.impact] || Settings;
+
+                      return (
+                        <motion.div
+                          key={recommendation.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                          className={`border rounded-lg p-6 ${priorityColors[recommendation.priority]}`}
+                        >
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-start gap-3">
+                              <div className="flex-shrink-0">
+                                <ImpactIcon className="w-5 h-5 text-blue-400 mt-0.5" />
+                              </div>
+                              <div>
+                                <h4 className="font-semibold text-white mb-2">{recommendation.title}</h4>
+                                <p className="text-slate-300 text-sm mb-3">{recommendation.description}</p>
+                                <p className="text-slate-400 text-xs italic">{recommendation.reasoning}</p>
+                              </div>
+                            </div>
+                            
+                            <div className="flex flex-col items-end gap-2">
+                              <span className={`px-2 py-1 rounded text-xs font-medium uppercase ${
+                                recommendation.priority === 'critical' ? 'bg-red-600 text-white' :
+                                recommendation.priority === 'high' ? 'bg-orange-600 text-white' :
+                                recommendation.priority === 'medium' ? 'bg-yellow-600 text-black' :
+                                'bg-blue-600 text-white'
+                              }`}>
+                                {recommendation.priority}
+                              </span>
+                              
+                              <div className="flex items-center gap-1 text-xs text-slate-400">
+                                <Clock className="w-3 h-3" />
+                                {recommendation.confidence}% confidence
+                              </div>
+                            </div>
+                          </div>
+
+                          {recommendation.actions && recommendation.actions.length > 0 && (
+                            <div className="border-t border-slate-700/50 pt-4">
+                              <h5 className="text-sm font-medium text-slate-300 mb-2">Suggested Actions:</h5>
+                              <div className="space-y-2">
+                                {recommendation.actions.map((action, actionIndex) => (
+                                  <div key={actionIndex} className="flex items-center gap-2 text-sm text-slate-400">
+                                    <div className="w-1 h-1 bg-slate-500 rounded-full" />
+                                    {action.description}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-700/50">
+                            <div className="flex items-center gap-4 text-xs text-slate-500">
+                              <span>Impact: {recommendation.impact.replace('-', ' ')}</span>
+                              <span>Type: {recommendation.type}</span>
+                            </div>
+                            
+                            <button
+                              onClick={() => aiCoachingService.storeRecommendation(recommendation)}
+                              className="px-3 py-1 bg-slate-700/50 text-slate-300 rounded text-xs hover:bg-slate-700 transition-colors"
+                            >
+                              Save Recommendation
+                            </button>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Analysis Tab */}
             {activeTab === 'analysis' && (
               <div className="space-y-6">
