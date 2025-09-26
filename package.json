@@ -124,6 +124,7 @@
     "jose": "^6.1.0",
     "jsonwebtoken": "^9.0.2",
     "node-cron": "^3.0.3",
+    "openai": "^5.23.1",
     "papaparse": "^5.4.1",
     "pg": "^8.16.3",
     "prisma": "^6.16.2",

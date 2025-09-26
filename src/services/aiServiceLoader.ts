@@ -37,10 +37,11 @@ let aiServiceModule: unknown = null;
 async function getAIService() {
   if (!aiServiceModule) {
     try {
-      aiServiceModule = await import('./aiService');
+      // Use OpenAI service instead of Gemini
+      aiServiceModule = await import('./openAiService');
     } catch (_error) {
-      console.error('Failed to load AI service:', _error);
-      throw new Error('AI service is currently unavailable');
+      console.error('Failed to load OpenAI service:', _error);
+      throw new Error('OpenAI service is currently unavailable');
     }
   }
   return aiServiceModule;

@@ -24,8 +24,8 @@ export default defineConfig(({ mode }) => {
       host: true, // This allows external connections
     },
     define: {
-      'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY || env.API_KEY),
-      'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY || env.API_KEY),
+      'process.env.API_KEY': JSON.stringify(env.OPENAI_API_KEY || env.API_KEY),
+      'process.env.OPENAI_API_KEY': JSON.stringify(env.OPENAI_API_KEY || env.API_KEY),
       global: 'globalThis',
     },
     optimizeDeps: {
@@ -51,9 +51,9 @@ export default defineConfig(({ mode }) => {
           manualChunks: id => {
             // Vendor libraries
             if (id.includes('node_modules')) {
-              // Google GenAI - large external library
-              if (id.includes('@google/genai')) {
-                return 'google-genai';
+              // OpenAI - large external library
+              if (id.includes('openai')) {
+                return 'openai-vendor';
               }
               // Keep React and React-DOM together in vendor chunk
               if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {

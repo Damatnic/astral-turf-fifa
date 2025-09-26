@@ -1,27 +1,20 @@
 {
   "deployment": {
-    "url": "https://astral-turf-4wrsrigk6-astral-productions.vercel.app",
+    "url": "https://astral-turf-fresh-9e3q2gamc-astral-productions.vercel.app",
     "status": "successful",
-    "timestamp": "2025-09-26T16:39:25.000Z",
+    "timestamp": "2025-09-26T16:56:00.000Z",
     "platform": "Vercel",
     "framework": "Vite",
-    "buildTime": "4s",
+    "buildTime": "37s",
     "region": "iad1",
-    "lastUpdate": "2025-09-26T16:39:25.000Z",
-    "fixesApplied": [
-      "Fixed React createContext undefined error",
-      "Removed Tailwind CDN production warning",
-      "Added proper Tailwind CSS import via globals.css",
-      "Enhanced React optimization with jsx-runtime inclusion",
-      "Improved esbuild configuration for React context handling",
-      "Prevented external React dependencies to avoid context splitting",
-      "Force deployed with cache clearing"
-    ]
+    "projectName": "astral-turf-fresh",
+    "buildSuccessful": true,
+    "note": "Build completed successfully but deployment may have access restrictions"
   },
   "github": {
     "repository": "https://github.com/Damatnic/ASTRAL_TURF",
     "branch": "master",
-    "lastCommit": "19dca0f"
+    "lastCommit": "bcbbfe4"
   },
   "application": {
     "name": "Astral Turf",
@@ -35,26 +28,37 @@
       "Multi-language support and mobile optimization",
       "Banking-grade security with zero vulnerabilities",
       "Production-ready infrastructure with Kubernetes deployment",
-      "87.2% test coverage with comprehensive test suites",
-      "Modern React 18 + TypeScript architecture"
+      "Modern React 18 + TypeScript architecture",
+      "Tailwind CSS 4.x design system"
     ]
   },
-  "performance": {
-    "buildSize": {
-      "total": "~1.2MB gzipped",
+  "build": {
+    "bundleSize": {
+      "total": "~2.1MB (697kB vendor + 283kB pages + 235kB GenAI)",
+      "gzipped": "~400kB total",
       "chunks": [
-        "vendor-DF7Xudw8.js: 529.62 kB (178.26 kB gzipped)",
-        "pages-UqU8oc8X.js: 283.44 kB (51.45 kB gzipped)",
-        "google-genai-CKe6zKZD.js: 234.58 kB (39.45 kB gzipped)"
+        "vendor-D2IzyJjg.js: 697.02 kB (231.98 kB gzipped)",
+        "pages-CgBBhS0Q.js: 283.40 kB (51.44 kB gzipped)",
+        "google-genai-C7RYCuas.js: 234.58 kB (39.45 kB gzipped)"
       ]
     },
-    "responseTime": "HTTP 200 OK",
-    "caching": "CDN optimized"
+    "buildWarnings": "Some chunks larger than 250kB - consider code splitting",
+    "cssFiles": [
+      "index-8PE4CHJ_.css: 114.33 kB (16.41 kB gzipped)",
+      "Layout-ByebWjtv.css: 7.03 kB (1.84 kB gzipped)"
+    ]
   },
-  "monitoring": {
-    "healthCheck": "✅ Passed",
-    "securityHeaders": "✅ Implemented",
-    "responsiveDesign": "✅ Mobile-first",
-    "accessibility": "✅ WCAG 2.1 AA compliant"
-  }
+  "configuration": {
+    "vercelJson": "Minimal configuration with SPA routing",
+    "environment": "Production ready with demo API keys",
+    "tailwindCDN": "Removed - using bundled CSS",
+    "reactContext": "Fixed with proper vendor chunking"
+  },
+  "nextSteps": [
+    "Configure production API keys",
+    "Set up custom domain",
+    "Configure environment variables in Vercel dashboard",
+    "Set up database connections",
+    "Review access permissions if needed"
+  ]
 }
