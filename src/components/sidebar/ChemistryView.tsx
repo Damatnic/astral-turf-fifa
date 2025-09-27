@@ -25,38 +25,49 @@ const ChemistryView: React.FC<ChemistryViewProps> = ({ team }) => {
   }, [formation, players]);
 
   const chemistryPairs = useMemo(() => {
-    const pairs: { p1: string; p2: string; score: number; relationship?: string }[] = [];
-    for (let i = 0; i < teamPlayers.length; i++) {
-      for (let j = i + 1; j < teamPlayers.length; j++) {
-        const p1 = teamPlayers[i];
-        const p2 = teamPlayers[j];
-        if (!p1 || !p2) {
-          continue;
-        }
-
-        const score = calculateChemistryScore(
-          p1,
-          p2,
-          chemistry,
-          relationships,
-          mentoringGroups[team],
-        );
-        const relationship = relationships[p1.id]?.[p2.id] || relationships[p2.id]?.[p1.id];
-
-        const payload: { p1: string; p2: string; score: number; relationship?: string } = {
-          p1: p1.name,
-          p2: p2.name,
-          score,
-        };
-
-        if (relationship) {
-          payload.relationship = relationship;
-        }
-
-        pairs.push(payload);
+    try {
+      const pairs: { p1: string; p2: string; score: number; relationship?: string }[] = [];
+      
+      if (!Array.isArray(teamPlayers) || teamPlayers.length === 0) {
+        return [];
       }
+
+      for (let i = 0; i < teamPlayers.length; i++) {
+        for (let j = i + 1; j < teamPlayers.length; j++) {
+          const p1 = teamPlayers[i];
+          const p2 = teamPlayers[j];
+          
+          if (!p1 || !p2 || !p1.name || !p2.name) {
+            continue;
+          }
+
+          const score = calculateChemistryScore(
+            p1,
+            p2,
+            chemistry,
+            relationships,
+            mentoringGroups?.[team],
+          );
+          const relationship = relationships?.[p1.id]?.[p2.id] || relationships?.[p2.id]?.[p1.id];
+
+          const payload: { p1: string; p2: string; score: number; relationship?: string } = {
+            p1: p1.name || 'Unknown Player',
+            p2: p2.name || 'Unknown Player',
+            score: score || 0,
+          };
+
+          if (relationship) {
+            payload.relationship = relationship;
+          }
+
+          pairs.push(payload);
+        }
+      }
+      return pairs.sort((a, b) => (b.score || 0) - (a.score || 0));
+    } catch (error) {
+      console.error('Error calculating chemistry pairs:', error);
+      return [];
     }
-    return pairs.sort((a, b) => b.score - a.score);
   }, [teamPlayers, chemistry, relationships, mentoringGroups, team]);
 
   const top5 = chemistryPairs.slice(0, 5);

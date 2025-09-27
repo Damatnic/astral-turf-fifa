@@ -519,14 +519,53 @@ const AITacticalAnalyzer: React.FC = () => {
     }
   }, [activeFormationIds, analysisState.autoAnalyze, performTacticalAnalysis]);
 
+  const [isMinimized, setIsMinimized] = useState(false);
+  const [position, setPosition] = useState({ x: 20, y: 20 });
+
   return (
-    <div className="fixed top-20 right-6 z-30">
-      <AIAnalysisPanel
-        analysis={analysisState.currentAnalysis}
-        isAnalyzing={analysisState.isAnalyzing}
-        onAnalyze={performTacticalAnalysis}
-        onApplySuggestion={applySuggestion}
-      />
+    <div 
+      className="fixed z-30 select-none"
+      style={{ 
+        top: `${position.y}px`, 
+        right: `${position.x}px`,
+        transition: isMinimized ? 'all 0.3s ease' : 'none'
+      }}
+    >
+      {isMinimized ? (
+        <div 
+          className="bg-gray-800/90 backdrop-blur-sm border border-gray-600 rounded-lg p-2 cursor-pointer hover:bg-gray-700/90 transition-colors"
+          onClick={() => setIsMinimized(false)}
+        >
+          <div className="flex items-center space-x-2 text-white text-sm">
+            <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+            <span>AI Analysis</span>
+          </div>
+        </div>
+      ) : (
+        <div className="bg-gray-900/95 backdrop-blur-sm border border-gray-700 rounded-lg">
+          <div className="flex items-center justify-between p-2 border-b border-gray-700">
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+              <span className="text-white text-sm font-medium">AI Tactical Analysis</span>
+            </div>
+            <button
+              onClick={() => setIsMinimized(true)}
+              className="text-gray-400 hover:text-white transition-colors p-1 rounded"
+              title="Minimize"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+          </div>
+          <AIAnalysisPanel
+            analysis={analysisState.currentAnalysis}
+            isAnalyzing={analysisState.isAnalyzing}
+            onAnalyze={performTacticalAnalysis}
+            onApplySuggestion={applySuggestion}
+          />
+        </div>
+      )}
     </div>
   );
 };
