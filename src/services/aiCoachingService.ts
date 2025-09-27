@@ -1,6 +1,5 @@
 import { type Formation, type Player } from '../types';
 import { openAiService } from './openAiService';
-import { tacticalIntegrationService } from './tacticalIntegrationService';
 
 interface CoachingRecommendation {
   id: string;
@@ -280,7 +279,6 @@ class AICoachingService {
     context?: any,
   ): Promise<CoachingRecommendation[]> {
     try {
-      const formationAnalysis = await tacticalIntegrationService.analyzeFormation(formation, players);
 
       const prompt = `As an expert football tactical analyst, analyze this formation and provide specific coaching recommendations:
 

@@ -11,7 +11,6 @@ import {
   MapPin,
 } from 'lucide-react';
 import { type Player, type Formation } from '../../types';
-import { tacticalIntegrationService } from '../../services/tacticalIntegrationService';
 
 interface PlayerStatsOverlayProps {
   formation?: Formation;
@@ -89,7 +88,6 @@ const PlayerStatsOverlay: React.FC<PlayerStatsOverlayProps> = ({
   const heatZones = useMemo((): HeatZone[] => {
     if (!formation || !showHeatMap) {return [];}
 
-    const heatMapData = tacticalIntegrationService.generateHeatMapData(formation, players);
 
     return heatMapData.zones.map(zone => ({
       x: (zone.x / 100) * fieldDimensions.width,

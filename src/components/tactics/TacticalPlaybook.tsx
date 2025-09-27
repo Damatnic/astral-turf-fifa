@@ -15,7 +15,6 @@ import {
   Filter,
 } from 'lucide-react';
 import { type Formation, type Player } from '../../types';
-import { type FormationExport, tacticalIntegrationService } from '../../services/tacticalIntegrationService';
 
 interface TacticalPlaybookProps {
   currentFormation?: Formation;
@@ -83,14 +82,14 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
 
     try {
       const players = currentPlayers || [];
-      const analysis = await tacticalIntegrationService.analyzeFormation(currentFormation, players);
-      const exportData = tacticalIntegrationService.exportFormation(
-        { ...currentFormation, name: formationName.trim() },
+      const formationData = {
+        ...currentFormation,
+        name: formationName.trim(),
         players,
-        analysis,
-      );
+        savedAt: new Date().toISOString()
+      };
 
-      const updatedFormations = [...savedFormations, exportData];
+      const updatedFormations = [...savedFormations, formationData];
       setSavedFormations(updatedFormations);
       localStorage.setItem('savedFormations', JSON.stringify(updatedFormations));
 

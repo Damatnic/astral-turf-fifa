@@ -8,7 +8,6 @@ import ProfessionalPresentationMode from '../components/field/ProfessionalPresen
 import ChatButton from '../components/ui/ChatButton';
 import AITacticalAnalyzer from '../components/analysis/AITacticalAnalyzer';
 import UnifiedTacticsBoard from '../components/tactics/UnifiedTacticsBoard';
-import { tacticalIntegrationService } from '../services/tacticalIntegrationService';
 import { type Formation } from '../types';
 
 const TacticsBoardPage: React.FC = React.memo(() => {
@@ -35,7 +34,7 @@ const TacticsBoardPage: React.FC = React.memo(() => {
   const handleSimulateMatch = useCallback((formation: Formation) => {
     // Navigate to match simulation with formation data
     const players = tacticsState?.players || [];
-    const simulationConfig = tacticalIntegrationService.createSimulationConfig(formation, players);
+    const simulationConfig = { formation, players };
     
     // Store formation in session for match simulation
     sessionStorage.setItem('tacticalFormation', JSON.stringify(simulationConfig));
@@ -62,8 +61,13 @@ const TacticsBoardPage: React.FC = React.memo(() => {
   const handleSaveFormation = useCallback(async (formation: Formation) => {
     try {
       const players = tacticsState?.players || [];
-      const analysis = await tacticalIntegrationService.analyzeFormation(formation, players);
-      const exportData = tacticalIntegrationService.exportFormation(formation, players, analysis);
+      const exportData = {
+        id: Date.now().toString(),
+        name: formation.name || 'Custom Formation',
+        formation,
+        players,
+        createdAt: new Date().toISOString()
+      };
       
       // Save to localStorage (could be enhanced with proper backend)
       const savedFormations = JSON.parse(localStorage.getItem('savedFormations') || '[]');
@@ -80,8 +84,13 @@ const TacticsBoardPage: React.FC = React.memo(() => {
   const handleExportFormation = useCallback(async (formation: Formation) => {
     try {
       const players = tacticsState?.players || [];
-      const analysis = await tacticalIntegrationService.analyzeFormation(formation, players);
-      const exportData = tacticalIntegrationService.exportFormation(formation, players, analysis);
+      const exportData = {
+        id: Date.now().toString(),
+        name: formation.name || 'Custom Formation',
+        formation,
+        players,
+        createdAt: new Date().toISOString()
+      };
       
       // Create downloadable JSON file
       const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
