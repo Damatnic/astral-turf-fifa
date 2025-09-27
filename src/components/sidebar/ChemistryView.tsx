@@ -70,8 +70,8 @@ const ChemistryView: React.FC<ChemistryViewProps> = ({ team }) => {
     }
   }, [teamPlayers, chemistry, relationships, mentoringGroups, team]);
 
-  const top5 = chemistryPairs.slice(0, 5);
-  const bottom5 = chemistryPairs.slice(-5).reverse();
+  const top5 = Array.isArray(chemistryPairs) ? chemistryPairs.slice(0, 5).filter(Boolean) : [];
+  const bottom5 = Array.isArray(chemistryPairs) ? chemistryPairs.slice(-5).reverse().filter(Boolean) : [];
 
   const RelationshipIcon: React.FC<{ type?: string }> = ({ type }) => {
     if (type === 'friendship') {
@@ -88,39 +88,53 @@ const ChemistryView: React.FC<ChemistryViewProps> = ({ team }) => {
       <div>
         <h4 className="font-bold text-green-400 mb-2">Top 5 Chemistry Links</h4>
         <div className="space-y-1">
-          {top5.map((pair, i) => pair && (
-            <div
-              key={i}
-              className="flex items-center justify-between text-sm p-1 bg-gray-700/50 rounded"
-            >
-              <div className="flex items-center truncate">
-                <RelationshipIcon type={pair.relationship || undefined} />
-                <span className="ml-1.5 truncate" title={`${pair.p1 || 'Unknown'} & ${pair.p2 || 'Unknown'}`}>
-                  {pair.p1 || 'Unknown'} & {pair.p2 || 'Unknown'}
-                </span>
+          {top5.map((pair, i) => {
+            if (!pair || typeof pair !== 'object') return null;
+            const p1Name = pair.p1 || 'Unknown Player';
+            const p2Name = pair.p2 || 'Unknown Player';
+            const score = pair.score || 0;
+            
+            return (
+              <div
+                key={`top-${i}-${p1Name}-${p2Name}`}
+                className="flex items-center justify-between text-sm p-1 bg-gray-700/50 rounded"
+              >
+                <div className="flex items-center truncate">
+                  <RelationshipIcon type={pair.relationship || undefined} />
+                  <span className="ml-1.5 truncate" title={`${p1Name} & ${p2Name}`}>
+                    {p1Name} & {p2Name}
+                  </span>
+                </div>
+                <span className="font-bold text-green-300">{score}</span>
               </div>
-              <span className="font-bold text-green-300">{pair.score || 0}</span>
-            </div>
-          ))}
+            );
+          }).filter(Boolean)}
         </div>
       </div>
       <div>
         <h4 className="font-bold text-red-400 mb-2">Bottom 5 Chemistry Links</h4>
         <div className="space-y-1">
-          {bottom5.map((pair, i) => pair && (
-            <div
-              key={i}
-              className="flex items-center justify-between text-sm p-1 bg-gray-700/50 rounded"
-            >
-              <div className="flex items-center truncate">
-                <RelationshipIcon type={pair.relationship || undefined} />
-                <span className="ml-1.5 truncate" title={`${pair.p1 || 'Unknown'} & ${pair.p2 || 'Unknown'}`}>
-                  {pair.p1 || 'Unknown'} & {pair.p2 || 'Unknown'}
-                </span>
+          {bottom5.map((pair, i) => {
+            if (!pair || typeof pair !== 'object') return null;
+            const p1Name = pair.p1 || 'Unknown Player';
+            const p2Name = pair.p2 || 'Unknown Player';
+            const score = pair.score || 0;
+            
+            return (
+              <div
+                key={`bottom-${i}-${p1Name}-${p2Name}`}
+                className="flex items-center justify-between text-sm p-1 bg-gray-700/50 rounded"
+              >
+                <div className="flex items-center truncate">
+                  <RelationshipIcon type={pair.relationship || undefined} />
+                  <span className="ml-1.5 truncate" title={`${p1Name} & ${p2Name}`}>
+                    {p1Name} & {p2Name}
+                  </span>
+                </div>
+                <span className="font-bold text-red-300">{score}</span>
               </div>
-              <span className="font-bold text-red-300">{pair.score || 0}</span>
-            </div>
-          ))}
+            );
+          }).filter(Boolean)}
         </div>
       </div>
     </div>

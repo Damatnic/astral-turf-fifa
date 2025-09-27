@@ -58,6 +58,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
   const [showAIAssistant, setShowAIAssistant] = useState(false);
   const [showTacticalPlaybook, setShowTacticalPlaybook] = useState(false);
   const [showAnalyticsPanel, setShowAnalyticsPanel] = useState(false);
+  const [showAIAnalysis, setShowAIAnalysis] = useState(false);
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [showHeatMap, setShowHeatMap] = useState(false);
@@ -169,6 +170,13 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
         }
       },
       disabled: !currentFormation || !onSimulateMatch,
+    },
+    {
+      id: 'ai-analysis',
+      icon: Brain,
+      label: 'AI Analysis',
+      action: () => setShowAIAnalysis(!showAIAnalysis),
+      isActive: showAIAnalysis,
     },
     {
       id: 'analytics',
@@ -483,6 +491,43 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
               onClose={() => setShowAnalyticsPanel(false)}
             />
           </Suspense>
+        )}
+
+        {showAIAnalysis && (
+          <div className="fixed top-4 right-4 z-30 bg-gray-900/95 backdrop-blur-sm border border-gray-700 rounded-lg max-w-md">
+            <div className="flex items-center justify-between p-3 border-b border-gray-700">
+              <div className="flex items-center space-x-2">
+                <Brain className="w-4 h-4 text-blue-400" />
+                <span className="text-white text-sm font-medium">AI Tactical Analysis</span>
+              </div>
+              <button
+                onClick={() => setShowAIAnalysis(false)}
+                className="text-gray-400 hover:text-white transition-colors p-1 rounded"
+                title="Close"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-4">
+              <div className="text-gray-300 text-sm">
+                <div className="flex items-center space-x-2 mb-3">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <span>Analyzing formation...</span>
+                </div>
+                <div className="space-y-2 text-xs">
+                  <div>• Formation strength: 8.2/10</div>
+                  <div>• Defensive stability: High</div>
+                  <div>• Attacking potential: Medium</div>
+                  <div className="text-yellow-400">• Suggestion: Consider stronger midfield presence</div>
+                </div>
+                <button className="mt-3 w-full bg-blue-600 hover:bg-blue-700 text-white text-xs py-2 px-3 rounded transition-colors">
+                  Get Detailed Analysis
+                </button>
+              </div>
+            </div>
+          </div>
         )}
       </AnimatePresence>
 

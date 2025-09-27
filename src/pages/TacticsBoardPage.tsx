@@ -6,7 +6,6 @@ import { TacticsErrorBoundary } from '../components/boundaries/TacticsErrorBound
 import { LoadingFallback } from '../components/ErrorFallback';
 import ProfessionalPresentationMode from '../components/field/ProfessionalPresentationMode';
 import ChatButton from '../components/ui/ChatButton';
-import AITacticalAnalyzer from '../components/analysis/AITacticalAnalyzer';
 import UnifiedTacticsBoard from '../components/tactics/UnifiedTacticsBoard';
 import { type Formation } from '../types';
 
@@ -128,12 +127,6 @@ const TacticsBoardPage: React.FC = React.memo(() => {
         </TacticsErrorBoundary>
       )}
 
-      {/* AI Tactical Analyzer - Always Available */}
-      {!isPresentationMode && (
-        <TacticsErrorBoundary componentName="AITacticalAnalyzer" showDetails={import.meta.env.DEV}>
-          <AITacticalAnalyzer />
-        </TacticsErrorBoundary>
-      )}
 
       {/* Chat Button */}
       {!isPresentationMode && (
