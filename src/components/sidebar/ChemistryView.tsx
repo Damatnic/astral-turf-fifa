@@ -77,18 +77,18 @@ const ChemistryView: React.FC<ChemistryViewProps> = ({ team }) => {
       <div>
         <h4 className="font-bold text-green-400 mb-2">Top 5 Chemistry Links</h4>
         <div className="space-y-1">
-          {top5.map((pair, i) => (
+          {top5.map((pair, i) => pair && (
             <div
               key={i}
               className="flex items-center justify-between text-sm p-1 bg-gray-700/50 rounded"
             >
               <div className="flex items-center truncate">
                 <RelationshipIcon type={pair.relationship || undefined} />
-                <span className="ml-1.5 truncate" title={`${pair.p1} & ${pair.p2}`}>
-                  {pair.p1} & {pair.p2}
+                <span className="ml-1.5 truncate" title={`${pair.p1 || 'Unknown'} & ${pair.p2 || 'Unknown'}`}>
+                  {pair.p1 || 'Unknown'} & {pair.p2 || 'Unknown'}
                 </span>
               </div>
-              <span className="font-bold text-green-300">{pair.score}</span>
+              <span className="font-bold text-green-300">{pair.score || 0}</span>
             </div>
           ))}
         </div>
@@ -96,18 +96,18 @@ const ChemistryView: React.FC<ChemistryViewProps> = ({ team }) => {
       <div>
         <h4 className="font-bold text-red-400 mb-2">Bottom 5 Chemistry Links</h4>
         <div className="space-y-1">
-          {bottom5.map((pair, i) => (
+          {bottom5.map((pair, i) => pair && (
             <div
               key={i}
               className="flex items-center justify-between text-sm p-1 bg-gray-700/50 rounded"
             >
               <div className="flex items-center truncate">
                 <RelationshipIcon type={pair.relationship || undefined} />
-                <span className="ml-1.5 truncate" title={`${pair.p1} & ${pair.p2}`}>
-                  {pair.p1} & {pair.p2}
+                <span className="ml-1.5 truncate" title={`${pair.p1 || 'Unknown'} & ${pair.p2 || 'Unknown'}`}>
+                  {pair.p1 || 'Unknown'} & {pair.p2 || 'Unknown'}
                 </span>
               </div>
-              <span className="font-bold text-red-300">{pair.score}</span>
+              <span className="font-bold text-red-300">{pair.score || 0}</span>
             </div>
           ))}
         </div>
