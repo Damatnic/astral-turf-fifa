@@ -8,6 +8,10 @@ import { HashRouter } from 'react-router-dom';
 import SecurityProvider from './src/components/security/SecurityProvider';
 import SecurityErrorBoundary from './src/components/security/SecurityErrorBoundary';
 
+// Vercel Analytics Integration
+import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
+
 // Enhanced UI styles now embedded in index.html inline
 
 // Performance optimizations
@@ -78,6 +82,9 @@ root.render(
         <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <AppProvider>
             <App />
+            {/* Vercel Analytics and Speed Insights */}
+            <Analytics />
+            <SpeedInsights />
           </AppProvider>
         </HashRouter>
       </SecurityProvider>

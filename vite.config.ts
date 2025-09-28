@@ -18,6 +18,7 @@ const optimizeReactPlugin = () => ({
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, '.', '');
   const isProd = mode === 'production';
+  const isVercel = env.VERCEL === '1' || process.env.VERCEL === '1';
   
   return {
     plugins: [
@@ -129,10 +130,10 @@ export default defineConfig(({ mode }) => {
     },
     build: {
       target: 'es2022', // Target newer ES for better optimization
-      sourcemap: false, // Disable sourcemaps for production
+      sourcemap: isProd && !isVercel ? false : 'hidden', // Source maps for Vercel debugging
       minify: 'esbuild', // Use esbuild for fastest minification
-      reportCompressedSize: false, // Skip gzip size analysis for faster builds
-      chunkSizeWarningLimit: 100, // Ultra-aggressive chunk size limits for better loading
+      reportCompressedSize: !isVercel, // Skip gzip size analysis for Vercel builds
+      chunkSizeWarningLimit: isVercel ? 500 : 100, // Relaxed limits for Vercel edge functions
       
       // Ultra-aggressive asset optimization
       assetsInlineLimit: 4096, // Inline smaller assets (4KB) for fewer requests
