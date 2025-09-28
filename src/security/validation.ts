@@ -178,11 +178,61 @@ export const aiPromptSchema = z.object({
   playerId: z.string().uuid().optional(),
 });
 
-// Formation and tactics schemas
+// Formation and tactics schemas - Enhanced for Guardian Security
 export const positionSchema = z.object({
-  x: z.number().min(-200).max(200),
-  y: z.number().min(-200).max(200),
+  x: z.number().min(0).max(100),
+  y: z.number().min(0).max(100),
 });
+
+export const alternativePositionSchema = z.array(positionSchema).max(3);
+
+export const tacticalInstructionSchema = z.object({
+  type: z.enum(['defensive', 'offensive', 'set_piece', 'transition']),
+  phase: z.enum(['build_up', 'attack', 'defense', 'set_piece']),
+  instruction: z.string().min(1).max(500).refine(
+    instruction => !detectXss(instruction) && !detectSqlInjection(instruction),
+    'Instruction contains potentially dangerous content'
+  ),
+  priority: z.enum(['high', 'medium', 'low']),
+  playerIds: z.array(z.string().uuid()).optional(),
+});
+
+export const playerPositionSchema = z.object({
+  playerId: z.string().uuid(),
+  position: positionSchema,
+  role: z.string().min(1).max(50).refine(
+    role => !detectXss(role) && /^[a-zA-Z0-9\s-_]+$/.test(role),
+    'Role contains invalid characters'
+  ),
+  instructions: z.array(z.string().max(200)).max(10),
+  alternativePositions: alternativePositionSchema.optional(),
+});
+
+export const opponentAnalysisSchema = z.object({
+  opponentTeam: nameSchema,
+  weaknesses: z.array(z.string().max(200)).max(10),
+  strengths: z.array(z.string().max(200)).max(10),
+  keyPlayers: z.array(z.string().max(100)).max(15),
+  recommendedCounterTactics: z.array(z.string().max(300)).max(10),
+  confidenceLevel: z.number().min(0).max(1),
+});
+
+export const formationMetadataSchema = z.object({
+  version: z.number().int().positive(),
+  lastModified: z.string().datetime(),
+  modifiedBy: z.string().uuid(),
+  accessCount: z.number().int().min(0),
+  sharedWith: z.array(z.string().uuid()).max(50),
+  tags: z.array(z.string().max(50)).max(20),
+  effectivenessRating: z.number().min(0).max(10).optional(),
+});
+
+export const tacticalClassificationSchema = z.enum([
+  'public_formation',
+  'team_internal',
+  'coach_confidential',
+  'strategic_secret'
+]);
 
 export const formationSlotSchema = z.object({
   id: z.string().min(1),
@@ -191,12 +241,84 @@ export const formationSlotSchema = z.object({
   playerId: z.string().uuid().nullable(),
 });
 
+export const tacticalFormationSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string().min(1).max(100).refine(
+    name => !detectXss(name) && !detectSqlInjection(name),
+    'Formation name contains potentially dangerous content'
+  ),
+  description: z.string().max(1000).optional().refine(
+    desc => !desc || (!detectXss(desc) && !detectSqlInjection(desc)),
+    'Formation description contains potentially dangerous content'
+  ),
+  formation: z.string().regex(/^\d+-\d+(-\d+)*$/, 'Invalid formation format'),
+  playerPositions: z.array(playerPositionSchema).min(1).max(11),
+  tacticalInstructions: z.array(tacticalInstructionSchema).max(20),
+  opponentAnalysis: opponentAnalysisSchema.optional(),
+  classification: tacticalClassificationSchema,
+  createdBy: z.string().uuid(),
+  teamId: z.string().uuid(),
+  matchId: z.string().uuid().optional(),
+  isActive: z.boolean(),
+  metadata: formationMetadataSchema,
+});
+
 export const formationSchema = z.object({
   id: z.string().min(1),
   name: nameSchema,
   slots: z.array(formationSlotSchema),
   isCustom: z.boolean().optional(),
   notes: descriptionSchema,
+});
+
+// Tactical drawing and annotation schemas
+export const drawingPointSchema = z.object({
+  x: z.number().min(0).max(100),
+  y: z.number().min(0).max(100),
+  timestamp: z.number().positive(),
+});
+
+export const drawingLineSchema = z.object({
+  id: z.string().uuid(),
+  points: z.array(drawingPointSchema).min(2).max(1000),
+  color: z.string().regex(/^#[0-9A-F]{6}$/i, 'Invalid color format'),
+  thickness: z.number().min(1).max(10),
+  type: z.enum(['arrow', 'line', 'curve', 'highlight']),
+  createdBy: z.string().uuid(),
+  timestamp: z.string().datetime(),
+});
+
+export const tacticalAnnotationSchema = z.object({
+  id: z.string().uuid(),
+  position: positionSchema,
+  text: z.string().min(1).max(200).refine(
+    text => !detectXss(text) && !detectSqlInjection(text),
+    'Annotation contains potentially dangerous content'
+  ),
+  type: z.enum(['note', 'instruction', 'warning', 'highlight']),
+  color: z.string().regex(/^#[0-9A-F]{6}$/i, 'Invalid color format'),
+  fontSize: z.number().min(8).max(24),
+  createdBy: z.string().uuid(),
+  timestamp: z.string().datetime(),
+  visibility: z.enum(['public', 'team', 'coaches_only']),
+});
+
+// Tactical export/import schemas
+export const tacticalExportSchema = z.object({
+  format: z.enum(['json', 'xml', 'pdf', 'image']),
+  includePlayerNames: z.boolean(),
+  includeInstructions: z.boolean(),
+  includeAnalysis: z.boolean(),
+  exportLevel: z.enum(['public', 'team', 'coach']),
+  password: z.string().min(8).max(50).optional(),
+});
+
+export const tacticalImportSchema = z.object({
+  data: z.unknown(),
+  format: z.enum(['json', 'xml']),
+  validateSignature: z.boolean().default(true),
+  sanitizeContent: z.boolean().default(true),
+  maxFileSize: z.number().max(10 * 1024 * 1024), // 10MB max
 });
 
 // File upload schema
@@ -435,6 +557,130 @@ export function sanitizeInput(input: string): string {
   return sanitized;
 }
 
+// Guardian tactical validation utilities
+export function validateAndSanitize(
+  data: unknown,
+  options: {
+    allowedFields?: string[];
+    sanitizeStrings?: boolean;
+    maxStringLength?: number;
+    maxDepth?: number;
+    depth?: number;
+  } = {}
+): unknown {
+  const {
+    allowedFields,
+    sanitizeStrings = true,
+    maxStringLength = 10000,
+    maxDepth = 10,
+    depth = 0
+  } = options;
+
+  if (depth > maxDepth) {
+    throw new Error('Maximum object depth exceeded');
+  }
+
+  if (data === null || data === undefined) {
+    return data;
+  }
+
+  if (typeof data === 'string') {
+    if (data.length > maxStringLength) {
+      throw new Error(`String length exceeds maximum of ${maxStringLength}`);
+    }
+    
+    if (detectXss(data) || detectSqlInjection(data)) {
+      throw new Error('String contains potentially dangerous content');
+    }
+    
+    return sanitizeStrings ? sanitizeInput(data) : data;
+  }
+
+  if (typeof data === 'number' || typeof data === 'boolean') {
+    return data;
+  }
+
+  if (Array.isArray(data)) {
+    return data.map(item => validateAndSanitize(item, { ...options, depth: depth + 1 }));
+  }
+
+  if (typeof data === 'object') {
+    const sanitized: Record<string, unknown> = {};
+    
+    for (const [key, value] of Object.entries(data)) {
+      // Skip dangerous prototype properties
+      if (['__proto__', 'constructor', 'prototype'].includes(key)) {
+        continue;
+      }
+      
+      // Check allowed fields if specified
+      if (allowedFields && !allowedFields.includes(key)) {
+        continue;
+      }
+      
+      // Validate and sanitize key
+      if (detectXss(key) || detectSqlInjection(key)) {
+        throw new Error(`Object key '${key}' contains potentially dangerous content`);
+      }
+      
+      sanitized[key] = validateAndSanitize(value, { ...options, depth: depth + 1 });
+    }
+    
+    return sanitized;
+  }
+
+  return data;
+}
+
+// Advanced tactical data validation
+export function validateTacticalData(
+  data: unknown,
+  type: 'formation' | 'drawing' | 'annotation' | 'export' | 'import'
+): { valid: boolean; errors: string[]; sanitizedData?: unknown } {
+  const errors: string[] = [];
+  
+  try {
+    let schema: z.ZodSchema;
+    
+    switch (type) {
+      case 'formation':
+        schema = tacticalFormationSchema;
+        break;
+      case 'drawing':
+        schema = drawingLineSchema;
+        break;
+      case 'annotation':
+        schema = tacticalAnnotationSchema;
+        break;
+      case 'export':
+        schema = tacticalExportSchema;
+        break;
+      case 'import':
+        schema = tacticalImportSchema;
+        break;
+      default:
+        throw new Error(`Unknown tactical data type: ${type}`);
+    }
+    
+    const result = schema.parse(data);
+    return { valid: true, errors: [], sanitizedData: result };
+    
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      errors.push(...error.errors.map(err => `${err.path.join('.')}: ${err.message}`));
+    } else {
+      errors.push(error instanceof Error ? error.message : 'Unknown validation error');
+    }
+    
+    securityLogger.warn(`Tactical data validation failed for type: ${type}`, {
+      errors,
+      dataType: typeof data
+    });
+    
+    return { valid: false, errors };
+  }
+}
+
 // Export all validation schemas for use in components
 export const validationSchemas = {
   email: emailSchema,
@@ -461,4 +707,14 @@ export const validationSchemas = {
   uuid: uuidSchema,
   playerId: playerIdSchema,
   formationId: formationIdSchema,
+  // Guardian tactical schemas
+  tacticalFormation: tacticalFormationSchema,
+  playerPosition: playerPositionSchema,
+  tacticalInstruction: tacticalInstructionSchema,
+  opponentAnalysis: opponentAnalysisSchema,
+  drawingLine: drawingLineSchema,
+  tacticalAnnotation: tacticalAnnotationSchema,
+  tacticalExport: tacticalExportSchema,
+  tacticalImport: tacticalImportSchema,
+  tacticalClassification: tacticalClassificationSchema,
 };

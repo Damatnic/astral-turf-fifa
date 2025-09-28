@@ -1,0 +1,532 @@
+# ==================================================================
+# ATLAS GLOBAL LOAD BALANCER CONFIGURATION
+# Multi-cloud intelligent traffic routing with CDN integration
+# Global anycast with geo-distributed edge computing
+# ==================================================================
+
+# AWS Application Load Balancer
+apiVersion: v1
+kind: Service
+metadata:
+  name: astral-turf-alb-aws
+  namespace: astral-turf-production
+  labels:
+    app: astral-turf
+    atlas.lb/type: "application"
+    atlas.lb/provider: "aws"
+    atlas.lb/tier: "global"
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
+    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "arn:aws:acm:us-east-1:123456789012:certificate/12345678-1234-1234-1234-123456789012"
+    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
+    service.beta.kubernetes.io/aws-load-balancer-ssl-negotiation-policy: "ELBSecurityPolicy-TLS-1-2-2017-01"
+    service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: "atlas.deployment=production,atlas.environment=aws,atlas.tier=global"
+    service.beta.kubernetes.io/aws-load-balancer-healthcheck-path: "/health/live"
+    service.beta.kubernetes.io/aws-load-balancer-healthcheck-interval-seconds: "30"
+    service.beta.kubernetes.io/aws-load-balancer-healthcheck-timeout-seconds: "10"
+    service.beta.kubernetes.io/aws-load-balancer-healthy-threshold-count: "2"
+    service.beta.kubernetes.io/aws-load-balancer-unhealthy-threshold-count: "3"
+    atlas.traffic/weight: "40"
+    atlas.region/primary: "us-east-1"
+    atlas.failover/priority: "1"
+spec:
+  type: LoadBalancer
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 3600
+  ports:
+  - name: https
+    port: 443
+    targetPort: 3000
+    protocol: TCP
+  - name: http
+    port: 80
+    targetPort: 3000
+    protocol: TCP
+  - name: metrics
+    port: 8080
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    app: astral-turf
+    tier: frontend
+    atlas.cloud/provider: "aws"
+
+---
+
+# Azure Load Balancer
+apiVersion: v1
+kind: Service
+metadata:
+  name: astral-turf-alb-azure
+  namespace: astral-turf-production
+  labels:
+    app: astral-turf
+    atlas.lb/type: "application"
+    atlas.lb/provider: "azure"
+    atlas.lb/tier: "global"
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "false"
+    service.beta.kubernetes.io/azure-load-balancer-mode: "auto"
+    service.beta.kubernetes.io/azure-dns-label-name: "astral-turf-azure"
+    service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: "/health/live"
+    service.beta.kubernetes.io/azure-load-balancer-health-probe-interval: "30"
+    service.beta.kubernetes.io/azure-load-balancer-health-probe-num-of-probe: "3"
+    service.beta.kubernetes.io/azure-pip-tags: "atlas.deployment=production,atlas.environment=azure,atlas.tier=global"
+    atlas.traffic/weight: "35"
+    atlas.region/primary: "eastus"
+    atlas.failover/priority: "2"
+spec:
+  type: LoadBalancer
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 3600
+  ports:
+  - name: https
+    port: 443
+    targetPort: 3000
+    protocol: TCP
+  - name: http
+    port: 80
+    targetPort: 3000
+    protocol: TCP
+  - name: metrics
+    port: 8080
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    app: astral-turf
+    tier: frontend
+    atlas.cloud/provider: "azure"
+
+---
+
+# Google Cloud Load Balancer
+apiVersion: v1
+kind: Service
+metadata:
+  name: astral-turf-alb-gcp
+  namespace: astral-turf-production
+  labels:
+    app: astral-turf
+    atlas.lb/type: "application"
+    atlas.lb/provider: "gcp"
+    atlas.lb/tier: "global"
+  annotations:
+    cloud.google.com/load-balancer-type: "External"
+    cloud.google.com/neg: '{"ingress": true}'
+    cloud.google.com/backend-config: '{"ports": {"3000":"astral-turf-backend-config"}}'
+    service.alpha.kubernetes.io/app-protocols: '{"https":"HTTPS","http":"HTTP"}'
+    atlas.traffic/weight: "25"
+    atlas.region/primary: "us-central1"
+    atlas.failover/priority: "3"
+spec:
+  type: LoadBalancer
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 3600
+  ports:
+  - name: https
+    port: 443
+    targetPort: 3000
+    protocol: TCP
+  - name: http
+    port: 80
+    targetPort: 3000
+    protocol: TCP
+  - name: metrics
+    port: 8080
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    app: astral-turf
+    tier: frontend
+    atlas.cloud/provider: "gcp"
+
+---
+
+# Global Ingress Controller
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: astral-turf-global-ingress
+  namespace: astral-turf-production
+  labels:
+    app: astral-turf
+    atlas.ingress/type: "global"
+    atlas.ingress/tier: "production"
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "30"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
+    nginx.ingress.kubernetes.io/proxy-buffering: "on"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://astralturf.com,https://app.astralturf.com"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization"
+    nginx.ingress.kubernetes.io/cors-expose-headers: "Content-Length,Content-Range"
+    nginx.ingress.kubernetes.io/cors-max-age: "86400"
+    nginx.ingress.kubernetes.io/rate-limit: "1000"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      # Security headers
+      add_header X-Frame-Options "SAMEORIGIN" always;
+      add_header X-Content-Type-Options "nosniff" always;
+      add_header X-XSS-Protection "1; mode=block" always;
+      add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+      add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+      add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:; media-src 'self'; object-src 'none'; frame-src 'none';" always;
+      
+      # Performance optimizations
+      gzip on;
+      gzip_vary on;
+      gzip_min_length 1024;
+      gzip_types text/plain text/css text/xml text/javascript application/javascript application/xml+rss application/json;
+      
+      # Atlas deployment info
+      add_header X-Atlas-Deployment-Strategy "blue-green" always;
+      add_header X-Atlas-Version "8.0.0" always;
+      add_header X-Atlas-Cloud-Provider "$atlas_cloud_provider" always;
+    nginx.ingress.kubernetes.io/server-snippet: |
+      # Global server configuration
+      client_max_body_size 10m;
+      client_body_timeout 60s;
+      client_header_timeout 60s;
+      keepalive_timeout 65s;
+      
+      # Atlas monitoring
+      location /atlas/health {
+        access_log off;
+        return 200 "healthy\n";
+        add_header Content-Type text/plain;
+      }
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    cert-manager.io/acme-challenge-type: "http01"
+    atlas.deployment/strategy: "blue-green"
+    atlas.traffic/intelligent-routing: "enabled"
+    atlas.cdn/enabled: "true"
+    atlas.edge/computing: "enabled"
+spec:
+  tls:
+  - hosts:
+    - astralturf.com
+    - app.astralturf.com
+    - api.astralturf.com
+    - cdn.astralturf.com
+    secretName: astral-turf-tls-cert
+  rules:
+  - host: astralturf.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: astral-turf-service
+            port:
+              number: 80
+  - host: app.astralturf.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: astral-turf-service
+            port:
+              number: 80
+  - host: api.astralturf.com
+    http:
+      paths:
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: astral-turf-service
+            port:
+              number: 80
+      - path: /health
+        pathType: Prefix
+        backend:
+          service:
+            name: astral-turf-service
+            port:
+              number: 80
+      - path: /metrics
+        pathType: Prefix
+        backend:
+          service:
+            name: astral-turf-service
+            port:
+              number: 8080
+
+---
+
+# Global Traffic Policy for Intelligent Routing
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: atlas-traffic-policy
+  namespace: astral-turf-production
+  labels:
+    app: astral-turf
+    atlas.traffic/policy: "global"
+data:
+  traffic-policy.json: |
+    {
+      "version": "v1",
+      "policy": {
+        "name": "astral-turf-global-policy",
+        "description": "Atlas intelligent traffic routing policy",
+        "rules": [
+          {
+            "name": "geographic-routing",
+            "priority": 100,
+            "conditions": [
+              {
+                "type": "geographic",
+                "regions": ["north-america", "south-america"],
+                "target": "aws-us-east-1",
+                "weight": 70,
+                "backup": "azure-eastus"
+              },
+              {
+                "type": "geographic", 
+                "regions": ["europe", "africa"],
+                "target": "azure-westeurope",
+                "weight": 70,
+                "backup": "aws-eu-west-1"
+              },
+              {
+                "type": "geographic",
+                "regions": ["asia", "oceania"],
+                "target": "gcp-asia-southeast1",
+                "weight": 70,
+                "backup": "aws-ap-southeast-1"
+              }
+            ]
+          },
+          {
+            "name": "performance-routing",
+            "priority": 90,
+            "conditions": [
+              {
+                "type": "latency",
+                "threshold": "50ms",
+                "action": "route-to-nearest"
+              },
+              {
+                "type": "bandwidth",
+                "threshold": "100mbps",
+                "action": "load-balance"
+              }
+            ]
+          },
+          {
+            "name": "health-based-routing",
+            "priority": 80,
+            "conditions": [
+              {
+                "type": "health-check",
+                "unhealthy-threshold": 3,
+                "action": "failover"
+              },
+              {
+                "type": "error-rate",
+                "threshold": "1%",
+                "action": "reduce-traffic"
+              }
+            ]
+          },
+          {
+            "name": "load-based-routing",
+            "priority": 70,
+            "conditions": [
+              {
+                "type": "cpu-utilization",
+                "threshold": "80%",
+                "action": "redistribute"
+              },
+              {
+                "type": "memory-utilization",
+                "threshold": "85%",
+                "action": "redistribute"
+              }
+            ]
+          }
+        ],
+        "failover": {
+          "strategy": "cascading",
+          "max-retries": 3,
+          "retry-delay": "5s",
+          "circuit-breaker": {
+            "failure-threshold": 5,
+            "recovery-timeout": "30s"
+          }
+        },
+        "monitoring": {
+          "metrics": ["latency", "throughput", "error-rate", "availability"],
+          "alerts": ["health-degraded", "performance-threshold", "failover-triggered"],
+          "dashboards": ["global-traffic", "regional-performance", "error-analysis"]
+        }
+      }
+    }
+  
+  edge-config.json: |
+    {
+      "edge": {
+        "enabled": true,
+        "providers": ["cloudflare", "fastly", "aws-cloudfront"],
+        "regions": [
+          {
+            "name": "us-east",
+            "providers": ["cloudflare", "aws-cloudfront"],
+            "cache-strategy": "aggressive",
+            "ttl": 3600
+          },
+          {
+            "name": "eu-west",
+            "providers": ["cloudflare", "fastly"],
+            "cache-strategy": "aggressive",
+            "ttl": 3600
+          },
+          {
+            "name": "asia-pacific",
+            "providers": ["cloudflare", "aws-cloudfront"],
+            "cache-strategy": "moderate",
+            "ttl": 1800
+          }
+        ],
+        "caching": {
+          "static-assets": {
+            "ttl": 86400,
+            "compression": "brotli,gzip",
+            "optimize": true
+          },
+          "api-responses": {
+            "ttl": 300,
+            "conditional": true,
+            "vary": ["Accept-Encoding", "Authorization"]
+          },
+          "dynamic-content": {
+            "ttl": 60,
+            "edge-side-includes": true
+          }
+        },
+        "security": {
+          "ddos-protection": "enabled",
+          "waf-rules": "strict",
+          "rate-limiting": {
+            "requests-per-minute": 1000,
+            "burst": 100
+          },
+          "ssl": {
+            "version": "TLS 1.3",
+            "ciphers": "strong-only",
+            "hsts": "max-age=31536000"
+          }
+        }
+      }
+    }
+
+---
+
+# Global DNS Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: atlas-dns-config
+  namespace: astral-turf-production
+  labels:
+    app: astral-turf
+    atlas.dns/type: "global"
+data:
+  dns-config.yaml: |
+    dns:
+      zones:
+        - name: astralturf.com
+          type: primary
+          records:
+            - type: A
+              name: "@"
+              values: ["52.86.1.100", "52.202.51.150"]  # AWS ALB IPs
+              ttl: 300
+              health_check: true
+            - type: A
+              name: "app"
+              values: ["52.86.1.100", "20.85.34.200", "34.102.136.180"]  # Multi-cloud IPs
+              ttl: 300
+              health_check: true
+              geo_routing:
+                - region: "us"
+                  target: "52.86.1.100"  # AWS
+                - region: "eu"
+                  target: "20.85.34.200"  # Azure
+                - region: "asia"
+                  target: "34.102.136.180"  # GCP
+            - type: CNAME
+              name: "api"
+              value: "app.astralturf.com"
+              ttl: 300
+            - type: CNAME
+              name: "cdn"
+              value: "d1234567890.cloudfront.net"
+              ttl: 86400
+            - type: MX
+              name: "@"
+              values: ["10 mail.astralturf.com"]
+              ttl: 3600
+            - type: TXT
+              name: "@"
+              values: [
+                "v=spf1 include:_spf.google.com ~all",
+                "atlas-verification=abc123def456"
+              ]
+              ttl: 3600
+      
+      health_checks:
+        - name: "aws-health"
+          url: "https://app.astralturf.com/health/live"
+          method: "GET"
+          interval: 30
+          timeout: 10
+          expected_status: 200
+          regions: ["us-east-1", "us-west-2"]
+        
+        - name: "azure-health"
+          url: "https://azure.astralturf.com/health/live"
+          method: "GET"
+          interval: 30
+          timeout: 10
+          expected_status: 200
+          regions: ["eastus", "westeurope"]
+        
+        - name: "gcp-health"
+          url: "https://gcp.astralturf.com/health/live"
+          method: "GET"
+          interval: 30
+          timeout: 10
+          expected_status: 200
+          regions: ["us-central1", "asia-southeast1"]
+      
+      failover:
+        primary: "aws"
+        secondary: "azure"
+        tertiary: "gcp"
+        strategy: "weighted"
+        weights:
+          aws: 40
+          azure: 35
+          gcp: 25

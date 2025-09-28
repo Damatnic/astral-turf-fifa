@@ -12,6 +12,14 @@ export type PositionRole = 'GK' | 'DF' | 'MF' | 'FW';
 export type Team = 'home' | 'away';
 export type TeamView = Team | 'both';
 
+export type KitPattern = 'solid' | 'stripes' | 'hoops';
+
+export interface TeamKit {
+  primaryColor: string;
+  secondaryColor: string;
+  pattern: KitPattern;
+}
+
 export interface PlayerRole {
   id: string;
   name: string;
@@ -159,6 +167,8 @@ export interface Player {
   lastConversationInitiatedWeek: number;
   moraleBoost: { duration: number; effect: number } | null;
   completedChallenges: string[];
+  isCaptain?: boolean;
+  teamKit?: TeamKit;
 }
 
 export type TransferPlayer = Omit<Player, 'position' | 'teamColor' | 'attributeHistory'> & {
@@ -191,6 +201,7 @@ export interface FormationSlot {
   role: PositionRole;
   defaultPosition: { x: number; y: number };
   playerId: string | null;
+  preferredRoles?: string[];
 }
 
 export interface Formation {
@@ -299,8 +310,58 @@ export interface DrawingShape {
   id: string;
   tool: DrawingTool;
   color: string;
-  points: readonly { x: number; y: number }[];
+  points: { x: number; y: number }[];
   text?: string;
+  timestamp: number;
+}
+
+// AI-related types
+export interface AIFormationInsight {
+  strengthAnalysis: {
+    attacking: number;
+    defensive: number;
+    midfield: number;
+    overall: number;
+  };
+  weaknesses: string[];
+  recommendations: string[];
+  playerCompatibility: Record<string, number>;
+  tacticalSuggestions: string[];
+}
+
+export interface AIPlayerSuggestion {
+  playerId: string;
+  suggestedPosition: { x: number; y: number };
+  reasoning: string;
+  confidenceScore: number;
+  alternativePositions?: { x: number; y: number; reason: string }[];
+}
+
+export interface AIMatchPrediction {
+  winProbability: number;
+  expectedGoals: number;
+  keyFactors: string[];
+  playerPerformancePredictions: Record<string, {
+    expectedRating: number;
+    strengths: string[];
+    concerns: string[];
+  }>;
+}
+
+export interface AITacticalPattern {
+  patternType: 'attacking' | 'defensive' | 'transition' | 'possession';
+  confidence: number;
+  description: string;
+  effectiveness: number;
+  counters: string[];
+}
+
+export interface AIDrawingSuggestion {
+  tool: DrawingTool;
+  positions: { x: number; y: number }[];
+  description: string;
+  reasoning: string;
+  priority: 'low' | 'medium' | 'high';
 }
 
 export const PLAY_CATEGORIES = [
@@ -908,8 +969,10 @@ export interface User {
 
 export interface AuthState {
   isAuthenticated: boolean;
+  isLoading: boolean;
   user: User | null;
   error: string | null;
+  familyAssociations: any[];
 }
 
 export interface RootState {
@@ -993,7 +1056,8 @@ export type Action =
       type: 'RESOLVE_SLOT_ACTION';
       payload: { decision: 'swap' | 'replace' | 'bench' | 'captain' | 'loan' };
     }
-  | { type: 'SWAP_PLAYERS'; payload: { sourcePlayerId: string; targetPlayerId: string } }
+  | { type: 'SWAP_PLAYERS'; payload: { playerId1: string; playerId2: string } }
+  | { type: 'MOVE_TO_BENCH'; payload: { playerId: string } }
   | { type: 'TOGGLE_GRID_VISIBILITY' }
   | { type: 'TOGGLE_FORMATION_STRENGTH_VISIBILITY' }
   | { type: 'TOGGLE_THEME' }

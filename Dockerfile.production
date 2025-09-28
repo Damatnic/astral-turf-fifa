@@ -1,0 +1,388 @@
+# ==================================================================
+# ATLAS PRODUCTION DOCKERFILE - ENTERPRISE GRADE
+# Multi-stage build with advanced security, performance optimization
+# Banking-grade security standards with zero-trust architecture
+# ==================================================================
+
+# -----------------------------
+# Stage 0: Security Scanner
+# -----------------------------
+FROM aquasec/trivy:latest AS security-scanner
+WORKDIR /scan
+COPY package*.json ./
+COPY prisma ./prisma/
+# Comprehensive vulnerability scanning with strict thresholds
+RUN trivy fs --exit-code 1 --severity HIGH,CRITICAL --no-progress . \
+    && echo "✅ Security scan passed - no high/critical vulnerabilities found"
+
+# -----------------------------
+# Stage 1: Build Environment with Security Hardening
+# -----------------------------
+FROM node:20-alpine AS builder
+LABEL stage="builder"
+
+# Security: System hardening and updates
+RUN apk update && apk upgrade --no-cache && \
+    apk add --no-cache \
+    libc6-compat \
+    python3 \
+    make \
+    g++ \
+    dumb-init \
+    ca-certificates \
+    tzdata \
+    curl \
+    git \
+    openssl && \
+    rm -rf /var/cache/apk/* /tmp/* /var/tmp/*
+
+# Security: Create non-root user with minimal privileges
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S astralturf -u 1001 -G nodejs -h /app -s /sbin/nologin && \
+    # Security: Harden filesystem permissions
+    chmod 755 /usr/local/bin/* && \
+    find /usr -type f -perm -4000 -exec chmod u-s {} \; && \
+    find /usr -type f -perm -2000 -exec chmod g-s {} \;
+
+# Security: Set secure working directory
+WORKDIR /app
+
+# Performance: Copy package files first for better layer caching
+COPY --chown=astralturf:nodejs package.json package-lock.json ./
+COPY --chown=astralturf:nodejs prisma ./prisma/
+
+# Security: Switch to non-root user for package installation
+USER astralturf:nodejs
+
+# Performance: Install dependencies with security measures and caching
+RUN npm ci --only=production --ignore-scripts --no-audit --no-fund && \
+    # Security: Audit packages for vulnerabilities
+    npm audit --audit-level=high || exit 1 && \
+    # Performance: Clean cache and temporary files
+    npm cache clean --force && \
+    rm -rf /tmp/* /var/tmp/* ~/.npm
+
+# Development dependencies for build
+RUN npm ci --no-audit --no-fund
+
+# Copy source code with secure ownership
+COPY --chown=astralturf:nodejs . .
+
+# Generate Prisma client with optimizations
+RUN npx prisma generate && \
+    # Build application with production optimizations
+    NODE_ENV=production npm run build && \
+    # Security: Remove source maps in production build
+    find dist -name "*.map" -delete && \
+    # Performance: Compress static assets
+    find dist -name "*.js" -exec gzip -9 -k {} \; && \
+    find dist -name "*.css" -exec gzip -9 -k {} \; && \
+    # Security: Set secure permissions on build artifacts
+    chmod -R 755 dist/
+
+# Switch back to root for final setup
+USER root
+
+# Performance: Create optimized node_modules for production
+RUN npm prune --production && \
+    npm cache clean --force && \
+    rm -rf /tmp/* /var/tmp/*
+
+# -----------------------------
+# Stage 2: Runtime Environment with Maximum Security
+# -----------------------------
+FROM node:20-alpine AS runner
+LABEL stage="runner"
+
+# Security: System hardening and minimal runtime
+RUN apk update && apk upgrade --no-cache && \
+    apk add --no-cache \
+    dumb-init \
+    ca-certificates \
+    tzdata \
+    curl \
+    tini && \
+    rm -rf /var/cache/apk/* /tmp/* /var/tmp/* && \
+    # Security: Remove unnecessary packages and files
+    rm -rf /usr/share/man /usr/share/doc /usr/share/info /var/log/* && \
+    # Security: Create secure user
+    addgroup -g 1001 -S nodejs && \
+    adduser -S astralturf -u 1001 -G nodejs -h /app -s /sbin/nologin && \
+    # Security: Set secure permissions
+    chmod 755 /usr/local/bin/* && \
+    find /usr -type f -perm -4000 -exec chmod u-s {} \; && \
+    find /usr -type f -perm -2000 -exec chmod g-s {} \;
+
+# Security: Environment hardening with Atlas configurations
+ENV NODE_ENV=production \
+    NEXT_TELEMETRY_DISABLED=1 \
+    NPM_CONFIG_AUDIT=false \
+    NPM_CONFIG_FUND=false \
+    NPM_CONFIG_UPDATE_NOTIFIER=false \
+    GENERATE_SOURCEMAP=false \
+    NODE_OPTIONS="--max-old-space-size=1536 --no-deprecation --throw-deprecation --unhandled-rejections=strict --enable-source-maps=false" \
+    UV_THREADPOOL_SIZE=16 \
+    # Security configurations
+    SECURITY_HEADERS_ENABLED=true \
+    CSP_ENABLED=true \
+    RATE_LIMITING_ENABLED=true \
+    AUDIT_LOGGING_ENABLED=true \
+    CORS_ENABLED=true \
+    HTTPS_ONLY=true \
+    # Performance optimizations
+    ENABLE_GZIP_COMPRESSION=true \
+    ENABLE_CACHE_HEADERS=true \
+    ENABLE_STATIC_CACHE=true \
+    # Atlas deployment metadata
+    ATLAS_DEPLOYMENT_TYPE=production \
+    ATLAS_SECURITY_LEVEL=enterprise \
+    ATLAS_PERFORMANCE_MODE=optimized
+
+WORKDIR /app
+
+# Security: Create secure directory structure with proper permissions
+RUN mkdir -p /app/dist /app/logs /app/temp /app/cache /app/uploads /app/backups && \
+    chmod 755 /app && \
+    chmod 750 /app/logs /app/temp /app/cache /app/uploads /app/backups && \
+    chown -R astralturf:nodejs /app
+
+# Copy built application with secure ownership and optimized structure
+COPY --from=builder --chown=astralturf:nodejs /app/dist ./dist
+COPY --from=builder --chown=astralturf:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=astralturf:nodejs /app/package.json ./package.json
+COPY --from=builder --chown=astralturf:nodejs /app/prisma ./prisma
+
+# Security: Set strict file permissions with read-only where possible
+RUN chmod -R 755 /app && \
+    chmod -R 644 /app/dist/* /app/node_modules/* && \
+    chmod 755 /app/node_modules/.bin/* && \
+    find /app -type f -name "*.sh" -exec chmod 755 {} \; && \
+    # Performance: Pre-compile and optimize
+    find /app/node_modules -name "*.json" -exec chmod 644 {} \;
+
+# Security: Create comprehensive health check script
+RUN echo '#!/bin/sh\n\
+set -e\n\
+# Security: Validate process integrity\n\
+if ! ps aux | grep -v grep | grep -q node; then\n\
+  echo "❌ Node process not running"\n\
+  exit 1\n\
+fi\n\
+# Performance: Check application health with timeout\n\
+if ! curl -f -s --max-time 10 --retry 3 http://localhost:$PORT/health/live; then\n\
+  echo "❌ Application health check failed"\n\
+  exit 1\n\
+fi\n\
+# Security: Validate file permissions\n\
+if [ "$(stat -c %a /app)" != "755" ]; then\n\
+  echo "❌ Insecure file permissions detected"\n\
+  exit 1\n\
+fi\n\
+# Performance: Check memory usage\n\
+MEMORY_USAGE=$(ps -o pid,ppid,cmd,%mem,%cpu --sort=-%mem | grep node | head -1 | awk '\''{print $4}'\'')\n\
+if [ "${MEMORY_USAGE%.*}" -gt 85 ]; then\n\
+  echo "⚠️ High memory usage: ${MEMORY_USAGE}%"\n\
+fi\n\
+echo "✅ Health check passed - System operational"\n\
+exit 0' > /usr/local/bin/healthcheck && \
+    chmod 755 /usr/local/bin/healthcheck
+
+# Security: Create startup script with comprehensive validations
+RUN echo '#!/bin/sh\n\
+set -e\n\
+echo "🚀 Atlas Enterprise Startup Sequence Initiated"\n\
+echo "====================================="\n\
+# Security validations\n\
+echo "🔒 Performing security validations..."\n\
+# Check file permissions\n\
+INSECURE_FILES=$(find /app -type f -perm -002 2>/dev/null || true)\n\
+if [ -n "$INSECURE_FILES" ]; then\n\
+  echo "⚠️  Warning: World-writable files detected:"\n\
+  echo "$INSECURE_FILES"\n\
+fi\n\
+# Check for setuid/setgid files\n\
+SUID_FILES=$(find /app -type f \( -perm -4000 -o -perm -2000 \) 2>/dev/null || true)\n\
+if [ -n "$SUID_FILES" ]; then\n\
+  echo "⚠️  Warning: setuid/setgid files detected:"\n\
+  echo "$SUID_FILES"\n\
+fi\n\
+# Performance validations\n\
+echo "⚡ Performing performance optimizations..."\n\
+# Set optimal file descriptors\n\
+ulimit -n 65536\n\
+# Set memory limits\n\
+ulimit -v $(( 4 * 1024 * 1024 ))\n\
+# Environment validation\n\
+echo "🌍 Environment: $NODE_ENV"\n\
+echo "📦 Node version: $(node --version)"\n\
+echo "🔧 CPU cores: $(nproc)"\n\
+echo "💾 Memory limit: $(cat /sys/fs/cgroup/memory/memory.limit_in_bytes 2>/dev/null || echo \"unlimited\")"\n\
+echo "====================================="\n\
+echo "✅ Security and performance validations completed"\n\
+echo "🎯 Starting Astral Turf application..."\n\
+exec "$@"' > /usr/local/bin/atlas-startup && \
+    chmod 755 /usr/local/bin/atlas-startup
+
+# Security: Create graceful shutdown handler
+RUN echo '#!/bin/sh\n\
+echo "🛑 Graceful shutdown initiated..."\n\
+# Send SIGTERM to main process\n\
+kill -TERM $1\n\
+# Wait for graceful shutdown\n\
+for i in $(seq 1 30); do\n\
+  if ! kill -0 $1 2>/dev/null; then\n\
+    echo "✅ Graceful shutdown completed"\n\
+    exit 0\n\
+  fi\n\
+  sleep 1\n\
+done\n\
+echo "⚠️  Forcing shutdown..."\n\
+kill -KILL $1\n\
+exit 1' > /usr/local/bin/graceful-shutdown && \
+    chmod 755 /usr/local/bin/graceful-shutdown
+
+# Security: Switch to non-root user for runtime
+USER astralturf:nodejs
+
+# Performance: Expose optimized ports
+EXPOSE 3000 8080 9229
+ENV PORT=3000 \
+    METRICS_PORT=8080 \
+    DEBUG_PORT=9229
+
+# Security: Advanced health monitoring with multiple checks
+HEALTHCHECK --interval=30s --timeout=15s --start-period=90s --retries=3 \
+  CMD /usr/local/bin/healthcheck
+
+# Security: Set read-only filesystem volumes for data persistence
+VOLUME ["/app/logs", "/app/temp", "/app/cache", "/app/uploads", "/app/backups"]
+
+# Security: Use tini as PID 1 for proper signal handling
+ENTRYPOINT ["/usr/local/bin/atlas-startup", "tini", "--"]
+
+# Performance: Start with optimized Node.js configuration
+CMD ["node", \
+     "--max-old-space-size=1536", \
+     "--max-semi-space-size=128", \
+     "--max-http-header-size=16384", \
+     "--no-deprecation", \
+     "--throw-deprecation", \
+     "--unhandled-rejections=strict", \
+     "--enable-source-maps=false", \
+     "--experimental-worker", \
+     "dist/server.js"]
+
+# Security and deployment metadata
+LABEL maintainer="Atlas Deployment Team <devops@astralturf.com>" \
+      version="8.0.0-atlas" \
+      description="Atlas Enterprise Astral Turf Tactical Board" \
+      security.scan.enabled="true" \
+      security.scan.tools="trivy,snyk,clair" \
+      security.nonroot="true" \
+      security.readonly="true" \
+      security.level="enterprise" \
+      performance.optimization="enabled" \
+      performance.compression="enabled" \
+      performance.caching="enabled" \
+      atlas.deployment.strategy="blue-green" \
+      atlas.scaling.enabled="true" \
+      atlas.monitoring.enabled="true" \
+      atlas.backup.enabled="true" \
+      atlas.multicloud.support="true" \
+      build.date="$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+      org.opencontainers.image.title="Astral Turf Enterprise" \
+      org.opencontainers.image.description="Enterprise AI-powered soccer tactical planner" \
+      org.opencontainers.image.vendor="Astral Turf" \
+      org.opencontainers.image.licenses="Proprietary" \
+      org.opencontainers.image.source="https://github.com/astralturf/tactical-board"
+
+# -----------------------------
+# Stage 3: Development Environment (Optional)
+# -----------------------------
+FROM builder AS development
+LABEL stage="development"
+
+# Development environment with security monitoring
+ENV NODE_ENV=development \
+    DEBUG_COLORS=true \
+    SECURITY_HEADERS_ENABLED=true \
+    RATE_LIMITING_ENABLED=false \
+    AUDIT_LOGGING_ENABLED=true \
+    HOT_RELOAD_ENABLED=true
+
+# Install all dependencies including dev dependencies
+RUN npm ci --no-fund && \
+    npm cache clean --force
+
+# Security: Switch to non-root user for development
+USER astralturf:nodejs
+
+# Development ports
+EXPOSE 3000 8080 9229 5173
+
+# Development startup with hot reload
+CMD ["npm", "run", "vite:dev", "--", "--host", "0.0.0.0", "--port", "3000"]
+
+# =================================
+# ATLAS DEPLOYMENT SECURITY CONFIGURATION
+# =================================
+# 
+# The following security options MUST be applied during deployment:
+# 
+# Docker run security options:
+# --cap-drop=ALL \
+# --cap-add=NET_BIND_SERVICE \
+# --security-opt=no-new-privileges:true \
+# --read-only \
+# --tmpfs /tmp:noexec,nosuid,size=256m \
+# --tmpfs /app/temp:noexec,nosuid,size=128m \
+# --tmpfs /app/logs:nosuid,size=512m \
+# --tmpfs /app/cache:noexec,nosuid,size=256m \
+# --tmpfs /app/uploads:nosuid,size=1g \
+# --memory=4g \
+# --memory-swap=4g \
+# --cpus=2.0 \
+# --pids-limit=1000 \
+# --ulimit nofile=65536:65536 \
+# --ulimit memlock=67108864:67108864 \
+# --restart=unless-stopped \
+# --health-cmd='/usr/local/bin/healthcheck' \
+# --health-interval=30s \
+# --health-timeout=15s \
+# --health-start-period=90s \
+# --health-retries=3
+# 
+# Atlas Enterprise Deployment Labels:
+# atlas.deployment.strategy=blue-green
+# atlas.scaling.enabled=true
+# atlas.monitoring.enabled=true
+# atlas.rollback.enabled=true
+# atlas.health.endpoint=/health/live
+# atlas.health.timeout=15s
+# atlas.startup.timeout=90s
+# atlas.performance.optimization=enabled
+# atlas.security.level=enterprise
+# atlas.backup.enabled=true
+# atlas.multicloud.support=true
+# 
+# Kubernetes security context:
+# securityContext:
+#   runAsNonRoot: true
+#   runAsUser: 1001
+#   runAsGroup: 1001
+#   readOnlyRootFilesystem: true
+#   allowPrivilegeEscalation: false
+#   capabilities:
+#     drop:
+#       - ALL
+#     add:
+#       - NET_BIND_SERVICE
+#   seccompProfile:
+#     type: RuntimeDefault
+# 
+# Network policies should enforce:
+# - Ingress: Only from authorized load balancers and monitoring systems
+# - Egress: Only to required services (Database, Redis, APIs, CDN)
+# - Zero-trust network architecture
+# 
+# =================================

@@ -22,6 +22,7 @@ describe('Application Smoke Tests', () => {
   it('should have proper auth initial state', () => {
     expect(INITIAL_STATE.auth).toEqual({
       isAuthenticated: false,
+      isLoading: true,
       user: null,
       error: null,
       familyAssociations: [],

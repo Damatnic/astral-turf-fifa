@@ -10,6 +10,7 @@ import type {
   ContractClause,
 } from '../../types';
 import { PLAYER_ROLES } from '../../constants';
+import { autoAssignPlayersToFormation, updatePlayerPositionsFromFormation } from '../../services/formationAutoAssignment';
 
 export const tacticsReducer = (draft: TacticsState, action: Action): TacticsState | void => {
   switch (action.type) {
@@ -54,46 +55,6 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
     case 'CLEAR_DRAWINGS':
       draft.drawings = [];
       break;
-    case 'SWAP_PLAYERS': {
-      const { sourcePlayerId, targetPlayerId } = action.payload;
-      const sourcePlayer = draft.players.find(p => p.id === sourcePlayerId);
-      if (!sourcePlayer) {
-        break;
-      }
-
-      const activeFormation = draft.formations[draft.activeFormationIds[sourcePlayer.team]];
-      if (!activeFormation) {
-        break;
-      }
-
-      const sourceSlot = activeFormation.slots.find(s => s.playerId === sourcePlayerId);
-      const targetSlot = activeFormation.slots.find(s => s.playerId === targetPlayerId);
-
-      if (sourceSlot && targetSlot) {
-        [sourceSlot.playerId, targetSlot.playerId] = [targetSlot.playerId, sourceSlot.playerId];
-      } else if (sourceSlot) {
-        // Benching player by dragging to another on-field player who is then benched
-        const benchedPlayer = draft.players.find(p => p.id === targetPlayerId);
-        if (benchedPlayer) {
-          benchedPlayer.position = { x: -100, y: -100 };
-          sourceSlot.playerId = targetPlayerId;
-        }
-      } else if (targetSlot) {
-        // Dragging benched player onto field
-        targetSlot.playerId = sourcePlayerId;
-      }
-
-      // Update positions after swap
-      draft.players.forEach(p => {
-        if (p.team === sourcePlayer.team) {
-          const slot = activeFormation.slots.find(s => s.playerId === p.id);
-          if (slot) {
-            p.position = slot.defaultPosition;
-          }
-        }
-      });
-      break;
-    }
     case 'UPDATE_PLAYER_POSITION': {
       const { playerId, position } = action.payload;
       const player = draft.players.find(p => p.id === playerId);
@@ -157,38 +118,18 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
     case 'SET_ACTIVE_FORMATION': {
       const { formationId, team } = action.payload;
       draft.activeFormationIds[team] = formationId;
-      const newFormation = draft.formations[formationId];
-      // Assign players from bench if slots are empty
-      const onFieldIds = new Set(newFormation.slots.map(s => s.playerId));
-      const benchedPlayers = draft.players.filter(p => p.team === team && !onFieldIds.has(p.id));
-
-      newFormation.slots.forEach(slot => {
-        if (!slot.playerId) {
-          // Try to find a player of the correct role
-          let playerToAssign = benchedPlayers.find(
-            p =>
-              PLAYER_ROLES.find(r => r.id === p.roleId)?.category === slot.role &&
-              !newFormation.slots.some(s => s.playerId === p.id),
-          );
-          if (!playerToAssign) {
-            // If no specific role match, take any benched player
-            playerToAssign = benchedPlayers.find(
-              p => !newFormation.slots.some(s => s.playerId === p.id),
-            );
-          }
-          if (playerToAssign) {
-            slot.playerId = playerToAssign.id;
-          }
-        }
-      });
-
-      // Update all player positions for the team
-      draft.players.forEach(p => {
-        if (p.team === team) {
-          const assignedSlot = newFormation.slots.find(s => s.playerId === p.id);
-          p.position = assignedSlot ? assignedSlot.defaultPosition : { x: -100, y: -100 };
-        }
-      });
+      
+      // Use intelligent auto-assignment system
+      const baseFormation = draft.formations[formationId];
+      const autoAssignedFormation = autoAssignPlayersToFormation(draft.players, baseFormation, team);
+      
+      // Update the formation with auto-assigned players
+      draft.formations[formationId] = autoAssignedFormation;
+      
+      // Update player positions to match their assigned slots
+      const updatedPlayers = updatePlayerPositionsFromFormation(draft.players, autoAssignedFormation, team);
+      draft.players = updatedPlayers;
+      
       break;
     }
     case 'SAVE_CUSTOM_FORMATION':
@@ -420,6 +361,54 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
         } else {
           player.completedChallenges.push(challengeId);
         }
+      }
+      break;
+    }
+
+    case 'SWAP_PLAYERS': {
+      const { playerId1, playerId2 } = action.payload;
+      const player1 = draft.players.find(p => p.id === playerId1);
+      const player2 = draft.players.find(p => p.id === playerId2);
+      
+      if (player1 && player2) {
+        // Swap positions
+        const tempPosition = player1.position;
+        player1.position = player2.position;
+        player2.position = tempPosition;
+        
+        // Swap formation slot assignments if they exist
+        const formation1 = draft.formations[draft.activeFormationIds[player1.team]];
+        const formation2 = draft.formations[draft.activeFormationIds[player2.team]];
+        
+        if (formation1) {
+          const slot1 = formation1.slots.find(s => s.playerId === playerId1);
+          const slot2 = formation1.slots.find(s => s.playerId === playerId2);
+          
+          if (slot1 && slot2) {
+            slot1.playerId = playerId2;
+            slot2.playerId = playerId1;
+          }
+        }
+      }
+      break;
+    }
+
+    case 'MOVE_TO_BENCH': {
+      const { playerId } = action.payload;
+      const player = draft.players.find(p => p.id === playerId);
+      
+      if (player) {
+        // Remove from formation slot
+        const formation = draft.formations[draft.activeFormationIds[player.team]];
+        if (formation) {
+          const slot = formation.slots.find(s => s.playerId === playerId);
+          if (slot) {
+            slot.playerId = null;
+          }
+        }
+        
+        // Move to bench position
+        player.position = { x: -100, y: -100 };
       }
       break;
     }

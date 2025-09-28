@@ -1,0 +1,905 @@
+# ==================================================================
+# ATLAS EDGE COMPUTING INFRASTRUCTURE
+# Global edge deployment for ultra-low latency access
+# CDN integration, edge functions, and geo-distributed computing
+# Real-time performance optimization with intelligent routing
+# ==================================================================
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: atlas-edge-computing
+  labels:
+    name: atlas-edge-computing
+    tier: edge
+    atlas.edge/enabled: "true"
+    atlas.cdn/integration: "enabled"
+    atlas.latency/optimization: "ultra-low"
+    atlas.geo/distributed: "true"
+  annotations:
+    atlas.edge/strategy: "global-distribution"
+    atlas.latency/target: "50ms"
+    atlas.availability/target: "99.99%"
+    atlas.regions/count: "12"
+
+---
+
+# Edge Computing Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: atlas-edge-config
+  namespace: atlas-edge-computing
+  labels:
+    atlas.config/type: "edge-computing"
+data:
+  edge-strategy.yaml: |
+    edge_computing:
+      strategy: "global_intelligent_caching"
+      
+      regions:
+        tier1_primary:
+          - name: "us-east-1"
+            provider: "aws"
+            latency_target: "20ms"
+            capacity: "100%"
+            edge_functions: true
+          - name: "eu-west-1"
+            provider: "azure"
+            latency_target: "25ms"
+            capacity: "100%"
+            edge_functions: true
+          - name: "ap-southeast-1"
+            provider: "gcp"
+            latency_target: "30ms"
+            capacity: "100%"
+            edge_functions: true
+        
+        tier2_regional:
+          - name: "us-west-2"
+            provider: "aws"
+            latency_target: "40ms"
+            capacity: "75%"
+            edge_functions: true
+          - name: "eu-central-1"
+            provider: "azure"
+            latency_target: "35ms"
+            capacity: "75%"
+            edge_functions: true
+          - name: "ap-northeast-1"
+            provider: "gcp"
+            latency_target: "45ms"
+            capacity: "75%"
+            edge_functions: true
+        
+        tier3_edge:
+          - name: "us-central-1"
+            provider: "cloudflare"
+            latency_target: "50ms"
+            capacity: "50%"
+            edge_functions: false
+          - name: "eu-north-1"
+            provider: "fastly"
+            latency_target: "55ms"
+            capacity: "50%"
+            edge_functions: false
+          - name: "ap-south-1"
+            provider: "cloudflare"
+            latency_target: "60ms"
+            capacity: "50%"
+            edge_functions: false
+      
+      routing:
+        method: "geo_latency_based"
+        algorithms:
+          primary: "anycast_bgp"
+          fallback: "dns_geo_routing"
+          
+        health_checks:
+          interval: "10s"
+          timeout: "5s"
+          threshold: 3
+          
+        failover:
+          automatic: true
+          cross_region: true
+          health_based: true
+      
+      caching:
+        strategy: "intelligent_multi_tier"
+        
+        static_assets:
+          ttl: "86400s"  # 24 hours
+          compression: "brotli,gzip"
+          webp_conversion: true
+          image_optimization: true
+          
+        api_responses:
+          ttl: "300s"  # 5 minutes
+          cache_control: "conditional"
+          etag_enabled: true
+          vary_headers: ["Accept-Encoding", "Authorization"]
+          
+        dynamic_content:
+          ttl: "60s"  # 1 minute
+          edge_side_includes: true
+          personalization: "cookie_based"
+          
+        tactical_boards:
+          ttl: "1800s"  # 30 minutes
+          user_specific: true
+          formation_cache: true
+          ai_analysis_cache: true
+      
+      edge_functions:
+        enabled: true
+        runtime: "v8_isolates"
+        
+        functions:
+          user_authentication:
+            runtime: "edge"
+            latency_budget: "5ms"
+            
+          content_personalization:
+            runtime: "edge"
+            latency_budget: "10ms"
+            
+          real_time_analytics:
+            runtime: "edge"
+            latency_budget: "15ms"
+            
+          ab_testing:
+            runtime: "edge"
+            latency_budget: "3ms"
+      
+      performance:
+        targets:
+          first_contentful_paint: "800ms"
+          largest_contentful_paint: "1200ms"
+          cumulative_layout_shift: "0.1"
+          first_input_delay: "50ms"
+          
+        optimization:
+          http2_server_push: true
+          resource_hints: true
+          critical_css_inline: true
+          lazy_loading: true
+          
+        monitoring:
+          real_user_monitoring: true
+          synthetic_monitoring: true
+          core_web_vitals: true
+
+  cdn-configuration.yaml: |
+    cdn_configuration:
+      providers:
+        primary: "cloudflare"
+        secondary: "fastly"
+        tertiary: "aws_cloudfront"
+      
+      cloudflare:
+        zone_id: "your_cloudflare_zone_id"
+        features:
+          - "argo_smart_routing"
+          - "polish_image_optimization"
+          - "mirage_mobile_optimization"
+          - "rocket_loader"
+          - "brotli_compression"
+          - "http2_server_push"
+        
+        security:
+          - "ddos_protection"
+          - "waf_managed_rules"
+          - "bot_management"
+          - "rate_limiting"
+        
+        performance:
+          - "auto_minify"
+          - "browser_cache_ttl"
+          - "edge_cache_ttl"
+          - "development_mode"
+      
+      fastly:
+        service_id: "your_fastly_service_id"
+        features:
+          - "image_optimization"
+          - "video_optimization"
+          - "compute_edge"
+          - "real_time_analytics"
+        
+        vcl_snippets:
+          - "custom_headers"
+          - "geo_blocking"
+          - "cache_control"
+          - "redirect_rules"
+      
+      aws_cloudfront:
+        distribution_id: "your_cloudfront_distribution_id"
+        features:
+          - "lambda_edge"
+          - "cloudfront_functions"
+          - "origin_shield"
+          - "real_time_logs"
+        
+        behaviors:
+          - path_pattern: "/api/*"
+            cache_policy: "no_cache"
+            origin_request_policy: "all_viewer_headers"
+          - path_pattern: "/static/*"
+            cache_policy: "optimized_caching"
+            compression: true
+
+---
+
+# Edge Node Deployment - US East
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: atlas-edge-us-east
+  namespace: atlas-edge-computing
+  labels:
+    app: atlas-edge
+    region: us-east-1
+    tier: edge
+    atlas.edge/tier: "primary"
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: atlas-edge
+      region: us-east-1
+  template:
+    metadata:
+      labels:
+        app: atlas-edge
+        region: us-east-1
+        tier: edge
+        atlas.edge/tier: "primary"
+        atlas.monitoring/scrape: "true"
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+    spec:
+      nodeSelector:
+        atlas.region: us-east-1
+        atlas.nodepool/type: edge
+      tolerations:
+      - key: "atlas.nodepool/edge"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
+      containers:
+      - name: edge-proxy
+        image: atlas/edge-proxy:v2.0.0
+        ports:
+        - containerPort: 80
+          name: http
+        - containerPort: 443
+          name: https
+        - containerPort: 9090
+          name: metrics
+        env:
+        - name: EDGE_REGION
+          value: "us-east-1"
+        - name: EDGE_TIER
+          value: "primary"
+        - name: UPSTREAM_URL
+          value: "https://app.astralturf.com"
+        - name: CACHE_SIZE
+          value: "1GB"
+        - name: EDGE_FUNCTIONS_ENABLED
+          value: "true"
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+            ephemeral-storage: "2Gi"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+            ephemeral-storage: "4Gi"
+        volumeMounts:
+        - name: cache-storage
+          mountPath: /var/cache/edge
+        - name: ssl-certs
+          mountPath: /etc/ssl/certs
+          readOnly: true
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 9090
+          initialDelaySeconds: 30
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 9090
+          initialDelaySeconds: 10
+          periodSeconds: 10
+      
+      - name: edge-functions-runtime
+        image: atlas/edge-functions-runtime:v1.0.0
+        ports:
+        - containerPort: 8080
+          name: runtime
+        env:
+        - name: RUNTIME_TYPE
+          value: "v8_isolates"
+        - name: MAX_ISOLATES
+          value: "1000"
+        - name: MEMORY_LIMIT_PER_ISOLATE
+          value: "128MB"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        volumeMounts:
+        - name: functions-storage
+          mountPath: /var/lib/functions
+      
+      volumes:
+      - name: cache-storage
+        emptyDir:
+          sizeLimit: 2Gi
+      - name: functions-storage
+        emptyDir:
+          sizeLimit: 1Gi
+      - name: ssl-certs
+        secret:
+          secretName: atlas-edge-ssl-certs
+
+---
+
+# Edge Node Deployment - EU West
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: atlas-edge-eu-west
+  namespace: atlas-edge-computing
+  labels:
+    app: atlas-edge
+    region: eu-west-1
+    tier: edge
+    atlas.edge/tier: "primary"
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: atlas-edge
+      region: eu-west-1
+  template:
+    metadata:
+      labels:
+        app: atlas-edge
+        region: eu-west-1
+        tier: edge
+        atlas.edge/tier: "primary"
+        atlas.monitoring/scrape: "true"
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+    spec:
+      nodeSelector:
+        atlas.region: eu-west-1
+        atlas.nodepool/type: edge
+      tolerations:
+      - key: "atlas.nodepool/edge"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
+      containers:
+      - name: edge-proxy
+        image: atlas/edge-proxy:v2.0.0
+        ports:
+        - containerPort: 80
+          name: http
+        - containerPort: 443
+          name: https
+        - containerPort: 9090
+          name: metrics
+        env:
+        - name: EDGE_REGION
+          value: "eu-west-1"
+        - name: EDGE_TIER
+          value: "primary"
+        - name: UPSTREAM_URL
+          value: "https://app.astralturf.com"
+        - name: CACHE_SIZE
+          value: "1GB"
+        - name: EDGE_FUNCTIONS_ENABLED
+          value: "true"
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+            ephemeral-storage: "2Gi"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+            ephemeral-storage: "4Gi"
+        volumeMounts:
+        - name: cache-storage
+          mountPath: /var/cache/edge
+        - name: ssl-certs
+          mountPath: /etc/ssl/certs
+          readOnly: true
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 9090
+          initialDelaySeconds: 30
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 9090
+          initialDelaySeconds: 10
+          periodSeconds: 10
+      
+      - name: edge-functions-runtime
+        image: atlas/edge-functions-runtime:v1.0.0
+        ports:
+        - containerPort: 8080
+          name: runtime
+        env:
+        - name: RUNTIME_TYPE
+          value: "v8_isolates"
+        - name: MAX_ISOLATES
+          value: "1000"
+        - name: MEMORY_LIMIT_PER_ISOLATE
+          value: "128MB"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        volumeMounts:
+        - name: functions-storage
+          mountPath: /var/lib/functions
+      
+      volumes:
+      - name: cache-storage
+        emptyDir:
+          sizeLimit: 2Gi
+      - name: functions-storage
+        emptyDir:
+          sizeLimit: 1Gi
+      - name: ssl-certs
+        secret:
+          secretName: atlas-edge-ssl-certs
+
+---
+
+# Edge Node Deployment - Asia Pacific
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: atlas-edge-ap-southeast
+  namespace: atlas-edge-computing
+  labels:
+    app: atlas-edge
+    region: ap-southeast-1
+    tier: edge
+    atlas.edge/tier: "primary"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: atlas-edge
+      region: ap-southeast-1
+  template:
+    metadata:
+      labels:
+        app: atlas-edge
+        region: ap-southeast-1
+        tier: edge
+        atlas.edge/tier: "primary"
+        atlas.monitoring/scrape: "true"
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+    spec:
+      nodeSelector:
+        atlas.region: ap-southeast-1
+        atlas.nodepool/type: edge
+      tolerations:
+      - key: "atlas.nodepool/edge"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
+      containers:
+      - name: edge-proxy
+        image: atlas/edge-proxy:v2.0.0
+        ports:
+        - containerPort: 80
+          name: http
+        - containerPort: 443
+          name: https
+        - containerPort: 9090
+          name: metrics
+        env:
+        - name: EDGE_REGION
+          value: "ap-southeast-1"
+        - name: EDGE_TIER
+          value: "primary"
+        - name: UPSTREAM_URL
+          value: "https://app.astralturf.com"
+        - name: CACHE_SIZE
+          value: "1GB"
+        - name: EDGE_FUNCTIONS_ENABLED
+          value: "true"
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+            ephemeral-storage: "2Gi"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+            ephemeral-storage: "4Gi"
+        volumeMounts:
+        - name: cache-storage
+          mountPath: /var/cache/edge
+        - name: ssl-certs
+          mountPath: /etc/ssl/certs
+          readOnly: true
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 9090
+          initialDelaySeconds: 30
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 9090
+          initialDelaySeconds: 10
+          periodSeconds: 10
+      
+      - name: edge-functions-runtime
+        image: atlas/edge-functions-runtime:v1.0.0
+        ports:
+        - containerPort: 8080
+          name: runtime
+        env:
+        - name: RUNTIME_TYPE
+          value: "v8_isolates"
+        - name: MAX_ISOLATES
+          value: "1000"
+        - name: MEMORY_LIMIT_PER_ISOLATE
+          value: "128MB"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        volumeMounts:
+        - name: functions-storage
+          mountPath: /var/lib/functions
+      
+      volumes:
+      - name: cache-storage
+        emptyDir:
+          sizeLimit: 2Gi
+      - name: functions-storage
+        emptyDir:
+          sizeLimit: 1Gi
+      - name: ssl-certs
+        secret:
+          secretName: atlas-edge-ssl-certs
+
+---
+
+# Edge Intelligence Controller
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: atlas-edge-intelligence
+  namespace: atlas-edge-computing
+  labels:
+    app: edge-intelligence
+    atlas.controller/type: "edge-optimization"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: edge-intelligence
+  template:
+    metadata:
+      labels:
+        app: edge-intelligence
+    spec:
+      containers:
+      - name: edge-controller
+        image: atlas/edge-intelligence:v1.0.0
+        ports:
+        - containerPort: 8080
+          name: api
+        - containerPort: 9090
+          name: metrics
+        env:
+        - name: PROMETHEUS_URL
+          value: "http://atlas-prometheus-enterprise.atlas-enterprise-monitoring:9090"
+        - name: OPTIMIZATION_INTERVAL
+          value: "60s"
+        command:
+        - /bin/sh
+        - -c
+        - |
+          #!/bin/sh
+          set -e
+          
+          echo "🧠 Atlas Edge Intelligence: Starting edge optimization controller..."
+          
+          while true; do
+            echo "📊 Analyzing edge performance metrics..."
+            
+            # Get latency metrics from all edge regions
+            US_EAST_LATENCY=$(curl -s "$PROMETHEUS_URL/api/v1/query?query=avg(http_request_duration_seconds{region=\"us-east-1\"})" | \
+              jq -r '.data.result[0].value[1]' 2>/dev/null || echo "0")
+            
+            EU_WEST_LATENCY=$(curl -s "$PROMETHEUS_URL/api/v1/query?query=avg(http_request_duration_seconds{region=\"eu-west-1\"})" | \
+              jq -r '.data.result[0].value[1]' 2>/dev/null || echo "0")
+            
+            AP_SOUTHEAST_LATENCY=$(curl -s "$PROMETHEUS_URL/api/v1/query?query=avg(http_request_duration_seconds{region=\"ap-southeast-1\"})" | \
+              jq -r '.data.result[0].value[1]' 2>/dev/null || echo "0")
+            
+            echo "📊 Current latencies: US-East: ${US_EAST_LATENCY}s, EU-West: ${EU_WEST_LATENCY}s, AP-Southeast: ${AP_SOUTHEAST_LATENCY}s"
+            
+            # Check cache hit rates
+            GLOBAL_CACHE_HIT_RATE=$(curl -s "$PROMETHEUS_URL/api/v1/query?query=avg(cache_hit_rate)" | \
+              jq -r '.data.result[0].value[1]' 2>/dev/null || echo "0")
+            
+            echo "📊 Global cache hit rate: ${GLOBAL_CACHE_HIT_RATE}"
+            
+            # Optimize based on metrics
+            if [ "$(echo "$GLOBAL_CACHE_HIT_RATE < 0.85" | bc -l)" -eq 1 ]; then
+              echo "⚠️ Cache hit rate below threshold (85%), optimizing cache policies..."
+              
+              # Update cache TTL dynamically
+              kubectl patch configmap atlas-edge-config -n atlas-edge-computing \
+                --type='json' \
+                -p='[{"op": "replace", "path": "/data/cache_ttl_multiplier", "value": "1.5"}]'
+            fi
+            
+            # Auto-scale edge nodes based on load
+            for region in us-east-1 eu-west-1 ap-southeast-1; do
+              REGION_LOAD=$(curl -s "$PROMETHEUS_URL/api/v1/query?query=avg(cpu_usage{region=\"$region\"})" | \
+                jq -r '.data.result[0].value[1]' 2>/dev/null || echo "0")
+              
+              if [ "$(echo "$REGION_LOAD > 0.8" | bc -l)" -eq 1 ]; then
+                echo "🔥 High load in $region ($REGION_LOAD), scaling up..."
+                
+                kubectl scale deployment atlas-edge-${region//-/} \
+                  --replicas=6 -n atlas-edge-computing
+              elif [ "$(echo "$REGION_LOAD < 0.3" | bc -l)" -eq 1 ]; then
+                echo "📉 Low load in $region ($REGION_LOAD), scaling down..."
+                
+                kubectl scale deployment atlas-edge-${region//-/} \
+                  --replicas=2 -n atlas-edge-computing
+              fi
+            done
+            
+            # Update routing weights based on performance
+            if [ "$(echo "$US_EAST_LATENCY < $EU_WEST_LATENCY" | bc -l)" -eq 1 ] && \
+               [ "$(echo "$US_EAST_LATENCY < $AP_SOUTHEAST_LATENCY" | bc -l)" -eq 1 ]; then
+              echo "🎯 US-East performing best, increasing traffic weight..."
+              # Update DNS weights or load balancer configuration
+            fi
+            
+            # Generate edge performance report
+            cat > /tmp/edge-performance-report.json << EOF
+            {
+              "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+              "global_metrics": {
+                "cache_hit_rate": $GLOBAL_CACHE_HIT_RATE,
+                "average_latency": $(echo "($US_EAST_LATENCY + $EU_WEST_LATENCY + $AP_SOUTHEAST_LATENCY) / 3" | bc -l)
+              },
+              "regional_metrics": {
+                "us_east_1": {
+                  "latency": $US_EAST_LATENCY,
+                  "status": "$([ "$(echo "$US_EAST_LATENCY < 0.05" | bc -l)" -eq 1 ] && echo "optimal" || echo "acceptable")"
+                },
+                "eu_west_1": {
+                  "latency": $EU_WEST_LATENCY,
+                  "status": "$([ "$(echo "$EU_WEST_LATENCY < 0.05" | bc -l)" -eq 1 ] && echo "optimal" || echo "acceptable")"
+                },
+                "ap_southeast_1": {
+                  "latency": $AP_SOUTHEAST_LATENCY,
+                  "status": "$([ "$(echo "$AP_SOUTHEAST_LATENCY < 0.05" | bc -l)" -eq 1 ] && echo "optimal" || echo "acceptable")"
+                }
+              }
+            }
+            EOF
+            
+            # Store report as ConfigMap
+            kubectl create configmap edge-performance-report-$(date +%Y%m%d-%H%M) \
+              --from-file=/tmp/edge-performance-report.json \
+              --namespace=atlas-edge-computing \
+              --dry-run=client -o yaml | kubectl apply -f -
+            
+            echo "✅ Edge optimization cycle completed"
+            sleep $(echo $OPTIMIZATION_INTERVAL | sed 's/s//')
+          done
+        
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+
+---
+
+# Edge Services
+apiVersion: v1
+kind: Service
+metadata:
+  name: atlas-edge-us-east
+  namespace: atlas-edge-computing
+  labels:
+    app: atlas-edge
+    region: us-east-1
+    atlas.service/type: "edge"
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 80
+    name: http
+  - port: 443
+    targetPort: 443
+    name: https
+  - port: 9090
+    targetPort: 9090
+    name: metrics
+  selector:
+    app: atlas-edge
+    region: us-east-1
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: atlas-edge-eu-west
+  namespace: atlas-edge-computing
+  labels:
+    app: atlas-edge
+    region: eu-west-1
+    atlas.service/type: "edge"
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 80
+    name: http
+  - port: 443
+    targetPort: 443
+    name: https
+  - port: 9090
+    targetPort: 9090
+    name: metrics
+  selector:
+    app: atlas-edge
+    region: eu-west-1
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: atlas-edge-ap-southeast
+  namespace: atlas-edge-computing
+  labels:
+    app: atlas-edge
+    region: ap-southeast-1
+    atlas.service/type: "edge"
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 80
+    name: http
+  - port: 443
+    targetPort: 443
+    name: https
+  - port: 9090
+    targetPort: 9090
+    name: metrics
+  selector:
+    app: atlas-edge
+    region: ap-southeast-1
+
+---
+
+# Edge Auto-Scaling
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: atlas-edge-us-east-hpa
+  namespace: atlas-edge-computing
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: atlas-edge-us-east
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+
+---
+
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: atlas-edge-eu-west-hpa
+  namespace: atlas-edge-computing
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: atlas-edge-eu-west
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+
+---
+
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: atlas-edge-ap-southeast-hpa
+  namespace: atlas-edge-computing
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: atlas-edge-ap-southeast
+  minReplicas: 2
+  maxReplicas: 8
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80

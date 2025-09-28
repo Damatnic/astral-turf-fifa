@@ -1,0 +1,441 @@
+# Atlas Zero-Downtime Deployment Pipeline
+# Enterprise-grade CI/CD with comprehensive testing and security
+name: Atlas Production Deployment
+
+on:
+  push:
+    branches: [main, master]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+      deployment_strategy:
+        description: 'Deployment strategy'
+        required: true
+        default: 'blue-green'
+        type: choice
+        options:
+          - blue-green
+          - canary
+          - rolling
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  NODE_VERSION: '20'
+  ATLAS_DEPLOYMENT_ID: ${{ github.run_id }}-${{ github.run_attempt }}
+
+jobs:
+  # Security and Quality Gates
+  security-scan:
+    name: Security Vulnerability Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '1'
+
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  code-quality:
+    name: Code Quality Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linting
+        run: npm run lint
+
+      - name: Run type checking
+        run: npm run type-check
+
+      - name: Run formatting check
+        run: npm run format:check
+
+  test-suite:
+    name: Comprehensive Test Suite
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        test-group: [unit, integration, performance, accessibility]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run test group - ${{ matrix.test-group }}
+        run: |
+          case "${{ matrix.test-group }}" in
+            "unit")
+              npm run test:unit-only
+              ;;
+            "integration")
+              npm run test:integration-only
+              ;;
+            "performance")
+              npm run test:performance
+              ;;
+            "accessibility")
+              npm run test:a11y
+              ;;
+          esac
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-${{ matrix.test-group }}
+          path: |
+            coverage/
+            test-results/
+
+  # Build and Security Hardening
+  build-and-scan:
+    name: Build and Container Security Scan
+    runs-on: ubuntu-latest
+    needs: [security-scan, code-quality, test-suite]
+    outputs:
+      image: ${{ steps.image.outputs.image }}
+      digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=${{ env.ATLAS_DEPLOYMENT_ID }}
+
+      - name: Build and push Docker image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          target: runner
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: |
+            ${{ steps.meta.outputs.labels }}
+            atlas.deployment.id=${{ env.ATLAS_DEPLOYMENT_ID }}
+            atlas.deployment.strategy=blue-green
+            atlas.build.timestamp=${{ github.event.head_commit.timestamp }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            ATLAS_DEPLOYMENT_ID=${{ env.ATLAS_DEPLOYMENT_ID }}
+            ATLAS_DEPLOYMENT_TIMESTAMP=${{ github.event.head_commit.timestamp }}
+
+      - name: Output image
+        id: image
+        run: echo "image=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.ATLAS_DEPLOYMENT_ID }}" >> $GITHUB_OUTPUT
+
+      - name: Run container security scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ steps.image.outputs.image }}
+          format: 'sarif'
+          output: 'container-scan-results.sarif'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload container scan results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'container-scan-results.sarif'
+
+  # Staging Deployment
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [build-and-scan]
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    environment: staging
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      - name: Configure kubectl
+        run: |
+          echo "${{ secrets.KUBECONFIG_STAGING }}" | base64 -d > kubeconfig
+          export KUBECONFIG=kubeconfig
+
+      - name: Deploy to staging with blue-green
+        run: |
+          # Update deployment image
+          kubectl set image deployment/astral-turf-blue astral-turf=${{ needs.build-and-scan.outputs.image }} -n astral-turf-staging
+          
+          # Wait for rollout to complete
+          kubectl rollout status deployment/astral-turf-blue -n astral-turf-staging --timeout=600s
+          
+          # Run health checks
+          kubectl run atlas-health-check --image=curlimages/curl:latest --rm -i --restart=Never -- \
+            curl -f http://astral-turf-service.astral-turf-staging.svc.cluster.local/health
+
+      - name: Run smoke tests
+        run: |
+          npm run test:production
+
+  # Production Deployment (Blue-Green)
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [deploy-staging, build-and-scan]
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    environment: production
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      - name: Configure kubectl
+        run: |
+          echo "${{ secrets.KUBECONFIG_PRODUCTION }}" | base64 -d > kubeconfig
+          export KUBECONFIG=kubeconfig
+
+      - name: Atlas Blue-Green Deployment
+        run: |
+          #!/bin/bash
+          set -e
+          
+          NAMESPACE="astral-turf"
+          NEW_IMAGE="${{ needs.build-and-scan.outputs.image }}"
+          DEPLOYMENT_ID="${{ env.ATLAS_DEPLOYMENT_ID }}"
+          
+          echo "🚀 Atlas: Starting blue-green deployment ${DEPLOYMENT_ID}"
+          
+          # Determine current active slot
+          CURRENT_SLOT=$(kubectl get service astral-turf-service -n $NAMESPACE -o jsonpath='{.spec.selector.version}')
+          if [ "$CURRENT_SLOT" = "blue" ]; then
+            NEW_SLOT="green"
+          else
+            NEW_SLOT="blue"
+          fi
+          
+          echo "🔄 Atlas: Current active slot: $CURRENT_SLOT, deploying to: $NEW_SLOT"
+          
+          # Scale up the new slot
+          echo "⬆️ Atlas: Scaling up $NEW_SLOT slot"
+          kubectl scale deployment astral-turf-$NEW_SLOT --replicas=3 -n $NAMESPACE
+          
+          # Update the new slot with new image
+          echo "🔄 Atlas: Updating $NEW_SLOT with new image"
+          kubectl set image deployment/astral-turf-$NEW_SLOT astral-turf=$NEW_IMAGE -n $NAMESPACE
+          
+          # Wait for new slot to be ready
+          echo "⏳ Atlas: Waiting for $NEW_SLOT deployment to be ready"
+          kubectl rollout status deployment/astral-turf-$NEW_SLOT -n $NAMESPACE --timeout=600s
+          
+          # Health check on new slot
+          echo "🏥 Atlas: Running health checks on $NEW_SLOT"
+          for i in {1..30}; do
+            if kubectl run atlas-health-check-$i --image=curlimages/curl:latest --rm -i --restart=Never -- \
+               curl -f http://astral-turf-$NEW_SLOT:3000/health; then
+              echo "✅ Atlas: Health check passed"
+              break
+            fi
+            echo "⏳ Atlas: Health check attempt $i/30 failed, retrying..."
+            sleep 10
+          done
+          
+          # Canary traffic test (5% for 2 minutes)
+          echo "🐤 Atlas: Starting canary traffic test (5% traffic to $NEW_SLOT)"
+          kubectl patch service astral-turf-service -n $NAMESPACE --type='json' \
+            -p='[{"op": "replace", "path": "/metadata/annotations/atlas.traffic.split", "value": "'$CURRENT_SLOT':95,'$NEW_SLOT':5"}]'
+          
+          # Monitor canary metrics
+          sleep 120
+          
+          # Gradual traffic shift
+          echo "🔄 Atlas: Gradually shifting traffic to $NEW_SLOT"
+          for TRAFFIC in 25 50 75 100; do
+            OLD_TRAFFIC=$((100 - TRAFFIC))
+            echo "📊 Atlas: Shifting traffic - $NEW_SLOT:$TRAFFIC%, $CURRENT_SLOT:$OLD_TRAFFIC%"
+            
+            kubectl patch service astral-turf-service -n $NAMESPACE --type='json' \
+              -p='[{"op": "replace", "path": "/metadata/annotations/atlas.traffic.split", "value": "'$CURRENT_SLOT':'$OLD_TRAFFIC','$NEW_SLOT':'$TRAFFIC'"}]'
+            
+            # Update service selector when reaching 100%
+            if [ "$TRAFFIC" = "100" ]; then
+              kubectl patch service astral-turf-service -n $NAMESPACE --type='json' \
+                -p='[{"op": "replace", "path": "/spec/selector/version", "value": "'$NEW_SLOT'"}]'
+            fi
+            
+            # Monitor metrics during shift
+            sleep 60
+            
+            # Health check
+            kubectl run atlas-health-check-$TRAFFIC --image=curlimages/curl:latest --rm -i --restart=Never -- \
+              curl -f http://astral-turf-service.$NAMESPACE.svc.cluster.local/health
+          done
+          
+          # Scale down old slot
+          echo "⬇️ Atlas: Scaling down old slot $CURRENT_SLOT"
+          kubectl scale deployment astral-turf-$CURRENT_SLOT --replicas=0 -n $NAMESPACE
+          
+          # Update HPA target to new slot
+          kubectl patch hpa astral-turf-hpa -n $NAMESPACE --type='json' \
+            -p='[{"op": "replace", "path": "/spec/scaleTargetRef/name", "value": "astral-turf-'$NEW_SLOT'"}]'
+          
+          echo "✅ Atlas: Blue-green deployment completed successfully!"
+          echo "🎯 Atlas: Active slot is now: $NEW_SLOT"
+
+      - name: Post-deployment validation
+        run: |
+          # Comprehensive post-deployment tests
+          kubectl run atlas-validation --image=curlimages/curl:latest --rm -i --restart=Never -- \
+            curl -f http://astral-turf-service.astral-turf.svc.cluster.local/health
+          
+          # Performance baseline check
+          kubectl run atlas-perf-check --image=curlimages/curl:latest --rm -i --restart=Never -- \
+            sh -c 'for i in $(seq 1 100); do curl -s -w "%{time_total}\n" -o /dev/null http://astral-turf-service.astral-turf.svc.cluster.local/ && sleep 0.1; done | awk "{sum+=\$1; count++} END {print \"Average response time:\", sum/count \"s\"}"'
+
+      - name: Notify deployment success
+        uses: 8398a7/action-slack@v3
+        if: success()
+        with:
+          status: success
+          channel: '#deployments'
+          text: |
+            🚀 Atlas Deployment Success!
+            Environment: Production
+            Image: ${{ needs.build-and-scan.outputs.image }}
+            Deployment ID: ${{ env.ATLAS_DEPLOYMENT_ID }}
+            Strategy: Blue-Green
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  # Rollback on Failure
+  rollback-on-failure:
+    name: Emergency Rollback
+    runs-on: ubuntu-latest
+    needs: [deploy-production]
+    if: failure()
+    environment: production
+    steps:
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      - name: Configure kubectl
+        run: |
+          echo "${{ secrets.KUBECONFIG_PRODUCTION }}" | base64 -d > kubeconfig
+          export KUBECONFIG=kubeconfig
+
+      - name: Atlas Emergency Rollback
+        run: |
+          #!/bin/bash
+          set -e
+          
+          NAMESPACE="astral-turf"
+          
+          echo "🚨 Atlas: EMERGENCY ROLLBACK INITIATED"
+          
+          # Get current service selector
+          CURRENT_SLOT=$(kubectl get service astral-turf-service -n $NAMESPACE -o jsonpath='{.spec.selector.version}')
+          if [ "$CURRENT_SLOT" = "blue" ]; then
+            ROLLBACK_SLOT="green"
+          else
+            ROLLBACK_SLOT="blue"
+          fi
+          
+          echo "🔄 Atlas: Rolling back from $CURRENT_SLOT to $ROLLBACK_SLOT"
+          
+          # Immediate traffic switch
+          kubectl patch service astral-turf-service -n $NAMESPACE --type='json' \
+            -p='[{"op": "replace", "path": "/spec/selector/version", "value": "'$ROLLBACK_SLOT'"}]'
+          
+          # Scale up rollback slot if needed
+          kubectl scale deployment astral-turf-$ROLLBACK_SLOT --replicas=3 -n $NAMESPACE
+          
+          # Scale down failed slot
+          kubectl scale deployment astral-turf-$CURRENT_SLOT --replicas=0 -n $NAMESPACE
+          
+          # Update HPA target
+          kubectl patch hpa astral-turf-hpa -n $NAMESPACE --type='json' \
+            -p='[{"op": "replace", "path": "/spec/scaleTargetRef/name", "value": "astral-turf-'$ROLLBACK_SLOT'"}]'
+          
+          echo "✅ Atlas: Emergency rollback completed"
+
+      - name: Notify rollback
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure
+          channel: '#alerts'
+          text: |
+            🚨 Atlas Emergency Rollback Executed!
+            Environment: Production
+            Failed Deployment ID: ${{ env.ATLAS_DEPLOYMENT_ID }}
+            Rollback completed successfully
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

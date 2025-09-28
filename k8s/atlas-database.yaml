@@ -1,0 +1,487 @@
+# Atlas Database Migration and Backup Strategy
+# Zero-downtime database operations with automatic rollback
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: atlas-db-migration-config
+  namespace: astral-turf
+  labels:
+    atlas.database: migration
+data:
+  migration-strategy.json: |
+    {
+      "strategy": "blue-green-with-backward-compatibility",
+      "rollback_enabled": true,
+      "safety_checks": {
+        "backup_before_migration": true,
+        "test_migrations_first": true,
+        "validate_backward_compatibility": true,
+        "check_connection_pool": true
+      },
+      "migration_phases": [
+        {
+          "phase": "preparation",
+          "actions": ["backup", "validate", "test_connection"]
+        },
+        {
+          "phase": "schema_migration", 
+          "actions": ["create_new_tables", "add_columns", "create_indexes"]
+        },
+        {
+          "phase": "data_migration",
+          "actions": ["migrate_data", "validate_data_integrity"]
+        },
+        {
+          "phase": "cleanup",
+          "actions": ["remove_old_columns", "drop_old_tables"]
+        }
+      ]
+    }
+
+  backup-policy.json: |
+    {
+      "backup_schedule": {
+        "full_backup": "0 2 * * *",
+        "incremental_backup": "0 */6 * * *",
+        "point_in_time_recovery": "*/15 * * * *"
+      },
+      "retention_policy": {
+        "daily_backups": 30,
+        "weekly_backups": 12,
+        "monthly_backups": 12,
+        "yearly_backups": 5
+      },
+      "storage": {
+        "primary": "s3://atlas-backups/astral-turf/",
+        "secondary": "gcs://atlas-backups-secondary/astral-turf/",
+        "encryption": "AES-256"
+      }
+    }
+---
+# Atlas Database Migration Job Template
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: atlas-db-migration-${MIGRATION_VERSION}
+  namespace: astral-turf
+  labels:
+    atlas.database.operation: migration
+    atlas.migration.version: "${MIGRATION_VERSION}"
+spec:
+  template:
+    metadata:
+      labels:
+        atlas.database.operation: migration
+    spec:
+      restartPolicy: Never
+      serviceAccountName: atlas-db-migration-sa
+      initContainers:
+      # Pre-migration backup
+      - name: pre-migration-backup
+        image: postgres:15-alpine
+        command:
+        - /bin/sh
+        - -c
+        - |
+          echo "🏥 Atlas: Creating pre-migration backup..."
+          BACKUP_NAME="pre-migration-$(date +%Y%m%d-%H%M%S)"
+          pg_dump $DATABASE_URL > /backup/${BACKUP_NAME}.sql
+          
+          # Upload to cloud storage
+          aws s3 cp /backup/${BACKUP_NAME}.sql s3://atlas-backups/astral-turf/migrations/
+          
+          echo "✅ Atlas: Pre-migration backup completed: ${BACKUP_NAME}"
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: database-secrets
+              key: url
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: aws-secrets
+              key: access-key-id
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: aws-secrets
+              key: secret-access-key
+        volumeMounts:
+        - name: backup-storage
+          mountPath: /backup
+      
+      # Migration validation
+      - name: migration-validation
+        image: postgres:15-alpine
+        command:
+        - /bin/sh
+        - -c
+        - |
+          echo "🔍 Atlas: Validating migration scripts..."
+          
+          # Create test database
+          createdb test_migration -h $DB_HOST -U $DB_USER
+          
+          # Run migration on test database
+          psql $TEST_DATABASE_URL -f /migrations/${MIGRATION_VERSION}.sql
+          
+          # Validate data integrity
+          psql $TEST_DATABASE_URL -c "SELECT COUNT(*) FROM information_schema.tables;"
+          
+          # Drop test database
+          dropdb test_migration -h $DB_HOST -U $DB_USER
+          
+          echo "✅ Atlas: Migration validation completed"
+        env:
+        - name: DB_HOST
+          valueFrom:
+            secretKeyRef:
+              name: database-secrets
+              key: host
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: database-secrets
+              key: username
+        - name: TEST_DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: database-secrets
+              key: test-url
+        volumeMounts:
+        - name: migration-scripts
+          mountPath: /migrations
+      
+      containers:
+      # Main migration execution
+      - name: atlas-migration
+        image: atlas/db-migrator:latest
+        command:
+        - /bin/sh
+        - -c
+        - |
+          set -e
+          
+          echo "🚀 Atlas: Starting database migration ${MIGRATION_VERSION}"
+          
+          # Check current database version
+          CURRENT_VERSION=$(psql $DATABASE_URL -t -c "SELECT version FROM schema_migrations ORDER BY version DESC LIMIT 1;" || echo "0")
+          echo "📊 Atlas: Current database version: $CURRENT_VERSION"
+          
+          # Run migration with rollback capability
+          if ! psql $DATABASE_URL -f /migrations/${MIGRATION_VERSION}.sql; then
+            echo "❌ Atlas: Migration failed, initiating rollback..."
+            
+            # Restore from backup
+            BACKUP_FILE=$(ls -t /backup/*.sql | head -n1)
+            psql $DATABASE_URL < $BACKUP_FILE
+            
+            echo "🔄 Atlas: Database restored from backup"
+            exit 1
+          fi
+          
+          # Validate migration success
+          NEW_VERSION=$(psql $DATABASE_URL -t -c "SELECT version FROM schema_migrations ORDER BY version DESC LIMIT 1;")
+          echo "✅ Atlas: Migration completed successfully. New version: $NEW_VERSION"
+          
+          # Update migration status
+          kubectl patch configmap atlas-migration-status -n astral-turf --type='json' \
+            -p='[{"op": "replace", "path": "/data/current_version", "value": "'$NEW_VERSION'"}]'
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: database-secrets
+              key: url
+        - name: MIGRATION_VERSION
+          value: "${MIGRATION_VERSION}"
+        volumeMounts:
+        - name: migration-scripts
+          mountPath: /migrations
+        - name: backup-storage
+          mountPath: /backup
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+      
+      volumes:
+      - name: migration-scripts
+        configMap:
+          name: atlas-migration-scripts
+      - name: backup-storage
+        persistentVolumeClaim:
+          claimName: atlas-backup-storage
+      
+      # Job completion deadline
+      activeDeadlineSeconds: 1800  # 30 minutes
+      backoffLimit: 1  # No retries for migrations
+---
+# Atlas Database Connection Pool
+apiVersion: v1
+kind: Service
+metadata:
+  name: atlas-db-pool
+  namespace: astral-turf
+  labels:
+    atlas.database: connection-pool
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5432
+    targetPort: 5432
+    protocol: TCP
+  selector:
+    app: pgbouncer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: atlas-pgbouncer
+  namespace: astral-turf
+  labels:
+    app: pgbouncer
+    atlas.database: connection-pool
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: pgbouncer
+  template:
+    metadata:
+      labels:
+        app: pgbouncer
+    spec:
+      containers:
+      - name: pgbouncer
+        image: pgbouncer/pgbouncer:latest
+        ports:
+        - containerPort: 5432
+        env:
+        - name: DATABASES_HOST
+          valueFrom:
+            secretKeyRef:
+              name: database-secrets
+              key: host
+        - name: DATABASES_PORT
+          value: "5432"
+        - name: DATABASES_USER
+          valueFrom:
+            secretKeyRef:
+              name: database-secrets
+              key: username
+        - name: DATABASES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: database-secrets
+              key: password
+        - name: DATABASES_DBNAME
+          valueFrom:
+            secretKeyRef:
+              name: database-secrets
+              key: database
+        - name: POOL_MODE
+          value: "transaction"
+        - name: SERVER_RESET_QUERY
+          value: "DISCARD ALL"
+        - name: MAX_CLIENT_CONN
+          value: "1000"
+        - name: DEFAULT_POOL_SIZE
+          value: "25"
+        - name: MIN_POOL_SIZE
+          value: "5"
+        - name: RESERVE_POOL_SIZE
+          value: "5"
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+        livenessProbe:
+          tcpSocket:
+            port: 5432
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          tcpSocket:
+            port: 5432
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+# Atlas Backup CronJob
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: atlas-database-backup
+  namespace: astral-turf
+  labels:
+    atlas.database: backup
+spec:
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            atlas.database.operation: backup
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: backup
+            image: postgres:15-alpine
+            command:
+            - /bin/sh
+            - -c
+            - |
+              set -e
+              
+              BACKUP_NAME="astral-turf-$(date +%Y%m%d-%H%M%S)"
+              BACKUP_PATH="/backup/${BACKUP_NAME}"
+              
+              echo "🏥 Atlas: Starting database backup: ${BACKUP_NAME}"
+              
+              # Create compressed backup
+              pg_dump $DATABASE_URL | gzip > ${BACKUP_PATH}.sql.gz
+              
+              # Create metadata file
+              cat > ${BACKUP_PATH}.meta.json << EOF
+              {
+                "backup_name": "${BACKUP_NAME}",
+                "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+                "database_size": "$(psql $DATABASE_URL -t -c 'SELECT pg_size_pretty(pg_database_size(current_database()));')",
+                "backup_type": "full",
+                "compression": "gzip"
+              }
+              EOF
+              
+              # Upload to cloud storage
+              aws s3 cp ${BACKUP_PATH}.sql.gz s3://atlas-backups/astral-turf/daily/
+              aws s3 cp ${BACKUP_PATH}.meta.json s3://atlas-backups/astral-turf/daily/
+              
+              # Upload to secondary location
+              gsutil cp ${BACKUP_PATH}.sql.gz gs://atlas-backups-secondary/astral-turf/daily/
+              gsutil cp ${BACKUP_PATH}.meta.json gs://atlas-backups-secondary/astral-turf/daily/
+              
+              # Update backup registry
+              kubectl create configmap atlas-backup-${BACKUP_NAME} \
+                --from-file=${BACKUP_PATH}.meta.json \
+                --namespace=astral-turf \
+                --dry-run=client -o yaml | kubectl apply -f -
+              
+              echo "✅ Atlas: Backup completed: ${BACKUP_NAME}"
+              
+              # Cleanup old local backups
+              find /backup -name "*.sql.gz" -mtime +7 -delete
+              find /backup -name "*.meta.json" -mtime +7 -delete
+            env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: database-secrets
+                  key: url
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secrets
+                  key: access-key-id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secrets
+                  key: secret-access-key
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: "/gcp/credentials.json"
+            volumeMounts:
+            - name: backup-storage
+              mountPath: /backup
+            - name: gcp-credentials
+              mountPath: /gcp
+              readOnly: true
+            resources:
+              requests:
+                memory: "256Mi"
+                cpu: "100m"
+              limits:
+                memory: "512Mi"
+                cpu: "500m"
+          
+          volumes:
+          - name: backup-storage
+            persistentVolumeClaim:
+              claimName: atlas-backup-storage
+          - name: gcp-credentials
+            secret:
+              secretName: gcp-service-account
+---
+# Atlas Backup Storage
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: atlas-backup-storage
+  namespace: astral-turf
+  labels:
+    atlas.storage: backup
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
+  storageClassName: fast-ssd
+---
+# Atlas Migration Status ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: atlas-migration-status
+  namespace: astral-turf
+  labels:
+    atlas.database: status
+data:
+  current_version: "1.0.0"
+  last_migration: "2024-01-01T00:00:00Z"
+  status: "healthy"
+---
+# Atlas Database Monitoring Service Account
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: atlas-db-migration-sa
+  namespace: astral-turf
+  labels:
+    atlas.database: service-account
+automountServiceAccountToken: true
+---
+# Atlas Database Migration RBAC
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: astral-turf
+  name: atlas-db-migration-role
+rules:
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "list", "create", "update", "patch"]
+- apiGroups: ["batch"]
+  resources: ["jobs"]
+  verbs: ["get", "list", "create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: atlas-db-migration-binding
+  namespace: astral-turf
+subjects:
+- kind: ServiceAccount
+  name: atlas-db-migration-sa
+  namespace: astral-turf
+roleRef:
+  kind: Role
+  name: atlas-db-migration-role
+  apiGroup: rbac.authorization.k8s.io

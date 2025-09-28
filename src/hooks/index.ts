@@ -11,4 +11,4 @@ export {
   useResponsiveModal,
   useResponsiveNavigation,
   BREAKPOINTS,
-} from './useResponsive';
+} from './useResponsive.tsx';

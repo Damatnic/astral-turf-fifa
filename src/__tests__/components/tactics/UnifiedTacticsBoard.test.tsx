@@ -1,84 +1,69 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import React from 'react';
+import { screen, fireEvent, waitFor, within, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { vi, describe, it, expect, beforeEach, afterEach, MockedFunction } from 'vitest';
+import { renderWithProviders } from '../../utils/enhanced-mock-generators';
+import { 
+  generateEnhancedPlayer, 
+  generateEnhancedFormation, 
+  generateCompleteTacticalSetup,
+  generatePerformanceTestData,
+  generateEdgeCaseData,
+  generateDrawingShapes,
+  testScenarios
+} from '../../utils/enhanced-mock-generators';
 import { UnifiedTacticsBoard } from '../../../components/tactics/UnifiedTacticsBoard';
-import { TacticsProvider } from '../../../contexts/TacticsContext';
-import { UIProvider } from '../../../contexts/UIContext';
+import type { Formation, Player, UnifiedTacticsBoardProps } from '../../../types';
 
-// Mock framer-motion
-vi.mock('framer-motion', () => ({
-  motion: {
-    div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
-    button: ({ children, ...props }: any) => <button {...props}>{children}</button>
-  },
-  AnimatePresence: ({ children }: any) => children,
-  PanInfo: vi.fn(),
-  useMotionValue: () => ({ set: vi.fn(), get: () => 0 }),
-  useTransform: () => ({ get: () => 0 })
+// Mock heavy components that are lazy loaded
+vi.mock('../../../components/tactics/IntelligentAssistant', () => ({
+  default: () => <div data-testid="intelligent-assistant">AI Assistant</div>,
 }));
 
-// Mock hooks
-vi.mock('../../../hooks', () => ({
-  useTacticsContext: () => ({
-    tacticsState: {
-      formations: {
-        'home-formation': {
-          id: 'home-formation',
-          name: '4-3-3',
-          slots: [
-            { id: 'gk', position: { x: 50, y: 90 }, roleId: 'goalkeeper', playerId: null },
-            { id: 'cb1', position: { x: 40, y: 75 }, roleId: 'center-back', playerId: 'player-1' },
-            { id: 'cb2', position: { x: 60, y: 75 }, roleId: 'center-back', playerId: 'player-2' }
-          ],
-          players: [
-            { id: 'player-1', name: 'John Doe', roleId: 'center-back', rating: 85 },
-            { id: 'player-2', name: 'Jane Smith', roleId: 'center-back', rating: 82 }
-          ]
-        }
-      },
-      activeFormationIds: { home: 'home-formation' },
-      players: [
-        { id: 'player-1', name: 'John Doe', roleId: 'center-back', rating: 85, number: 4 },
-        { id: 'player-2', name: 'Jane Smith', roleId: 'center-back', rating: 82, number: 5 },
-        { id: 'player-3', name: 'Bob Wilson', roleId: 'goalkeeper', rating: 88, number: 1 }
-      ]
-    },
-    dispatch: vi.fn()
-  }),
-  useUIContext: () => ({
-    uiState: {
-      selectedPlayerId: null,
-      isPresentationMode: false,
-      drawingTool: 'select'
-    }
-  }),
-  useResponsive: () => ({
-    isMobile: false,
-    isTablet: false,
-    currentBreakpoint: 'lg'
-  })
+vi.mock('../../../components/tactics/FormationTemplates', () => ({
+  default: () => <div data-testid="formation-templates">Formation Templates</div>,
 }));
 
-// Mock ResizeObserver
-global.ResizeObserver = vi.fn().mockImplementation(() => ({
-  observe: vi.fn(),
-  unobserve: vi.fn(),
-  disconnect: vi.fn()
+vi.mock('../../../components/tactics/TacticalPlaybook', () => ({
+  default: () => <div data-testid="tactical-playbook">Tactical Playbook</div>,
+}));
+
+vi.mock('../../../components/analytics/AdvancedAnalyticsDashboard', () => ({
+  default: () => <div data-testid="analytics-dashboard">Analytics Dashboard</div>,
 }));
 
 describe('UnifiedTacticsBoard', () => {
-  const renderWithProviders = (component: React.ReactElement) => {
-    return render(
-      <TacticsProvider>
-        <UIProvider>
-          {component}
-        </UIProvider>
-      </TacticsProvider>
-    );
-  };
+  let mockFormation: Formation;
+  let mockPlayers: Player[];
+  let mockProps: any;
+  let user: ReturnType<typeof userEvent.setup>;
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    // Setup test data
+    const testData = createTestDataSet.complete();
+    mockFormation = testData.formation;
+    mockPlayers = testData.players;
+
+    // Setup component props
+    mockProps = {
+      onSimulateMatch: vi.fn(),
+      onSaveFormation: vi.fn(),
+      onAnalyticsView: vi.fn(),
+      onExportFormation: vi.fn(),
+    };
+
+    // Setup user event
+    user = userEvent.setup();
+
+    // Setup canvas mock
+    mockCanvas();
+
+    // Mock ResizeObserver for responsive behavior
+    global.ResizeObserver = vi.fn().mockImplementation(() => ({
+      observe: vi.fn(),
+      unobserve: vi.fn(),
+      disconnect: vi.fn(),
+    }));
   });
 
   afterEach(() => {
@@ -86,364 +71,518 @@ describe('UnifiedTacticsBoard', () => {
   });
 
   describe('Component Rendering', () => {
-    it('should render without crashing', () => {
-      renderWithProviders(<UnifiedTacticsBoard />);
+    it('should render the main tactical board interface', async () => {
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />);
+
+      // Check main layout elements
       expect(screen.getByTestId('unified-tactics-board')).toBeInTheDocument();
-    });
-
-    it('should render the field component', () => {
-      renderWithProviders(<UnifiedTacticsBoard />);
       expect(screen.getByTestId('modern-field')).toBeInTheDocument();
-    });
-
-    it('should render quick actions panel', () => {
-      renderWithProviders(<UnifiedTacticsBoard />);
+      expect(screen.getByTestId('smart-sidebar')).toBeInTheDocument();
       expect(screen.getByTestId('quick-actions-panel')).toBeInTheDocument();
+
+      // Check header controls
+      expect(screen.getByRole('button', { name: /view mode/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /fullscreen/i })).toBeInTheDocument();
     });
 
-    it('should render contextual toolbar', () => {
-      renderWithProviders(<UnifiedTacticsBoard />);
-      expect(screen.getByTestId('contextual-toolbar')).toBeInTheDocument();
+    it('should render all tactical board sections', () => {
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />);
+
+      // Main tactical components
+      expect(screen.getByTestId('animation-timeline')).toBeInTheDocument();
+      expect(screen.getByTestId('presentation-controls')).toBeInTheDocument();
+      expect(screen.getByTestId('dugout-management')).toBeInTheDocument();
+      expect(screen.getByTestId('challenge-management')).toBeInTheDocument();
+      expect(screen.getByTestId('collaboration-features')).toBeInTheDocument();
+      expect(screen.getByTestId('enhanced-export-import')).toBeInTheDocument();
+    });
+
+    it('should apply custom className when provided', () => {
+      const customClass = 'custom-tactics-board';
+      renderWithProviders(
+        <UnifiedTacticsBoard {...mockProps} className={customClass} />
+      );
+
+      const board = screen.getByTestId('unified-tactics-board');
+      expect(board).toHaveClass(customClass);
+    });
+  });
+
+  describe('View Mode Management', () => {
+    it('should start in standard view mode', () => {
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />);
+
+      const board = screen.getByTestId('unified-tactics-board');
+      expect(board).toHaveAttribute('data-view-mode', 'standard');
+    });
+
+    it('should toggle to fullscreen mode', async () => {
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />);
+
+      const fullscreenButton = screen.getByRole('button', { name: /fullscreen/i });
+      await user.click(fullscreenButton);
+
+      const board = screen.getByTestId('unified-tactics-board');
+      expect(board).toHaveAttribute('data-view-mode', 'fullscreen');
+    });
+
+    it('should switch to presentation mode', async () => {
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />);
+
+      const presentationButton = screen.getByRole('button', { name: /presentation/i });
+      await user.click(presentationButton);
+
+      const board = screen.getByTestId('unified-tactics-board');
+      expect(board).toHaveAttribute('data-view-mode', 'presentation');
+    });
+
+    it('should hide sidebar in fullscreen mode', async () => {
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />);
+
+      const fullscreenButton = screen.getByRole('button', { name: /fullscreen/i });
+      await user.click(fullscreenButton);
+
+      const sidebar = screen.getByTestId('smart-sidebar');
+      expect(sidebar).toHaveAttribute('data-collapsed', 'true');
     });
   });
 
   describe('Panel State Management', () => {
-    it('should toggle left panel state correctly', async () => {
-      const user = userEvent.setup();
-      renderWithProviders(<UnifiedTacticsBoard />);
-      
-      const leftPanelToggle = screen.getByTestId('toggle-left-panel');
-      
-      // Initially should be in peek mode for desktop
-      expect(screen.getByTestId('left-panel')).toHaveClass('w-16');
-      
-      // Click to expand
-      await user.click(leftPanelToggle);
-      await waitFor(() => {
-        expect(screen.getByTestId('left-panel')).toHaveClass('w-80');
-      });
-      
-      // Click to collapse
-      await user.click(leftPanelToggle);
-      await waitFor(() => {
-        expect(screen.queryByTestId('left-panel')).not.toBeInTheDocument();
-      });
+    it('should start with sidebar in expanded state', () => {
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />);
+
+      const sidebar = screen.getByTestId('smart-sidebar');
+      expect(sidebar).toHaveAttribute('data-state', 'expanded');
     });
 
-    it('should toggle right panel state correctly', async () => {
-      const user = userEvent.setup();
-      renderWithProviders(<UnifiedTacticsBoard />);
-      
-      const rightPanelToggle = screen.getByTestId('toggle-right-panel');
-      
-      // Click to expand
-      await user.click(rightPanelToggle);
-      await waitFor(() => {
-        expect(screen.getByTestId('right-panel')).toHaveClass('w-80');
-      });
+    it('should collapse sidebar when collapse button is clicked', async () => {
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />);
+
+      const collapseButton = screen.getByRole('button', { name: /collapse sidebar/i });
+      await user.click(collapseButton);
+
+      const sidebar = screen.getByTestId('smart-sidebar');
+      expect(sidebar).toHaveAttribute('data-state', 'collapsed');
     });
 
-    it('should collapse panels on mobile', () => {
+    it('should show peek state on sidebar hover when collapsed', async () => {
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />);
+
+      // First collapse the sidebar
+      const collapseButton = screen.getByRole('button', { name: /collapse sidebar/i });
+      await user.click(collapseButton);
+
+      // Then hover over it
+      const sidebar = screen.getByTestId('smart-sidebar');
+      await user.hover(sidebar);
+
+      expect(sidebar).toHaveAttribute('data-state', 'peek');
+    });
+  });
+
+  describe('Responsive Behavior', () => {
+    it('should adapt to mobile viewport', async () => {
       // Mock mobile viewport
-      vi.mocked(useResponsive).mockReturnValue({
-        isMobile: true,
-        isTablet: false,
-        currentBreakpoint: 'sm'
+      Object.defineProperty(window, 'innerWidth', {
+        writable: true,
+        configurable: true,
+        value: 768,
       });
 
-      renderWithProviders(<UnifiedTacticsBoard />);
-      
-      // Panels should be collapsed on mobile
-      expect(screen.queryByTestId('left-panel')).not.toBeInTheDocument();
-      expect(screen.queryByTestId('right-panel')).not.toBeInTheDocument();
+      // Trigger resize event
+      window.dispatchEvent(new Event('resize'));
+
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />);
+
+      const board = screen.getByTestId('unified-tactics-board');
+      expect(board).toHaveClass('responsive-mobile');
+    });
+
+    it('should collapse panels on small screens', async () => {
+      // Mock small screen
+      Object.defineProperty(window, 'innerWidth', {
+        writable: true,
+        configurable: true,
+        value: 640,
+      });
+
+      window.dispatchEvent(new Event('resize'));
+
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />);
+
+      const sidebar = screen.getByTestId('smart-sidebar');
+      expect(sidebar).toHaveAttribute('data-state', 'collapsed');
+    });
+  });
+
+  describe('Keyboard Navigation', () => {
+    it('should support keyboard shortcuts for view modes', async () => {
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />);
+
+      const board = screen.getByTestId('unified-tactics-board');
+
+      // Test fullscreen toggle (F11)
+      fireEvent.keyDown(board, { key: 'F11' });
+      expect(board).toHaveAttribute('data-view-mode', 'fullscreen');
+
+      // Test escape to exit fullscreen
+      fireEvent.keyDown(board, { key: 'Escape' });
+      expect(board).toHaveAttribute('data-view-mode', 'standard');
+    });
+
+    it('should support tab navigation through controls', async () => {
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />);
+
+      // Tab through main controls
+      await user.tab();
+      expect(screen.getByRole('button', { name: /view mode/i })).toHaveFocus();
+
+      await user.tab();
+      expect(screen.getByRole('button', { name: /fullscreen/i })).toHaveFocus();
+
+      await user.tab();
+      expect(screen.getByRole('button', { name: /presentation/i })).toHaveFocus();
+    });
+
+    it('should handle arrow key navigation for field elements', async () => {
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />);
+
+      const field = screen.getByTestId('modern-field');
+      field.focus();
+
+      // Test arrow key navigation
+      fireEvent.keyDown(field, { key: 'ArrowRight' });
+      fireEvent.keyDown(field, { key: 'ArrowDown' });
+
+      // Verify field received navigation events
+      expect(field).toHaveAttribute('tabindex', '0');
+    });
+  });
+
+  describe('Formation Management', () => {
+    it('should load formation data when provided', async () => {
+      const initialState = {
+        tactics: {
+          currentFormation: mockFormation,
+          selectedPlayers: mockFormation.players.slice(0, 11),
+        },
+      };
+
+      renderWithProviders(
+        <UnifiedTacticsBoard {...mockProps} />,
+        { initialState }
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText(mockFormation.name)).toBeInTheDocument();
+      });
+    });
+
+    it('should handle formation save action', async () => {
+      const initialState = {
+        tactics: {
+          currentFormation: mockFormation,
+        },
+      };
+
+      renderWithProviders(
+        <UnifiedTacticsBoard {...mockProps} />,
+        { initialState }
+      );
+
+      const saveButton = screen.getByRole('button', { name: /save formation/i });
+      await user.click(saveButton);
+
+      expect(mockProps.onSaveFormation).toHaveBeenCalledWith(mockFormation);
+    });
+
+    it('should handle formation export action', async () => {
+      const initialState = {
+        tactics: {
+          currentFormation: mockFormation,
+        },
+      };
+
+      renderWithProviders(
+        <UnifiedTacticsBoard {...mockProps} />,
+        { initialState }
+      );
+
+      const exportButton = screen.getByRole('button', { name: /export/i });
+      await user.click(exportButton);
+
+      expect(mockProps.onExportFormation).toHaveBeenCalledWith(mockFormation);
     });
   });
 
   describe('Player Interaction', () => {
     it('should handle player selection', async () => {
-      const user = userEvent.setup();
-      const mockDispatch = vi.fn();
-      
-      vi.mocked(useTacticsContext).mockReturnValue({
-        tacticsState: expect.any(Object),
-        dispatch: mockDispatch
-      });
-
-      renderWithProviders(<UnifiedTacticsBoard />);
-      
-      const playerToken = screen.getByTestId('player-token-player-1');
-      await user.click(playerToken);
-      
-      expect(mockDispatch).toHaveBeenCalledWith({
-        type: 'SELECT_PLAYER',
-        payload: { playerId: 'player-1' }
-      });
-    });
-
-    it('should handle player movement', async () => {
-      const mockDispatch = vi.fn();
-      
-      vi.mocked(useTacticsContext).mockReturnValue({
-        tacticsState: expect.any(Object),
-        dispatch: mockDispatch
-      });
-
-      renderWithProviders(<UnifiedTacticsBoard />);
-      
-      const field = screen.getByTestId('modern-field');
-      
-      // Simulate field click to move player
-      fireEvent.click(field, { clientX: 400, clientY: 300 });
-      
-      // Should dispatch player move action if a player is selected
-      await waitFor(() => {
-        expect(mockDispatch).toHaveBeenCalledWith({
-          type: 'UPDATE_PLAYER_POSITION',
-          payload: expect.objectContaining({
-            position: expect.objectContaining({
-              x: expect.any(Number),
-              y: expect.any(Number)
-            })
-          })
-        });
-      });
-    });
-  });
-
-  describe('Formation Management', () => {
-    it('should open formation templates modal', async () => {
-      const user = userEvent.setup();
-      renderWithProviders(<UnifiedTacticsBoard />);
-      
-      const formationButton = screen.getByTestId('quick-action-formations');
-      await user.click(formationButton);
-      
-      expect(screen.getByTestId('formation-templates-modal')).toBeInTheDocument();
-    });
-
-    it('should handle formation changes', async () => {
-      const mockDispatch = vi.fn();
-      
-      vi.mocked(useTacticsContext).mockReturnValue({
-        tacticsState: expect.any(Object),
-        dispatch: mockDispatch
-      });
-
-      renderWithProviders(<UnifiedTacticsBoard />);
-      
-      // Simulate formation change
-      const newFormation = {
-        id: '4-4-2',
-        name: '4-4-2',
-        slots: []
+      const initialState = {
+        tactics: {
+          currentFormation: mockFormation,
+          selectedPlayers: [],
+        },
       };
-      
-      // This would typically be triggered from the formation templates modal
-      const formationChangeEvent = new CustomEvent('formationChange', {
-        detail: newFormation
-      });
-      
-      fireEvent(document, formationChangeEvent);
-      
-      await waitFor(() => {
-        expect(mockDispatch).toHaveBeenCalledWith({
-          type: 'UPDATE_FORMATION',
-          payload: newFormation
-        });
-      });
-    });
-  });
 
-  describe('AI Assistant Integration', () => {
-    it('should open AI assistant modal', async () => {
-      const user = userEvent.setup();
-      renderWithProviders(<UnifiedTacticsBoard />);
-      
-      const aiButton = screen.getByTestId('quick-action-ai-assistant');
-      await user.click(aiButton);
-      
-      expect(screen.getByTestId('intelligent-assistant-modal')).toBeInTheDocument();
+      renderWithProviders(
+        <UnifiedTacticsBoard {...mockProps} />,
+        { initialState }
+      );
+
+      const playerToken = screen.getAllByTestId('player-token')[0];
+      await user.click(playerToken);
+
+      expect(playerToken).toHaveAttribute('data-selected', 'true');
     });
 
-    it('should display AI suggestions', async () => {
-      renderWithProviders(<UnifiedTacticsBoard />);
-      
-      const aiButton = screen.getByTestId('quick-action-ai-assistant');
-      await userEvent.click(aiButton);
-      
-      // Wait for AI analysis to complete
-      await waitFor(() => {
-        expect(screen.getByText(/formation rating/i)).toBeInTheDocument();
-      }, { timeout: 3000 });
-      
-      expect(screen.getByText(/strengths/i)).toBeInTheDocument();
-      expect(screen.getByText(/areas for improvement/i)).toBeInTheDocument();
-    });
-  });
+    it('should support multi-select with Ctrl+Click', async () => {
+      const initialState = {
+        tactics: {
+          currentFormation: mockFormation,
+          selectedPlayers: [],
+        },
+      };
 
-  describe('View Mode Management', () => {
-    it('should toggle fullscreen mode', async () => {
-      const user = userEvent.setup();
-      renderWithProviders(<UnifiedTacticsBoard />);
-      
-      const fullscreenButton = screen.getByTestId('quick-action-fullscreen');
-      await user.click(fullscreenButton);
-      
-      expect(screen.getByTestId('unified-tactics-board')).toHaveClass('fixed inset-0 z-50');
-    });
+      renderWithProviders(
+        <UnifiedTacticsBoard {...mockProps} />,
+        { initialState }
+      );
 
-    it('should exit fullscreen mode', async () => {
-      const user = userEvent.setup();
-      renderWithProviders(<UnifiedTacticsBoard />);
+      const playerTokens = screen.getAllByTestId('player-token');
       
-      const fullscreenButton = screen.getByTestId('quick-action-fullscreen');
+      // Select first player
+      await user.click(playerTokens[0]);
       
-      // Enter fullscreen
-      await user.click(fullscreenButton);
-      
-      // Exit fullscreen
-      await user.click(fullscreenButton);
-      
-      expect(screen.getByTestId('unified-tactics-board')).not.toHaveClass('fixed inset-0 z-50');
-    });
-  });
+      // Select second player with Ctrl
+      await user.keyboard('[ControlLeft>]');
+      await user.click(playerTokens[1]);
+      await user.keyboard('[/ControlLeft]');
 
-  describe('Drag and Drop', () => {
-    it('should show drag indicator during player drag', async () => {
-      renderWithProviders(<UnifiedTacticsBoard />);
-      
-      const playerToken = screen.getByTestId('player-token-player-1');
-      
-      // Start drag
-      fireEvent.mouseDown(playerToken);
-      fireEvent.dragStart(playerToken);
-      
-      expect(screen.getByTestId('drag-indicator')).toBeInTheDocument();
-      
-      // End drag
-      fireEvent.dragEnd(playerToken);
-      fireEvent.mouseUp(playerToken);
-      
-      await waitFor(() => {
-        expect(screen.queryByTestId('drag-indicator')).not.toBeInTheDocument();
-      });
+      expect(playerTokens[0]).toHaveAttribute('data-selected', 'true');
+      expect(playerTokens[1]).toHaveAttribute('data-selected', 'true');
     });
 
-    it('should validate drop positions', () => {
-      renderWithProviders(<UnifiedTacticsBoard />);
-      
+    it('should handle player drag and drop', async () => {
+      const initialState = {
+        tactics: {
+          currentFormation: mockFormation,
+        },
+      };
+
+      renderWithProviders(
+        <UnifiedTacticsBoard {...mockProps} />,
+        { initialState }
+      );
+
+      const playerToken = screen.getAllByTestId('player-token')[0];
       const field = screen.getByTestId('modern-field');
-      const playerToken = screen.getByTestId('player-token-player-1');
-      
+
       // Start drag
+      fireEvent.mouseDown(playerToken, { clientX: 100, clientY: 100 });
       fireEvent.dragStart(playerToken);
-      
-      // Drag to invalid position (outside field bounds)
-      fireEvent.dragOver(field, { clientX: -10, clientY: -10 });
-      
-      expect(screen.getByTestId('drag-indicator')).toHaveClass('border-red-400');
-      
-      // Drag to valid position
-      fireEvent.dragOver(field, { clientX: 400, clientY: 300 });
-      
-      expect(screen.getByTestId('drag-indicator')).toHaveClass('border-green-400');
+
+      // Move to new position
+      fireEvent.dragOver(field, { clientX: 200, clientY: 200 });
+      fireEvent.drop(field, { clientX: 200, clientY: 200 });
+
+      // Verify position update
+      expect(playerToken).toHaveAttribute('data-dragging', 'false');
+    });
+  });
+
+  describe('Analytics Integration', () => {
+    it('should open analytics view when analytics button is clicked', async () => {
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />);
+
+      const analyticsButton = screen.getByRole('button', { name: /analytics/i });
+      await user.click(analyticsButton);
+
+      expect(mockProps.onAnalyticsView).toHaveBeenCalled();
+    });
+
+    it('should display heat map when heat map mode is activated', async () => {
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />);
+
+      const heatMapButton = screen.getByRole('button', { name: /heat map/i });
+      await user.click(heatMapButton);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('heat-map-overlay')).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('Collaboration Features', () => {
+    it('should show collaboration status when session is active', async () => {
+      const initialState = {
+        collaboration: {
+          activeSession: {
+            id: 'session-1',
+            participants: [
+              { id: 'user-1', name: 'John Doe', isOnline: true },
+              { id: 'user-2', name: 'Jane Smith', isOnline: true },
+            ],
+          },
+        },
+      };
+
+      renderWithProviders(
+        <UnifiedTacticsBoard {...mockProps} />,
+        { initialState }
+      );
+
+      expect(screen.getByText(/2 users online/i)).toBeInTheDocument();
+    });
+
+    it('should handle real-time comments', async () => {
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />);
+
+      const commentButton = screen.getByRole('button', { name: /add comment/i });
+      await user.click(commentButton);
+
+      // Click on field to place comment
+      const field = screen.getByTestId('modern-field');
+      await user.click(field);
+
+      // Type comment
+      const commentInput = screen.getByPlaceholderText(/add a comment/i);
+      await user.type(commentInput, 'This position looks vulnerable');
+
+      // Submit comment
+      const submitButton = screen.getByRole('button', { name: /submit comment/i });
+      await user.click(submitButton);
+
+      expect(screen.getByText('This position looks vulnerable')).toBeInTheDocument();
     });
   });
 
   describe('Performance Optimization', () => {
-    it('should use requestAnimationFrame for player movement', async () => {
-      const rafSpy = vi.spyOn(window, 'requestAnimationFrame').mockImplementation(cb => {
-        cb(0);
-        return 0;
+    it('should lazy load heavy components', async () => {
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />);
+
+      // AI Assistant should not be loaded initially
+      expect(screen.queryByTestId('intelligent-assistant')).not.toBeInTheDocument();
+
+      // Click to load AI Assistant
+      const aiButton = screen.getByRole('button', { name: /ai assistant/i });
+      await user.click(aiButton);
+
+      // Should now be loaded
+      await waitFor(() => {
+        expect(screen.getByTestId('intelligent-assistant')).toBeInTheDocument();
       });
-      
-      const mockDispatch = vi.fn();
-      vi.mocked(useTacticsContext).mockReturnValue({
-        tacticsState: expect.any(Object),
-        dispatch: mockDispatch
+    });
+
+    it('should handle large formations efficiently', async () => {
+      // Create large formation with many players
+      const largeFormation = generateFormation({
+        players: Array.from({ length: 50 }, () => generatePlayer()),
       });
 
-      renderWithProviders(<UnifiedTacticsBoard />);
-      
-      const field = screen.getByTestId('modern-field');
-      fireEvent.click(field, { clientX: 400, clientY: 300 });
-      
-      expect(rafSpy).toHaveBeenCalled();
-      rafSpy.mockRestore();
-    });
+      const initialState = {
+        tactics: {
+          currentFormation: largeFormation,
+        },
+      };
 
-    it('should cleanup animation frames on unmount', () => {
-      const cancelSpy = vi.spyOn(window, 'cancelAnimationFrame');
-      
-      const { unmount } = renderWithProviders(<UnifiedTacticsBoard />);
-      unmount();
-      
-      expect(cancelSpy).toHaveBeenCalled();
-      cancelSpy.mockRestore();
-    });
-  });
+      const renderTime = await testUtils.measureRenderTime(() => {
+        renderWithProviders(
+          <UnifiedTacticsBoard {...mockProps} />,
+          { initialState }
+        );
+      });
 
-  describe('Accessibility', () => {
-    it('should support keyboard navigation', async () => {
-      const user = userEvent.setup();
-      renderWithProviders(<UnifiedTacticsBoard />);
-      
-      // Tab to first focusable element
-      await user.tab();
-      
-      // Should focus on first quick action button
-      expect(screen.getByTestId('quick-action-formations')).toHaveFocus();
-      
-      // Tab to next element
-      await user.tab();
-      expect(screen.getByTestId('quick-action-ai-assistant')).toHaveFocus();
-    });
-
-    it('should have proper ARIA labels', () => {
-      renderWithProviders(<UnifiedTacticsBoard />);
-      
-      expect(screen.getByLabelText(/toggle left panel/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/toggle right panel/i)).toBeInTheDocument();
-      expect(screen.getByRole('main')).toBeInTheDocument();
-    });
-
-    it('should announce drag state to screen readers', async () => {
-      renderWithProviders(<UnifiedTacticsBoard />);
-      
-      const playerToken = screen.getByTestId('player-token-player-1');
-      fireEvent.dragStart(playerToken);
-      
-      expect(screen.getByText(/dragging john doe/i)).toBeInTheDocument();
+      // Should render within performance threshold
+      expect(renderTime).toBeLessThan(1000); // 1 second
     });
   });
 
   describe('Error Handling', () => {
     it('should handle missing formation gracefully', () => {
-      vi.mocked(useTacticsContext).mockReturnValue({
-        tacticsState: {
-          formations: {},
-          activeFormationIds: { home: 'non-existent' },
-          players: []
+      const initialState = {
+        tactics: {
+          currentFormation: null,
         },
-        dispatch: vi.fn()
-      });
+      };
 
-      renderWithProviders(<UnifiedTacticsBoard />);
-      
-      expect(screen.getByText(/no formation selected/i)).toBeInTheDocument();
+      renderWithProviders(
+        <UnifiedTacticsBoard {...mockProps} />,
+        { initialState }
+      );
+
+      expect(screen.getByText(/no formation loaded/i)).toBeInTheDocument();
     });
 
-    it('should handle invalid player data', () => {
-      vi.mocked(useTacticsContext).mockReturnValue({
-        tacticsState: {
-          formations: {},
-          activeFormationIds: {},
-          players: [{ id: null, name: '', roleId: null }] // Invalid player data
+    it('should display error message for invalid formations', () => {
+      const invalidFormation = {
+        ...mockFormation,
+        players: null, // Invalid players data
+      };
+
+      const initialState = {
+        tactics: {
+          currentFormation: invalidFormation,
         },
-        dispatch: vi.fn()
+      };
+
+      renderWithProviders(
+        <UnifiedTacticsBoard {...mockProps} />,
+        { initialState }
+      );
+
+      expect(screen.getByText(/formation data is invalid/i)).toBeInTheDocument();
+    });
+
+    it('should recover from API errors gracefully', async () => {
+      // Mock API error
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />);
+
+      // Trigger action that would cause API error
+      const saveButton = screen.getByRole('button', { name: /save formation/i });
+      await user.click(saveButton);
+
+      // Should show error message
+      await waitFor(() => {
+        expect(screen.getByText(/failed to save formation/i)).toBeInTheDocument();
       });
 
-      expect(() => renderWithProviders(<UnifiedTacticsBoard />)).not.toThrow();
+      consoleSpy.mockRestore();
+    });
+  });
+
+  describe('Accessibility', () => {
+    it('should have proper ARIA labels and roles', () => {
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />);
+
+      const board = screen.getByTestId('unified-tactics-board');
+      expect(board).toHaveAttribute('role', 'application');
+      expect(board).toHaveAttribute('aria-label', 'Tactical Board Interface');
+
+      const field = screen.getByTestId('modern-field');
+      expect(field).toHaveAttribute('role', 'grid');
+      expect(field).toHaveAttribute('aria-label', 'Soccer Field');
+    });
+
+    it('should support screen reader navigation', () => {
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />);
+
+      const playerTokens = screen.getAllByTestId('player-token');
+      playerTokens.forEach((token, index) => {
+        expect(token).toHaveAttribute('aria-label');
+        expect(token).toHaveAttribute('tabindex');
+      });
+    });
+
+    it('should announce state changes to screen readers', async () => {
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />);
+
+      const fullscreenButton = screen.getByRole('button', { name: /fullscreen/i });
+      await user.click(fullscreenButton);
+
+      const announcer = screen.getByTestId('screen-reader-announcer');
+      expect(announcer).toHaveTextContent(/entered fullscreen mode/i);
     });
   });
 });

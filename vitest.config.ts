@@ -35,42 +35,104 @@ export default defineConfig({
       ],
       thresholds: {
         global: {
-          branches: 80,
-          functions: 80,
-          lines: 80,
-          statements: 80,
+          branches: 95,
+          functions: 95,
+          lines: 95,
+          statements: 95,
         },
-        // Higher thresholds for critical components
+        // Ultra-high thresholds for critical components
         'src/services/**': {
-          branches: 90,
-          functions: 90,
-          lines: 90,
-          statements: 90,
+          branches: 98,
+          functions: 98,
+          lines: 98,
+          statements: 98,
         },
         'src/context/**': {
-          branches: 85,
-          functions: 85,
-          lines: 85,
-          statements: 85,
+          branches: 95,
+          functions: 95,
+          lines: 95,
+          statements: 95,
         },
         'src/hooks/**': {
-          branches: 85,
-          functions: 85,
-          lines: 85,
-          statements: 85,
+          branches: 95,
+          functions: 95,
+          lines: 95,
+          statements: 95,
+        },
+        'src/components/**': {
+          branches: 92,
+          functions: 92,
+          lines: 92,
+          statements: 92,
+        },
+        'src/utils/**': {
+          branches: 95,
+          functions: 95,
+          lines: 95,
+          statements: 95,
         },
       },
     },
     // Configure test timeouts
-    testTimeout: 10000,
+    testTimeout: 30000,
     hookTimeout: 10000,
+    // Enable parallel test execution
+    pool: 'threads',
+    poolOptions: {
+      threads: {
+        maxThreads: 4,
+        minThreads: 2,
+      },
+    },
+    // Test reporting
+    reporter: [
+      'default',
+      'verbose',
+      'json',
+      'html',
+    ],
+    outputFile: {
+      json: './coverage/test-results.json',
+      html: './coverage/test-results.html',
+    },
+    // Retry configuration for flaky tests
+    retry: 2,
+    // Watch configuration
+    watch: {
+      enabled: false,
+      ignore: ['**/node_modules/**', '**/dist/**'],
+    },
+    // Performance optimization
+    isolate: true,
+    passWithNoTests: false,
+    logHeapUsage: true,
     // Mock specific modules
     deps: {
       inline: [
         // Inline dependencies that need to be processed by Vitest
         '@google/genai',
         'html-to-image',
+        'framer-motion',
+        'react-spring',
+        'chart.js',
+        'react-chartjs-2',
+        'lucide-react',
       ],
+    },
+    // Mock server setup
+    server: {
+      deps: {
+        inline: ['@testing-library/user-event'],
+      },
+    },
+    // Advanced configuration
+    sequence: {
+      hooks: 'stack',
+    },
+    typecheck: {
+      enabled: true,
+      checker: 'tsc',
+      include: ['**/*.{test,spec}.{ts,tsx}'],
     },
   },
   resolve: {
@@ -87,7 +149,14 @@ export default defineConfig({
   },
   define: {
     // Mock environment variables for testing
+    'process.env.NODE_ENV': JSON.stringify('test'),
     'process.env.API_KEY': JSON.stringify('test-api-key'),
     'process.env.GEMINI_API_KEY': JSON.stringify('test-gemini-api-key'),
+    'process.env.DATABASE_URL': JSON.stringify('test://localhost:5432/test'),
+    'process.env.REDIS_URL': JSON.stringify('redis://localhost:6379/0'),
+    'process.env.JWT_SECRET': JSON.stringify('test-jwt-secret'),
+    'process.env.ENCRYPTION_KEY': JSON.stringify('test-encryption-key'),
+    'process.env.WEBHOOK_SECRET': JSON.stringify('test-webhook-secret'),
+    '__VITEST__': JSON.stringify(true),
   },
 });

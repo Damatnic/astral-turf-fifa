@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* eslint-env node */
 
-const net = require('net');
+import net from 'net';
 
 function checkPort(port) {
   return new Promise(resolve => {
@@ -36,20 +36,18 @@ async function findAvailablePort(startPort = 3000, maxPort = 3100) {
 }
 
 // If run directly
-if (require.main === module) {
-  const args = process.argv.slice(2);
-  const startPort = parseInt(args[0]) || 3000;
-  const maxPort = parseInt(args[1]) || 3100;
+const args = process.argv.slice(2);
+const startPort = parseInt(args[0]) || 3000;
+const maxPort = parseInt(args[1]) || 3100;
 
-  console.log(`🔍 Checking ports from ${startPort} to ${maxPort}...`);
-  findAvailablePort(startPort, maxPort).then(port => {
-    if (port) {
-      console.log(`\n🚀 You can use: npx vite --port ${port}`);
-      process.exit(0);
-    } else {
-      process.exit(1);
-    }
-  });
-}
+console.log(`🔍 Checking ports from ${startPort} to ${maxPort}...`);
+findAvailablePort(startPort, maxPort).then(port => {
+  if (port) {
+    console.log(`\n🚀 You can use: npx vite --port ${port}`);
+    process.exit(0);
+  } else {
+    process.exit(1);
+  }
+});
 
-module.exports = { checkPort, findAvailablePort };
+export { checkPort, findAvailablePort };

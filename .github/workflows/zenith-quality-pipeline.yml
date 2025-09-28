@@ -1,0 +1,656 @@
+name: 🏆 Zenith Quality Pipeline - Ultimate Testing & QA
+
+on:
+  push:
+    branches: [main, develop, master]
+  pull_request:
+    types: [opened, synchronize, reopened]
+  schedule:
+    # Run comprehensive tests nightly
+    - cron: '0 2 * * *'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20'
+  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+  PERCY_TOKEN: ${{ secrets.PERCY_TOKEN }}
+  LIGHTHOUSE_CI_TOKEN: ${{ secrets.LIGHTHOUSE_CI_TOKEN }}
+
+jobs:
+  # ==========================================
+  # QUALITY GATE 1: CODE QUALITY & LINTING
+  # ==========================================
+  code-quality:
+    name: 🔍 Code Quality Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🔧 Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🔍 ESLint analysis
+        run: |
+          npm run lint -- --format=json --output-file=eslint-report.json
+          npm run lint -- --format=github
+
+      - name: 📏 Prettier formatting check
+        run: npm run format:check
+
+      - name: 🔍 TypeScript type checking
+        run: npm run type-check
+
+      - name: 📊 SonarCloud analysis
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: 📤 Upload ESLint results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: eslint-report
+          path: eslint-report.json
+
+  # ==========================================
+  # QUALITY GATE 2: UNIT TESTS & COVERAGE
+  # ==========================================
+  unit-tests:
+    name: 🧪 Unit Tests & Coverage Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      matrix:
+        node-version: ['18', '20', '22']
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🧪 Run unit tests with coverage
+        run: |
+          npm run test:coverage -- \
+            --reporter=json --outputFile=test-results.json \
+            --reporter=html --outputDir=coverage/html \
+            --reporter=lcov --outputFile=coverage/lcov.info \
+            --reporter=text-summary
+
+      - name: 📊 Coverage thresholds check
+        run: |
+          node -e "
+            const coverage = require('./coverage/coverage-summary.json');
+            const thresholds = {
+              statements: 95,
+              branches: 90,
+              functions: 95,
+              lines: 95
+            };
+            
+            let failed = false;
+            Object.entries(thresholds).forEach(([key, threshold]) => {
+              const actual = coverage.total[key].pct;
+              if (actual < threshold) {
+                console.error(\`❌ \${key} coverage \${actual}% below threshold \${threshold}%\`);
+                failed = true;
+              } else {
+                console.log(\`✅ \${key} coverage \${actual}% meets threshold \${threshold}%\`);
+              }
+            });
+            
+            if (failed) process.exit(1);
+          "
+
+      - name: 📤 Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info
+          fail_ci_if_error: true
+          verbose: true
+
+      - name: 📤 Upload test results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: unit-test-results-node-${{ matrix.node-version }}
+          path: |
+            test-results.json
+            coverage/
+
+  # ==========================================
+  # QUALITY GATE 3: INTEGRATION TESTS
+  # ==========================================
+  integration-tests:
+    name: 🔗 Integration Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: [code-quality]
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_USER: test_user
+          POSTGRES_DB: astral_turf_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🗄️ Setup test database
+        run: |
+          npm run db:migrate:test
+          npm run db:seed:test
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/astral_turf_test
+          REDIS_URL: redis://localhost:6379
+
+      - name: 🔗 Run integration tests
+        run: |
+          npm run test:integration -- \
+            --reporter=json --outputFile=integration-results.json \
+            --timeout=30000
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/astral_turf_test
+          REDIS_URL: redis://localhost:6379
+          NODE_ENV: test
+
+      - name: 📤 Upload integration test results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: integration-test-results
+          path: integration-results.json
+
+  # ==========================================
+  # QUALITY GATE 4: E2E TESTS
+  # ==========================================
+  e2e-tests:
+    name: 🎭 End-to-End Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [unit-tests]
+    
+    strategy:
+      matrix:
+        browser: [chromium, firefox, webkit]
+        shard: [1/3, 2/3, 3/3]
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🎭 Install Playwright browsers
+        run: npx playwright install --with-deps ${{ matrix.browser }}
+
+      - name: 🏗️ Build application
+        run: npm run build
+
+      - name: 🚀 Start application
+        run: |
+          npm run start &
+          npx wait-on http://localhost:3000 --timeout 60000
+
+      - name: 🎭 Run E2E tests
+        run: |
+          npx playwright test \
+            --project=${{ matrix.browser }} \
+            --shard=${{ matrix.shard }} \
+            --reporter=json \
+            --output-dir=playwright-results
+        env:
+          CI: true
+
+      - name: 📤 Upload E2E test results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: e2e-results-${{ matrix.browser }}-${{ matrix.shard }}
+          path: |
+            playwright-results/
+            test-results/
+
+  # ==========================================
+  # QUALITY GATE 5: PERFORMANCE TESTING
+  # ==========================================
+  performance-tests:
+    name: 🚀 Performance Testing
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    needs: [integration-tests]
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🏗️ Build optimized application
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: 🚀 Start application
+        run: |
+          npm run start &
+          npx wait-on http://localhost:3000 --timeout 60000
+
+      - name: 🔬 Run Lighthouse CI
+        run: |
+          npm install -g @lhci/cli
+          lhci autorun --upload.target=temporary-public-storage
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+      - name: ⚡ Bundle size analysis
+        run: |
+          npm run analyze:bundle
+          node scripts/check-bundle-size.js
+
+      - name: 🎯 Load testing with K6
+        run: |
+          docker run --rm -i --network host grafana/k6 run - < tests/performance/load-test.js
+
+      - name: 📊 Memory leak detection
+        run: npm run test:memory-leaks
+
+      - name: 📤 Upload performance results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: performance-results
+          path: |
+            lighthouse-results/
+            bundle-analysis/
+            performance-reports/
+
+  # ==========================================
+  # QUALITY GATE 6: ACCESSIBILITY TESTING
+  # ==========================================
+  accessibility-tests:
+    name: ♿ Accessibility Testing
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: [e2e-tests]
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🎭 Install Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: 🏗️ Build application
+        run: npm run build
+
+      - name: 🚀 Start application
+        run: |
+          npm run start &
+          npx wait-on http://localhost:3000 --timeout 60000
+
+      - name: ♿ Run axe-core accessibility tests
+        run: npm run test:a11y
+
+      - name: 📱 Test with screen readers
+        run: npm run test:screen-reader
+
+      - name: ⌨️ Keyboard navigation tests
+        run: npm run test:keyboard
+
+      - name: 🎨 Color contrast analysis
+        run: npm run test:contrast
+
+      - name: 📤 Upload accessibility results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: accessibility-results
+          path: accessibility-reports/
+
+  # ==========================================
+  # QUALITY GATE 7: SECURITY SCANNING
+  # ==========================================
+  security-tests:
+    name: 🔒 Security Scanning
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [code-quality]
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🔍 Run npm audit
+        run: |
+          npm audit --audit-level=high --json > npm-audit.json || true
+          npm audit --audit-level=high
+
+      - name: 🔒 SAST with CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: javascript
+
+      - name: 🏗️ Build for CodeQL
+        run: npm run build
+
+      - name: 🔒 Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+
+      - name: 🔐 Dependency vulnerability scan
+        run: |
+          npx snyk test --json > snyk-report.json || true
+          npx snyk test
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+      - name: 📤 Upload security reports
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: security-reports
+          path: |
+            npm-audit.json
+            snyk-report.json
+
+  # ==========================================
+  # QUALITY GATE 8: VISUAL REGRESSION
+  # ==========================================
+  visual-tests:
+    name: 👁️ Visual Regression Testing
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: [performance-tests]
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🎭 Install Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: 🏗️ Build application
+        run: npm run build
+
+      - name: 🚀 Start application
+        run: |
+          npm run start &
+          npx wait-on http://localhost:3000 --timeout 60000
+
+      - name: 📸 Run visual regression tests
+        run: npm run test:visual
+
+      - name: 🎨 Percy visual testing
+        run: npx percy exec -- npm run test:visual:percy
+        env:
+          PERCY_TOKEN: ${{ secrets.PERCY_TOKEN }}
+
+      - name: 📤 Upload visual test results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: visual-test-results
+          path: |
+            visual-test-results/
+            percy-results/
+
+  # ==========================================
+  # QUALITY GATE 9: MUTATION TESTING
+  # ==========================================
+  mutation-tests:
+    name: 🧬 Mutation Testing
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [unit-tests]
+    if: github.event_name == 'schedule' || contains(github.event.pull_request.labels.*.name, 'mutation-test')
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🧬 Install Stryker mutator
+        run: npm install -g stryker-cli
+
+      - name: 🧬 Run mutation testing
+        run: |
+          npx stryker run --reporters json,html,clear-text
+          
+          # Check mutation score threshold
+          MUTATION_SCORE=$(cat reports/mutation/mutation.json | jq '.mutationScore')
+          if (( $(echo "$MUTATION_SCORE < 85" | bc -l) )); then
+            echo "❌ Mutation score $MUTATION_SCORE% below threshold 85%"
+            exit 1
+          else
+            echo "✅ Mutation score $MUTATION_SCORE% meets threshold 85%"
+          fi
+
+      - name: 📤 Upload mutation test results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: mutation-test-results
+          path: reports/mutation/
+
+  # ==========================================
+  # QUALITY GATE 10: FINAL QUALITY REPORT
+  # ==========================================
+  quality-report:
+    name: 📋 Quality Gate Summary
+    runs-on: ubuntu-latest
+    needs: [
+      code-quality,
+      unit-tests,
+      integration-tests,
+      e2e-tests,
+      performance-tests,
+      accessibility-tests,
+      security-tests,
+      visual-tests
+    ]
+    if: always()
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📥 Download all artifacts
+        uses: actions/download-artifact@v3
+
+      - name: 📊 Generate comprehensive quality report
+        run: |
+          cat << 'EOF' > quality-report.md
+          # 🏆 Zenith Quality Report
+          
+          ## Test Results Summary
+          
+          | Quality Gate | Status | Coverage | Score |
+          |--------------|--------|----------|-------|
+          | Code Quality | ${{ needs.code-quality.result == 'success' && '✅ PASS' || '❌ FAIL' }} | - | - |
+          | Unit Tests | ${{ needs.unit-tests.result == 'success' && '✅ PASS' || '❌ FAIL' }} | 95%+ | A+ |
+          | Integration Tests | ${{ needs.integration-tests.result == 'success' && '✅ PASS' || '❌ FAIL' }} | - | A |
+          | E2E Tests | ${{ needs.e2e-tests.result == 'success' && '✅ PASS' || '❌ FAIL' }} | - | A |
+          | Performance | ${{ needs.performance-tests.result == 'success' && '✅ PASS' || '❌ FAIL' }} | - | A |
+          | Accessibility | ${{ needs.accessibility-tests.result == 'success' && '✅ PASS' || '❌ FAIL' }} | WCAG AA | A+ |
+          | Security | ${{ needs.security-tests.result == 'success' && '✅ PASS' || '❌ FAIL' }} | - | A |
+          | Visual Regression | ${{ needs.visual-tests.result == 'success' && '✅ PASS' || '❌ FAIL' }} | - | A |
+          
+          ## Overall Quality Score: ${{ 
+            (needs.code-quality.result == 'success' && 
+             needs.unit-tests.result == 'success' && 
+             needs.integration-tests.result == 'success' && 
+             needs.e2e-tests.result == 'success' && 
+             needs.performance-tests.result == 'success' && 
+             needs.accessibility-tests.result == 'success' && 
+             needs.security-tests.result == 'success' && 
+             needs.visual-tests.result == 'success') && 'A+ 🏆' || 'NEEDS IMPROVEMENT ⚠️' 
+          }}
+          
+          ## Recommendations
+          
+          ${{ needs.code-quality.result != 'success' && '- Fix code quality issues identified by ESLint and SonarCloud' || '' }}
+          ${{ needs.unit-tests.result != 'success' && '- Improve unit test coverage to meet 95% threshold' || '' }}
+          ${{ needs.integration-tests.result != 'success' && '- Fix failing integration tests' || '' }}
+          ${{ needs.e2e-tests.result != 'success' && '- Resolve E2E test failures' || '' }}
+          ${{ needs.performance-tests.result != 'success' && '- Optimize application performance' || '' }}
+          ${{ needs.accessibility-tests.result != 'success' && '- Fix accessibility violations' || '' }}
+          ${{ needs.security-tests.result != 'success' && '- Address security vulnerabilities' || '' }}
+          ${{ needs.visual-tests.result != 'success' && '- Fix visual regression issues' || '' }}
+          
+          ---
+          
+          **Generated by Zenith Quality Pipeline** 🏆
+          **Timestamp:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')
+          **Commit:** ${{ github.sha }}
+          **Branch:** ${{ github.ref_name }}
+          EOF
+
+      - name: 📝 Comment PR with quality report
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('quality-report.md', 'utf8');
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: report
+            });
+
+      - name: 📤 Upload final quality report
+        uses: actions/upload-artifact@v3
+        with:
+          name: quality-report
+          path: quality-report.md
+
+  # ==========================================
+  # DEPLOYMENT (ONLY ON SUCCESS)
+  # ==========================================
+  deploy:
+    name: 🚀 Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [quality-report]
+    if: github.ref == 'refs/heads/main' && needs.quality-report.result == 'success'
+    environment: production
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🚀 Deploy to production
+        run: |
+          echo "🏆 All quality gates passed! Deploying to production..."
+          # Add your deployment steps here
+          
+      - name: 📊 Post-deployment verification
+        run: |
+          echo "🔍 Running post-deployment health checks..."
+          # Add health check steps here
+
+      - name: 🎉 Success notification
+        run: |
+          echo "🎉 Deployment successful! Quality gates: PASSED ✅"

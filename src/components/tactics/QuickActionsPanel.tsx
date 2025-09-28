@@ -13,7 +13,7 @@ interface QuickAction {
 
 interface QuickActionsPanelProps {
   actions: QuickAction[];
-  position: 'bottom-right' | 'bottom-center' | 'bottom-left';
+  position: 'bottom-right' | 'bottom-center' | 'bottom-left' | 'top-center' | 'top-right' | 'top-left';
 }
 
 const QuickActionsPanel: React.FC<QuickActionsPanelProps> = ({ actions, position }) => {
@@ -21,13 +21,16 @@ const QuickActionsPanel: React.FC<QuickActionsPanelProps> = ({ actions, position
     'bottom-right': 'bottom-6 right-6',
     'bottom-center': 'bottom-6 left-1/2 transform -translate-x-1/2',
     'bottom-left': 'bottom-6 left-6',
+    'top-center': 'top-20 left-1/2 transform -translate-x-1/2', // Account for navbar height
+    'top-right': 'top-20 right-6', // Account for navbar height
+    'top-left': 'top-20 left-6', // Account for navbar height
   };
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: position.startsWith('top') ? -20 : 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`fixed ${positionClasses[position]} z-40`}
+      className={`fixed ${positionClasses[position]} z-30`}
     >
       <div className="flex items-center gap-3 bg-slate-900/90 backdrop-blur-md border border-slate-700/50 rounded-xl p-3 shadow-2xl">
         {actions.map((action, index) => {

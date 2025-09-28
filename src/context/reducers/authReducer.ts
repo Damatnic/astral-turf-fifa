@@ -4,6 +4,7 @@ export const authReducer = (draft: AuthState, action: Action): AuthState | void 
   switch (action.type) {
     case 'LOGIN_SUCCESS':
       draft.isAuthenticated = true;
+      draft.isLoading = false;
       draft.user = {
         ...action.payload,
         lastLoginAt: new Date().toISOString(),
@@ -77,6 +78,9 @@ export const authReducer = (draft: AuthState, action: Action): AuthState | void 
       if (draft.user) {
         draft.user.isActive = true;
       }
+      break;
+    case 'SET_AUTH_LOADING':
+      draft.isLoading = action.payload;
       break;
     default:
       return;

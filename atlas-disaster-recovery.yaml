@@ -1,0 +1,652 @@
+# Atlas Disaster Recovery and Business Continuity Plan
+# Enterprise-grade disaster recovery with automated failover
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: atlas-disaster-recovery-plan
+  namespace: astral-turf
+  labels:
+    atlas.dr: configuration
+data:
+  recovery-plan.json: |
+    {
+      "disaster_recovery": {
+        "rto": "15m",
+        "rpo": "5m",
+        "tiers": {
+          "tier1_critical": {
+            "services": ["astral-turf-api", "database", "authentication"],
+            "rto": "5m",
+            "rpo": "1m",
+            "backup_frequency": "continuous",
+            "replication": "synchronous"
+          },
+          "tier2_important": {
+            "services": ["file-storage", "cdn", "monitoring"],
+            "rto": "15m", 
+            "rpo": "5m",
+            "backup_frequency": "every_5m",
+            "replication": "asynchronous"
+          },
+          "tier3_standard": {
+            "services": ["analytics", "logs", "metrics"],
+            "rto": "30m",
+            "rpo": "15m", 
+            "backup_frequency": "every_15m",
+            "replication": "scheduled"
+          }
+        },
+        "scenarios": {
+          "region_failure": {
+            "response": "automatic_failover_to_secondary_region",
+            "estimated_downtime": "3-5m",
+            "manual_steps": []
+          },
+          "data_center_failure": {
+            "response": "activate_disaster_recovery_site",
+            "estimated_downtime": "10-15m",
+            "manual_steps": ["verify_dns_propagation", "validate_ssl_certificates"]
+          },
+          "application_failure": {
+            "response": "blue_green_rollback",
+            "estimated_downtime": "<30s",
+            "manual_steps": []
+          },
+          "database_corruption": {
+            "response": "restore_from_point_in_time_backup",
+            "estimated_downtime": "5-10m",
+            "manual_steps": ["validate_data_integrity", "restart_application_services"]
+          }
+        }
+      }
+    }
+
+  runbook.md: |
+    # Atlas Disaster Recovery Runbook
+    
+    ## Emergency Contacts
+    - **Primary On-Call:** +1-555-DR-ATLAS (555-372-8527)
+    - **Secondary On-Call:** +1-555-BACKUP1 (555-222-5871)
+    - **Incident Commander:** +1-555-COMMAND (555-266-6263)
+    
+    ## Critical Scenarios and Response
+    
+    ### 1. Complete Regional Failure
+    **Symptoms:** All services in primary region unresponsive
+    **Response Time:** Immediate (< 5 minutes)
+    
+    **Automated Response:**
+    1. Health checks detect regional failure
+    2. DNS failover to secondary region triggered
+    3. Secondary region automatically scales up
+    4. Database replica promoted to primary
+    
+    **Manual Validation:**
+    ```bash
+    # Verify failover status
+    kubectl get pods -n astral-turf-dr
+    kubectl get services -n astral-turf-dr
+    curl -f https://astralturf.com/health
+    ```
+    
+    ### 2. Database Corruption/Failure
+    **Symptoms:** Database connection errors, data inconsistencies
+    **Response Time:** < 10 minutes
+    
+    **Recovery Steps:**
+    ```bash
+    # Stop application traffic
+    kubectl scale deployment astral-turf-blue --replicas=0 -n astral-turf
+    
+    # Restore from latest backup
+    kubectl create job atlas-db-restore --from=cronjob/atlas-database-backup
+    
+    # Validate data integrity
+    kubectl logs -f job/atlas-db-restore
+    
+    # Restart application
+    kubectl scale deployment astral-turf-blue --replicas=3 -n astral-turf
+    ```
+    
+    ### 3. Security Breach Detection
+    **Symptoms:** Falco security alerts, unusual network traffic
+    **Response Time:** Immediate
+    
+    **Security Response:**
+    ```bash
+    # Isolate affected pods
+    kubectl label pod <affected-pod> atlas.security.isolated=true
+    
+    # Scale down to minimum replicas
+    kubectl scale deployment astral-turf-blue --replicas=1 -n astral-turf
+    
+    # Review security logs
+    kubectl logs -f deployment/atlas-falco -n atlas-security
+    
+    # Apply security patches
+    kubectl set image deployment/astral-turf-blue astral-turf=<patched-image>
+    ```
+---
+# Atlas Multi-Region Disaster Recovery Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: astral-turf-dr
+  namespace: astral-turf-dr
+  labels:
+    app: astral-turf
+    atlas.dr: enabled
+    atlas.region: secondary
+spec:
+  replicas: 2  # Minimal replicas for cost efficiency
+  selector:
+    matchLabels:
+      app: astral-turf
+      atlas.dr: enabled
+  template:
+    metadata:
+      labels:
+        app: astral-turf
+        atlas.dr: enabled
+      annotations:
+        atlas.dr.role: "standby"
+        atlas.dr.activation: "automatic"
+    spec:
+      serviceAccountName: astral-turf-dr-sa
+      containers:
+      - name: astral-turf
+        image: astral-turf:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: ATLAS_DR_MODE
+          value: "standby"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: astral-turf-dr-secrets
+              key: database-url
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 60
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          failureThreshold: 30
+---
+# Atlas Auto-Failover Controller
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: atlas-failover-controller
+  namespace: astral-turf
+  labels:
+    app: failover-controller
+    atlas.dr: controller
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: failover-controller
+  template:
+    metadata:
+      labels:
+        app: failover-controller
+    spec:
+      serviceAccountName: atlas-failover-controller
+      containers:
+      - name: failover-controller
+        image: atlas/failover-controller:latest
+        command:
+        - /manager
+        args:
+        - --health-check-interval=30s
+        - --failover-threshold=3
+        - --recovery-check-interval=60s
+        env:
+        - name: PRIMARY_REGION
+          value: "us-central1"
+        - name: SECONDARY_REGION
+          value: "us-east1"
+        - name: DNS_ZONE
+          value: "astralturf.com"
+        - name: PROMETHEUS_URL
+          value: "http://atlas-prometheus.atlas-monitoring:9090"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+# Atlas Backup and Restore CronJobs
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: atlas-full-backup
+  namespace: astral-turf
+  labels:
+    atlas.backup: full
+spec:
+  schedule: "0 2 * * 0"  # Weekly full backup on Sunday at 2 AM
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            atlas.backup: full
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: backup
+            image: atlas/backup-operator:latest
+            command:
+            - /bin/sh
+            - -c
+            - |
+              set -e
+              
+              BACKUP_NAME="atlas-full-backup-$(date +%Y%m%d-%H%M%S)"
+              echo "🏥 Atlas: Starting full system backup: ${BACKUP_NAME}"
+              
+              # Backup database
+              echo "📊 Backing up database..."
+              pg_dump $DATABASE_URL | gzip > /backup/database-${BACKUP_NAME}.sql.gz
+              
+              # Backup persistent volumes
+              echo "💾 Backing up persistent volumes..."
+              kubectl get pv -o json > /backup/persistent-volumes-${BACKUP_NAME}.json
+              
+              # Backup Kubernetes resources
+              echo "⚙️ Backing up Kubernetes resources..."
+              kubectl get all -n astral-turf -o yaml > /backup/k8s-resources-${BACKUP_NAME}.yaml
+              kubectl get secrets -n astral-turf -o yaml > /backup/secrets-${BACKUP_NAME}.yaml
+              kubectl get configmaps -n astral-turf -o yaml > /backup/configmaps-${BACKUP_NAME}.yaml
+              
+              # Create backup manifest
+              cat > /backup/manifest-${BACKUP_NAME}.json << EOF
+              {
+                "backup_name": "${BACKUP_NAME}",
+                "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+                "type": "full",
+                "components": {
+                  "database": "database-${BACKUP_NAME}.sql.gz",
+                  "persistent_volumes": "persistent-volumes-${BACKUP_NAME}.json",
+                  "kubernetes_resources": "k8s-resources-${BACKUP_NAME}.yaml",
+                  "secrets": "secrets-${BACKUP_NAME}.yaml",
+                  "configmaps": "configmaps-${BACKUP_NAME}.yaml"
+                },
+                "verification": {
+                  "checksums": {
+                    "database": "$(sha256sum /backup/database-${BACKUP_NAME}.sql.gz | cut -d' ' -f1)",
+                    "k8s_resources": "$(sha256sum /backup/k8s-resources-${BACKUP_NAME}.yaml | cut -d' ' -f1)"
+                  }
+                }
+              }
+              EOF
+              
+              # Upload to multiple storage locations
+              echo "☁️ Uploading to cloud storage..."
+              
+              # Primary storage (AWS S3)
+              aws s3 cp /backup/ s3://atlas-backups/full/ --recursive --include "*${BACKUP_NAME}*"
+              
+              # Secondary storage (Google Cloud Storage)
+              gsutil -m cp /backup/*${BACKUP_NAME}* gs://atlas-backups-secondary/full/
+              
+              # Tertiary storage (Azure Blob)
+              az storage blob upload-batch --destination full --source /backup --pattern "*${BACKUP_NAME}*"
+              
+              # Register backup in recovery database
+              psql $RECOVERY_DB_URL << EOF
+              INSERT INTO backups (name, timestamp, type, status, manifest_path) 
+              VALUES ('${BACKUP_NAME}', NOW(), 'full', 'completed', 's3://atlas-backups/full/manifest-${BACKUP_NAME}.json');
+              EOF
+              
+              echo "✅ Atlas: Full backup completed: ${BACKUP_NAME}"
+              
+              # Cleanup old local files
+              find /backup -name "*.gz" -mtime +7 -delete
+              find /backup -name "*.json" -mtime +7 -delete
+              find /backup -name "*.yaml" -mtime +7 -delete
+            env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: database-secrets
+                  key: url
+            - name: RECOVERY_DB_URL
+              valueFrom:
+                secretKeyRef:
+                  name: recovery-secrets
+                  key: url
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secrets
+                  key: access-key-id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secrets
+                  key: secret-access-key
+            volumeMounts:
+            - name: backup-storage
+              mountPath: /backup
+            resources:
+              requests:
+                memory: "512Mi"
+                cpu: "200m"
+              limits:
+                memory: "1Gi"
+                cpu: "500m"
+          volumes:
+          - name: backup-storage
+            persistentVolumeClaim:
+              claimName: atlas-backup-storage
+---
+# Atlas Point-in-Time Recovery Job Template
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: atlas-point-in-time-recovery
+  namespace: astral-turf
+  labels:
+    atlas.dr: recovery
+spec:
+  template:
+    metadata:
+      labels:
+        atlas.dr: recovery
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: recovery
+        image: atlas/recovery-operator:latest
+        command:
+        - /bin/sh
+        - -c
+        - |
+          set -e
+          
+          RECOVERY_POINT="${ATLAS_RECOVERY_POINT:-$(date -u -d '1 hour ago' +%Y-%m-%dT%H:%M:%SZ)}"
+          echo "🔄 Atlas: Starting point-in-time recovery to ${RECOVERY_POINT}"
+          
+          # Find appropriate backup
+          BACKUP_TO_USE=$(psql $RECOVERY_DB_URL -t -c "
+            SELECT name FROM backups 
+            WHERE timestamp <= '${RECOVERY_POINT}' 
+            AND status = 'completed' 
+            ORDER BY timestamp DESC 
+            LIMIT 1;
+          " | tr -d ' ')
+          
+          echo "📋 Atlas: Using backup: ${BACKUP_TO_USE}"
+          
+          # Download backup files
+          echo "⬇️ Atlas: Downloading backup files..."
+          aws s3 cp s3://atlas-backups/full/database-${BACKUP_TO_USE}.sql.gz /recovery/
+          aws s3 cp s3://atlas-backups/full/k8s-resources-${BACKUP_TO_USE}.yaml /recovery/
+          aws s3 cp s3://atlas-backups/full/secrets-${BACKUP_TO_USE}.yaml /recovery/
+          
+          # Scale down application
+          echo "⬇️ Atlas: Scaling down application..."
+          kubectl scale deployment astral-turf-blue --replicas=0 -n astral-turf
+          kubectl scale deployment astral-turf-green --replicas=0 -n astral-turf
+          
+          # Restore database
+          echo "🗃️ Atlas: Restoring database..."
+          dropdb atlas_recovery -h $DB_HOST -U $DB_USER --if-exists
+          createdb atlas_recovery -h $DB_HOST -U $DB_USER
+          
+          # Apply point-in-time recovery
+          gunzip -c /recovery/database-${BACKUP_TO_USE}.sql.gz | psql $RECOVERY_DATABASE_URL
+          
+          # Apply WAL logs for point-in-time recovery
+          if [ -n "${ATLAS_WAL_RECOVERY}" ]; then
+            echo "📝 Atlas: Applying WAL logs for point-in-time recovery..."
+            psql $RECOVERY_DATABASE_URL -c "SELECT pg_start_backup('recovery');"
+            # Restore WAL files from backup
+            aws s3 cp s3://atlas-backups/wal/ /recovery/wal/ --recursive
+            # Apply WAL files up to recovery point
+            # This would involve PostgreSQL specific recovery procedures
+          fi
+          
+          # Validate database integrity
+          echo "✅ Atlas: Validating database integrity..."
+          psql $RECOVERY_DATABASE_URL -c "SELECT COUNT(*) FROM information_schema.tables;"
+          
+          # Update database connection
+          kubectl patch secret database-secrets -n astral-turf --type='json' \
+            -p='[{"op": "replace", "path": "/data/url", "value": "'$(echo -n $RECOVERY_DATABASE_URL | base64)'"}]'
+          
+          # Restore Kubernetes resources
+          echo "⚙️ Atlas: Restoring Kubernetes resources..."
+          kubectl apply -f /recovery/k8s-resources-${BACKUP_TO_USE}.yaml
+          
+          # Scale up application
+          echo "⬆️ Atlas: Scaling up application..."
+          kubectl scale deployment astral-turf-blue --replicas=3 -n astral-turf
+          
+          # Wait for application to be ready
+          kubectl rollout status deployment/astral-turf-blue -n astral-turf --timeout=300s
+          
+          # Validate recovery
+          echo "🔍 Atlas: Validating recovery..."
+          kubectl run atlas-recovery-test --image=curlimages/curl:latest --rm -i --restart=Never -- \
+            curl -f http://astral-turf-service.astral-turf.svc.cluster.local/health
+          
+          echo "✅ Atlas: Point-in-time recovery completed successfully to ${RECOVERY_POINT}"
+        env:
+        - name: ATLAS_RECOVERY_POINT
+          value: "${ATLAS_RECOVERY_POINT}"
+        - name: RECOVERY_DB_URL
+          valueFrom:
+            secretKeyRef:
+              name: recovery-secrets
+              key: url
+        - name: RECOVERY_DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: recovery-secrets
+              key: database-url
+        - name: DB_HOST
+          valueFrom:
+            secretKeyRef:
+              name: database-secrets
+              key: host
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: database-secrets
+              key: username
+        volumeMounts:
+        - name: recovery-storage
+          mountPath: /recovery
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+      volumes:
+      - name: recovery-storage
+        persistentVolumeClaim:
+          claimName: atlas-recovery-storage
+---
+# Atlas Health Check and Monitoring for DR
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: atlas-dr-monitor
+  namespace: astral-turf
+  labels:
+    app: dr-monitor
+    atlas.dr: monitoring
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: dr-monitor
+  template:
+    metadata:
+      labels:
+        app: dr-monitor
+    spec:
+      containers:
+      - name: dr-monitor
+        image: atlas/dr-monitor:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: CHECK_INTERVAL
+          value: "30s"
+        - name: HEALTH_ENDPOINTS
+          value: "https://astralturf.com/health,https://api.astralturf.com/health"
+        - name: DR_ENDPOINTS
+          value: "https://dr.astralturf.com/health"
+        - name: ALERT_THRESHOLDS
+          value: "3"  # Fail after 3 consecutive failures
+        command:
+        - /bin/sh
+        - -c
+        - |
+          #!/bin/sh
+          set -e
+          
+          PRIMARY_FAILURES=0
+          DR_ACTIVE=false
+          
+          while true; do
+            echo "🔍 Atlas DR: Checking system health..."
+            
+            # Check primary endpoints
+            PRIMARY_HEALTHY=true
+            for endpoint in $(echo $HEALTH_ENDPOINTS | tr ',' ' '); do
+              if ! curl -f -s --max-time 10 "$endpoint" > /dev/null; then
+                echo "❌ Primary endpoint failed: $endpoint"
+                PRIMARY_HEALTHY=false
+              else
+                echo "✅ Primary endpoint healthy: $endpoint"
+              fi
+            done
+            
+            if [ "$PRIMARY_HEALTHY" = "true" ]; then
+              PRIMARY_FAILURES=0
+              if [ "$DR_ACTIVE" = "true" ]; then
+                echo "🔄 Atlas DR: Primary recovered, considering failback..."
+                # Implement failback logic here
+                DR_ACTIVE=false
+              fi
+            else
+              PRIMARY_FAILURES=$((PRIMARY_FAILURES + 1))
+              echo "⚠️ Atlas DR: Primary failure count: $PRIMARY_FAILURES"
+              
+              if [ $PRIMARY_FAILURES -ge $ALERT_THRESHOLDS ] && [ "$DR_ACTIVE" = "false" ]; then
+                echo "🚨 Atlas DR: Triggering disaster recovery failover!"
+                
+                # Trigger DNS failover
+                kubectl create job atlas-dns-failover --image=atlas/dns-failover:latest
+                
+                # Scale up DR region
+                kubectl scale deployment astral-turf-dr --replicas=5 -n astral-turf-dr
+                
+                # Send alerts
+                curl -X POST "$ALERT_WEBHOOK_URL" \
+                  -H "Content-Type: application/json" \
+                  -d "{\"text\": \"🚨 Atlas DR: Disaster recovery activated due to primary region failure\"}"
+                
+                DR_ACTIVE=true
+              fi
+            fi
+            
+            # Publish metrics
+            cat > /tmp/metrics.prom << EOF
+            # HELP atlas_dr_primary_healthy Primary region health status
+            # TYPE atlas_dr_primary_healthy gauge
+            atlas_dr_primary_healthy $([ "$PRIMARY_HEALTHY" = "true" ] && echo 1 || echo 0)
+            
+            # HELP atlas_dr_failure_count Primary region failure count
+            # TYPE atlas_dr_failure_count counter
+            atlas_dr_failure_count $PRIMARY_FAILURES
+            
+            # HELP atlas_dr_active Disaster recovery active status
+            # TYPE atlas_dr_active gauge
+            atlas_dr_active $([ "$DR_ACTIVE" = "true" ] && echo 1 || echo 0)
+            EOF
+            
+            # Expose metrics on HTTP endpoint
+            nc -l -p 8080 -c 'echo -e "HTTP/1.1 200 OK\n\n$(cat /tmp/metrics.prom)"' &
+            
+            sleep $(echo $CHECK_INTERVAL | sed 's/s//')
+          done
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "50m"
+          limits:
+            memory: "256Mi"
+            cpu: "100m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+# Atlas Recovery Storage
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: atlas-recovery-storage
+  namespace: astral-turf
+  labels:
+    atlas.dr: storage
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 200Gi
+  storageClassName: fast-ssd

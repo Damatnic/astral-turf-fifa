@@ -55,33 +55,48 @@ const PlayerStatsOverlay: React.FC<PlayerStatsOverlayProps> = ({
 
   // Calculate player statistics
   const playerStats = useMemo((): PlayerStats[] => {
-    if (!formation || players.length === 0) {return [];}
+    try {
+      if (!formation || !formation.positions || players.length === 0) {return [];}
 
-    return players.map(player => {
-      const position = formation.positions[player.id];
-      if (!position) {return null;}
+      return players.map(player => {
+        if (!player || !player.id) return null;
+        
+        const position = formation.positions[player.id];
+        if (!position || typeof position !== 'object') {return null;}
+        
+        // Ensure position has required properties
+        const safePosition = {
+          x: typeof position.x === 'number' ? position.x : 50,
+          y: typeof position.y === 'number' ? position.y : 50,
+          ...position
+        };
 
-      // Calculate various player metrics
-      const performance = Math.min(100, (player.currentPotential || 70) + Math.random() * 10);
-      const positioning = Math.max(0, 100 - Math.abs(position.x - 50) - Math.abs(position.y - 50));
-      const influence = performance * (player.position?.includes('M') ? 1.2 : 1.0);
-      const workrate = 60 + Math.random() * 40;
-      const chemistry = 70 + Math.random() * 30;
+        // Calculate various player metrics with null checks
+        const currentPotential = player.currentPotential || 70;
+        const performance = Math.min(100, currentPotential + Math.random() * 10);
+        const positioning = Math.max(0, 100 - Math.abs(safePosition.x - 50) - Math.abs(safePosition.y - 50));
+        const influence = performance * (player.position?.includes('M') ? 1.2 : 1.0);
+        const workrate = 60 + Math.random() * 40;
+        const chemistry = 70 + Math.random() * 30;
 
-      return {
-        id: player.id,
-        name: player.name,
-        position,
-        metrics: {
-          performance,
-          positioning,
-          influence,
-          workrate,
-          chemistry,
-        },
-        heatIntensity: (performance + influence) / 200,
-      };
-    }).filter(Boolean) as PlayerStats[];
+        return {
+          id: player.id,
+          name: player.name || 'Unknown Player',
+          position: safePosition,
+          metrics: {
+            performance,
+            positioning,
+            influence,
+            workrate,
+            chemistry,
+          },
+          heatIntensity: (performance + influence) / 200,
+        };
+      }).filter(Boolean) as PlayerStats[];
+    } catch (error) {
+      console.error('Error calculating player stats:', error);
+      return [];
+    }
   }, [formation, players]);
 
   // Generate heat map zones

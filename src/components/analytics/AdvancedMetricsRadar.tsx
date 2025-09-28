@@ -1,5 +1,17 @@
 import React, { useRef, useEffect } from 'react';
-import type { PlayerPerformanceMetrics } from '../../services/advancedAiService';
+
+interface PlayerPerformanceMetrics {
+  expectedGoals: number;
+  expectedAssists: number;
+  passCompletionRate: number;
+  progressivePasses: number;
+  defensiveActions: number;
+  aerialDuelsWon: number;
+  pressureResistance: number;
+  creativeIndex: number;
+  consistencyRating: number;
+  workRateIndex: number;
+}
 
 interface AdvancedMetricsRadarProps {
   playerMetrics: PlayerPerformanceMetrics;

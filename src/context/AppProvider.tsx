@@ -88,7 +88,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [state, dispatch] = useReducer(rootReducer, INITIAL_STATE);
 
   useEffect(() => {
-    // Check for existing authentication first
+    // Set loading to false first to ensure app doesn't get stuck
+    dispatch({ type: 'SET_AUTH_LOADING', payload: false });
+    
+    // Check for existing authentication
     const currentUser = authService.getCurrentUserSync();
     if (currentUser) {
       dispatch({ type: 'LOGIN_SUCCESS', payload: currentUser });

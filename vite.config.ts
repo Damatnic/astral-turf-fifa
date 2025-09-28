@@ -1,10 +1,32 @@
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
+import { resolve } from 'path';
+import { getSecurityHeaders } from './src/security/securityHeaders';
+
+// Performance optimization plugins
+const optimizeReactPlugin = () => ({
+  name: 'optimize-react',
+  config(config: any) {
+    config.esbuild = {
+      ...config.esbuild,
+      jsxDev: false, // Disable React dev mode in production
+      drop: ['console', 'debugger'], // Remove console.log and debugger statements
+    };
+  },
+});
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, '.', '');
+  const isProd = mode === 'production';
+  
   return {
-    plugins: [react()],
+    plugins: [
+      react({
+        // Use SWC for faster compilation
+        jsxRuntime: 'automatic'
+      }),
+      ...(isProd ? [optimizeReactPlugin()] : [])
+    ],
     test: {
       globals: true,
       environment: 'jsdom',
@@ -22,6 +44,29 @@ export default defineConfig(({ mode }) => {
       port: 8081,
       strictPort: true,
       host: true, // This allows external connections
+      headers: {
+        // Guardian Security Headers for Development
+        ...getSecurityHeaders(),
+        // Additional development-specific headers
+        'X-Powered-By': '', // Remove server fingerprinting
+        'Server': '', // Remove server information
+        'X-DNS-Prefetch-Control': 'off',
+        'X-Download-Options': 'noopen',
+        'X-Permitted-Cross-Domain-Policies': 'none',
+        'Referrer-Policy': 'strict-origin-when-cross-origin',
+        'Permissions-Policy': [
+          'geolocation=()',
+          'microphone=()',
+          'camera=()',
+          'payment=()',
+          'usb=()',
+          'magnetometer=()',
+          'gyroscope=()',
+          'speaker=(self)',
+          'fullscreen=(self)',
+          'autoplay=(self)'
+        ].join(', ')
+      }
     },
     define: {
       'process.env.API_KEY': JSON.stringify(env.OPENAI_API_KEY || env.API_KEY),
@@ -29,151 +74,378 @@ export default defineConfig(({ mode }) => {
       global: 'globalThis',
     },
     optimizeDeps: {
-      include: ['react', 'react-dom', 'react-router-dom', 'react/jsx-runtime'],
+      include: [
+        'react', 'react-dom', 'react-router-dom', 'react/jsx-runtime',
+        'framer-motion', 'lucide-react', '@react-spring/web',
+        'chart.js', 'react-chartjs-2', 'axios'
+      ],
+      exclude: ['@tauri-apps/api'], // Exclude Tauri APIs from optimization
       force: true,
       esbuildOptions: {
-        target: 'es2020',
-        jsx: 'automatic'
+        target: 'es2022',
+        jsx: 'automatic',
+        treeShaking: true,
+        minifyIdentifiers: isProd,
+        minifyWhitespace: isProd,
+        minifySyntax: isProd,
+        legalComments: 'none',
+        keepNames: false,
+        platform: 'browser'
       }
+    },
+    
+    // Performance-focused resolve configuration
+    resolve: {
+      alias: {
+        '@': resolve(__dirname, 'src'),
+        '@components': resolve(__dirname, 'src/components'),
+        '@hooks': resolve(__dirname, 'src/hooks'),
+        '@utils': resolve(__dirname, 'src/utils'),
+        '@types': resolve(__dirname, 'src/types'),
+        '@services': resolve(__dirname, 'src/services'),
+        '@context': resolve(__dirname, 'src/context')
+      },
+      extensions: ['.ts', '.tsx', '.js', '.jsx'], // Prioritize TypeScript
+      mainFields: ['module', 'jsnext:main', 'main'] // Prefer ES modules
     },
     esbuild: {
       loader: 'tsx',
       include: /\.(tsx?|jsx?)$/,
       exclude: [],
+      target: 'es2022',
+      jsx: 'automatic',
+      jsxFactory: 'React.createElement',
+      jsxFragment: 'React.Fragment',
+      tsconfigRaw: {
+        compilerOptions: {
+          experimentalDecorators: true,
+          useDefineForClassFields: false
+        }
+      },
+      drop: isProd ? ['console', 'debugger'] : [],
+      pure: isProd ? ['console.log', 'console.warn', 'console.error'] : [],
+      legalComments: 'none',
+      keepNames: false
     },
     build: {
+      target: 'es2022', // Target newer ES for better optimization
+      sourcemap: false, // Disable sourcemaps for production
+      minify: 'esbuild', // Use esbuild for fastest minification
+      reportCompressedSize: false, // Skip gzip size analysis for faster builds
+      chunkSizeWarningLimit: 100, // Ultra-aggressive chunk size limits for better loading
+      
+      // Ultra-aggressive asset optimization
+      assetsInlineLimit: 4096, // Inline smaller assets (4KB) for fewer requests
+      cssCodeSplit: true,
+      cssMinify: 'esbuild',
+      
+      // Catalyst-specific optimizations
+      modulePreload: {
+        polyfill: false // Modern browsers only
+      },
+      
+      // Advanced compression
+      terserOptions: {
+        compress: {
+          drop_console: isProd,
+          drop_debugger: isProd,
+          pure_funcs: isProd ? ['console.log', 'console.warn'] : [],
+          passes: 3
+        },
+        mangle: {
+          safari10: true
+        },
+        format: {
+          comments: false
+        }
+      },
+      
       rollupOptions: {
+        treeshake: {
+          moduleSideEffects: false,
+          propertyReadSideEffects: false,
+          unknownGlobalSideEffects: false
+        },
         external: (_id) => {
           // Don't externalize React - keep it bundled to prevent context issues
           return false;
         },
         output: {
-          manualChunks: id => {
-            // Vendor libraries - split into smaller chunks
-            if (id.includes('node_modules')) {
-              // OpenAI - large external library
-              if (id.includes('openai')) {
-                return 'openai-vendor';
-              }
-              // React ecosystem - core chunk
-              if (id.includes('react') || id.includes('react-dom')) {
-                return 'react-vendor';
-              }
-              // React Router - separate chunk
-              if (id.includes('react-router')) {
-                return 'router-vendor';
-              }
-              // Framer Motion - large animation library
-              if (id.includes('framer-motion')) {
-                return 'animation-vendor';
-              }
-              // UI libraries (lucide, etc)
-              if (id.includes('lucide') || id.includes('@headlessui') || id.includes('@radix-ui')) {
-                return 'ui-vendor';
-              }
-              // Charts and visualization
-              if (id.includes('chart') || id.includes('d3') || id.includes('plotly')) {
-                return 'charts-vendor';
-              }
-              // Date and time libraries
-              if (id.includes('date-fns') || id.includes('moment') || id.includes('dayjs')) {
-                return 'date-vendor';
-              }
-              // Form and validation libraries
-              if (id.includes('formik') || id.includes('yup') || id.includes('joi') || id.includes('zod')) {
-                return 'forms-vendor';
-              }
-              // HTTP and API libraries
-              if (id.includes('axios') || id.includes('fetch') || id.includes('request')) {
-                return 'http-vendor';
-              }
-              // Utility libraries (lodash, ramda, etc)
-              if (id.includes('lodash') || id.includes('ramda') || id.includes('underscore')) {
-                return 'lodash-vendor';
-              }
-              // Crypto and security libraries
-              if (id.includes('crypto') || id.includes('bcrypt') || id.includes('jwt')) {
-                return 'crypto-vendor';
-              }
-              // All other vendors
-              return 'misc-vendor';
+          // Optimized chunk naming for better caching
+          entryFileNames: isProd ? 'js/[name]-[hash].js' : 'js/[name].js',
+          chunkFileNames: isProd ? 'js/[name]-[hash].js' : 'js/[name].js',
+          assetFileNames: isProd ? 'assets/[name]-[hash].[ext]' : 'assets/[name].[ext]',
+          
+          // Ultra-aggressive manual chunking for Catalyst performance
+          manualChunks: (id) => {
+            // CRITICAL PATH - Priority 1 (sub-100KB chunks)
+            if (id.includes('react') && !id.includes('router') && !id.includes('spring') && !id.includes('aria')) {
+              return 'react-core';
             }
-
-            // AI services - large functionality
-            if (id.includes('src/services/ai') || id.includes('src/services/advanced')) {
-              return 'ai-services';
+            
+            // Performance utilities - Critical
+            if (id.includes('performanceOptimizations') || 
+                id.includes('cachingOptimizations') ||
+                id.includes('animationOptimizations') ||
+                id.includes('lazyLoadingOptimizations')) {
+              return 'performance-core';
             }
-
-            // Large page components - more granular splitting
-            if (id.includes('src/pages/')) {
-              // Tactics and Analytics - heavy pages
-              if (id.includes('TacticsBoard')) {
-                return 'tactics-pages';
-              }
-              if (id.includes('Analytics')) {
-                return 'analytics-pages';
-              }
-              if (id.includes('Advanced')) {
-                return 'advanced-pages';
-              }
-              // Dashboard pages
-              if (id.includes('Dashboard')) {
-                return 'dashboard-pages';
-              }
-              // User management pages
-              if (id.includes('Player') || id.includes('Coach') || id.includes('Staff')) {
-                return 'user-pages';
-              }
-              // Admin and settings pages
-              if (id.includes('Settings') || id.includes('Finances') || id.includes('Admin')) {
-                return 'admin-pages';
-              }
-              // Authentication pages
-              if (id.includes('Login') || id.includes('Register') || id.includes('Auth')) {
-                return 'auth-pages';
-              }
-              // Remaining pages
-              return 'core-pages';
+            
+            // Essential UI components - Critical
+            if (id.includes('UnifiedTacticsBoard') ||
+                id.includes('ModernField') ||
+                id.includes('PlayerToken') ||
+                id.includes('ContextualToolbar')) {
+              return 'tactics-essential';
             }
-
-            // Popup components
-            if (id.includes('src/components/popups/')) {
-              return 'popups';
+            
+            // Formation engine - Critical
+            if (id.includes('formationAutoAssignment') ||
+                id.includes('formationCalculationWorker') ||
+                id.includes('tacticsReducer')) {
+              return 'formation-engine';
             }
-
-            // Chart components
-            if (id.includes('src/components/charts/') || id.includes('src/components/analytics/')) {
+            
+            // PRIORITY 2 - High-performance features (sub-150KB)
+            
+            // Advanced tactical components
+            if (id.includes('QuickActionsPanel') ||
+                id.includes('PlayerStatsOverlay') ||
+                id.includes('TacticalDrawingTools') ||
+                id.includes('PositioningModeToggle')) {
+              return 'tactics-advanced';
+            }
+            
+            // Canvas and rendering
+            if (id.includes('DrawingCanvas') ||
+                id.includes('CanvasRenderer') ||
+                id.includes('TacticalHeatMapCanvas') ||
+                id.includes('performance/CanvasRenderer')) {
+              return 'render-engine';
+            }
+            
+            // Analytics and visualization
+            if (id.includes('AdvancedAnalyticsDashboard') ||
+                id.includes('AdvancedMetricsRadar') ||
+                id.includes('HeatMapAnalytics') ||
+                id.includes('ChemistryVisualization')) {
+              return 'analytics-core';
+            }
+            
+            // Animation system
+            if (id.includes('framer-motion') ||
+                id.includes('@react-spring') ||
+                id.includes('AnimationTimeline') ||
+                id.includes('AnimationSystem')) {
+              return 'animations';
+            }
+            
+            // PRIORITY 3 - Feature modules (lazy-loaded)
+            
+            // Chart libraries
+            if (id.includes('chart.js') ||
+                id.includes('react-chartjs') ||
+                id.includes('RadarChart') ||
+                id.includes('PerformanceChart')) {
               return 'charts';
             }
-
-            // Dashboard components
-            if (id.includes('src/components/dashboards/')) {
-              return 'dashboards';
+            
+            // UI icons and assets
+            if (id.includes('lucide-react')) {
+              return 'ui-icons';
             }
-
-            // Field and tactical components
-            if (id.includes('src/components/field/') || id.includes('src/components/tactics/')) {
-              return 'tactical';
+            
+            // Collaboration features
+            if (id.includes('CollaborationFeatures') ||
+                id.includes('ChallengeManagement') ||
+                id.includes('ConflictResolutionMenu')) {
+              return 'collaboration';
             }
+            
+            // Export/Import features
+            if (id.includes('EnhancedExportImport') ||
+                id.includes('PrintableLineup') ||
+                id.includes('PresentationControls')) {
+              return 'export-import';
+            }
+            
+            // Management features
+            if (id.includes('DugoutManagement') ||
+                id.includes('ExpandedPlayerCard') ||
+                id.includes('ChallengeCreator')) {
+              return 'management';
+            }
+            
+            // PRIORITY 4 - External services (lazy-loaded)
+            
+            // AI services
+            if (id.includes('openai') ||
+                id.includes('@google/genai') ||
+                id.includes('IntelligentAssistant')) {
+              return 'ai-services';
+            }
+            
+            // Database and persistence
+            if (id.includes('@prisma/client') ||
+                id.includes('indexedDBOptimizations') ||
+                id.includes('dexie')) {
+              return 'data-layer';
+            }
+            
+            // Security and crypto
+            if (id.includes('crypto-js') ||
+                id.includes('bcryptjs') ||
+                id.includes('jsonwebtoken') ||
+                id.includes('jose')) {
+              return 'security';
+            }
+            
+            // PRIORITY 5 - Utilities and libraries
+            
+            // HTTP and validation
+            if (id.includes('axios') ||
+                id.includes('zod') ||
+                id.includes('joi') ||
+                id.includes('validator')) {
+              return 'utilities';
+            }
+            
+            // Router (separate for code splitting)
+            if (id.includes('react-router')) {
+              return 'router';
+            }
+            
+            // Accessibility
+            if (id.includes('react-aria') ||
+                id.includes('@react-aria')) {
+              return 'accessibility';
+            }
+            
+            // Internationalization
+            if (id.includes('i18next') ||
+                id.includes('react-i18next')) {
+              return 'i18n';
+            }
+            
+            // Everything else in node_modules
+            if (id.includes('node_modules')) {
+              // Split large vendor packages
+              if (id.includes('node_modules/react-dom')) return 'react-dom';
+              if (id.includes('node_modules/winston')) return 'logging';
+              if (id.includes('node_modules/prisma')) return 'database-client';
+              
+              return 'vendor';
+            }
+            
+            // Application code fallback
+            return 'app';
           },
+          
+          // Optimize imports
+          hoistTransitiveImports: false,
+          generatedCode: {
+            preset: 'es2015',
+            arrowFunctions: true,
+            constBindings: true,
+            objectShorthand: true
+          },
+          
+          // Reduce bundle size
+          compact: true
         },
+        
+        // Optimize external dependencies
+        onwarn(warning, warn) {
+          // Suppress 'this' has been rewritten to 'undefined' warning
+          if (warning.code === 'THIS_IS_UNDEFINED') return;
+          warn(warning);
+        }
       },
-      // Optimize chunk size warning limit to be more aggressive
-      chunkSizeWarningLimit: 200,
-      // Disable source maps in production for smaller bundles
-      sourcemap: false,
-      // Enable minification with esbuild for faster builds
-      minify: 'esbuild',
-      // Target modern browsers for better optimization
-      target: ['es2020', 'chrome80', 'firefox74', 'safari13'],
-      // Optimize dependencies
+      
+      // Performance optimizations
       commonjsOptions: {
         transformMixedEsModules: true,
+        include: [/node_modules/],
+        exclude: [/node_modules\/@tauri-apps/]
       },
-      // Compress assets
-      assetsInlineLimit: 4096,
-      // Enable CSS code splitting
-      cssCodeSplit: true,
+      
+      // Advanced build optimizations
+      copyPublicDir: true,
+      emptyOutDir: true,
+      
+      // Catalyst-specific build pipeline
+      plugins: isProd ? [
+        // Additional production optimizations would go here
+      ] : [],
+      
+      // Experimental features for better performance
+      experimental: {
+        renderBuiltUrl(filename: string) {
+          return `/${filename}`;
+        }
+      }
     },
+    
+    // Catalyst Performance Features
+    experimental: {
+      hmrPartialAccept: true // Enable partial HMR for better dev performance
+    },
+    
+    // Advanced preview configuration with Guardian Security
+    preview: {
+      port: 8080,
+      strictPort: true,
+      host: true,
+      cors: {
+        origin: ['http://localhost:3011', 'http://localhost:3012', 'http://127.0.0.1:3011', 'http://127.0.0.1:3012'],
+        credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token', 'X-Requested-With']
+      },
+      headers: {
+        // Guardian Enterprise Security Headers
+        ...getSecurityHeaders(),
+        // Production-optimized caching
+        'Cache-Control': 'public, max-age=31536000, immutable',
+        'Vary': 'Accept-Encoding',
+        // Security hardening
+        'X-Powered-By': '',
+        'Server': '',
+        'X-DNS-Prefetch-Control': 'off',
+        'X-Download-Options': 'noopen',
+        'X-Permitted-Cross-Domain-Policies': 'none',
+        // Feature policy for enhanced security
+        'Permissions-Policy': [
+          'geolocation=()',
+          'microphone=()',
+          'camera=()',
+          'payment=()',
+          'usb=()',
+          'magnetometer=()',
+          'gyroscope=()',
+          'speaker=(self)',
+          'fullscreen=(self)',
+          'autoplay=(self)',
+          'encrypted-media=(self)',
+          'picture-in-picture=(self)'
+        ].join(', '),
+        // Additional security headers
+        'Cross-Origin-Embedder-Policy': 'require-corp',
+        'Cross-Origin-Opener-Policy': 'same-origin',
+        'Cross-Origin-Resource-Policy': 'same-origin'
+      }
+    },
+    
+    // Worker configuration for better performance
+    worker: {
+      format: 'es',
+      plugins: () => [react()]
+    },
+    
+    // JSON optimization
+    json: {
+      namedExports: true,
+      stringify: isProd
+    }
   };
 });

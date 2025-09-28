@@ -307,6 +307,13 @@ interface ThemeContextType {
   setThemeMode: (mode: ThemeMode) => void;
   tokens: typeof designTokens;
   isDark: boolean;
+  // Accessibility features
+  reducedMotion: boolean;
+  setReducedMotion: (enabled: boolean) => void;
+  highContrast: boolean;
+  setHighContrast: (enabled: boolean) => void;
+  fontSize: 'small' | 'medium' | 'large';
+  setFontSize: (size: 'small' | 'medium' | 'large') => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -330,6 +337,24 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   });
 
+  // Accessibility states
+  const [reducedMotion, setReducedMotionState] = useState<boolean>(() => {
+    const saved = localStorage.getItem('reduced-motion');
+    if (saved) return saved === 'true';
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  });
+
+  const [highContrast, setHighContrastState] = useState<boolean>(() => {
+    const saved = localStorage.getItem('high-contrast');
+    if (saved) return saved === 'true';
+    return window.matchMedia('(prefers-contrast: high)').matches;
+  });
+
+  const [fontSize, setFontSizeState] = useState<'small' | 'medium' | 'large'>(() => {
+    const saved = localStorage.getItem('font-size') as 'small' | 'medium' | 'large';
+    return saved || 'medium';
+  });
+
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const handleChange = (e: MediaQueryListEvent) => {
@@ -340,9 +365,50 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
 
+  // Listen for accessibility preference changes
+  useEffect(() => {
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const contrastQuery = window.matchMedia('(prefers-contrast: high)');
+
+    const handleMotionChange = (e: MediaQueryListEvent) => {
+      if (!localStorage.getItem('reduced-motion')) {
+        setReducedMotionState(e.matches);
+      }
+    };
+
+    const handleContrastChange = (e: MediaQueryListEvent) => {
+      if (!localStorage.getItem('high-contrast')) {
+        setHighContrastState(e.matches);
+      }
+    };
+
+    motionQuery.addEventListener('change', handleMotionChange);
+    contrastQuery.addEventListener('change', handleContrastChange);
+
+    return () => {
+      motionQuery.removeEventListener('change', handleMotionChange);
+      contrastQuery.removeEventListener('change', handleContrastChange);
+    };
+  }, []);
+
   const setThemeMode = (mode: ThemeMode) => {
     setThemeModeState(mode);
     localStorage.setItem('theme-mode', mode);
+  };
+
+  const setReducedMotion = (enabled: boolean) => {
+    setReducedMotionState(enabled);
+    localStorage.setItem('reduced-motion', enabled.toString());
+  };
+
+  const setHighContrast = (enabled: boolean) => {
+    setHighContrastState(enabled);
+    localStorage.setItem('high-contrast', enabled.toString());
+  };
+
+  const setFontSize = (size: 'small' | 'medium' | 'large') => {
+    setFontSizeState(size);
+    localStorage.setItem('font-size', size);
   };
 
   const resolvedTheme = themeMode === 'system' ? systemTheme : themeMode;
@@ -414,7 +480,22 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
     // Set theme class on body
     document.body.className = document.body.className.replace(/theme-\w+/g, '');
     document.body.classList.add(`theme-${resolvedTheme}`);
-  }, [theme, resolvedTheme]);
+
+    // Apply accessibility classes
+    document.body.classList.toggle('reduced-motion', reducedMotion);
+    document.body.classList.toggle('high-contrast', highContrast);
+    
+    // Apply font size class
+    document.body.className = document.body.className.replace(/font-size-\w+/g, '');
+    document.body.classList.add(`font-size-${fontSize}`);
+
+    // Apply CSS custom properties for accessibility
+    root.style.setProperty('--reduced-motion', reducedMotion ? '1' : '0');
+    root.style.setProperty('--high-contrast', highContrast ? '1' : '0');
+    
+    const fontSizeMultiplier = fontSize === 'small' ? 0.875 : fontSize === 'large' ? 1.125 : 1;
+    root.style.setProperty('--font-size-multiplier', fontSizeMultiplier.toString());
+  }, [theme, resolvedTheme, reducedMotion, highContrast, fontSize]);
 
   const value: ThemeContextType = {
     theme,
@@ -422,6 +503,12 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
     setThemeMode,
     tokens: designTokens,
     isDark,
+    reducedMotion,
+    setReducedMotion,
+    highContrast,
+    setHighContrast,
+    fontSize,
+    setFontSize,
   };
 
   return (
@@ -506,5 +593,121 @@ export const createThemeStyles = (theme: Theme, tokens: typeof designTokens) => 
     transition: `all ${tokens.transitions.normal} ease-in-out`,
   },
 });
+
+// Accessibility utility hooks
+export const useAccessibility = () => {
+  const { reducedMotion, highContrast, fontSize, setReducedMotion, setHighContrast, setFontSize } = useTheme();
+  
+  return {
+    reducedMotion,
+    highContrast,
+    fontSize,
+    setReducedMotion,
+    setHighContrast,
+    setFontSize,
+    // Helper functions
+    getAnimationDuration: (normalDuration: number) => reducedMotion ? 0 : normalDuration,
+    shouldAnimate: !reducedMotion,
+    getContrastColor: (lightColor: string, darkColor: string) => highContrast ? darkColor : lightColor,
+  };
+};
+
+// Motion-safe animation hook
+export const useMotionSafe = () => {
+  const { reducedMotion } = useTheme();
+  
+  return {
+    animate: (animation: any) => reducedMotion ? false : animation,
+    transition: (transition: any) => reducedMotion ? { duration: 0 } : transition,
+    duration: reducedMotion ? 0 : undefined,
+  };
+};
+
+// Focus management utilities
+export const useFocusManagement = () => {
+  const focusElement = (selector: string) => {
+    const element = document.querySelector(selector) as HTMLElement;
+    if (element) {
+      element.focus();
+    }
+  };
+
+  const trapFocus = (containerRef: React.RefObject<HTMLElement>) => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const focusableElements = container.querySelectorAll(
+      'a[href], button, textarea, input[type="text"], input[type="radio"], input[type="checkbox"], select'
+    );
+    const firstElement = focusableElements[0] as HTMLElement;
+    const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
+
+    const handleTabKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+
+      if (e.shiftKey) {
+        if (document.activeElement === firstElement) {
+          e.preventDefault();
+          lastElement.focus();
+        }
+      } else {
+        if (document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement.focus();
+        }
+      }
+    };
+
+    container.addEventListener('keydown', handleTabKey);
+
+    // Focus first element
+    firstElement?.focus();
+
+    return () => {
+      container.removeEventListener('keydown', handleTabKey);
+    };
+  };
+
+  return { focusElement, trapFocus };
+};
+
+// Keyboard navigation hook
+export const useKeyboardNavigation = (
+  onEnter?: () => void,
+  onEscape?: () => void,
+  onArrowKeys?: (direction: 'up' | 'down' | 'left' | 'right') => void
+) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    switch (e.key) {
+      case 'Enter':
+      case ' ':
+        e.preventDefault();
+        onEnter?.();
+        break;
+      case 'Escape':
+        e.preventDefault();
+        onEscape?.();
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        onArrowKeys?.('up');
+        break;
+      case 'ArrowDown':
+        e.preventDefault();
+        onArrowKeys?.('down');
+        break;
+      case 'ArrowLeft':
+        e.preventDefault();
+        onArrowKeys?.('left');
+        break;
+      case 'ArrowRight':
+        e.preventDefault();
+        onArrowKeys?.('right');
+        break;
+    }
+  };
+
+  return { handleKeyDown };
+};
 
 export default ThemeContext;

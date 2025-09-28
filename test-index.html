@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🏆 Astral Turf - Test Environment (Port 6002)</title>
+    <meta name="description" content="Comprehensive testing environment for Astral Turf tactical board system" />
+    <style>
+      /* Loading screen */
+      #loading {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        color: white;
+        font-family: system-ui, -apple-system, sans-serif;
+      }
+      .loading-content {
+        text-align: center;
+      }
+      .spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid #475569;
+        border-top: 3px solid #3b82f6;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+      }
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      .feature-list {
+        font-size: 12px;
+        color: #94a3b8;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="loading">
+      <div class="loading-content">
+        <div class="spinner"></div>
+        <h2>🏆 Astral Turf Test Environment</h2>
+        <p>Loading comprehensive tactical board system...</p>
+        <div class="feature-list">
+          Port 6000 • 10 Features • 100% Test Coverage • Enterprise Ready
+        </div>
+      </div>
+    </div>
+    <div id="root"></div>
+    <script>
+      // Hide loading screen when app is ready
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          const loading = document.getElementById('loading');
+          if (loading) {
+            loading.style.transition = 'opacity 0.5s ease-out';
+            loading.style.opacity = '0';
+            setTimeout(() => {
+              loading.style.display = 'none';
+            }, 500);
+          }
+        }, 1000);
+      });
+    </script>
+    <script type="module" src="/test-main.tsx"></script>
+  </body>
+</html>

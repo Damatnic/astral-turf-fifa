@@ -8,7 +8,7 @@
 import { securityLogger } from './logging';
 import type { UserRole } from '../types';
 
-// Define available permissions
+// Guardian Enhanced Tactical Permissions
 export enum Permission {
   // Player management permissions
   VIEW_PLAYERS = 'VIEW_PLAYERS',
@@ -16,11 +16,38 @@ export enum Permission {
   DELETE_PLAYERS = 'DELETE_PLAYERS',
   ASSIGN_PLAYERS = 'ASSIGN_PLAYERS',
 
-  // Formation and tactics permissions
+  // Formation and tactics permissions - Enhanced
   VIEW_FORMATIONS = 'VIEW_FORMATIONS',
   EDIT_FORMATIONS = 'EDIT_FORMATIONS',
   CREATE_FORMATIONS = 'CREATE_FORMATIONS',
   DELETE_FORMATIONS = 'DELETE_FORMATIONS',
+  SHARE_FORMATIONS = 'SHARE_FORMATIONS',
+  EXPORT_FORMATIONS = 'EXPORT_FORMATIONS',
+  IMPORT_FORMATIONS = 'IMPORT_FORMATIONS',
+  
+  // Tactical board specific permissions
+  VIEW_TACTICAL_BOARD = 'VIEW_TACTICAL_BOARD',
+  EDIT_TACTICAL_BOARD = 'EDIT_TACTICAL_BOARD',
+  CREATE_TACTICAL_DRAWINGS = 'CREATE_TACTICAL_DRAWINGS',
+  DELETE_TACTICAL_DRAWINGS = 'DELETE_TACTICAL_DRAWINGS',
+  ANNOTATE_TACTICAL_BOARD = 'ANNOTATE_TACTICAL_BOARD',
+  
+  // Advanced tactical permissions
+  VIEW_OPPONENT_ANALYSIS = 'VIEW_OPPONENT_ANALYSIS',
+  EDIT_OPPONENT_ANALYSIS = 'EDIT_OPPONENT_ANALYSIS',
+  CREATE_TACTICAL_INSTRUCTIONS = 'CREATE_TACTICAL_INSTRUCTIONS',
+  VIEW_TACTICAL_INSTRUCTIONS = 'VIEW_TACTICAL_INSTRUCTIONS',
+  
+  // Formation classification access
+  VIEW_PUBLIC_FORMATIONS = 'VIEW_PUBLIC_FORMATIONS',
+  VIEW_INTERNAL_FORMATIONS = 'VIEW_INTERNAL_FORMATIONS',
+  VIEW_CONFIDENTIAL_FORMATIONS = 'VIEW_CONFIDENTIAL_FORMATIONS',
+  VIEW_SECRET_FORMATIONS = 'VIEW_SECRET_FORMATIONS',
+  
+  // Collaboration permissions
+  REAL_TIME_COLLABORATION = 'REAL_TIME_COLLABORATION',
+  PRESENTATION_MODE = 'PRESENTATION_MODE',
+  SCREEN_SHARING = 'SCREEN_SHARING',
 
   // Match and simulation permissions
   SIMULATE_MATCHES = 'SIMULATE_MATCHES',
@@ -59,10 +86,15 @@ export enum Permission {
   EXPORT_DATA = 'EXPORT_DATA',
 }
 
-// Define resource types for fine-grained access control
+// Define resource types for fine-grained access control - Enhanced for Guardian
 export enum Resource {
   PLAYER = 'PLAYER',
   FORMATION = 'FORMATION',
+  TACTICAL_BOARD = 'TACTICAL_BOARD',
+  TACTICAL_DRAWING = 'TACTICAL_DRAWING',
+  TACTICAL_ANNOTATION = 'TACTICAL_ANNOTATION',
+  TACTICAL_INSTRUCTION = 'TACTICAL_INSTRUCTION',
+  OPPONENT_ANALYSIS = 'OPPONENT_ANALYSIS',
   MATCH = 'MATCH',
   TRAINING = 'TRAINING',
   FINANCE = 'FINANCE',
@@ -134,6 +166,109 @@ export const ROLE_PERMISSIONS: Record<UserRole, PermissionRule[]> = {
       permission: Permission.DELETE_FORMATIONS,
       resource: Resource.FORMATION,
       description: 'Delete formations',
+    },
+    {
+      permission: Permission.SHARE_FORMATIONS,
+      resource: Resource.FORMATION,
+      description: 'Share formations with team members',
+    },
+    {
+      permission: Permission.EXPORT_FORMATIONS,
+      resource: Resource.FORMATION,
+      description: 'Export formations to external formats',
+    },
+    {
+      permission: Permission.IMPORT_FORMATIONS,
+      resource: Resource.FORMATION,
+      description: 'Import formations from external sources',
+    },
+
+    // Tactical board permissions
+    {
+      permission: Permission.VIEW_TACTICAL_BOARD,
+      resource: Resource.TACTICAL_BOARD,
+      description: 'Access tactical board interface',
+    },
+    {
+      permission: Permission.EDIT_TACTICAL_BOARD,
+      resource: Resource.TACTICAL_BOARD,
+      description: 'Modify tactical board configurations',
+    },
+    {
+      permission: Permission.CREATE_TACTICAL_DRAWINGS,
+      resource: Resource.TACTICAL_DRAWING,
+      description: 'Create tactical drawings and annotations',
+    },
+    {
+      permission: Permission.DELETE_TACTICAL_DRAWINGS,
+      resource: Resource.TACTICAL_DRAWING,
+      description: 'Delete tactical drawings',
+    },
+    {
+      permission: Permission.ANNOTATE_TACTICAL_BOARD,
+      resource: Resource.TACTICAL_ANNOTATION,
+      description: 'Add annotations to tactical board',
+    },
+
+    // Advanced tactical analysis
+    {
+      permission: Permission.VIEW_OPPONENT_ANALYSIS,
+      resource: Resource.OPPONENT_ANALYSIS,
+      description: 'View opponent analysis data',
+    },
+    {
+      permission: Permission.EDIT_OPPONENT_ANALYSIS,
+      resource: Resource.OPPONENT_ANALYSIS,
+      description: 'Edit opponent analysis data',
+    },
+    {
+      permission: Permission.CREATE_TACTICAL_INSTRUCTIONS,
+      resource: Resource.TACTICAL_INSTRUCTION,
+      description: 'Create tactical instructions for players',
+    },
+    {
+      permission: Permission.VIEW_TACTICAL_INSTRUCTIONS,
+      resource: Resource.TACTICAL_INSTRUCTION,
+      description: 'View tactical instructions',
+    },
+
+    // Formation classification access (full access for coaches)
+    {
+      permission: Permission.VIEW_PUBLIC_FORMATIONS,
+      resource: Resource.FORMATION,
+      description: 'View public formations',
+    },
+    {
+      permission: Permission.VIEW_INTERNAL_FORMATIONS,
+      resource: Resource.FORMATION,
+      description: 'View internal team formations',
+    },
+    {
+      permission: Permission.VIEW_CONFIDENTIAL_FORMATIONS,
+      resource: Resource.FORMATION,
+      description: 'View confidential formations',
+    },
+    {
+      permission: Permission.VIEW_SECRET_FORMATIONS,
+      resource: Resource.FORMATION,
+      description: 'View strategic secret formations',
+    },
+
+    // Collaboration features
+    {
+      permission: Permission.REAL_TIME_COLLABORATION,
+      resource: Resource.TACTICAL_BOARD,
+      description: 'Participate in real-time collaboration',
+    },
+    {
+      permission: Permission.PRESENTATION_MODE,
+      resource: Resource.TACTICAL_BOARD,
+      description: 'Use presentation mode for tactical board',
+    },
+    {
+      permission: Permission.SCREEN_SHARING,
+      resource: Resource.TACTICAL_BOARD,
+      description: 'Share tactical board screen',
     },
 
     // Match management
@@ -250,11 +385,43 @@ export const ROLE_PERMISSIONS: Record<UserRole, PermissionRule[]> = {
       description: 'Edit own data',
     },
 
-    // Formation viewing only
+    // Formation viewing only (limited)
     {
       permission: Permission.VIEW_FORMATIONS,
       resource: Resource.FORMATION,
       description: 'View formations',
+    },
+    {
+      permission: Permission.VIEW_PUBLIC_FORMATIONS,
+      resource: Resource.FORMATION,
+      description: 'View public formations',
+    },
+    {
+      permission: Permission.VIEW_INTERNAL_FORMATIONS,
+      resource: Resource.FORMATION,
+      conditions: [Condition.SAME_TEAM],
+      description: 'View team internal formations',
+    },
+
+    // Limited tactical board access
+    {
+      permission: Permission.VIEW_TACTICAL_BOARD,
+      resource: Resource.TACTICAL_BOARD,
+      description: 'View tactical board (read-only)',
+    },
+    {
+      permission: Permission.VIEW_TACTICAL_INSTRUCTIONS,
+      resource: Resource.TACTICAL_INSTRUCTION,
+      conditions: [Condition.OWN_DATA],
+      description: 'View own tactical instructions',
+    },
+
+    // Basic collaboration
+    {
+      permission: Permission.REAL_TIME_COLLABORATION,
+      resource: Resource.TACTICAL_BOARD,
+      conditions: [Condition.APPROVED_BY_COACH],
+      description: 'Participate in tactical sessions when invited',
     },
 
     // Match viewing

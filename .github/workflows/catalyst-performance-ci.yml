@@ -1,0 +1,473 @@
+name: 🚀 Catalyst Performance CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run performance tests daily at 6 AM UTC
+    - cron: '0 6 * * *'
+
+env:
+  NODE_VERSION: '18.x'
+  PERFORMANCE_BUDGET_FAIL_ON_ERROR: true
+  LIGHTHOUSE_CI_TOKEN: ${{ secrets.LIGHTHOUSE_CI_TOKEN }}
+
+jobs:
+  performance-audit:
+    name: 🔍 Performance Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    strategy:
+      matrix:
+        viewport: [mobile, desktop]
+        
+    steps:
+      - name: 📦 Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📥 Install Dependencies
+        run: |
+          npm ci --prefer-offline --no-audit
+          npm install -g @lhci/cli lighthouse chrome-launcher
+
+      - name: 📊 Cache Performance Data
+        uses: actions/cache@v3
+        with:
+          path: |
+            .lighthouseci
+            performance-reports
+          key: performance-${{ matrix.viewport }}-${{ github.sha }}
+          restore-keys: |
+            performance-${{ matrix.viewport }}-
+
+      - name: 🏗️ Build Application
+        run: |
+          npm run build
+          echo "Build completed successfully ✅"
+
+      - name: 🚀 Run Lighthouse CI (Mobile)
+        if: matrix.viewport == 'mobile'
+        run: |
+          lhci autorun --config=.lighthouserc-mobile.json || exit 1
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+      - name: 🖥️ Run Lighthouse CI (Desktop)
+        if: matrix.viewport == 'desktop'
+        run: |
+          lhci autorun --config=.lighthouserc-desktop.json || exit 1
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+      - name: 📊 Generate Performance Report
+        run: |
+          node scripts/performance-check.js
+          echo "Performance check completed ✅"
+
+      - name: 📈 Upload Performance Artifacts
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: performance-report-${{ matrix.viewport }}
+          path: |
+            performance-report.json
+            .lighthouseci/
+          retention-days: 30
+
+  bundle-analysis:
+    name: 📦 Bundle Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: 📦 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📥 Install Dependencies
+        run: npm ci --prefer-offline --no-audit
+
+      - name: 🏗️ Build with Bundle Analysis
+        run: |
+          npm run build
+          npm run analyze:bundle || echo "Bundle analysis completed"
+
+      - name: 📊 Bundle Size Check
+        run: |
+          node -e "
+            const fs = require('fs');
+            const path = require('path');
+            const budgets = JSON.parse(fs.readFileSync('performance-budgets.json', 'utf8'));
+            
+            // Check bundle sizes
+            const distPath = './dist';
+            let totalSize = 0;
+            let jsSize = 0;
+            let cssSize = 0;
+            
+            function getFilesRecursive(dir, ext) {
+              let files = [];
+              const items = fs.readdirSync(dir);
+              for (const item of items) {
+                const fullPath = path.join(dir, item);
+                if (fs.statSync(fullPath).isDirectory()) {
+                  files = files.concat(getFilesRecursive(fullPath, ext));
+                } else if (fullPath.endsWith(ext)) {
+                  files.push(fullPath);
+                }
+              }
+              return files;
+            }
+            
+            // Calculate JS bundle size
+            const jsFiles = getFilesRecursive(distPath, '.js');
+            jsFiles.forEach(file => {
+              jsSize += fs.statSync(file).size;
+            });
+            
+            // Calculate CSS bundle size
+            const cssFiles = getFilesRecursive(distPath, '.css');
+            cssFiles.forEach(file => {
+              cssSize += fs.statSync(file).size;
+            });
+            
+            totalSize = jsSize + cssSize;
+            
+            const jsKB = Math.round(jsSize / 1024);
+            const cssKB = Math.round(cssSize / 1024);
+            const totalKB = Math.round(totalSize / 1024);
+            
+            console.log('📦 Bundle Size Analysis:');
+            console.log(\`  JavaScript: \${jsKB}KB\`);
+            console.log(\`  CSS: \${cssKB}KB\`);
+            console.log(\`  Total: \${totalKB}KB\`);
+            
+            // Check against budgets
+            const scriptBudget = budgets.budgets[0].resourceSizes.find(r => r.resourceType === 'script').budget;
+            const styleBudget = budgets.budgets[0].resourceSizes.find(r => r.resourceType === 'stylesheet').budget;
+            const totalBudget = budgets.budgets[0].resourceSizes.find(r => r.resourceType === 'total').budget;
+            
+            let failed = false;
+            
+            if (jsKB > scriptBudget) {
+              console.log(\`❌ JavaScript bundle (\${jsKB}KB) exceeds budget (\${scriptBudget}KB)\`);
+              failed = true;
+            } else {
+              console.log(\`✅ JavaScript bundle within budget\`);
+            }
+            
+            if (cssKB > styleBudget) {
+              console.log(\`❌ CSS bundle (\${cssKB}KB) exceeds budget (\${styleBudget}KB)\`);
+              failed = true;
+            } else {
+              console.log(\`✅ CSS bundle within budget\`);
+            }
+            
+            if (totalKB > totalBudget) {
+              console.log(\`❌ Total bundle (\${totalKB}KB) exceeds budget (\${totalBudget}KB)\`);
+              failed = true;
+            } else {
+              console.log(\`✅ Total bundle within budget\`);
+            }
+            
+            if (failed) {
+              console.log('❌ Bundle size check failed');
+              process.exit(1);
+            } else {
+              console.log('✅ Bundle size check passed');
+            }
+          "
+
+      - name: 📊 Upload Bundle Analysis
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: bundle-analysis
+          path: |
+            dist/
+            bundle-analysis.json
+          retention-days: 30
+
+  load-testing:
+    name: ⚡ Load Testing
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+      - name: 📦 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📥 Install Dependencies
+        run: |
+          npm ci --prefer-offline --no-audit
+          npm install -g autocannon
+
+      - name: 🏗️ Build Application
+        run: npm run build
+
+      - name: 🚀 Start Application
+        run: |
+          npm run preview &
+          sleep 10
+          echo "Application started ✅"
+
+      - name: ⚡ Run Load Tests
+        run: |
+          echo "Running load tests..."
+          
+          # Basic load test
+          autocannon -c 10 -d 30 -j http://localhost:4173 > load-test-results.json
+          
+          # Parse results
+          node -e "
+            const results = JSON.parse(require('fs').readFileSync('load-test-results.json', 'utf8'));
+            const latency = results.latency;
+            const requests = results.requests;
+            const throughput = results.throughput;
+            
+            console.log('⚡ Load Test Results:');
+            console.log(\`  Requests/sec: \${requests.mean}\`);
+            console.log(\`  Latency (avg): \${latency.mean}ms\`);
+            console.log(\`  Latency (p95): \${latency.p95}ms\`);
+            console.log(\`  Latency (p99): \${latency.p99}ms\`);
+            console.log(\`  Throughput: \${throughput.mean} MB/sec\`);
+            
+            // Check against thresholds
+            const budgets = JSON.parse(require('fs').readFileSync('performance-budgets.json', 'utf8'));
+            const thresholds = budgets.catalyst.monitoring.alertThresholds;
+            
+            if (latency.p95 <= thresholds.p95ResponseTime) {
+              console.log('✅ P95 latency within threshold');
+            } else {
+              console.log(\`❌ P95 latency (\${latency.p95}ms) exceeds threshold (\${thresholds.p95ResponseTime}ms)\`);
+              process.exit(1);
+            }
+            
+            if (requests.mean >= 100) { // Minimum 100 RPS
+              console.log('✅ Throughput acceptable');
+            } else {
+              console.log(\`❌ Throughput (\${requests.mean} RPS) below minimum (100 RPS)\`);
+              process.exit(1);
+            }
+          "
+
+      - name: 📊 Upload Load Test Results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: load-test-results
+          path: load-test-results.json
+          retention-days: 30
+
+  memory-profiling:
+    name: 🧠 Memory Profiling
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: 📦 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📥 Install Dependencies
+        run: npm ci --prefer-offline --no-audit
+
+      - name: 🧠 Run Memory Tests
+        run: |
+          npm run test:performance
+          echo "Memory profiling completed ✅"
+
+      - name: 📊 Memory Usage Analysis
+        run: |
+          node -e "
+            console.log('🧠 Memory Usage Analysis:');
+            const usage = process.memoryUsage();
+            console.log(\`  RSS: \${Math.round(usage.rss / 1024 / 1024)}MB\`);
+            console.log(\`  Heap Used: \${Math.round(usage.heapUsed / 1024 / 1024)}MB\`);
+            console.log(\`  Heap Total: \${Math.round(usage.heapTotal / 1024 / 1024)}MB\`);
+            console.log(\`  External: \${Math.round(usage.external / 1024 / 1024)}MB\`);
+            
+            // Check against thresholds
+            const budgets = JSON.parse(require('fs').readFileSync('performance-budgets.json', 'utf8'));
+            const thresholds = budgets.catalyst.thresholds.memoryUsage;
+            
+            if (usage.heapUsed <= thresholds.warning) {
+              console.log('✅ Memory usage within normal range');
+            } else {
+              console.log('⚠️ Memory usage approaching warning threshold');
+            }
+          "
+
+  performance-regression:
+    name: 📈 Performance Regression Check
+    runs-on: ubuntu-latest
+    needs: [performance-audit, bundle-analysis]
+    if: github.event_name == 'pull_request'
+    timeout-minutes: 10
+    
+    steps:
+      - name: 📦 Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 📥 Download Performance Reports
+        uses: actions/download-artifact@v3
+        with:
+          name: performance-report-desktop
+          path: ./current-reports
+
+      - name: 📊 Get Baseline Performance Data
+        run: |
+          # Get performance data from main branch
+          git checkout origin/main -- performance-report.json || echo "No baseline found"
+          
+          # Compare current vs baseline
+          node -e "
+            const fs = require('fs');
+            
+            let baseline = {};
+            let current = {};
+            
+            try {
+              baseline = JSON.parse(fs.readFileSync('performance-report.json', 'utf8'));
+            } catch (e) {
+              console.log('⚠️ No baseline performance data found');
+              baseline = { results: { lighthouse: null } };
+            }
+            
+            try {
+              current = JSON.parse(fs.readFileSync('./current-reports/performance-report.json', 'utf8'));
+            } catch (e) {
+              console.log('❌ Current performance data not found');
+              process.exit(1);
+            }
+            
+            console.log('📈 Performance Regression Analysis:');
+            
+            // Compare Lighthouse scores if available
+            if (baseline.results?.lighthouse && current.results?.lighthouse) {
+              const baselineReport = JSON.parse(baseline.results.lighthouse);
+              const currentReport = JSON.parse(current.results.lighthouse);
+              
+              const categories = ['performance', 'accessibility', 'best-practices', 'seo'];
+              let regressions = 0;
+              
+              categories.forEach(category => {
+                const baselineScore = Math.round((baselineReport.categories[category]?.score || 0) * 100);
+                const currentScore = Math.round((currentReport.categories[category]?.score || 0) * 100);
+                const delta = currentScore - baselineScore;
+                
+                if (delta >= 0) {
+                  console.log(\`  ✅ \${category}: \${currentScore} (Δ+\${delta})\`);
+                } else if (delta >= -5) {
+                  console.log(\`  ⚠️ \${category}: \${currentScore} (Δ\${delta})\`);
+                } else {
+                  console.log(\`  ❌ \${category}: \${currentScore} (Δ\${delta})\`);
+                  regressions++;
+                }
+              });
+              
+              if (regressions > 0) {
+                console.log(\`❌ \${regressions} performance regression(s) detected\`);
+                process.exit(1);
+              } else {
+                console.log('✅ No performance regressions detected');
+              }
+            } else {
+              console.log('ℹ️ Skipping regression analysis - insufficient data');
+            }
+          "
+
+  performance-summary:
+    name: 📋 Performance Summary
+    runs-on: ubuntu-latest
+    needs: [performance-audit, bundle-analysis, load-testing, memory-profiling]
+    if: always()
+    timeout-minutes: 5
+    
+    steps:
+      - name: 📦 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 📥 Download All Reports
+        uses: actions/download-artifact@v3
+        with:
+          path: ./reports
+
+      - name: 📊 Generate Performance Summary
+        run: |
+          echo "# 🚀 Catalyst Performance Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 📊 Performance Audit Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Check job statuses
+          if [[ "${{ needs.performance-audit.result }}" == "success" ]]; then
+            echo "✅ **Performance Audit**: Passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Performance Audit**: Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [[ "${{ needs.bundle-analysis.result }}" == "success" ]]; then
+            echo "✅ **Bundle Analysis**: Passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Bundle Analysis**: Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [[ "${{ needs.load-testing.result }}" == "success" ]]; then
+            echo "✅ **Load Testing**: Passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Load Testing**: Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [[ "${{ needs.memory-profiling.result }}" == "success" ]]; then
+            echo "✅ **Memory Profiling**: Passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Memory Profiling**: Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 🎯 Performance Targets" >> $GITHUB_STEP_SUMMARY
+          echo "- **LCP**: < 2.5s" >> $GITHUB_STEP_SUMMARY
+          echo "- **FID**: < 100ms" >> $GITHUB_STEP_SUMMARY
+          echo "- **CLS**: < 0.1" >> $GITHUB_STEP_SUMMARY
+          echo "- **Bundle Size**: < 500KB" >> $GITHUB_STEP_SUMMARY
+          echo "- **Lighthouse Score**: > 90" >> $GITHUB_STEP_SUMMARY
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "⚡ **Catalyst Performance System Active** ⚡" >> $GITHUB_STEP_SUMMARY
+
+      - name: 🚨 Notify on Performance Failure
+        if: failure()
+        run: |
+          echo "❌ Performance checks failed!"
+          echo "Please review the performance reports and fix any issues."
+          exit 1

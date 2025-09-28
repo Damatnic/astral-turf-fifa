@@ -1,7 +1,8 @@
-import React, { useState, useMemo, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
+import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import { type Formation } from '../../types';
-import { X, Search, Filter, Star, TrendingUp, Shield, Zap } from 'lucide-react';
+import { X, Search, Filter, Star, TrendingUp, Shield, Zap, Play, Info, Users, Target, Eye } from 'lucide-react';
+import { useResponsive } from '../../hooks';
 
 interface FormationTemplatesProps {
   onSelect: (formation: Formation) => void;
@@ -20,12 +21,23 @@ interface FormationTemplate {
   weaknesses: string[];
   formation: Formation;
   preview: string;
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  proTeams: string[];
+  videoUrl?: string;
 }
 
 const FormationTemplates: React.FC<FormationTemplatesProps> = ({ onSelect, onClose }) => {
+  const { isMobile, isTablet } = useResponsive();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<FormationCategory>('all');
   const [selectedTemplate, setSelectedTemplate] = useState<FormationTemplate | null>(null);
+  const [hoveredTemplate, setHoveredTemplate] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  
+  // Animation controls
+  const containerControls = useAnimation();
+  const headerControls = useAnimation();
 
   // Formation templates data
   const formationTemplates: FormationTemplate[] = useMemo(() => [
@@ -38,6 +50,9 @@ const FormationTemplates: React.FC<FormationTemplatesProps> = ({ onSelect, onClo
       strengths: ['Width in attack', 'Midfield control', 'Defensive stability'],
       weaknesses: ['Vulnerable to counter-attacks', 'Requires fit wingbacks'],
       preview: '🟦🟦🟦🟦\n  🟨🟨🟨\n🟩  🟩  🟩',
+      difficulty: 'intermediate',
+      proTeams: ['Barcelona', 'Man City', 'Bayern Munich'],
+      videoUrl: 'https://example.com/4-3-3-guide',
       formation: {
         id: '4-3-3',
         name: '4-3-3 Classic',
@@ -70,6 +85,9 @@ const FormationTemplates: React.FC<FormationTemplatesProps> = ({ onSelect, onClo
       strengths: ['Strong central midfield', 'Good for counter-attacks', 'Two striker threat'],
       weaknesses: ['Lacks width', 'Vulnerable on flanks'],
       preview: '🟦🟦🟦🟦\n 🟨🟨🟨🟨\n  🟩🟩',
+      difficulty: 'beginner',
+      proTeams: ['Leicester City', 'Atletico Madrid'],
+      videoUrl: 'https://example.com/4-4-2-guide',
       formation: {
         id: '4-4-2',
         name: '4-4-2 Diamond',
@@ -102,6 +120,9 @@ const FormationTemplates: React.FC<FormationTemplatesProps> = ({ onSelect, onClo
       strengths: ['Numerical advantage in midfield', 'Attacking wing-backs', 'Strong central defense'],
       weaknesses: ['Exposed flanks when attacking', 'Requires disciplined wing-backs'],
       preview: ' 🟦🟦🟦\n🟨🟨🟨🟨🟨\n  🟩🟩',
+      difficulty: 'advanced',
+      proTeams: ['Inter Milan', 'Chelsea'],
+      videoUrl: 'https://example.com/3-5-2-guide',
       formation: {
         id: '3-5-2',
         name: '3-5-2 Wing-backs',
@@ -134,6 +155,9 @@ const FormationTemplates: React.FC<FormationTemplatesProps> = ({ onSelect, onClo
       strengths: ['Very solid defense', 'Good for counter-attacks', 'Hard to break down'],
       weaknesses: ['Limited attacking options', 'Relies on individual brilliance'],
       preview: '🟦🟦🟦🟦🟦\n  🟨🟨🟨\n   🟩🟩',
+      difficulty: 'intermediate',
+      proTeams: ['Juventus', 'Portugal NT'],
+      videoUrl: 'https://example.com/5-3-2-guide',
       formation: {
         id: '5-3-2',
         name: '5-3-2 Defensive',
@@ -166,6 +190,9 @@ const FormationTemplates: React.FC<FormationTemplatesProps> = ({ onSelect, onClo
       strengths: ['Balance in all areas', 'Creative freedom', 'Defensive solidity'],
       weaknesses: ['Complex to implement', 'Requires technical players'],
       preview: '🟦🟦🟦🟦\n  🟨🟨\n🟨🟨🟨\n  🟩',
+      difficulty: 'advanced',
+      proTeams: ['Real Madrid', 'Liverpool', 'PSG'],
+      videoUrl: 'https://example.com/4-2-3-1-guide',
       formation: {
         id: '4-2-3-1',
         name: '4-2-3-1 Modern',
@@ -217,6 +244,105 @@ const FormationTemplates: React.FC<FormationTemplatesProps> = ({ onSelect, onClo
     onSelect(template.formation);
     onClose();
   }, [onSelect, onClose]);
+
+  // Handle template detail view
+  const handleShowDetails = useCallback((template: FormationTemplate, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedTemplate(template);
+    setShowDetailModal(true);
+  }, []);
+
+  // Interactive SVG Formation Preview Component
+  const FormationPreview: React.FC<{ 
+    template: FormationTemplate; 
+    isHovered: boolean; 
+    className?: string;
+  }> = ({ template, isHovered, className = "" }) => {
+    const slots = template.formation.slots || [];
+    
+    return (
+      <div className={`relative bg-gradient-to-br from-green-900/30 via-green-800/20 to-green-900/30 rounded-lg p-4 h-32 ${className}`}>
+        {/* Field background with lines */}
+        <svg 
+          viewBox="0 0 100 100" 
+          className="absolute inset-0 w-full h-full opacity-20"
+          preserveAspectRatio="none"
+        >
+          {/* Center circle */}
+          <circle cx="50" cy="50" r="15" fill="none" stroke="currentColor" strokeWidth="0.5" />
+          <circle cx="50" cy="50" r="1" fill="currentColor" />
+          {/* Penalty areas */}
+          <rect x="30" y="0" width="40" height="18" fill="none" stroke="currentColor" strokeWidth="0.3" />
+          <rect x="30" y="82" width="40" height="18" fill="none" stroke="currentColor" strokeWidth="0.3" />
+          {/* Goals */}
+          <rect x="45" y="0" width="10" height="8" fill="none" stroke="currentColor" strokeWidth="0.3" />
+          <rect x="45" y="92" width="10" height="8" fill="none" stroke="currentColor" strokeWidth="0.3" />
+          {/* Center line */}
+          <line x1="0" y1="50" x2="100" y2="50" stroke="currentColor" strokeWidth="0.3" />
+        </svg>
+        
+        {/* Player positions */}
+        <svg 
+          viewBox="0 0 100 100" 
+          className="absolute inset-0 w-full h-full"
+          preserveAspectRatio="none"
+        >
+          {slots.map((slot, index) => {
+            const isDefender = slot.position?.y > 65;
+            const isMidfielder = slot.position?.y >= 35 && slot.position?.y <= 65;
+            const isAttacker = slot.position?.y < 35;
+            const isGoalkeeper = slot.roleId === 'goalkeeper';
+            
+            const color = isGoalkeeper ? '#fbbf24' : 
+                         isDefender ? '#3b82f6' : 
+                         isMidfielder ? '#10b981' : '#ef4444';
+            
+            return (
+              <motion.circle
+                key={slot.id}
+                cx={slot.position?.x || 50}
+                cy={slot.position?.y || 50}
+                r={isHovered ? "2.5" : "2"}
+                fill={color}
+                stroke="white"
+                strokeWidth="0.5"
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ 
+                  scale: 1, 
+                  opacity: 1,
+                  r: isHovered ? 2.5 : 2
+                }}
+                transition={{ 
+                  delay: index * 0.05,
+                  type: "spring",
+                  stiffness: 400,
+                  damping: 25
+                }}
+                style={{
+                  filter: isHovered ? 'drop-shadow(0 0 2px currentColor)' : 'none'
+                }}
+              />
+            );
+          })}
+        </svg>
+        
+        {/* Popularity badge */}
+        <div className="absolute top-2 right-2 bg-slate-900/90 backdrop-blur-sm rounded-full px-2 py-1 text-xs text-white border border-slate-600/50">
+          <Star className="w-3 h-3 inline mr-1 text-yellow-400" />
+          {template.popularity}%
+        </div>
+        
+        {/* Difficulty indicator */}
+        <div className={`absolute top-2 left-2 px-2 py-1 rounded-full text-xs font-medium ${
+          template.difficulty === 'beginner' ? 'bg-green-600/80 text-green-100' :
+          template.difficulty === 'intermediate' ? 'bg-yellow-600/80 text-yellow-100' :
+          'bg-red-600/80 text-red-100'
+        }`}>
+          {template.difficulty}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <AnimatePresence>
@@ -299,32 +425,64 @@ const FormationTemplates: React.FC<FormationTemplatesProps> = ({ onSelect, onClo
                   layout
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-4 hover:border-blue-500/50 transition-all cursor-pointer group"
+                  whileHover={{ y: -5 }}
+                  className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4 hover:border-blue-500/50 hover:bg-slate-800/70 transition-all cursor-pointer group backdrop-blur-sm"
                   onClick={() => handleSelectTemplate(template)}
+                  onMouseEnter={() => setHoveredTemplate(template.id)}
+                  onMouseLeave={() => setHoveredTemplate(null)}
                 >
-                  {/* Formation Preview */}
-                  <div className="relative bg-gradient-to-br from-green-900/30 to-green-800/30 rounded-lg p-4 mb-4 h-32 flex items-center justify-center">
-                    <div className="text-center text-white/80 font-mono text-sm whitespace-pre-line">
-                      {template.preview}
-                    </div>
-                    <div className="absolute top-2 right-2 bg-slate-900/80 rounded-full px-2 py-1 text-xs text-white">
-                      {template.popularity}%
-                    </div>
-                  </div>
+                  {/* Enhanced Formation Preview */}
+                  <FormationPreview 
+                    template={template} 
+                    isHovered={hoveredTemplate === template.id}
+                    className="mb-4"
+                  />
 
                   {/* Formation Info */}
                   <div>
-                    <h3 className="text-lg font-semibold text-white mb-1 group-hover:text-blue-400 transition-colors">
-                      {template.name}
-                    </h3>
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-lg font-semibold text-white group-hover:text-blue-400 transition-colors">
+                        {template.name}
+                      </h3>
+                      <button
+                        onClick={(e) => handleShowDetails(template, e)}
+                        className="p-1 text-slate-400 hover:text-blue-400 opacity-0 group-hover:opacity-100 transition-all"
+                      >
+                        <Info className="w-4 h-4" />
+                      </button>
+                    </div>
+                    
                     <p className="text-slate-400 text-sm mb-3">
                       {template.description}
                     </p>
 
+                    {/* Pro Teams */}
+                    <div className="mb-3">
+                      <div className="text-blue-400 text-xs font-medium mb-1 flex items-center">
+                        <Users className="w-3 h-3 mr-1" />
+                        Used by
+                      </div>
+                      <div className="flex flex-wrap gap-1">
+                        {template.proTeams.slice(0, 2).map(team => (
+                          <span key={team} className="bg-blue-900/30 text-blue-400 text-xs px-2 py-1 rounded">
+                            {team}
+                          </span>
+                        ))}
+                        {template.proTeams.length > 2 && (
+                          <span className="text-slate-500 text-xs px-2 py-1">
+                            +{template.proTeams.length - 2}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
                     {/* Strengths & Weaknesses */}
                     <div className="space-y-2">
                       <div>
-                        <div className="text-green-400 text-xs font-medium mb-1">Strengths</div>
+                        <div className="text-green-400 text-xs font-medium mb-1 flex items-center">
+                          <TrendingUp className="w-3 h-3 mr-1" />
+                          Strengths
+                        </div>
                         <div className="flex flex-wrap gap-1">
                           {template.strengths.slice(0, 2).map(strength => (
                             <span key={strength} className="bg-green-900/30 text-green-400 text-xs px-2 py-1 rounded">
@@ -334,7 +492,10 @@ const FormationTemplates: React.FC<FormationTemplatesProps> = ({ onSelect, onClo
                         </div>
                       </div>
                       <div>
-                        <div className="text-red-400 text-xs font-medium mb-1">Weaknesses</div>
+                        <div className="text-red-400 text-xs font-medium mb-1 flex items-center">
+                          <Target className="w-3 h-3 mr-1" />
+                          Weaknesses
+                        </div>
                         <div className="flex flex-wrap gap-1">
                           {template.weaknesses.slice(0, 2).map(weakness => (
                             <span key={weakness} className="bg-red-900/30 text-red-400 text-xs px-2 py-1 rounded">
@@ -343,6 +504,31 @@ const FormationTemplates: React.FC<FormationTemplatesProps> = ({ onSelect, onClo
                           ))}
                         </div>
                       </div>
+                    </div>
+                    
+                    {/* Action Buttons */}
+                    <div className="flex gap-2 mt-4 opacity-0 group-hover:opacity-100 transition-all">
+                      <button 
+                        className="flex-1 bg-blue-600/80 hover:bg-blue-700 text-white text-sm py-2 px-3 rounded-lg transition-colors flex items-center justify-center gap-1"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSelectTemplate(template);
+                        }}
+                      >
+                        <Play className="w-3 h-3" />
+                        Use Formation
+                      </button>
+                      {template.videoUrl && (
+                        <button 
+                          className="bg-slate-600/80 hover:bg-slate-700 text-white text-sm py-2 px-3 rounded-lg transition-colors"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            window.open(template.videoUrl, '_blank');
+                          }}
+                        >
+                          <Eye className="w-3 h-3" />
+                        </button>
+                      )}
                     </div>
                   </div>
                 </motion.div>

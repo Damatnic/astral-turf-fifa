@@ -19,10 +19,10 @@ interface ContextualToolbarProps {
   selectedPlayer: Player | null;
   currentFormation: Formation | undefined;
   onFormationChange: (formation: Formation) => void;
-  leftPanelState: 'collapsed' | 'peek' | 'expanded';
-  rightPanelState: 'collapsed' | 'peek' | 'expanded';
-  onToggleLeftPanel: () => void;
-  onToggleRightPanel: () => void;
+  showLeftSidebar: boolean;
+  showRightSidebar: boolean;
+  onToggleLeftSidebar: () => void;
+  onToggleRightSidebar: () => void;
   viewMode: 'standard' | 'fullscreen' | 'presentation';
 }
 
@@ -30,10 +30,10 @@ const ContextualToolbar: React.FC<ContextualToolbarProps> = ({
   selectedPlayer,
   currentFormation,
   onFormationChange,
-  leftPanelState,
-  rightPanelState,
-  onToggleLeftPanel,
-  onToggleRightPanel,
+  showLeftSidebar,
+  showRightSidebar,
+  onToggleLeftSidebar,
+  onToggleRightSidebar,
   viewMode,
 }) => {
   return (
@@ -42,29 +42,29 @@ const ContextualToolbar: React.FC<ContextualToolbarProps> = ({
       <div className="flex items-center gap-3">
         {/* Panel Toggles */}
         <button
-          onClick={onToggleLeftPanel}
+          onClick={onToggleLeftSidebar}
           className={`
             p-2 rounded-lg transition-all
-            ${leftPanelState !== 'collapsed'
+            ${ showLeftSidebar
               ? 'bg-blue-600/80 text-white'
               : 'bg-slate-700/50 text-slate-300 hover:bg-slate-600/50'
             }
           `}
-          title="Toggle Left Panel"
+          title="Toggle Left Sidebar"
         >
           <Menu className="w-5 h-5" />
         </button>
 
         <button
-          onClick={onToggleRightPanel}
+          onClick={onToggleRightSidebar}
           className={`
             p-2 rounded-lg transition-all
-            ${rightPanelState !== 'collapsed'
+            ${ showRightSidebar
               ? 'bg-blue-600/80 text-white'
               : 'bg-slate-700/50 text-slate-300 hover:bg-slate-600/50'
             }
           `}
-          title="Toggle Right Panel"
+          title="Toggle Right Sidebar"
         >
           <Sidebar className="w-5 h-5" />
         </button>

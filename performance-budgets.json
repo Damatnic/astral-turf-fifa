@@ -1,0 +1,225 @@
+{
+  "budgets": [
+    {
+      "path": "/*",
+      "timings": [
+        {
+          "metric": "lcp",
+          "budget": 2500,
+          "tolerance": 100
+        },
+        {
+          "metric": "fid",
+          "budget": 100,
+          "tolerance": 20
+        },
+        {
+          "metric": "cls",
+          "budget": 0.1,
+          "tolerance": 0.02
+        },
+        {
+          "metric": "ttfb",
+          "budget": 600,
+          "tolerance": 100
+        },
+        {
+          "metric": "first-contentful-paint",
+          "budget": 1800,
+          "tolerance": 200
+        },
+        {
+          "metric": "total-blocking-time",
+          "budget": 200,
+          "tolerance": 50
+        }
+      ],
+      "resourceSizes": [
+        {
+          "resourceType": "script",
+          "budget": 150,
+          "tolerance": 25
+        },
+        {
+          "resourceType": "stylesheet",
+          "budget": 50,
+          "tolerance": 10
+        },
+        {
+          "resourceType": "image",
+          "budget": 200,
+          "tolerance": 50
+        },
+        {
+          "resourceType": "font",
+          "budget": 100,
+          "tolerance": 20
+        },
+        {
+          "resourceType": "document",
+          "budget": 25,
+          "tolerance": 5
+        },
+        {
+          "resourceType": "total",
+          "budget": 500,
+          "tolerance": 100
+        }
+      ],
+      "resourceCounts": [
+        {
+          "resourceType": "script",
+          "budget": 10,
+          "tolerance": 2
+        },
+        {
+          "resourceType": "stylesheet",
+          "budget": 5,
+          "tolerance": 1
+        },
+        {
+          "resourceType": "image",
+          "budget": 20,
+          "tolerance": 5
+        },
+        {
+          "resourceType": "font",
+          "budget": 4,
+          "tolerance": 1
+        },
+        {
+          "resourceType": "total",
+          "budget": 50,
+          "tolerance": 10
+        }
+      ]
+    }
+  ],
+  "assertions": [
+    {
+      "auditId": "largest-contentful-paint",
+      "level": "error",
+      "options": {
+        "maxNumericValue": 2500
+      }
+    },
+    {
+      "auditId": "first-input-delay",
+      "level": "error", 
+      "options": {
+        "maxNumericValue": 100
+      }
+    },
+    {
+      "auditId": "cumulative-layout-shift",
+      "level": "error",
+      "options": {
+        "maxNumericValue": 0.1
+      }
+    },
+    {
+      "auditId": "total-blocking-time",
+      "level": "warn",
+      "options": {
+        "maxNumericValue": 200
+      }
+    },
+    {
+      "auditId": "speed-index",
+      "level": "warn",
+      "options": {
+        "maxNumericValue": 3000
+      }
+    },
+    {
+      "auditId": "interactive",
+      "level": "warn",
+      "options": {
+        "maxNumericValue": 3800
+      }
+    },
+    {
+      "auditId": "unused-javascript",
+      "level": "warn",
+      "options": {
+        "maxNumericValue": 50000
+      }
+    },
+    {
+      "auditId": "render-blocking-resources",
+      "level": "warn",
+      "options": {
+        "maxNumericValue": 500
+      }
+    },
+    {
+      "auditId": "uses-optimized-images",
+      "level": "warn"
+    },
+    {
+      "auditId": "uses-webp-images", 
+      "level": "warn"
+    },
+    {
+      "auditId": "efficient-animated-content",
+      "level": "warn"
+    },
+    {
+      "auditId": "uses-responsive-images",
+      "level": "warn"
+    }
+  ],
+  "categories": {
+    "performance": {
+      "minScore": 90
+    },
+    "accessibility": {
+      "minScore": 95
+    },
+    "best-practices": {
+      "minScore": 90
+    },
+    "seo": {
+      "minScore": 95
+    }
+  },
+  "catalyst": {
+    "thresholds": {
+      "memoryUsage": {
+        "warning": 52428800,
+        "critical": 104857600,
+        "emergency": 209715200
+      },
+      "bundleSize": {
+        "mainBundle": 153600,
+        "chunkSize": 102400,
+        "totalSize": 512000
+      },
+      "apiPerformance": {
+        "responseTime": 200,
+        "timeout": 5000,
+        "retryCount": 3
+      },
+      "cacheEfficiency": {
+        "hitRateMin": 0.85,
+        "accessTimeMax": 10
+      },
+      "renderingPerformance": {
+        "frameTime": 16.67,
+        "maxDroppedFrames": 5,
+        "animationBudget": 16.67
+      }
+    },
+    "monitoring": {
+      "intervalMs": 5000,
+      "reportingEndpoint": "/api/performance-metrics",
+      "enableRealUserMonitoring": true,
+      "enableSyntheticMonitoring": true,
+      "alertThresholds": {
+        "performanceScore": 85,
+        "errorRate": 0.01,
+        "p95ResponseTime": 500
+      }
+    }
+  }
+}

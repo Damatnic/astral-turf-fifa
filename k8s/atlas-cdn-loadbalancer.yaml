@@ -1,0 +1,579 @@
+# Atlas Global CDN and Load Balancing Infrastructure
+# Multi-region, high-availability with intelligent traffic routing
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: atlas-global-ingress
+  namespace: astral-turf
+  labels:
+    atlas.networking: global-lb
+  annotations:
+    # Global Load Balancer Configuration
+    kubernetes.io/ingress.class: "gce"
+    kubernetes.io/ingress.global-static-ip-name: "atlas-global-ip"
+    ingress.gcp.io/frontend-config: "atlas-frontend-config"
+    
+    # SSL Configuration
+    kubernetes.io/ingress.allow-http: "false"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    
+    # CDN Configuration
+    cloud.google.com/backend-config: '{"default": "atlas-backend-config"}'
+    ingress.kubernetes.io/rewrite-target: /
+    
+    # Security Headers
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/ssl-protocols: "TLSv1.2 TLSv1.3"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      more_set_headers "Strict-Transport-Security: max-age=31536000; includeSubDomains; preload";
+      more_set_headers "X-Frame-Options: DENY";
+      more_set_headers "X-Content-Type-Options: nosniff";
+      more_set_headers "X-XSS-Protection: 1; mode=block";
+      more_set_headers "Referrer-Policy: strict-origin-when-cross-origin";
+      more_set_headers "Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';";
+    
+    # Rate Limiting
+    nginx.ingress.kubernetes.io/rate-limit: "1000"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+    
+    # Atlas Deployment Annotations
+    atlas.deployment.cdn: "enabled"
+    atlas.deployment.ssl: "letsencrypt"
+    atlas.deployment.regions: "us-central1,europe-west1,asia-southeast1"
+spec:
+  tls:
+  - hosts:
+    - astralturf.com
+    - www.astralturf.com
+    - api.astralturf.com
+    - cdn.astralturf.com
+    secretName: atlas-tls-cert
+  rules:
+  # Main Application
+  - host: astralturf.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: astral-turf-service
+            port:
+              number: 80
+  - host: www.astralturf.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: astral-turf-service
+            port:
+              number: 80
+  
+  # API Endpoints
+  - host: api.astralturf.com
+    http:
+      paths:
+      - path: /v1
+        pathType: Prefix
+        backend:
+          service:
+            name: astral-turf-api-service
+            port:
+              number: 80
+      - path: /health
+        pathType: Exact
+        backend:
+          service:
+            name: astral-turf-service
+            port:
+              number: 80
+  
+  # Static Assets CDN
+  - host: cdn.astralturf.com
+    http:
+      paths:
+      - path: /static
+        pathType: Prefix
+        backend:
+          service:
+            name: astral-turf-cdn-service
+            port:
+              number: 80
+---
+# Atlas Frontend Configuration (GCP)
+apiVersion: networking.gke.io/v1beta1
+kind: FrontendConfig
+metadata:
+  name: atlas-frontend-config
+  namespace: astral-turf
+  labels:
+    atlas.networking: frontend-config
+spec:
+  # SSL Policy
+  sslPolicy: atlas-ssl-policy
+  
+  # Redirect HTTP to HTTPS
+  redirectToHttps:
+    enabled: true
+    responseCodeName: MOVED_PERMANENTLY_DEFAULT
+  
+  # Custom Headers
+  responseHeaders:
+    headers:
+      X-Atlas-Version: "1.0.0"
+      X-Atlas-Region: "%{geo_region}"
+      X-Atlas-Cache: "%{cache_status}"
+---
+# Atlas Backend Configuration (GCP)
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: atlas-backend-config
+  namespace: astral-turf
+  labels:
+    atlas.networking: backend-config
+spec:
+  # Health Check Configuration
+  healthCheck:
+    checkIntervalSec: 10
+    timeoutSec: 5
+    healthyThreshold: 2
+    unhealthyThreshold: 3
+    type: HTTP
+    requestPath: /health
+    port: 3000
+  
+  # Connection Draining
+  connectionDraining:
+    drainingTimeoutSec: 60
+  
+  # Session Affinity
+  sessionAffinity:
+    affinityType: "CLIENT_IP"
+    affinityCookieTtlSec: 3600
+  
+  # CDN Configuration
+  cdn:
+    enabled: true
+    cachePolicy:
+      includeHost: true
+      includeProtocol: true
+      includeQueryString: false
+    negativeCaching: true
+    negativeCachingPolicy:
+    - code: 404
+      ttl: 120
+    - code: 500
+      ttl: 60
+  
+  # Security Policy
+  securityPolicy:
+    name: "atlas-security-policy"
+  
+  # Load Balancing
+  loadBalancingScheme: "EXTERNAL"
+  localityLbPolicy: "ROUND_ROBIN"
+  
+  # Outlier Detection
+  outlierDetection:
+    consecutiveErrors: 3
+    interval:
+      seconds: 30
+    baseEjectionTime:
+      seconds: 30
+    maxEjectionPercent: 50
+    minHealthPercent: 50
+---
+# Atlas Multi-Region Service (US)
+apiVersion: v1
+kind: Service
+metadata:
+  name: astral-turf-us
+  namespace: astral-turf
+  labels:
+    atlas.region: us-central1
+    atlas.networking: regional-service
+  annotations:
+    cloud.google.com/neg: '{"ingress": true}'
+    cloud.google.com/backend-config: '{"default": "atlas-backend-config"}'
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 3000
+    protocol: TCP
+  selector:
+    app: astral-turf
+    atlas.region: us
+---
+# Atlas Multi-Region Service (EU)
+apiVersion: v1
+kind: Service
+metadata:
+  name: astral-turf-eu
+  namespace: astral-turf
+  labels:
+    atlas.region: europe-west1
+    atlas.networking: regional-service
+  annotations:
+    cloud.google.com/neg: '{"ingress": true}'
+    cloud.google.com/backend-config: '{"default": "atlas-backend-config"}'
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 3000
+    protocol: TCP
+  selector:
+    app: astral-turf
+    atlas.region: eu
+---
+# Atlas Multi-Region Service (ASIA)
+apiVersion: v1
+kind: Service
+metadata:
+  name: astral-turf-asia
+  namespace: astral-turf
+  labels:
+    atlas.region: asia-southeast1
+    atlas.networking: regional-service
+  annotations:
+    cloud.google.com/neg: '{"ingress": true}'
+    cloud.google.com/backend-config: '{"default": "atlas-backend-config"}'
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 3000
+    protocol: TCP
+  selector:
+    app: astral-turf
+    atlas.region: asia
+---
+# Atlas CDN Service for Static Assets
+apiVersion: v1
+kind: Service
+metadata:
+  name: astral-turf-cdn-service
+  namespace: astral-turf
+  labels:
+    atlas.networking: cdn-service
+  annotations:
+    cloud.google.com/neg: '{"ingress": true}'
+    cloud.google.com/backend-config: '{"default": "atlas-cdn-backend-config"}'
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    app: astral-turf-cdn
+---
+# Atlas CDN Backend Configuration
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: atlas-cdn-backend-config
+  namespace: astral-turf
+  labels:
+    atlas.networking: cdn-backend-config
+spec:
+  cdn:
+    enabled: true
+    cachePolicy:
+      includeHost: false
+      includeProtocol: false
+      includeQueryString: false
+    cacheMode: "CACHE_ALL_STATIC"
+    defaultTtl: 86400  # 24 hours
+    maxTtl: 604800     # 7 days
+    negativeCaching: true
+    negativeCachingPolicy:
+    - code: 404
+      ttl: 300
+  
+  # Compression
+  compressionMode: "AUTOMATIC"
+---
+# Atlas CDN Static Assets Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: astral-turf-cdn
+  namespace: astral-turf
+  labels:
+    app: astral-turf-cdn
+    atlas.networking: cdn-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: astral-turf-cdn
+  template:
+    metadata:
+      labels:
+        app: astral-turf-cdn
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+      - name: nginx-cdn
+        image: nginx:alpine
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: static-assets
+          mountPath: /usr/share/nginx/html
+        - name: nginx-config
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+      - name: static-assets
+        configMap:
+          name: astral-turf-static-assets
+      - name: nginx-config
+        configMap:
+          name: atlas-nginx-cdn-config
+---
+# Atlas NGINX CDN Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: atlas-nginx-cdn-config
+  namespace: astral-turf
+  labels:
+    atlas.networking: nginx-config
+data:
+  nginx.conf: |
+    worker_processes auto;
+    error_log /var/log/nginx/error.log warn;
+    pid /var/run/nginx.pid;
+    
+    events {
+        worker_connections 1024;
+        use epoll;
+        multi_accept on;
+    }
+    
+    http {
+        include /etc/nginx/mime.types;
+        default_type application/octet-stream;
+        
+        # Logging
+        log_format atlas_cdn '$remote_addr - $remote_user [$time_local] '
+                            '"$request" $status $body_bytes_sent '
+                            '"$http_referer" "$http_user_agent" '
+                            'rt=$request_time uct="$upstream_connect_time" '
+                            'uht="$upstream_header_time" urt="$upstream_response_time" '
+                            'atlas_cache="$upstream_cache_status"';
+        
+        access_log /var/log/nginx/access.log atlas_cdn;
+        
+        # Performance tuning
+        sendfile on;
+        tcp_nopush on;
+        tcp_nodelay on;
+        keepalive_timeout 65;
+        types_hash_max_size 2048;
+        client_max_body_size 10M;
+        
+        # Compression
+        gzip on;
+        gzip_vary on;
+        gzip_min_length 1024;
+        gzip_types
+            application/atom+xml
+            application/javascript
+            application/json
+            application/rss+xml
+            application/vnd.ms-fontobject
+            application/x-font-ttf
+            application/x-web-app-manifest+json
+            application/xhtml+xml
+            application/xml
+            font/opentype
+            image/svg+xml
+            image/x-icon
+            text/css
+            text/plain
+            text/x-component;
+        
+        # Caching
+        map $sent_http_content_type $expires {
+            default                    off;
+            text/html                  epoch;
+            text/css                   max;
+            application/javascript     max;
+            ~image/                    max;
+            ~font/                     max;
+        }
+        
+        expires $expires;
+        
+        # Security headers
+        add_header X-Frame-Options DENY always;
+        add_header X-Content-Type-Options nosniff always;
+        add_header X-XSS-Protection "1; mode=block" always;
+        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+        add_header X-Atlas-CDN "v1.0.0" always;
+        
+        server {
+            listen 8080;
+            server_name _;
+            root /usr/share/nginx/html;
+            index index.html;
+            
+            # Health check endpoint
+            location /health {
+                access_log off;
+                return 200 "healthy\n";
+                add_header Content-Type text/plain;
+            }
+            
+            # Static assets with aggressive caching
+            location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+                expires 1y;
+                add_header Cache-Control "public, immutable";
+                add_header X-Atlas-Cache "static";
+                try_files $uri =404;
+            }
+            
+            # HTML files with no caching
+            location ~* \.html$ {
+                expires -1;
+                add_header Cache-Control "no-cache, no-store, must-revalidate";
+                add_header X-Atlas-Cache "no-cache";
+                try_files $uri =404;
+            }
+            
+            # Default location
+            location / {
+                try_files $uri $uri/ =404;
+            }
+            
+            # Error pages
+            error_page 404 /404.html;
+            error_page 500 502 503 504 /50x.html;
+            
+            location = /50x.html {
+                root /usr/share/nginx/html;
+            }
+        }
+    }
+---
+# Atlas Network Policies
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: atlas-ingress-policy
+  namespace: astral-turf
+  labels:
+    atlas.networking: security-policy
+spec:
+  podSelector:
+    matchLabels:
+      app: astral-turf
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  # Allow ingress from load balancer
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    ports:
+    - protocol: TCP
+      port: 3000
+  
+  # Allow ingress from monitoring
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: monitoring
+    ports:
+    - protocol: TCP
+      port: 3000
+  
+  egress:
+  # Allow egress to database
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: database
+    ports:
+    - protocol: TCP
+      port: 5432
+  
+  # Allow egress to external APIs
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 443
+    - protocol: TCP
+      port: 80
+---
+# Atlas Global IP Address (for reference)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: atlas-network-config
+  namespace: astral-turf
+  labels:
+    atlas.networking: configuration
+data:
+  global-ip-name: "atlas-global-ip"
+  ssl-certificate: "atlas-tls-cert"
+  cdn-regions: "us-central1,europe-west1,asia-southeast1"
+  
+  # Traffic distribution configuration
+  traffic-policy.json: |
+    {
+      "routing_policy": "geo_proximity",
+      "failover_enabled": true,
+      "health_check_interval": 10,
+      "regions": {
+        "us-central1": {
+          "weight": 40,
+          "backup_region": "us-east1"
+        },
+        "europe-west1": {
+          "weight": 35,
+          "backup_region": "europe-north1"
+        },
+        "asia-southeast1": {
+          "weight": 25,
+          "backup_region": "asia-east1"
+        }
+      },
+      "cdn_config": {
+        "cache_ttl": 86400,
+        "compression_enabled": true,
+        "image_optimization": true,
+        "minify_enabled": true
+      }
+    }

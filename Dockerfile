@@ -216,7 +216,7 @@ EXPOSE 8081
 CMD ["npm", "run", "dev"]
 
 # =================================
-# DEPLOYMENT SECURITY REQUIREMENTS
+# ATLAS DEPLOYMENT SECURITY REQUIREMENTS
 # =================================
 # 
 # The following security options MUST be applied during deployment:
@@ -230,12 +230,21 @@ CMD ["npm", "run", "dev"]
 # --tmpfs /app/temp:noexec,nosuid,size=50m \
 # --tmpfs /app/logs:nosuid,size=100m \
 # --tmpfs /app/cache:noexec,nosuid,size=50m \
-# --memory=512m \
-# --memory-swap=512m \
-# --cpus=0.5 \
-# --pids-limit=100 \
-# --ulimit nofile=1024:1024 \
+# --memory=1024m \
+# --memory-swap=1024m \
+# --cpus=1.0 \
+# --pids-limit=200 \
+# --ulimit nofile=2048:2048 \
 # --restart=unless-stopped
+# 
+# Atlas Zero-Downtime Deployment Labels:
+# atlas.deployment.strategy=blue-green
+# atlas.scaling.enabled=true
+# atlas.monitoring.enabled=true
+# atlas.rollback.enabled=true
+# atlas.health.endpoint=/health
+# atlas.health.timeout=30s
+# atlas.startup.timeout=60s
 # 
 # Kubernetes security context:
 # securityContext:
@@ -251,7 +260,7 @@ CMD ["npm", "run", "dev"]
 #       - NET_BIND_SERVICE
 # 
 # Network policies should restrict:
-# - Ingress: Only from load balancer
-# - Egress: Only to required services (DB, APIs)
+# - Ingress: Only from load balancer and monitoring
+# - Egress: Only to required services (DB, APIs, CDN)
 # 
 # =================================

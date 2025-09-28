@@ -126,7 +126,7 @@ describe('Tactics Board Integration', () => {
 
   describe('Desktop Layout', () => {
     it('should render full desktop layout with all components', () => {
-      render(<TacticsBoardPage />);
+      renderWithProviders(<TacticsBoardPage />);
 
       expect(screen.getByTestId('left-sidebar')).toBeInTheDocument();
       expect(screen.getByTestId('soccer-field')).toBeInTheDocument();
@@ -137,7 +137,7 @@ describe('Tactics Board Integration', () => {
     });
 
     it('should apply correct CSS classes for desktop layout', () => {
-      const { container } = render(<TacticsBoardPage />);
+      const { container } = renderWithProviders(<TacticsBoardPage />);
 
       const mainContainer = container.firstChild as HTMLElement;
       expect(mainContainer).toHaveClass('flex-row', 'h-screen');
@@ -148,7 +148,7 @@ describe('Tactics Board Integration', () => {
       mockResponsive.isMobile = false;
       mockResponsiveNavigation.shouldUseDrawer = false;
 
-      render(<TacticsBoardPage />);
+      renderWithProviders(<TacticsBoardPage />);
 
       expect(screen.getByTestId('left-sidebar')).toBeInTheDocument();
       expect(screen.getByTestId('right-sidebar')).toBeInTheDocument();
@@ -167,7 +167,7 @@ describe('Tactics Board Integration', () => {
     });
 
     it('should render mobile layout with collapsed sidebars', () => {
-      render(<TacticsBoardPage />);
+      renderWithProviders(<TacticsBoardPage />);
 
       // Sidebars should not be visible in mobile layout when using drawer
       expect(screen.queryByTestId('left-sidebar')).not.toBeInTheDocument();
@@ -180,7 +180,7 @@ describe('Tactics Board Integration', () => {
     });
 
     it('should apply mobile-specific CSS classes', () => {
-      const { container } = render(<TacticsBoardPage />);
+      const { container } = renderWithProviders(<TacticsBoardPage />);
 
       const mainContainer = container.firstChild as HTMLElement;
       expect(mainContainer).toHaveClass('flex-col', 'mobile-full-height');
@@ -188,7 +188,7 @@ describe('Tactics Board Integration', () => {
     });
 
     it('should apply mobile padding to field container', () => {
-      const { container } = render(<TacticsBoardPage />);
+      const { container } = renderWithProviders(<TacticsBoardPage />);
 
       // Look for mobile padding classes
       const fieldContainer = container.querySelector('.mobile-p-2');
@@ -207,7 +207,7 @@ describe('Tactics Board Integration', () => {
     });
 
     it('should render tablet layout appropriately', () => {
-      render(<TacticsBoardPage />);
+      renderWithProviders(<TacticsBoardPage />);
 
       expect(screen.getByTestId('soccer-field')).toBeInTheDocument();
       expect(screen.getByTestId('tactical-toolbar')).toBeInTheDocument();
@@ -225,20 +225,20 @@ describe('Tactics Board Integration', () => {
     });
 
     it('should hide sidebars in presentation mode', () => {
-      render(<TacticsBoardPage />);
+      renderWithProviders(<TacticsBoardPage />);
 
       expect(screen.queryByTestId('left-sidebar')).not.toBeInTheDocument();
       expect(screen.queryByTestId('right-sidebar')).not.toBeInTheDocument();
     });
 
     it('should show presentation controls in presentation mode', () => {
-      render(<TacticsBoardPage />);
+      renderWithProviders(<TacticsBoardPage />);
 
       expect(screen.getByTestId('presentation-controls')).toBeInTheDocument();
     });
 
     it('should apply presentation mode styling', () => {
-      const { container } = render(<TacticsBoardPage />);
+      const { container } = renderWithProviders(<TacticsBoardPage />);
 
       // Should have no padding in presentation mode
       const fieldContainer = container.querySelector('[class*="p-0"]');
@@ -246,7 +246,7 @@ describe('Tactics Board Integration', () => {
     });
 
     it('should still show essential field components', () => {
-      render(<TacticsBoardPage />);
+      renderWithProviders(<TacticsBoardPage />);
 
       expect(screen.getByTestId('soccer-field')).toBeInTheDocument();
       expect(screen.getByTestId('dugout')).toBeInTheDocument();
@@ -264,7 +264,7 @@ describe('Tactics Board Integration', () => {
 
       mockTacticsContext.tacticsState = mockPlayersState;
 
-      render(<TacticsBoardPage />);
+      renderWithProviders(<TacticsBoardPage />);
 
       // Components should be rendered (they would receive the state as props)
       expect(screen.getByTestId('soccer-field')).toBeInTheDocument();
@@ -279,7 +279,7 @@ describe('Tactics Board Integration', () => {
 
       mockUIContext.uiState = mockUIStateWithModal;
 
-      render(<TacticsBoardPage />);
+      renderWithProviders(<TacticsBoardPage />);
 
       // Page should still render correctly with different UI states
       expect(screen.getByTestId('soccer-field')).toBeInTheDocument();
@@ -288,7 +288,7 @@ describe('Tactics Board Integration', () => {
 
   describe('Responsive Behavior', () => {
     it('should adapt to screen size changes', () => {
-      const { rerender } = render(<TacticsBoardPage />);
+      const { rerender } = renderWithProviders(<TacticsBoardPage />);
 
       // Start with desktop
       expect(screen.getByTestId('left-sidebar')).toBeInTheDocument();
@@ -300,7 +300,7 @@ describe('Tactics Board Integration', () => {
       });
       mockResponsiveNavigation.shouldUseDrawer = true;
 
-      rerender(<TacticsBoardPage />);
+      rerenderWithProviders(<TacticsBoardPage />);
 
       // Sidebar should be hidden in mobile with drawer
       expect(screen.queryByTestId('left-sidebar')).not.toBeInTheDocument();
@@ -310,14 +310,14 @@ describe('Tactics Board Integration', () => {
       mockResponsiveNavigation.shouldUseDrawer = true;
       mockResponsiveNavigation.isDrawerOpen = false;
 
-      render(<TacticsBoardPage />);
+      renderWithProviders(<TacticsBoardPage />);
 
       expect(screen.queryByTestId('left-sidebar')).not.toBeInTheDocument();
     });
 
     it('should maintain field functionality across breakpoints', () => {
       // Test desktop
-      render(<TacticsBoardPage />);
+      renderWithProviders(<TacticsBoardPage />);
       expect(screen.getByTestId('soccer-field')).toBeInTheDocument();
       expect(screen.getByTestId('tactical-toolbar')).toBeInTheDocument();
 
@@ -327,8 +327,8 @@ describe('Tactics Board Integration', () => {
         currentBreakpoint: 'mobile',
       });
 
-      const { rerender } = render(<TacticsBoardPage />);
-      rerender(<TacticsBoardPage />);
+      const { rerender } = renderWithProviders(<TacticsBoardPage />);
+      rerenderWithProviders(<TacticsBoardPage />);
 
       expect(screen.getByTestId('soccer-field')).toBeInTheDocument();
       expect(screen.getByTestId('tactical-toolbar')).toBeInTheDocument();
@@ -337,7 +337,7 @@ describe('Tactics Board Integration', () => {
 
   describe('Background and Styling', () => {
     it('should apply gradient backgrounds', () => {
-      const { container } = render(<TacticsBoardPage />);
+      const { container } = renderWithProviders(<TacticsBoardPage />);
 
       const mainContainer = container.firstChild as HTMLElement;
       expect(mainContainer).toHaveClass('bg-gradient-to-br');
@@ -347,14 +347,14 @@ describe('Tactics Board Integration', () => {
     });
 
     it('should apply backdrop blur effects', () => {
-      const { container } = render(<TacticsBoardPage />);
+      const { container } = renderWithProviders(<TacticsBoardPage />);
 
       const backdropElement = container.querySelector('.backdrop-blur-sm');
       expect(backdropElement).toBeInTheDocument();
     });
 
     it('should use appropriate border styling', () => {
-      const { container } = render(<TacticsBoardPage />);
+      const { container } = renderWithProviders(<TacticsBoardPage />);
 
       const borderedElement = container.querySelector('.border-slate-700\\/50');
       expect(borderedElement).toBeInTheDocument();
@@ -363,7 +363,7 @@ describe('Tactics Board Integration', () => {
 
   describe('Accessibility', () => {
     it('should have proper semantic structure', () => {
-      render(<TacticsBoardPage />);
+      renderWithProviders(<TacticsBoardPage />);
 
       // Check if main element exists using querySelector since role might not be accessible
       const mainElements = document.getElementsByTagName('main');
@@ -375,11 +375,11 @@ describe('Tactics Board Integration', () => {
     });
 
     it('should maintain focus management across layout changes', () => {
-      const { rerender } = render(<TacticsBoardPage />);
+      const { rerender } = renderWithProviders(<TacticsBoardPage />);
 
       // Switch to presentation mode
       mockUIContext.uiState = createMockUIState({ isPresentationMode: true });
-      rerender(<TacticsBoardPage />);
+      rerenderWithProviders(<TacticsBoardPage />);
 
       // Essential elements should still be accessible
       expect(screen.getByTestId('soccer-field')).toBeInTheDocument();
@@ -387,7 +387,7 @@ describe('Tactics Board Integration', () => {
     });
 
     it('should handle keyboard navigation', async () => {
-      render(<TacticsBoardPage />);
+      renderWithProviders(<TacticsBoardPage />);
 
       // Page should be rendered and accessible
       const mainElement = screen.getByRole('main');
@@ -409,7 +409,7 @@ describe('Tactics Board Integration', () => {
       expect(TacticsBoardPage).not.toBeNull();
 
       // Verify the component renders without errors (which indicates it's properly optimized)
-      const { container } = render(<TacticsBoardPage />);
+      const { container } = renderWithProviders(<TacticsBoardPage />);
       expect(container).toBeTruthy();
 
       // Check that essential components are rendered efficiently
@@ -417,13 +417,13 @@ describe('Tactics Board Integration', () => {
     });
 
     it('should not re-render unnecessarily', () => {
-      const { rerender } = render(<TacticsBoardPage />);
+      const { rerender } = renderWithProviders(<TacticsBoardPage />);
 
       // Mock context values should not change
       const initialRenderCount = mockTacticsContext.dispatch.mock.calls.length;
 
       // Rerender with same props
-      rerender(<TacticsBoardPage />);
+      rerenderWithProviders(<TacticsBoardPage />);
 
       // No additional dispatches should have been made
       expect(mockTacticsContext.dispatch.mock.calls.length).toBe(initialRenderCount);
@@ -434,7 +434,7 @@ describe('Tactics Board Integration', () => {
     it('should handle component errors gracefully', () => {
       // Test that the component renders without throwing errors
       expect(() => {
-        render(<TacticsBoardPage />);
+        renderWithProviders(<TacticsBoardPage />);
       }).not.toThrow();
 
       // Verify core components are present

@@ -1,21 +1,168 @@
 {
-  "name": "Astral Turf",
+  "name": "Astral Turf - Soccer Tactics Board",
   "short_name": "Astral Turf",
-  "description": "AI-powered soccer tactical planner",
+  "description": "AI-powered soccer tactical planner with mobile-first design",
+  "version": "8.0.0",
   "start_url": "/",
   "display": "standalone",
-  "theme_color": "#0f172a",
+  "orientation": "any",
+  "theme_color": "#1e40af",
   "background_color": "#0f172a",
-  "icons": [
+  "lang": "en",
+  "scope": "/",
+  "categories": ["sports", "productivity", "education"],
+  "screenshots": [
     {
-      "src": "/favicon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml"
+      "src": "/screenshots/desktop.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "platform": "wide"
     },
     {
-      "src": "/favicon.png",
-      "sizes": "32x32",
-      "type": "image/png"
+      "src": "/screenshots/mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "platform": "narrow"
     }
-  ]
+  ],
+  "icons": [
+    {
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "New Formation",
+      "short_name": "New",
+      "description": "Create a new tactical formation",
+      "url": "/tactics?action=new",
+      "icons": [
+        {
+          "src": "/icons/shortcut-new.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Analytics Dashboard",
+      "short_name": "Analytics",
+      "description": "View team performance analytics",
+      "url": "/analytics",
+      "icons": [
+        {
+          "src": "/icons/shortcut-analytics.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Player Management",
+      "short_name": "Players",
+      "description": "Manage your team roster",
+      "url": "/players",
+      "icons": [
+        {
+          "src": "/icons/shortcut-players.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "share_target": {
+    "action": "/share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "formation",
+          "accept": ["application/json", ".json"]
+        }
+      ]
+    }
+  },
+  "file_handlers": [
+    {
+      "action": "/import",
+      "accept": {
+        "application/json": [".json"],
+        "text/csv": [".csv"]
+      }
+    }
+  ],
+  "protocol_handlers": [
+    {
+      "protocol": "astral-turf",
+      "url": "/handle?url=%s"
+    }
+  ],
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=com.astralturf.tactics",
+      "id": "com.astralturf.tactics"
+    },
+    {
+      "platform": "itunes",
+      "url": "https://apps.apple.com/app/astral-turf/id123456789"
+    }
+  ],
+  "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  }
 }

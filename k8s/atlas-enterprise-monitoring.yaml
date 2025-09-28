@@ -1,0 +1,963 @@
+# ==================================================================
+# ATLAS ENTERPRISE MONITORING & OBSERVABILITY STACK
+# Comprehensive monitoring with Prometheus, Grafana, ELK, Jaeger
+# Real-time alerting, distributed tracing, and performance analytics
+# Banking-grade security with compliance logging and audit trails
+# ==================================================================
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: atlas-enterprise-monitoring
+  labels:
+    name: atlas-enterprise-monitoring
+    tier: observability
+    atlas.monitoring: "enterprise"
+    atlas.alerting: "enabled"
+    atlas.tracing: "enabled"
+    atlas.logging: "enabled"
+    atlas.compliance: "sox-gdpr-pci"
+  annotations:
+    atlas.monitoring/retention: "90d"
+    atlas.alerting/channels: "slack,email,pagerduty,teams"
+    atlas.compliance/logging: "enabled"
+    atlas.security/level: "banking-grade"
+
+---
+
+# Enterprise Prometheus Configuration with HA
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: atlas-prometheus-enterprise-config
+  namespace: atlas-enterprise-monitoring
+  labels:
+    atlas.config/type: "monitoring-enterprise"
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 10s
+      evaluation_interval: 10s
+      scrape_timeout: 8s
+      external_labels:
+        cluster: 'atlas-production'
+        environment: 'production'
+        region: 'multi-cloud'
+        deployment_strategy: 'blue-green'
+        compliance_level: 'banking-grade'
+    
+    rule_files:
+      - "atlas_alert_rules.yml"
+      - "atlas_performance_rules.yml"
+      - "atlas_security_rules.yml"
+      - "atlas_business_rules.yml"
+      - "atlas_compliance_rules.yml"
+    
+    alerting:
+      alertmanagers:
+      - static_configs:
+        - targets:
+          - atlas-alertmanager-enterprise:9093
+        path_prefix: /alertmanager
+        scheme: http
+        timeout: 10s
+    
+    scrape_configs:
+    # Astral Turf application monitoring with enhanced metrics
+    - job_name: 'astral-turf-production'
+      kubernetes_sd_configs:
+      - role: endpoints
+        namespaces:
+          names: ['astral-turf-production']
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape]
+        action: keep
+        regex: true
+      - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_path]
+        action: replace
+        target_label: __metrics_path__
+        regex: (.+)
+      - source_labels: [__address__, __meta_kubernetes_service_annotation_prometheus_io_port]
+        action: replace
+        regex: ([^:]+)(?::\d+)?;(\d+)
+        replacement: $1:$2
+        target_label: __address__
+      - action: labelmap
+        regex: __meta_kubernetes_service_label_(.+)
+      - source_labels: [__meta_kubernetes_namespace]
+        action: replace
+        target_label: kubernetes_namespace
+      - source_labels: [__meta_kubernetes_service_name]
+        action: replace
+        target_label: kubernetes_name
+      - source_labels: [__meta_kubernetes_pod_name]
+        action: replace
+        target_label: kubernetes_pod_name
+      scrape_interval: 5s
+      metrics_path: /metrics
+    
+    # Database monitoring with comprehensive metrics
+    - job_name: 'atlas-database-enterprise'
+      kubernetes_sd_configs:
+      - role: endpoints
+        namespaces:
+          names: ['atlas-database-production']
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_service_name]
+        action: keep
+        regex: '.*postgres.*|.*redis.*'
+      - source_labels: [__meta_kubernetes_endpoint_port_name]
+        action: keep
+        regex: 'metrics'
+      scrape_interval: 15s
+    
+    # Load balancer and ingress monitoring
+    - job_name: 'atlas-loadbalancers-enterprise'
+      kubernetes_sd_configs:
+      - role: service
+        namespaces:
+          names: ['astral-turf-production']
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_service_type]
+        action: keep
+        regex: LoadBalancer
+      - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape]
+        action: keep
+        regex: true
+      scrape_interval: 30s
+    
+    # Security and compliance monitoring
+    - job_name: 'atlas-security-monitoring'
+      kubernetes_sd_configs:
+      - role: endpoints
+        namespaces:
+          names: ['atlas-enterprise-monitoring', 'kube-system']
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_service_name]
+        action: keep
+        regex: '.*security.*|.*audit.*|.*compliance.*'
+      scrape_interval: 30s
+    
+    # Business metrics and KPIs
+    - job_name: 'atlas-business-metrics'
+      kubernetes_sd_configs:
+      - role: endpoints
+        namespaces:
+          names: ['astral-turf-production']
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_service_annotation_atlas_business_metrics]
+        action: keep
+        regex: true
+      scrape_interval: 60s
+    
+    # External monitoring and synthetic tests
+    - job_name: 'blackbox-external-enterprise'
+      metrics_path: /probe
+      params:
+        module: [http_2xx]
+      static_configs:
+      - targets:
+        - https://astralturf.com
+        - https://app.astralturf.com
+        - https://api.astralturf.com
+        - https://grafana.astralturf.com
+        - https://prometheus.astralturf.com
+      relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter-enterprise:9115
+      scrape_interval: 30s
+      scrape_timeout: 20s
+
+  atlas_alert_rules.yml: |
+    groups:
+    - name: atlas.application.critical
+      interval: 30s
+      rules:
+      - alert: AstralTurfServiceDown
+        expr: up{job="astral-turf-production"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: platform
+          component: application
+          runbook: "https://docs.astralturf.com/runbooks/service-down"
+          sla_impact: "high"
+        annotations:
+          summary: "Astral Turf service is down"
+          description: "Service {{ $labels.instance }} has been down for more than 1 minute. This affects all users."
+          impact: "Complete service unavailability"
+          action_required: "Immediate investigation and recovery"
+          
+      - alert: AstralTurfHighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+          team: platform
+          component: application
+          sla_impact: "medium"
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value | humanizePercentage }} for the last 5 minutes. SLA threshold exceeded."
+          impact: "User experience degradation"
+          
+      - alert: AstralTurfHighLatency
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+          component: application
+          sla_impact: "medium"
+        annotations:
+          summary: "High latency detected"
+          description: "95th percentile latency is {{ $value }}s, exceeding SLA target of 2s"
+          impact: "Slow user experience"
+          
+      - alert: AstralTurfMemoryLeakDetected
+        expr: increase(container_memory_usage_bytes{pod=~"astral-turf-.*"}[1h]) > 500000000
+        for: 15m
+        labels:
+          severity: warning
+          team: platform
+          component: application
+        annotations:
+          summary: "Potential memory leak detected"
+          description: "Pod {{ $labels.pod }} memory usage increased by {{ $value | humanizeBytes }} in the last hour"
+          
+      - alert: AstralTurfDiskSpaceRunningOut
+        expr: (1 - (node_filesystem_avail_bytes{fstype!="tmpfs"} / node_filesystem_size_bytes)) > 0.85
+        for: 10m
+        labels:
+          severity: warning
+          team: infrastructure
+          component: storage
+        annotations:
+          summary: "Disk space running low"
+          description: "Disk usage is {{ $value | humanizePercentage }} on {{ $labels.device }} at {{ $labels.instance }}"
+
+    - name: atlas.business.metrics
+      interval: 60s
+      rules:
+      - alert: AstralTurfLowUserEngagement
+        expr: rate(user_session_duration_seconds_count[1h]) < 10
+        for: 30m
+        labels:
+          severity: warning
+          team: product
+          component: engagement
+          business_impact: "high"
+        annotations:
+          summary: "Low user engagement detected"
+          description: "User session rate is {{ $value }} sessions/second over the last hour, below target of 10"
+          business_impact: "Potential revenue loss"
+          
+      - alert: AstralTurfTacticalBoardUsageAnomaly
+        expr: abs(rate(tactical_board_interactions_total[1h]) - rate(tactical_board_interactions_total[1h] offset 24h)) / rate(tactical_board_interactions_total[1h] offset 24h) > 0.5
+        for: 15m
+        labels:
+          severity: info
+          team: product
+          component: tactical-board
+        annotations:
+          summary: "Tactical board usage anomaly detected"
+          description: "Current usage is {{ $value | humanizePercentage }} different from same time yesterday"
+
+    - name: atlas.security.alerts
+      interval: 30s
+      rules:
+      - alert: AstralTurfUnauthorizedAccess
+        expr: increase(http_requests_total{status="401"}[5m]) > 100
+        for: 2m
+        labels:
+          severity: critical
+          team: security
+          component: authentication
+          security_incident: "true"
+        annotations:
+          summary: "High number of unauthorized access attempts"
+          description: "{{ $value }} unauthorized requests in the last 5 minutes. Possible attack."
+          action_required: "Security team investigation"
+          
+      - alert: AstralTurfDDoSAttackSuspected
+        expr: rate(http_requests_total[1m]) > 10000
+        for: 1m
+        labels:
+          severity: critical
+          team: security
+          component: traffic
+          security_incident: "true"
+        annotations:
+          summary: "Potential DDoS attack detected"
+          description: "Request rate is {{ $value }} req/s, significantly above normal patterns"
+          action_required: "Activate DDoS protection"
+          
+      - alert: AstralTurfDataExfiltrationAttempt
+        expr: increase(http_response_size_bytes_sum[5m]) > 10000000000
+        for: 2m
+        labels:
+          severity: critical
+          team: security
+          component: data-protection
+          security_incident: "true"
+        annotations:
+          summary: "Suspicious data transfer detected"
+          description: "{{ $value | humanizeBytes }} transferred in 5 minutes, possible data exfiltration"
+
+    - name: atlas.compliance.monitoring
+      interval: 60s
+      rules:
+      - alert: AstralTurfAuditLogFailure
+        expr: up{job="audit-log-exporter"} == 0
+        for: 5m
+        labels:
+          severity: critical
+          team: compliance
+          component: audit-logging
+          compliance_violation: "true"
+        annotations:
+          summary: "Audit logging system failure"
+          description: "Audit log collection has been down for 5 minutes. Compliance requirement violated."
+          compliance_impact: "SOX, GDPR audit trail compromised"
+          
+      - alert: AstralTurfDataRetentionViolation
+        expr: atlas_data_retention_days > 2555
+        for: 1m
+        labels:
+          severity: warning
+          team: compliance
+          component: data-retention
+          compliance_violation: "true"
+        annotations:
+          summary: "Data retention policy violation"
+          description: "Data has been retained for {{ $value }} days, exceeding 7-year policy"
+
+---
+
+# Enterprise AlertManager with HA
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: atlas-alertmanager-enterprise
+  namespace: atlas-enterprise-monitoring
+  labels:
+    app: alertmanager
+    atlas.monitoring: "alertmanager-enterprise"
+    atlas.ha: "enabled"
+spec:
+  serviceName: atlas-alertmanager-enterprise
+  replicas: 3
+  selector:
+    matchLabels:
+      app: alertmanager
+  template:
+    metadata:
+      labels:
+        app: alertmanager
+        atlas.monitoring: "alertmanager-enterprise"
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9093"
+    spec:
+      serviceAccountName: atlas-alertmanager
+      securityContext:
+        runAsUser: 65534
+        runAsGroup: 65534
+        runAsNonRoot: true
+        fsGroup: 65534
+      containers:
+      - name: alertmanager
+        image: prom/alertmanager:v0.26.0
+        args:
+          - '--config.file=/etc/alertmanager/config.yml'
+          - '--storage.path=/alertmanager'
+          - '--data.retention=168h'
+          - '--cluster.listen-address=0.0.0.0:9094'
+          - '--cluster.peer=atlas-alertmanager-enterprise-0.atlas-alertmanager-enterprise:9094'
+          - '--cluster.peer=atlas-alertmanager-enterprise-1.atlas-alertmanager-enterprise:9094'
+          - '--cluster.peer=atlas-alertmanager-enterprise-2.atlas-alertmanager-enterprise:9094'
+          - '--cluster.gossip-interval=200ms'
+          - '--cluster.pushpull-interval=60s'
+          - '--web.external-url=https://alertmanager.astralturf.com'
+          - '--web.route-prefix=/'
+          - '--log.level=info'
+          - '--log.format=json'
+        ports:
+        - containerPort: 9093
+          name: web
+        - containerPort: 9094
+          name: cluster
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        volumeMounts:
+        - name: alertmanager-config
+          mountPath: /etc/alertmanager
+        - name: alertmanager-storage
+          mountPath: /alertmanager
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+            ephemeral-storage: "1Gi"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+            ephemeral-storage: "2Gi"
+        livenessProbe:
+          httpGet:
+            path: /-/healthy
+            port: 9093
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /-/ready
+            port: 9093
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: ["ALL"]
+      
+      volumes:
+      - name: alertmanager-config
+        configMap:
+          name: atlas-alertmanager-enterprise-config
+          defaultMode: 0644
+      
+      nodeSelector:
+        atlas.nodepool/type: "monitoring"
+      tolerations:
+      - key: "atlas.nodepool/monitoring"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                app: alertmanager
+            topologyKey: kubernetes.io/hostname
+  volumeClaimTemplates:
+  - metadata:
+      name: alertmanager-storage
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      storageClassName: "atlas-fast-ssd"
+      resources:
+        requests:
+          storage: 50Gi
+
+---
+
+# Enterprise AlertManager Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: atlas-alertmanager-enterprise-config
+  namespace: atlas-enterprise-monitoring
+  labels:
+    atlas.config/type: "alerting-enterprise"
+data:
+  config.yml: |
+    global:
+      smtp_smarthost: 'smtp.office365.com:587'
+      smtp_from: 'atlas-alerts@astralturf.com'
+      smtp_auth_username: 'atlas-alerts@astralturf.com'
+      smtp_auth_password: 'AtlasEnterpriseEmailPassword2024!'
+      smtp_require_tls: true
+      
+      slack_api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+      pagerduty_url: 'https://events.pagerduty.com/v2/enqueue'
+      
+    templates:
+    - '/etc/alertmanager/templates/*.tmpl'
+    
+    route:
+      group_by: ['alertname', 'cluster', 'service', 'severity']
+      group_wait: 10s
+      group_interval: 5s
+      repeat_interval: 12h
+      receiver: 'atlas-default'
+      routes:
+      # Critical alerts - immediate response
+      - match:
+          severity: critical
+        receiver: 'atlas-critical-all-channels'
+        group_wait: 0s
+        repeat_interval: 5m
+        continue: true
+      
+      # Security incidents - special handling
+      - match:
+          security_incident: "true"
+        receiver: 'atlas-security-incident'
+        group_wait: 0s
+        repeat_interval: 2m
+        continue: true
+      
+      # Compliance violations - audit trail
+      - match:
+          compliance_violation: "true"
+        receiver: 'atlas-compliance-team'
+        group_wait: 5s
+        repeat_interval: 15m
+        continue: true
+      
+      # Business impact alerts
+      - match:
+          business_impact: "high"
+        receiver: 'atlas-business-team'
+        group_wait: 30s
+        repeat_interval: 1h
+      
+      # Team-specific routing
+      - match:
+          team: database
+        receiver: 'atlas-database-team'
+      - match:
+          team: security
+        receiver: 'atlas-security-team'
+      - match:
+          team: platform
+        receiver: 'atlas-platform-team'
+      - match:
+          team: product
+        receiver: 'atlas-product-team'
+    
+    receivers:
+    - name: 'atlas-default'
+      slack_configs:
+      - channel: '#atlas-monitoring'
+        title: 'Atlas Alert: {{ .GroupLabels.alertname }}'
+        text: |
+          *Severity:* {{ .CommonLabels.severity }}
+          *Service:* {{ .CommonLabels.service | default "Unknown" }}
+          *Component:* {{ .CommonLabels.component | default "Unknown" }}
+          {{ range .Alerts }}
+          *Summary:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          {{ if .Annotations.runbook }}*Runbook:* {{ .Annotations.runbook }}{{ end }}
+          {{ end }}
+        
+    - name: 'atlas-critical-all-channels'
+      email_configs:
+      - to: 'oncall@astralturf.com,cto@astralturf.com,devops-lead@astralturf.com'
+        subject: '[ATLAS CRITICAL] {{ .GroupLabels.alertname }}'
+        headers:
+          Priority: 'urgent'
+          X-Priority: '1'
+        body: |
+          🚨🚨🚨 CRITICAL ATLAS ALERT 🚨🚨🚨
+          
+          Timestamp: {{ .CommonAnnotations.timestamp }}
+          Environment: Production
+          
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Service: {{ .Labels.service }}
+          Component: {{ .Labels.component }}
+          Impact: {{ .Annotations.impact | default "High" }}
+          Action Required: {{ .Annotations.action_required | default "Immediate investigation" }}
+          {{ if .Annotations.runbook }}Runbook: {{ .Annotations.runbook }}{{ end }}
+          {{ end }}
+          
+          This is a CRITICAL alert requiring immediate attention.
+          
+      slack_configs:
+      - channel: '#atlas-critical'
+        title: '🚨 CRITICAL: {{ .GroupLabels.alertname }}'
+        text: |
+          <!channel> CRITICAL ALERT REQUIRES IMMEDIATE ATTENTION
+          
+          *Severity:* {{ .CommonLabels.severity }}
+          *Service:* {{ .CommonLabels.service }}
+          *Component:* {{ .CommonLabels.component }}
+          {{ range .Alerts }}
+          *Summary:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *Impact:* {{ .Annotations.impact | default "High" }}
+          *Action Required:* {{ .Annotations.action_required | default "Immediate investigation" }}
+          {{ if .Annotations.runbook }}*Runbook:* {{ .Annotations.runbook }}{{ end }}
+          {{ end }}
+        color: 'danger'
+        
+      pagerduty_configs:
+      - routing_key: 'YOUR_PAGERDUTY_INTEGRATION_KEY'
+        severity: 'critical'
+        description: '{{ .GroupLabels.alertname }}: {{ .CommonAnnotations.summary }}'
+        details:
+          environment: 'production'
+          component: '{{ .CommonLabels.component }}'
+          service: '{{ .CommonLabels.service }}'
+          impact: '{{ .CommonAnnotations.impact }}'
+        
+    - name: 'atlas-security-incident'
+      email_configs:
+      - to: 'security-team@astralturf.com,ciso@astralturf.com,legal@astralturf.com'
+        subject: '[ATLAS SECURITY INCIDENT] {{ .GroupLabels.alertname }}'
+        headers:
+          Priority: 'urgent'
+          X-Priority: '1'
+          Classification: 'Security-Incident'
+        body: |
+          🔒🚨 SECURITY INCIDENT DETECTED 🚨🔒
+          
+          Incident ID: {{ .GroupLabels.alertname }}-{{ now }}
+          Timestamp: {{ .CommonAnnotations.timestamp }}
+          Severity: {{ .CommonLabels.severity }}
+          
+          {{ range .Alerts }}
+          Incident: {{ .Annotations.summary }}
+          Details: {{ .Annotations.description }}
+          Component: {{ .Labels.component }}
+          Action Required: {{ .Annotations.action_required }}
+          {{ end }}
+          
+          This incident requires immediate security team response.
+          Please follow incident response procedures.
+          
+      slack_configs:
+      - channel: '#security-incidents'
+        title: '🔒 SECURITY INCIDENT: {{ .GroupLabels.alertname }}'
+        text: |
+          <!here> SECURITY INCIDENT DETECTED
+          
+          {{ range .Alerts }}
+          *Incident:* {{ .Annotations.summary }}
+          *Details:* {{ .Annotations.description }}
+          *Component:* {{ .Labels.component }}
+          *Action Required:* {{ .Annotations.action_required }}
+          {{ end }}
+        color: 'danger'
+        
+    - name: 'atlas-compliance-team'
+      email_configs:
+      - to: 'compliance@astralturf.com,legal@astralturf.com,audit@astralturf.com'
+        subject: '[ATLAS COMPLIANCE] {{ .GroupLabels.alertname }}'
+        body: |
+          ⚖️ COMPLIANCE ALERT ⚖️
+          
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Details: {{ .Annotations.description }}
+          Compliance Impact: {{ .Annotations.compliance_impact }}
+          Violation Type: {{ .Labels.compliance_violation }}
+          {{ end }}
+          
+          This alert indicates a potential compliance violation requiring review.
+          
+    - name: 'atlas-business-team'
+      email_configs:
+      - to: 'product@astralturf.com,business-ops@astralturf.com'
+        subject: '[ATLAS BUSINESS IMPACT] {{ .GroupLabels.alertname }}'
+        body: |
+          📊 BUSINESS IMPACT ALERT 📊
+          
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Details: {{ .Annotations.description }}
+          Business Impact: {{ .Annotations.business_impact }}
+          {{ end }}
+      
+      slack_configs:
+      - channel: '#business-alerts'
+        title: '📊 Business Impact: {{ .GroupLabels.alertname }}'
+        
+    - name: 'atlas-platform-team'
+      email_configs:
+      - to: 'platform-team@astralturf.com'
+        subject: '[ATLAS PLATFORM] {{ .GroupLabels.alertname }}'
+      slack_configs:
+      - channel: '#platform-alerts'
+        
+    - name: 'atlas-database-team'
+      email_configs:
+      - to: 'database-team@astralturf.com,dba@astralturf.com'
+        subject: '[ATLAS DATABASE] {{ .GroupLabels.alertname }}'
+      slack_configs:
+      - channel: '#database-alerts'
+        
+    - name: 'atlas-security-team'
+      email_configs:
+      - to: 'security-team@astralturf.com'
+        subject: '[ATLAS SECURITY] {{ .GroupLabels.alertname }}'
+      slack_configs:
+      - channel: '#security-alerts'
+        
+    - name: 'atlas-product-team'
+      email_configs:
+      - to: 'product-team@astralturf.com'
+        subject: '[ATLAS PRODUCT] {{ .GroupLabels.alertname }}'
+      slack_configs:
+      - channel: '#product-alerts'
+    
+    inhibit_rules:
+    - source_match:
+        severity: 'critical'
+      target_match:
+        severity: 'warning'
+      equal: ['alertname', 'service', 'instance']
+    - source_match:
+        alertname: 'AstralTurfServiceDown'
+      target_match_re:
+        alertname: 'AstralTurf.*'
+      equal: ['service', 'instance']
+
+---
+
+# Enterprise Grafana with Enhanced Features
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: atlas-grafana-enterprise
+  namespace: atlas-enterprise-monitoring
+  labels:
+    app: grafana
+    atlas.monitoring: "grafana-enterprise"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+        atlas.monitoring: "grafana-enterprise"
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "3000"
+    spec:
+      serviceAccountName: atlas-grafana
+      securityContext:
+        runAsUser: 472
+        runAsGroup: 472
+        runAsNonRoot: true
+        fsGroup: 472
+      containers:
+      - name: grafana
+        image: grafana/grafana-enterprise:10.2.0
+        ports:
+        - containerPort: 3000
+          name: grafana
+        env:
+        - name: GF_SECURITY_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: atlas-grafana-secrets
+              key: admin-password
+        - name: GF_INSTALL_PLUGINS
+          value: "grafana-kubernetes-app,grafana-worldmap-panel,grafana-piechart-panel,grafana-polystat-panel,grafana-statusmap,grafana-trackmap-panel,grafana-business-table"
+        - name: GF_SECURITY_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: atlas-grafana-secrets
+              key: secret-key
+        - name: GF_DATABASE_TYPE
+          value: "postgres"
+        - name: GF_DATABASE_HOST
+          value: "atlas-postgres-primary-service.atlas-database-production.svc.cluster.local:5432"
+        - name: GF_DATABASE_NAME
+          value: "grafana"
+        - name: GF_DATABASE_USER
+          value: "grafana_user"
+        - name: GF_DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: atlas-grafana-secrets
+              key: db-password
+        - name: GF_SESSION_PROVIDER
+          value: "postgres"
+        - name: GF_SESSION_PROVIDER_CONFIG
+          value: "user=grafana_user password=$(GF_DATABASE_PASSWORD) host=atlas-postgres-primary-service.atlas-database-production.svc.cluster.local port=5432 dbname=grafana sslmode=require"
+        volumeMounts:
+        - name: grafana-storage
+          mountPath: /var/lib/grafana
+        - name: grafana-config
+          mountPath: /etc/grafana/provisioning
+        - name: grafana-dashboards
+          mountPath: /var/lib/grafana/dashboards
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+            ephemeral-storage: "1Gi"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+            ephemeral-storage: "2Gi"
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          capabilities:
+            drop: ["ALL"]
+      
+      volumes:
+      - name: grafana-storage
+        persistentVolumeClaim:
+          claimName: atlas-grafana-enterprise-storage
+      - name: grafana-config
+        configMap:
+          name: atlas-grafana-enterprise-config
+      - name: grafana-dashboards
+        configMap:
+          name: atlas-grafana-dashboards
+      
+      nodeSelector:
+        atlas.nodepool/type: "monitoring"
+      tolerations:
+      - key: "atlas.nodepool/monitoring"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: grafana
+              topologyKey: kubernetes.io/hostname
+
+---
+
+# Services for Enterprise Monitoring
+apiVersion: v1
+kind: Service
+metadata:
+  name: atlas-prometheus-enterprise
+  namespace: atlas-enterprise-monitoring
+  labels:
+    app: prometheus
+    atlas.service/type: "monitoring"
+spec:
+  type: ClusterIP
+  ports:
+  - port: 9090
+    targetPort: 9090
+    name: prometheus
+  selector:
+    app: prometheus
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: atlas-alertmanager-enterprise
+  namespace: atlas-enterprise-monitoring
+  labels:
+    app: alertmanager
+    atlas.service/type: "alerting"
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+  - port: 9093
+    targetPort: 9093
+    name: web
+  - port: 9094
+    targetPort: 9094
+    name: cluster
+  selector:
+    app: alertmanager
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: atlas-grafana-enterprise
+  namespace: atlas-enterprise-monitoring
+  labels:
+    app: grafana
+    atlas.service/type: "visualization"
+spec:
+  type: ClusterIP
+  ports:
+  - port: 3000
+    targetPort: 3000
+    name: grafana
+  selector:
+    app: grafana
+
+---
+
+# ServiceAccounts and RBAC
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: atlas-prometheus
+  namespace: atlas-enterprise-monitoring
+  labels:
+    atlas.security/managed: "true"
+
+---
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: atlas-alertmanager
+  namespace: atlas-enterprise-monitoring
+  labels:
+    atlas.security/managed: "true"
+
+---
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: atlas-grafana
+  namespace: atlas-enterprise-monitoring
+  labels:
+    atlas.security/managed: "true"
+
+---
+
+# Storage Claims
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: atlas-grafana-enterprise-storage
+  namespace: atlas-enterprise-monitoring
+  labels:
+    atlas.storage/type: "monitoring"
+spec:
+  accessModes: ["ReadWriteOnce"]
+  storageClassName: "atlas-fast-ssd"
+  resources:
+    requests:
+      storage: 100Gi

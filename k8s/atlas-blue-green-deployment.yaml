@@ -1,0 +1,864 @@
+# ==================================================================
+# ATLAS BLUE-GREEN DEPLOYMENT STRATEGY
+# Zero-downtime deployment with automated traffic switching
+# Advanced canary analysis, automated rollback, and performance validation
+# Enterprise-grade deployment safety with comprehensive monitoring
+# ==================================================================
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: atlas-blue-green
+  labels:
+    name: atlas-blue-green
+    tier: deployment
+    atlas.deployment/strategy: "blue-green"
+    atlas.rollback/enabled: "true"
+    atlas.monitoring/enabled: "true"
+    atlas.automation/level: "enterprise"
+  annotations:
+    atlas.deployment/zero-downtime: "guaranteed"
+    atlas.rollback/automation: "enabled"
+    atlas.traffic/validation: "comprehensive"
+    atlas.performance/monitoring: "real-time"
+
+---
+
+# Blue-Green Deployment Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: atlas-blue-green-config
+  namespace: atlas-blue-green
+  labels:
+    atlas.config/type: "blue-green-deployment"
+data:
+  deployment-strategy.yaml: |
+    blue_green_deployment:
+      strategy: "zero_downtime_with_validation"
+      
+      environments:
+        blue:
+          status: "active"
+          traffic_weight: 100
+          replica_count: 6
+          resource_allocation: "production"
+          
+        green:
+          status: "standby"
+          traffic_weight: 0
+          replica_count: 0
+          resource_allocation: "minimal"
+      
+      deployment_phases:
+        preparation:
+          duration: "60 seconds"
+          actions:
+            - "validate_new_image"
+            - "check_resource_availability"
+            - "backup_current_configuration"
+            - "prepare_green_environment"
+          
+        green_deployment:
+          duration: "300 seconds"
+          actions:
+            - "deploy_to_green"
+            - "wait_for_readiness"
+            - "run_health_checks"
+            - "validate_functionality"
+          
+        canary_testing:
+          duration: "600 seconds"
+          traffic_split: "5:95"  # 5% to green, 95% to blue
+          validation:
+            - "response_time_validation"
+            - "error_rate_monitoring"
+            - "throughput_analysis"
+            - "user_experience_metrics"
+          
+        gradual_traffic_shift:
+          phases:
+            - traffic_split: "25:75"
+              duration: "300 seconds"
+              validation_required: true
+            - traffic_split: "50:50"
+              duration: "300 seconds"
+              validation_required: true
+            - traffic_split: "75:25"
+              duration: "300 seconds"
+              validation_required: true
+            - traffic_split: "100:0"
+              duration: "60 seconds"
+              validation_required: true
+          
+        validation:
+          duration: "300 seconds"
+          checks:
+            - "full_functionality_test"
+            - "performance_regression_test"
+            - "integration_test_suite"
+            - "user_acceptance_test"
+          
+        cleanup:
+          duration: "120 seconds"
+          actions:
+            - "scale_down_blue"
+            - "update_deployment_status"
+            - "cleanup_old_resources"
+            - "send_completion_notification"
+      
+      rollback:
+        trigger_conditions:
+          error_rate_threshold: "1%"
+          response_time_threshold: "2000ms"
+          availability_threshold: "99.9%"
+          manual_trigger: true
+          
+        automation:
+          enabled: true
+          timeout: "60 seconds"
+          preserve_logs: true
+          
+        sequence:
+          - "stop_traffic_to_green"
+          - "redirect_all_traffic_to_blue"
+          - "scale_down_green"
+          - "investigate_and_alert"
+      
+      monitoring:
+        metrics:
+          - "response_time"
+          - "error_rate"
+          - "throughput"
+          - "memory_usage"
+          - "cpu_utilization"
+          - "database_connections"
+          
+        alerting:
+          channels: ["slack", "email", "pagerduty"]
+          thresholds:
+            critical: "immediate"
+            warning: "5_minutes"
+            info: "15_minutes"
+
+  traffic-management.yaml: |
+    traffic_management:
+      load_balancer:
+        type: "nginx_ingress"
+        session_affinity: "cookie"
+        affinity_timeout: "3600"
+        
+      routing:
+        method: "weighted_round_robin"
+        health_check_path: "/health/live"
+        health_check_interval: "10s"
+        health_check_timeout: "5s"
+        
+      canary_analysis:
+        metrics:
+          success_rate:
+            threshold: "99.5%"
+            weight: 30
+          
+          response_time_p95:
+            threshold: "500ms"
+            weight: 25
+            
+          response_time_p99:
+            threshold: "1000ms"
+            weight: 20
+            
+          error_4xx_rate:
+            threshold: "2%"
+            weight: 15
+            
+          error_5xx_rate:
+            threshold: "0.5%"
+            weight: 10
+        
+        analysis_duration: "300s"
+        success_threshold: 85  # Weighted score out of 100
+
+---
+
+# Blue Environment Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: astral-turf-blue
+  namespace: atlas-blue-green
+  labels:
+    app: astral-turf
+    version: blue
+    atlas.deployment/environment: "blue"
+    atlas.deployment/status: "active"
+spec:
+  replicas: 6
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: astral-turf
+      version: blue
+  template:
+    metadata:
+      labels:
+        app: astral-turf
+        version: blue
+        atlas.deployment/environment: "blue"
+        atlas.monitoring/scrape: "true"
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "3000"
+        prometheus.io/path: "/metrics"
+        atlas.deployment/timestamp: "2024-12-28T00:00:00Z"
+    spec:
+      serviceAccountName: astral-turf-blue-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+      containers:
+      - name: astral-turf
+        image: astralturf/tactical-board:v8.0.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+          name: http
+          protocol: TCP
+        - containerPort: 8080
+          name: metrics
+          protocol: TCP
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "3000"
+        - name: ATLAS_DEPLOYMENT_ENVIRONMENT
+          value: "blue"
+        - name: ATLAS_DEPLOYMENT_VERSION
+          value: "v8.0.0"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: astral-turf-secrets
+              key: database-url
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: astral-turf-secrets
+              key: redis-url
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1000m"
+            ephemeral-storage: "2Gi"
+          limits:
+            memory: "4Gi"
+            cpu: "2000m"
+            ephemeral-storage: "4Gi"
+        livenessProbe:
+          httpGet:
+            path: /health/live
+            port: 3000
+            httpHeaders:
+            - name: X-Environment
+              value: "blue"
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 3000
+            httpHeaders:
+            - name: X-Environment
+              value: "blue"
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        startupProbe:
+          httpGet:
+            path: /health/startup
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 20
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: ["ALL"]
+            add: ["NET_BIND_SERVICE"]
+        volumeMounts:
+        - name: tmp-volume
+          mountPath: /tmp
+        - name: cache-volume
+          mountPath: /app/cache
+        - name: logs-volume
+          mountPath: /app/logs
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sh", "-c", "sleep 15"]
+      volumes:
+      - name: tmp-volume
+        emptyDir:
+          sizeLimit: 1Gi
+      - name: cache-volume
+        emptyDir:
+          sizeLimit: 2Gi
+      - name: logs-volume
+        emptyDir:
+          sizeLimit: 2Gi
+      nodeSelector:
+        atlas.nodepool/type: "application"
+      tolerations:
+      - key: "atlas.nodepool/application"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                app: astral-turf
+            topologyKey: kubernetes.io/hostname
+
+---
+
+# Green Environment Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: astral-turf-green
+  namespace: atlas-blue-green
+  labels:
+    app: astral-turf
+    version: green
+    atlas.deployment/environment: "green"
+    atlas.deployment/status: "standby"
+spec:
+  replicas: 0  # Initially scaled to 0
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: astral-turf
+      version: green
+  template:
+    metadata:
+      labels:
+        app: astral-turf
+        version: green
+        atlas.deployment/environment: "green"
+        atlas.monitoring/scrape: "true"
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "3000"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: astral-turf-green-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+      containers:
+      - name: astral-turf
+        image: astralturf/tactical-board:latest  # This will be updated during deployment
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+          name: http
+          protocol: TCP
+        - containerPort: 8080
+          name: metrics
+          protocol: TCP
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "3000"
+        - name: ATLAS_DEPLOYMENT_ENVIRONMENT
+          value: "green"
+        - name: ATLAS_DEPLOYMENT_VERSION
+          value: "latest"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: astral-turf-secrets
+              key: database-url
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: astral-turf-secrets
+              key: redis-url
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1000m"
+            ephemeral-storage: "2Gi"
+          limits:
+            memory: "4Gi"
+            cpu: "2000m"
+            ephemeral-storage: "4Gi"
+        livenessProbe:
+          httpGet:
+            path: /health/live
+            port: 3000
+            httpHeaders:
+            - name: X-Environment
+              value: "green"
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 3000
+            httpHeaders:
+            - name: X-Environment
+              value: "green"
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        startupProbe:
+          httpGet:
+            path: /health/startup
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 20
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: ["ALL"]
+            add: ["NET_BIND_SERVICE"]
+        volumeMounts:
+        - name: tmp-volume
+          mountPath: /tmp
+        - name: cache-volume
+          mountPath: /app/cache
+        - name: logs-volume
+          mountPath: /app/logs
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sh", "-c", "sleep 15"]
+      volumes:
+      - name: tmp-volume
+        emptyDir:
+          sizeLimit: 1Gi
+      - name: cache-volume
+        emptyDir:
+          sizeLimit: 2Gi
+      - name: logs-volume
+        emptyDir:
+          sizeLimit: 2Gi
+      nodeSelector:
+        atlas.nodepool/type: "application"
+      tolerations:
+      - key: "atlas.nodepool/application"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                app: astral-turf
+            topologyKey: kubernetes.io/hostname
+
+---
+
+# Blue-Green Traffic Management Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: astral-turf-active
+  namespace: atlas-blue-green
+  labels:
+    app: astral-turf
+    atlas.service/type: "active-traffic"
+  annotations:
+    atlas.traffic/environment: "blue"
+    atlas.traffic/weight: "100"
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 3000
+    protocol: TCP
+    name: http
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
+    name: metrics
+  selector:
+    app: astral-turf
+    version: blue  # This will be switched during deployment
+
+---
+
+# Blue Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: astral-turf-blue
+  namespace: atlas-blue-green
+  labels:
+    app: astral-turf
+    version: blue
+    atlas.service/type: "blue-environment"
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 3000
+    protocol: TCP
+    name: http
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
+    name: metrics
+  selector:
+    app: astral-turf
+    version: blue
+
+---
+
+# Green Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: astral-turf-green
+  namespace: atlas-blue-green
+  labels:
+    app: astral-turf
+    version: green
+    atlas.service/type: "green-environment"
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 3000
+    protocol: TCP
+    name: http
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
+    name: metrics
+  selector:
+    app: astral-turf
+    version: green
+
+---
+
+# Blue-Green Ingress with Traffic Splitting
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: astral-turf-blue-green-ingress
+  namespace: atlas-blue-green
+  labels:
+    app: astral-turf
+    atlas.ingress/type: "blue-green"
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/canary: "false"
+    nginx.ingress.kubernetes.io/upstream-hash-by: "$request_uri"
+    nginx.ingress.kubernetes.io/session-cookie-name: "atlas-session"
+    nginx.ingress.kubernetes.io/session-cookie-expires: "3600"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "3600"
+    nginx.ingress.kubernetes.io/session-cookie-path: "/"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      # Blue-Green deployment headers
+      add_header X-Atlas-Environment "blue" always;
+      add_header X-Atlas-Deployment-Strategy "blue-green" always;
+      add_header X-Atlas-Version "$atlas_version" always;
+      
+      # Performance monitoring
+      add_header X-Response-Time $request_time always;
+      add_header X-Upstream-Response-Time $upstream_response_time always;
+      
+      # Security headers
+      add_header X-Frame-Options "SAMEORIGIN" always;
+      add_header X-Content-Type-Options "nosniff" always;
+spec:
+  tls:
+  - hosts:
+    - app.astralturf.com
+    secretName: astral-turf-tls-cert
+  rules:
+  - host: app.astralturf.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: astral-turf-active
+            port:
+              number: 80
+
+---
+
+# Canary Ingress for Green Environment Testing
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: astral-turf-canary-ingress
+  namespace: atlas-blue-green
+  labels:
+    app: astral-turf
+    atlas.ingress/type: "canary"
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/canary: "true"
+    nginx.ingress.kubernetes.io/canary-weight: "0"  # Initially 0%, controlled by deployment
+    nginx.ingress.kubernetes.io/canary-by-header: "Atlas-Canary"
+    nginx.ingress.kubernetes.io/canary-by-header-value: "enabled"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      # Canary deployment headers
+      add_header X-Atlas-Environment "green" always;
+      add_header X-Atlas-Deployment-Type "canary" always;
+      add_header X-Atlas-Canary-Weight "$canary_weight" always;
+spec:
+  tls:
+  - hosts:
+    - app.astralturf.com
+    secretName: astral-turf-tls-cert
+  rules:
+  - host: app.astralturf.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: astral-turf-green
+            port:
+              number: 80
+
+---
+
+# Blue-Green Deployment Controller
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: atlas-blue-green-controller
+  namespace: atlas-blue-green
+  labels:
+    app: blue-green-controller
+    atlas.controller/type: "deployment"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: blue-green-controller
+  template:
+    metadata:
+      labels:
+        app: blue-green-controller
+    spec:
+      serviceAccountName: atlas-blue-green-controller-sa
+      containers:
+      - name: controller
+        image: atlas/blue-green-controller:v2.0.0
+        ports:
+        - containerPort: 8080
+          name: http
+        - containerPort: 9090
+          name: metrics
+        env:
+        - name: NAMESPACE
+          value: "atlas-blue-green"
+        - name: PROMETHEUS_URL
+          value: "http://atlas-prometheus-enterprise.atlas-enterprise-monitoring:9090"
+        - name: SLACK_WEBHOOK
+          valueFrom:
+            secretKeyRef:
+              name: atlas-notification-secrets
+              key: slack-webhook
+        command:
+        - /bin/sh
+        - -c
+        - |
+          #!/bin/sh
+          set -e
+          
+          echo "🚀 Atlas Blue-Green Controller: Starting deployment controller..."
+          
+          # Controller main loop
+          while true; do
+            # Check for pending deployments
+            PENDING_DEPLOYMENTS=$(kubectl get configmap -n atlas-blue-green \
+              -l atlas.deployment/status=pending -o name | wc -l)
+            
+            if [ $PENDING_DEPLOYMENTS -gt 0 ]; then
+              echo "📋 Found $PENDING_DEPLOYMENTS pending deployment(s)"
+              
+              # Process each pending deployment
+              for deployment in $(kubectl get configmap -n atlas-blue-green \
+                -l atlas.deployment/status=pending -o name); do
+                
+                DEPLOYMENT_NAME=$(basename $deployment)
+                echo "🔄 Processing deployment: $DEPLOYMENT_NAME"
+                
+                # Get deployment details
+                NEW_IMAGE=$(kubectl get configmap $DEPLOYMENT_NAME -n atlas-blue-green \
+                  -o jsonpath='{.data.image}')
+                TARGET_VERSION=$(kubectl get configmap $DEPLOYMENT_NAME -n atlas-blue-green \
+                  -o jsonpath='{.data.version}')
+                
+                echo "🎯 Deploying image: $NEW_IMAGE (version: $TARGET_VERSION)"
+                
+                # Execute blue-green deployment
+                /usr/local/bin/execute-blue-green-deployment.sh \
+                  "$NEW_IMAGE" "$TARGET_VERSION" "$DEPLOYMENT_NAME"
+                
+                # Update deployment status
+                kubectl patch configmap $DEPLOYMENT_NAME -n atlas-blue-green \
+                  --type='json' \
+                  -p='[{"op": "replace", "path": "/data/status", "value": "completed"}]'
+              done
+            fi
+            
+            sleep 30
+          done
+        
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 30
+        
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 10
+
+---
+
+# Service Accounts
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: astral-turf-blue-sa
+  namespace: atlas-blue-green
+  labels:
+    atlas.security/managed: "true"
+
+---
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: astral-turf-green-sa
+  namespace: atlas-blue-green
+  labels:
+    atlas.security/managed: "true"
+
+---
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: atlas-blue-green-controller-sa
+  namespace: atlas-blue-green
+  labels:
+    atlas.security/managed: "true"
+
+---
+
+# RBAC for Blue-Green Controller
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: atlas-blue-green
+  name: atlas-blue-green-controller-role
+rules:
+- apiGroups: [""]
+  resources: ["services", "configmaps", "secrets"]
+  verbs: ["get", "list", "create", "update", "patch", "delete"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "replicasets"]
+  verbs: ["get", "list", "create", "update", "patch", "delete", "scale"]
+- apiGroups: ["networking.k8s.io"]
+  resources: ["ingresses"]
+  verbs: ["get", "list", "create", "update", "patch", "delete"]
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: atlas-blue-green-controller-binding
+  namespace: atlas-blue-green
+subjects:
+- kind: ServiceAccount
+  name: atlas-blue-green-controller-sa
+  namespace: atlas-blue-green
+roleRef:
+  kind: Role
+  name: atlas-blue-green-controller-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+
+# Pod Disruption Budget
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: astral-turf-blue-pdb
+  namespace: atlas-blue-green
+spec:
+  minAvailable: 50%
+  selector:
+    matchLabels:
+      app: astral-turf
+      version: blue
+
+---
+
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: astral-turf-green-pdb
+  namespace: atlas-blue-green
+spec:
+  minAvailable: 50%
+  selector:
+    matchLabels:
+      app: astral-turf
+      version: green
