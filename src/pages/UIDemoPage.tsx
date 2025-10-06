@@ -223,9 +223,11 @@ const UIDemoPage: React.FC = () => {
                 />
                 <EnhancedInput label="Password" type="password" placeholder="Enter password..." />
                 <EnhancedInput
-                  label="Team Formation"
-                  placeholder="4-4-2"
-                  help="Enter your preferred formation"
+                  {...({
+                    label: 'Team Formation',
+                    placeholder: '4-4-2',
+                    help: 'Enter your preferred formation',
+                  } as any)}
                 />
               </div>
             </div>
@@ -352,9 +354,12 @@ const UIDemoPage: React.FC = () => {
                   borderColor: theme.colors.border.primary,
                   backgroundColor: theme.colors.background.secondary,
                 }}
-              >
-                <p style={{ color: theme.colors.text.secondary }}>👆 Swipe in any direction</p>
-              </SwipeArea>
+                {...({
+                  children: (
+                    <p style={{ color: theme.colors.text.secondary }}>👆 Swipe in any direction</p>
+                  ),
+                } as any)}
+              ></SwipeArea>
             </div>
 
             {/* Draggable */}
@@ -382,7 +387,7 @@ const UIDemoPage: React.FC = () => {
               <h3 className="text-lg font-medium mb-3" style={{ color: theme.colors.text.primary }}>
                 Sortable List
               </h3>
-              <SortableList items={sortableItems} onReorder={setSortableItems} />
+              <SortableList items={sortableItems} onReorder={setSortableItems as any} />
             </div>
           </div>
         </EnhancedCard>

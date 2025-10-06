@@ -11,7 +11,10 @@ const InfoCard: React.FC<{
 }> = ({ title, icon, onClick, children }) => (
   <div
     onClick={onClick}
-    className="bg-gray-700/50 p-4 rounded-lg cursor-pointer hover:bg-gray-700/80 transition-colors border border-transparent hover:border-teal-500/50"
+    className="bg-gray-700/50 p-4 md:p-4 sm:p-5 rounded-lg cursor-pointer hover:bg-gray-700/80 transition-colors border border-transparent hover:border-teal-500/50 active:scale-95 touch-none min-h-[88px]"
+    role="button"
+    tabIndex={0}
+    onKeyDown={e => e.key === 'Enter' && onClick()}
   >
     <div className="flex items-center text-gray-300 mb-2">
       {icon}
@@ -49,7 +52,7 @@ const CoachDashboard: React.FC = () => {
   const { players } = tacticsState;
 
   const nextFixture = season.fixtures.find(
-    f => f.week === gameWeek && (f.homeTeam === 'Astral FC' || f.awayTeam === 'Astral FC'),
+    f => f.week === gameWeek && (f.homeTeam === 'Astral FC' || f.awayTeam === 'Astral FC')
   );
   const unreadMessages = inbox.filter(i => !i.isRead).length;
   const injuredPlayers = players.filter(p => p.availability.status.includes('Injury')).length;

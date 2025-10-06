@@ -78,9 +78,12 @@ export const useMobileCapabilities = (): MobileCapabilities => {
     const isTablet = /iPad/.test(userAgent) || (isAndroid && !/Mobile/.test(userAgent));
 
     // Network connection detection
-    const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection;
+    const connection =
+      (navigator as any).connection ||
+      (navigator as any).mozConnection ||
+      (navigator as any).webkitConnection;
     let connectionType: 'slow' | 'fast' | 'unknown' = 'unknown';
-    
+
     if (connection) {
       const effectiveType = connection.effectiveType;
       connectionType = ['slow-2g', '2g', '3g'].includes(effectiveType) ? 'slow' : 'fast';
@@ -88,7 +91,7 @@ export const useMobileCapabilities = (): MobileCapabilities => {
 
     // Battery API detection
     const battery = (navigator as any).battery || (navigator as any).getBattery?.();
-    
+
     return {
       isMobile,
       isTablet,
@@ -178,12 +181,14 @@ export const useTouchGestures = (
 
   useEffect(() => {
     const el = element.current;
-    if (!el) return;
+    if (!el) {
+      return;
+    }
 
     const handleTouchStart = (e: TouchEvent) => {
       const touch = e.touches[0];
       const now = Date.now();
-      
+
       touchState.current = {
         ...touchState.current,
         startTime: now,
@@ -199,7 +204,7 @@ export const useTouchGestures = (
         const touch2 = e.touches[1];
         const distance = Math.sqrt(
           Math.pow(touch2.clientX - touch1.clientX, 2) +
-          Math.pow(touch2.clientY - touch1.clientY, 2)
+            Math.pow(touch2.clientY - touch1.clientY, 2)
         );
         touchState.current.initialDistance = distance;
       }
@@ -208,7 +213,7 @@ export const useTouchGestures = (
       touchState.current.longPressTimer = setTimeout(() => {
         touchState.current.isLongPress = true;
         callbacks.onLongPress?.(e, touchState.current.startPosition);
-        
+
         // Haptic feedback for long press
         if ('vibrate' in navigator) {
           navigator.vibrate(50);
@@ -221,13 +226,13 @@ export const useTouchGestures = (
     const handleTouchMove = (e: TouchEvent) => {
       const touch = e.touches[0];
       const currentPosition = { x: touch.clientX, y: touch.clientY };
-      
+
       // Calculate movement distance
       const deltaX = currentPosition.x - touchState.current.lastPosition.x;
       const deltaY = currentPosition.y - touchState.current.lastPosition.y;
       const totalDistance = Math.sqrt(
         Math.pow(currentPosition.x - touchState.current.startPosition.x, 2) +
-        Math.pow(currentPosition.y - touchState.current.startPosition.y, 2)
+          Math.pow(currentPosition.y - touchState.current.startPosition.y, 2)
       );
 
       // Cancel long press if moved too much
@@ -248,9 +253,9 @@ export const useTouchGestures = (
         const touch2 = e.touches[1];
         const distance = Math.sqrt(
           Math.pow(touch2.clientX - touch1.clientX, 2) +
-          Math.pow(touch2.clientY - touch1.clientY, 2)
+            Math.pow(touch2.clientY - touch1.clientY, 2)
         );
-        
+
         if (touchState.current.initialDistance > 0) {
           const scale = distance / touchState.current.initialDistance;
           callbacks.onPinch?.(e, scale);
@@ -264,7 +269,7 @@ export const useTouchGestures = (
     const handleTouchEnd = (e: TouchEvent) => {
       const endTime = Date.now();
       const duration = endTime - touchState.current.startTime;
-      
+
       // Clear long press timer
       if (touchState.current.longPressTimer) {
         clearTimeout(touchState.current.longPressTimer);
@@ -274,7 +279,7 @@ export const useTouchGestures = (
       // If it wasn't a long press or drag, it's a tap
       if (!touchState.current.isLongPress && !touchState.current.isDragging && duration < 500) {
         callbacks.onTap?.(e, touchState.current.startPosition);
-        
+
         // Light haptic feedback for tap
         if ('vibrate' in navigator) {
           navigator.vibrate(10);
@@ -288,7 +293,8 @@ export const useTouchGestures = (
         const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
         const velocity = distance / duration;
 
-        if (velocity > 0.5) { // Minimum velocity for swipe
+        if (velocity > 0.5) {
+          // Minimum velocity for swipe
           let direction = '';
           if (Math.abs(deltaX) > Math.abs(deltaY)) {
             direction = deltaX > 0 ? 'right' : 'left';
@@ -313,7 +319,7 @@ export const useTouchGestures = (
       el.removeEventListener('touchstart', handleTouchStart);
       el.removeEventListener('touchmove', handleTouchMove);
       el.removeEventListener('touchend', handleTouchEnd);
-      
+
       if (touchState.current.longPressTimer) {
         clearTimeout(touchState.current.longPressTimer);
       }
@@ -343,15 +349,15 @@ export const useMobilePerformanceMonitor = () => {
     const measureFrameRate = () => {
       frameCountRef.current++;
       const now = performance.now();
-      
+
       if (now - lastTimeRef.current >= 1000) {
         const fps = Math.round((frameCountRef.current * 1000) / (now - lastTimeRef.current));
         setMetrics(prev => ({ ...prev, frameRate: fps }));
-        
+
         frameCountRef.current = 0;
         lastTimeRef.current = now;
       }
-      
+
       requestAnimationFrame(measureFrameRate);
     };
 
@@ -366,15 +372,15 @@ export const useMobilePerformanceMonitor = () => {
 
     // Performance observer for render times
     if ('PerformanceObserver' in window) {
-      performanceObserverRef.current = new PerformanceObserver((list) => {
+      performanceObserverRef.current = new PerformanceObserver(list => {
         const entries = list.getEntries();
-        entries.forEach((entry) => {
+        entries.forEach(entry => {
           if (entry.entryType === 'measure') {
             setMetrics(prev => ({ ...prev, renderTime: entry.duration }));
           }
         });
       });
-      
+
       performanceObserverRef.current.observe({ entryTypes: ['measure', 'navigation', 'paint'] });
     }
 
@@ -395,7 +401,7 @@ export const useMobilePerformanceMonitor = () => {
   const markInteractionEnd = useCallback((interactionType: string) => {
     performance.mark(`${interactionType}-end`);
     performance.measure(interactionType, `${interactionType}-start`, `${interactionType}-end`);
-    
+
     const measure = performance.getEntriesByName(interactionType)[0];
     if (measure) {
       setMetrics(prev => ({ ...prev, interactionLatency: measure.duration }));
@@ -426,10 +432,22 @@ export const useMobileViewport = () => {
     const updateViewport = () => {
       // Get safe area insets for modern mobile browsers
       const computedStyle = getComputedStyle(document.documentElement);
-      const safeAreaTop = parseInt(computedStyle.getPropertyValue('env(safe-area-inset-top)') || '0', 10);
-      const safeAreaBottom = parseInt(computedStyle.getPropertyValue('env(safe-area-inset-bottom)') || '0', 10);
-      const safeAreaLeft = parseInt(computedStyle.getPropertyValue('env(safe-area-inset-left)') || '0', 10);
-      const safeAreaRight = parseInt(computedStyle.getPropertyValue('env(safe-area-inset-right)') || '0', 10);
+      const safeAreaTop = parseInt(
+        computedStyle.getPropertyValue('env(safe-area-inset-top)') || '0',
+        10
+      );
+      const safeAreaBottom = parseInt(
+        computedStyle.getPropertyValue('env(safe-area-inset-bottom)') || '0',
+        10
+      );
+      const safeAreaLeft = parseInt(
+        computedStyle.getPropertyValue('env(safe-area-inset-left)') || '0',
+        10
+      );
+      const safeAreaRight = parseInt(
+        computedStyle.getPropertyValue('env(safe-area-inset-right)') || '0',
+        10
+      );
 
       setViewport({
         width: window.innerWidth,
@@ -442,7 +460,7 @@ export const useMobileViewport = () => {
     };
 
     updateViewport();
-    
+
     let resizeTimer: NodeJS.Timeout;
     const handleResize = () => {
       clearTimeout(resizeTimer);
@@ -468,23 +486,34 @@ export const useMobileViewport = () => {
 export const useMobileScrollOptimization = (elementRef: React.RefObject<HTMLElement>) => {
   useEffect(() => {
     const element = elementRef.current;
-    if (!element) return;
+    if (!element) {
+      return;
+    }
 
     // Enable momentum scrolling on iOS
-    element.style.webkitOverflowScrolling = 'touch';
+    element.style.setProperty('-webkit-overflow-scrolling', 'touch');
     element.style.overscrollBehavior = 'contain';
 
     // Prevent scroll chaining
     const preventScrollChaining = (e: TouchEvent) => {
-      const target = e.target as HTMLElement;
-      const scrollParent = target.closest('[data-scroll]') || element;
-      
-      if (scrollParent.scrollTop === 0 && e.touches[0].pageY > e.touches[0].target.getBoundingClientRect().top) {
+      const target = e.target as HTMLElement | null;
+      const scrollParent = (target?.closest('[data-scroll]') as HTMLElement | null) || element;
+      const touch = e.touches[0];
+      const touchElement = touch.target as Element | null;
+      const rect = touchElement?.getBoundingClientRect();
+
+      if (!scrollParent || !rect) {
+        return;
+      }
+
+      if (scrollParent.scrollTop === 0 && touch.pageY > rect.top) {
         e.preventDefault();
       }
-      
-      if (scrollParent.scrollTop === scrollParent.scrollHeight - scrollParent.clientHeight && 
-          e.touches[0].pageY < e.touches[0].target.getBoundingClientRect().bottom) {
+
+      if (
+        scrollParent.scrollTop === scrollParent.scrollHeight - scrollParent.clientHeight &&
+        touch.pageY < rect.bottom
+      ) {
         e.preventDefault();
       }
     };
@@ -502,13 +531,14 @@ export const useMobileScrollOptimization = (elementRef: React.RefObject<HTMLElem
  */
 export const useMobileLoadingStrategy = () => {
   const capabilities = useMobileCapabilities();
-  
+
   return useMemo(() => {
     const strategy = {
       enableSkeleton: capabilities.connectionType === 'slow',
       showProgressIndicator: true,
       useOptimisticUpdates: capabilities.connectionType === 'fast',
-      preloadCriticalResources: capabilities.connectionType === 'fast' && !capabilities.prefersReducedMotion,
+      preloadCriticalResources:
+        capabilities.connectionType === 'fast' && !capabilities.prefersReducedMotion,
       lazyLoadImages: true,
       compressionLevel: capabilities.connectionType === 'slow' ? 'high' : 'medium',
       maxConcurrentRequests: capabilities.connectionType === 'slow' ? 2 : 6,
@@ -524,9 +554,8 @@ export const useMobileLoadingStrategy = () => {
 export const useMobileErrorHandling = () => {
   const showMobileError = useCallback((error: Error, context: string) => {
     // Mobile-friendly error display
-    const errorMessage = error.message.length > 100 ? 
-      error.message.substring(0, 97) + '...' : 
-      error.message;
+    const errorMessage =
+      error.message.length > 100 ? error.message.substring(0, 97) + '...' : error.message;
 
     // Use native alerts on mobile for critical errors
     if ('vibrate' in navigator) {

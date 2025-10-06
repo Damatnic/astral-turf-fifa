@@ -203,10 +203,10 @@ jobs:
         run: |
           echo "Waiting for deployment to be ready..."
           sleep 30
-          
+
           # Health check
           curl -f "${{ steps.deploy-production.outputs.production-url }}/api/health" || exit 1
-          
+
           echo "✅ Production deployment health check passed"
 
       - name: Create deployment notification

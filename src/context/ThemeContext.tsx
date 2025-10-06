@@ -340,13 +340,17 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
   // Accessibility states
   const [reducedMotion, setReducedMotionState] = useState<boolean>(() => {
     const saved = localStorage.getItem('reduced-motion');
-    if (saved) return saved === 'true';
+    if (saved) {
+      return saved === 'true';
+    }
     return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   });
 
   const [highContrast, setHighContrastState] = useState<boolean>(() => {
     const saved = localStorage.getItem('high-contrast');
-    if (saved) return saved === 'true';
+    if (saved) {
+      return saved === 'true';
+    }
     return window.matchMedia('(prefers-contrast: high)').matches;
   });
 
@@ -484,7 +488,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
     // Apply accessibility classes
     document.body.classList.toggle('reduced-motion', reducedMotion);
     document.body.classList.toggle('high-contrast', highContrast);
-    
+
     // Apply font size class
     document.body.className = document.body.className.replace(/font-size-\w+/g, '');
     document.body.classList.add(`font-size-${fontSize}`);
@@ -492,7 +496,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
     // Apply CSS custom properties for accessibility
     root.style.setProperty('--reduced-motion', reducedMotion ? '1' : '0');
     root.style.setProperty('--high-contrast', highContrast ? '1' : '0');
-    
+
     const fontSizeMultiplier = fontSize === 'small' ? 0.875 : fontSize === 'large' ? 1.125 : 1;
     root.style.setProperty('--font-size-multiplier', fontSizeMultiplier.toString());
   }, [theme, resolvedTheme, reducedMotion, highContrast, fontSize]);
@@ -596,8 +600,9 @@ export const createThemeStyles = (theme: Theme, tokens: typeof designTokens) => 
 
 // Accessibility utility hooks
 export const useAccessibility = () => {
-  const { reducedMotion, highContrast, fontSize, setReducedMotion, setHighContrast, setFontSize } = useTheme();
-  
+  const { reducedMotion, highContrast, fontSize, setReducedMotion, setHighContrast, setFontSize } =
+    useTheme();
+
   return {
     reducedMotion,
     highContrast,
@@ -606,19 +611,20 @@ export const useAccessibility = () => {
     setHighContrast,
     setFontSize,
     // Helper functions
-    getAnimationDuration: (normalDuration: number) => reducedMotion ? 0 : normalDuration,
+    getAnimationDuration: (normalDuration: number) => (reducedMotion ? 0 : normalDuration),
     shouldAnimate: !reducedMotion,
-    getContrastColor: (lightColor: string, darkColor: string) => highContrast ? darkColor : lightColor,
+    getContrastColor: (lightColor: string, darkColor: string) =>
+      highContrast ? darkColor : lightColor,
   };
 };
 
 // Motion-safe animation hook
 export const useMotionSafe = () => {
   const { reducedMotion } = useTheme();
-  
+
   return {
-    animate: (animation: any) => reducedMotion ? false : animation,
-    transition: (transition: any) => reducedMotion ? { duration: 0 } : transition,
+    animate: (animation: any) => (reducedMotion ? false : animation),
+    transition: (transition: any) => (reducedMotion ? { duration: 0 } : transition),
     duration: reducedMotion ? 0 : undefined,
   };
 };
@@ -634,7 +640,9 @@ export const useFocusManagement = () => {
 
   const trapFocus = (containerRef: React.RefObject<HTMLElement>) => {
     const container = containerRef.current;
-    if (!container) return;
+    if (!container) {
+      return;
+    }
 
     const focusableElements = container.querySelectorAll(
       'a[href], button, textarea, input[type="text"], input[type="radio"], input[type="checkbox"], select'
@@ -643,7 +651,9 @@ export const useFocusManagement = () => {
     const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
 
     const handleTabKey = (e: KeyboardEvent) => {
-      if (e.key !== 'Tab') return;
+      if (e.key !== 'Tab') {
+        return;
+      }
 
       if (e.shiftKey) {
         if (document.activeElement === firstElement) {

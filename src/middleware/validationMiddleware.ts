@@ -1,7 +1,13 @@
 /**
  * Comprehensive Input Validation Middleware
  *
- * Production-ready input validation and sanitization middleware
+   private sqlInjectionPatterns = [
+    /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|UNION|SCRIPT)\b)/gi,
+    /('|(\\')|;|(\\\\)|(\\\\\\\\))/gi,
+    /(((%27)|')\s*((%6F)|o|(%4F))\s*((%72)|r|(%52)))/gi,
+    /exec(\s|\+)+(s|x)p\w+/gi,
+    /UNION(?:\s+ALL)?\s+SELECT/gi,
+  ];ction-ready input validation and sanitization middleware
  * with threat detection, rate limiting, and comprehensive logging.
  */
 
@@ -9,6 +15,7 @@ import Joi from 'joi';
 import validator from 'validator';
 import DOMPurify from 'dompurify';
 import { JSDOM } from 'jsdom';
+import type { Request, Response, NextFunction } from 'express';
 import { log, SecurityEventType } from '../services/loggingService';
 import { rateLimit } from '../services/redisService';
 
@@ -25,7 +32,7 @@ export interface ValidationContext {
   method?: string;
 }
 
-export interface ValidationResult<T = any> {
+export interface ValidationResult<T = unknown> {
   success: boolean;
   data?: T;
   errors: string[];
@@ -91,10 +98,10 @@ class ValidationService {
   /**
    * Comprehensive input validation with threat detection
    */
-  async validateInput<T = any>(
+  async validateInput<T = unknown>(
     schema: Joi.ObjectSchema<T>,
     data: unknown,
-    context?: ValidationContext,
+    context?: ValidationContext
   ): Promise<ValidationResult<T>> {
     const startTime = Date.now();
     const result: ValidationResult<T> = {
@@ -109,15 +116,15 @@ class ValidationService {
         const rateLimitResult = await rateLimit.check(
           `validation:${context.ipAddress}`,
           100, // 100 validation requests
-          60, // per minute
+          60 // per minute
         );
 
         if (!rateLimitResult.allowed) {
           log.security(SecurityEventType.RATE_LIMIT_EXCEEDED, 'Validation rate limit exceeded', {
             userId: context.userId,
             ipAddress: context.ipAddress,
-            endpoint: context.endpoint,
             severity: 'medium',
+            metadata: { endpoint: context.endpoint },
           });
 
           result.errors.push('Rate limit exceeded. Please try again later.');
@@ -137,9 +144,11 @@ class ValidationService {
 
         log.warn('Input validation failed', {
           userId: context?.userId,
-          endpoint: context?.endpoint,
-          errors: result.errors,
-          metadata: { validationDuration: Date.now() - startTime },
+          metadata: {
+            endpoint: context?.endpoint,
+            errors: result.errors,
+            validationDuration: Date.now() - startTime,
+          },
         });
 
         return result;
@@ -148,8 +157,8 @@ class ValidationService {
       // Step 2: Threat detection and sanitization
       const { sanitizedData, threats } = await this.detectThreatsAndSanitize(value, context);
 
-      result.data = value;
-      result.sanitized = sanitizedData;
+      result.data = value as T;
+      result.sanitized = sanitizedData as T;
       result.threats = threats;
       result.success = true;
 
@@ -164,19 +173,23 @@ class ValidationService {
         // Log slow validations
         log.performance('Input validation', duration, {
           userId: context?.userId,
-          endpoint: context?.endpoint,
-          threatCount: threats.length,
-          dataSize: JSON.stringify(data).length,
+          metadata: {
+            endpoint: context?.endpoint,
+            threatCount: threats.length,
+            dataSize: JSON.stringify(data).length,
+          },
         });
       }
 
       return result;
-    } catch (_error) {
+    } catch (err) {
       log.error('Validation service error', {
-        error: error instanceof Error ? error.message : 'Unknown error',
         userId: context?.userId,
-        endpoint: context?.endpoint,
-        metadata: { validationDuration: Date.now() - startTime },
+        metadata: {
+          endpoint: context?.endpoint,
+          error: err instanceof Error ? err.message : 'Unknown error',
+          validationDuration: Date.now() - startTime,
+        },
       });
 
       result.errors.push('Internal validation error');
@@ -189,7 +202,7 @@ class ValidationService {
    */
   private async detectThreatsAndSanitize(
     data: unknown,
-    context?: ValidationContext,
+    context?: ValidationContext
   ): Promise<{ sanitizedData: unknown; threats: ThreatDetection[] }> {
     const threats: ThreatDetection[] = [];
     const sanitizedData = JSON.parse(JSON.stringify(data)); // Deep clone
@@ -200,7 +213,7 @@ class ValidationService {
       } else if (Array.isArray(value)) {
         return value.map((item, index) => processValue(item, `${fieldPath}[${index}]`));
       } else if (value && typeof value === 'object') {
-        const processedObject: unknown = {};
+        const processedObject: Record<string, unknown> = {};
         for (const [key, val] of Object.entries(value)) {
           processedObject[key] = processValue(val, `${fieldPath}.${key}`);
         }
@@ -488,7 +501,7 @@ class ValidationService {
             'image/gif',
             'image/webp',
             'application/pdf',
-            'text/plain',
+            'text/plain'
           )
           .required(),
         size: Joi.number()
@@ -514,11 +527,11 @@ export const validationService = new ValidationService();
  * Middleware factory for Express-like frameworks
  */
 export function createValidationMiddleware(schema: Joi.ObjectSchema) {
-  return async (req: unknown, res: unknown, next: unknown) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
     const context: ValidationContext = {
-      userId: req.user?.id,
-      sessionId: req.sessionId,
-      ipAddress: req.ip || req.connection.remoteAddress,
+      userId: (req as any).user?.id,
+      sessionId: (req as any).sessionId,
+      ipAddress: req.ip || (req.connection as any)?.remoteAddress,
       userAgent: req.get('User-Agent'),
       endpoint: req.path,
       method: req.method,
@@ -535,9 +548,10 @@ export function createValidationMiddleware(schema: Joi.ObjectSchema) {
 
     // Replace request body with sanitized data
     req.body = result.sanitized || result.data;
-    req.validationResult = result;
+    (req as any).validationResult = result;
 
     next();
+    return undefined;
   };
 }
 
@@ -547,7 +561,7 @@ export function createValidationMiddleware(schema: Joi.ObjectSchema) {
 export function useValidation() {
   const validate = async <T>(
     schema: Joi.ObjectSchema<T>,
-    data: unknown,
+    data: unknown
   ): Promise<ValidationResult<T>> => {
     return await validationService.validateInput(schema, data);
   };

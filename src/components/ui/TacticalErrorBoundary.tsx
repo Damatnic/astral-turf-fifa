@@ -40,7 +40,7 @@ export class TacticalErrorBoundary extends Component<Props, State> {
     };
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  override componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     this.setState({
       error,
       errorInfo,
@@ -74,7 +74,7 @@ export class TacticalErrorBoundary extends Component<Props, State> {
     };
 
     console.warn('Error report generated:', errorReport);
-    
+
     // Example: Send to analytics/monitoring service
     // analytics.track('tactical_error_boundary_triggered', errorReport);
   };
@@ -101,7 +101,7 @@ export class TacticalErrorBoundary extends Component<Props, State> {
     });
   };
 
-  render() {
+  override render() {
     if (this.state.hasError) {
       // Custom fallback UI
       if (this.props.fallback) {
@@ -118,10 +118,9 @@ export class TacticalErrorBoundary extends Component<Props, State> {
                 Tactical Component Error
               </h3>
               <p className="text-sm text-red-600 dark:text-red-300 mb-4">
-                {this.props.context 
-                  ? `Error in ${this.props.context}` 
-                  : 'An error occurred in the tactical system'
-                }
+                {this.props.context
+                  ? `Error in ${this.props.context}`
+                  : 'An error occurred in the tactical system'}
               </p>
             </div>
 
@@ -131,12 +130,8 @@ export class TacticalErrorBoundary extends Component<Props, State> {
                   <Bug className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
                   <div className="text-xs text-red-700 dark:text-red-300">
                     <div className="font-medium mb-1">Debug Info:</div>
-                    <div className="font-mono text-xs">
-                      {this.state.error?.message}
-                    </div>
-                    <div className="text-xs text-red-500 mt-1">
-                      Error ID: {this.state.errorId}
-                    </div>
+                    <div className="font-mono text-xs">{this.state.error?.message}</div>
+                    <div className="text-xs text-red-500 mt-1">Error ID: {this.state.errorId}</div>
                   </div>
                 </div>
               </div>
@@ -152,7 +147,7 @@ export class TacticalErrorBoundary extends Component<Props, State> {
                   Retry ({this.maxRetries - this.retryCount} left)
                 </button>
               )}
-              
+
               <button
                 onClick={this.handleReset}
                 className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white text-sm rounded-md transition-colors"

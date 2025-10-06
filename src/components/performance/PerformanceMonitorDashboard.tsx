@@ -4,24 +4,24 @@
  */
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { 
-  Activity, 
-  Zap, 
-  Clock, 
-  Database, 
-  Wifi, 
-  AlertTriangle, 
-  CheckCircle, 
+import {
+  Activity,
+  Zap,
+  Clock,
+  Database,
+  Wifi,
+  AlertTriangle,
+  CheckCircle,
   TrendingUp,
   Monitor,
   Cpu,
-  HardDrive
+  HardDrive,
 } from 'lucide-react';
-import { 
+import {
   initializeCatalystPerformance,
   PERFORMANCE_THRESHOLDS,
   CoreWebVitalsMonitor,
-  AdvancedMemoryManager 
+  AdvancedMemoryManager,
 } from '../../utils/performanceOptimizations';
 import { getCacheStats } from '../../utils/cachingOptimizations';
 
@@ -89,10 +89,10 @@ const PerformanceMonitorDashboard: React.FC = () => {
           effectiveType: connection.effectiveType || '4g',
           downlink: connection.downlink || 10,
           saveData: connection.saveData || false,
-          rtt: connection.rtt || 0
+          rtt: connection.rtt || 0,
         });
       };
-      
+
       updateNetworkInfo();
       connection.addEventListener('change', updateNetworkInfo);
     }
@@ -120,14 +120,18 @@ const PerformanceMonitorDashboard: React.FC = () => {
     if (LCP) {
       if (LCP > PERFORMANCE_THRESHOLDS.LCP_TARGET) {
         score -= 20;
-        issues.push(`LCP is ${(LCP / 1000).toFixed(1)}s (target: <2.5s) - Optimize largest content element`);
+        issues.push(
+          `LCP is ${(LCP / 1000).toFixed(1)}s (target: <2.5s) - Optimize largest content element`
+        );
       }
     }
 
     if (FID) {
       if (FID > PERFORMANCE_THRESHOLDS.FID_TARGET) {
         score -= 15;
-        issues.push(`FID is ${FID.toFixed(1)}ms (target: <100ms) - Reduce JavaScript execution time`);
+        issues.push(
+          `FID is ${FID.toFixed(1)}ms (target: <100ms) - Reduce JavaScript execution time`
+        );
       }
     }
 
@@ -140,7 +144,9 @@ const PerformanceMonitorDashboard: React.FC = () => {
 
     if (memoryInfo && memoryInfo.usedJSHeapSize > PERFORMANCE_THRESHOLDS.MEMORY_WARNING) {
       score -= 10;
-      issues.push(`Memory usage is ${(memoryInfo.usedJSHeapSize / 1024 / 1024).toFixed(1)}MB (warning: >50MB)`);
+      issues.push(
+        `Memory usage is ${(memoryInfo.usedJSHeapSize / 1024 / 1024).toFixed(1)}MB (warning: >50MB)`
+      );
     }
 
     if (networkInfo?.effectiveType === 'slow-2g' || networkInfo?.effectiveType === '2g') {
@@ -149,22 +155,34 @@ const PerformanceMonitorDashboard: React.FC = () => {
 
     setRecommendations(issues);
 
-    if (score >= 90) setPerformanceGrade('A');
-    else if (score >= 80) setPerformanceGrade('B');
-    else if (score >= 70) setPerformanceGrade('C');
-    else if (score >= 60) setPerformanceGrade('D');
-    else setPerformanceGrade('F');
+    if (score >= 90) {
+      setPerformanceGrade('A');
+    } else if (score >= 80) {
+      setPerformanceGrade('B');
+    } else if (score >= 70) {
+      setPerformanceGrade('C');
+    } else if (score >= 60) {
+      setPerformanceGrade('D');
+    } else {
+      setPerformanceGrade('F');
+    }
   }, [metrics, memoryInfo, networkInfo]);
 
   // Performance score color
   const getGradeColor = (grade: string) => {
     switch (grade) {
-      case 'A': return 'text-green-400 bg-green-900/20';
-      case 'B': return 'text-blue-400 bg-blue-900/20';
-      case 'C': return 'text-yellow-400 bg-yellow-900/20';
-      case 'D': return 'text-orange-400 bg-orange-900/20';
-      case 'F': return 'text-red-400 bg-red-900/20';
-      default: return 'text-gray-400 bg-gray-900/20';
+      case 'A':
+        return 'text-green-400 bg-green-900/20';
+      case 'B':
+        return 'text-blue-400 bg-blue-900/20';
+      case 'C':
+        return 'text-yellow-400 bg-yellow-900/20';
+      case 'D':
+        return 'text-orange-400 bg-orange-900/20';
+      case 'F':
+        return 'text-red-400 bg-red-900/20';
+      default:
+        return 'text-gray-400 bg-gray-900/20';
     }
   };
 
@@ -221,7 +239,7 @@ const PerformanceMonitorDashboard: React.FC = () => {
         <div className="text-xs text-slate-400 font-semibold uppercase tracking-wide">
           Core Web Vitals
         </div>
-        
+
         {/* LCP */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -233,11 +251,13 @@ const PerformanceMonitorDashboard: React.FC = () => {
               {metrics.LCP ? formatMetric(metrics.LCP, 'ms') : '—'}
             </span>
             {metrics.LCP && (
-              <div className={`w-2 h-2 rounded-full ${
-                getMetricStatus(metrics.LCP, PERFORMANCE_THRESHOLDS.LCP_TARGET) === 'good' 
-                  ? 'bg-green-400' 
-                  : 'bg-orange-400'
-              }`} />
+              <div
+                className={`w-2 h-2 rounded-full ${
+                  getMetricStatus(metrics.LCP, PERFORMANCE_THRESHOLDS.LCP_TARGET) === 'good'
+                    ? 'bg-green-400'
+                    : 'bg-orange-400'
+                }`}
+              />
             )}
           </div>
         </div>
@@ -253,11 +273,13 @@ const PerformanceMonitorDashboard: React.FC = () => {
               {metrics.FID ? formatMetric(metrics.FID, 'ms') : '—'}
             </span>
             {metrics.FID && (
-              <div className={`w-2 h-2 rounded-full ${
-                getMetricStatus(metrics.FID, PERFORMANCE_THRESHOLDS.FID_TARGET) === 'good' 
-                  ? 'bg-green-400' 
-                  : 'bg-orange-400'
-              }`} />
+              <div
+                className={`w-2 h-2 rounded-full ${
+                  getMetricStatus(metrics.FID, PERFORMANCE_THRESHOLDS.FID_TARGET) === 'good'
+                    ? 'bg-green-400'
+                    : 'bg-orange-400'
+                }`}
+              />
             )}
           </div>
         </div>
@@ -273,11 +295,13 @@ const PerformanceMonitorDashboard: React.FC = () => {
               {metrics.CLS ? formatMetric(metrics.CLS, '') : '—'}
             </span>
             {metrics.CLS !== undefined && (
-              <div className={`w-2 h-2 rounded-full ${
-                getMetricStatus(metrics.CLS, PERFORMANCE_THRESHOLDS.CLS_TARGET) === 'good' 
-                  ? 'bg-green-400' 
-                  : 'bg-orange-400'
-              }`} />
+              <div
+                className={`w-2 h-2 rounded-full ${
+                  getMetricStatus(metrics.CLS, PERFORMANCE_THRESHOLDS.CLS_TARGET) === 'good'
+                    ? 'bg-green-400'
+                    : 'bg-orange-400'
+                }`}
+              />
             )}
           </div>
         </div>
@@ -298,11 +322,13 @@ const PerformanceMonitorDashboard: React.FC = () => {
               <span className="text-sm text-white">
                 {formatMetric(memoryInfo.usedJSHeapSize, 'MB')}
               </span>
-              <div className={`w-2 h-2 rounded-full ${
-                memoryInfo.usedJSHeapSize > PERFORMANCE_THRESHOLDS.MEMORY_WARNING 
-                  ? 'bg-orange-400' 
-                  : 'bg-green-400'
-              }`} />
+              <div
+                className={`w-2 h-2 rounded-full ${
+                  memoryInfo.usedJSHeapSize > PERFORMANCE_THRESHOLDS.MEMORY_WARNING
+                    ? 'bg-orange-400'
+                    : 'bg-green-400'
+                }`}
+              />
             </div>
           </div>
         </div>
@@ -320,12 +346,8 @@ const PerformanceMonitorDashboard: React.FC = () => {
               <span className="text-sm text-slate-300">Connection</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-sm text-white">
-                {networkInfo.effectiveType.toUpperCase()}
-              </span>
-              <span className="text-xs text-slate-400">
-                {networkInfo.downlink}Mbps
-              </span>
+              <span className="text-sm text-white">{networkInfo.effectiveType.toUpperCase()}</span>
+              <span className="text-xs text-slate-400">{networkInfo.downlink}Mbps</span>
             </div>
           </div>
         </div>
@@ -379,10 +401,7 @@ const PerformanceMonitorDashboard: React.FC = () => {
             <AlertTriangle className="w-4 h-4 text-orange-400" />
           )}
           <span className="text-xs text-slate-300">
-            {performanceGrade === 'A' 
-              ? 'Performance optimized' 
-              : 'Optimization recommended'
-            }
+            {performanceGrade === 'A' ? 'Performance optimized' : 'Optimization recommended'}
           </span>
         </div>
       </div>

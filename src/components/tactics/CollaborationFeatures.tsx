@@ -128,88 +128,91 @@ const CollaborationFeatures: React.FC<CollaborationFeaturesProps> = ({
   const chatRef = useRef<HTMLDivElement>(null);
 
   // Mock collaboration session data
-  const mockSession = useMemo((): CollaborationSession => ({
-    id: 'session-123',
-    name: 'Tactical Planning Session',
-    createdBy: currentUser.id,
-    createdAt: new Date(),
-    isLive: liveMode,
-    collaborators: [
-      {
-        id: currentUser.id,
-        name: currentUser.name,
-        role: 'owner',
-        isOnline: true,
-        lastActivity: new Date(),
-        permissions: {
-          canEdit: true,
-          canComment: true,
-          canShare: true,
-          canModifyFormations: true,
-          canManagePlayers: true,
-        },
-      },
-      {
-        id: 'user-2',
-        name: 'Assistant Coach',
-        role: 'editor',
-        isOnline: true,
-        cursor: { x: 45, y: 30 },
-        lastActivity: new Date(Date.now() - 2 * 60 * 1000),
-        permissions: {
-          canEdit: true,
-          canComment: true,
-          canShare: false,
-          canModifyFormations: true,
-          canManagePlayers: false,
-        },
-      },
-      {
-        id: 'user-3',
-        name: 'Team Analyst',
-        role: 'viewer',
-        isOnline: false,
-        lastActivity: new Date(Date.now() - 15 * 60 * 1000),
-        permissions: {
-          canEdit: false,
-          canComment: true,
-          canShare: false,
-          canModifyFormations: false,
-          canManagePlayers: false,
-        },
-      },
-    ],
-    comments: [
-      {
-        id: 'comment-1',
-        authorId: 'user-2',
-        content: 'Should we move the midfielder higher up the pitch?',
-        position: { x: 50, y: 45 },
-        timestamp: new Date(Date.now() - 10 * 60 * 1000),
-        isResolved: false,
-        replies: [
-          {
-            id: 'reply-1',
-            authorId: currentUser.id,
-            content: 'Good point, let me adjust that.',
-            timestamp: new Date(Date.now() - 8 * 60 * 1000),
+  const mockSession = useMemo(
+    (): CollaborationSession => ({
+      id: 'session-123',
+      name: 'Tactical Planning Session',
+      createdBy: currentUser.id,
+      createdAt: new Date(),
+      isLive: liveMode,
+      collaborators: [
+        {
+          id: currentUser.id,
+          name: currentUser.name,
+          role: 'owner',
+          isOnline: true,
+          lastActivity: new Date(),
+          permissions: {
+            canEdit: true,
+            canComment: true,
+            canShare: true,
+            canModifyFormations: true,
+            canManagePlayers: true,
           },
-        ],
-      },
-      {
-        id: 'comment-2',
-        authorId: 'user-3',
-        content: 'Defensive line looks solid 👍',
-        position: { x: 20, y: 60 },
-        timestamp: new Date(Date.now() - 20 * 60 * 1000),
-        isResolved: true,
-        replies: [],
-      },
-    ],
-    shareLink: 'https://tactics.app/share/session-123',
-    visibility: 'team',
-    version: 1,
-  }), [currentUser, liveMode]);
+        },
+        {
+          id: 'user-2',
+          name: 'Assistant Coach',
+          role: 'editor',
+          isOnline: true,
+          cursor: { x: 45, y: 30 },
+          lastActivity: new Date(Date.now() - 2 * 60 * 1000),
+          permissions: {
+            canEdit: true,
+            canComment: true,
+            canShare: false,
+            canModifyFormations: true,
+            canManagePlayers: false,
+          },
+        },
+        {
+          id: 'user-3',
+          name: 'Team Analyst',
+          role: 'viewer',
+          isOnline: false,
+          lastActivity: new Date(Date.now() - 15 * 60 * 1000),
+          permissions: {
+            canEdit: false,
+            canComment: true,
+            canShare: false,
+            canModifyFormations: false,
+            canManagePlayers: false,
+          },
+        },
+      ],
+      comments: [
+        {
+          id: 'comment-1',
+          authorId: 'user-2',
+          content: 'Should we move the midfielder higher up the pitch?',
+          position: { x: 50, y: 45 },
+          timestamp: new Date(Date.now() - 10 * 60 * 1000),
+          isResolved: false,
+          replies: [
+            {
+              id: 'reply-1',
+              authorId: currentUser.id,
+              content: 'Good point, let me adjust that.',
+              timestamp: new Date(Date.now() - 8 * 60 * 1000),
+            },
+          ],
+        },
+        {
+          id: 'comment-2',
+          authorId: 'user-3',
+          content: 'Defensive line looks solid 👍',
+          position: { x: 20, y: 60 },
+          timestamp: new Date(Date.now() - 20 * 60 * 1000),
+          isResolved: true,
+          replies: [],
+        },
+      ],
+      shareLink: 'https://tactics.app/share/session-123',
+      visibility: 'team',
+      version: 1,
+    }),
+    [currentUser, liveMode]
+  );
 
   const currentSession = session || mockSession;
 
@@ -241,10 +244,14 @@ const CollaborationFeatures: React.FC<CollaborationFeaturesProps> = ({
 
   const getRoleColor = (role: string) => {
     switch (role) {
-      case 'owner': return 'text-yellow-400 bg-yellow-900/30';
-      case 'editor': return 'text-blue-400 bg-blue-900/30';
-      case 'viewer': return 'text-green-400 bg-green-900/30';
-      default: return 'text-gray-400 bg-gray-900/30';
+      case 'owner':
+        return 'text-yellow-400 bg-yellow-900/30';
+      case 'editor':
+        return 'text-blue-400 bg-blue-900/30';
+      case 'viewer':
+        return 'text-green-400 bg-green-900/30';
+      default:
+        return 'text-gray-400 bg-gray-900/30';
     }
   };
 
@@ -252,23 +259,36 @@ const CollaborationFeatures: React.FC<CollaborationFeaturesProps> = ({
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / (1000 * 60));
-    
-    if (diffMins < 1) return 'Just now';
-    if (diffMins < 60) return `${diffMins}m ago`;
+
+    if (diffMins < 1) {
+      return 'Just now';
+    }
+    if (diffMins < 60) {
+      return `${diffMins}m ago`;
+    }
     const diffHours = Math.floor(diffMins / 60);
-    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffHours < 24) {
+      return `${diffHours}h ago`;
+    }
     const diffDays = Math.floor(diffHours / 24);
     return `${diffDays}d ago`;
   };
 
   const tabs = [
     { id: 'collaborators', name: 'Team', icon: Users, count: currentSession.collaborators.length },
-    { id: 'comments', name: 'Comments', icon: MessageCircle, count: currentSession.comments.filter(c => !c.isResolved).length },
+    {
+      id: 'comments',
+      name: 'Comments',
+      icon: MessageCircle,
+      count: currentSession.comments.filter(c => !c.isResolved).length,
+    },
     { id: 'share', name: 'Share', icon: Share2, count: 0 },
     { id: 'session', name: 'Session', icon: Video, count: 0 },
   ];
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return null;
+  }
 
   return (
     <motion.div
@@ -320,7 +340,9 @@ const CollaborationFeatures: React.FC<CollaborationFeaturesProps> = ({
             <button
               onClick={() => setNotifications(!notifications)}
               className={`p-2 rounded-lg transition-colors ${
-                notifications ? 'text-yellow-400 bg-yellow-900/30' : 'text-slate-400 hover:text-white'
+                notifications
+                  ? 'text-yellow-400 bg-yellow-900/30'
+                  : 'text-slate-400 hover:text-white'
               }`}
               title={notifications ? 'Disable notifications' : 'Enable notifications'}
             >
@@ -345,19 +367,22 @@ const CollaborationFeatures: React.FC<CollaborationFeaturesProps> = ({
                 onClick={() => setActiveTab(tab.id as TabType)}
                 className={`
                   flex items-center gap-2 px-6 py-4 text-sm font-medium transition-all relative
-                  ${activeTab === tab.id
-                    ? 'text-purple-400 bg-purple-500/10'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-700/30'
+                  ${
+                    activeTab === tab.id
+                      ? 'text-purple-400 bg-purple-500/10'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-700/30'
                   }
                 `}
               >
                 <IconComponent className="w-4 h-4" />
                 {tab.name}
                 {tab.count > 0 && (
-                  <span className={`
+                  <span
+                    className={`
                     px-1.5 py-0.5 rounded text-xs
                     ${activeTab === tab.id ? 'bg-purple-500/20 text-purple-300' : 'bg-slate-700/50 text-slate-300'}
-                  `}>
+                  `}
+                  >
                     {tab.count}
                   </span>
                 )}
@@ -407,24 +432,30 @@ const CollaborationFeatures: React.FC<CollaborationFeaturesProps> = ({
                           <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center text-white font-bold">
                             {collaborator.name.charAt(0)}
                           </div>
-                          <div className={`
+                          <div
+                            className={`
                             absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-slate-800
                             ${collaborator.isOnline ? 'bg-green-500' : 'bg-slate-500'}
-                          `} />
+                          `}
+                          />
                           {collaborator.role === 'owner' && (
                             <Crown className="absolute -top-1 -right-1 w-4 h-4 text-yellow-400" />
                           )}
                         </div>
-                        
+
                         <div>
                           <div className="flex items-center gap-2">
                             <h4 className="font-semibold text-white">{collaborator.name}</h4>
-                            <span className={`text-xs px-2 py-1 rounded-full ${getRoleColor(collaborator.role)}`}>
+                            <span
+                              className={`text-xs px-2 py-1 rounded-full ${getRoleColor(collaborator.role)}`}
+                            >
                               {collaborator.role}
                             </span>
                           </div>
                           <div className="text-sm text-slate-400">
-                            {collaborator.isOnline ? 'Online' : `Last seen ${formatTimeAgo(collaborator.lastActivity)}`}
+                            {collaborator.isOnline
+                              ? 'Online'
+                              : `Last seen ${formatTimeAgo(collaborator.lastActivity)}`}
                           </div>
                         </div>
                       </div>
@@ -460,15 +491,15 @@ const CollaborationFeatures: React.FC<CollaborationFeaturesProps> = ({
               >
                 <div className="p-6 border-b border-slate-700/50">
                   <h3 className="text-lg font-semibold text-white mb-4">Comments & Feedback</h3>
-                  
+
                   {/* Add Comment Input */}
                   <div className="flex gap-3">
                     <input
                       type="text"
                       placeholder="Add a comment..."
                       value={newComment}
-                      onChange={(e) => setNewComment(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && handleAddComment()}
+                      onChange={e => setNewComment(e.target.value)}
+                      onKeyPress={e => e.key === 'Enter' && handleAddComment()}
                       className="flex-1 bg-slate-800/50 border border-slate-600/50 rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-purple-500/50"
                     />
                     <button
@@ -483,15 +514,17 @@ const CollaborationFeatures: React.FC<CollaborationFeaturesProps> = ({
 
                 <div ref={chatRef} className="flex-1 overflow-y-auto p-6 space-y-4">
                   {currentSession.comments.map(comment => {
-                    const author = currentSession.collaborators.find(c => c.id === comment.authorId);
+                    const author = currentSession.collaborators.find(
+                      c => c.id === comment.authorId
+                    );
                     return (
                       <motion.div
                         key={comment.id}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         className={`p-4 rounded-xl border ${
-                          comment.isResolved 
-                            ? 'bg-green-900/20 border-green-500/30 opacity-75' 
+                          comment.isResolved
+                            ? 'bg-green-900/20 border-green-500/30 opacity-75'
                             : 'bg-slate-800/40 border-slate-600/50'
                         }`}
                       >
@@ -501,11 +534,15 @@ const CollaborationFeatures: React.FC<CollaborationFeaturesProps> = ({
                               {author?.name.charAt(0) || '?'}
                             </div>
                             <div>
-                              <div className="font-medium text-white">{author?.name || 'Unknown'}</div>
-                              <div className="text-xs text-slate-400">{formatTimeAgo(comment.timestamp)}</div>
+                              <div className="font-medium text-white">
+                                {author?.name || 'Unknown'}
+                              </div>
+                              <div className="text-xs text-slate-400">
+                                {formatTimeAgo(comment.timestamp)}
+                              </div>
                             </div>
                           </div>
-                          
+
                           {!comment.isResolved && (
                             <button
                               onClick={() => onResolveComment(comment.id)}
@@ -521,12 +558,18 @@ const CollaborationFeatures: React.FC<CollaborationFeaturesProps> = ({
                         {comment.replies.length > 0 && (
                           <div className="space-y-2 ml-4 border-l-2 border-slate-600 pl-4">
                             {comment.replies.map(reply => {
-                              const replyAuthor = currentSession.collaborators.find(c => c.id === reply.authorId);
+                              const replyAuthor = currentSession.collaborators.find(
+                                c => c.id === reply.authorId
+                              );
                               return (
                                 <div key={reply.id} className="text-sm">
                                   <div className="flex items-center gap-2 mb-1">
-                                    <span className="font-medium text-white">{replyAuthor?.name}</span>
-                                    <span className="text-xs text-slate-400">{formatTimeAgo(reply.timestamp)}</span>
+                                    <span className="font-medium text-white">
+                                      {replyAuthor?.name}
+                                    </span>
+                                    <span className="text-xs text-slate-400">
+                                      {formatTimeAgo(reply.timestamp)}
+                                    </span>
                                   </div>
                                   <p className="text-slate-300">{reply.content}</p>
                                 </div>
@@ -559,7 +602,7 @@ const CollaborationFeatures: React.FC<CollaborationFeaturesProps> = ({
                       <Globe className="w-5 h-5" />
                       Share Link
                     </h4>
-                    
+
                     <div className="flex gap-3 mb-4">
                       <input
                         type="text"
@@ -571,13 +614,18 @@ const CollaborationFeatures: React.FC<CollaborationFeaturesProps> = ({
                         onClick={handleCopyLink}
                         className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors flex items-center gap-2"
                       >
-                        {isLinkCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                        {isLinkCopied ? (
+                          <Check className="w-4 h-4" />
+                        ) : (
+                          <Copy className="w-4 h-4" />
+                        )}
                         {isLinkCopied ? 'Copied!' : 'Copy'}
                       </button>
                     </div>
 
                     <div className="text-sm text-slate-400">
-                      Anyone with this link can view the session according to the visibility settings below.
+                      Anyone with this link can view the session according to the visibility
+                      settings below.
                     </div>
                   </div>
 
@@ -587,12 +635,27 @@ const CollaborationFeatures: React.FC<CollaborationFeaturesProps> = ({
                       <Lock className="w-5 h-5" />
                       Visibility
                     </h4>
-                    
+
                     <div className="space-y-3">
                       {[
-                        { id: 'private', label: 'Private', desc: 'Only invited members can access', icon: Lock },
-                        { id: 'team', label: 'Team', desc: 'Anyone in your organization can view', icon: Users },
-                        { id: 'public', label: 'Public', desc: 'Anyone with the link can view', icon: Globe },
+                        {
+                          id: 'private',
+                          label: 'Private',
+                          desc: 'Only invited members can access',
+                          icon: Lock,
+                        },
+                        {
+                          id: 'team',
+                          label: 'Team',
+                          desc: 'Anyone in your organization can view',
+                          icon: Users,
+                        },
+                        {
+                          id: 'public',
+                          label: 'Public',
+                          desc: 'Anyone with the link can view',
+                          icon: Globe,
+                        },
                       ].map(option => {
                         const IconComponent = option.icon;
                         return (
@@ -625,7 +688,7 @@ const CollaborationFeatures: React.FC<CollaborationFeaturesProps> = ({
                       <Download className="w-5 h-5" />
                       Export Session
                     </h4>
-                    
+
                     <div className="grid grid-cols-2 gap-3">
                       <button className="flex items-center gap-2 p-3 bg-slate-700/50 hover:bg-slate-600/50 rounded-lg transition-colors">
                         <Camera className="w-4 h-4" />
@@ -656,13 +719,13 @@ const CollaborationFeatures: React.FC<CollaborationFeaturesProps> = ({
                   {/* Session Status */}
                   <div className="bg-slate-800/40 border border-slate-600/50 rounded-xl p-6">
                     <h4 className="font-medium text-white mb-4">Session Status</h4>
-                    
+
                     <div className="flex items-center gap-4 mb-4">
                       <button
                         onClick={() => setLiveMode(!liveMode)}
                         className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                          liveMode 
-                            ? 'bg-red-600 hover:bg-red-700 text-white' 
+                          liveMode
+                            ? 'bg-red-600 hover:bg-red-700 text-white'
                             : 'bg-green-600 hover:bg-green-700 text-white'
                         }`}
                       >
@@ -678,7 +741,7 @@ const CollaborationFeatures: React.FC<CollaborationFeaturesProps> = ({
                           </>
                         )}
                       </button>
-                      
+
                       <div className="text-sm text-slate-400">
                         {liveMode ? 'Session is live' : 'Session is offline'}
                       </div>
@@ -703,13 +766,13 @@ const CollaborationFeatures: React.FC<CollaborationFeaturesProps> = ({
                   {/* Recording Controls */}
                   <div className="bg-slate-800/40 border border-slate-600/50 rounded-xl p-6">
                     <h4 className="font-medium text-white mb-4">Recording</h4>
-                    
+
                     <div className="flex items-center gap-4 mb-4">
                       <button
                         onClick={() => setIsRecording(!isRecording)}
                         className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                          isRecording 
-                            ? 'bg-red-600 hover:bg-red-700 text-white' 
+                          isRecording
+                            ? 'bg-red-600 hover:bg-red-700 text-white'
                             : 'bg-slate-600 hover:bg-slate-700 text-white'
                         }`}
                       >
@@ -755,7 +818,7 @@ const CollaborationFeatures: React.FC<CollaborationFeaturesProps> = ({
                 className="bg-slate-800 border border-slate-700 rounded-xl p-6 w-full max-w-md"
               >
                 <h3 className="text-lg font-semibold text-white mb-4">Invite Collaborator</h3>
-                
+
                 <div className="space-y-4">
                   <div>
                     <label className="text-sm text-slate-400 mb-2 block">Email Address</label>
@@ -763,16 +826,16 @@ const CollaborationFeatures: React.FC<CollaborationFeaturesProps> = ({
                       type="email"
                       placeholder="colleague@example.com"
                       value={inviteEmail}
-                      onChange={(e) => setInviteEmail(e.target.value)}
+                      onChange={e => setInviteEmail(e.target.value)}
                       className="w-full bg-slate-700/50 border border-slate-600/50 rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-purple-500/50"
                     />
                   </div>
-                  
+
                   <div>
                     <label className="text-sm text-slate-400 mb-2 block">Role</label>
                     <select
                       value={inviteRole}
-                      onChange={(e) => setInviteRole(e.target.value as 'editor' | 'viewer')}
+                      onChange={e => setInviteRole(e.target.value as 'editor' | 'viewer')}
                       className="w-full bg-slate-700/50 border border-slate-600/50 rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-purple-500/50"
                     >
                       <option value="viewer">Viewer - Can view and comment</option>

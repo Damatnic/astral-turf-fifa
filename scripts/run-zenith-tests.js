@@ -21,7 +21,7 @@ const ZENITH_CONFIG = {
   maxWorkers: 4,
   timeout: 30000,
   retries: 2,
-  
+
   // Coverage requirements (100% for production)
   coverage: {
     statements: 100,
@@ -29,14 +29,14 @@ const ZENITH_CONFIG = {
     functions: 100,
     lines: 100,
   },
-  
+
   // Performance thresholds
   performance: {
-    renderTime: 50,    // 50ms max
-    memoryUsage: 100,  // 100MB max
-    bundleSize: 2048,  // 2MB max
+    renderTime: 50, // 50ms max
+    memoryUsage: 100, // 100MB max
+    bundleSize: 2048, // 2MB max
   },
-  
+
   // Quality gates
   qualityGates: {
     mustPass: true,
@@ -152,10 +152,10 @@ class ZenithTestRunner {
    */
   async runAllTests() {
     console.log('🚀 Starting ZENITH Comprehensive Test Suite...\n');
-    console.log('=' .repeat(80));
+    console.log('='.repeat(80));
     console.log('🏆 ZENITH ELITE TESTING FRAMEWORK');
     console.log('   100% Pass Rate • Complete Coverage • Production Ready');
-    console.log('=' .repeat(80) + '\n');
+    console.log('='.repeat(80) + '\n');
 
     try {
       // Prepare environment
@@ -179,7 +179,6 @@ class ZenithTestRunner {
 
       console.log('✅ ZENITH Test Suite completed successfully!\n');
       process.exit(0);
-
     } catch (error) {
       console.error('❌ ZENITH Test Suite failed:', error.message);
       await this.generateFailureReport(error);
@@ -237,24 +236,25 @@ class ZenithTestRunner {
       });
 
       const duration = Date.now() - startTime;
-      
+
       // Parse results based on category
       const result = await this.parseTestResults(categoryKey, stdout, stderr);
       result.duration = duration;
-      
+
       this.results.addCategoryResult(categoryKey, result);
 
       console.log(`✅ ${category.name} completed in ${(duration / 1000).toFixed(2)}s`);
-      console.log(`   Passed: ${result.passed}, Failed: ${result.failed}, Total: ${result.total}\n`);
+      console.log(
+        `   Passed: ${result.passed}, Failed: ${result.failed}, Total: ${result.total}\n`
+      );
 
       // Fail fast if configured and tests failed
       if (ZENITH_CONFIG.qualityGates.failFast && result.failed > 0) {
         throw new Error(`${category.name} failed with ${result.failed} failures`);
       }
-
     } catch (error) {
       const duration = Date.now() - startTime;
-      
+
       console.error(`❌ ${category.name} failed after ${(duration / 1000).toFixed(2)}s`);
       console.error(`   Error: ${error.message}\n`);
 
@@ -289,19 +289,21 @@ class ZenithTestRunner {
         case 'unit':
         case 'integration':
           // Parse Vitest output
-          const vitestMatch = stdout.match(/Tests\s+(\d+)\s+passed.*?(\d+)\s+failed.*?(\d+)\s+total/i);
+          const vitestMatch = stdout.match(
+            /Tests\s+(\d+)\s+passed.*?(\d+)\s+failed.*?(\d+)\s+total/i
+          );
           if (vitestMatch) {
             result.passed = parseInt(vitestMatch[1]);
             result.failed = parseInt(vitestMatch[2]);
             result.total = parseInt(vitestMatch[3]);
           }
-          
+
           // Parse coverage from coverage file if exists
           try {
             const coverageFile = path.join(this.outputDir, 'coverage', 'coverage-summary.json');
             const coverageData = JSON.parse(await fs.readFile(coverageFile, 'utf-8'));
             result.coverage = coverageData.total;
-            
+
             // Update overall coverage
             this.results.results.coverage = coverageData.total;
           } catch (error) {
@@ -325,12 +327,12 @@ class ZenithTestRunner {
           if (renderTimeMatch) {
             this.results.results.performance.avgRenderTime = parseInt(renderTimeMatch[1]);
           }
-          
+
           const memoryMatch = stdout.match(/Peak memory usage:\s*(\d+)MB/i);
           if (memoryMatch) {
             this.results.results.performance.maxMemoryUsage = parseInt(memoryMatch[1]);
           }
-          
+
           // Default success for performance tests
           result.passed = 1;
           result.total = 1;
@@ -342,7 +344,7 @@ class ZenithTestRunner {
           if (violationsMatch) {
             this.results.results.accessibility.violations = parseInt(violationsMatch[1]);
           }
-          
+
           // Default success for accessibility tests
           result.passed = 1;
           result.total = 1;
@@ -363,7 +365,6 @@ class ZenithTestRunner {
           result.passed = 1;
           result.total = 1;
       }
-
     } catch (error) {
       console.warn(`Warning: Could not parse results for ${category}:`, error.message);
       // Assume success if we can't parse
@@ -398,7 +399,10 @@ class ZenithTestRunner {
 
     // Generate badge JSON for README
     const badgeData = this.generateBadgeData(finalResults);
-    await fs.writeFile(path.join(this.outputDir, 'badges.json'), JSON.stringify(badgeData, null, 2));
+    await fs.writeFile(
+      path.join(this.outputDir, 'badges.json'),
+      JSON.stringify(badgeData, null, 2)
+    );
 
     console.log('✅ Reports generated\n');
   }
@@ -419,20 +423,28 @@ class ZenithTestRunner {
 
     // Check coverage thresholds
     if (results.coverage.statements?.pct < ZENITH_CONFIG.coverage.statements) {
-      failures.push(`Statement coverage: ${results.coverage.statements?.pct}% (required: ${ZENITH_CONFIG.coverage.statements}%)`);
+      failures.push(
+        `Statement coverage: ${results.coverage.statements?.pct}% (required: ${ZENITH_CONFIG.coverage.statements}%)`
+      );
     }
 
     if (results.coverage.branches?.pct < ZENITH_CONFIG.coverage.branches) {
-      failures.push(`Branch coverage: ${results.coverage.branches?.pct}% (required: ${ZENITH_CONFIG.coverage.branches}%)`);
+      failures.push(
+        `Branch coverage: ${results.coverage.branches?.pct}% (required: ${ZENITH_CONFIG.coverage.branches}%)`
+      );
     }
 
     // Check performance thresholds
     if (results.performance.avgRenderTime > ZENITH_CONFIG.performance.renderTime) {
-      failures.push(`Render time: ${results.performance.avgRenderTime}ms (required: <${ZENITH_CONFIG.performance.renderTime}ms)`);
+      failures.push(
+        `Render time: ${results.performance.avgRenderTime}ms (required: <${ZENITH_CONFIG.performance.renderTime}ms)`
+      );
     }
 
     if (results.performance.maxMemoryUsage > ZENITH_CONFIG.performance.memoryUsage) {
-      failures.push(`Memory usage: ${results.performance.maxMemoryUsage}MB (required: <${ZENITH_CONFIG.performance.memoryUsage}MB)`);
+      failures.push(
+        `Memory usage: ${results.performance.maxMemoryUsage}MB (required: <${ZENITH_CONFIG.performance.memoryUsage}MB)`
+      );
     }
 
     // Check accessibility
@@ -458,12 +470,15 @@ class ZenithTestRunner {
    */
   generateHTMLReport(results) {
     const successRate = ((results.summary.passed / results.summary.total) * 100).toFixed(1);
-    const coverageAvg = [
-      results.coverage.statements?.pct,
-      results.coverage.branches?.pct,
-      results.coverage.functions?.pct,
-      results.coverage.lines?.pct,
-    ].filter(Boolean).reduce((a, b) => a + b, 0) / 4;
+    const coverageAvg =
+      [
+        results.coverage.statements?.pct,
+        results.coverage.branches?.pct,
+        results.coverage.functions?.pct,
+        results.coverage.lines?.pct,
+      ]
+        .filter(Boolean)
+        .reduce((a, b) => a + b, 0) / 4;
 
     return `
 <!DOCTYPE html>
@@ -652,7 +667,9 @@ class ZenithTestRunner {
         <div class="section">
             <h2>🎯 Test Categories</h2>
             <div class="category-grid">
-                ${Object.entries(results.categories).map(([name, stats]) => `
+                ${Object.entries(results.categories)
+                  .map(
+                    ([name, stats]) => `
                     <div class="category">
                         <h4>
                             ${name.charAt(0).toUpperCase() + name.slice(1)} Tests
@@ -664,16 +681,21 @@ class ZenithTestRunner {
                         <div>Failed: <span class="${stats.failed > 0 ? 'error' : 'success'}">${stats.failed}</span></div>
                         <div>Duration: ${((stats.duration || 0) / 1000).toFixed(2)}s</div>
                     </div>
-                `).join('')}
+                `
+                  )
+                  .join('')}
             </div>
         </div>
 
         <div class="section">
             <h2>📋 Coverage Report</h2>
-            ${['statements', 'branches', 'functions', 'lines'].map(type => {
-              const coverage = results.coverage[type];
-              if (!coverage) return '';
-              return `
+            ${['statements', 'branches', 'functions', 'lines']
+              .map(type => {
+                const coverage = results.coverage[type];
+                if (!coverage) {
+                  return '';
+                }
+                return `
                 <div style="margin-bottom: 20px;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
                         <span>${type.charAt(0).toUpperCase() + type.slice(1)}</span>
@@ -685,7 +707,8 @@ class ZenithTestRunner {
                     </div>
                 </div>
               `;
-            }).join('')}
+              })
+              .join('')}
         </div>
 
         <div class="section">
@@ -743,14 +766,18 @@ class ZenithTestRunner {
                         ${results.qualityGates.passed ? 'ALL GATES PASSED' : 'GATES FAILED'}
                     </span>
                 </div>
-                ${results.qualityGates.failures.length > 0 ? `
+                ${
+                  results.qualityGates.failures.length > 0
+                    ? `
                     <div>
                         <h4 style="color: #ef4444; margin-bottom: 10px;">Failures:</h4>
                         <ul style="color: #ef4444; margin-left: 20px;">
                             ${results.qualityGates.failures.map(failure => `<li>${failure}</li>`).join('')}
                         </ul>
                     </div>
-                ` : ''}
+                `
+                    : ''
+                }
             </div>
         </div>
 
@@ -771,16 +798,20 @@ class ZenithTestRunner {
    */
   generateJUnitXML(results) {
     const timestamp = new Date().toISOString();
-    
+
     return `<?xml version="1.0" encoding="UTF-8"?>
 <testsuites name="ZENITH Test Suite" tests="${results.summary.total}" failures="${results.summary.failed}" time="${(results.summary.duration / 1000).toFixed(3)}">
-  ${Object.entries(results.categories).map(([name, stats]) => `
+  ${Object.entries(results.categories)
+    .map(
+      ([name, stats]) => `
   <testsuite name="${name}" tests="${stats.total || 1}" failures="${stats.failed || 0}" time="${((stats.duration || 0) / 1000).toFixed(3)}" timestamp="${timestamp}">
     <testcase name="${name} tests" classname="ZenithTestSuite" time="${((stats.duration || 0) / 1000).toFixed(3)}">
       ${stats.failed > 0 ? `<failure message="Test failures detected">${stats.error || 'Tests failed'}</failure>` : ''}
     </testcase>
   </testsuite>
-  `).join('')}
+  `
+    )
+    .join('')}
 </testsuites>`;
   }
 
@@ -789,12 +820,15 @@ class ZenithTestRunner {
    */
   generateBadgeData(results) {
     const successRate = ((results.summary.passed / results.summary.total) * 100).toFixed(1);
-    const coverageAvg = [
-      results.coverage.statements?.pct,
-      results.coverage.branches?.pct,
-      results.coverage.functions?.pct,
-      results.coverage.lines?.pct,
-    ].filter(Boolean).reduce((a, b) => a + b, 0) / 4;
+    const coverageAvg =
+      [
+        results.coverage.statements?.pct,
+        results.coverage.branches?.pct,
+        results.coverage.functions?.pct,
+        results.coverage.lines?.pct,
+      ]
+        .filter(Boolean)
+        .reduce((a, b) => a + b, 0) / 4;
 
     return {
       schemaVersion: 1,
@@ -813,7 +847,10 @@ class ZenithTestRunner {
       },
       accessibility: {
         label: 'Accessibility',
-        message: results.accessibility.violations === 0 ? 'AAA' : `${results.accessibility.violations} violations`,
+        message:
+          results.accessibility.violations === 0
+            ? 'AAA'
+            : `${results.accessibility.violations} violations`,
         color: results.accessibility.violations === 0 ? 'brightgreen' : 'red',
       },
     };
@@ -840,25 +877,33 @@ class ZenithTestRunner {
    */
   printFinalSummary() {
     const results = this.results.results;
-    
-    console.log('\n' + '=' .repeat(80));
+
+    console.log('\n' + '='.repeat(80));
     console.log('🏆 ZENITH TEST SUITE FINAL SUMMARY');
-    console.log('=' .repeat(80));
-    console.log(`📊 Tests: ${results.summary.total} total, ${results.summary.passed} passed, ${results.summary.failed} failed`);
-    console.log(`📈 Coverage: ${results.coverage.statements?.pct || 0}% statements, ${results.coverage.branches?.pct || 0}% branches`);
-    console.log(`⚡ Performance: ${results.performance.avgRenderTime}ms avg render, ${results.performance.maxMemoryUsage}MB peak memory`);
-    console.log(`♿ Accessibility: ${results.accessibility.level} compliance, ${results.accessibility.violations} violations`);
+    console.log('='.repeat(80));
+    console.log(
+      `📊 Tests: ${results.summary.total} total, ${results.summary.passed} passed, ${results.summary.failed} failed`
+    );
+    console.log(
+      `📈 Coverage: ${results.coverage.statements?.pct || 0}% statements, ${results.coverage.branches?.pct || 0}% branches`
+    );
+    console.log(
+      `⚡ Performance: ${results.performance.avgRenderTime}ms avg render, ${results.performance.maxMemoryUsage}MB peak memory`
+    );
+    console.log(
+      `♿ Accessibility: ${results.accessibility.level} compliance, ${results.accessibility.violations} violations`
+    );
     console.log(`🚪 Quality Gates: ${results.qualityGates.passed ? 'PASSED' : 'FAILED'}`);
     console.log(`⏱️ Duration: ${(results.summary.duration / 1000).toFixed(2)} seconds`);
-    console.log('=' .repeat(80));
-    
+    console.log('='.repeat(80));
+
     if (results.qualityGates.passed) {
       console.log('🎉 ZENITH CERTIFICATION: PRODUCTION READY 🎉');
     } else {
       console.log('❌ ZENITH CERTIFICATION: FAILED - NOT PRODUCTION READY');
     }
-    
-    console.log('=' .repeat(80) + '\n');
+
+    console.log('='.repeat(80) + '\n');
   }
 }
 

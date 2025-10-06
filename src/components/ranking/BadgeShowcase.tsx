@@ -34,7 +34,7 @@ const BadgeShowcase: React.FC<BadgeShowcaseProps> = ({ badges, playerName }) => 
       acc[badge.rarity].push(badge);
       return acc;
     },
-    {} as Record<string, PlayerBadge[]>,
+    {} as Record<string, PlayerBadge[]>
   );
 
   return (

@@ -50,7 +50,7 @@ const MatchSimulatorPopup: React.FC = () => {
         chemistry,
         relationships,
         mentoringGroups,
-        onUpdate,
+        onUpdate
       );
 
       await sleep(90 * 50 + 500); // Wait for simulation to finish
@@ -67,13 +67,13 @@ const MatchSimulatorPopup: React.FC = () => {
   const handleClose = () => dispatch({ type: 'CLOSE_MODAL' });
 
   const homeScore = simulationTimeline.filter(
-    e => 'type' in e && e.type === 'Goal' && e.team === 'home',
+    (e: any) => 'type' in e && e.type === 'Goal' && e.team === 'home'
   ).length;
   const awayScore = simulationTimeline.filter(
-    e => 'type' in e && e.type === 'Goal' && e.team === 'away',
+    (e: any) => 'type' in e && e.type === 'Goal' && e.team === 'away'
   ).length;
-  const lastEvent = simulationTimeline[simulationTimeline.length - 1];
-  const minute = lastEvent ? lastEvent.minute : 0;
+  const lastEvent = simulationTimeline[simulationTimeline.length - 1] as any;
+  const minute = lastEvent && typeof lastEvent.minute === 'number' ? lastEvent.minute : 0;
 
   const renderEvent = (event: MatchEvent | MatchCommentary) => {
     if ('type' in event) {
@@ -115,12 +115,19 @@ const MatchSimulatorPopup: React.FC = () => {
         </div>
 
         <div ref={timelineRef} className="p-4 flex-grow overflow-y-auto space-y-3">
-          {simulationTimeline.map((event, i) => (
-            <div key={i} className="flex items-start text-sm">
-              <span className="w-10 text-gray-500 font-mono text-right mr-3">{event.minute}'</span>
-              <div className="flex-grow">{renderEvent(event)}</div>
-            </div>
-          ))}
+          {simulationTimeline.map((event, i) => {
+            const typedEvent = event as any;
+            return (
+              <div key={i} className="flex items-start text-sm">
+                <span className="w-10 text-gray-500 font-mono text-right mr-3">
+                  {typedEvent.minute}'
+                </span>
+                <div className="flex-grow">
+                  {renderEvent(typedEvent as MatchEvent | MatchCommentary)}
+                </div>
+              </div>
+            );
+          })}
         </div>
         {minute >= 90 && (
           <div className="p-4 border-t border-gray-700 text-center">

@@ -14,7 +14,17 @@ const GlassToolButton: React.FC<{
   tooltip?: string;
   variant?: 'primary' | 'secondary' | 'danger';
 }> = React.memo(
-  ({ label, tool, onClick, isActive, disabled = false, children, shortcut, tooltip, variant = 'primary' }) => {
+  ({
+    label,
+    tool,
+    onClick,
+    isActive,
+    disabled = false,
+    children,
+    shortcut,
+    tooltip,
+    variant = 'primary',
+  }) => {
     const [isHovered, setIsHovered] = useState(false);
 
     const variantStyles = {
@@ -47,11 +57,12 @@ const GlassToolButton: React.FC<{
           className={`
             relative p-3 rounded-xl transition-all duration-300 flex items-center justify-center
             backdrop-blur-md border border-solid
-            ${disabled 
-              ? 'from-gray-700/20 to-gray-800/20 border-gray-600/30 text-gray-500 cursor-not-allowed opacity-50' 
-              : isActive 
-                ? `bg-gradient-to-br ${styles.active} shadow-xl transform scale-105`
-                : `bg-gradient-to-br ${styles.inactive} hover:shadow-lg hover:scale-105`
+            ${
+              disabled
+                ? 'from-gray-700/20 to-gray-800/20 border-gray-600/30 text-gray-500 cursor-not-allowed opacity-50'
+                : isActive
+                  ? `bg-gradient-to-br ${styles.active} shadow-xl transform scale-105`
+                  : `bg-gradient-to-br ${styles.inactive} hover:shadow-lg hover:scale-105`
             }
             ${!disabled ? styles.text : ''}
             ${isHovered && !disabled ? 'shadow-2xl' : ''}
@@ -59,20 +70,18 @@ const GlassToolButton: React.FC<{
           style={{
             backdropFilter: 'blur(12px)',
             WebkitBackdropFilter: 'blur(12px)',
-            background: disabled 
+            background: disabled
               ? 'linear-gradient(135deg, rgba(107, 114, 128, 0.1), rgba(75, 85, 99, 0.1))'
               : isActive
                 ? `linear-gradient(135deg, ${variant === 'primary' ? 'rgba(59, 130, 246, 0.2)' : variant === 'secondary' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'}, rgba(0, 0, 0, 0.1))`
                 : 'linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))',
-            boxShadow: isActive 
+            boxShadow: isActive
               ? `0 8px 32px -4px ${variant === 'primary' ? 'rgba(59, 130, 246, 0.3)' : variant === 'secondary' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)'}, inset 0 1px 0 rgba(255, 255, 255, 0.2)`
               : 'inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 4px 16px rgba(0, 0, 0, 0.1)',
           }}
           title={tooltip || label}
         >
-          <div className="relative z-10 w-5 h-5">
-            {children}
-          </div>
+          <div className="relative z-10 w-5 h-5">{children}</div>
           {shortcut && (
             <div className="absolute -top-1 -right-1 bg-gray-900/80 text-gray-300 px-1.5 py-0.5 rounded-md text-[10px] font-medium border border-white/20">
               {shortcut}
@@ -83,26 +92,25 @@ const GlassToolButton: React.FC<{
         {/* Enhanced tooltip */}
         {isHovered && tooltip && !disabled && (
           <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 z-50">
-            <div 
+            <div
               className="bg-gray-900/95 backdrop-blur-md text-white text-sm rounded-lg px-3 py-2 whitespace-nowrap shadow-2xl border border-white/20"
               style={{
-                background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95))',
+                background:
+                  'linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95))',
                 backdropFilter: 'blur(16px)',
                 WebkitBackdropFilter: 'blur(16px)',
               }}
             >
               {tooltip}
               {shortcut && <span className="ml-2 text-gray-400 text-xs">({shortcut})</span>}
-              <div 
-                className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-6 border-transparent border-t-gray-900/95"
-              />
+              <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-6 border-transparent border-t-gray-900/95" />
             </div>
           </div>
         )}
 
         {/* Glow effect for active buttons */}
         {isActive && !disabled && (
-          <div 
+          <div
             className="absolute inset-0 rounded-xl opacity-30 animate-pulse"
             style={{
               background: `radial-gradient(circle, ${variant === 'primary' ? 'rgba(59, 130, 246, 0.4)' : variant === 'secondary' ? 'rgba(16, 185, 129, 0.4)' : 'rgba(239, 68, 68, 0.4)'} 0%, transparent 70%)`,
@@ -113,7 +121,7 @@ const GlassToolButton: React.FC<{
         )}
       </div>
     );
-  },
+  }
 );
 
 // Modern color picker with glass morphism
@@ -135,7 +143,7 @@ const GlassColorPicker: React.FC<{
   ];
 
   return (
-    <div 
+    <div
       className="flex items-center space-x-2 p-3 rounded-xl backdrop-blur-md border border-white/20"
       style={{
         background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))',
@@ -152,16 +160,18 @@ const GlassColorPicker: React.FC<{
             onClick={() => onColorChange(color)}
             className={`
               w-7 h-7 rounded-full border-2 transition-all duration-300 relative group
-              ${currentColor === color 
-                ? 'border-white scale-110 shadow-lg' 
-                : 'border-white/40 hover:border-white/70 hover:scale-105'
+              ${
+                currentColor === color
+                  ? 'border-white scale-110 shadow-lg'
+                  : 'border-white/40 hover:border-white/70 hover:scale-105'
               }
             `}
-            style={{ 
+            style={{
               backgroundColor: color,
-              boxShadow: currentColor === color 
-                ? `0 0 16px ${color}44, 0 4px 12px rgba(0, 0, 0, 0.3)`
-                : '0 2px 8px rgba(0, 0, 0, 0.2)',
+              boxShadow:
+                currentColor === color
+                  ? `0 0 16px ${color}44, 0 4px 12px rgba(0, 0, 0, 0.3)`
+                  : '0 2px 8px rgba(0, 0, 0, 0.2)',
             }}
             title={name}
           >
@@ -195,11 +205,11 @@ const GlassFormationSelector: React.FC = React.memo(() => {
         payload: { team, formationId },
       });
     },
-    [dispatch],
+    [dispatch]
   );
 
   return (
-    <div 
+    <div
       className="flex items-center space-x-3 p-3 rounded-xl backdrop-blur-md border border-white/20"
       style={{
         background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))',
@@ -219,7 +229,9 @@ const GlassFormationSelector: React.FC = React.memo(() => {
           WebkitBackdropFilter: 'blur(8px)',
         }}
       >
-        <option value="" className="bg-gray-800">Home Team</option>
+        <option value="" className="bg-gray-800">
+          Home Team
+        </option>
         {availableFormations.map(formation => (
           <option key={formation.id} value={formation.id} className="bg-gray-800">
             {formation.name} ({formation.slots})
@@ -238,7 +250,9 @@ const GlassFormationSelector: React.FC = React.memo(() => {
           WebkitBackdropFilter: 'blur(8px)',
         }}
       >
-        <option value="" className="bg-gray-800">Away Team</option>
+        <option value="" className="bg-gray-800">
+          Away Team
+        </option>
         {availableFormations.map(formation => (
           <option key={formation.id} value={formation.id} className="bg-gray-800">
             {formation.name} ({formation.slots})
@@ -269,7 +283,7 @@ const GlassMorphismTacticalToolbar: React.FC = () => {
 
   const [isExpanded, setIsExpanded] = useState(!isMobile);
   const [activeSection, setActiveSection] = useState<'tools' | 'animation' | 'view' | 'formation'>(
-    'tools',
+    'tools'
   );
 
   // Keyboard shortcuts
@@ -321,14 +335,14 @@ const GlassMorphismTacticalToolbar: React.FC = () => {
         dispatch({ type: 'SET_DRAWING_TOOL', payload: tool });
       }
     },
-    [dispatch],
+    [dispatch]
   );
 
   const setColor = useCallback(
     (color: string) => {
       dispatch({ type: 'SET_DRAWING_COLOR', payload: color });
     },
-    [dispatch],
+    [dispatch]
   );
 
   const undo = useCallback(() => {
@@ -407,8 +421,16 @@ const GlassMorphismTacticalToolbar: React.FC = () => {
               onClick={() => setIsExpanded(!isExpanded)}
               className="text-white/70 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/10"
             >
-              <svg className={`w-5 h-5 transition-transform ${isExpanded ? 'rotate-180' : ''}`} fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+              <svg
+                className={`w-5 h-5 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                />
               </svg>
             </button>
           </div>
@@ -430,9 +452,10 @@ const GlassMorphismTacticalToolbar: React.FC = () => {
                   onClick={() => setActiveSection(section.id as any)}
                   className={`
                     flex-1 p-3 text-sm text-center transition-all duration-300
-                    ${activeSection === section.id
-                      ? 'bg-blue-500/20 text-blue-300 border-b-2 border-blue-400'
-                      : 'text-white/60 hover:text-white/80 hover:bg-white/5'
+                    ${
+                      activeSection === section.id
+                        ? 'bg-blue-500/20 text-blue-300 border-b-2 border-blue-400'
+                        : 'text-white/60 hover:text-white/80 hover:bg-white/5'
                     }
                   `}
                   style={{
@@ -448,8 +471,9 @@ const GlassMorphismTacticalToolbar: React.FC = () => {
 
           <div className="p-4">
             {/* Desktop layout or mobile section content */}
-            <div className={`flex items-center gap-4 ${isMobile ? 'flex-col space-y-4' : 'flex-row flex-wrap'}`}>
-              
+            <div
+              className={`flex items-center gap-4 ${isMobile ? 'flex-col space-y-4' : 'flex-row flex-wrap'}`}
+            >
               {/* Drawing tools */}
               {(!isMobile || activeSection === 'tools') && (
                 <div className="flex items-center space-x-2">
@@ -501,7 +525,11 @@ const GlassMorphismTacticalToolbar: React.FC = () => {
                     tooltip="Draw tactical zones"
                   >
                     <svg fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm2 2v8h10V6H5z" clipRule="evenodd" />
+                      <path
+                        fillRule="evenodd"
+                        d="M3 4a1 1 0 011-1h12a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm2 2v8h10V6H5z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   </GlassToolButton>
 
@@ -514,7 +542,11 @@ const GlassMorphismTacticalToolbar: React.FC = () => {
                     tooltip="Add text annotations"
                   >
                     <svg fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M4 3a1 1 0 000 2h4.586l-4.293 4.293a1 1 0 101.414 1.414L10 6.414V11a1 1 0 102 0V4a1 1 0 00-1-1H4z" clipRule="evenodd" />
+                      <path
+                        fillRule="evenodd"
+                        d="M4 3a1 1 0 000 2h4.586l-4.293 4.293a1 1 0 101.414 1.414L10 6.414V11a1 1 0 102 0V4a1 1 0 00-1-1H4z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   </GlassToolButton>
 
@@ -529,7 +561,11 @@ const GlassMorphismTacticalToolbar: React.FC = () => {
                     variant="secondary"
                   >
                     <svg fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+                      <path
+                        fillRule="evenodd"
+                        d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   </GlassToolButton>
 
@@ -542,7 +578,11 @@ const GlassMorphismTacticalToolbar: React.FC = () => {
                     variant="danger"
                   >
                     <svg fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                      <path
+                        fillRule="evenodd"
+                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   </GlassToolButton>
                 </div>
@@ -550,7 +590,10 @@ const GlassMorphismTacticalToolbar: React.FC = () => {
 
               {/* Color picker */}
               {(!isMobile || activeSection === 'tools') && (
-                <GlassColorPicker currentColor={drawingColor || '#ffff00'} onColorChange={setColor} />
+                <GlassColorPicker
+                  currentColor={drawingColor || '#ffff00'}
+                  onColorChange={setColor}
+                />
               )}
 
               {/* Animation controls */}
@@ -565,7 +608,11 @@ const GlassMorphismTacticalToolbar: React.FC = () => {
                     variant="secondary"
                   >
                     <svg fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   </GlassToolButton>
 
@@ -578,7 +625,11 @@ const GlassMorphismTacticalToolbar: React.FC = () => {
                     variant="secondary"
                   >
                     <svg fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
+                      <path
+                        fillRule="evenodd"
+                        d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   </GlassToolButton>
                 </div>
@@ -596,7 +647,11 @@ const GlassMorphismTacticalToolbar: React.FC = () => {
                     variant="secondary"
                   >
                     <svg fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                      <path
+                        fillRule="evenodd"
+                        d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   </GlassToolButton>
 
@@ -620,7 +675,11 @@ const GlassMorphismTacticalToolbar: React.FC = () => {
                     variant="secondary"
                   >
                     <svg fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                      <path
+                        fillRule="evenodd"
+                        d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   </GlassToolButton>
                 </div>

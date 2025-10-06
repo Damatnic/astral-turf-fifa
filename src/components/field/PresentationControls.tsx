@@ -90,7 +90,7 @@ const PresentationControls: React.FC = () => {
   };
 
   const handleAISub = () => {
-    dispatch({ type: 'GET_AI_SUB_SUGGESTION_START' });
+    (dispatch as (action: { type: string }) => void)({ type: 'GET_AI_SUB_SUGGESTION_START' });
   };
 
   return (

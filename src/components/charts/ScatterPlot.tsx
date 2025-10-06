@@ -24,7 +24,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
 }) => {
   const padding = useMemo(() => ({ top: 20, right: 20, bottom: 50, left: 50 }), []);
   const [tooltip, setTooltip] = useState<{ x: number; y: number; point: ScatterPoint } | null>(
-    null,
+    null
   );
 
   const { xScale, yScale, points } = useMemo(() => {
@@ -33,8 +33,10 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
     }
 
     // Filter out invalid data points and ensure valid coordinates
-    const validData = data.filter(d => d && typeof d.x === 'number' && typeof d.y === 'number' && !isNaN(d.x) && !isNaN(d.y));
-    
+    const validData = data.filter(
+      d => d && typeof d.x === 'number' && typeof d.y === 'number' && !isNaN(d.x) && !isNaN(d.y)
+    );
+
     if (validData.length === 0) {
       return { xScale: () => 0, yScale: () => 0, points: [] };
     }
@@ -62,14 +64,16 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
     if (!data || data.length === 0) {
       return { xTicks: [], yTicks: [] };
     }
-    
+
     // Filter out invalid data points and ensure valid coordinates
-    const validData = data.filter(d => d && typeof d.x === 'number' && typeof d.y === 'number' && !isNaN(d.x) && !isNaN(d.y));
-    
+    const validData = data.filter(
+      d => d && typeof d.x === 'number' && typeof d.y === 'number' && !isNaN(d.x) && !isNaN(d.y)
+    );
+
     if (validData.length === 0) {
       return { xTicks: [], yTicks: [] };
     }
-    
+
     const xCoordinates = validData.map(d => d.x);
     const yCoordinates = validData.map(d => d.y);
     const xMin = Math.min(...xCoordinates, 0);
@@ -77,13 +81,13 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
     const yMin = Math.min(...yCoordinates, 0);
     const yMax = Math.max(...yCoordinates);
 
-    const xTicks = [];
+    const xTicks: { value: number; x: number }[] = [];
     for (let i = 0; i <= 5; i++) {
       const value = Math.round(xMin + (i / 5) * (xMax - xMin));
       xTicks.push({ value, x: xScale(value) });
     }
 
-    const yTicks = [];
+    const yTicks: { value: number; y: number }[] = [];
     for (let i = 0; i <= 5; i++) {
       const value = Math.round(yMin + (i / 5) * (yMax - yMin));
       yTicks.push({ value, y: yScale(value) });

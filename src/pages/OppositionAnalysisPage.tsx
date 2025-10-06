@@ -23,7 +23,7 @@ const OppositionAnalysisPage: React.FC = () => {
 
   const handleDispatchScout = () => {
     if (selectedOpponent) {
-      dispatch({
+      (dispatch as any)({
         type: 'DISPATCH_SCOUT',
         payload: { opponentName: selectedOpponent },
       });
@@ -40,7 +40,7 @@ const OppositionAnalysisPage: React.FC = () => {
     }
   };
 
-  const getAssignmentStatus = (assignment: unknown) => {
+  const getAssignmentStatus = (assignment: any) => {
     if (assignment.report) {
       return 'completed';
     }
@@ -244,15 +244,15 @@ const OppositionAnalysisPage: React.FC = () => {
                           <div className="space-y-2 text-sm text-gray-300">
                             <div>
                               <span className="font-medium">Key Players:</span>{' '}
-                              {assignment.report.keyPlayers}
+                              {(assignment.report as any).keyPlayers}
                             </div>
                             <div>
                               <span className="font-medium">Tactical Approach:</span>{' '}
-                              {assignment.report.tacticalApproach}
+                              {(assignment.report as any).tacticalApproach}
                             </div>
                             <div>
                               <span className="font-medium">Weaknesses:</span>{' '}
-                              {assignment.report.weaknesses}
+                              {(assignment.report as any).weaknesses}
                             </div>
                           </div>
                         </div>

@@ -33,10 +33,10 @@ class TacticalBoardPage {
   async addPlayerToPosition(playerName: string, position: { x: number; y: number }) {
     // Open player selection
     await this.sidebar.getByRole('button', { name: /players/i }).click();
-    
+
     // Select player
     await this.page.getByText(playerName).click();
-    
+
     // Place on field
     await this.field.click({ position });
   }
@@ -125,7 +125,7 @@ test.describe('Tactical Board Complete Workflows', () => {
       await test.step('Add midfielders', async () => {
         const midfielders = [
           { name: 'Luka Modric', position: { x: 30, y: 50 } },
-          { name: 'N\'Golo Kante', position: { x: 50, y: 50 } },
+          { name: "N'Golo Kante", position: { x: 50, y: 50 } },
           { name: 'Kevin De Bruyne', position: { x: 70, y: 50 } },
           { name: 'Sadio Mane', position: { x: 20, y: 40 } },
         ];
@@ -190,7 +190,7 @@ test.describe('Tactical Board Complete Workflows', () => {
     test('should validate formation completeness', async ({ page }) => {
       await test.step('Try to save incomplete formation', async () => {
         await tacticsPage.selectFormationTemplate('4-4-2');
-        
+
         // Add only a few players
         await tacticsPage.addPlayerToPosition('Goalkeeper', { x: 50, y: 90 });
         await tacticsPage.addPlayerToPosition('Striker', { x: 50, y: 20 });
@@ -232,28 +232,28 @@ test.describe('Tactical Board Complete Workflows', () => {
 
       await test.step('Configure simulation settings', async () => {
         await page.getByRole('button', { name: /simulation settings/i }).click();
-        
+
         await page.getByLabel('Match duration').fill('90');
         await page.getByLabel('Weather').selectOption('Clear');
         await page.getByLabel('Pitch condition').selectOption('Excellent');
-        
+
         await page.getByRole('button', { name: /apply settings/i }).click();
       });
 
       await test.step('Start simulation', async () => {
         await tacticsPage.runSimulation();
-        
+
         // Verify simulation UI appears
         await expect(page.getByTestId('simulation-timeline')).toBeVisible();
         await expect(page.getByTestId('match-stats')).toBeVisible();
-        await expect(page.getByText('0\' - Match Started')).toBeVisible();
+        await expect(page.getByText("0' - Match Started")).toBeVisible();
       });
 
       await test.step('Watch simulation progress', async () => {
         // Wait for simulation events
         await expect(page.getByText(/15'/)).toBeVisible({ timeout: 10000 });
         await expect(page.getByText(/30'/)).toBeVisible({ timeout: 10000 });
-        
+
         // Check for match events
         const events = page.getByTestId('match-events');
         await expect(events).toContainText(/pass/i);
@@ -262,12 +262,12 @@ test.describe('Tactical Board Complete Workflows', () => {
 
       await test.step('Analyze simulation results', async () => {
         // Wait for simulation to complete
-        await expect(page.getByText('90\' - Full Time')).toBeVisible({ timeout: 30000 });
-        
+        await expect(page.getByText("90' - Full Time")).toBeVisible({ timeout: 30000 });
+
         // Check final score
         const finalScore = page.getByTestId('final-score');
         await expect(finalScore).toBeVisible();
-        
+
         // Check match statistics
         await expect(page.getByText(/possession/i)).toBeVisible();
         await expect(page.getByText(/shots on target/i)).toBeVisible();
@@ -278,7 +278,7 @@ test.describe('Tactical Board Complete Workflows', () => {
         await page.getByRole('button', { name: /save simulation/i }).click();
         await page.getByPlaceholder(/simulation name/i).fill('Test Match vs La Liga');
         await page.getByRole('button', { name: /save/i }).click();
-        
+
         await expect(page.getByText('Simulation saved')).toBeVisible();
       });
     });
@@ -292,12 +292,12 @@ test.describe('Tactical Board Complete Workflows', () => {
       await test.step('Make substitution during match', async () => {
         // Wait for first half
         await expect(page.getByText(/45'/)).toBeVisible({ timeout: 15000 });
-        
+
         await page.getByRole('button', { name: /make substitution/i }).click();
         await page.getByTestId('bench-player-sub1').click();
         await page.getByTestId('field-player-starter').click();
         await page.getByRole('button', { name: /confirm substitution/i }).click();
-        
+
         await expect(page.getByText(/substitution made/i)).toBeVisible();
       });
 
@@ -305,7 +305,7 @@ test.describe('Tactical Board Complete Workflows', () => {
         await page.getByRole('button', { name: /tactical change/i }).click();
         await page.getByRole('combobox', { name: /formation/i }).selectOption('4-5-1');
         await page.getByRole('button', { name: /apply change/i }).click();
-        
+
         await expect(page.getByText('Formation changed to 4-5-1')).toBeVisible();
       });
 
@@ -323,7 +323,7 @@ test.describe('Tactical Board Complete Workflows', () => {
       await test.step('Start collaboration session', async () => {
         await tacticsPage.openCollaboration();
         await page.getByRole('button', { name: /start session/i }).click();
-        
+
         const sessionId = await page.getByTestId('session-id').textContent();
         expect(sessionId).toBeTruthy();
       });
@@ -332,16 +332,13 @@ test.describe('Tactical Board Complete Workflows', () => {
         await page.getByRole('button', { name: /invite users/i }).click();
         await page.getByPlaceholder(/enter email/i).fill('coach@example.com');
         await page.getByRole('button', { name: /send invite/i }).click();
-        
+
         await expect(page.getByText('Invitation sent')).toBeVisible();
       });
 
       await test.step('Add comments to formation', async () => {
-        await tacticsPage.addComment(
-          { x: 300, y: 200 }, 
-          'This midfield positioning needs work'
-        );
-        
+        await tacticsPage.addComment({ x: 300, y: 200 }, 'This midfield positioning needs work');
+
         await expect(page.getByText('This midfield positioning needs work')).toBeVisible();
       });
 
@@ -349,27 +346,27 @@ test.describe('Tactical Board Complete Workflows', () => {
         // Open second browser context to simulate another user
         const secondPage = await context.newPage();
         const secondTactics = new TacticalBoardPage(secondPage);
-        
+
         // Join the session
         await secondPage.goto('/tactics?session=test-session-id');
         await expect(secondPage.getByText('Joined collaboration session')).toBeVisible();
-        
+
         // Add comment from second user
         await secondTactics.addComment(
           { x: 400, y: 300 },
           'Agreed, we should push the wingers higher'
         );
-        
+
         // Verify comment appears on first user's screen
         await expect(page.getByText('Agreed, we should push the wingers higher')).toBeVisible();
-        
+
         await secondPage.close();
       });
 
       await test.step('Real-time cursor tracking', async () => {
         // Move mouse and verify cursor position is tracked
         await page.mouse.move(350, 250);
-        
+
         const cursorIndicator = page.getByTestId('user-cursor');
         await expect(cursorIndicator).toBeVisible();
       });
@@ -377,7 +374,7 @@ test.describe('Tactical Board Complete Workflows', () => {
       await test.step('End collaboration session', async () => {
         await page.getByRole('button', { name: /end session/i }).click();
         await page.getByRole('button', { name: /confirm end/i }).click();
-        
+
         await expect(page.getByText('Session ended')).toBeVisible();
       });
     });
@@ -386,24 +383,24 @@ test.describe('Tactical Board Complete Workflows', () => {
       await test.step('Create conflicting changes', async () => {
         await tacticsPage.openCollaboration();
         await page.getByRole('button', { name: /start session/i }).click();
-        
+
         // Make change on first client
         await tacticsPage.dragPlayerToPosition('midfielder-1', { x: 300, y: 250 });
-        
+
         // Simulate second client making conflicting change
         const secondPage = await context.newPage();
         await secondPage.goto('/tactics?session=test-session-id');
-        
+
         const secondTactics = new TacticalBoardPage(secondPage);
         await secondTactics.dragPlayerToPosition('midfielder-1', { x: 400, y: 300 });
-        
+
         await secondPage.close();
       });
 
       await test.step('Resolve conflict', async () => {
         // Should show conflict resolution dialog
         await expect(page.getByText(/conflicting changes detected/i)).toBeVisible();
-        
+
         await page.getByRole('button', { name: /keep my changes/i }).click();
         await expect(page.getByText('Conflict resolved')).toBeVisible();
       });
@@ -420,17 +417,17 @@ test.describe('Tactical Board Complete Workflows', () => {
       await test.step('Generate heat maps', async () => {
         await tacticsPage.openAnalytics();
         await tacticsPage.generateHeatMap('striker-1');
-        
+
         await expect(page.getByTestId('heat-map-overlay')).toBeVisible();
         await expect(page.getByText(/high activity zones/i)).toBeVisible();
       });
 
       await test.step('Analyze player performance', async () => {
         await page.getByRole('button', { name: /player analysis/i }).click();
-        
+
         const playerStats = page.getByTestId('player-performance-chart');
         await expect(playerStats).toBeVisible();
-        
+
         // Check specific metrics
         await expect(page.getByText(/pass completion/i)).toBeVisible();
         await expect(page.getByText(/distance covered/i)).toBeVisible();
@@ -439,8 +436,10 @@ test.describe('Tactical Board Complete Workflows', () => {
 
       await test.step('Compare formations', async () => {
         await page.getByRole('button', { name: /compare formations/i }).click();
-        await page.getByRole('combobox', { name: /select formation to compare/i }).selectOption('Premier League 4-3-3');
-        
+        await page
+          .getByRole('combobox', { name: /select formation to compare/i })
+          .selectOption('Premier League 4-3-3');
+
         const comparison = page.getByTestId('formation-comparison');
         await expect(comparison).toBeVisible();
         await expect(comparison).toContainText(/strengths/i);
@@ -449,21 +448,21 @@ test.describe('Tactical Board Complete Workflows', () => {
 
       await test.step('Generate detailed report', async () => {
         await page.getByRole('button', { name: /generate report/i }).click();
-        
+
         // Configure report options
         await page.getByLabel('Include heat maps').check();
         await page.getByLabel('Include player stats').check();
         await page.getByLabel('Include tactical analysis').check();
-        
+
         await page.getByRole('button', { name: /create report/i }).click();
-        
+
         await expect(page.getByText('Report generated successfully')).toBeVisible();
       });
 
       await test.step('Export analysis', async () => {
         await page.getByRole('button', { name: /export analysis/i }).click();
         await page.getByRole('menuitem', { name: /pdf report/i }).click();
-        
+
         // Verify download started
         const downloadPromise = page.waitForEvent('download');
         await downloadPromise;
@@ -475,7 +474,7 @@ test.describe('Tactical Board Complete Workflows', () => {
         await tacticsPage.sidebar.getByRole('button', { name: /formations/i }).click();
         await page.getByText('Season Evolution').click();
         await page.getByRole('button', { name: /view history/i }).click();
-        
+
         const timeline = page.getByTestId('formation-timeline');
         await expect(timeline).toBeVisible();
       });
@@ -483,12 +482,12 @@ test.describe('Tactical Board Complete Workflows', () => {
       await test.step('Compare different versions', async () => {
         const versions = page.getByTestId('version-list');
         await expect(versions).toBeVisible();
-        
+
         // Select two versions to compare
         await page.getByTestId('version-1').click();
         await page.getByTestId('version-3').click();
         await page.getByRole('button', { name: /compare selected/i }).click();
-        
+
         const comparison = page.getByTestId('version-comparison');
         await expect(comparison).toBeVisible();
         await expect(comparison).toContainText(/changes made/i);
@@ -497,7 +496,7 @@ test.describe('Tactical Board Complete Workflows', () => {
       await test.step('Restore previous version', async () => {
         await page.getByRole('button', { name: /restore version 2/i }).click();
         await page.getByRole('button', { name: /confirm restore/i }).click();
-        
+
         await expect(page.getByText('Formation restored')).toBeVisible();
       });
     });
@@ -512,38 +511,38 @@ test.describe('Tactical Board Complete Workflows', () => {
 
       await test.step('Export as JSON', async () => {
         await tacticsPage.exportFormation('json');
-        
+
         const downloadPromise = page.waitForEvent('download');
         const download = await downloadPromise;
-        
+
         expect(download.suggestedFilename()).toContain('.json');
       });
 
       await test.step('Export as image', async () => {
         await tacticsPage.exportFormation('png');
-        
+
         // Configure image options
         await page.getByLabel('Quality').fill('90');
         await page.getByLabel('Include player names').check();
         await page.getByRole('button', { name: /generate image/i }).click();
-        
+
         const downloadPromise = page.waitForEvent('download');
         const download = await downloadPromise;
-        
+
         expect(download.suggestedFilename()).toContain('.png');
       });
 
       await test.step('Export as PDF report', async () => {
         await tacticsPage.exportFormation('pdf');
-        
+
         // Configure PDF options
         await page.getByLabel('Include statistics').check();
         await page.getByLabel('Include analysis').check();
         await page.getByRole('button', { name: /generate pdf/i }).click();
-        
+
         const downloadPromise = page.waitForEvent('download');
         const download = await downloadPromise;
-        
+
         expect(download.suggestedFilename()).toContain('.pdf');
       });
     });
@@ -551,32 +550,36 @@ test.describe('Tactical Board Complete Workflows', () => {
     test('should import formations from various sources', async ({ page }) => {
       await test.step('Import JSON formation', async () => {
         await page.getByRole('button', { name: /import/i }).click();
-        
+
         // Upload file
         const fileInput = page.getByRole('button', { name: /choose file/i });
         await fileInput.setInputFiles('test-files/formation.json');
-        
+
         await expect(page.getByText('Formation imported successfully')).toBeVisible();
       });
 
       await test.step('Import from URL', async () => {
         await page.getByRole('button', { name: /import from url/i }).click();
-        await page.getByPlaceholder(/enter formation url/i).fill('https://example.com/formation.json');
+        await page
+          .getByPlaceholder(/enter formation url/i)
+          .fill('https://example.com/formation.json');
         await page.getByRole('button', { name: /import/i }).click();
-        
+
         await expect(page.getByText('Formation imported from URL')).toBeVisible();
       });
 
       await test.step('Import from FIFA/FM', async () => {
         await page.getByRole('button', { name: /import from fifa/i }).click();
-        await page.getByRole('button', { name: /choose fifa file/i }).setInputFiles('test-files/fifa-formation.txt');
-        
+        await page
+          .getByRole('button', { name: /choose fifa file/i })
+          .setInputFiles('test-files/fifa-formation.txt');
+
         await expect(page.getByText('FIFA formation converted')).toBeVisible();
       });
 
       await test.step('Verify imported formations', async () => {
         await tacticsPage.sidebar.getByRole('button', { name: /formations/i }).click();
-        
+
         await expect(page.getByText('Imported Formation')).toBeVisible();
         await expect(page.getByText('URL Formation')).toBeVisible();
         await expect(page.getByText('FIFA Formation')).toBeVisible();
@@ -585,14 +588,14 @@ test.describe('Tactical Board Complete Workflows', () => {
   });
 
   test.describe('Mobile Responsiveness', () => {
-    test.use({ 
-      viewport: { width: 375, height: 667 } // iPhone SE
+    test.use({
+      viewport: { width: 375, height: 667 }, // iPhone SE
     });
 
     test('should work correctly on mobile devices', async ({ page }) => {
       await test.step('Navigate on mobile', async () => {
         await tacticsPage.navigateToTactics();
-        
+
         // Sidebar should be collapsed on mobile
         await expect(tacticsPage.sidebar).toHaveClass(/collapsed/);
       });
@@ -601,7 +604,7 @@ test.describe('Tactical Board Complete Workflows', () => {
         // Open sidebar with touch
         await page.getByRole('button', { name: /menu/i }).tap();
         await expect(tacticsPage.sidebar).toBeVisible();
-        
+
         // Select formation
         await page.getByText('Mobile Formation').tap();
       });
@@ -609,11 +612,11 @@ test.describe('Tactical Board Complete Workflows', () => {
       await test.step('Player positioning with touch', async () => {
         const player = page.getByTestId('player-token-1');
         const field = page.getByTestId('modern-field');
-        
+
         // Long press to select
         await player.tap({ timeout: 500 });
         await expect(player).toHaveClass(/selected/);
-        
+
         // Tap to move
         await field.tap({ position: { x: 200, y: 300 } });
         await expect(page.getByText('Player moved')).toBeVisible();
@@ -626,7 +629,7 @@ test.describe('Tactical Board Complete Workflows', () => {
         await page.mouse.down();
         await page.mouse.move(300, 300);
         await page.mouse.up();
-        
+
         // Should switch to next tab
         await expect(page.getByText('Players')).toHaveClass(/active/);
       });
@@ -639,7 +642,7 @@ test.describe('Tactical Board Complete Workflows', () => {
         const startTime = Date.now();
         await tacticsPage.navigateToTactics();
         const loadTime = Date.now() - startTime;
-        
+
         expect(loadTime).toBeLessThan(3000); // Load within 3 seconds
       });
 
@@ -648,7 +651,7 @@ test.describe('Tactical Board Complete Workflows', () => {
         await page.keyboard.press('Tab');
         await page.keyboard.press('Tab');
         await page.keyboard.press('Enter');
-        
+
         // Verify focus management
         const focusedElement = page.locator(':focus');
         await expect(focusedElement).toBeVisible();
@@ -658,7 +661,7 @@ test.describe('Tactical Board Complete Workflows', () => {
         // Check ARIA labels
         const tacticBoard = page.getByRole('application');
         await expect(tacticBoard).toHaveAttribute('aria-label');
-        
+
         // Check live regions
         const liveRegion = page.getByRole('status');
         await expect(liveRegion).toHaveAttribute('aria-live');
@@ -668,7 +671,7 @@ test.describe('Tactical Board Complete Workflows', () => {
     test('should handle large formations efficiently', async ({ page }) => {
       await test.step('Load formation with many players', async () => {
         await page.goto('/tactics?formation=large-squad');
-        
+
         // Should load without performance issues
         await expect(page.getByTestId('unified-tactics-board')).toBeVisible({ timeout: 5000 });
       });
@@ -676,14 +679,14 @@ test.describe('Tactical Board Complete Workflows', () => {
       await test.step('Interact with many players', async () => {
         const players = page.getByTestId(/player-token-/);
         const playerCount = await players.count();
-        
+
         expect(playerCount).toBeGreaterThan(20);
-        
+
         // Select multiple players quickly
         for (let i = 0; i < Math.min(5, playerCount); i++) {
           await players.nth(i).click();
         }
-        
+
         // Should remain responsive
         await expect(page.getByText(/5 players selected/)).toBeVisible();
       });

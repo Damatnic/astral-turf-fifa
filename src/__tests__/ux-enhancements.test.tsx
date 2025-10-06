@@ -41,9 +41,7 @@ vi.mock('../hooks', () => ({
 
 // Test wrapper with theme provider
 const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <ThemeProvider defaultMode="light">
-    {children}
-  </ThemeProvider>
+  <ThemeProvider defaultMode="light">{children}</ThemeProvider>
 );
 
 // Mock player data
@@ -59,20 +57,34 @@ const mockPlayer: Player = {
     passing: 92,
     dribbling: 98,
     defending: 35,
-    physicality: 68,
+    physical: 68,
   },
-  morale: 'excellent',
+  morale: 'Excellent',
   fitness: 88,
-  availability: 'available',
-};
+  availability: { status: 'Available' },
+} as any;
 
 // Mock formation data
 const mockFormation: Formation = {
   id: '4-3-3',
   name: '4-3-3 Classic',
   slots: [
-    { id: 'gk', position: { x: 50, y: 90 }, roleId: 'goalkeeper' },
-    { id: 'rw', position: { x: 75, y: 25 }, roleId: 'right-winger', playerId: '1' },
+    {
+      id: 'gk',
+      role: 'GK',
+      defaultPosition: { x: 50, y: 90 },
+      position: { x: 50, y: 90 },
+      roleId: 'goalkeeper',
+      playerId: null,
+    },
+    {
+      id: 'rw',
+      role: 'FW',
+      defaultPosition: { x: 75, y: 25 },
+      position: { x: 75, y: 25 },
+      roleId: 'right-winger',
+      playerId: '1',
+    },
   ],
   players: [mockPlayer],
 };
@@ -162,7 +174,7 @@ describe('Enhanced Player Token', () => {
 
     const playerToken = screen.getByRole('button', { name: /lionel messi/i });
     playerToken.focus();
-    
+
     await user.keyboard('{Enter}');
     expect(onSelect).toHaveBeenCalled();
   });
@@ -186,7 +198,7 @@ describe('Enhanced Player Token', () => {
     );
 
     const playerToken = screen.getByRole('button', { name: /lionel messi/i });
-    
+
     // Simulate drag start
     fireEvent.dragStart(playerToken);
     expect(onDragStart).toHaveBeenCalledWith('1');
@@ -251,7 +263,7 @@ describe('Enhanced Drawing Canvas', () => {
     );
 
     const canvas = screen.getByRole('img', { hidden: true });
-    
+
     // Simulate drawing
     fireEvent.mouseDown(canvas, { clientX: 100, clientY: 100, button: 0 });
     fireEvent.mouseMove(canvas, { clientX: 150, clientY: 150 });
@@ -278,7 +290,7 @@ describe('Enhanced Drawing Canvas', () => {
     );
 
     const canvas = screen.getByRole('img', { hidden: true });
-    
+
     // Click to add text
     fireEvent.mouseDown(canvas, { clientX: 200, clientY: 200, button: 0 });
 
@@ -294,7 +306,10 @@ describe('Enhanced Drawing Canvas', () => {
         id: 'test-shape',
         tool: 'line' as const,
         color: '#ff0000',
-        points: [{ x: 10, y: 10 }, { x: 50, y: 50 }],
+        points: [
+          { x: 10, y: 10 },
+          { x: 50, y: 50 },
+        ],
         timestamp: Date.now(),
       },
     ];
@@ -479,6 +494,7 @@ describe('Accessibility Features', () => {
   it('provides keyboard navigation for drawing tools', async () => {
     const user = userEvent.setup();
     const onAddDrawing = vi.fn();
+    const mockFieldRef = { current: document.createElement('div') };
 
     render(
       <TestWrapper>

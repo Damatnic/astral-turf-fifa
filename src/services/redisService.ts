@@ -17,7 +17,8 @@ const securityLogger = {
   info: (message: string, meta?: unknown) => console.log(`[INFO] ${message}`, meta),
   error: (message: string, meta?: unknown) => console.error(`[ERROR] ${message}`, meta),
   warn: (message: string, meta?: unknown) => console.warn(`[WARN] ${message}`, meta),
-  logSecurityEvent: (type: string, message: string, meta?: unknown) => console.log(`[SECURITY] ${type}: ${message}`, meta),
+  logSecurityEvent: (type: string, message: string, meta?: unknown) =>
+    console.log(`[SECURITY] ${type}: ${message}`, meta),
 };
 
 const SecurityEventType = {
@@ -91,7 +92,7 @@ class RedisService {
         family: 4,
         keepAlive: true,
         // Reconnection settings
-        reconnectOnError: (err) => {
+        reconnectOnError: (err: any) => {
           const targetError = 'READONLY';
           return err.message.includes(targetError);
         },
@@ -107,10 +108,10 @@ class RedisService {
       });
     } catch (_error) {
       securityLogger.error('Redis service initialization failed', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
         attempts: this.connectionAttempts,
       });
-      throw error;
+      throw _error;
     }
   }
 
@@ -137,7 +138,8 @@ class RedisService {
           exists: () => Promise.resolve(1),
           expire: () => Promise.resolve(1),
           eval: () => Promise.resolve([1, 0, 1]),
-          info: () => Promise.resolve('redis_version:6.0.0\nused_memory_human:1M\nuptime_in_seconds:3600'),
+          info: () =>
+            Promise.resolve('redis_version:6.0.0\nused_memory_human:1M\nuptime_in_seconds:3600'),
           quit: () => Promise.resolve('OK'),
           on: () => {},
           subscribe: () => Promise.resolve(),
@@ -162,7 +164,7 @@ class RedisService {
         securityLogger.warn('Redis connection attempt failed', {
           attempt: this.connectionAttempts,
           maxRetries: this.maxRetries,
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: _error instanceof Error ? _error.message : 'Unknown error',
         });
 
         if (this.connectionAttempts >= this.maxRetries) {
@@ -187,7 +189,7 @@ class RedisService {
       securityLogger.info(`Redis ${clientType} client ready`);
     });
 
-    client.on('error', (error) => {
+    client.on('error', (error: any) => {
       securityLogger.error(`Redis ${clientType} client error`, {
         error: error.message,
         clientType,
@@ -235,7 +237,7 @@ class RedisService {
     } catch (_error) {
       securityLogger.error('Redis SET operation failed', {
         key,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
       });
       return false;
     }
@@ -260,7 +262,7 @@ class RedisService {
     } catch (_error) {
       securityLogger.error('Redis GET operation failed', {
         key,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
       });
       return null;
     }
@@ -280,7 +282,7 @@ class RedisService {
     } catch (_error) {
       securityLogger.error('Redis DEL operation failed', {
         key,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
       });
       return false;
     }
@@ -300,7 +302,7 @@ class RedisService {
     } catch (_error) {
       securityLogger.error('Redis EXISTS operation failed', {
         key,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
       });
       return false;
     }
@@ -321,7 +323,7 @@ class RedisService {
       securityLogger.error('Redis EXPIRE operation failed', {
         key,
         seconds,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
       });
       return false;
     }
@@ -338,7 +340,7 @@ class RedisService {
     identifier: string,
     maxRequests: number,
     windowSeconds: number,
-    prefix = 'rate_limit',
+    prefix = 'rate_limit'
   ): Promise<RateLimitResult> {
     if (!this.client) {
       throw new Error('Redis client not initialized');
@@ -346,7 +348,7 @@ class RedisService {
 
     const key = `${prefix}:${identifier}`;
     const now = Date.now();
-    const windowStart = now - (windowSeconds * 1000);
+    const windowStart = now - windowSeconds * 1000;
 
     try {
       // Use a Lua script for atomic operations
@@ -374,18 +376,18 @@ class RedisService {
         end
       `;
 
-      const result = await this.client.eval(
+      const result = (await this.client.eval(
         luaScript,
         1,
         key,
         windowStart.toString(),
         maxRequests.toString(),
         now.toString(),
-        windowSeconds.toString(),
-      ) as [number, number, number];
+        windowSeconds.toString()
+      )) as [number, number, number];
 
       const [allowed, remaining, totalRequests] = result;
-      const resetTime = now + (windowSeconds * 1000);
+      const resetTime = now + windowSeconds * 1000;
 
       const rateLimitResult: RateLimitResult = {
         allowed: allowed === 1,
@@ -406,7 +408,7 @@ class RedisService {
               windowSeconds,
               totalRequests,
             },
-          },
+          }
         );
       }
 
@@ -414,14 +416,14 @@ class RedisService {
     } catch (_error) {
       securityLogger.error('Redis rate limit check failed', {
         identifier,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
       });
 
       // Fail open - allow request if Redis is down
       return {
         allowed: true,
         remaining: maxRequests - 1,
-        resetTime: now + (windowSeconds * 1000),
+        resetTime: now + windowSeconds * 1000,
         totalRequests: 1,
       };
     }
@@ -482,7 +484,7 @@ class RedisService {
     } catch (_error) {
       securityLogger.error('Redis PUBLISH operation failed', {
         channel,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
       });
       return 0;
     }
@@ -499,7 +501,7 @@ class RedisService {
     try {
       await this.subscriber.subscribe(channel);
 
-      this.subscriber.on('message', (receivedChannel, message) => {
+      this.subscriber.on('message', (receivedChannel: any, message: any) => {
         if (receivedChannel === channel) {
           try {
             const parsedMessage = JSON.parse(message);
@@ -507,7 +509,7 @@ class RedisService {
           } catch (_error) {
             securityLogger.error('Failed to parse Redis message', {
               channel: receivedChannel,
-              error: error instanceof Error ? error.message : 'Unknown error',
+              error: _error instanceof Error ? _error.message : 'Unknown error',
             });
           }
         }
@@ -515,7 +517,7 @@ class RedisService {
     } catch (_error) {
       securityLogger.error('Redis SUBSCRIBE operation failed', {
         channel,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
       });
     }
   }
@@ -565,7 +567,7 @@ class RedisService {
       const latency = Date.now() - startTime;
 
       securityLogger.error('Redis health check failed', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
         latency,
       });
 
@@ -607,7 +609,7 @@ class RedisService {
       };
     } catch (_error) {
       securityLogger.error('Failed to get Redis statistics', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
       });
 
       return {
@@ -640,7 +642,7 @@ class RedisService {
       securityLogger.info('Redis connections closed gracefully');
     } catch (_error) {
       securityLogger.error('Error during Redis disconnection', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
       });
     }
   }
@@ -704,7 +706,8 @@ export const redisService = new RedisService();
 
 // Export utility functions
 export const cache = {
-  set: (key: string, value: unknown, options?: CacheOptions) => redisService.set(key, value, options),
+  set: (key: string, value: unknown, options?: CacheOptions) =>
+    redisService.set(key, value, options),
   get: <T = any>(key: string) => redisService.get<T>(key),
   del: (key: string) => redisService.del(key),
   exists: (key: string) => redisService.exists(key),

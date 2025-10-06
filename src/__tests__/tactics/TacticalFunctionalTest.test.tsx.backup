@@ -1,0 +1,1004 @@
+/**/**/**
+
+ * Tactical Features Functional Tests
+
+ * Updated to match current Formation API (slots instead of positions) * Tactical Features Functional Tests * Tactical Features Functional Tests
+
+ */
+
+ *  * 
+
+import { describe, it, expect } from 'vitest';
+
+import TacticalIntegrationService from '../../services/tacticalIntegrationService'; * Updated to match current API structure: * Updated to match current API structure:
+
+import { type Formation, type FormationSlot } from '../../types';
+
+ * - Formation uses `slots` array instead of `positions` object * - Formation uses `slots` array instead of `positions` object
+
+describe('Tactical Features Tests', () => {
+
+  const createTestFormation = (): Formation => { * - Services use static methods from TacticalIntegrationService * - Services use static methods from TacticalIntegrationService
+
+    const slots: FormationSlot[] = [
+
+      { id: 's1', role: 'GK', defaultPosition: { x: 50, y: 5 }, playerId: 'p1' }, * - AICoachingService instance methods * - AICoachingService instance methods
+
+      { id: 's2', role: 'CB', defaultPosition: { x: 35, y: 20 }, playerId: 'p2' },
+
+      { id: 's3', role: 'CB', defaultPosition: { x: 65, y: 20 }, playerId: 'p3' }, */ */
+
+    ];
+
+    return { id: 'test-formation', name: 'Test Formation', slots };
+
+  };
+
+import { describe, it, expect, vi, beforeEach } from 'vitest';import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+  it('should validate formation structure', () => {
+
+    const formation = createTestFormation();import TacticalIntegrationService from '../../services/tacticalIntegrationService';import TacticalIntegrationService from '../../services/tacticalIntegrationService';
+
+    const isValid = TacticalIntegrationService.validateFormation(formation);
+
+    expect(isValid).toBe(true);import { aiCoachingService } from '../../services/aiCoachingService';import { aiCoachingService } from '../../services/aiCoachingService';
+
+  });
+
+import { type Formation, type Player, type FormationSlot } from '../../types';import { type Formation, type Player, type FormationSlot } from '../../types';
+
+  it('should export and import formations', () => {
+
+    const formation = createTestFormation();
+
+    const exported = TacticalIntegrationService.exportFormation(formation);
+
+    const imported = TacticalIntegrationService.importFormation(exported);// Mock OpenAI service for consistent testing// Mock OpenAI service for consistent testing
+
+
+
+    expect(imported).toBeDefined();vi.mock('../../services/openAiService', () => ({vi.mock('../../services/openAiService', () => ({
+
+    expect(imported?.id).toBe(formation.id);
+
+    expect(imported?.slots.length).toBe(3);  openAiService: {  openAiService: {
+
+  });
+
+    generateContent: vi.fn().mockResolvedValue(    generateContent: vi.fn().mockResolvedValue('{"recommendations": [{"title": "Improve Midfield Balance", "description": "Your midfield lacks width and could benefit from wider positioning", "reasoning": "Width in midfield creates more passing options and stretches the opposition", "priority": "medium", "confidence": 78, "impact": "moderate"}]}'),
+
+  it('should validate slot positions', () => {
+
+    const formation = createTestFormation();      JSON.stringify({  },
+
+    formation.slots.forEach((slot) => {
+
+      expect(slot.defaultPosition.x).toBeGreaterThanOrEqual(0);        recommendations: [}));
+
+      expect(slot.defaultPosition.x).toBeLessThanOrEqual(100);
+
+      expect(slot.defaultPosition.y).toBeGreaterThanOrEqual(0);          {
+
+      expect(slot.defaultPosition.y).toBeLessThanOrEqual(100);
+
+    });            title: 'Improve Midfield Balance',describe('Tactical Features Functional Tests', () => {
+
+  });
+
+});            description: 'Your midfield lacks width',  // Create test formation using new slots structure
+
+
+            reasoning: 'Width creates more passing options',  const createTestFormation = (id: string, name: string): Formation => {
+
+            priority: 'medium',    const slots: FormationSlot[] = [
+
+            confidence: 78,      { id: 'gk1', role: 'GK', defaultPosition: { x: 50, y: 5 }, playerId: 'gk1' },
+
+            impact: 'moderate',      { id: 'cb1', role: 'CB', defaultPosition: { x: 35, y: 20 }, playerId: 'cb1' },
+
+          },      { id: 'cb2', role: 'CB', defaultPosition: { x: 65, y: 20 }, playerId: 'cb2' },
+
+        ],      { id: 'lb1', role: 'LB', defaultPosition: { x: 15, y: 25 }, playerId: 'lb1' },
+
+      }),      { id: 'rb1', role: 'RB', defaultPosition: { x: 85, y: 25 }, playerId: 'rb1' },
+
+    ),      { id: 'dm1', role: 'DM', defaultPosition: { x: 50, y: 40 }, playerId: 'dm1' },
+
+  },      { id: 'cm1', role: 'CM', defaultPosition: { x: 35, y: 55 }, playerId: 'cm1' },
+
+}));      { id: 'cm2', role: 'CM', defaultPosition: { x: 65, y: 55 }, playerId: 'cm2' },
+
+      { id: 'lw1', role: 'LW', defaultPosition: { x: 20, y: 75 }, playerId: 'lw1' },
+
+describe('Tactical Features Functional Tests', () => {      { id: 'rw1', role: 'RW', defaultPosition: { x: 80, y: 75 }, playerId: 'rw1' },
+
+  // Helper to create test formations using new slots structure      { id: 'st1', role: 'ST', defaultPosition: { x: 50, y: 85 }, playerId: 'st1' },
+
+  const createTestFormation = (id: string, name: string, numSlots = 11): Formation => {    ];
+
+    const roles = ['GK', 'CB', 'CB', 'LB', 'RB', 'DM', 'CM', 'CM', 'LW', 'RW', 'ST'];
+
+    const positions = [    return { id, name, slots };
+
+      { x: 50, y: 5 },  };
+
+      { x: 35, y: 20 },
+
+      { x: 65, y: 20 },  const testFormation = createTestFormation('test-433', '4-3-3');
+
+      { x: 15, y: 25 },
+
+      { x: 85, y: 25 },  const testPlayers: Player[] = [
+
+      { x: 50, y: 40 },    { id: 'gk1', name: 'Test Keeper', position: 'GK', currentPotential: 85, age: 28 },
+
+      { x: 35, y: 55 },    { id: 'cb1', name: 'Test CB1', position: 'CB', currentPotential: 82, age: 25 },
+
+      { x: 65, y: 55 },    { id: 'cb2', name: 'Test CB2', position: 'CB', currentPotential: 80, age: 27 },
+
+      { x: 20, y: 75 },    { id: 'lb1', name: 'Test LB', position: 'LB', currentPotential: 78, age: 24 },
+
+      { x: 80, y: 75 },    { id: 'rb1', name: 'Test RB', position: 'RB', currentPotential: 76, age: 26 },
+
+      { x: 50, y: 85 },    { id: 'dm1', name: 'Test DM', position: 'DM', currentPotential: 84, age: 25 },
+
+    ];    { id: 'cm1', name: 'Test CM1', position: 'CM', currentPotential: 83, age: 23 },
+
+    { id: 'cm2', name: 'Test CM2', position: 'CM', currentPotential: 81, age: 24 },
+
+    const slots: FormationSlot[] = [];    { id: 'lw1', name: 'Test LW', position: 'LW', currentPotential: 86, age: 22 },
+
+    for (let i = 0; i < Math.min(numSlots, 11); i++) {    { id: 'rw1', name: 'Test RW', position: 'RW', currentPotential: 85, age: 23 },
+
+      slots.push({    { id: 'st1', name: 'Test ST', position: 'ST', currentPotential: 90, age: 25 }
+
+        id: `slot${i + 1}`,  ];
+
+        role: roles[i],
+
+        defaultPosition: positions[i],  beforeEach(() => {
+
+        playerId: `player${i + 1}`,    vi.clearAllMocks();
+
+      });  });
+
+    }
+
+  describe('1. Formation Analysis Integration', () => {
+
+    return { id, name, slots };    it('should analyze formation effectiveness correctly', async () => {
+
+  };      const analysis = await tacticalIntegrationService.analyzeFormation(testFormation, testPlayers);
+
+
+
+  const createTestPlayers = (count = 11): Player[] => {      expect(analysis).toBeDefined();
+
+    const roles = ['GK', 'CB', 'CB', 'LB', 'RB', 'DM', 'CM', 'CM', 'LW', 'RW', 'ST'];      expect(analysis.effectiveness).toBeGreaterThanOrEqual(0);
+
+    const players: Player[] = [];      expect(analysis.effectiveness).toBeLessThanOrEqual(100);
+
+      expect(Array.isArray(analysis.strengths)).toBe(true);
+
+    for (let i = 0; i < count; i++) {      expect(Array.isArray(analysis.weaknesses)).toBe(true);
+
+      players.push({      expect(Array.isArray(analysis.recommendations)).toBe(true);
+
+        id: `player${i + 1}`,      expect(['low', 'medium', 'high']).toContain(analysis.riskLevel);
+
+        name: `Test Player ${i + 1}`,    });
+
+        position: { x: 50, y: 50 },
+
+        currentPotential: 70 + Math.floor(Math.random() * 20),    it('should calculate player chemistry properly', () => {
+
+        age: 20 + Math.floor(Math.random() * 10),      const chemistry = tacticalIntegrationService.calculatePlayerChemistry(testPlayers, testFormation);
+
+        firstName: `First${i + 1}`,
+
+        lastName: `Last${i + 1}`,      expect(chemistry.overall).toBeGreaterThanOrEqual(0);
+
+        role: roles[i] || 'CM',      expect(chemistry.overall).toBeLessThanOrEqual(100);
+
+        overall: 75,      expect(typeof chemistry.individual).toBe('object');
+
+        potential: 85,      expect(Array.isArray(chemistry.suggestions)).toBe(true);
+
+        nationality: 'Test',
+
+        value: 1000000,      // Check individual chemistry scores
+
+        wages: 10000,      testPlayers.forEach(player => {
+
+        contract: { years: 3, expiryDate: '2027-06-30' },        if (chemistry.individual[player.id] !== undefined) {
+
+        morale: 80,          expect(chemistry.individual[player.id]).toBeGreaterThanOrEqual(0);
+
+        fitness: 90,          expect(chemistry.individual[player.id]).toBeLessThanOrEqual(100);
+
+        sharpness: 85,        }
+
+        injured: false,      });
+
+        attributes: {    });
+
+          pace: 75,
+
+          shooting: 70,    it('should generate heat map data', () => {
+
+          passing: 72,      const heatMap = tacticalIntegrationService.generateHeatMapData(testFormation, testPlayers);
+
+          dribbling: 68,
+
+          defending: 65,      expect(heatMap.zones).toBeDefined();
+
+          physical: 70,      expect(Array.isArray(heatMap.zones)).toBe(true);
+
+          technical: 73,      expect(heatMap.coverage).toBeGreaterThanOrEqual(0);
+
+        },      expect(heatMap.coverage).toBeLessThanOrEqual(100);
+
+      });
+
+    }      // Validate zone data
+
+      heatMap.zones.forEach(zone => {
+
+    return players;        expect(zone.x).toBeGreaterThanOrEqual(0);
+
+  };        expect(zone.x).toBeLessThanOrEqual(100);
+
+        expect(zone.y).toBeGreaterThanOrEqual(0);
+
+  const testFormation = createTestFormation('test-433', '4-3-3');        expect(zone.y).toBeLessThanOrEqual(100);
+
+  const testPlayers = createTestPlayers(11);        expect(zone.intensity).toBeGreaterThanOrEqual(0);
+
+        expect(zone.intensity).toBeLessThanOrEqual(1);
+
+  beforeEach(() => {        expect(['attack', 'defense', 'midfield']).toContain(zone.type);
+
+    vi.clearAllMocks();      });
+
+  });    });
+
+  });
+
+  describe('1. Formation Validation and Management', () => {
+
+    it('should validate formation structure correctly', () => {  describe('2. AI Coaching Recommendations', () => {
+
+      const isValid = TacticalIntegrationService.validateFormation(testFormation);    it('should generate comprehensive coaching recommendations', async () => {
+
+      expect(isValid).toBe(true);      const recommendations = await aiCoachingService.generateCoachingRecommendations(
+
+    });        testFormation,
+
+        testPlayers
+
+    it('should reject invalid formations', () => {      );
+
+      const invalidFormation = { id: 'invalid', name: 'Invalid', slots: [] };
+
+      const isValid = TacticalIntegrationService.validateFormation(invalidFormation as Formation);      expect(Array.isArray(recommendations)).toBe(true);
+
+      expect(isValid).toBe(false);      expect(recommendations.length).toBeGreaterThan(0);
+
+    });
+
+      // Validate recommendation structure
+
+    it('should assign players to formation slots', () => {      recommendations.forEach(rec => {
+
+      const emptyFormation = createTestFormation('empty', 'Empty Formation');        expect(rec.id).toBeDefined();
+
+      emptyFormation.slots.forEach((slot) => {        expect(rec.title).toBeDefined();
+
+        slot.playerId = null;        expect(rec.description).toBeDefined();
+
+      });        expect(rec.reasoning).toBeDefined();
+
+        expect(rec.confidence).toBeGreaterThanOrEqual(0);
+
+      const assignedFormation = TacticalIntegrationService.assignPlayersToFormation(        expect(rec.confidence).toBeLessThanOrEqual(100);
+
+        emptyFormation,        expect(['low', 'medium', 'high', 'critical']).toContain(rec.priority);
+
+        testPlayers,        expect(['minor', 'moderate', 'significant', 'game-changing']).toContain(rec.impact);
+
+      );        expect(['formation', 'player', 'tactical', 'strategy', 'substitution']).toContain(rec.type);
+
+      });
+
+      expect(assignedFormation.slots[0].playerId).toBeDefined();    });
+
+      expect(assignedFormation.slots[0].playerId).toBe(testPlayers[0].id);
+
+    });    it('should provide contextual advice for different game situations', async () => {
+
+      // Test losing scenario
+
+    it('should calculate formation strength based on assigned players', () => {      const losingRecommendations = await aiCoachingService.generateCoachingRecommendations(
+
+      const strength = TacticalIntegrationService.calculateFormationStrength(        testFormation,
+
+        testFormation,        testPlayers,
+
+        testPlayers,        { gamePhase: 'late', score: { home: 0, away: 1 }, gameState: 'losing' }
+
+      );      );
+
+
+
+      expect(strength).toBeGreaterThanOrEqual(0);      expect(losingRecommendations.length).toBeGreaterThan(0);
+
+      expect(strength).toBeLessThanOrEqual(100);
+
+    });      // Test winning scenario
+
+  });      const winningRecommendations = await aiCoachingService.generateCoachingRecommendations(
+
+        testFormation,
+
+  describe('2. Formation Export/Import', () => {        testPlayers,
+
+    it('should export formation to JSON', () => {        { gamePhase: 'late', score: { home: 2, away: 1 }, gameState: 'winning' }
+
+      const exported = TacticalIntegrationService.exportFormation(testFormation);      );
+
+
+
+      expect(typeof exported).toBe('string');      expect(winningRecommendations.length).toBeGreaterThan(0);
+
+      expect(() => JSON.parse(exported)).not.toThrow();
+
+      // Recommendations should be different for different contexts
+
+      const parsed = JSON.parse(exported);      const losingTitles = losingRecommendations.map(r => r.title);
+
+      expect(parsed.id).toBe(testFormation.id);      const winningTitles = winningRecommendations.map(r => r.title);
+
+      expect(parsed.name).toBe(testFormation.name);      
+
+      expect(Array.isArray(parsed.slots)).toBe(true);      // At least some recommendations should be different
+
+    });      const commonTitles = losingTitles.filter(title => winningTitles.includes(title));
+
+      expect(commonTitles.length).toBeLessThan(Math.max(losingTitles.length, winningTitles.length));
+
+    it('should import formation from JSON', () => {    });
+
+      const exported = TacticalIntegrationService.exportFormation(testFormation);
+
+      const imported = TacticalIntegrationService.importFormation(exported);    it('should store and retrieve coaching history', () => {
+
+      const testRec = {
+
+      expect(imported).toBeDefined();        id: 'test-history',
+
+      expect(imported?.id).toBe(testFormation.id);        type: 'tactical' as const,
+
+      expect(imported?.name).toBe(testFormation.name);        title: 'Test Historical Recommendation',
+
+      expect(imported?.slots.length).toBe(testFormation.slots.length);        description: 'This is a test',
+
+    });        reasoning: 'For testing purposes',
+
+        confidence: 90,
+
+    it('should reject invalid JSON during import', () => {        priority: 'high' as const,
+
+      const invalidJson = '{ invalid json }';        impact: 'significant' as const
+
+      const result = TacticalIntegrationService.importFormation(invalidJson);      };
+
+
+
+      expect(result).toBeNull();      const initialHistoryLength = aiCoachingService.getCoachingHistory().length;
+
+    });      
+
+  });      aiCoachingService.storeRecommendation(testRec);
+
+      
+
+  describe('3. AI Coaching Recommendations', () => {      const newHistory = aiCoachingService.getCoachingHistory();
+
+    it('should generate coaching recommendations', async () => {      expect(newHistory.length).toBe(initialHistoryLength + 1);
+
+      const recommendations =      
+
+        await aiCoachingService.generateCoachingRecommendations(testFormation, testPlayers);      const storedRec = newHistory.find(r => r.title === 'Test Historical Recommendation');
+
+      expect(storedRec).toBeDefined();
+
+      expect(Array.isArray(recommendations)).toBe(true);      expect(storedRec?.confidence).toBe(90);
+
+      expect(recommendations.length).toBeGreaterThan(0);    });
+
+  });
+
+      // Validate recommendation structure
+
+      if (recommendations.length > 0) {  describe('3. Match Simulation Integration', () => {
+
+        const rec = recommendations[0];    it('should create proper simulation configuration', () => {
+
+        expect(rec.id).toBeDefined();      const config = tacticalIntegrationService.createSimulationConfig(
+
+        expect(rec.title).toBeDefined();        testFormation,
+
+        expect(rec.description).toBeDefined();        testPlayers,
+
+        expect(rec.reasoning).toBeDefined();        { playStyle: 'attacking', tempo: 'fast', aggression: 80 }
+
+        expect(rec.confidence).toBeGreaterThanOrEqual(0);      );
+
+        expect(rec.confidence).toBeLessThanOrEqual(100);
+
+        expect(['low', 'medium', 'high', 'critical']).toContain(rec.priority);      expect(config.formation).toEqual(testFormation);
+
+      }      expect(config.players).toEqual(testPlayers);
+
+    });      expect(config.tactics.playStyle).toBe('attacking');
+
+      expect(config.tactics.tempo).toBe('fast');
+
+    it('should provide contextual advice for different game situations', async () => {      expect(config.tactics.aggression).toBe(80);
+
+      // Test losing scenario    });
+
+      const losingRecommendations =
+
+        await aiCoachingService.generateCoachingRecommendations(    it('should use default tactics when not specified', () => {
+
+          testFormation,      const config = tacticalIntegrationService.createSimulationConfig(testFormation, testPlayers);
+
+          testPlayers,
+
+          {      expect(config.tactics.playStyle).toBe('balanced');
+
+            gamePhase: 'late',      expect(config.tactics.tempo).toBe('medium');
+
+            score: { home: 0, away: 1 },      expect(config.tactics.aggression).toBe(50);
+
+            gameState: 'losing',    });
+
+          },
+
+        );    it('should calculate formation matchups', () => {
+
+      const opponentFormation: Formation = {
+
+      expect(losingRecommendations.length).toBeGreaterThan(0);        id: 'opponent-442',
+
+        name: '4-4-2',
+
+      // Test winning scenario        positions: {
+
+      const winningRecommendations =          'opp-gk': { x: 50, y: 95 },
+
+        await aiCoachingService.generateCoachingRecommendations(          'opp-cb1': { x: 35, y: 80 },
+
+          testFormation,          'opp-cb2': { x: 65, y: 80 },
+
+          testPlayers,          'opp-lb': { x: 15, y: 75 },
+
+          {          'opp-rb': { x: 85, y: 75 },
+
+            gamePhase: 'late',          'opp-lm': { x: 25, y: 55 },
+
+            score: { home: 2, away: 1 },          'opp-rm': { x: 75, y: 55 },
+
+            gameState: 'winning',          'opp-cm1': { x: 40, y: 45 },
+
+          },          'opp-cm2': { x: 60, y: 45 },
+
+        );          'opp-st1': { x: 40, y: 15 },
+
+          'opp-st2': { x: 60, y: 15 }
+
+      expect(winningRecommendations.length).toBeGreaterThan(0);        }
+
+    });      };
+
+
+
+    it('should store and retrieve coaching history', () => {      const matchup = tacticalIntegrationService.calculateMatchup(testFormation, opponentFormation);
+
+      const testRec = {
+
+        id: 'test-history',      expect(matchup.homeAdvantage).toBeGreaterThanOrEqual(0);
+
+        type: 'tactical' as const,      expect(matchup.homeAdvantage).toBeLessThanOrEqual(100);
+
+        title: 'Test Historical Recommendation',      expect(matchup.awayAdvantage).toBeGreaterThanOrEqual(0);
+
+        description: 'This is a test',      expect(matchup.awayAdvantage).toBeLessThanOrEqual(100);
+
+        reasoning: 'For testing purposes',      expect(Array.isArray(matchup.keyBattles)).toBe(true);
+
+        confidence: 90,      expect(Array.isArray(matchup.predictions)).toBe(true);
+
+        priority: 'high' as const,    });
+
+        impact: 'significant' as const,  });
+
+      };
+
+  describe('4. Formation Export/Import', () => {
+
+      const initialHistoryLength = aiCoachingService.getCoachingHistory().length;    it('should export formation with complete data', async () => {
+
+      const analysis = await tacticalIntegrationService.analyzeFormation(testFormation, testPlayers);
+
+      aiCoachingService.storeRecommendation(testRec);      const exportData = tacticalIntegrationService.exportFormation(testFormation, testPlayers, analysis);
+
+
+
+      const newHistory = aiCoachingService.getCoachingHistory();      expect(exportData.id).toBeDefined();
+
+      expect(newHistory.length).toBe(initialHistoryLength + 1);      expect(exportData.name).toBe(testFormation.name);
+
+      expect(exportData.formation).toEqual(testFormation);
+
+      const storedRec = newHistory.find((r) => r.title === 'Test Historical Recommendation');      expect(exportData.players).toEqual(testPlayers);
+
+      expect(storedRec).toBeDefined();      expect(exportData.analysis).toEqual(analysis);
+
+      expect(storedRec?.confidence).toBe(90);      expect(exportData.timestamp).toBeDefined();
+
+    });      expect(typeof exportData.timestamp).toBe('number');
+
+  });    });
+
+
+
+  describe('4. Error Handling and Edge Cases', () => {    it('should export formation without analysis (fallback)', () => {
+
+    it('should handle empty formations gracefully', async () => {      const exportData = tacticalIntegrationService.exportFormation(testFormation, testPlayers);
+
+      const emptyFormation: Formation = {
+
+        id: 'empty',      expect(exportData.formation).toEqual(testFormation);
+
+        name: 'Empty Formation',      expect(exportData.players).toEqual(testPlayers);
+
+        slots: [],      expect(exportData.analysis).toBeDefined();
+
+      };      expect(exportData.analysis.effectiveness).toBeGreaterThanOrEqual(0);
+
+    });
+
+      const isValid = TacticalIntegrationService.validateFormation(emptyFormation);  });
+
+      expect(isValid).toBe(false);
+
+  describe('5. Error Handling and Edge Cases', () => {
+
+      const recommendations = await aiCoachingService.generateCoachingRecommendations(    it('should handle empty formations gracefully', async () => {
+
+        testFormation,      const emptyFormation: Formation = {
+
+        [],        id: 'empty',
+
+      );        name: 'Empty Formation',
+
+      expect(recommendations).toBeDefined();        positions: {}
+
+      expect(Array.isArray(recommendations)).toBe(true);      };
+
+    });
+
+      const analysis = await tacticalIntegrationService.analyzeFormation(emptyFormation, []);
+
+    it('should handle formations without assigned players', () => {      expect(analysis).toBeDefined();
+
+      const unassignedFormation = createTestFormation('unassigned', 'Unassigned');      expect(analysis.effectiveness).toBeGreaterThanOrEqual(0);
+
+      unassignedFormation.slots.forEach((slot) => {
+
+        slot.playerId = null;      const chemistry = tacticalIntegrationService.calculatePlayerChemistry([], emptyFormation);
+
+      });      expect(chemistry).toBeDefined();
+
+
+
+      const strength = TacticalIntegrationService.calculateFormationStrength(      const heatMap = tacticalIntegrationService.generateHeatMapData(emptyFormation, []);
+
+        unassignedFormation,      expect(heatMap.zones).toEqual([]);
+
+        testPlayers,    });
+
+      );
+
+    it('should handle malformed position data', () => {
+
+      expect(strength).toBe(0);      const malformedFormation: Formation = {
+
+    });        id: 'malformed',
+
+  });        name: 'Malformed',
+
+        positions: {
+
+  describe('5. Performance and Optimization', () => {          'player1': { x: -10, y: 120 }, // Invalid coordinates
+
+    it('should handle large formations efficiently', async () => {          'player2': { x: 150, y: -5 }   // Invalid coordinates
+
+      const largePlayers = createTestPlayers(20);        }
+
+      const largeFormation = createTestFormation('large', 'Large Formation', 11);      };
+
+
+
+      const startTime = Date.now();      const chemistry = tacticalIntegrationService.calculatePlayerChemistry(testPlayers, malformedFormation);
+
+      expect(chemistry).toBeDefined();
+
+      const strength = TacticalIntegrationService.calculateFormationStrength(      expect(chemistry.overall).toBeGreaterThanOrEqual(0);
+
+        largeFormation,    });
+
+        largePlayers,
+
+      );    it('should handle missing player data', async () => {
+
+      const recommendations = await aiCoachingService.generateCoachingRecommendations(      const recommendations = await aiCoachingService.generateCoachingRecommendations(testFormation, []);
+
+        largeFormation,      expect(recommendations).toBeDefined();
+
+        largePlayers,      expect(Array.isArray(recommendations)).toBe(true);
+
+      );    });
+
+  });
+
+      const endTime = Date.now();
+
+      const duration = endTime - startTime;  describe('6. Performance and Optimization', () => {
+
+    it('should handle large formations efficiently', async () => {
+
+      // Should complete within reasonable time (5 seconds)      // Create a formation with many positions
+
+      expect(duration).toBeLessThan(5000);      const largeFormation: Formation = {
+
+        id: 'large',
+
+      // All results should be valid        name: 'Large Formation',
+
+      expect(strength).toBeGreaterThanOrEqual(0);        positions: {}
+
+      expect(recommendations).toBeDefined();      };
+
+    });
+
+  });      const largePlayers: Player[] = [];
+
+
+
+  describe('6. Data Consistency and Validation', () => {      // Add 20 players (more than typical 11)
+
+    it('should maintain consistent data across multiple operations', async () => {      for (let i = 1; i <= 20; i++) {
+
+      const strength1 = TacticalIntegrationService.calculateFormationStrength(        const playerId = `player${i}`;
+
+        testFormation,        largeFormation.positions[playerId] = {
+
+        testPlayers,          x: Math.random() * 100,
+
+      );          y: Math.random() * 100
+
+      const strength2 = TacticalIntegrationService.calculateFormationStrength(        };
+
+        testFormation,        largePlayers.push({
+
+        testPlayers,          id: playerId,
+
+      );          name: `Player ${i}`,
+
+          position: 'CM',
+
+      // Strength calculation should be deterministic          currentPotential: 70 + Math.random() * 20,
+
+      expect(strength1).toBe(strength2);          age: 20 + Math.random() * 10
+
+    });        });
+
+      }
+
+    it('should validate formation slot structure', () => {
+
+      testFormation.slots.forEach((slot) => {      const startTime = Date.now();
+
+        expect(slot.id).toBeDefined();      
+
+        expect(slot.role).toBeDefined();      const analysis = await tacticalIntegrationService.analyzeFormation(largeFormation, largePlayers);
+
+        expect(slot.defaultPosition).toBeDefined();      const chemistry = tacticalIntegrationService.calculatePlayerChemistry(largePlayers, largeFormation);
+
+        expect(slot.defaultPosition.x).toBeGreaterThanOrEqual(0);      const heatMap = tacticalIntegrationService.generateHeatMapData(largeFormation, largePlayers);
+
+        expect(slot.defaultPosition.x).toBeLessThanOrEqual(100);      const recommendations = await aiCoachingService.generateCoachingRecommendations(largeFormation, largePlayers);
+
+        expect(slot.defaultPosition.y).toBeGreaterThanOrEqual(0);      
+
+        expect(slot.defaultPosition.y).toBeLessThanOrEqual(100);      const endTime = Date.now();
+
+      });      const duration = endTime - startTime;
+
+    });
+
+      // Should complete within reasonable time (5 seconds)
+
+    it('should validate player data integrity', () => {      expect(duration).toBeLessThan(5000);
+
+      testPlayers.forEach((player) => {      
+
+        expect(player.id).toBeDefined();      // All results should be valid
+
+        expect(player.name).toBeDefined();      expect(analysis).toBeDefined();
+
+        expect(player.currentPotential).toBeGreaterThanOrEqual(0);      expect(chemistry).toBeDefined();
+
+        expect(player.currentPotential).toBeLessThanOrEqual(100);      expect(heatMap).toBeDefined();
+
+        expect(player.age).toBeGreaterThan(0);      expect(recommendations).toBeDefined();
+
+        expect(player.age).toBeLessThan(50);    });
+
+      });  });
+
+    });
+
+  });  describe('7. Data Consistency and Validation', () => {
+
+});    it('should maintain consistent data across multiple operations', async () => {
+
+      // Perform multiple operations and ensure they return consistent results
+
+describe('Integration Verification Summary', () => {      const analysis1 = await tacticalIntegrationService.analyzeFormation(testFormation, testPlayers);
+
+  it('should confirm all tactical features are functional', async () => {      const analysis2 = await tacticalIntegrationService.analyzeFormation(testFormation, testPlayers);
+
+    const verificationFormation: Formation = {
+
+      id: 'verification',      // Same formation should produce similar results (allowing for minor variations)
+
+      name: 'Verification Formation',      expect(Math.abs(analysis1.effectiveness - analysis2.effectiveness)).toBeLessThan(10);
+
+      slots: [
+
+        { id: 's1', role: 'ST', defaultPosition: { x: 50, y: 85 }, playerId: 'p1' },      const chemistry1 = tacticalIntegrationService.calculatePlayerChemistry(testPlayers, testFormation);
+
+        { id: 's2', role: 'LM', defaultPosition: { x: 30, y: 60 }, playerId: 'p2' },      const chemistry2 = tacticalIntegrationService.calculatePlayerChemistry(testPlayers, testFormation);
+
+        { id: 's3', role: 'RM', defaultPosition: { x: 70, y: 60 }, playerId: 'p3' },
+
+        { id: 's4', role: 'CB', defaultPosition: { x: 50, y: 30 }, playerId: 'p4' },      // Chemistry should be deterministic for same inputs
+
+      ],      expect(chemistry1.overall).toBe(chemistry2.overall);
+
+    };    });
+
+
+
+    const verificationPlayers: Player[] = [    it('should validate formation position ranges', () => {
+
+      {      const positions = Object.values(testFormation.positions);
+
+        id: 'p1',      
+
+        name: 'Striker',      positions.forEach(position => {
+
+        position: { x: 50, y: 85 },        expect(position.x).toBeGreaterThanOrEqual(0);
+
+        currentPotential: 85,        expect(position.x).toBeLessThanOrEqual(100);
+
+        age: 25,        expect(position.y).toBeGreaterThanOrEqual(0);
+
+        firstName: 'Test',        expect(position.y).toBeLessThanOrEqual(100);
+
+        lastName: 'Striker',      });
+
+        role: 'ST',    });
+
+        overall: 80,
+
+        potential: 90,    it('should validate player data integrity', () => {
+
+        nationality: 'Test',      testPlayers.forEach(player => {
+
+        value: 5000000,        expect(player.id).toBeDefined();
+
+        wages: 50000,        expect(player.name).toBeDefined();
+
+        contract: { years: 4, expiryDate: '2028-06-30' },        expect(player.currentPotential).toBeGreaterThanOrEqual(0);
+
+        morale: 85,        expect(player.currentPotential).toBeLessThanOrEqual(100);
+
+        fitness: 95,        expect(player.age).toBeGreaterThan(0);
+
+        sharpness: 90,        expect(player.age).toBeLessThan(50);
+
+        injured: false,      });
+
+        attributes: {    });
+
+          pace: 85,  });
+
+          shooting: 88,});
+
+          passing: 75,
+
+          dribbling: 82,describe('Integration Verification Summary', () => {
+
+          defending: 40,  it('should confirm all tactical features are functional', async () => {
+
+          physical: 80,    const testFormation: Formation = {
+
+          technical: 78,      id: 'verification',
+
+        },      name: 'Verification Formation',
+
+      },      positions: {
+
+      {        'p1': { x: 50, y: 85 },
+
+        id: 'p2',        'p2': { x: 30, y: 60 },
+
+        name: 'Left Mid',        'p3': { x: 70, y: 60 },
+
+        position: { x: 30, y: 60 },        'p4': { x: 50, y: 30 }
+
+        currentPotential: 80,      }
+
+        age: 24,    };
+
+        firstName: 'Test',
+
+        lastName: 'LeftMid',    const testPlayers: Player[] = [
+
+        role: 'LM',      { id: 'p1', name: 'Striker', position: 'ST', currentPotential: 85, age: 25 },
+
+        overall: 77,      { id: 'p2', name: 'Left Mid', position: 'LM', currentPotential: 80, age: 24 },
+
+        potential: 85,      { id: 'p3', name: 'Right Mid', position: 'RM', currentPotential: 82, age: 23 },
+
+        nationality: 'Test',      { id: 'p4', name: 'Center Back', position: 'CB', currentPotential: 78, age: 27 }
+
+        value: 3000000,    ];
+
+        wages: 35000,
+
+        contract: { years: 3, expiryDate: '2027-06-30' },    // Test all major features
+
+        morale: 80,    const results = await Promise.all([
+
+        fitness: 92,      tacticalIntegrationService.analyzeFormation(testFormation, testPlayers),
+
+        sharpness: 88,      aiCoachingService.generateCoachingRecommendations(testFormation, testPlayers)
+
+        injured: false,    ]);
+
+        attributes: {
+
+          pace: 82,    const [analysis, recommendations] = results;
+
+          shooting: 70,    const chemistry = tacticalIntegrationService.calculatePlayerChemistry(testPlayers, testFormation);
+
+          passing: 80,    const heatMap = tacticalIntegrationService.generateHeatMapData(testFormation, testPlayers);
+
+          dribbling: 85,    const exportData = tacticalIntegrationService.exportFormation(testFormation, testPlayers, analysis);
+
+          defending: 50,    const simulationConfig = tacticalIntegrationService.createSimulationConfig(testFormation, testPlayers);
+
+          physical: 72,
+
+          technical: 80,    // Verify all features produced valid results
+
+        },    expect(analysis.effectiveness).toBeGreaterThan(0);
+
+      },    expect(recommendations.length).toBeGreaterThan(0);
+
+      {    expect(chemistry.overall).toBeGreaterThan(0);
+
+        id: 'p3',    expect(heatMap.zones.length).toBeGreaterThan(0);
+
+        name: 'Right Mid',    expect(exportData.id).toBeDefined();
+
+        position: { x: 70, y: 60 },    expect(simulationConfig.formation).toEqual(testFormation);
+
+        currentPotential: 82,
+
+        age: 23,    console.log('âœ… All tactical features verified successfully!');
+
+        firstName: 'Test',    console.log(`Formation Analysis: ${analysis.effectiveness}% effective`);
+
+        lastName: 'RightMid',    console.log(`AI Recommendations: ${recommendations.length} generated`);
+
+        role: 'RM',    console.log(`Player Chemistry: ${chemistry.overall}% overall`);
+
+        overall: 78,    console.log(`Heat Map Zones: ${heatMap.zones.length} zones`);
+
+        potential: 87,    console.log(`Export Data: Complete with ID ${exportData.id}`);
+
+        nationality: 'Test',  });
+
+        value: 3500000,});
+
+        wages: 38000,
+
+        contract: { years: 3, expiryDate: '2027-06-30' },*/
+        morale: 82,
+        fitness: 93,
+        sharpness: 89,
+        injured: false,
+        attributes: {
+          pace: 83,
+          shooting: 72,
+          passing: 78,
+          dribbling: 86,
+          defending: 48,
+          physical: 70,
+          technical: 82,
+        },
+      },
+      {
+        id: 'p4',
+        name: 'Center Back',
+        position: { x: 50, y: 30 },
+        currentPotential: 78,
+        age: 27,
+        firstName: 'Test',
+        lastName: 'CenterBack',
+        role: 'CB',
+        overall: 76,
+        potential: 80,
+        nationality: 'Test',
+        value: 2500000,
+        wages: 30000,
+        contract: { years: 2, expiryDate: '2026-06-30' },
+        morale: 78,
+        fitness: 90,
+        sharpness: 85,
+        injured: false,
+        attributes: {
+          pace: 70,
+          shooting: 45,
+          passing: 68,
+          dribbling: 55,
+          defending: 85,
+          physical: 82,
+          technical: 65,
+        },
+      },
+    ];
+
+    // Test all major features
+    const isValid = TacticalIntegrationService.validateFormation(verificationFormation);
+    const strength = TacticalIntegrationService.calculateFormationStrength(
+      verificationFormation,
+      verificationPlayers,
+    );
+    const recommendations = await aiCoachingService.generateCoachingRecommendations(
+      verificationFormation,
+      verificationPlayers,
+    );
+    const exportData = TacticalIntegrationService.exportFormation(verificationFormation);
+
+    // Verify all features produced valid results
+    expect(isValid).toBe(true);
+    expect(strength).toBeGreaterThan(0);
+    expect(recommendations.length).toBeGreaterThan(0);
+    expect(exportData).toBeDefined();
+
+    console.log('âœ… All tactical features verified successfully!');
+    console.log(`Formation Validation: ${isValid}`);
+    console.log(`Formation Strength: ${strength}`);
+    console.log(`AI Recommendations: ${recommendations.length} generated`);
+    console.log(`Export Data: ${exportData.substring(0, 50)}...`);
+  });
+});

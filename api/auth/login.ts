@@ -16,7 +16,7 @@ const loginSchema = z.object({
   email: z.string().email('Invalid email format'),
   password: z.string().min(1, 'Password is required'),
   deviceInfo: z.string().optional(),
-  rememberMe: z.boolean().optional().default(false)
+  rememberMe: z.boolean().optional().default(false),
 });
 
 /**
@@ -34,9 +34,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   if (req.method !== 'POST') {
-    return res.status(405).json({ 
+    return res.status(405).json({
       error: 'Method not allowed',
-      message: 'Only POST requests are allowed'
+      message: 'Only POST requests are allowed',
     });
   }
 
@@ -46,12 +46,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (!validationResult.success) {
       return res.status(400).json({
         error: 'Validation failed',
-        details: validationResult.error.errors
+        details: validationResult.error.errors,
       });
     }
 
     const { email, password, deviceInfo, rememberMe } = validationResult.data;
-    
+
     // Get client IP and user agent
     const ipAddress = req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || 'unknown';
     const userAgent = req.headers['user-agent'] || 'unknown';
@@ -62,8 +62,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const user = await prisma.user.findUnique({
       where: { email },
       include: {
-        notifications: true
-      }
+        notifications: true,
+      },
     });
 
     if (!user) {
@@ -75,13 +75,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           ipAddress: Array.isArray(ipAddress) ? ipAddress[0] : ipAddress,
           userAgent: Array.isArray(userAgent) ? userAgent[0] : userAgent,
           securityEventType: 'failed_login',
-          metadata: { email, reason: 'user_not_found' }
-        }
+          metadata: { email, reason: 'user_not_found' },
+        },
       });
 
       return res.status(401).json({
         error: 'Invalid credentials',
-        message: 'Email or password is incorrect'
+        message: 'Email or password is incorrect',
       });
     }
 
@@ -95,13 +95,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           ipAddress: Array.isArray(ipAddress) ? ipAddress[0] : ipAddress,
           userAgent: Array.isArray(userAgent) ? userAgent[0] : userAgent,
           securityEventType: 'locked_account_access',
-          metadata: { email }
-        }
+          metadata: { email },
+        },
       });
 
       return res.status(423).json({
         error: 'Account locked',
-        message: 'Your account has been locked. Please contact support.'
+        message: 'Your account has been locked. Please contact support.',
       });
     }
 
@@ -109,27 +109,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (!user.isActive) {
       return res.status(403).json({
         error: 'Account inactive',
-        message: 'Your account is not active. Please contact support.'
+        message: 'Your account is not active. Please contact support.',
       });
     }
 
     // Verify password
     const isValidPassword = await bcrypt.compare(password, user.passwordHash);
-    
+
     if (!isValidPassword) {
       // Increment failed login attempts
       const updatedUser = await prisma.user.update({
         where: { id: user.id },
         data: {
-          failedLoginAttempts: { increment: 1 }
-        }
+          failedLoginAttempts: { increment: 1 },
+        },
       });
 
       // Lock account if too many failed attempts
       if (updatedUser.failedLoginAttempts >= 5) {
         await prisma.user.update({
           where: { id: user.id },
-          data: { accountLocked: true }
+          data: { accountLocked: true },
         });
       }
 
@@ -141,30 +141,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           ipAddress: Array.isArray(ipAddress) ? ipAddress[0] : ipAddress,
           userAgent: Array.isArray(userAgent) ? userAgent[0] : userAgent,
           securityEventType: 'failed_login',
-          metadata: { 
-            email, 
+          metadata: {
+            email,
             reason: 'invalid_password',
-            failedAttempts: updatedUser.failedLoginAttempts
-          }
-        }
+            failedAttempts: updatedUser.failedLoginAttempts,
+          },
+        },
       });
 
       return res.status(401).json({
         error: 'Invalid credentials',
-        message: 'Email or password is incorrect'
+        message: 'Email or password is incorrect',
       });
     }
 
     // Generate JWT token
     const jwtSecret = process.env.JWT_SECRET || 'your-secret-key';
     const tokenExpiry = rememberMe ? '30d' : '24h';
-    
+
     const token = jwt.sign(
       {
         userId: user.id,
         email: user.email,
         role: user.role,
-        sessionType: rememberMe ? 'persistent' : 'session'
+        sessionType: rememberMe ? 'persistent' : 'session',
       },
       jwtSecret,
       { expiresIn: tokenExpiry }
@@ -172,7 +172,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // Create user session
     const sessionExpiry = new Date();
-    sessionExpiry.setTime(sessionExpiry.getTime() + (rememberMe ? 30 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000));
+    sessionExpiry.setTime(
+      sessionExpiry.getTime() + (rememberMe ? 30 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000)
+    );
 
     const session = await prisma.userSession.create({
       data: {
@@ -181,8 +183,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         deviceInfo: deviceInfo || 'Unknown Device',
         ipAddress: Array.isArray(ipAddress) ? ipAddress[0] : ipAddress,
         userAgent: Array.isArray(userAgent) ? userAgent[0] : userAgent,
-        expiresAt: sessionExpiry
-      }
+        expiresAt: sessionExpiry,
+      },
     });
 
     // Reset failed login attempts and update last login
@@ -190,8 +192,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       where: { id: user.id },
       data: {
         failedLoginAttempts: 0,
-        lastLoginAt: new Date()
-      }
+        lastLoginAt: new Date(),
+      },
     });
 
     // Log successful login
@@ -204,12 +206,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         ipAddress: Array.isArray(ipAddress) ? ipAddress[0] : ipAddress,
         userAgent: Array.isArray(userAgent) ? userAgent[0] : userAgent,
         securityEventType: 'successful_login',
-        metadata: { 
+        metadata: {
           email,
           deviceInfo,
-          rememberMe
-        }
-      }
+          rememberMe,
+        },
+      },
     });
 
     await prisma.$disconnect();
@@ -227,17 +229,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         role: user.role,
         timezone: user.timezone,
         language: user.language,
-        notifications: user.notifications
+        notifications: user.notifications,
       },
       session: {
         id: session.id,
-        expiresAt: session.expiresAt
-      }
+        expiresAt: session.expiresAt,
+      },
     });
-
   } catch (error) {
     console.error('Login error:', error);
-    
+
     try {
       await prisma.$disconnect();
     } catch (disconnectError) {
@@ -246,7 +247,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     return res.status(500).json({
       error: 'Internal server error',
-      message: 'An error occurred during login'
+      message: 'An error occurred during login',
     });
   }
 }

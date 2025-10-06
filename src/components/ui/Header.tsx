@@ -54,7 +54,7 @@ const TeamToggleButton: React.FC<{
         'border backdrop-blur-sm',
         'focus:outline-none focus:ring-2 focus:ring-primary-500/50',
         'active:scale-95',
-        variantClasses[variant],
+        variantClasses[variant]
       )}
     >
       {children}
@@ -152,7 +152,7 @@ export const Header: React.FC = React.memo(() => {
           'supports-[backdrop-filter]:bg-secondary-900/60',
           isMobile ? 'h-14 px-3' : 'h-16 px-6',
           'flex items-center justify-between',
-          'transition-all duration-300',
+          'transition-all duration-300'
         )}
       >
         {/* Gradient Background */}
@@ -191,7 +191,7 @@ export const Header: React.FC = React.memo(() => {
               className={cn(
                 'font-bold tracking-wider text-white',
                 isMobile ? 'text-lg' : 'text-xl',
-                'drop-shadow-sm',
+                'drop-shadow-sm'
               )}
             >
               <span className="text-primary-400">Astral</span>
@@ -211,7 +211,7 @@ export const Header: React.FC = React.memo(() => {
                   'flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200',
                   'text-secondary-300 hover:text-white hover:bg-secondary-700/50',
                   'focus:outline-none focus:ring-2 focus:ring-primary-500/50',
-                  'backdrop-blur-sm border border-transparent hover:border-secondary-600/50',
+                  'backdrop-blur-sm border border-transparent hover:border-secondary-600/50'
                 )}
                 title="Go to Tactics Board"
                 data-testid="header-tactics-button"
@@ -228,7 +228,7 @@ export const Header: React.FC = React.memo(() => {
                     onClick={() => {
                       if (
                         confirm(
-                          'Are you sure you want to reset the current tactic board? This will reset player positions and drawings.',
+                          'Are you sure you want to reset the current tactic board? This will reset player positions and drawings.'
                         )
                       ) {
                         dispatch({ type: 'SOFT_RESET_APP' });
@@ -487,7 +487,7 @@ export const Header: React.FC = React.memo(() => {
                       onClick={() => {
                         if (
                           confirm(
-                            'Are you sure you want to reset the current tactic board? This will reset player positions and drawings.',
+                            'Are you sure you want to reset the current tactic board? This will reset player positions and drawings.'
                           )
                         ) {
                           dispatch({ type: 'SOFT_RESET_APP' });

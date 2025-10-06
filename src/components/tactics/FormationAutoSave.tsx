@@ -1,21 +1,25 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Save, 
-  Clock, 
-  Download, 
-  Upload, 
-  Settings, 
-  History, 
-  Star, 
-  Trash2, 
-  Play, 
+import {
+  Save,
+  Clock,
+  Download,
+  Upload,
+  Settings,
+  History,
+  Star,
+  Trash2,
+  Play,
   RefreshCw,
   CheckCircle,
   AlertCircle,
-  Info
+  Info,
 } from 'lucide-react';
-import { formationManager, type FormationSaveData, type FormationAutoSaveOptions } from '../../services/formationManagementService';
+import {
+  formationManager,
+  type FormationSaveData,
+  type FormationAutoSaveOptions,
+} from '../../services/formationManagementService';
 import type { Formation, Player } from '../../types';
 
 interface FormationAutoSaveProps {
@@ -70,10 +74,10 @@ const FormationAutoSave: React.FC<FormationAutoSaveProps> = ({
   const loadSaveData = useCallback(() => {
     const history = formationManager.getSaveHistory();
     const formationTemplates = formationManager.getFormationTemplates();
-    
+
     setSaveHistory(history);
     setTemplates(formationTemplates);
-    
+
     // Update last auto-save time
     const latestAutoSave = history.find(save => save.isAutoSaved);
     if (latestAutoSave) {
@@ -90,7 +94,7 @@ const FormationAutoSave: React.FC<FormationAutoSaveProps> = ({
 
     const customName = `Manual Save - ${new Date().toLocaleString()}`;
     const saveData = formationManager.manualSave(customName);
-    
+
     if (saveData) {
       onNotification('Formation saved successfully!', 'success');
       loadSaveData();
@@ -100,22 +104,28 @@ const FormationAutoSave: React.FC<FormationAutoSaveProps> = ({
   }, [currentFormation, onNotification, loadSaveData]);
 
   // Handle load formation
-  const handleLoadFormation = useCallback((saveId: string) => {
-    const saveData = formationManager.loadFormationFromSave(saveId);
-    if (saveData) {
-      onLoadFormation(saveData.formation);
-      onNotification(`Loaded: ${saveData.name}`, 'success');
-      setIsOpen(false);
-    }
-  }, [onLoadFormation, onNotification]);
+  const handleLoadFormation = useCallback(
+    (saveId: string) => {
+      const saveData = formationManager.loadFormationFromSave(saveId);
+      if (saveData) {
+        onLoadFormation(saveData.formation);
+        onNotification(`Loaded: ${saveData.name}`, 'success');
+        setIsOpen(false);
+      }
+    },
+    [onLoadFormation, onNotification]
+  );
 
   // Handle delete save
-  const handleDeleteSave = useCallback((saveId: string) => {
-    if (formationManager.deleteFormationSave(saveId)) {
-      onNotification('Formation save deleted', 'info');
-      loadSaveData();
-    }
-  }, [onNotification, loadSaveData]);
+  const handleDeleteSave = useCallback(
+    (saveId: string) => {
+      if (formationManager.deleteFormationSave(saveId)) {
+        onNotification('Formation save deleted', 'info');
+        loadSaveData();
+      }
+    },
+    [onNotification, loadSaveData]
+  );
 
   // Handle create template
   const handleCreateTemplate = useCallback(() => {
@@ -138,50 +148,68 @@ const FormationAutoSave: React.FC<FormationAutoSaveProps> = ({
       setTemplateDescription('');
       loadSaveData();
     }
-  }, [currentFormation, currentPlayers, templateName, templateDescription, onNotification, loadSaveData]);
+  }, [
+    currentFormation,
+    currentPlayers,
+    templateName,
+    templateDescription,
+    onNotification,
+    loadSaveData,
+  ]);
 
   // Handle settings update
-  const handleSettingsUpdate = useCallback((newOptions: Partial<FormationAutoSaveOptions>) => {
-    const updatedOptions = { ...autoSaveOptions, ...newOptions };
-    setAutoSaveOptions(updatedOptions);
-    formationManager.updateAutoSaveOptions(updatedOptions);
-    onNotification('Auto-save settings updated', 'success');
-  }, [autoSaveOptions, onNotification]);
+  const handleSettingsUpdate = useCallback(
+    (newOptions: Partial<FormationAutoSaveOptions>) => {
+      const updatedOptions = { ...autoSaveOptions, ...newOptions };
+      setAutoSaveOptions(updatedOptions);
+      formationManager.updateAutoSaveOptions(updatedOptions);
+      onNotification('Auto-save settings updated', 'success');
+    },
+    [autoSaveOptions, onNotification]
+  );
 
   // Handle export
-  const handleExport = useCallback((saveId: string) => {
-    const exportData = formationManager.exportFormation(saveId);
-    if (exportData) {
-      const blob = new Blob([exportData], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `formation_${Date.now()}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-      onNotification('Formation exported!', 'success');
-    }
-  }, [onNotification]);
+  const handleExport = useCallback(
+    (saveId: string) => {
+      const exportData = formationManager.exportFormation(saveId);
+      if (exportData) {
+        const blob = new Blob([exportData], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `formation_${Date.now()}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        onNotification('Formation exported!', 'success');
+      }
+    },
+    [onNotification]
+  );
 
   // Handle import
-  const handleImport = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const content = e.target?.result as string;
-      const imported = formationManager.importFormation(content);
-      
-      if (imported) {
-        onNotification('Formation imported successfully!', 'success');
-        loadSaveData();
-      } else {
-        onNotification('Failed to import formation', 'error');
+  const handleImport = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (!file) {
+        return;
       }
-    };
-    reader.readAsText(file);
-  }, [onNotification, loadSaveData]);
+
+      const reader = new FileReader();
+      reader.onload = e => {
+        const content = e.target?.result as string;
+        const imported = formationManager.importFormation(content);
+
+        if (imported) {
+          onNotification('Formation imported successfully!', 'success');
+          loadSaveData();
+        } else {
+          onNotification('Failed to import formation', 'error');
+        }
+      };
+      reader.readAsText(file);
+    },
+    [onNotification, loadSaveData]
+  );
 
   // Format time ago
   const formatTimeAgo = useCallback((dateString: string) => {
@@ -189,23 +217,36 @@ const FormationAutoSave: React.FC<FormationAutoSaveProps> = ({
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);
-    
-    if (diffMins < 1) return 'Just now';
-    if (diffMins < 60) return `${diffMins}m ago`;
-    if (diffMins < 1440) return `${Math.floor(diffMins / 60)}h ago`;
+
+    if (diffMins < 1) {
+      return 'Just now';
+    }
+    if (diffMins < 60) {
+      return `${diffMins}m ago`;
+    }
+    if (diffMins < 1440) {
+      return `${Math.floor(diffMins / 60)}h ago`;
+    }
     return date.toLocaleDateString();
   }, []);
 
   // Auto-save status
   const autoSaveStatus = useMemo(() => {
-    if (!autoSaveOptions.enabled) return { status: 'disabled', message: 'Auto-save disabled' };
-    if (!lastAutoSave) return { status: 'waiting', message: 'Waiting for changes...' };
-    
+    if (!autoSaveOptions.enabled) {
+      return { status: 'disabled', message: 'Auto-save disabled' };
+    }
+    if (!lastAutoSave) {
+      return { status: 'waiting', message: 'Waiting for changes...' };
+    }
+
     const timeSinceLastSave = Date.now() - lastAutoSave.getTime();
     if (timeSinceLastSave < autoSaveOptions.interval) {
-      return { status: 'recent', message: `Last saved ${formatTimeAgo(lastAutoSave.toISOString())}` };
+      return {
+        status: 'recent',
+        message: `Last saved ${formatTimeAgo(lastAutoSave.toISOString())}`,
+      };
     }
-    
+
     return { status: 'pending', message: 'Changes detected, will save soon...' };
   }, [autoSaveOptions.enabled, autoSaveOptions.interval, lastAutoSave, formatTimeAgo]);
 
@@ -223,14 +264,22 @@ const FormationAutoSave: React.FC<FormationAutoSaveProps> = ({
       >
         <Save className="w-4 h-4" />
         <span className="hidden md:inline">Auto-Save</span>
-        
+
         {/* Status indicator */}
-        <div className={`
+        <div
+          className={`
           w-2 h-2 rounded-full
-          ${autoSaveStatus.status === 'recent' ? 'bg-green-400' : 
-            autoSaveStatus.status === 'pending' ? 'bg-yellow-400 animate-pulse' :
-            autoSaveStatus.status === 'disabled' ? 'bg-red-400' : 'bg-gray-400'}
-        `} />
+          ${
+            autoSaveStatus.status === 'recent'
+              ? 'bg-green-400'
+              : autoSaveStatus.status === 'pending'
+                ? 'bg-yellow-400 animate-pulse'
+                : autoSaveStatus.status === 'disabled'
+                  ? 'bg-red-400'
+                  : 'bg-gray-400'
+          }
+        `}
+        />
       </button>
 
       {/* Auto-Save Modal */}
@@ -241,7 +290,7 @@ const FormationAutoSave: React.FC<FormationAutoSaveProps> = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
-            onClick={(e) => e.target === e.currentTarget && setIsOpen(false)}
+            onClick={e => e.target === e.currentTarget && setIsOpen(false)}
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -284,9 +333,10 @@ const FormationAutoSave: React.FC<FormationAutoSaveProps> = ({
                     onClick={() => setActiveTab(tab.id as any)}
                     className={`
                       flex items-center gap-2 px-6 py-4 text-sm font-medium transition-colors
-                      ${activeTab === tab.id
-                        ? 'text-blue-400 border-b-2 border-blue-400'
-                        : 'text-slate-400 hover:text-white'
+                      ${
+                        activeTab === tab.id
+                          ? 'text-blue-400 border-b-2 border-blue-400'
+                          : 'text-slate-400 hover:text-white'
                       }
                     `}
                   >
@@ -397,13 +447,13 @@ const FormationAutoSave: React.FC<FormationAutoSaveProps> = ({
                             type="text"
                             placeholder="Template name..."
                             value={templateName}
-                            onChange={(e) => setTemplateName(e.target.value)}
+                            onChange={e => setTemplateName(e.target.value)}
                             className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600/50 rounded text-white placeholder-slate-400"
                           />
                           <textarea
                             placeholder="Description (optional)..."
                             value={templateDescription}
-                            onChange={(e) => setTemplateDescription(e.target.value)}
+                            onChange={e => setTemplateDescription(e.target.value)}
                             className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600/50 rounded text-white placeholder-slate-400 resize-none"
                             rows={2}
                           />
@@ -441,7 +491,9 @@ const FormationAutoSave: React.FC<FormationAutoSaveProps> = ({
                             <div className="flex-1">
                               <h3 className="text-white font-medium mb-1">{template.name}</h3>
                               {template.formation.notes && (
-                                <p className="text-slate-400 text-sm mb-2">{template.formation.notes}</p>
+                                <p className="text-slate-400 text-sm mb-2">
+                                  {template.formation.notes}
+                                </p>
                               )}
                               <p className="text-slate-500 text-xs">
                                 Created {formatTimeAgo(template.savedAt)}
@@ -474,24 +526,32 @@ const FormationAutoSave: React.FC<FormationAutoSaveProps> = ({
                   <div className="space-y-6">
                     <div>
                       <h3 className="text-white font-medium mb-4">Auto-Save Settings</h3>
-                      
+
                       <div className="space-y-4">
                         <div className="flex items-center justify-between">
                           <div>
-                            <label className="text-white text-sm font-medium">Enable Auto-Save</label>
-                            <p className="text-slate-400 text-xs">Automatically save formations while you work</p>
+                            <label className="text-white text-sm font-medium">
+                              Enable Auto-Save
+                            </label>
+                            <p className="text-slate-400 text-xs">
+                              Automatically save formations while you work
+                            </p>
                           </div>
                           <button
-                            onClick={() => handleSettingsUpdate({ enabled: !autoSaveOptions.enabled })}
+                            onClick={() =>
+                              handleSettingsUpdate({ enabled: !autoSaveOptions.enabled })
+                            }
                             className={`
                               relative w-12 h-6 rounded-full transition-colors
                               ${autoSaveOptions.enabled ? 'bg-green-600' : 'bg-slate-600'}
                             `}
                           >
-                            <div className={`
+                            <div
+                              className={`
                               absolute top-1 w-4 h-4 bg-white rounded-full transition-transform
                               ${autoSaveOptions.enabled ? 'translate-x-7' : 'translate-x-1'}
-                            `} />
+                            `}
+                            />
                           </button>
                         </div>
 
@@ -505,7 +565,9 @@ const FormationAutoSave: React.FC<FormationAutoSaveProps> = ({
                             max="300000"
                             step="5000"
                             value={autoSaveOptions.interval}
-                            onChange={(e) => handleSettingsUpdate({ interval: parseInt(e.target.value) })}
+                            onChange={e =>
+                              handleSettingsUpdate({ interval: parseInt(e.target.value) })
+                            }
                             className="w-full"
                           />
                         </div>
@@ -520,7 +582,9 @@ const FormationAutoSave: React.FC<FormationAutoSaveProps> = ({
                             max="50"
                             step="5"
                             value={autoSaveOptions.maxAutoSaves}
-                            onChange={(e) => handleSettingsUpdate({ maxAutoSaves: parseInt(e.target.value) })}
+                            onChange={e =>
+                              handleSettingsUpdate({ maxAutoSaves: parseInt(e.target.value) })
+                            }
                             className="w-full"
                           />
                         </div>
@@ -531,7 +595,9 @@ const FormationAutoSave: React.FC<FormationAutoSaveProps> = ({
                               type="checkbox"
                               id="saveOnPlayerChange"
                               checked={autoSaveOptions.saveOnPlayerChange}
-                              onChange={(e) => handleSettingsUpdate({ saveOnPlayerChange: e.target.checked })}
+                              onChange={e =>
+                                handleSettingsUpdate({ saveOnPlayerChange: e.target.checked })
+                              }
                               className="w-4 h-4"
                             />
                             <label htmlFor="saveOnPlayerChange" className="text-white text-sm">
@@ -543,7 +609,9 @@ const FormationAutoSave: React.FC<FormationAutoSaveProps> = ({
                               type="checkbox"
                               id="saveOnFormationChange"
                               checked={autoSaveOptions.saveOnFormationChange}
-                              onChange={(e) => handleSettingsUpdate({ saveOnFormationChange: e.target.checked })}
+                              onChange={e =>
+                                handleSettingsUpdate({ saveOnFormationChange: e.target.checked })
+                              }
                               className="w-4 h-4"
                             />
                             <label htmlFor="saveOnFormationChange" className="text-white text-sm">

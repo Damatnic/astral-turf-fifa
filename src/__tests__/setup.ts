@@ -3,6 +3,21 @@ import { cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import React from 'react';
 
+type ClipboardLike = {
+  writeText: (text: string) => Promise<void>;
+  readText?: () => Promise<string>;
+  [key: string]: unknown;
+};
+
+let clipboardStore: ClipboardLike | undefined;
+
+declare global {
+  interface Window {
+    __setClipboardMock?: (mock?: ClipboardLike) => void;
+    __getClipboardMock?: () => ClipboardLike | undefined;
+  }
+}
+
 // Mock Chart.js before any imports
 vi.mock('chart.js', () => {
   const mockChart = {
@@ -66,23 +81,23 @@ vi.mock('react-chartjs-2', () => {
 
   MockChart.displayName = 'MockChart';
 
-  const Line = React.forwardRef<any, any>((props, ref) => 
-    React.createElement(MockChart, { ...props, type: 'line', ref })
+  const Line = React.forwardRef<any, any>((props, ref) =>
+    React.createElement(MockChart, { ...props, type: 'line', ref }),
   );
   Line.displayName = 'Line';
 
-  const Bar = React.forwardRef<any, any>((props, ref) => 
-    React.createElement(MockChart, { ...props, type: 'bar', ref })
+  const Bar = React.forwardRef<any, any>((props, ref) =>
+    React.createElement(MockChart, { ...props, type: 'bar', ref }),
   );
   Bar.displayName = 'Bar';
 
-  const Doughnut = React.forwardRef<any, any>((props, ref) => 
-    React.createElement(MockChart, { ...props, type: 'doughnut', ref })
+  const Doughnut = React.forwardRef<any, any>((props, ref) =>
+    React.createElement(MockChart, { ...props, type: 'doughnut', ref }),
   );
   Doughnut.displayName = 'Doughnut';
 
-  const Radar = React.forwardRef<any, any>((props, ref) => 
-    React.createElement(MockChart, { ...props, type: 'radar', ref })
+  const Radar = React.forwardRef<any, any>((props, ref) =>
+    React.createElement(MockChart, { ...props, type: 'radar', ref }),
   );
   Radar.displayName = 'Radar';
 
@@ -102,7 +117,7 @@ vi.mock('react-chartjs-2', () => {
 beforeAll(() => {
   // Mock the getComputedStyle function - CRITICAL for html-to-image
   Object.defineProperty(window, 'getComputedStyle', {
-    value: (element: Element, pseudoElt?: string | null) => ({
+    value: (element: globalThis.Element, pseudoElt?: string | null) => ({
       getPropertyValue: (property: string) => {
         // Return sensible defaults for common properties
         const defaults: Record<string, string> = {
@@ -151,9 +166,9 @@ beforeAll(() => {
   });
 
   // Mock closest method for Element - CRITICAL for event handlers
-  Object.defineProperty(Element.prototype, 'closest', {
+  Object.defineProperty(globalThis.Element.prototype, 'closest', {
     value: function (selector: string) {
-      let el: Element | null = this;
+      let el: globalThis.Element | null = this as unknown as globalThis.Element;
       while (el && el.nodeType === 1) {
         try {
           if (el.matches && el.matches(selector)) {
@@ -170,7 +185,7 @@ beforeAll(() => {
   });
 
   // Mock matches method for Element
-  Object.defineProperty(Element.prototype, 'matches', {
+  Object.defineProperty(globalThis.Element.prototype, 'matches', {
     value: function (selector: string) {
       // Simple mock that handles common selectors
       if (selector.includes('button') && this.tagName === 'BUTTON') {
@@ -194,7 +209,7 @@ beforeAll(() => {
   });
 
   // Mock getBoundingClientRect
-  Object.defineProperty(Element.prototype, 'getBoundingClientRect', {
+  Object.defineProperty(globalThis.Element.prototype, 'getBoundingClientRect', {
     value: () => ({
       x: 0,
       y: 0,
@@ -225,7 +240,7 @@ beforeAll(() => {
 
   // Mock requestAnimationFrame and cancelAnimationFrame
   Object.defineProperty(window, 'requestAnimationFrame', {
-    value: (callback: FrameRequestCallback) => {
+    value: (callback: globalThis.FrameRequestCallback) => {
       return setTimeout(() => callback(Date.now()), 16);
     },
     writable: true,
@@ -264,6 +279,68 @@ beforeAll(() => {
     writable: true,
   });
 
+  const clipboardTarget: Record<string, unknown> & ClipboardLike = (window.navigator.clipboard as unknown as ClipboardLike) ?? {
+    writeText: async () => {},
+    readText: async () => '',
+  };
+
+  const defaultClipboardImplementation: Required<ClipboardLike> = {
+    writeText: async () => {},
+    readText: async () => '',
+  };
+
+  if (!window.navigator.clipboard) {
+    try {
+      Object.defineProperty(window.navigator, 'clipboard', {
+        configurable: true,
+        enumerable: true,
+        value: clipboardTarget,
+        writable: true,
+      });
+    } catch {
+      (window.navigator as unknown as Record<string, unknown>).clipboard = clipboardTarget;
+    }
+  }
+
+  const originalWriteText = typeof clipboardTarget.writeText === 'function' ? clipboardTarget.writeText.bind(clipboardTarget) : undefined;
+  const originalReadText = typeof clipboardTarget.readText === 'function' ? clipboardTarget.readText.bind(clipboardTarget) : undefined;
+
+  const applyClipboardMethod = (
+    method: 'writeText' | 'readText',
+    implementation: ClipboardLike[typeof method] | undefined,
+  ) => {
+  const fallback = method === 'writeText' ? originalWriteText : originalReadText;
+  const defaultImpl = defaultClipboardImplementation[method];
+  const value = (implementation ?? fallback ?? defaultImpl) as ClipboardLike[typeof method];
+    try {
+      Object.defineProperty(clipboardTarget, method, {
+        configurable: true,
+        enumerable: true,
+        writable: true,
+        value,
+      });
+    } catch {
+      (clipboardTarget as Record<string, unknown>)[method] = value;
+    }
+  };
+
+  window.__setClipboardMock = (mock?: ClipboardLike) => {
+    clipboardStore = mock;
+    if (mock) {
+      applyClipboardMethod('writeText', mock.writeText);
+      applyClipboardMethod('readText', mock.readText);
+    } else {
+      if (originalWriteText) {
+        applyClipboardMethod('writeText', originalWriteText);
+      }
+      if (originalReadText) {
+        applyClipboardMethod('readText', originalReadText);
+      }
+    }
+  };
+
+  window.__getClipboardMock = () => clipboardStore ?? (window.navigator.clipboard as unknown as ClipboardLike | undefined);
+
   // Mock window.matchMedia
   Object.defineProperty(window, 'matchMedia', {
     writable: true,
@@ -296,10 +373,12 @@ beforeAll(() => {
 
   // Mock scrollTo and scrollIntoView
   Object.defineProperty(window, 'scrollTo', { value: vi.fn(), writable: true });
-  Object.defineProperty(Element.prototype, 'scrollIntoView', { value: vi.fn(), writable: true });
+  Object.defineProperty(globalThis.Element.prototype, 'scrollIntoView', {
+    value: vi.fn(),
+    writable: true,
+  });
 
-  // Mock focus and blur
-  Object.defineProperty(HTMLElement.prototype, 'focus', { value: vi.fn(), writable: true });
+  // Mock blur (retain native focus behavior)
   Object.defineProperty(HTMLElement.prototype, 'blur', { value: vi.fn(), writable: true });
 
   // Mock console methods for cleaner test output
@@ -316,14 +395,6 @@ beforeAll(() => {
   global.URL.createObjectURL = vi.fn(() => 'mock-object-url');
   global.URL.revokeObjectURL = vi.fn();
 
-  // Mock navigator.clipboard
-  Object.defineProperty(navigator, 'clipboard', {
-    value: {
-      writeText: vi.fn(() => Promise.resolve()),
-      readText: vi.fn(() => Promise.resolve('mock clipboard content')),
-    },
-    writable: true,
-  });
 
   // Mock crypto for uuid generation
   Object.defineProperty(global, 'crypto', {
@@ -343,6 +414,42 @@ beforeAll(() => {
     },
     writable: true,
   });
+
+  if (typeof global.File === 'undefined') {
+    const BlobCtor: any = typeof globalThis.Blob !== 'undefined'
+      ? globalThis.Blob
+      : class {
+          size = 0;
+          type = '';
+          constructor() {}
+        };
+
+    class MockFile extends BlobCtor {
+      lastModified: number;
+      name: string;
+      webkitRelativePath = '';
+
+      constructor(fileBits: unknown[] = [], fileName = '', options: Record<string, unknown> = {}) {
+        super(fileBits as unknown[], options as unknown);
+        this.name = fileName;
+        this.lastModified = (options.lastModified as number | undefined) ?? Date.now();
+        if (typeof options.type === 'string') {
+          Object.defineProperty(this, 'type', {
+            configurable: true,
+            enumerable: true,
+            value: options.type,
+            writable: true,
+          });
+        }
+      }
+    }
+
+    Object.defineProperty(global, 'File', {
+      configurable: true,
+      writable: true,
+      value: MockFile,
+    });
+  }
 });
 
 // Clean up after each test
@@ -354,6 +461,16 @@ afterEach(() => {
   (window.localStorage.setItem as any).mockClear();
   (window.localStorage.removeItem as any).mockClear();
   (window.localStorage.clear as any).mockClear();
+
+  clipboardStore = undefined;
+  window.__setClipboardMock?.(undefined);
+
+  Object.defineProperty(window, 'innerWidth', {
+    configurable: true,
+    writable: true,
+    value: 1024,
+  });
+  window.dispatchEvent(new Event('resize'));
 });
 
 afterAll(() => {

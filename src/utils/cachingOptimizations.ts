@@ -38,12 +38,12 @@ export class UltraFastCache<K, V> {
       ttl: 5 * 60 * 1000, // 5 minutes default
       persistToStorage: true,
       compressionEnabled: true,
-      ...config
+      ...config,
     };
 
     // Start cleanup interval
     this.startCleanup();
-    
+
     // Load from storage if enabled
     if (this.config.persistToStorage) {
       this.loadFromStorage();
@@ -73,9 +73,8 @@ export class UltraFastCache<K, V> {
 
     // If still over capacity, remove LRU items
     if (this.cache.size > this.config.maxSize) {
-      const sortedByAccess = Array.from(this.accessOrder.entries())
-        .sort((a, b) => a[1] - b[1]);
-      
+      const sortedByAccess = Array.from(this.accessOrder.entries()).sort((a, b) => a[1] - b[1]);
+
       const itemsToRemove = this.cache.size - this.config.maxSize;
       for (let i = 0; i < itemsToRemove; i++) {
         const [key] = sortedByAccess[i];
@@ -89,7 +88,7 @@ export class UltraFastCache<K, V> {
     if (!this.config.compressionEnabled) {
       return JSON.stringify(data);
     }
-    
+
     // Simple compression using JSON stringification with repeated pattern removal
     const jsonStr = JSON.stringify(data);
     return this.simpleCompress(jsonStr);
@@ -99,7 +98,7 @@ export class UltraFastCache<K, V> {
     if (!this.config.compressionEnabled) {
       return JSON.parse(compressed);
     }
-    
+
     const decompressed = this.simpleDecompress(compressed);
     return JSON.parse(decompressed);
   }
@@ -116,7 +115,7 @@ export class UltraFastCache<K, V> {
       [/"formation":/g, '§f§'],
       [/null/g, '§0§'],
       [/true/g, '§1§'],
-      [/false/g, '§2§']
+      [/false/g, '§2§'],
     ];
 
     let compressed = str;
@@ -138,7 +137,7 @@ export class UltraFastCache<K, V> {
       [/§f§/g, '"formation":'],
       [/§0§/g, 'null'],
       [/§1§/g, 'true'],
-      [/§2§/g, 'false']
+      [/§2§/g, 'false'],
     ];
 
     let decompressed = str;
@@ -151,7 +150,7 @@ export class UltraFastCache<K, V> {
 
   get(key: K): V | undefined {
     const entry = this.cache.get(key);
-    
+
     if (!entry) {
       return undefined;
     }
@@ -173,22 +172,22 @@ export class UltraFastCache<K, V> {
   set(key: K, value: V, customTtl?: number): void {
     const now = Date.now();
     const ttl = customTtl || this.config.ttl;
-    
+
     // Calculate size (approximate)
     const dataString = JSON.stringify(value);
     const size = new Blob([dataString]).size;
-    
+
     // Compress if enabled and data is large enough
     const shouldCompress = this.config.compressionEnabled && size > 1024; // 1KB threshold
     const finalData = shouldCompress ? this.compress(value) : value;
-    
+
     const entry: CacheEntry<V> = {
-      data: finalData,
+      data: finalData as V,
       timestamp: now,
       ttl,
       hits: 0,
       size: shouldCompress ? new Blob([finalData as string]).size : size,
-      compressed: shouldCompress
+      compressed: shouldCompress,
     };
 
     this.cache.set(key, entry);
@@ -207,15 +206,17 @@ export class UltraFastCache<K, V> {
 
   has(key: K): boolean {
     const entry = this.cache.get(key);
-    if (!entry) return false;
-    
+    if (!entry) {
+      return false;
+    }
+
     // Check TTL
     if (Date.now() - entry.timestamp > entry.ttl) {
       this.cache.delete(key);
       this.accessOrder.delete(key);
       return false;
     }
-    
+
     return true;
   }
 
@@ -237,21 +238,24 @@ export class UltraFastCache<K, V> {
     const entries = Array.from(this.cache.values());
     const totalSize = entries.reduce((sum, entry) => sum + entry.size, 0);
     const totalHits = entries.reduce((sum, entry) => sum + entry.hits, 0);
-    
+
     return {
       size: this.cache.size,
       maxSize: this.config.maxSize,
       totalSize,
       totalHits,
       hitRate: totalHits / Math.max(entries.length, 1),
-      compressionRatio: this.config.compressionEnabled ? 
-        entries.filter(e => e.compressed).length / Math.max(entries.length, 1) : 0
+      compressionRatio: this.config.compressionEnabled
+        ? entries.filter(e => e.compressed).length / Math.max(entries.length, 1)
+        : 0,
     };
   }
 
   private persistToStorage() {
-    if (typeof window === 'undefined') return;
-    
+    if (typeof window === 'undefined') {
+      return;
+    }
+
     try {
       const cacheData = Array.from(this.cache.entries()).slice(0, 100); // Limit stored items
       localStorage.setItem('cache-data', JSON.stringify(cacheData));
@@ -261,8 +265,10 @@ export class UltraFastCache<K, V> {
   }
 
   private loadFromStorage() {
-    if (typeof window === 'undefined') return;
-    
+    if (typeof window === 'undefined') {
+      return;
+    }
+
     try {
       const stored = localStorage.getItem('cache-data');
       if (stored) {
@@ -294,7 +300,7 @@ export class FormationCache extends UltraFastCache<string, Formation> {
       maxSize: 500,
       ttl: 10 * 60 * 1000, // 10 minutes for formations
       persistToStorage: true,
-      compressionEnabled: true
+      compressionEnabled: true,
     });
   }
 
@@ -308,14 +314,14 @@ export class FormationCache extends UltraFastCache<string, Formation> {
 
   getFormationsByType(type: string): Formation[] {
     const formations: Formation[] = [];
-    
-    for (const [key] of this.cache) {
+
+    for (const [key] of (this as any).cache) {
       const formation = this.get(key);
-      if (formation && formation.type === type) {
+      if (formation && (formation as any).type === type) {
         formations.push(formation);
       }
     }
-    
+
     return formations;
   }
 
@@ -333,7 +339,7 @@ export class PlayerCache extends UltraFastCache<string, Player> {
       maxSize: 1000,
       ttl: 15 * 60 * 1000, // 15 minutes for player data
       persistToStorage: true,
-      compressionEnabled: true
+      compressionEnabled: true,
     });
   }
 
@@ -347,14 +353,14 @@ export class PlayerCache extends UltraFastCache<string, Player> {
 
   getPlayersByTeam(teamId: string): Player[] {
     const players: Player[] = [];
-    
-    for (const [key] of this.cache) {
+
+    for (const [key] of (this as any).cache) {
       const player = this.get(key);
-      if (player && player.teamId === teamId) {
+      if (player && (player as any).teamId === teamId) {
         players.push(player);
       }
     }
-    
+
     return players;
   }
 
@@ -372,7 +378,7 @@ export class QueryCache extends UltraFastCache<string, any> {
       maxSize: 200,
       ttl: 5 * 60 * 1000, // 5 minutes for computed results
       persistToStorage: false, // Don't persist computed data
-      compressionEnabled: true
+      compressionEnabled: true,
     });
   }
 
@@ -382,12 +388,12 @@ export class QueryCache extends UltraFastCache<string, any> {
   ): (...args: Args) => Return {
     return (...args: Args): Return => {
       const key = keyGenerator ? keyGenerator(...args) : JSON.stringify(args);
-      
+
       const cached = this.get(key);
       if (cached !== undefined) {
         return cached;
       }
-      
+
       const result = fn(...args);
       this.set(key, result);
       return result;
@@ -403,14 +409,18 @@ export const queryCache = new QueryCache();
 // React hooks for cache integration
 export function useCachedFormation(formationId: string | undefined) {
   return useMemo(() => {
-    if (!formationId) return undefined;
+    if (!formationId) {
+      return undefined;
+    }
     return formationCache.getFormationById(formationId);
   }, [formationId]);
 }
 
 export function useCachedPlayer(playerId: string | undefined) {
   return useMemo(() => {
-    if (!playerId) return undefined;
+    if (!playerId) {
+      return undefined;
+    }
     return playerCache.getPlayerById(playerId);
   }, [playerId]);
 }
@@ -425,7 +435,7 @@ export function useCachedQuery<T>(
     if (cached !== undefined) {
       return cached;
     }
-    
+
     const result = queryFn();
     queryCache.set(cacheKey, result);
     return result;
@@ -436,10 +446,10 @@ export function useCachedQuery<T>(
 export function warmCache() {
   // This would typically be called on app startup
   console.log('Warming caches...');
-  
+
   // Preload critical formations
   // This would fetch from API or local storage
-  
+
   // Preload critical player data
   // This would fetch from API or local storage
 }
@@ -464,7 +474,7 @@ export function invalidatePlayerCache(playerId?: string) {
 export function invalidateQueryCache(pattern?: string) {
   if (pattern) {
     // Remove all keys matching pattern
-    for (const [key] of queryCache.cache) {
+    for (const [key] of (queryCache as any).cache) {
       if (key.includes(pattern)) {
         queryCache.delete(key);
       }
@@ -479,14 +489,14 @@ export function getCacheStats() {
   return {
     formations: formationCache.getStats(),
     players: playerCache.getStats(),
-    queries: queryCache.getStats()
+    queries: queryCache.getStats(),
   };
 }
 
 // Service Worker cache for assets
 export class ServiceWorkerCache {
   private static instance: ServiceWorkerCache;
-  
+
   static getInstance(): ServiceWorkerCache {
     if (!ServiceWorkerCache.instance) {
       ServiceWorkerCache.instance = new ServiceWorkerCache();
@@ -512,9 +522,7 @@ export class ServiceWorkerCache {
   async clearCache(): Promise<void> {
     if ('caches' in window) {
       const cacheNames = await caches.keys();
-      await Promise.all(
-        cacheNames.map(cacheName => caches.delete(cacheName))
-      );
+      await Promise.all(cacheNames.map(cacheName => caches.delete(cacheName)));
     }
   }
 }
@@ -535,5 +543,5 @@ export default {
   invalidateFormationCache,
   invalidatePlayerCache,
   invalidateQueryCache,
-  getCacheStats
+  getCacheStats,
 };

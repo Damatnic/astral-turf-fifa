@@ -1,6 +1,6 @@
 /**
  * Documentation Analytics Service
- * 
+ *
  * Tracks user interactions with documentation, measures effectiveness,
  * and provides insights for improving documentation quality and usability.
  */
@@ -28,7 +28,7 @@ export const AnalyticsEventSchema = z.object({
     'time_spent',
     'scroll_depth',
     'external_link_clicked',
-    'download_initiated'
+    'download_initiated',
   ]),
   timestamp: z.string(),
   userId: z.string().optional(),
@@ -37,15 +37,17 @@ export const AnalyticsEventSchema = z.object({
   metadata: z.record(z.any()).optional(),
   context: z.object({
     userAgent: z.string().optional(),
-    viewport: z.object({
-      width: z.number(),
-      height: z.number()
-    }).optional(),
+    viewport: z
+      .object({
+        width: z.number(),
+        height: z.number(),
+      })
+      .optional(),
     referrer: z.string().optional(),
     url: z.string(),
     userType: z.enum(['new', 'returning', 'anonymous']).optional(),
-    deviceType: z.enum(['desktop', 'tablet', 'mobile']).optional()
-  })
+    deviceType: z.enum(['desktop', 'tablet', 'mobile']).optional(),
+  }),
 });
 
 export const UserSessionSchema = z.object({
@@ -59,18 +61,20 @@ export const UserSessionSchema = z.object({
   timeSpent: z.number(), // seconds
   bounceRate: z.boolean(),
   conversionGoals: z.array(z.string()),
-  userJourney: z.array(z.object({
-    action: z.string(),
-    timestamp: z.string(),
-    documentId: z.string().optional()
-  }))
+  userJourney: z.array(
+    z.object({
+      action: z.string(),
+      timestamp: z.string(),
+      documentId: z.string().optional(),
+    })
+  ),
 });
 
 export const DocumentationMetricsSchema = z.object({
   documentId: z.string(),
   period: z.object({
     start: z.string(),
-    end: z.string()
+    end: z.string(),
   }),
   metrics: z.object({
     views: z.number(),
@@ -80,25 +84,31 @@ export const DocumentationMetricsSchema = z.object({
     helpfulRating: z.number(),
     searchRanking: z.number(),
     conversionRate: z.number(),
-    errorRate: z.number()
+    errorRate: z.number(),
   }),
-  userSegments: z.record(z.object({
-    views: z.number(),
-    satisfaction: z.number(),
-    completionRate: z.number()
-  })),
+  userSegments: z.record(
+    z.object({
+      views: z.number(),
+      satisfaction: z.number(),
+      completionRate: z.number(),
+    })
+  ),
   trends: z.object({
-    daily: z.array(z.object({
-      date: z.string(),
-      views: z.number(),
-      satisfaction: z.number()
-    })),
-    weekly: z.array(z.object({
-      week: z.string(),
-      views: z.number(),
-      satisfaction: z.number()
-    }))
-  })
+    daily: z.array(
+      z.object({
+        date: z.string(),
+        views: z.number(),
+        satisfaction: z.number(),
+      })
+    ),
+    weekly: z.array(
+      z.object({
+        week: z.string(),
+        views: z.number(),
+        satisfaction: z.number(),
+      })
+    ),
+  }),
 });
 
 export type AnalyticsEvent = z.infer<typeof AnalyticsEventSchema>;
@@ -139,7 +149,7 @@ export class DocumentationAnalyticsService {
   private initializeTracking(): void {
     this.currentSessionId = this.generateSessionId();
     this.startTime = Date.now();
-    
+
     // Initialize current session
     this.sessions.set(this.currentSessionId, {
       sessionId: this.currentSessionId,
@@ -150,7 +160,7 @@ export class DocumentationAnalyticsService {
       timeSpent: 0,
       bounceRate: false,
       conversionGoals: [],
-      userJourney: []
+      userJourney: [],
     });
 
     // Track initial page view
@@ -168,7 +178,9 @@ export class DocumentationAnalyticsService {
    * Track analytics event
    */
   track(type: AnalyticsEvent['type'], metadata?: Record<string, any>, documentId?: string): void {
-    if (!this.isTracking) return;
+    if (!this.isTracking) {
+      return;
+    }
 
     const event: AnalyticsEvent = {
       id: this.generateEventId(),
@@ -177,7 +189,7 @@ export class DocumentationAnalyticsService {
       sessionId: this.currentSessionId,
       documentId,
       metadata: metadata || {},
-      context: this.getContext()
+      context: this.getContext(),
     };
 
     // Add to queue for batch processing
@@ -197,13 +209,17 @@ export class DocumentationAnalyticsService {
    */
   trackPageView(documentId?: string, metadata?: Record<string, any>): void {
     this.pageStartTime = Date.now();
-    
-    this.track('page_view', {
-      ...metadata,
-      url: window.location.href,
-      title: document.title,
-      referrer: document.referrer
-    }, documentId);
+
+    this.track(
+      'page_view',
+      {
+        ...metadata,
+        url: window.location.href,
+        title: document.title,
+        referrer: document.referrer,
+      },
+      documentId
+    );
   }
 
   /**
@@ -215,7 +231,7 @@ export class DocumentationAnalyticsService {
       resultsCount: results,
       category,
       queryLength: query.length,
-      hasResults: results > 0
+      hasResults: results > 0,
     });
 
     // Update session search queries
@@ -231,21 +247,29 @@ export class DocumentationAnalyticsService {
   trackHelpSystem(action: 'opened' | 'closed' | 'searched', metadata?: Record<string, any>): void {
     this.track('help_opened', {
       action,
-      ...metadata
+      ...metadata,
     });
   }
 
   /**
    * Track tutorial progress
    */
-  trackTutorial(action: 'started' | 'completed' | 'skipped', tutorialId: string, stepIndex?: number): void {
-    const eventType = action === 'started' ? 'tutorial_started' :
-                     action === 'completed' ? 'tutorial_completed' : 'tutorial_skipped';
-    
+  trackTutorial(
+    action: 'started' | 'completed' | 'skipped',
+    tutorialId: string,
+    stepIndex?: number
+  ): void {
+    const eventType =
+      action === 'started'
+        ? 'tutorial_started'
+        : action === 'completed'
+          ? 'tutorial_completed'
+          : 'tutorial_skipped';
+
     this.track(eventType, {
       tutorialId,
       stepIndex,
-      action
+      action,
     });
 
     // Track conversion goals
@@ -257,24 +281,36 @@ export class DocumentationAnalyticsService {
   /**
    * Track document interaction
    */
-  trackDocumentInteraction(action: 'helpful' | 'unhelpful' | 'bookmark' | 'share', documentId: string): void {
-    const eventType = action === 'helpful' ? 'article_helpful' :
-                     action === 'unhelpful' ? 'article_unhelpful' :
-                     action === 'bookmark' ? 'bookmark_added' : 'feedback_submitted';
-    
+  trackDocumentInteraction(
+    action: 'helpful' | 'unhelpful' | 'bookmark' | 'share',
+    documentId: string
+  ): void {
+    const eventType =
+      action === 'helpful'
+        ? 'article_helpful'
+        : action === 'unhelpful'
+          ? 'article_unhelpful'
+          : action === 'bookmark'
+            ? 'bookmark_added'
+            : 'feedback_submitted';
+
     this.track(eventType, { action }, documentId);
   }
 
   /**
    * Track code example interaction
    */
-  trackCodeExample(action: 'copied' | 'run' | 'modified', exampleId: string, success?: boolean): void {
+  trackCodeExample(
+    action: 'copied' | 'run' | 'modified',
+    exampleId: string,
+    success?: boolean
+  ): void {
     const eventType = action === 'copied' ? 'code_copied' : 'example_run';
-    
+
     this.track(eventType, {
       exampleId,
       action,
-      success
+      success,
     });
   }
 
@@ -283,11 +319,15 @@ export class DocumentationAnalyticsService {
    */
   trackTimeSpent(documentId?: string): void {
     const timeSpent = Date.now() - this.pageStartTime;
-    
-    this.track('time_spent', {
-      duration: timeSpent,
+
+    this.track(
+      'time_spent',
+      {
+        duration: timeSpent,
+        documentId,
+      },
       documentId
-    }, documentId);
+    );
   }
 
   /**
@@ -296,10 +336,14 @@ export class DocumentationAnalyticsService {
   trackScrollDepth(percentage: number, documentId?: string): void {
     // Only track significant scroll milestones
     if (percentage % 25 === 0) {
-      this.track('scroll_depth', {
-        percentage,
-        milestone: `${percentage}%`
-      }, documentId);
+      this.track(
+        'scroll_depth',
+        {
+          percentage,
+          milestone: `${percentage}%`,
+        },
+        documentId
+      );
     }
   }
 
@@ -307,12 +351,16 @@ export class DocumentationAnalyticsService {
    * Track errors in documentation
    */
   trackError(error: string, context?: Record<string, any>, documentId?: string): void {
-    this.track('error_encountered', {
-      error,
-      context,
-      userAgent: navigator.userAgent,
-      url: window.location.href
-    }, documentId);
+    this.track(
+      'error_encountered',
+      {
+        error,
+        context,
+        userAgent: navigator.userAgent,
+        url: window.location.href,
+      },
+      documentId
+    );
   }
 
   /**
@@ -327,7 +375,7 @@ export class DocumentationAnalyticsService {
     this.track('feedback_submitted', {
       goalId,
       value,
-      type: 'conversion_goal'
+      type: 'conversion_goal',
     });
   }
 
@@ -339,12 +387,12 @@ export class DocumentationAnalyticsService {
       userAgent: navigator.userAgent,
       viewport: {
         width: window.innerWidth,
-        height: window.innerHeight
+        height: window.innerHeight,
       },
       referrer: document.referrer,
       url: window.location.href,
       deviceType: this.getDeviceType(),
-      userType: this.getUserType()
+      userType: this.getUserType(),
     };
   }
 
@@ -353,8 +401,12 @@ export class DocumentationAnalyticsService {
    */
   private getDeviceType(): 'desktop' | 'tablet' | 'mobile' {
     const width = window.innerWidth;
-    if (width < 768) return 'mobile';
-    if (width < 1024) return 'tablet';
+    if (width < 768) {
+      return 'mobile';
+    }
+    if (width < 1024) {
+      return 'tablet';
+    }
     return 'desktop';
   }
 
@@ -382,7 +434,9 @@ export class DocumentationAnalyticsService {
    */
   private updateSession(event: AnalyticsEvent): void {
     const session = this.sessions.get(this.currentSessionId);
-    if (!session) return;
+    if (!session) {
+      return;
+    }
 
     // Update session metrics
     if (event.type === 'page_view') {
@@ -396,7 +450,7 @@ export class DocumentationAnalyticsService {
     session.userJourney.push({
       action: event.type,
       timestamp: event.timestamp,
-      documentId: event.documentId
+      documentId: event.documentId,
     });
 
     // Update time spent
@@ -425,7 +479,9 @@ export class DocumentationAnalyticsService {
    * Flush events to storage/server
    */
   private flushEvents(): void {
-    if (this.eventQueue.length === 0) return;
+    if (this.eventQueue.length === 0) {
+      return;
+    }
 
     // Process events in batches
     const batch = this.eventQueue.splice(0, this.batchSize);
@@ -444,7 +500,7 @@ export class DocumentationAnalyticsService {
       const stored = localStorage.getItem('astral_turf_analytics') || '[]';
       const existingEvents = JSON.parse(stored);
       const allEvents = [...existingEvents, ...events];
-      
+
       // Keep only recent events to avoid storage overflow
       const recentEvents = allEvents.slice(-1000);
       localStorage.setItem('astral_turf_analytics', JSON.stringify(recentEvents));
@@ -467,9 +523,9 @@ export class DocumentationAnalyticsService {
       await fetch('/api/analytics/documentation', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ events })
+        body: JSON.stringify({ events }),
       });
     } catch (error) {
       console.warn('Failed to send analytics events:', error);
@@ -486,7 +542,7 @@ export class DocumentationAnalyticsService {
     window.addEventListener('beforeunload', () => {
       this.trackTimeSpent();
       this.flushEvents();
-      
+
       // End current session
       const session = this.sessions.get(this.currentSessionId);
       if (session) {
@@ -516,34 +572,36 @@ export class DocumentationAnalyticsService {
     conversionFunnels: any;
   }> {
     const events = this.getEventsInRange(dateRange);
-    
+
     return {
       overview: this.calculateOverviewMetrics(events),
       topDocuments: this.getTopDocuments(events),
       searchAnalytics: this.getSearchAnalytics(events),
       userBehavior: this.getUserBehaviorMetrics(events),
-      conversionFunnels: this.getConversionFunnels(events)
+      conversionFunnels: this.getConversionFunnels(events),
     };
   }
 
   /**
    * Get documentation performance metrics
    */
-  async getDocumentMetrics(documentId: string, period?: { start: string; end: string }): Promise<DocumentationMetrics> {
-    const events = this.getEventsInRange(period)
-      .filter(event => event.documentId === documentId);
-    
+  async getDocumentMetrics(
+    documentId: string,
+    period?: { start: string; end: string }
+  ): Promise<DocumentationMetrics> {
+    const events = this.getEventsInRange(period).filter(event => event.documentId === documentId);
+
     const metrics = this.calculateDocumentMetrics(events);
-    
+
     return {
       documentId,
       period: period || {
         start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-        end: new Date().toISOString()
+        end: new Date().toISOString(),
       },
       metrics,
       userSegments: this.calculateUserSegmentMetrics(events),
-      trends: this.calculateTrends(events)
+      trends: this.calculateTrends(events),
     };
   }
 
@@ -573,14 +631,14 @@ export class DocumentationAnalyticsService {
     const searches = events.filter(e => e.type === 'search').length;
     const helpfulRatings = events.filter(e => e.type === 'article_helpful').length;
     const unhelpfulRatings = events.filter(e => e.type === 'article_unhelpful').length;
-    
+
     return {
       pageViews,
       uniqueUsers,
       searches,
       satisfactionRate: helpfulRatings / (helpfulRatings + unhelpfulRatings) || 0,
       averageSessionDuration: this.calculateAverageSessionDuration(),
-      bounceRate: this.calculateBounceRate()
+      bounceRate: this.calculateBounceRate(),
     };
   }
 
@@ -611,13 +669,13 @@ export class DocumentationAnalyticsService {
       .map(([documentId, views]) => {
         const ratings = documentRatings.get(documentId) || { helpful: 0, unhelpful: 0 };
         const satisfaction = ratings.helpful / (ratings.helpful + ratings.unhelpful) || 0;
-        
+
         return {
           documentId,
           views,
           satisfaction,
           helpfulRatings: ratings.helpful,
-          unhelpfulRatings: ratings.unhelpful
+          unhelpfulRatings: ratings.unhelpful,
         };
       })
       .sort((a, b) => b.views - a.views)
@@ -630,15 +688,15 @@ export class DocumentationAnalyticsService {
   private getSearchAnalytics(events: AnalyticsEvent[]): any {
     const searchEvents = events.filter(e => e.type === 'search');
     const totalSearches = searchEvents.length;
-    
+
     const queryFrequency = new Map<string, number>();
     const noResultQueries: string[] = [];
-    
+
     searchEvents.forEach(event => {
       const query = event.metadata?.query;
       if (query) {
         queryFrequency.set(query, (queryFrequency.get(query) || 0) + 1);
-        
+
         if (event.metadata?.resultsCount === 0) {
           noResultQueries.push(query);
         }
@@ -652,7 +710,8 @@ export class DocumentationAnalyticsService {
         .sort((a, b) => b[1] - a[1])
         .slice(0, 10),
       noResultQueries: [...new Set(noResultQueries)],
-      averageResultsPerQuery: searchEvents.reduce((sum, e) => sum + (e.metadata?.resultsCount || 0), 0) / totalSearches
+      averageResultsPerQuery:
+        searchEvents.reduce((sum, e) => sum + (e.metadata?.resultsCount || 0), 0) / totalSearches,
     };
   }
 
@@ -662,12 +721,16 @@ export class DocumentationAnalyticsService {
   private getUserBehaviorMetrics(events: AnalyticsEvent[]): any {
     const timeSpentEvents = events.filter(e => e.type === 'time_spent');
     const scrollEvents = events.filter(e => e.type === 'scroll_depth');
-    
+
     return {
-      averageTimeSpent: timeSpentEvents.reduce((sum, e) => sum + (e.metadata?.duration || 0), 0) / timeSpentEvents.length,
-      averageScrollDepth: scrollEvents.reduce((sum, e) => sum + (e.metadata?.percentage || 0), 0) / scrollEvents.length,
+      averageTimeSpent:
+        timeSpentEvents.reduce((sum, e) => sum + (e.metadata?.duration || 0), 0) /
+        timeSpentEvents.length,
+      averageScrollDepth:
+        scrollEvents.reduce((sum, e) => sum + (e.metadata?.percentage || 0), 0) /
+        scrollEvents.length,
       deviceBreakdown: this.calculateDeviceBreakdown(events),
-      userTypeBreakdown: this.calculateUserTypeBreakdown(events)
+      userTypeBreakdown: this.calculateUserTypeBreakdown(events),
     };
   }
 
@@ -678,17 +741,18 @@ export class DocumentationAnalyticsService {
     const tutorialStarted = events.filter(e => e.type === 'tutorial_started').length;
     const tutorialCompleted = events.filter(e => e.type === 'tutorial_completed').length;
     const helpOpened = events.filter(e => e.type === 'help_opened').length;
-    
+
     return {
       onboardingFunnel: {
         started: tutorialStarted,
         completed: tutorialCompleted,
-        completionRate: tutorialCompleted / tutorialStarted || 0
+        completionRate: tutorialCompleted / tutorialStarted || 0,
       },
       helpEngagement: {
         helpOpened,
-        conversionToPositiveFeedback: events.filter(e => e.type === 'article_helpful').length / helpOpened || 0
-      }
+        conversionToPositiveFeedback:
+          events.filter(e => e.type === 'article_helpful').length / helpOpened || 0,
+      },
     };
   }
 
@@ -697,7 +761,8 @@ export class DocumentationAnalyticsService {
    */
   private calculateDocumentMetrics(events: AnalyticsEvent[]): DocumentationMetrics['metrics'] {
     const views = events.filter(e => e.type === 'page_view').length;
-    const uniqueViews = new Set(events.filter(e => e.type === 'page_view').map(e => e.sessionId)).size;
+    const uniqueViews = new Set(events.filter(e => e.type === 'page_view').map(e => e.sessionId))
+      .size;
     const timeSpentEvents = events.filter(e => e.type === 'time_spent');
     const helpfulRatings = events.filter(e => e.type === 'article_helpful').length;
     const unhelpfulRatings = events.filter(e => e.type === 'article_unhelpful').length;
@@ -706,12 +771,14 @@ export class DocumentationAnalyticsService {
     return {
       views,
       uniqueViews,
-      averageTimeSpent: timeSpentEvents.reduce((sum, e) => sum + (e.metadata?.duration || 0), 0) / timeSpentEvents.length || 0,
+      averageTimeSpent:
+        timeSpentEvents.reduce((sum, e) => sum + (e.metadata?.duration || 0), 0) /
+          timeSpentEvents.length || 0,
       bounceRate: this.calculateDocumentBounceRate(events),
       helpfulRating: helpfulRatings / (helpfulRatings + unhelpfulRatings) || 0,
       searchRanking: 0, // Would be calculated based on search result positions
       conversionRate: 0, // Would be calculated based on specific conversion goals
-      errorRate: errors / views || 0
+      errorRate: errors / views || 0,
     };
   }
 
@@ -720,7 +787,9 @@ export class DocumentationAnalyticsService {
     return 0;
   }
 
-  private calculateUserSegmentMetrics(events: AnalyticsEvent[]): DocumentationMetrics['userSegments'] {
+  private calculateUserSegmentMetrics(
+    events: AnalyticsEvent[]
+  ): DocumentationMetrics['userSegments'] {
     // Implementation would segment users and calculate metrics per segment
     return {};
   }
@@ -729,7 +798,7 @@ export class DocumentationAnalyticsService {
     // Implementation would calculate daily and weekly trends
     return {
       daily: [],
-      weekly: []
+      weekly: [],
     };
   }
 
@@ -784,10 +853,14 @@ export class DocumentationAnalyticsService {
    * Export analytics data
    */
   exportData(): string {
-    return JSON.stringify({
-      events: this.events,
-      sessions: Array.from(this.sessions.entries())
-    }, null, 2);
+    return JSON.stringify(
+      {
+        events: this.events,
+        sessions: Array.from(this.sessions.entries()),
+      },
+      null,
+      2
+    );
   }
 }
 
@@ -797,8 +870,10 @@ export const documentationAnalytics = DocumentationAnalyticsService.getInstance(
 // Auto-track scroll depth
 let lastScrollDepth = 0;
 window.addEventListener('scroll', () => {
-  const scrollDepth = Math.round((window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100);
-  
+  const scrollDepth = Math.round(
+    (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100
+  );
+
   if (scrollDepth > lastScrollDepth && scrollDepth % 25 === 0) {
     documentationAnalytics.trackScrollDepth(scrollDepth);
     lastScrollDepth = scrollDepth;

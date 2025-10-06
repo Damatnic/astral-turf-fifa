@@ -5,12 +5,12 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Brain, 
-  Zap, 
-  Target, 
-  TrendingUp, 
-  Users, 
+import {
+  Brain,
+  Zap,
+  Target,
+  TrendingUp,
+  Users,
   BarChart3,
   Lightbulb,
   AlertTriangle,
@@ -21,15 +21,15 @@ import {
   Maximize2,
   Minimize2,
   Loader,
-  RefreshCw
+  RefreshCw,
 } from 'lucide-react';
 
-import { 
+import {
   aiFootballIntelligence,
   type FormationAnalysis,
   type OptimizedAssignment,
   type TacticalAnalysis,
-  type EffectivenessPrediction
+  type EffectivenessPrediction,
 } from '../../services/aiFootballIntelligence';
 
 import {
@@ -37,14 +37,14 @@ import {
   type MatchPrediction,
   type PlayerPerformancePrediction,
   type TeamChemistryAnalysis,
-  type TeamPerformanceAnalysis
+  type TeamPerformanceAnalysis,
 } from '../../services/aiPredictiveAnalytics';
 
 import {
   aiDrawingIntelligence,
   type DrawingAnalysis,
   type DrawingSuggestion,
-  type DrawingValidation
+  type DrawingValidation,
 } from '../../services/aiDrawingIntelligence';
 
 import { Player, Formation, DrawingShape, Team } from '../../types';
@@ -74,45 +74,47 @@ const AITacticalIntelligence: React.FC<AITacticalIntelligenceProps> = ({
   onMinimizeToggle,
   onPlayerAssignmentSuggestion,
   onTacticalSuggestion,
-  onDrawingSuggestion
+  onDrawingSuggestion,
 }) => {
   // State management
   const [activeTab, setActiveTab] = useState<AnalysisTab>('formation');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [lastAnalysisTime, setLastAnalysisTime] = useState<Date | null>(null);
   const [autoAnalyze, setAutoAnalyze] = useState(true);
-  
+
   // Analysis results
   const [formationAnalysis, setFormationAnalysis] = useState<FormationAnalysis | null>(null);
   const [tacticalAnalysis, setTacticalAnalysis] = useState<TacticalAnalysis | null>(null);
-  const [effectivenessPrediction, setEffectivenessPrediction] = useState<EffectivenessPrediction | null>(null);
+  const [effectivenessPrediction, setEffectivenessPrediction] =
+    useState<EffectivenessPrediction | null>(null);
   const [chemistryAnalysis, setChemistryAnalysis] = useState<TeamChemistryAnalysis | null>(null);
   const [drawingAnalysis, setDrawingAnalysis] = useState<DrawingAnalysis | null>(null);
   const [optimizedAssignment, setOptimizedAssignment] = useState<OptimizedAssignment | null>(null);
-  const [playerPredictions, setPlayerPredictions] = useState<Record<string, PlayerPerformancePrediction>>({});
-  
+  const [playerPredictions, setPlayerPredictions] = useState<
+    Record<string, PlayerPerformancePrediction>
+  >({});
+
   // Error handling
   const [error, setError] = useState<string | null>(null);
 
   // Filter players for current team
-  const teamPlayers = useMemo(() => 
-    players.filter(p => p.team === team), 
-    [players, team]
-  );
+  const teamPlayers = useMemo(() => players.filter(p => p.team === team), [players, team]);
 
   // Check if we have sufficient data for analysis
-  const hasRequiredData = useMemo(() => 
-    formation && teamPlayers.length > 0, 
+  const hasRequiredData = useMemo(
+    () => formation && teamPlayers.length > 0,
     [formation, teamPlayers]
   );
 
   // Main analysis function
   const runCompleteAnalysis = useCallback(async () => {
-    if (!hasRequiredData) return;
-    
+    if (!hasRequiredData) {
+      return;
+    }
+
     setIsAnalyzing(true);
     setError(null);
-    
+
     try {
       // Run all analyses in parallel for better performance
       const [
@@ -121,27 +123,27 @@ const AITacticalIntelligence: React.FC<AITacticalIntelligenceProps> = ({
         optimizedAssignmentResult,
         effectivenessResult,
         chemistryResult,
-        drawingResult
+        drawingResult,
       ] = await Promise.all([
         // Formation analysis
         aiFootballIntelligence.analyzeFormation(formation!, teamPlayers),
-        
+
         // Tactical pattern analysis
         aiFootballIntelligence.analyzeTacticalPatterns(formation!, teamPlayers),
-        
+
         // Optimized player assignments
         aiFootballIntelligence.optimizePlayerAssignments(formation!, teamPlayers),
-        
+
         // Formation effectiveness prediction
         aiFootballIntelligence.predictFormationEffectiveness(formation!, teamPlayers),
-        
+
         // Team chemistry analysis
         aiPredictiveAnalytics.analyzeTeamChemistry(teamPlayers),
-        
+
         // Drawing analysis (if drawings exist)
-        drawings.length > 0 
+        drawings.length > 0
           ? aiDrawingIntelligence.analyzeDrawings(drawings, teamPlayers, formation!)
-          : null
+          : null,
       ]);
 
       // Update all results
@@ -151,15 +153,15 @@ const AITacticalIntelligence: React.FC<AITacticalIntelligenceProps> = ({
       setEffectivenessPrediction(effectivenessResult);
       setChemistryAnalysis(chemistryResult);
       setDrawingAnalysis(drawingResult);
-      
+
       // Run individual player predictions
       const playerPredictionsResult: Record<string, PlayerPerformancePrediction> = {};
       const matchContext = {
         isHome: team === 'home',
         oppositionStrength: 0.7, // Default value
-        matchImportance: 'medium' as const
+        matchImportance: 'medium' as const,
       };
-      
+
       await Promise.all(
         teamPlayers.map(async player => {
           const prediction = await aiPredictiveAnalytics.predictPlayerPerformance(
@@ -169,10 +171,9 @@ const AITacticalIntelligence: React.FC<AITacticalIntelligenceProps> = ({
           playerPredictionsResult[player.id] = prediction;
         })
       );
-      
+
       setPlayerPredictions(playerPredictionsResult);
       setLastAnalysisTime(new Date());
-      
     } catch (err) {
       console.error('AI Analysis Error:', err);
       setError(err instanceof Error ? err.message : 'Analysis failed');
@@ -187,6 +188,7 @@ const AITacticalIntelligence: React.FC<AITacticalIntelligenceProps> = ({
       const timer = setTimeout(runCompleteAnalysis, 500); // Debounce
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [autoAnalyze, hasRequiredData, runCompleteAnalysis]);
 
   // Render loading state
@@ -220,10 +222,15 @@ const AITacticalIntelligence: React.FC<AITacticalIntelligenceProps> = ({
             </span>
             {formationAnalysis && (
               <div className="flex items-center space-x-1">
-                <div className={`w-2 h-2 rounded-full ${
-                  formationAnalysis.overallRating > 0.8 ? 'bg-green-500' :
-                  formationAnalysis.overallRating > 0.6 ? 'bg-yellow-500' : 'bg-red-500'
-                }`} />
+                <div
+                  className={`w-2 h-2 rounded-full ${
+                    formationAnalysis.overallRating > 0.8
+                      ? 'bg-green-500'
+                      : formationAnalysis.overallRating > 0.6
+                        ? 'bg-yellow-500'
+                        : 'bg-red-500'
+                  }`}
+                />
                 <span className="text-xs text-gray-500">
                   {Math.round(formationAnalysis.overallRating * 100)}%
                 </span>
@@ -272,7 +279,7 @@ const AITacticalIntelligence: React.FC<AITacticalIntelligenceProps> = ({
             </span>
           )}
         </div>
-        
+
         <div className="flex items-center space-x-2">
           <button
             onClick={runCompleteAnalysis}
@@ -282,7 +289,7 @@ const AITacticalIntelligence: React.FC<AITacticalIntelligenceProps> = ({
           >
             <RefreshCw className={`w-4 h-4 text-gray-500 ${isAnalyzing ? 'animate-spin' : ''}`} />
           </button>
-          
+
           <button
             onClick={() => setAutoAnalyze(!autoAnalyze)}
             className={`p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 ${
@@ -292,7 +299,7 @@ const AITacticalIntelligence: React.FC<AITacticalIntelligenceProps> = ({
           >
             <Zap className={`w-4 h-4 ${autoAnalyze ? 'text-blue-500' : 'text-gray-500'}`} />
           </button>
-          
+
           <button
             onClick={onMinimizeToggle}
             className="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -319,7 +326,7 @@ const AITacticalIntelligence: React.FC<AITacticalIntelligenceProps> = ({
           { id: 'tactics', label: 'Tactics', icon: Target },
           { id: 'prediction', label: 'Prediction', icon: TrendingUp },
           { id: 'chemistry', label: 'Chemistry', icon: Users },
-          { id: 'drawing', label: 'Drawing', icon: Eye }
+          { id: 'drawing', label: 'Drawing', icon: Eye },
         ].map(tab => (
           <button
             key={tab.id}
@@ -340,38 +347,35 @@ const AITacticalIntelligence: React.FC<AITacticalIntelligenceProps> = ({
       <div className="p-4 h-96 overflow-y-auto">
         <AnimatePresence mode="wait">
           {activeTab === 'formation' && formationAnalysis && (
-            <FormationAnalysisPanel 
+            <FormationAnalysisPanel
               analysis={formationAnalysis}
               optimizedAssignment={optimizedAssignment}
               onAssignmentSuggestion={onPlayerAssignmentSuggestion}
             />
           )}
-          
+
           {activeTab === 'tactics' && tacticalAnalysis && (
-            <TacticalAnalysisPanel 
+            <TacticalAnalysisPanel
               analysis={tacticalAnalysis}
               effectiveness={effectivenessPrediction}
               onSuggestion={onTacticalSuggestion}
             />
           )}
-          
+
           {activeTab === 'prediction' && (
-            <PredictionPanel 
+            <PredictionPanel
               playerPredictions={playerPredictions}
               effectiveness={effectivenessPrediction}
               players={teamPlayers}
             />
           )}
-          
+
           {activeTab === 'chemistry' && chemistryAnalysis && (
-            <ChemistryPanel 
-              analysis={chemistryAnalysis}
-              players={teamPlayers}
-            />
+            <ChemistryPanel analysis={chemistryAnalysis} players={teamPlayers} />
           )}
-          
+
           {activeTab === 'drawing' && (
-            <DrawingAnalysisPanel 
+            <DrawingAnalysisPanel
               analysis={drawingAnalysis}
               drawings={drawings}
               onSuggestion={onDrawingSuggestion}
@@ -402,7 +406,7 @@ const FormationAnalysisPanel: React.FC<{
           {Math.round(analysis.overallRating * 100)}%
         </div>
       </div>
-      
+
       <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded">
         <div className="text-sm text-gray-500 dark:text-gray-400">Chemistry</div>
         <div className="text-2xl font-bold text-gray-800 dark:text-white">
@@ -417,7 +421,7 @@ const FormationAnalysisPanel: React.FC<{
         { label: 'Defensive', value: analysis.defensiveStrength, color: 'blue' },
         { label: 'Attacking', value: analysis.attackingStrength, color: 'red' },
         { label: 'Midfield', value: analysis.midfieldfControl, color: 'green' },
-        { label: 'Balance', value: analysis.balanceScore, color: 'purple' }
+        { label: 'Balance', value: analysis.balanceScore, color: 'purple' },
       ].map(item => (
         <div key={item.label} className="flex items-center justify-between">
           <span className="text-sm text-gray-600 dark:text-gray-300">{item.label}</span>
@@ -428,9 +432,7 @@ const FormationAnalysisPanel: React.FC<{
                 style={{ width: `${item.value * 100}%` }}
               />
             </div>
-            <span className="text-xs text-gray-500 w-8">
-              {Math.round(item.value * 100)}%
-            </span>
+            <span className="text-xs text-gray-500 w-8">{Math.round(item.value * 100)}%</span>
           </div>
         </div>
       ))}
@@ -600,14 +602,21 @@ const PredictionPanel: React.FC<{
     )}
 
     <div>
-      <h4 className="font-medium text-gray-800 dark:text-white mb-2">Player Performance Predictions</h4>
+      <h4 className="font-medium text-gray-800 dark:text-white mb-2">
+        Player Performance Predictions
+      </h4>
       <div className="space-y-2 max-h-64 overflow-y-auto">
         {players.map(player => {
           const prediction = playerPredictions[player.id];
-          if (!prediction) return null;
+          if (!prediction) {
+            return null;
+          }
 
           return (
-            <div key={player.id} className="border border-gray-200 dark:border-gray-700 rounded p-3">
+            <div
+              key={player.id}
+              className="border border-gray-200 dark:border-gray-700 rounded p-3"
+            >
               <div className="flex items-center justify-between mb-2">
                 <span className="font-medium text-sm text-gray-800 dark:text-white">
                   {player.name}
@@ -616,19 +625,25 @@ const PredictionPanel: React.FC<{
                   <span className="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
                     {prediction.expectedRating.toFixed(1)}/10
                   </span>
-                  <div className={`w-2 h-2 rounded-full ${
-                    prediction.injuryRisk.level === 'high' ? 'bg-red-500' :
-                    prediction.injuryRisk.level === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
-                  }`} title={`Injury risk: ${prediction.injuryRisk.level}`} />
+                  <div
+                    className={`w-2 h-2 rounded-full ${
+                      prediction.injuryRisk.level === 'high'
+                        ? 'bg-red-500'
+                        : prediction.injuryRisk.level === 'medium'
+                          ? 'bg-yellow-500'
+                          : 'bg-green-500'
+                    }`}
+                    title={`Injury risk: ${prediction.injuryRisk.level}`}
+                  />
                 </div>
               </div>
-              
+
               {prediction.keyStrengths.length > 0 && (
                 <div className="text-xs text-gray-600 dark:text-gray-300">
                   <strong>Strengths:</strong> {prediction.keyStrengths.join(', ')}
                 </div>
               )}
-              
+
               {prediction.potentialWeaknesses.length > 0 && (
                 <div className="text-xs text-gray-600 dark:text-gray-300 mt-1">
                   <strong>Watch:</strong> {prediction.potentialWeaknesses.join(', ')}
@@ -676,7 +691,10 @@ const ChemistryPanel: React.FC<{
         <h4 className="font-medium text-gray-800 dark:text-white mb-2">Chemistry Boosters</h4>
         <div className="space-y-2">
           {analysis.chemistryBoosters.map((booster, index) => (
-            <div key={index} className="flex items-center justify-between p-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded">
+            <div
+              key={index}
+              className="flex items-center justify-between p-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded"
+            >
               <div>
                 <div className="font-medium text-sm text-gray-800 dark:text-white">
                   {booster.playerName}
@@ -699,7 +717,10 @@ const ChemistryPanel: React.FC<{
         <h4 className="font-medium text-gray-800 dark:text-white mb-2">Chemistry Concerns</h4>
         <div className="space-y-2">
           {analysis.chemistryDisruptors.map((disruptor, index) => (
-            <div key={index} className="flex items-center justify-between p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded">
+            <div
+              key={index}
+              className="flex items-center justify-between p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded"
+            >
               <div>
                 <div className="font-medium text-sm text-gray-800 dark:text-white">
                   {disruptor.playerName}
@@ -765,16 +786,22 @@ const DrawingAnalysisPanel: React.FC<{
           <div className="bg-gradient-to-r from-indigo-50 to-cyan-50 dark:from-indigo-900/20 dark:to-cyan-900/20 p-4 rounded-lg">
             <h4 className="font-medium text-gray-800 dark:text-white mb-2">Drawing Analysis</h4>
             <div className="text-sm text-gray-600 dark:text-gray-300">
-              Overall Score: <span className="font-bold">{Math.round(analysis.overallScore * 100)}%</span>
+              Overall Score:{' '}
+              <span className="font-bold">{Math.round(analysis.overallScore * 100)}%</span>
             </div>
           </div>
 
           {analysis.tacticalRecognition.patterns.length > 0 && (
             <div>
-              <h4 className="font-medium text-gray-800 dark:text-white mb-2">Recognized Patterns</h4>
+              <h4 className="font-medium text-gray-800 dark:text-white mb-2">
+                Recognized Patterns
+              </h4>
               <div className="space-y-2">
                 {analysis.tacticalRecognition.patterns.map((pattern, index) => (
-                  <div key={index} className="border border-gray-200 dark:border-gray-700 rounded p-3">
+                  <div
+                    key={index}
+                    className="border border-gray-200 dark:border-gray-700 rounded p-3"
+                  >
                     <div className="flex items-center justify-between mb-1">
                       <span className="font-medium text-sm text-gray-800 dark:text-white">
                         {pattern.name}
@@ -801,7 +828,9 @@ const DrawingAnalysisPanel: React.FC<{
 
           {analysis.tacticalRecognition.suggestions.length > 0 && (
             <div>
-              <h4 className="font-medium text-gray-800 dark:text-white mb-2">Drawing Suggestions</h4>
+              <h4 className="font-medium text-gray-800 dark:text-white mb-2">
+                Drawing Suggestions
+              </h4>
               <div className="space-y-2">
                 {analysis.tacticalRecognition.suggestions.map((suggestion, index) => (
                   <div
@@ -818,7 +847,7 @@ const DrawingAnalysisPanel: React.FC<{
                     </div>
                     {onSuggestion && (
                       <button
-                        onClick={() => onSuggestion(suggestion)}
+                        onClick={() => onSuggestion(suggestion as any)}
                         className="ml-2 text-xs bg-blue-200 dark:bg-blue-800 text-blue-800 dark:text-blue-200 px-2 py-1 rounded hover:bg-blue-300 dark:hover:bg-blue-700"
                       >
                         Apply

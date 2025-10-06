@@ -5,7 +5,7 @@
  * real-time security monitoring with threat detection capabilities.
  */
 
-import { AUDIT_CONFIG, ENVIRONMENT_CONFIG } from './config';
+import { ENVIRONMENT_CONFIG } from './config';
 
 // Log levels with priority
 export enum LogLevel {
@@ -37,8 +37,15 @@ export enum SecurityEventType {
   PASSWORD_RESET_REQUEST = 'PASSWORD_RESET_REQUEST',
   PASSWORD_RESET_SUCCESS = 'PASSWORD_RESET_SUCCESS',
 
+  // MFA events
+  MFA_CHALLENGE_CREATED = 'MFA_CHALLENGE_CREATED',
+  MFA_CHALLENGE_VERIFIED = 'MFA_CHALLENGE_VERIFIED',
+  MFA_CHALLENGE_FAILED = 'MFA_CHALLENGE_FAILED',
+  MFA_BACKUP_CODE_USED = 'MFA_BACKUP_CODE_USED',
+
   // Suspicious activity
   SUSPICIOUS_LOGIN_PATTERN = 'SUSPICIOUS_LOGIN_PATTERN',
+  SUSPICIOUS_ACTIVITY = 'SUSPICIOUS_ACTIVITY',
   BRUTE_FORCE_ATTEMPT = 'BRUTE_FORCE_ATTEMPT',
   RATE_LIMIT_EXCEEDED = 'RATE_LIMIT_EXCEEDED',
   INVALID_TOKEN_USAGE = 'INVALID_TOKEN_USAGE',
@@ -66,6 +73,50 @@ export enum SecurityEventType {
   AI_RATE_LIMITED = 'AI_RATE_LIMITED',
 }
 
+// Shared security event metadata structure
+export interface SecurityEventMetadata {
+  timestamp?: string;
+  userId?: string;
+  sessionId?: string;
+  userRole?: string;
+  ipAddress?: string;
+  userAgent?: string;
+  action?: string;
+  resource?: string;
+  requestId?: string;
+  incidentId?: string;
+  severity?: string;
+  riskScore?: number;
+  reason?: string;
+  count?: number;
+  maxRequests?: number;
+  windowMs?: number;
+  key?: string;
+  newIp?: string;
+  knownIps?: string[];
+  hour?: number;
+  typicalHours?: number[];
+  actions?: string[];
+  features?: string[];
+  error?: unknown;
+  duration?: number;
+  loginDuration?: number;
+  [key: string]: unknown;
+}
+
+// Context supplied when logging security events
+export interface SecurityEventContext {
+  userId?: string;
+  userRole?: string;
+  sessionId?: string;
+  ipAddress?: string;
+  userAgent?: string;
+  resource?: string;
+  action?: string;
+  metadata?: SecurityEventMetadata;
+  [key: string]: unknown;
+}
+
 // Security log entry structure
 export interface SecurityLogEntry {
   id: string;
@@ -80,7 +131,7 @@ export interface SecurityLogEntry {
   userAgent?: string;
   resource?: string;
   action?: string;
-  metadata?: Record<string, unknown>;
+  metadata?: SecurityEventMetadata;
   stackTrace?: string;
   riskScore?: number; // 0-100 risk assessment
   tags?: string[];
@@ -159,47 +210,50 @@ class SecurityLogStore {
   private updateMetrics(entry: SecurityLogEntry): void {
     switch (entry.eventType) {
       case SecurityEventType.LOGIN_SUCCESS:
-        this.metrics.loginAttempts.successful++;
+        this.metrics.loginAttempts.successful += 1;
         break;
       case SecurityEventType.LOGIN_FAILURE:
-        this.metrics.loginAttempts.failed++;
+        this.metrics.loginAttempts.failed += 1;
         break;
       case SecurityEventType.ACCOUNT_LOCKED:
-        this.metrics.loginAttempts.blocked++;
+        this.metrics.loginAttempts.blocked += 1;
         break;
       case SecurityEventType.PERMISSION_GRANTED:
-        this.metrics.accessAttempts.authorized++;
+        this.metrics.accessAttempts.authorized += 1;
         break;
       case SecurityEventType.PERMISSION_DENIED:
       case SecurityEventType.UNAUTHORIZED_ACCESS:
-        this.metrics.accessAttempts.unauthorized++;
+        this.metrics.accessAttempts.unauthorized += 1;
+        this.metrics.dataAccess.unauthorizedAccess += 1;
         break;
       case SecurityEventType.XSS_ATTEMPT:
-        this.metrics.threats.xssAttempts++;
+        this.metrics.threats.xssAttempts += 1;
         break;
       case SecurityEventType.SQL_INJECTION_ATTEMPT:
-        this.metrics.threats.sqlInjectionAttempts++;
+        this.metrics.threats.sqlInjectionAttempts += 1;
         break;
       case SecurityEventType.BRUTE_FORCE_ATTEMPT:
-        this.metrics.threats.bruteForceAttempts++;
+        this.metrics.threats.bruteForceAttempts += 1;
         break;
       case SecurityEventType.RATE_LIMIT_EXCEEDED:
-        this.metrics.threats.rateLimitExceeded++;
+        this.metrics.threats.rateLimitExceeded += 1;
         break;
       case SecurityEventType.AI_PROMPT_INJECTION:
-        this.metrics.aiSecurity.promptInjections++;
+        this.metrics.aiSecurity.promptInjections += 1;
         break;
       case SecurityEventType.AI_RESPONSE_FILTERED:
-        this.metrics.aiSecurity.responsesFiltered++;
+        this.metrics.aiSecurity.responsesFiltered += 1;
         break;
       case SecurityEventType.AI_RATE_LIMITED:
-        this.metrics.aiSecurity.rateLimited++;
+        this.metrics.aiSecurity.rateLimited += 1;
         break;
       case SecurityEventType.SENSITIVE_DATA_ACCESS:
-        this.metrics.dataAccess.sensitiveDataAccess++;
+        this.metrics.dataAccess.sensitiveDataAccess += 1;
         break;
       case SecurityEventType.DATA_EXPORT:
-        this.metrics.dataAccess.dataExports++;
+        this.metrics.dataAccess.dataExports += 1;
+        break;
+      default:
         break;
     }
   }
@@ -208,14 +262,22 @@ class SecurityLogStore {
     this.alertCallbacks.forEach(callback => {
       try {
         callback(entry);
-      } catch (_error) {
-        console.error('Alert callback failed:', _error);
+      } catch (error) {
+        if (ENVIRONMENT_CONFIG.isDevelopment) {
+          const consoleRef = globalThis.console;
+          consoleRef?.warn?.('Security alert callback failed', error);
+        }
       }
     });
   }
 
   private consoleOutput(entry: SecurityLogEntry): void {
-    const levelColors = {
+    const consoleRef = globalThis.console;
+    if (!consoleRef?.log) {
+      return;
+    }
+
+    const levelColors: Record<LogLevel, string> = {
       [LogLevel.DEBUG]: '\x1b[36m', // Cyan
       [LogLevel.INFO]: '\x1b[32m', // Green
       [LogLevel.WARN]: '\x1b[33m', // Yellow
@@ -224,17 +286,18 @@ class SecurityLogStore {
     };
 
     const reset = '\x1b[0m';
-    const color = levelColors[entry.level] || '';
+    const color = levelColors[entry.level] ?? '';
 
-    //     // // // console.log(
-    //   `${color}[SECURITY ${LogLevel[entry.level]}]${reset} ` +
-    //   `${entry.timestamp} - ${entry.eventType}: ${entry.message}` +
-    //   (entry.userId ? ` (User: ${entry.userId})` : '') +
-    //   (entry.riskScore ? ` [Risk: ${entry.riskScore}]` : '')
-    // );
+    const summary =
+      `${color}[SECURITY ${LogLevel[entry.level]}]${reset} ` +
+      `${entry.timestamp} - ${entry.eventType}: ${entry.message}` +
+      (entry.userId ? ` (User: ${entry.userId})` : '') +
+      (entry.riskScore !== undefined ? ` [Risk: ${entry.riskScore}]` : '');
+
+    consoleRef.log(summary);
 
     if (entry.metadata && Object.keys(entry.metadata).length > 0) {
-      // // // // console.log(`${color}  Metadata:${reset}`, entry.metadata);
+      consoleRef.log(`${color}  Metadata:${reset}`, entry.metadata);
     }
   }
 
@@ -298,8 +361,13 @@ const RISK_SCORES: Record<SecurityEventType, number> = {
   [SecurityEventType.PASSWORD_CHANGED]: 20,
   [SecurityEventType.PASSWORD_RESET_REQUEST]: 30,
   [SecurityEventType.PASSWORD_RESET_SUCCESS]: 40,
+  [SecurityEventType.MFA_CHALLENGE_CREATED]: 35,
+  [SecurityEventType.MFA_CHALLENGE_VERIFIED]: 25,
+  [SecurityEventType.MFA_CHALLENGE_FAILED]: 55,
+  [SecurityEventType.MFA_BACKUP_CODE_USED]: 45,
 
   [SecurityEventType.SUSPICIOUS_LOGIN_PATTERN]: 70,
+  [SecurityEventType.SUSPICIOUS_ACTIVITY]: 65,
   [SecurityEventType.BRUTE_FORCE_ATTEMPT]: 90,
   [SecurityEventType.RATE_LIMIT_EXCEEDED]: 50,
   [SecurityEventType.INVALID_TOKEN_USAGE]: 60,
@@ -335,7 +403,7 @@ class SecurityLogger {
     level: LogLevel,
     eventType: SecurityEventType,
     message: string,
-    metadata?: Record<string, unknown>,
+    metadata?: SecurityEventMetadata
   ): SecurityLogEntry {
     return {
       id: this.generateId(),
@@ -349,7 +417,7 @@ class SecurityLogger {
     };
   }
 
-  private generateTags(eventType: SecurityEventType, metadata?: Record<string, unknown>): string[] {
+  private generateTags(eventType: SecurityEventType, _metadata?: SecurityEventMetadata): string[] {
     const tags: string[] = [];
 
     // Add category tags
@@ -392,7 +460,7 @@ class SecurityLogger {
     return tags;
   }
 
-  debug(message: string, metadata?: Record<string, unknown>): void {
+  debug(message: string, metadata?: SecurityEventMetadata): void {
     if (!ENVIRONMENT_CONFIG.isDevelopment) {
       return;
     }
@@ -401,43 +469,43 @@ class SecurityLogger {
       LogLevel.DEBUG,
       SecurityEventType.SYSTEM_ERROR,
       message,
-      metadata,
+      metadata
     );
     logStore.add(entry);
   }
 
-  info(message: string, metadata?: Record<string, unknown>): void {
+  info(message: string, metadata?: SecurityEventMetadata): void {
     const entry = this.createEntry(LogLevel.INFO, SecurityEventType.DATA_ACCESS, message, metadata);
     logStore.add(entry);
   }
 
-  warn(message: string, metadata?: Record<string, unknown>): void {
+  warn(message: string, metadata?: SecurityEventMetadata): void {
     const entry = this.createEntry(
       LogLevel.WARN,
       SecurityEventType.SUSPICIOUS_LOGIN_PATTERN,
       message,
-      metadata,
+      metadata
     );
     logStore.add(entry);
   }
 
-  error(message: string, metadata?: Record<string, unknown>): void {
+  error(message: string, metadata?: SecurityEventMetadata): void {
     const entry = this.createEntry(
       LogLevel.ERROR,
       SecurityEventType.SYSTEM_ERROR,
       message,
-      metadata,
+      metadata
     );
     entry.stackTrace = new Error().stack;
     logStore.add(entry);
   }
 
-  critical(message: string, metadata?: Record<string, unknown>): void {
+  critical(message: string, metadata?: SecurityEventMetadata): void {
     const entry = this.createEntry(
       LogLevel.CRITICAL,
       SecurityEventType.SECURITY_POLICY_VIOLATION,
       message,
-      metadata,
+      metadata
     );
     entry.stackTrace = new Error().stack;
     logStore.add(entry);
@@ -447,16 +515,7 @@ class SecurityLogger {
   logSecurityEvent(
     eventType: SecurityEventType,
     message: string,
-    context?: {
-      userId?: string;
-      userRole?: string;
-      sessionId?: string;
-      ipAddress?: string;
-      userAgent?: string;
-      resource?: string;
-      action?: string;
-      metadata?: Record<string, unknown>;
-    },
+    context?: SecurityEventContext
   ): void {
     const level = this.getLogLevelForEvent(eventType);
     const entry = this.createEntry(level, eventType, message, context?.metadata);
@@ -496,12 +555,12 @@ class SecurityLogger {
     userId: string,
     ipAddress: string,
     userAgent: string,
-    reason?: string,
+    reason?: string
   ): void {
     this.logSecurityEvent(
       success ? SecurityEventType.LOGIN_SUCCESS : SecurityEventType.LOGIN_FAILURE,
       success ? 'User login successful' : `User login failed: ${reason}`,
-      { userId, ipAddress, userAgent, metadata: { reason } },
+      { userId, ipAddress, userAgent, metadata: { reason } }
     );
   }
 
@@ -514,18 +573,18 @@ class SecurityLogger {
     userId: string,
     resource: string,
     action: string,
-    reason?: string,
+    reason?: string
   ): void {
     this.logSecurityEvent(
       granted ? SecurityEventType.PERMISSION_GRANTED : SecurityEventType.PERMISSION_DENIED,
       granted ? 'Permission granted' : `Permission denied: ${reason}`,
-      { userId, resource, action, metadata: { reason } },
+      { userId, resource, action, metadata: { reason } }
     );
   }
 
   logSuspiciousActivity(
     type: 'brute_force' | 'rate_limit' | 'invalid_token' | 'pattern',
-    details: Record<string, unknown>,
+    details: SecurityEventMetadata
   ): void {
     const eventType = {
       brute_force: SecurityEventType.BRUTE_FORCE_ATTEMPT,
@@ -542,7 +601,7 @@ class SecurityLogger {
   logInputThreat(
     type: 'xss' | 'sql_injection' | 'malicious',
     input: string,
-    userId?: string,
+    userId?: string
   ): void {
     const eventType = {
       xss: SecurityEventType.XSS_ATTEMPT,
@@ -563,13 +622,13 @@ class SecurityLogger {
     this.logSecurityEvent(
       sensitive ? SecurityEventType.SENSITIVE_DATA_ACCESS : SecurityEventType.DATA_ACCESS,
       `Data access: ${action} on ${resource}`,
-      { userId, resource, action },
+      { userId, resource, action }
     );
   }
 
   logAiSecurityEvent(
     type: 'prompt_injection' | 'response_filtered' | 'rate_limited',
-    details: Record<string, unknown>,
+    details: SecurityEventMetadata
   ): void {
     const eventType = {
       prompt_injection: SecurityEventType.AI_PROMPT_INJECTION,
@@ -609,16 +668,6 @@ class SecurityLogger {
 
 // Export singleton instance
 export const securityLogger = new SecurityLogger();
-
-// Export additional types and constants
-export type {
-  SecurityLogEntry,
-  SecurityMetrics,
-  SecurityIncident,
-  IncidentIndicator,
-  IncidentEvidence,
-  IncidentMitigation,
-};
 
 /**
  * Advanced Security Incident Response System
@@ -722,6 +771,12 @@ function generateIncidentUUID(): string {
   });
 }
 
+type IncidentCreationMetadata = SecurityEventMetadata & {
+  affectedSystems?: string[];
+  affectedUsers?: string[];
+  tags?: string[];
+};
+
 // Create security incident
 export function createSecurityIncident(
   type: IncidentType,
@@ -729,7 +784,7 @@ export function createSecurityIncident(
   title: string,
   description: string,
   source: string,
-  metadata: Record<string, unknown> = {},
+  metadata: IncidentCreationMetadata = {}
 ): string {
   const incidentId = generateIncidentUUID();
   const now = new Date().toISOString();
@@ -742,14 +797,14 @@ export function createSecurityIncident(
     description,
     timestamp: now,
     source,
-    affectedSystems: metadata.affectedSystems || [],
-    affectedUsers: metadata.affectedUsers || [],
+    affectedSystems: Array.isArray(metadata.affectedSystems) ? metadata.affectedSystems : [],
+    affectedUsers: Array.isArray(metadata.affectedUsers) ? metadata.affectedUsers : [],
     indicators: [],
     evidence: [],
     mitigations: [],
     status: 'open',
     escalated: severity === IncidentSeverity.CRITICAL,
-    tags: metadata.tags || [],
+    tags: Array.isArray(metadata.tags) ? metadata.tags : [],
     relatedIncidents: [],
     compliance: {
       requiresNotification:
@@ -805,7 +860,7 @@ function determineRequiredNotifications(type: IncidentType, severity: IncidentSe
 // Calculate notification deadline
 function calculateNotificationDeadline(
   type: IncidentType,
-  severity: IncidentSeverity,
+  severity: IncidentSeverity
 ): string | undefined {
   if (type === IncidentType.DATA_BREACH) {
     // GDPR requires notification within 72 hours
@@ -830,7 +885,7 @@ function triggerAutomatedResponse(incident: SecurityIncident): void {
         'Automatically enabled enhanced DDoS protection',
         'system',
         'high',
-        true,
+        true
       );
       break;
 
@@ -842,7 +897,7 @@ function triggerAutomatedResponse(incident: SecurityIncident): void {
         'Automatically enabled strict input validation',
         'system',
         'medium',
-        true,
+        true
       );
       break;
 
@@ -853,7 +908,7 @@ function triggerAutomatedResponse(incident: SecurityIncident): void {
         'Automatically enabled enhanced account lockout policies',
         'system',
         'medium',
-        true,
+        true
       );
       break;
   }
@@ -866,7 +921,7 @@ export function addIncidentMitigation(
   description: string,
   performedBy: string,
   effectiveness: 'low' | 'medium' | 'high',
-  automated: boolean = false,
+  automated: boolean = false
 ): void {
   const incident = securityIncidents.get(incidentId);
   if (!incident) {
@@ -903,7 +958,7 @@ export function addIncidentMitigation(
 export function updateIncidentStatus(
   incidentId: string,
   status: SecurityIncident['status'],
-  assignedTo?: string,
+  assignedTo?: string
 ): void {
   const incident = securityIncidents.get(incidentId);
   if (!incident) {
@@ -954,12 +1009,12 @@ function updateIncidentMetrics(): void {
   incidentMetrics.totalIncidents = incidents.length;
   incidentMetrics.openIncidents = incidents.filter(i => i.status === 'open').length;
   incidentMetrics.criticalIncidents = incidents.filter(
-    i => i.severity === IncidentSeverity.CRITICAL,
+    i => i.severity === IncidentSeverity.CRITICAL
   ).length;
 
   if (incidents.length > 0) {
     const latestIncident = incidents.sort(
-      (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+      (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
     )[0];
     incidentMetrics.lastIncident = latestIncident.timestamp;
   }
@@ -986,7 +1041,7 @@ export function getSecurityIncidents(filter?: {
   }
 
   return incidents.sort(
-    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
   );
 }
 
@@ -997,28 +1052,24 @@ export function getIncidentMetrics(): typeof incidentMetrics {
 }
 
 // Enhanced security event logging with automatic incident creation
+type CriticalEventContext = SecurityEventContext & {
+  success?: boolean;
+  riskLevel?: 'low' | 'medium' | 'high' | 'critical';
+};
+
 export function logCriticalSecurityEvent(
   type: SecurityEventType,
   message: string,
-  metadata: {
-    userId?: string;
-    ipAddress?: string;
-    userAgent?: string;
-    resource?: string;
-    action?: string;
-    success?: boolean;
-    riskLevel?: 'low' | 'medium' | 'high' | 'critical';
-    metadata?: Record<string, unknown>;
-  } = {},
+  context: CriticalEventContext = {}
 ): void {
   // Log the event normally
-  securityLogger.logSecurityEvent(type, message, metadata);
+  securityLogger.logSecurityEvent(type, message, context);
 
   // Create incident for high-risk events
-  if (metadata.riskLevel === 'critical' || metadata.riskLevel === 'high') {
+  if (context.riskLevel === 'critical' || context.riskLevel === 'high') {
     const incidentType = mapEventTypeToIncidentType(type);
     const severity =
-      metadata.riskLevel === 'critical' ? IncidentSeverity.CRITICAL : IncidentSeverity.HIGH;
+      context.riskLevel === 'critical' ? IncidentSeverity.CRITICAL : IncidentSeverity.HIGH;
 
     createSecurityIncident(
       incidentType,
@@ -1028,15 +1079,15 @@ export function logCriticalSecurityEvent(
       'security_monitoring',
       {
         eventType: type,
-        ...metadata,
-      },
+        ...context,
+      }
     );
   }
 }
 
 // Map security event types to incident types
 function mapEventTypeToIncidentType(eventType: SecurityEventType): IncidentType {
-  const mapping: Record<SecurityEventType, IncidentType> = {
+  const mapping: Partial<Record<SecurityEventType, IncidentType>> = {
     [SecurityEventType.LOGIN_SUCCESS]: IncidentType.AUTHENTICATION_FAILURE,
     [SecurityEventType.LOGIN_FAILURE]: IncidentType.AUTHENTICATION_FAILURE,
     [SecurityEventType.LOGOUT]: IncidentType.SUSPICIOUS_ACTIVITY,
@@ -1050,7 +1101,7 @@ function mapEventTypeToIncidentType(eventType: SecurityEventType): IncidentType 
     [SecurityEventType.PERMISSION_DENIED]: IncidentType.AUTHORIZATION_VIOLATION,
     [SecurityEventType.TOKEN_REFRESH]: IncidentType.SUSPICIOUS_ACTIVITY,
     [SecurityEventType.RATE_LIMIT_EXCEEDED]: IncidentType.DDOS_ATTACK,
-    [SecurityEventType.CONFIGURATION_CHANGED]: IncidentType.SUSPICIOUS_ACTIVITY,
+    [SecurityEventType.CONFIGURATION_CHANGE]: IncidentType.SUSPICIOUS_ACTIVITY,
     [SecurityEventType.SYSTEM_ERROR]: IncidentType.SYSTEM_COMPROMISE,
     [SecurityEventType.SENSITIVE_DATA_ACCESS]: IncidentType.DATA_BREACH,
     [SecurityEventType.AI_PROMPT_INJECTION]: IncidentType.INJECTION_ATTACK,
@@ -1066,13 +1117,16 @@ export function initializeSecurityMonitoring(): void {
   // Set up real-time threat detection with incident creation
   securityLogger.onSecurityAlert(entry => {
     if (entry.riskScore && entry.riskScore >= 90) {
-      console.error('🚨 CRITICAL SECURITY ALERT 🚨', {
-        eventType: entry.eventType,
-        message: entry.message,
-        userId: entry.userId,
-        timestamp: entry.timestamp,
-        riskScore: entry.riskScore,
-      });
+      if (ENVIRONMENT_CONFIG.isDevelopment) {
+        // eslint-disable-next-line no-console
+        console.error('🚨 CRITICAL SECURITY ALERT 🚨', {
+          eventType: entry.eventType,
+          message: entry.message,
+          userId: entry.userId,
+          timestamp: entry.timestamp,
+          riskScore: entry.riskScore,
+        });
+      }
 
       // Auto-create critical incident
       const incidentType = mapEventTypeToIncidentType(entry.eventType);
@@ -1085,7 +1139,7 @@ export function initializeSecurityMonitoring(): void {
         {
           logEntry: entry,
           riskScore: entry.riskScore,
-        },
+        }
       );
     }
   });

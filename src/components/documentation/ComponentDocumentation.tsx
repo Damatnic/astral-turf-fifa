@@ -1,18 +1,18 @@
 /**
  * Component Documentation System
- * 
+ *
  * Provides comprehensive documentation for all React components,
  * including props, usage examples, and interactive playground.
  */
 
 import React, { useState, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Search, 
-  Code, 
-  Play, 
-  Copy, 
-  ExternalLink, 
+import {
+  Search,
+  Code,
+  Play,
+  Copy,
+  ExternalLink,
   BookOpen,
   ChevronDown,
   ChevronRight,
@@ -25,7 +25,7 @@ import {
   Globe,
   Shield,
   Database,
-  Activity
+  Activity,
 } from 'lucide-react';
 import { Button } from '../ui/modern/Button';
 import { Input } from '../ui/modern/Input';
@@ -54,7 +54,16 @@ interface ComponentExample {
 interface ComponentDocumentation {
   name: string;
   description: string;
-  category: 'ui' | 'layout' | 'form' | 'data' | 'navigation' | 'feedback' | 'overlay' | 'tactical' | 'analytics';
+  category:
+    | 'ui'
+    | 'layout'
+    | 'form'
+    | 'data'
+    | 'navigation'
+    | 'feedback'
+    | 'overlay'
+    | 'tactical'
+    | 'analytics';
   importPath: string;
   props: ComponentProp[];
   examples: ComponentExample[];
@@ -78,7 +87,8 @@ interface ComponentDocumentation {
 const COMPONENT_DOCS: ComponentDocumentation[] = [
   {
     name: 'UnifiedTacticsBoard',
-    description: 'The main tactical board component for creating and editing football formations. Supports drag-and-drop player positioning, real-time chemistry visualization, and AI-powered analysis.',
+    description:
+      'The main tactical board component for creating and editing football formations. Supports drag-and-drop player positioning, real-time chemistry visualization, and AI-powered analysis.',
     category: 'tactical',
     importPath: "import { UnifiedTacticsBoard } from '@/components/tactics/UnifiedTacticsBoard';",
     props: [
@@ -90,9 +100,9 @@ const COMPONENT_DOCS: ComponentDocumentation[] = [
         examples: [
           [
             { id: '1', name: 'Lionel Messi', position: 'RW', team: 'home' },
-            { id: '2', name: 'Robert Lewandowski', position: 'ST', team: 'home' }
-          ]
-        ]
+            { id: '2', name: 'Robert Lewandowski', position: 'ST', team: 'home' },
+          ],
+        ],
       },
       {
         name: 'formation',
@@ -105,17 +115,17 @@ const COMPONENT_DOCS: ComponentDocumentation[] = [
             name: '4-3-3 Attacking',
             positions: [
               { id: 'gk', x: 50, y: 10, position: 'GK' },
-              { id: 'lb', x: 20, y: 25, position: 'LB' }
-            ]
-          }
-        ]
+              { id: 'lb', x: 20, y: 25, position: 'LB' },
+            ],
+          },
+        ],
       },
       {
         name: 'onPlayerMove',
         type: '(playerId: string, position: { x: number; y: number }) => void',
         required: false,
         description: 'Callback fired when a player is moved to a new position',
-        examples: ['(playerId, position) => console.log(`Player ${playerId} moved to`, position)']
+        examples: ['(playerId, position) => console.log(`Player ${playerId} moved to`, position)'],
       },
       {
         name: 'showChemistry',
@@ -123,7 +133,7 @@ const COMPONENT_DOCS: ComponentDocumentation[] = [
         required: false,
         defaultValue: false,
         description: 'Whether to display player chemistry connections',
-        examples: [true, false]
+        examples: [true, false],
       },
       {
         name: 'aiAnalysisEnabled',
@@ -131,7 +141,7 @@ const COMPONENT_DOCS: ComponentDocumentation[] = [
         required: false,
         defaultValue: true,
         description: 'Enable real-time AI tactical analysis',
-        examples: [true, false]
+        examples: [true, false],
       },
       {
         name: 'readOnly',
@@ -139,8 +149,8 @@ const COMPONENT_DOCS: ComponentDocumentation[] = [
         required: false,
         defaultValue: false,
         description: 'Disable player movement and editing when true',
-        examples: [false, true]
-      }
+        examples: [false, true],
+      },
     ],
     examples: [
       {
@@ -185,7 +195,7 @@ const BasicExample = () => {
 };
 
 export default BasicExample;`,
-        editable: true
+        editable: true,
       },
       {
         title: 'Advanced with Chemistry',
@@ -256,7 +266,7 @@ const AdvancedExample = () => {
 };
 
 export default AdvancedExample;`,
-        editable: true
+        editable: true,
       },
       {
         title: 'Read-Only Display',
@@ -296,27 +306,33 @@ const ReadOnlyExample = () => {
   );
 };
 
-export default ReadOnlyExample;`
-      }
+export default ReadOnlyExample;`,
+      },
     ],
-    relatedComponents: ['PlayerToken', 'ModernField', 'ChemistryVisualization', 'AITacticalIntelligence'],
+    relatedComponents: [
+      'PlayerToken',
+      'ModernField',
+      'ChemistryVisualization',
+      'AITacticalIntelligence',
+    ],
     version: '2.1.0',
     lastUpdated: '2024-01-15',
     accessibility: {
       keyboard: true,
       screenReader: true,
       focusManagement: true,
-      colorContrast: true
+      colorContrast: true,
     },
     performance: {
       renderingStrategy: 'Virtual scrolling with RAF optimization',
       memoryFootprint: 'medium',
-      lazyLoadable: true
-    }
+      lazyLoadable: true,
+    },
   },
   {
     name: 'Button',
-    description: 'Versatile button component with multiple variants, sizes, and states. Supports icons, loading states, and full accessibility.',
+    description:
+      'Versatile button component with multiple variants, sizes, and states. Supports icons, loading states, and full accessibility.',
     category: 'ui',
     importPath: "import { Button } from '@/components/ui/modern/Button';",
     props: [
@@ -326,7 +342,7 @@ export default ReadOnlyExample;`
         required: false,
         defaultValue: 'default',
         description: 'Visual style variant of the button',
-        examples: ['default', 'destructive', 'outline', 'secondary', 'ghost', 'link']
+        examples: ['default', 'destructive', 'outline', 'secondary', 'ghost', 'link'],
       },
       {
         name: 'size',
@@ -334,7 +350,7 @@ export default ReadOnlyExample;`
         required: false,
         defaultValue: 'default',
         description: 'Size of the button',
-        examples: ['default', 'sm', 'lg', 'icon']
+        examples: ['default', 'sm', 'lg', 'icon'],
       },
       {
         name: 'disabled',
@@ -342,7 +358,7 @@ export default ReadOnlyExample;`
         required: false,
         defaultValue: false,
         description: 'Whether the button is disabled',
-        examples: [false, true]
+        examples: [false, true],
       },
       {
         name: 'loading',
@@ -350,15 +366,15 @@ export default ReadOnlyExample;`
         required: false,
         defaultValue: false,
         description: 'Show loading spinner and disable interaction',
-        examples: [false, true]
+        examples: [false, true],
       },
       {
         name: 'children',
         type: 'React.ReactNode',
         required: true,
         description: 'Button content (text, icons, etc.)',
-        examples: ['Click me', 'Save Formation', '<Icon />']
-      }
+        examples: ['Click me', 'Save Formation', '<Icon />'],
+      },
     ],
     examples: [
       {
@@ -376,7 +392,7 @@ const VariantExample = () => (
     <Button variant="link">Link</Button>
   </div>
 );`,
-        editable: true
+        editable: true,
       },
       {
         title: 'Button Sizes',
@@ -390,7 +406,7 @@ const SizeExample = () => (
     <Button size="lg">Large</Button>
   </div>
 );`,
-        editable: true
+        editable: true,
       },
       {
         title: 'Button States',
@@ -415,8 +431,8 @@ const StateExample = () => {
     </div>
   );
 };`,
-        editable: true
-      }
+        editable: true,
+      },
     ],
     relatedComponents: ['Input', 'Card', 'Dialog'],
     version: '1.0.0',
@@ -425,14 +441,14 @@ const StateExample = () => {
       keyboard: true,
       screenReader: true,
       focusManagement: true,
-      colorContrast: true
+      colorContrast: true,
     },
     performance: {
       renderingStrategy: 'Optimized with React.memo',
       memoryFootprint: 'low',
-      lazyLoadable: false
-    }
-  }
+      lazyLoadable: false,
+    },
+  },
 ];
 
 // Categories for filtering
@@ -445,7 +461,7 @@ const CATEGORIES = [
   { id: 'feedback', name: 'Feedback', icon: Activity, count: 7 },
   { id: 'overlay', name: 'Overlay', icon: Shield, count: 4 },
   { id: 'tactical', name: 'Tactical', icon: Zap, count: 10 },
-  { id: 'analytics', name: 'Analytics', icon: Users, count: 8 }
+  { id: 'analytics', name: 'Analytics', icon: Users, count: 8 },
 ];
 
 // Main Component Documentation Component
@@ -457,12 +473,13 @@ export const ComponentDocumentation: React.FC = () => {
   // Filter components based on search and category
   const filteredComponents = useMemo(() => {
     return COMPONENT_DOCS.filter(component => {
-      const matchesSearch = !searchQuery || 
+      const matchesSearch =
+        !searchQuery ||
         component.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         component.description.toLowerCase().includes(searchQuery.toLowerCase());
-      
+
       const matchesCategory = !selectedCategory || component.category === selectedCategory;
-      
+
       return matchesSearch && matchesCategory;
     });
   }, [searchQuery, selectedCategory]);
@@ -479,28 +496,26 @@ export const ComponentDocumentation: React.FC = () => {
         <div className="p-6">
           <div className="flex items-center space-x-2 mb-6">
             <BookOpen className="w-6 h-6 text-blue-600" />
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-              Component Docs
-            </h1>
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white">Component Docs</h1>
           </div>
-          
+
           {/* Search */}
           <div className="relative mb-6">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
             <Input
               placeholder="Search components..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={e => setSearchQuery(e.target.value)}
               className="pl-10"
             />
           </div>
-          
+
           {/* Categories */}
           <div className="space-y-2 mb-6">
             <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
               Categories
             </h3>
-            
+
             <button
               onClick={() => setSelectedCategory(null)}
               className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
@@ -511,8 +526,8 @@ export const ComponentDocumentation: React.FC = () => {
             >
               All Components ({COMPONENT_DOCS.length})
             </button>
-            
-            {CATEGORIES.map((category) => {
+
+            {CATEGORIES.map(category => {
               const Icon = category.icon;
               return (
                 <button
@@ -528,21 +543,19 @@ export const ComponentDocumentation: React.FC = () => {
                     <Icon className="w-4 h-4 mr-2" />
                     {category.name}
                   </div>
-                  <span className="text-sm text-gray-500">
-                    {category.count}
-                  </span>
+                  <span className="text-sm text-gray-500">{category.count}</span>
                 </button>
               );
             })}
           </div>
-          
+
           {/* Component List */}
           <div className="space-y-2">
             <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
               Components
             </h3>
-            
-            {filteredComponents.map((component) => (
+
+            {filteredComponents.map(component => (
               <button
                 key={component.name}
                 onClick={() => setSelectedComponent(component)}
@@ -572,10 +585,7 @@ export const ComponentDocumentation: React.FC = () => {
       {/* Main Content */}
       <div className="flex-1 overflow-y-auto">
         {selectedComponent ? (
-          <ComponentDetailView
-            component={selectedComponent}
-            onCopyCode={copyToClipboard}
-          />
+          <ComponentDetailView component={selectedComponent} onCopyCode={copyToClipboard} />
         ) : (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
@@ -600,10 +610,7 @@ interface ComponentDetailViewProps {
   onCopyCode: (code: string) => void;
 }
 
-const ComponentDetailView: React.FC<ComponentDetailViewProps> = ({
-  component,
-  onCopyCode
-}) => {
+const ComponentDetailView: React.FC<ComponentDetailViewProps> = ({ component, onCopyCode }) => {
   const [activeExample, setActiveExample] = useState(0);
 
   return (
@@ -615,23 +622,19 @@ const ComponentDetailView: React.FC<ComponentDetailViewProps> = ({
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
               {component.name}
             </h1>
-            <p className="text-lg text-gray-600 dark:text-gray-300">
-              {component.description}
-            </p>
+            <p className="text-lg text-gray-600 dark:text-gray-300">{component.description}</p>
           </div>
-          
+
           <div className="flex items-center space-x-2">
             <Badge variant="outline">v{component.version}</Badge>
             <Badge variant="outline">{component.category}</Badge>
           </div>
         </div>
-        
+
         {/* Import Statement */}
         <Card className="p-4 bg-gray-900 text-gray-100">
           <div className="flex items-center justify-between">
-            <code className="text-sm font-mono">
-              {component.importPath}
-            </code>
+            <code className="text-sm font-mono">{component.importPath}</code>
             <Button
               variant="ghost"
               size="sm"
@@ -672,9 +675,7 @@ const ComponentDetailView: React.FC<ComponentDetailViewProps> = ({
                   <h4 className="font-medium text-gray-900 dark:text-white mb-1">
                     {example.title}
                   </h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {example.description}
-                  </p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{example.description}</p>
                 </button>
               ))}
             </div>
@@ -729,7 +730,7 @@ const ComponentDetailView: React.FC<ComponentDetailViewProps> = ({
         {/* Props Tab */}
         <TabsContent value="props" className="space-y-4">
           <div className="space-y-4">
-            {component.props.map((prop) => (
+            {component.props.map(prop => (
               <Card key={prop.name} className="p-4">
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex items-center space-x-2">
@@ -737,7 +738,7 @@ const ComponentDetailView: React.FC<ComponentDetailViewProps> = ({
                       {prop.name}
                     </code>
                     {prop.required && (
-                      <Badge variant="destructive" className="text-xs">
+                      <Badge variant="error" className="text-xs">
                         Required
                       </Badge>
                     )}
@@ -746,11 +747,9 @@ const ComponentDetailView: React.FC<ComponentDetailViewProps> = ({
                     {prop.type}
                   </code>
                 </div>
-                
-                <p className="text-gray-700 dark:text-gray-300 mb-3">
-                  {prop.description}
-                </p>
-                
+
+                <p className="text-gray-700 dark:text-gray-300 mb-3">{prop.description}</p>
+
                 {prop.defaultValue !== undefined && (
                   <div className="mb-2">
                     <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
@@ -761,7 +760,7 @@ const ComponentDetailView: React.FC<ComponentDetailViewProps> = ({
                     </code>
                   </div>
                 )}
-                
+
                 {prop.examples && prop.examples.length > 0 && (
                   <div>
                     <span className="text-sm font-medium text-gray-600 dark:text-gray-400 block mb-2">
@@ -788,33 +787,41 @@ const ComponentDetailView: React.FC<ComponentDetailViewProps> = ({
         <TabsContent value="accessibility" className="space-y-4">
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4">Accessibility Features</h3>
-            
+
             <div className="grid grid-cols-2 gap-4">
               <div className="flex items-center space-x-3">
-                <div className={`w-3 h-3 rounded-full ${
-                  component.accessibility.keyboard ? 'bg-green-500' : 'bg-red-500'
-                }`} />
+                <div
+                  className={`w-3 h-3 rounded-full ${
+                    component.accessibility.keyboard ? 'bg-green-500' : 'bg-red-500'
+                  }`}
+                />
                 <span>Keyboard Navigation</span>
               </div>
-              
+
               <div className="flex items-center space-x-3">
-                <div className={`w-3 h-3 rounded-full ${
-                  component.accessibility.screenReader ? 'bg-green-500' : 'bg-red-500'
-                }`} />
+                <div
+                  className={`w-3 h-3 rounded-full ${
+                    component.accessibility.screenReader ? 'bg-green-500' : 'bg-red-500'
+                  }`}
+                />
                 <span>Screen Reader Support</span>
               </div>
-              
+
               <div className="flex items-center space-x-3">
-                <div className={`w-3 h-3 rounded-full ${
-                  component.accessibility.focusManagement ? 'bg-green-500' : 'bg-red-500'
-                }`} />
+                <div
+                  className={`w-3 h-3 rounded-full ${
+                    component.accessibility.focusManagement ? 'bg-green-500' : 'bg-red-500'
+                  }`}
+                />
                 <span>Focus Management</span>
               </div>
-              
+
               <div className="flex items-center space-x-3">
-                <div className={`w-3 h-3 rounded-full ${
-                  component.accessibility.colorContrast ? 'bg-green-500' : 'bg-red-500'
-                }`} />
+                <div
+                  className={`w-3 h-3 rounded-full ${
+                    component.accessibility.colorContrast ? 'bg-green-500' : 'bg-red-500'
+                  }`}
+                />
                 <span>Color Contrast Compliant</span>
               </div>
             </div>
@@ -825,7 +832,7 @@ const ComponentDetailView: React.FC<ComponentDetailViewProps> = ({
         <TabsContent value="performance" className="space-y-4">
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4">Performance Characteristics</h3>
-            
+
             <div className="space-y-4">
               <div>
                 <span className="font-medium text-gray-700 dark:text-gray-300">
@@ -835,27 +842,28 @@ const ComponentDetailView: React.FC<ComponentDetailViewProps> = ({
                   {component.performance.renderingStrategy}
                 </p>
               </div>
-              
+
               <div>
                 <span className="font-medium text-gray-700 dark:text-gray-300">
                   Memory Footprint:
                 </span>
-                <Badge 
+                <Badge
                   variant={
-                    component.performance.memoryFootprint === 'low' ? 'default' :
-                    component.performance.memoryFootprint === 'medium' ? 'secondary' : 'destructive'
+                    component.performance.memoryFootprint === 'low'
+                      ? 'default'
+                      : component.performance.memoryFootprint === 'medium'
+                        ? 'secondary'
+                        : 'error'
                   }
                   className="ml-2"
                 >
                   {component.performance.memoryFootprint}
                 </Badge>
               </div>
-              
+
               <div>
-                <span className="font-medium text-gray-700 dark:text-gray-300">
-                  Lazy Loadable:
-                </span>
-                <Badge 
+                <span className="font-medium text-gray-700 dark:text-gray-300">Lazy Loadable:</span>
+                <Badge
                   variant={component.performance.lazyLoadable ? 'default' : 'secondary'}
                   className="ml-2"
                 >
@@ -872,7 +880,7 @@ const ComponentDetailView: React.FC<ComponentDetailViewProps> = ({
         <div className="mt-8">
           <h3 className="text-lg font-semibold mb-4">Related Components</h3>
           <div className="flex flex-wrap gap-2">
-            {component.relatedComponents.map((relatedComponent) => (
+            {component.relatedComponents.map(relatedComponent => (
               <Button
                 key={relatedComponent}
                 variant="outline"

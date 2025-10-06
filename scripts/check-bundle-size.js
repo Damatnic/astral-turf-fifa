@@ -15,26 +15,26 @@ const __dirname = path.dirname(__filename);
 // Bundle size thresholds (in KB)
 const SIZE_LIMITS = {
   // Main application bundle
-  'index.js': 500,           // 500KB max
-  'index.css': 100,          // 100KB max
-  
+  'index.js': 500, // 500KB max
+  'index.css': 100, // 100KB max
+
   // Vendor/chunk limits
-  'vendor': 800,             // 800KB max for vendor chunks
-  'async-chunks': 200,       // 200KB max per async chunk
-  
+  vendor: 800, // 800KB max for vendor chunks
+  'async-chunks': 200, // 200KB max per async chunk
+
   // Total bundle size
-  'total': 2000,             // 2MB total max
-  
+  total: 2000, // 2MB total max
+
   // Asset limits
-  'images': 50,              // 50KB max per image
-  'fonts': 30                // 30KB max per font
+  images: 50, // 50KB max per image
+  fonts: 30, // 30KB max per font
 };
 
 // Performance budget alerts
 const PERFORMANCE_BUDGETS = {
-  'critical': 150,           // Critical resources: 150KB
-  'warning': 300,            // Warning threshold: 300KB
-  'error': 500               // Error threshold: 500KB
+  critical: 150, // Critical resources: 150KB
+  warning: 300, // Warning threshold: 300KB
+  error: 500, // Error threshold: 500KB
 };
 
 class BundleAnalyzer {
@@ -47,38 +47,37 @@ class BundleAnalyzer {
       totalSize: 0,
       chunkCount: 0,
       assetCount: 0,
-      compressionRatio: 0
+      compressionRatio: 0,
     };
   }
 
   async analyze() {
     console.log('🔍 Starting bundle size analysis...\n');
-    
+
     try {
       // Ensure dist directory exists
       await this.ensureDistExists();
-      
+
       // Create report directory
       await this.ensureReportDir();
-      
+
       // Analyze bundle contents
       await this.analyzeBundleContents();
-      
+
       // Generate size report
       await this.generateSizeReport();
-      
+
       // Check size limits
       await this.checkSizeLimits();
-      
+
       // Generate recommendations
       await this.generateRecommendations();
-      
+
       // Output results
       this.outputResults();
-      
+
       // Exit with appropriate code
       this.exitWithStatus();
-      
     } catch (error) {
       console.error('❌ Bundle analysis failed:', error.message);
       process.exit(1);
@@ -89,7 +88,9 @@ class BundleAnalyzer {
     try {
       await fs.access(this.distPath);
     } catch (error) {
-      throw new Error(`Distribution directory not found: ${this.distPath}. Run 'npm run build' first.`);
+      throw new Error(
+        `Distribution directory not found: ${this.distPath}. Run 'npm run build' first.`
+      );
     }
   }
 
@@ -103,21 +104,21 @@ class BundleAnalyzer {
 
   async analyzeBundleContents() {
     const files = await this.getDistFiles();
-    
+
     for (const file of files) {
       const filePath = path.join(this.distPath, file);
       const stats = await fs.stat(filePath);
-      const sizeKB = Math.round(stats.size / 1024 * 100) / 100;
-      
+      const sizeKB = Math.round((stats.size / 1024) * 100) / 100;
+
       // Update metrics
       this.metrics.totalSize += sizeKB;
-      
+
       if (file.endsWith('.js')) {
         this.metrics.chunkCount++;
       } else {
         this.metrics.assetCount++;
       }
-      
+
       // Check individual file limits
       this.checkFileSize(file, sizeKB);
     }
@@ -126,11 +127,11 @@ class BundleAnalyzer {
   async getDistFiles() {
     const getAllFiles = async (dir, fileList = []) => {
       const files = await fs.readdir(dir);
-      
+
       for (const file of files) {
         const filePath = path.join(dir, file);
         const stat = await fs.stat(filePath);
-        
+
         if (stat.isDirectory()) {
           await getAllFiles(filePath, fileList);
         } else {
@@ -138,17 +139,17 @@ class BundleAnalyzer {
           fileList.push(relativePath);
         }
       }
-      
+
       return fileList;
     };
-    
+
     return await getAllFiles(this.distPath);
   }
 
   checkFileSize(file, sizeKB) {
     const fileName = path.basename(file);
     const ext = path.extname(file);
-    
+
     // Check specific file limits
     if (SIZE_LIMITS[fileName] && sizeKB > SIZE_LIMITS[fileName]) {
       this.violations.push({
@@ -156,10 +157,10 @@ class BundleAnalyzer {
         file,
         actual: sizeKB,
         limit: SIZE_LIMITS[fileName],
-        severity: 'error'
+        severity: 'error',
       });
     }
-    
+
     // Check by file type
     if (ext === '.js' && fileName.includes('vendor') && sizeKB > SIZE_LIMITS.vendor) {
       this.violations.push({
@@ -167,20 +168,20 @@ class BundleAnalyzer {
         file,
         actual: sizeKB,
         limit: SIZE_LIMITS.vendor,
-        severity: 'error'
+        severity: 'error',
       });
     }
-    
+
     if (ext === '.js' && !fileName.includes('vendor') && sizeKB > SIZE_LIMITS['async-chunks']) {
       this.warnings.push({
         type: 'chunk_size',
         file,
         actual: sizeKB,
         limit: SIZE_LIMITS['async-chunks'],
-        severity: 'warning'
+        severity: 'warning',
       });
     }
-    
+
     // Performance budget checks
     if (sizeKB > PERFORMANCE_BUDGETS.error) {
       this.violations.push({
@@ -188,7 +189,7 @@ class BundleAnalyzer {
         file,
         actual: sizeKB,
         limit: PERFORMANCE_BUDGETS.error,
-        severity: 'error'
+        severity: 'error',
       });
     } else if (sizeKB > PERFORMANCE_BUDGETS.warning) {
       this.warnings.push({
@@ -196,7 +197,7 @@ class BundleAnalyzer {
         file,
         actual: sizeKB,
         limit: PERFORMANCE_BUDGETS.warning,
-        severity: 'warning'
+        severity: 'warning',
       });
     }
   }
@@ -209,7 +210,7 @@ class BundleAnalyzer {
         file: 'entire bundle',
         actual: this.metrics.totalSize,
         limit: SIZE_LIMITS.total,
-        severity: 'error'
+        severity: 'error',
       });
     }
   }
@@ -225,19 +226,18 @@ class BundleAnalyzer {
         totalViolations: this.violations.length,
         totalWarnings: this.warnings.length,
         passed: this.violations.length === 0,
-        grade: this.calculateGrade()
-      }
+        grade: this.calculateGrade(),
+      },
     };
-    
+
     try {
       await fs.writeFile(
         path.join(this.reportPath, 'bundle-size-report.json'),
         JSON.stringify(report, null, 2)
       );
-      
+
       // Generate human-readable report
       await this.generateHumanReport(report);
-      
     } catch (error) {
       console.warn('⚠️ Could not write bundle size report:', error.message);
     }
@@ -261,15 +261,15 @@ class BundleAnalyzer {
 
 ## Size Violations (${report.violations.length})
 
-${report.violations.map(v => 
-  `- **${v.file}**: ${v.actual} KB (limit: ${v.limit} KB) - *${v.type}*`
-).join('\n')}
+${report.violations
+  .map(v => `- **${v.file}**: ${v.actual} KB (limit: ${v.limit} KB) - *${v.type}*`)
+  .join('\n')}
 
 ## Warnings (${report.warnings.length})
 
-${report.warnings.map(w => 
-  `- **${w.file}**: ${w.actual} KB (recommended: ${w.limit} KB) - *${w.type}*`
-).join('\n')}
+${report.warnings
+  .map(w => `- **${w.file}**: ${w.actual} KB (recommended: ${w.limit} KB) - *${w.type}*`)
+  .join('\n')}
 
 ## Recommendations
 
@@ -280,10 +280,7 @@ ${this.getRecommendations().join('\n')}
 `;
 
     try {
-      await fs.writeFile(
-        path.join(this.reportPath, 'bundle-size-report.md'),
-        humanReport
-      );
+      await fs.writeFile(path.join(this.reportPath, 'bundle-size-report.md'), humanReport);
     } catch (error) {
       console.warn('⚠️ Could not write human-readable report:', error.message);
     }
@@ -293,45 +290,55 @@ ${this.getRecommendations().join('\n')}
     const violationCount = this.violations.length;
     const warningCount = this.warnings.length;
     const utilizationPct = (this.metrics.totalSize / SIZE_LIMITS.total) * 100;
-    
-    if (violationCount > 0) return 'F';
-    if (warningCount > 3 || utilizationPct > 90) return 'D';
-    if (warningCount > 1 || utilizationPct > 80) return 'C';
-    if (warningCount > 0 || utilizationPct > 70) return 'B';
+
+    if (violationCount > 0) {
+      return 'F';
+    }
+    if (warningCount > 3 || utilizationPct > 90) {
+      return 'D';
+    }
+    if (warningCount > 1 || utilizationPct > 80) {
+      return 'C';
+    }
+    if (warningCount > 0 || utilizationPct > 70) {
+      return 'B';
+    }
     return 'A';
   }
 
   getRecommendations() {
     const recommendations = [];
-    
+
     if (this.metrics.totalSize > SIZE_LIMITS.total * 0.8) {
       recommendations.push('🔍 Consider implementing code splitting to reduce bundle size');
-      recommendations.push('📦 Analyze dependencies with `npm run analyze` to identify large packages');
+      recommendations.push(
+        '📦 Analyze dependencies with `npm run analyze` to identify large packages'
+      );
     }
-    
+
     if (this.violations.some(v => v.type === 'vendor_size')) {
       recommendations.push('📚 Vendor bundle is too large - consider using dynamic imports');
       recommendations.push('🌳 Implement tree shaking to remove unused code');
     }
-    
+
     if (this.warnings.some(w => w.type === 'chunk_size')) {
       recommendations.push('✂️ Split large chunks using dynamic imports');
       recommendations.push('⚡ Implement lazy loading for non-critical components');
     }
-    
+
     if (this.metrics.chunkCount > 20) {
       recommendations.push('🎯 Consider consolidating small chunks to reduce HTTP requests');
     }
-    
+
     recommendations.push('💡 Use compression (gzip/brotli) in production');
     recommendations.push('📊 Monitor bundle size changes in CI/CD pipeline');
-    
+
     return recommendations;
   }
 
   async generateRecommendations() {
     const recommendations = this.getRecommendations();
-    
+
     try {
       await fs.writeFile(
         path.join(this.reportPath, 'optimization-recommendations.md'),
@@ -350,25 +357,25 @@ ${this.getRecommendations().join('\n')}
     console.log(`Utilization: ${((this.metrics.totalSize / SIZE_LIMITS.total) * 100).toFixed(1)}%`);
     console.log(`Grade: ${this.calculateGrade()}`);
     console.log('='.repeat(50));
-    
+
     if (this.violations.length > 0) {
       console.log('\n❌ Size Violations:');
       this.violations.forEach(v => {
         console.log(`  • ${v.file}: ${v.actual} KB (limit: ${v.limit} KB)`);
       });
     }
-    
+
     if (this.warnings.length > 0) {
       console.log('\n⚠️ Warnings:');
       this.warnings.forEach(w => {
         console.log(`  • ${w.file}: ${w.actual} KB (recommended: ${w.limit} KB)`);
       });
     }
-    
+
     if (this.violations.length === 0 && this.warnings.length === 0) {
       console.log('\n✅ All bundle size checks passed!');
     }
-    
+
     console.log(`\n📁 Detailed reports saved to: ${this.reportPath}`);
   }
 

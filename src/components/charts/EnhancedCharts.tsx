@@ -33,11 +33,11 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  Filler,
+  Filler
 );
 
 // Chart animation variants
-const chartVariants = {
+const chartVariants: import('framer-motion').Variants = {
   hidden: { opacity: 0, scale: 0.8 },
   visible: {
     opacity: 1,
@@ -82,7 +82,7 @@ export const EnhancedLineChart: React.FC<EnhancedLineChartProps> = ({
   subtitle,
   height = 300,
   loading = false,
-  _error,
+  error,
   className = '',
   animated = true,
   showPoints = true,
@@ -100,7 +100,7 @@ export const EnhancedLineChart: React.FC<EnhancedLineChartProps> = ({
       0,
       `${color}${Math.round(alpha * 255)
         .toString(16)
-        .padStart(2, '0')}`,
+        .padStart(2, '0')}`
     );
     gradient.addColorStop(1, `${color}00`);
     return gradient;
@@ -131,7 +131,7 @@ export const EnhancedLineChart: React.FC<EnhancedLineChartProps> = ({
         pointBorderWidth: 2,
         fill: dataset.fill || dataset.gradient || false,
         tension: smooth ? 0.4 : 0,
-        cubicInterpolationMode: smooth ? 'monotone' : 'default',
+        cubicInterpolationMode: (smooth ? 'monotone' : 'default') as 'monotone' | 'default',
       };
     }),
   };
@@ -259,7 +259,7 @@ export const EnhancedLineChart: React.FC<EnhancedLineChartProps> = ({
       )}
 
       <motion.div variants={chartVariants} initial="hidden" animate="visible" style={{ height }}>
-        <Line ref={chartRef} data={chartData} options={options} />
+        <Line ref={chartRef as any} data={chartData} options={options} />
       </motion.div>
     </AnimatedContainer>
   );
@@ -286,7 +286,7 @@ export const EnhancedBarChart: React.FC<EnhancedBarChartProps> = ({
   subtitle,
   height = 300,
   loading = false,
-  _error,
+  error,
   className = '',
   animated = true,
   horizontal = false,
@@ -416,7 +416,7 @@ export const EnhancedBarChart: React.FC<EnhancedBarChartProps> = ({
       )}
 
       <motion.div variants={chartVariants} initial="hidden" animate="visible" style={{ height }}>
-        <Bar ref={chartRef} data={chartData} options={options} />
+        <Bar ref={chartRef as any} data={chartData} options={options} />
       </motion.div>
     </AnimatedContainer>
   );
@@ -439,7 +439,7 @@ export const EnhancedDoughnutChart: React.FC<EnhancedDoughnutChartProps> = ({
   subtitle,
   height = 300,
   loading = false,
-  _error,
+  error,
   className = '',
   animated = true,
   showPercentage = true,
@@ -454,8 +454,8 @@ export const EnhancedDoughnutChart: React.FC<EnhancedDoughnutChartProps> = ({
     theme.colors.status.success,
     theme.colors.status.warning,
     theme.colors.status.error,
-    theme.colors.secondary[400],
-    theme.colors.secondary[600],
+    theme.colors.accent.primary,
+    theme.colors.accent.secondary,
   ];
 
   const chartData = {
@@ -561,7 +561,7 @@ export const EnhancedDoughnutChart: React.FC<EnhancedDoughnutChartProps> = ({
       )}
 
       <motion.div variants={chartVariants} initial="hidden" animate="visible" style={{ height }}>
-        <Doughnut ref={chartRef} data={chartData} options={options} />
+        <Doughnut ref={chartRef as any} data={chartData} options={options} />
       </motion.div>
     </AnimatedContainer>
   );
@@ -587,7 +587,7 @@ export const EnhancedRadarChart: React.FC<EnhancedRadarChartProps> = ({
   subtitle,
   height = 300,
   loading = false,
-  _error,
+  error,
   className = '',
   animated = true,
   scale,
@@ -668,9 +668,6 @@ export const EnhancedRadarChart: React.FC<EnhancedRadarChartProps> = ({
         },
         ticks: {
           color: theme.colors.text.tertiary,
-          backdrop: {
-            color: 'transparent',
-          },
           font: {
             family: tokens.typography.fontFamilies.sans.join(', '),
             size: 10,
@@ -711,7 +708,7 @@ export const EnhancedRadarChart: React.FC<EnhancedRadarChartProps> = ({
       )}
 
       <motion.div variants={chartVariants} initial="hidden" animate="visible" style={{ height }}>
-        <Radar ref={chartRef} data={chartData} options={options} />
+        <Radar ref={chartRef as any} data={chartData} options={options} />
       </motion.div>
     </AnimatedContainer>
   );

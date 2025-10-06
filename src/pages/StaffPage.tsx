@@ -61,7 +61,7 @@ const StaffPage: React.FC = () => {
   };
 
   const handleHireStaff = (staffMember: unknown, type: keyof typeof availableStaff) => {
-    const staffCost = staffMember.cost;
+    const staffCost = (staffMember as any).cost;
     if (finances.transferBudget >= staffCost) {
       const staffType =
         type === 'coaches'
@@ -86,7 +86,7 @@ const StaffPage: React.FC = () => {
       uiDispatch({
         type: 'ADD_NOTIFICATION',
         payload: {
-          message: `Successfully hired ${staffMember.name} as ${staffType}!`,
+          message: `Successfully hired ${(staffMember as any).name} as ${staffType}!`,
           type: 'success',
         },
       });
@@ -94,7 +94,7 @@ const StaffPage: React.FC = () => {
       uiDispatch({
         type: 'ADD_NOTIFICATION',
         payload: {
-          message: `Insufficient budget to hire ${staffMember.name}`,
+          message: `Insufficient budget to hire ${(staffMember as any).name}`,
           type: 'error',
         },
       });
@@ -130,9 +130,9 @@ const StaffPage: React.FC = () => {
         <div>
           <div className="flex justify-between items-start mb-3">
             <div>
-              <h4 className="text-white font-medium">{staffMember.name}</h4>
+              <h4 className="text-white font-medium">{(staffMember as any).name}</h4>
               <p className="text-sm text-gray-400">
-                Weekly Cost: ${staffMember.cost.toLocaleString()}
+                Weekly Cost: ${(staffMember as any).cost.toLocaleString()}
               </p>
             </div>
           </div>

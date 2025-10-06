@@ -26,11 +26,14 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const [hasInitialized, setHasInitialized] = useState(false);
 
   // Memoize auth state values to prevent unnecessary re-renders
-  const { isAuthenticated, user, familyAssociations } = useMemo(() => ({
-    isAuthenticated: authState.isAuthenticated,
-    user: authState.user,
-    familyAssociations: authState.familyAssociations || []
-  }), [authState.isAuthenticated, authState.user, authState.familyAssociations]);
+  const { isAuthenticated, user, familyAssociations } = useMemo(
+    () => ({
+      isAuthenticated: authState.isAuthenticated,
+      user: authState.user,
+      familyAssociations: authState.familyAssociations || [],
+    }),
+    [authState.isAuthenticated, authState.user, authState.familyAssociations]
+  );
 
   // Allow auth context to initialize - only run once
   useEffect(() => {
@@ -41,6 +44,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [hasInitialized]);
 
   // Show loading state during initialization to prevent redirect loops
@@ -66,7 +70,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const { canAccess, fallbackPath: configFallback } = canAccessRoute(
     location.pathname,
     user.role,
-    requiredPermissions || [],
+    requiredPermissions || []
   );
 
   if (!canAccess) {
@@ -84,9 +88,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     }
 
     // Check if any associations are approved by coach
-    const hasApprovedAssociation = familyAssociations.some(
-      assoc => assoc.approvedByCoach,
-    );
+    const hasApprovedAssociation = familyAssociations.some(assoc => assoc.approvedByCoach);
 
     if (!hasApprovedAssociation && location.pathname !== '/pending-approval') {
       return <Navigate to="/pending-approval" replace />;
@@ -111,7 +113,10 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   // Render children if provided, otherwise render Outlet for nested routes
-  return children ? children : <Outlet />;
+  if (children) {
+    return children;
+  }
+  return <Outlet />;
 };
 
 export default ProtectedRoute;

@@ -67,7 +67,7 @@ interface UIContextType {
   toggleRosterRoleFilter: (role: PositionRole) => void;
   setAdvancedRosterFilters: (filters: Partial<AdvancedRosterFilters>) => void;
   clearRosterFilters: () => void;
-  setTransferMarketFilter: (filter: keyof TransferMarketFilters, value: unknown) => void;
+  setTransferMarketFilter: (filter: keyof TransferMarketFilters, value: any) => void;
 
   // AI settings
   setAIPersonality: (personality: AIPersonality) => void;
@@ -108,12 +108,17 @@ const UIEnhancedContext = createContext<UIContextType | undefined>(undefined);
 
 interface UIProviderProps {
   children: ReactNode;
+  initialState?: Partial<UIState>;
 }
 
-export const UIProvider: React.FC<UIProviderProps> = ({ children }) => {
-  const [uiState, dispatch] = useReducer(uiReducer, INITIAL_STATE.ui);
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
+export const UIProvider: React.FC<UIProviderProps> = ({ children, initialState }) => {
+  const [uiState, dispatch] = useReducer(
+    uiReducer as unknown as React.Reducer<UIState, Action>,
+    INITIAL_STATE.ui,
+    baseState => ({ ...baseState, ...initialState })
+  );
+  const isLoading = false;
+  const error: string | null = null;
 
   // Modal management
   const openModal = useCallback((modal: ModalType) => {
@@ -140,7 +145,7 @@ export const UIProvider: React.FC<UIProviderProps> = ({ children }) => {
 
   const setTheme = useCallback((theme: AppTheme) => {
     // This would require a new action type or handle in existing reducer
-    dispatch({ type: 'SET_THEME', payload: theme } as any);
+    dispatch({ type: 'SET_THEME', payload: theme } as unknown as Action);
   }, []);
 
   // Drawing management
@@ -206,7 +211,7 @@ export const UIProvider: React.FC<UIProviderProps> = ({ children }) => {
   }, []);
 
   const setAdvancedRosterFilters = useCallback((filters: Partial<AdvancedRosterFilters>) => {
-    dispatch({ type: 'SET_ADVANCED_ROSTER_FILTERS', payload: filters });
+    dispatch({ type: 'SET_ADVANCED_ROSTER_FILTERS', payload: filters } as any);
   }, []);
 
   const clearRosterFilters = useCallback(() => {
@@ -215,9 +220,9 @@ export const UIProvider: React.FC<UIProviderProps> = ({ children }) => {
 
   const setTransferMarketFilter = useCallback(
     (filter: keyof TransferMarketFilters, value: unknown) => {
-      dispatch({ type: 'SET_TRANSFER_MARKET_FILTER', payload: { filter, value } });
+      dispatch({ type: 'SET_TRANSFER_MARKET_FILTER', payload: { filter, value } } as any);
     },
-    [],
+    []
   );
 
   // AI settings

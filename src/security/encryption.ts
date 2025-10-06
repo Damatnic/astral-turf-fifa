@@ -6,8 +6,9 @@
  */
 
 import CryptoJS from 'crypto-js';
-import { DATA_PROTECTION_CONFIG } from './config';
-import { securityLogger } from './logging';
+import { securityLogger, SecurityEventType } from './logging';
+import type { SecurityEventContext } from './logging';
+import { bytesToBase64, bytesToHex, getSecureRandomBytes, randomHex } from './runtime';
 
 // Encryption algorithm configuration
 export enum EncryptionAlgorithm {
@@ -43,11 +44,22 @@ export interface DerivedKey {
 }
 
 // Encryption context for audit logging
-export interface EncryptionContext {
-  userId?: string;
+export interface EncryptionContext
+  extends Pick<
+    SecurityEventContext,
+    'userId' | 'sessionId' | 'ipAddress' | 'userAgent' | 'resource' | 'action'
+  > {
   operation: 'encrypt' | 'decrypt';
   dataType: string;
   classification: DataClassification;
+}
+
+function createWordArray(bytes: Uint8Array): CryptoJS.lib.WordArray {
+  return CryptoJS.lib.WordArray.create(bytes as any, bytes.length);
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
 }
 
 /**
@@ -60,11 +72,8 @@ const MASTER_KEY =
 
 // Generate a secure random key
 export function generateKey(length = 32): string {
-  const array = new Uint8Array(length);
-  if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
-    crypto.getRandomValues(array);
-  }
-  return btoa(String.fromCharCode(...array));
+  const randomBytes = getSecureRandomBytes(length);
+  return bytesToBase64(randomBytes);
 }
 
 // Derive key from master key and salt using PBKDF2
@@ -101,7 +110,7 @@ export function encryptData(
   data: string,
   classification: DataClassification = DataClassification.INTERNAL,
   algorithm: EncryptionAlgorithm = EncryptionAlgorithm.AES_256_GCM,
-  context?: EncryptionContext,
+  context?: EncryptionContext
 ): EncryptedData {
   try {
     if (!data) {
@@ -109,14 +118,15 @@ export function encryptData(
     }
 
     const key = getEncryptionKey(classification);
-    const { key: derivedKey, salt } = deriveKey(key);
+    const { key: derivedKey } = deriveKey(key);
 
-    // Generate random IV
-    const iv = CryptoJS.lib.WordArray.random(16);
+    // Generate random IV using shared runtime helpers
+    const ivBytes = getSecureRandomBytes(16);
+    const iv = createWordArray(ivBytes);
 
     // Encrypt data using AES-256-CBC (CryptoJS doesn't support GCM directly)
     const encrypted = CryptoJS.AES.encrypt(data, derivedKey, {
-      iv: iv,
+      iv,
       mode: CryptoJS.mode.CBC,
       padding: CryptoJS.pad.Pkcs7,
     });
@@ -126,7 +136,7 @@ export function encryptData(
 
     const encryptedData: EncryptedData = {
       data: encrypted.toString(),
-      iv: iv.toString(CryptoJS.enc.Base64),
+      iv: bytesToBase64(ivBytes),
       algorithm,
       classification,
       timestamp: new Date().toISOString(),
@@ -136,8 +146,13 @@ export function encryptData(
 
     // Log encryption operation
     if (context) {
-      securityLogger.logSecurityEvent('DATA_MODIFICATION' as any, 'Data encrypted', {
+      const auditContext: SecurityEventContext = {
         userId: context.userId,
+        sessionId: context.sessionId,
+        ipAddress: context.ipAddress,
+        userAgent: context.userAgent,
+        resource: context.resource,
+        action: context.action,
         metadata: {
           operation: context.operation,
           dataType: context.dataType,
@@ -145,11 +160,17 @@ export function encryptData(
           algorithm,
           dataLength: data.length,
         },
-      });
+      };
+
+      securityLogger.logSecurityEvent(
+        SecurityEventType.DATA_MODIFICATION,
+        'Data encrypted',
+        auditContext
+      );
     }
 
     return encryptedData;
-  } catch (_error) {
+  } catch (error) {
     securityLogger.error('Data encryption failed', {
       error: error instanceof Error ? error.message : 'Unknown error',
       classification,
@@ -172,7 +193,7 @@ export function decryptData(encryptedData: EncryptedData, context?: EncryptionCo
 
     // Decrypt data
     const decrypted = CryptoJS.AES.decrypt(encryptedData.data, derivedKey, {
-      iv: iv,
+      iv,
       mode: CryptoJS.mode.CBC,
       padding: CryptoJS.pad.Pkcs7,
     });
@@ -193,8 +214,13 @@ export function decryptData(encryptedData: EncryptedData, context?: EncryptionCo
 
     // Log decryption operation
     if (context) {
-      securityLogger.logSecurityEvent('DATA_ACCESS' as any, 'Data decrypted', {
+      const auditContext: SecurityEventContext = {
         userId: context.userId,
+        sessionId: context.sessionId,
+        ipAddress: context.ipAddress,
+        userAgent: context.userAgent,
+        resource: context.resource,
+        action: context.action,
         metadata: {
           operation: context.operation,
           dataType: context.dataType,
@@ -202,11 +228,17 @@ export function decryptData(encryptedData: EncryptedData, context?: EncryptionCo
           algorithm: encryptedData.algorithm,
           timestamp: encryptedData.timestamp,
         },
-      });
+      };
+
+      securityLogger.logSecurityEvent(
+        SecurityEventType.DATA_ACCESS,
+        'Data decrypted',
+        auditContext
+      );
     }
 
     return decryptedText;
-  } catch (_error) {
+  } catch (error) {
     securityLogger.error('Data decryption failed', {
       error: error instanceof Error ? error.message : 'Unknown error',
       classification: encryptedData.classification,
@@ -235,7 +267,7 @@ export function encryptPersonalInfo(personalInfo: unknown, userId?: string): Enc
     JSON.stringify(personalInfo),
     DataClassification.CONFIDENTIAL,
     EncryptionAlgorithm.AES_256_GCM,
-    context,
+    context
   );
 }
 
@@ -265,7 +297,7 @@ export function encryptMedicalData(medicalData: unknown, userId?: string): Encry
     JSON.stringify(medicalData),
     DataClassification.RESTRICTED,
     EncryptionAlgorithm.AES_256_GCM,
-    context,
+    context
   );
 }
 
@@ -295,7 +327,7 @@ export function encryptFinancialData(financialData: unknown, userId?: string): E
     JSON.stringify(financialData),
     DataClassification.CONFIDENTIAL,
     EncryptionAlgorithm.AES_256_GCM,
-    context,
+    context
   );
 }
 
@@ -366,18 +398,21 @@ export function maskSensitiveData(data: string, maskChar = '*', visibleChars = 4
 
 // Anonymize personal identifiers
 export function anonymizeData(data: unknown): unknown {
-  if (!data || typeof data !== 'object') {
+  if (!isRecord(data)) {
     return data;
   }
 
   const sensitiveFields = ['email', 'phone', 'ssn', 'creditCard', 'address', 'name'];
-  const anonymized = { ...data };
+  const anonymized: Record<string, unknown> = { ...data };
 
   sensitiveFields.forEach(field => {
-    if (anonymized[field]) {
-      if (typeof anonymized[field] === 'string') {
-        anonymized[field] = maskSensitiveData(anonymized[field]);
-      }
+    if (!Object.prototype.hasOwnProperty.call(anonymized, field)) {
+      return;
+    }
+
+    const value = anonymized[field];
+    if (typeof value === 'string') {
+      anonymized[field] = maskSensitiveData(value);
     }
   });
 
@@ -390,11 +425,7 @@ export function anonymizeData(data: unknown): unknown {
 
 // Generate cryptographically secure random string
 export function generateSecureRandom(length = 32): string {
-  const array = new Uint8Array(length);
-  if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
-    crypto.getRandomValues(array);
-  }
-  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+  return randomHex(length);
 }
 
 // Generate secure token for sessions, reset codes, etc.
@@ -404,11 +435,11 @@ export function generateSecureToken(length = 32): string {
 
 // Generate UUID v4
 export function generateUUID(): string {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    const r = (Math.random() * 16) | 0;
-    const v = c == 'x' ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
+  const bytes = getSecureRandomBytes(16);
+  bytes[6] = (bytes[6] & 0x0f) | 0x40;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  const hex = bytesToHex(bytes);
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
 }
 
 /**
@@ -469,20 +500,25 @@ export function secureDeepCopy(obj: unknown, userId?: string): unknown {
     return obj.map(item => secureDeepCopy(item, userId));
   }
 
-  const copy: unknown = {};
-  Object.keys(obj).forEach(key => {
-    const classification = requiresEncryption(obj[key], key);
+  if (!isRecord(obj)) {
+    return obj;
+  }
+
+  const copy: Record<string, unknown> = {};
+
+  Object.entries(obj).forEach(([key, value]) => {
+    const classification = requiresEncryption(value, key);
 
     if (classification && classification !== DataClassification.PUBLIC) {
-      // Encrypt sensitive data
-      copy[key] = encryptData(
-        typeof obj[key] === 'string' ? obj[key] : JSON.stringify(obj[key]),
+      const serialized = typeof value === 'string' ? value : JSON.stringify(value);
+      copy[key] = encryptData(serialized, classification, EncryptionAlgorithm.AES_256_GCM, {
+        userId,
+        operation: 'encrypt',
+        dataType: key,
         classification,
-        EncryptionAlgorithm.AES_256_GCM,
-        { userId, operation: 'encrypt', dataType: key, classification },
-      );
+      });
     } else {
-      copy[key] = secureDeepCopy(obj[key], userId);
+      copy[key] = secureDeepCopy(value, userId);
     }
   });
 

@@ -22,12 +22,12 @@ const Modern3DFormationStrengthOverlay: React.FC<{ formation: Formation; team: T
           slot =>
             slot?.position &&
             typeof slot.position.x === 'number' &&
-            typeof slot.position.y === 'number',
+            typeof slot.position.y === 'number'
         )
         .map(slot => ({
           id: slot.id,
-          x: slot.position.x,
-          y: slot.position.y,
+          x: slot.position?.x ?? 0,
+          y: slot.position?.y ?? 0,
           strength: slot.playerId ? 85 : 30,
           color: team === 'home' ? 'rgb(59, 130, 246)' : 'rgb(239, 68, 68)',
           glowColor: team === 'home' ? 'rgba(59, 130, 246, 0.4)' : 'rgba(239, 68, 68, 0.4)',
@@ -70,7 +70,7 @@ const Modern3DFormationStrengthOverlay: React.FC<{ formation: Formation; team: T
         ))}
       </div>
     );
-  },
+  }
 );
 
 // Enhanced 3D Formation Slot with modern styling
@@ -191,7 +191,7 @@ const Modern3DFormationSlot: React.FC<{
         </div>
       </div>
     );
-  },
+  }
 );
 
 const Modern3DSoccerField: React.FC<Modern3DSoccerFieldProps> = ({ className = '' }) => {
@@ -256,10 +256,12 @@ const Modern3DSoccerField: React.FC<Modern3DSoccerFieldProps> = ({ className = '
       <div className="flex items-center justify-center h-full bg-gradient-to-br from-red-900/20 to-red-800/20 border border-red-500/30 rounded-xl backdrop-blur-sm">
         <div className="text-center text-red-400 p-8">
           <div className="text-2xl font-bold mb-4">⚠️ Formation Configuration Required</div>
-          <div className="text-lg mb-4">Please select valid formations to begin tactical planning</div>
+          <div className="text-lg mb-4">
+            Please select valid formations to begin tactical planning
+          </div>
           <div className="text-sm bg-red-900/30 px-4 py-2 rounded-lg border border-red-500/30">
-            Home Formation: {homeFormation ? '✅ Ready' : '❌ Missing'} | 
-            Away Formation: {awayFormation ? '✅ Ready' : '❌ Missing'}
+            Home Formation: {homeFormation ? '✅ Ready' : '❌ Missing'} | Away Formation:{' '}
+            {awayFormation ? '✅ Ready' : '❌ Missing'}
           </div>
         </div>
       </div>
@@ -314,7 +316,7 @@ const Modern3DSoccerField: React.FC<Modern3DSoccerFieldProps> = ({ className = '
         console.error('Failed to update player position:', error);
       }
     },
-    [dispatch, drawingTool, positioningMode, players],
+    [dispatch, drawingTool, positioningMode, players]
   );
 
   // Enhanced slot drop handler
@@ -348,7 +350,7 @@ const Modern3DSoccerField: React.FC<Modern3DSoccerFieldProps> = ({ className = '
         if (slot.playerId && slot.playerId !== playerId) {
           dispatch({
             type: 'SWAP_PLAYERS',
-            payload: { playerId1: playerId, playerId2: slot.playerId },
+            payload: { sourcePlayerId: playerId, targetPlayerId: slot.playerId },
           });
         } else {
           dispatch({ type: 'ASSIGN_PLAYER_TO_SLOT', payload: { slotId: slot.id, playerId, team } });
@@ -357,7 +359,7 @@ const Modern3DSoccerField: React.FC<Modern3DSoccerFieldProps> = ({ className = '
         console.error('Failed to handle slot drop:', error);
       }
     },
-    [dispatch, players],
+    [dispatch, players]
   );
 
   const handleSlotDragOver = useCallback((e: React.DragEvent<HTMLDivElement>, slotId: string) => {
@@ -426,12 +428,12 @@ const Modern3DSoccerField: React.FC<Modern3DSoccerFieldProps> = ({ className = '
       handleSlotDrop,
       handleSlotDragOver,
       handleSlotDragLeave,
-    ],
+    ]
   );
 
   // Enhanced chemistry links with modern styling
   const chemistryLinks = useMemo(() => {
-    if (!chemistry || activeTeamContext === 'none' || !homeFormation || !awayFormation) {
+    if (!chemistry || !homeFormation || !awayFormation) {
       return [];
     }
 
@@ -462,7 +464,7 @@ const Modern3DSoccerField: React.FC<Modern3DSoccerFieldProps> = ({ className = '
               slot1.playerId &&
               slot1.position &&
               typeof slot1.position.x === 'number' &&
-              typeof slot1.position.y === 'number',
+              typeof slot1.position.y === 'number'
           )
           .forEach(slot1 => {
             formation.slots
@@ -473,20 +475,23 @@ const Modern3DSoccerField: React.FC<Modern3DSoccerFieldProps> = ({ className = '
                   slot2.position &&
                   typeof slot2.position.x === 'number' &&
                   typeof slot2.position.y === 'number' &&
-                  slot1.id !== slot2.id,
+                  slot1.id !== slot2.id
               )
               .forEach(slot2 => {
                 const chemistryScore = chemistry[slot1.playerId!]?.[slot2.playerId!] || 0;
                 if (
                   chemistryScore > 60 &&
+                  slot1.position &&
+                  slot2.position &&
                   !isNaN(slot1.position.x) &&
                   !isNaN(slot1.position.y) &&
                   !isNaN(slot2.position.x) &&
                   !isNaN(slot2.position.y)
                 ) {
                   const color = chemistryScore > 80 ? '#10b981' : '#f59e0b';
-                  const glowColor = chemistryScore > 80 ? 'rgba(16, 185, 129, 0.6)' : 'rgba(245, 158, 11, 0.6)';
-                  
+                  const glowColor =
+                    chemistryScore > 80 ? 'rgba(16, 185, 129, 0.6)' : 'rgba(245, 158, 11, 0.6)';
+
                   links.push({
                     x1: slot1.position.x,
                     y1: slot1.position.y,
@@ -578,16 +583,16 @@ const Modern3DSoccerField: React.FC<Modern3DSoccerFieldProps> = ({ className = '
             <stop offset="50%" stopColor="rgba(255,255,255,0.9)" />
             <stop offset="100%" stopColor="rgba(255,255,255,0.6)" />
           </linearGradient>
-          
+
           <filter id="fieldLineShadow">
             <feDropShadow dx="0" dy="2" stdDeviation="1" floodColor="rgba(0,0,0,0.3)" />
           </filter>
-          
+
           <filter id="fieldLineGlow">
-            <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+            <feGaussianBlur stdDeviation="1" result="coloredBlur" />
             <feMerge>
-              <feMergeNode in="coloredBlur"/>
-              <feMergeNode in="SourceGraphic"/>
+              <feMergeNode in="coloredBlur" />
+              <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
         </defs>
@@ -759,7 +764,7 @@ const Modern3DSoccerField: React.FC<Modern3DSoccerFieldProps> = ({ className = '
                       typeof p.x === 'number' &&
                       typeof p.y === 'number' &&
                       !isNaN(p.x) &&
-                      !isNaN(p.y),
+                      !isNaN(p.y)
                   )
                   .map(p => `${p.x},${p.y}`)
                   .join(' ')}
@@ -778,7 +783,7 @@ const Modern3DSoccerField: React.FC<Modern3DSoccerFieldProps> = ({ className = '
                       typeof p.x === 'number' &&
                       typeof p.y === 'number' &&
                       !isNaN(p.x) &&
-                      !isNaN(p.y),
+                      !isNaN(p.y)
                   )
                   .map(p => `${p.x},${p.y}`)
                   .join(' ')}
@@ -834,10 +839,12 @@ const Modern3DSoccerField: React.FC<Modern3DSoccerFieldProps> = ({ className = '
       {(!homeFormation || !awayFormation) && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="text-center p-8">
-            <div className="text-white text-2xl mb-4 font-bold">Loading Tactical Environment...</div>
+            <div className="text-white text-2xl mb-4 font-bold">
+              Loading Tactical Environment...
+            </div>
             <div className="text-gray-300 text-lg">
-              Home Formation: {homeFormation ? '✅ Ready' : '⏳ Loading...'} | 
-              Away Formation: {awayFormation ? '✅ Ready' : '⏳ Loading...'}
+              Home Formation: {homeFormation ? '✅ Ready' : '⏳ Loading...'} | Away Formation:{' '}
+              {awayFormation ? '✅ Ready' : '⏳ Loading...'}
             </div>
             <div className="mt-4">
               <div className="w-64 h-2 bg-gray-700 rounded-full overflow-hidden">

@@ -6,8 +6,16 @@ import { ThemeProvider } from '../../context/ThemeContext';
 import { TacticsProvider } from '../../context/TacticsContext';
 import { UIProvider } from '../../context/UIContext';
 import { AuthProvider } from '../../context/AuthContext';
-import { type Player, type Formation, type TacticsState, type UIState } from '../../types';
-import { initializeSampleData } from '../../utils/sampleTacticsData';
+import {
+  type Player,
+  type Formation,
+  type FormationSlot,
+  type TacticsState,
+  type UIState,
+  type AuthState,
+  type PositionRole,
+} from '../../types';
+import { INITIAL_STATE } from '../../constants';
 
 /**
  * Comprehensive test wrapper providing all necessary contexts for testing
@@ -16,7 +24,7 @@ interface TestProvidersProps {
   children: React.ReactNode;
   initialTacticsState?: Partial<TacticsState>;
   initialUIState?: Partial<UIState>;
-  initialAuthState?: any;
+  initialAuthState?: Partial<AuthState>;
   router?: boolean;
 }
 
@@ -32,9 +40,7 @@ export const TestProviders: React.FC<TestProvidersProps> = ({
       <ThemeProvider>
         <TacticsProvider initialState={initialTacticsState}>
           <UIProvider initialState={initialUIState}>
-            <AppProvider>
-              {children}
-            </AppProvider>
+            <AppProvider>{children}</AppProvider>
           </UIProvider>
         </TacticsProvider>
       </ThemeProvider>
@@ -54,14 +60,11 @@ export const TestProviders: React.FC<TestProvidersProps> = ({
 interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
   initialTacticsState?: Partial<TacticsState>;
   initialUIState?: Partial<UIState>;
-  initialAuthState?: any;
+  initialAuthState?: Partial<AuthState>;
   router?: boolean;
 }
 
-export function renderWithProviders(
-  ui: ReactElement,
-  options: CustomRenderOptions = {}
-) {
+export function renderWithProviders(ui: ReactElement, options: CustomRenderOptions = {}) {
   const {
     initialTacticsState,
     initialUIState,
@@ -84,6 +87,174 @@ export function renderWithProviders(
   return render(ui, { wrapper: Wrapper, ...renderOptions });
 }
 
+const deepClone = <T,>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
+
+const createBasePlayer = (overrides: Partial<Player> = {}): Player => {
+  const base: Player = {
+    id: 'player-1',
+    name: 'Test Player',
+    jerseyNumber: 10,
+    age: 25,
+    nationality: 'Testland',
+    potential: [80, 92],
+    currentPotential: 85,
+    roleId: 'central-midfielder',
+    instructions: {},
+    team: 'home',
+    teamColor: '#1f2937',
+    attributes: {
+      speed: 78,
+      passing: 82,
+      tackling: 70,
+      shooting: 74,
+      dribbling: 80,
+      positioning: 77,
+      stamina: 88,
+    },
+    position: { x: 50, y: 50 },
+    availability: { status: 'Available' },
+    morale: 'Good',
+    form: 'Good',
+    stamina: 88,
+    developmentLog: [],
+    contract: { clauses: [] },
+    stats: {
+      goals: 0,
+      assists: 0,
+      matchesPlayed: 0,
+      shotsOnTarget: 0,
+      tacklesWon: 0,
+      saves: 0,
+      passesCompleted: 0,
+      passesAttempted: 0,
+      careerHistory: [],
+    },
+    loan: { isLoaned: false },
+    traits: [],
+    individualTrainingFocus: null,
+    conversationHistory: [],
+    attributeHistory: [],
+    attributeDevelopmentProgress: {},
+    communicationLog: [],
+    customTrainingSchedule: null,
+    fatigue: 0,
+    injuryRisk: 10,
+    lastConversationInitiatedWeek: 0,
+    moraleBoost: null,
+    completedChallenges: [],
+  };
+
+  const player: Player = {
+    ...base,
+    ...overrides,
+  };
+
+  player.attributes = { ...base.attributes, ...(overrides.attributes ?? {}) };
+  player.availability = { ...base.availability, ...(overrides.availability ?? {}) };
+  player.stats = {
+    ...base.stats,
+    ...(overrides.stats ?? {}),
+    careerHistory: overrides.stats?.careerHistory ?? base.stats.careerHistory,
+  };
+  player.contract = {
+    ...base.contract,
+    ...(overrides.contract ?? {}),
+    clauses: overrides.contract?.clauses ?? base.contract.clauses,
+  };
+  player.loan = { ...base.loan, ...(overrides.loan ?? {}) };
+  player.traits = overrides.traits ?? base.traits;
+  player.developmentLog = overrides.developmentLog ?? base.developmentLog;
+  player.conversationHistory = overrides.conversationHistory ?? base.conversationHistory;
+  player.attributeHistory = overrides.attributeHistory ?? base.attributeHistory;
+  player.attributeDevelopmentProgress =
+    overrides.attributeDevelopmentProgress ?? base.attributeDevelopmentProgress;
+  player.communicationLog = overrides.communicationLog ?? base.communicationLog;
+  player.customTrainingSchedule = overrides.customTrainingSchedule ?? base.customTrainingSchedule;
+  player.moraleBoost = overrides.moraleBoost ?? base.moraleBoost;
+  player.completedChallenges = overrides.completedChallenges ?? base.completedChallenges;
+  player.individualTrainingFocus =
+    overrides.individualTrainingFocus ?? base.individualTrainingFocus;
+
+  return player;
+};
+
+const createFormationSlot = (
+  id: string,
+  role: PositionRole,
+  defaultPosition: { x: number; y: number },
+  playerId: string | null,
+  preferredRoles?: string[]
+): FormationSlot => ({
+  id,
+  role,
+  defaultPosition,
+  playerId,
+  ...(preferredRoles && preferredRoles.length ? { preferredRoles } : {}),
+});
+
+const buildTacticsState = (players: Player[], formation: Formation): TacticsState => ({
+  players,
+  formations: { [formation.id]: formation },
+  playbook: {},
+  activeFormationIds: { home: formation.id, away: formation.id },
+  teamTactics: {
+    home: {
+      mentality: 'balanced',
+      pressing: 'medium',
+      defensiveLine: 'medium',
+      attackingWidth: 'medium',
+    },
+    away: {
+      mentality: 'balanced',
+      pressing: 'medium',
+      defensiveLine: 'medium',
+      attackingWidth: 'medium',
+    },
+  },
+  drawings: [],
+  tacticalFamiliarity: { [formation.id]: 70 },
+  chemistry: {},
+  captainIds: { home: players[0]?.id ?? null, away: null },
+  setPieceTakers: { home: {}, away: {} },
+});
+
+const buildUIState = (overrides: Partial<UIState> = {}): UIState => {
+  const base = deepClone(INITIAL_STATE.ui);
+
+  return {
+    ...base,
+    ...overrides,
+    tutorial: {
+      ...base.tutorial,
+      ...(overrides.tutorial ?? {}),
+    },
+    setPieceEditor: {
+      ...base.setPieceEditor,
+      ...(overrides.setPieceEditor ?? {}),
+    },
+    teamKits: {
+      home: { ...base.teamKits.home, ...(overrides.teamKits?.home ?? {}) },
+      away: { ...base.teamKits.away, ...(overrides.teamKits?.away ?? {}) },
+    },
+    transferMarketFilters: {
+      ...base.transferMarketFilters,
+      ...(overrides.transferMarketFilters ?? {}),
+    },
+    advancedRosterFilters: {
+      ...base.advancedRosterFilters,
+      ...(overrides.advancedRosterFilters ?? {}),
+    },
+    playbookCategories: {
+      ...base.playbookCategories,
+      ...(overrides.playbookCategories ?? {}),
+    },
+    settings: {
+      ...base.settings,
+      ...(overrides.settings ?? {}),
+    },
+  };
+};
+
 /**
  * Create comprehensive test data sets
  */
@@ -92,118 +263,182 @@ export const createTestData = {
    * Complete tactical setup with players and formation
    */
   complete: () => {
-    const sampleData = initializeSampleData();
-    return {
-      players: sampleData.players,
-      formation: sampleData.formation,
-      tacticsState: {
-        players: sampleData.players,
-        formations: { [sampleData.formation.id]: sampleData.formation },
-        activeFormationIds: { home: sampleData.formation.id },
-        drawings: [],
-        playbook: {},
-        matchState: null,
-        notifications: []
-      } as TacticsState,
-      uiState: {
-        isLoading: false,
-        selectedTool: 'select',
-        drawingTool: 'select',
-        drawingColor: '#3b82f6',
-        drawings: [],
-        activePlaybookItemId: null,
-        activeStepIndex: null,
-        isAnimating: false,
-        collaborationMode: false,
-        presentationMode: false
-      } as UIState
+    const slotDefinitions: Array<{
+      id: string;
+      role: PositionRole;
+      position: { x: number; y: number };
+      roleId: string;
+    }> = [
+      { id: 'gk', role: 'GK', position: { x: 50, y: 8 }, roleId: 'goalkeeper' },
+      { id: 'lb', role: 'DF', position: { x: 18, y: 28 }, roleId: 'left-back' },
+      { id: 'lcb', role: 'DF', position: { x: 35, y: 25 }, roleId: 'centre-back' },
+      { id: 'rcb', role: 'DF', position: { x: 65, y: 25 }, roleId: 'centre-back' },
+      { id: 'rb', role: 'DF', position: { x: 82, y: 28 }, roleId: 'right-back' },
+      { id: 'cdm', role: 'MF', position: { x: 50, y: 45 }, roleId: 'defensive-midfielder' },
+      { id: 'lcm', role: 'MF', position: { x: 32, y: 58 }, roleId: 'central-midfielder' },
+      { id: 'rcm', role: 'MF', position: { x: 68, y: 58 }, roleId: 'central-midfielder' },
+      { id: 'lw', role: 'FW', position: { x: 25, y: 78 }, roleId: 'left-winger' },
+      { id: 'st', role: 'FW', position: { x: 50, y: 85 }, roleId: 'striker' },
+      { id: 'rw', role: 'FW', position: { x: 75, y: 78 }, roleId: 'right-winger' },
+    ];
+
+    const starters = slotDefinitions.map((slot, index) =>
+      createBasePlayer({
+        id: `starter-${index + 1}`,
+        name: `Starter ${index + 1}`,
+        jerseyNumber: index + 1,
+        roleId: slot.roleId,
+        position: slot.position,
+        attributes: {
+          speed: 70 + (index % 10),
+          passing: 72 + (index % 8),
+          tackling: 65 + (index % 7),
+          shooting: 68 + (index % 9),
+          dribbling: 70 + (index % 6),
+          positioning: 74 + (index % 5),
+          stamina: 80 + (index % 6),
+        },
+      })
+    );
+
+    const benchRoles: PositionRole[] = ['GK', 'DF', 'MF', 'FW'];
+    const bench = benchRoles.map((role, index) =>
+      createBasePlayer({
+        id: `bench-${index + 1}`,
+        name: `Bench Player ${index + 1}`,
+        jerseyNumber: 50 + index,
+        roleId:
+          role === 'GK'
+            ? 'goalkeeper'
+            : role === 'DF'
+              ? 'centre-back'
+              : role === 'MF'
+                ? 'central-midfielder'
+                : 'striker',
+        position: { x: 5 + index * 3, y: 5 },
+        stamina: 82 - index,
+      })
+    );
+
+    const players = [...starters, ...bench];
+
+    const formation: Formation = {
+      id: 'test-formation-433',
+      name: 'Test Formation 4-3-3',
+      slots: slotDefinitions.map((slot, index) =>
+        createFormationSlot(slot.id, slot.role, slot.position, starters[index]?.id ?? null)
+      ),
     };
+
+    const tacticsState = buildTacticsState(players, formation);
+    const uiState = buildUIState({
+      activeTeamContext: 'home',
+      highlightedByAIPlayerIds: starters.slice(0, 3).map(player => player.id),
+    });
+
+    return { players, formation, tacticsState, uiState };
   },
 
   /**
    * Minimal data for basic tests
    */
   minimal: () => {
-    const player: Player = {
-      id: 'test-player-1',
-      name: 'Test Player',
-      position: 'midfielder',
-      jerseyNumber: 10,
-      skills: {
-        pace: 80,
-        shooting: 75,
-        passing: 85,
-        defending: 70,
-        dribbling: 80,
-        physical: 75
-      },
-      currentPosition: { x: 50, y: 50 },
-      isSelected: false,
-      stamina: 100,
-      morale: 80,
-      isAvailable: true
-    };
+    const player = createBasePlayer({
+      id: 'minimal-player',
+      name: 'Minimal Player',
+      roleId: 'central-midfielder',
+      position: { x: 50, y: 50 },
+    });
 
     const formation: Formation = {
-      id: 'test-formation-1',
-      name: 'Test Formation',
-      type: '4-4-2',
-      description: 'Test formation for testing',
-      positions: [
-        { id: 'pos-1', x: 50, y: 50, role: 'midfielder', playerId: 'test-player-1' }
-      ],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      id: 'minimal-formation',
+      name: 'Minimal Setup',
+      slots: [createFormationSlot('mid', 'MF', { x: 50, y: 50 }, player.id)],
     };
 
-    return { player, formation, players: [player] };
+    return {
+      player,
+      players: [player],
+      formation,
+      tacticsState: buildTacticsState([player], formation),
+      uiState: buildUIState(),
+    };
   },
 
   /**
    * Large dataset for performance testing
    */
   performance: (playerCount: number = 100) => {
-    const players: Player[] = Array.from({ length: playerCount }, (_, i) => ({
-      id: `perf-player-${i}`,
-      name: `Performance Player ${i}`,
-      position: ['goalkeeper', 'defender', 'midfielder', 'forward'][i % 4] as Player['position'],
-      jerseyNumber: i + 1,
-      skills: {
-        pace: Math.floor(Math.random() * 40) + 60,
-        shooting: Math.floor(Math.random() * 40) + 60,
-        passing: Math.floor(Math.random() * 40) + 60,
-        defending: Math.floor(Math.random() * 40) + 60,
-        dribbling: Math.floor(Math.random() * 40) + 60,
-        physical: Math.floor(Math.random() * 40) + 60
-      },
-      currentPosition: { 
-        x: Math.floor(Math.random() * 100), 
-        y: Math.floor(Math.random() * 100) 
-      },
-      isSelected: false,
-      stamina: Math.floor(Math.random() * 40) + 60,
-      morale: Math.floor(Math.random() * 40) + 60,
-      isAvailable: true
-    }));
+    const roleCycle: PositionRole[] = ['GK', 'DF', 'MF', 'FW'];
+
+    const players = Array.from({ length: playerCount }, (_, index) => {
+      const role = roleCycle[index % roleCycle.length];
+      const isGoalkeeper = role === 'GK';
+
+      return createBasePlayer({
+        id: `perf-player-${index + 1}`,
+        name: `Performance Player ${index + 1}`,
+        jerseyNumber: (index % 99) + 1,
+        roleId:
+          role === 'GK'
+            ? 'goalkeeper'
+            : role === 'DF'
+              ? 'centre-back'
+              : role === 'MF'
+                ? 'central-midfielder'
+                : 'striker',
+        team: index % 2 === 0 ? 'home' : 'away',
+        teamColor: index % 2 === 0 ? '#1f2937' : '#dc2626',
+        position: { x: (index * 7) % 100, y: (index * 11) % 100 },
+        stamina: 65 + (index % 35),
+        morale: index % 3 === 0 ? 'Excellent' : index % 3 === 1 ? 'Good' : 'Okay',
+        form: index % 2 === 0 ? 'Good' : 'Average',
+        attributes: {
+          speed: 70 + (index % 20),
+          passing: 68 + (index % 18),
+          tackling: 60 + (index % 15),
+          shooting: 65 + (index % 17),
+          dribbling: 66 + (index % 16),
+          positioning: 64 + (index % 19),
+          stamina: 70 + (index % 20),
+        },
+        stats: {
+          goals: isGoalkeeper ? 0 : index % 12,
+          assists: isGoalkeeper ? 0 : index % 9,
+          matchesPlayed: 30,
+          shotsOnTarget: isGoalkeeper ? 0 : 10 + (index % 5),
+          tacklesWon: role !== 'FW' ? 15 + (index % 7) : 5,
+          saves: isGoalkeeper ? 40 + (index % 20) : 0,
+          passesCompleted: 400 + index * 3,
+          passesAttempted: 450 + index * 4,
+          careerHistory: [],
+        },
+      });
+    });
+
+    const formationSlots: FormationSlot[] = players
+      .slice(0, 11)
+      .map((player, index) =>
+        createFormationSlot(
+          `perf-slot-${index + 1}`,
+          roleCycle[index % roleCycle.length],
+          { x: (index * 9) % 100, y: 15 + (index % 11) * 7 },
+          player.id
+        )
+      );
 
     const formation: Formation = {
-      id: 'perf-formation-1',
+      id: 'perf-formation',
       name: 'Performance Test Formation',
-      type: '4-4-2',
-      description: 'Large formation for performance testing',
-      positions: players.slice(0, 11).map((player, i) => ({
-        id: `perf-pos-${i}`,
-        x: Math.floor(Math.random() * 100),
-        y: Math.floor(Math.random() * 100),
-        role: player.position,
-        playerId: player.id
-      })),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      slots: formationSlots,
     };
 
-    return { players, formation };
-  }
+    return {
+      players,
+      formation,
+      tacticsState: buildTacticsState(players, formation),
+    };
+  },
 };
 
 /**
@@ -215,7 +450,7 @@ export const createMockProps = {
     onSaveFormation: vi.fn(),
     onAnalyticsView: vi.fn(),
     onExportFormation: vi.fn(),
-    className: 'test-tactics-board'
+    className: 'test-tactics-board',
   }),
 
   playerDisplaySettings: () => ({
@@ -228,10 +463,11 @@ export const createMockProps = {
       showAvailability: true,
       iconType: 'circle' as const,
       namePosition: 'below' as const,
-      size: 'medium' as const
+      size: 'medium' as const,
     },
     onChange: vi.fn(),
-    onReset: vi.fn()
+    onConfigChange: vi.fn(),
+    onReset: vi.fn(),
   }),
 
   positionalBench: () => ({
@@ -240,8 +476,8 @@ export const createMockProps = {
     onPlayerMove: vi.fn(),
     groupBy: 'position' as const,
     showStats: true,
-    className: 'test-bench'
-  })
+    className: 'test-bench',
+  }),
 };
 
 /**
@@ -252,9 +488,10 @@ export const testUtils = {
    * Measure component render time
    */
   async measureRenderTime(renderFn: () => void): Promise<number> {
-    const startTime = performance.now();
+    const perf = globalThis.performance ?? { now: () => Date.now() };
+    const startTime = perf.now();
     renderFn();
-    const endTime = performance.now();
+    const endTime = perf.now();
     return endTime - startTime;
   },
 
@@ -262,7 +499,7 @@ export const testUtils = {
    * Wait for all lazy components to load
    */
   async waitForLazyComponents(timeout: number = 5000): Promise<void> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       setTimeout(resolve, timeout);
     });
   },
@@ -276,13 +513,13 @@ export const testUtils = {
     to: { x: number; y: number }
   ): Promise<void> {
     const { fireEvent } = await import('@testing-library/react');
-    
+
     fireEvent.mouseDown(element, { clientX: from.x, clientY: from.y });
     fireEvent.dragStart(element);
     fireEvent.dragOver(element, { clientX: to.x, clientY: to.y });
     fireEvent.drop(element, { clientX: to.x, clientY: to.y });
     fireEvent.mouseUp(element, { clientX: to.x, clientY: to.y });
-  }
+  },
 };
 
 /**

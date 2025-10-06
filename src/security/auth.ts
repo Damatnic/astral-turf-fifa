@@ -7,9 +7,10 @@
 
 import * as jose from 'jose';
 import bcrypt from 'bcryptjs';
-import crypto from 'crypto-js';
+import CryptoJS from 'crypto-js';
 import { JWT_CONFIG, PASSWORD_CONFIG, SESSION_CONFIG, ENVIRONMENT_CONFIG } from './config';
 import { securityLogger } from './logging';
+import { encodeText, randomHex } from './runtime';
 import type { User, UserRole } from '../types';
 
 // Enhanced User interface with security fields
@@ -17,8 +18,8 @@ export interface SecureUser extends Omit<User, 'id'> {
   id: string;
   email: string;
   role: UserRole;
-  firstName?: string;
-  lastName?: string;
+  firstName: string;
+  lastName: string;
 
   // Security fields
   passwordHash: string;
@@ -75,6 +76,12 @@ export interface JWTPayload {
   exp: number;
   iss: string;
   aud: string;
+  jti?: string;
+  deviceFingerprint?: string;
+  permissions?: string[];
+  rotationCount?: number;
+  parentJti?: string;
+  type?: string;
 }
 
 export interface LoginAttempt {
@@ -91,6 +98,67 @@ const users = new Map<string, SecureUser>();
 const loginAttempts = new Map<string, LoginAttempt[]>();
 const blacklistedTokens = new Set<string>();
 const activeSessions = new Map<string, SessionInfo>();
+
+const VALID_USER_ROLES: readonly UserRole[] = ['coach', 'player', 'family'];
+
+function isValidUserRole(role: unknown): role is UserRole {
+  return typeof role === 'string' && (VALID_USER_ROLES as readonly string[]).includes(role);
+}
+
+function normalizeVerifiedPayload(payload: jose.JWTPayload): JWTPayload | null {
+  if (
+    typeof payload.userId !== 'string' ||
+    typeof payload.email !== 'string' ||
+    !isValidUserRole(payload.role) ||
+    typeof payload.sessionId !== 'string' ||
+    typeof payload.iat !== 'number' ||
+    typeof payload.exp !== 'number' ||
+    typeof payload.iss !== 'string' ||
+    typeof payload.aud !== 'string'
+  ) {
+    return null;
+  }
+
+  const normalized: JWTPayload = {
+    userId: payload.userId,
+    email: payload.email,
+    role: payload.role,
+    sessionId: payload.sessionId,
+    iat: payload.iat,
+    exp: payload.exp,
+    iss: payload.iss,
+    aud: payload.aud,
+  };
+
+  if (typeof payload.jti === 'string') {
+    normalized.jti = payload.jti;
+  }
+
+  if (typeof payload.deviceFingerprint === 'string') {
+    normalized.deviceFingerprint = payload.deviceFingerprint;
+  }
+
+  if (
+    Array.isArray(payload.permissions) &&
+    payload.permissions.every((permission): permission is string => typeof permission === 'string')
+  ) {
+    normalized.permissions = payload.permissions;
+  }
+
+  if (typeof payload.rotationCount === 'number') {
+    normalized.rotationCount = payload.rotationCount;
+  }
+
+  if (typeof payload.parentJti === 'string') {
+    normalized.parentJti = payload.parentJti;
+  }
+
+  if (typeof payload.type === 'string') {
+    normalized.type = payload.type;
+  }
+
+  return normalized;
+}
 
 /**
  * Password Security Functions
@@ -122,7 +190,7 @@ export function validatePasswordStrength(password: string): { isValid: boolean; 
 
   if (PASSWORD_CONFIG.REQUIRE_SPECIAL_CHARS) {
     const specialCharsRegex = new RegExp(
-      `[${PASSWORD_CONFIG.SPECIAL_CHARS.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}]`,
+      `[${PASSWORD_CONFIG.SPECIAL_CHARS.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}]`
     );
     if (!specialCharsRegex.test(password)) {
       errors.push('Password must contain at least one special character');
@@ -139,7 +207,7 @@ export function validatePasswordStrength(password: string): { isValid: boolean; 
 export async function hashPassword(password: string): Promise<string> {
   try {
     return await bcrypt.hash(password, PASSWORD_CONFIG.BCRYPT_ROUNDS);
-  } catch (_error) {
+  } catch (error) {
     securityLogger.error('Password hashing failed', {
       error: error instanceof Error ? error.message : 'Unknown error',
     });
@@ -151,7 +219,7 @@ export async function hashPassword(password: string): Promise<string> {
 export async function verifyPassword(password: string, hash: string): Promise<boolean> {
   try {
     return await bcrypt.compare(password, hash);
-  } catch (_error) {
+  } catch (error) {
     securityLogger.error('Password verification failed', {
       error: error instanceof Error ? error.message : 'Unknown error',
     });
@@ -162,10 +230,10 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
 // Check if password was used before
 export function isPasswordPreviouslyUsed(
   password: string,
-  passwordHistory: string[],
+  passwordHistory: string[]
 ): Promise<boolean> {
   return Promise.all(passwordHistory.map(hash => verifyPassword(password, hash))).then(results =>
-    results.some(Boolean),
+    results.some(Boolean)
   );
 }
 
@@ -177,7 +245,7 @@ export function isPasswordPreviouslyUsed(
 export async function generateTokenPair(
   user: SecureUser,
   sessionId: string,
-  options?: { rotateRefresh?: boolean },
+  options?: { rotateRefresh?: boolean }
 ): Promise<TokenPair> {
   const now = Math.floor(Date.now() / 1000);
   const jti = generateSecureToken(16); // Unique token ID for revocation
@@ -196,17 +264,8 @@ export async function generateTokenPair(
   };
 
   try {
-    if (typeof TextEncoder === 'undefined') {
-      throw new Error('TextEncoder not available');
-    }
-    const secret =
-      typeof TextEncoder !== 'undefined'
-        ? new TextEncoder().encode(JWT_CONFIG.SECRET)
-        : new Uint8Array();
-    const refreshSecret =
-      typeof TextEncoder !== 'undefined'
-        ? new TextEncoder().encode(JWT_CONFIG.REFRESH_SECRET)
-        : new Uint8Array();
+    const secret = encodeText(JWT_CONFIG.SECRET);
+    const refreshSecret = encodeText(JWT_CONFIG.REFRESH_SECRET);
 
     // Enhanced access token with security claims
     const accessToken = await new jose.SignJWT(payload)
@@ -261,10 +320,10 @@ export async function generateTokenPair(
       expiresIn,
       tokenType: 'Bearer',
     };
-  } catch (_error) {
+  } catch (error) {
     securityLogger.error('Token generation failed', {
       userId: user.id,
-      error: _error instanceof Error ? _error.message : 'Unknown error',
+      error: error instanceof Error ? error.message : 'Unknown error',
     });
     throw new Error('Token generation failed');
   }
@@ -272,41 +331,37 @@ export async function generateTokenPair(
 
 // Generate device fingerprint for additional security
 function generateDeviceFingerprint(sessionId: string): string {
-  const fingerprint =
-    typeof crypto !== 'undefined' && crypto.SHA256
-      ? crypto.SHA256(sessionId + Date.now().toString()).toString()
-      : sessionId + Date.now().toString();
-  return fingerprint.substring(0, 16);
+  const source = `${sessionId}:${Date.now()}`;
+  try {
+    return CryptoJS.SHA256(source).toString().substring(0, 16);
+  } catch (error) {
+    securityLogger.warn('Device fingerprint generation failed', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
+    return source.substring(0, 16);
+  }
 }
 
 // Get user permissions based on role
-function getUserPermissions(role: string): string[] {
-  const permissionMap = {
-    coach: ['read:all', 'write:players', 'write:formations', 'admin:users'],
-    player: ['read:own', 'write:own'],
-    family: ['read:associated', 'write:own'],
-  };
-  return permissionMap[role] || ['read:own'];
+const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
+  coach: ['read:all', 'write:players', 'write:formations', 'admin:users'],
+  player: ['read:own', 'write:own'],
+  family: ['read:associated', 'write:own'],
+};
+
+function getUserPermissions(role: UserRole): string[] {
+  return ROLE_PERMISSIONS[role] ?? ['read:own'];
 }
 
 // Generate secure random token
 function generateSecureToken(length: number = 32): string {
-  const array = new Uint8Array(length);
-  if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
-    crypto.getRandomValues(array);
-  } else {
-    // Fallback for environments without crypto.getRandomValues
-    for (let i = 0; i < array.length; i++) {
-      array[i] = Math.floor(Math.random() * 256);
-    }
-  }
-  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+  return randomHex(length);
 }
 
 // Verify JWT token
 export async function verifyToken(
   token: string,
-  isRefreshToken = false,
+  isRefreshToken = false
 ): Promise<JWTPayload | null> {
   try {
     // Check if token is blacklisted
@@ -317,22 +372,23 @@ export async function verifyToken(
       return null;
     }
 
-    if (typeof TextEncoder === 'undefined') {
-      throw new Error('TextEncoder not available');
-    }
-
-    const secret =
-      typeof TextEncoder !== 'undefined'
-        ? new TextEncoder().encode(isRefreshToken ? JWT_CONFIG.REFRESH_SECRET : JWT_CONFIG.SECRET)
-        : new Uint8Array();
+    const secret = encodeText(isRefreshToken ? JWT_CONFIG.REFRESH_SECRET : JWT_CONFIG.SECRET);
 
     const { payload } = await jose.jwtVerify(token, secret, {
       issuer: JWT_CONFIG.ISSUER,
       audience: JWT_CONFIG.AUDIENCE,
     });
 
-    return payload as JWTPayload;
-  } catch (_error) {
+    const normalized = normalizeVerifiedPayload(payload);
+    if (!normalized) {
+      securityLogger.error('Token payload failed validation', {
+        payloadKeys: Object.keys(payload),
+      });
+      return null;
+    }
+
+    return normalized;
+  } catch (error) {
     if (error instanceof jose.errors.JWTExpired) {
       securityLogger.info('Token expired', { error: error.message });
     } else if (error instanceof jose.errors.JWTInvalid) {
@@ -349,7 +405,7 @@ export async function verifyToken(
 // Enhanced refresh access token with automatic rotation
 export async function refreshAccessToken(
   refreshToken: string,
-  options?: { userAgent?: string; ipAddress?: string },
+  options?: { userAgent?: string; ipAddress?: string }
 ): Promise<TokenPair | null> {
   const payload = await verifyToken(refreshToken, true);
   if (!payload) {
@@ -491,12 +547,9 @@ export function createSession(
   user: SecureUser,
   deviceInfo: string,
   ipAddress: string,
-  userAgent: string,
+  userAgent: string
 ): SessionInfo {
-  const sessionId =
-    typeof crypto !== 'undefined' && crypto.getRandomValues
-      ? generateSecureToken(16)
-      : Math.random().toString(36);
+  const sessionId = generateSecureToken(16);
 
   const session: SessionInfo = {
     id: sessionId,
@@ -546,7 +599,7 @@ export function terminateSession(userId: string, sessionId: string): void {
   const user = users.get(userId);
   if (user) {
     user.activeSessions = user.activeSessions.map(session =>
-      session.id === sessionId ? { ...session, isActive: false } : session,
+      session.id === sessionId ? { ...session, isActive: false } : session
     );
   }
 
@@ -586,7 +639,7 @@ export function recordLoginAttempt(
   ipAddress: string,
   userAgent: string,
   success: boolean,
-  failureReason?: string,
+  failureReason?: string
 ): void {
   const attempt: LoginAttempt = {
     email,
@@ -623,7 +676,7 @@ export function shouldLockAccount(email: string, ipAddress: string): boolean {
   // Count failed attempts in the last window
   const windowStart = Date.now() - 15 * 60 * 1000; // 15 minutes
   const recentFailures = attempts.filter(
-    a => !a.success && new Date(a.timestamp).getTime() > windowStart,
+    a => !a.success && new Date(a.timestamp).getTime() > windowStart
   );
 
   return recentFailures.length >= 5; // Max 5 failed attempts
@@ -735,18 +788,3 @@ export interface EnhancedSecureUser extends SecureUser {
     lastAssessment: string;
   };
 }
-
-// Export enhanced types for use in services
-export type {
-  SecureUser,
-  TokenPair,
-  JWTPayload,
-  SessionInfo,
-  SecurityQuestion,
-  LoginAttempt,
-  MFAConfiguration,
-  EnhancedJWTPayload,
-  TokenSecurityInfo,
-  SecurityAuditEvent,
-  EnhancedSecureUser,
-};

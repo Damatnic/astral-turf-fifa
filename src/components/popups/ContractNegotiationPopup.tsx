@@ -39,11 +39,13 @@ const ContractNegotiationPopup: React.FC = () => {
         player.stats.careerHistory.length > 0 ? 500000 : 100000,
         negotiationData.agentPersonality,
         offer,
-        negotiationData.conversation.join('\n'),
+        negotiationData.conversation.join('\n')
       );
       franchiseDispatch({ type: 'SEND_NEGOTIATION_OFFER_SUCCESS', payload: { response } });
     } catch (_error) {
-      franchiseDispatch({ type: 'SEND_NEGOTIATION_OFFER_FAILURE' });
+      (franchiseDispatch as (action: { type: string }) => void)({
+        type: 'SEND_NEGOTIATION_OFFER_FAILURE',
+      });
     }
   };
 

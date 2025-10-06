@@ -11,22 +11,21 @@ metadata:
     name: astral-turf-production
     environment: production
     tier: application
-    atlas.deployment/managed: "true"
-    atlas.security/level: "high"
-    atlas.monitoring/enabled: "true"
-    atlas.backup/enabled: "true"
-    atlas.scaling/enabled: "true"
+    atlas.deployment/managed: 'true'
+    atlas.security/level: 'high'
+    atlas.monitoring/enabled: 'true'
+    atlas.backup/enabled: 'true'
+    atlas.scaling/enabled: 'true'
   annotations:
-    atlas.deployment/strategy: "blue-green"
-    atlas.rollback/enabled: "true"
-    atlas.health/monitoring: "comprehensive"
-    atlas.performance/optimization: "enabled"
-    atlas.disaster-recovery/enabled: "true"
-    contact: "devops@astralturf.com"
-    documentation: "https://docs.astralturf.com/deployment"
+    atlas.deployment/strategy: 'blue-green'
+    atlas.rollback/enabled: 'true'
+    atlas.health/monitoring: 'comprehensive'
+    atlas.performance/optimization: 'enabled'
+    atlas.disaster-recovery/enabled: 'true'
+    contact: 'devops@astralturf.com'
+    documentation: 'https://docs.astralturf.com/deployment'
 
 ---
-
 # Resource Quota for production namespace
 apiVersion: v1
 kind: ResourceQuota
@@ -34,24 +33,23 @@ metadata:
   name: astral-turf-quota
   namespace: astral-turf-production
   labels:
-    atlas.resource/managed: "true"
+    atlas.resource/managed: 'true'
 spec:
   hard:
-    requests.cpu: "20"
-    requests.memory: "40Gi"
-    limits.cpu: "40"
-    limits.memory: "80Gi"
-    persistentvolumeclaims: "20"
-    services: "10"
-    secrets: "50"
-    configmaps: "50"
-    pods: "50"
-    replicationcontrollers: "20"
-    services.nodeports: "5"
-    services.loadbalancers: "3"
+    requests.cpu: '20'
+    requests.memory: '40Gi'
+    limits.cpu: '40'
+    limits.memory: '80Gi'
+    persistentvolumeclaims: '20'
+    services: '10'
+    secrets: '50'
+    configmaps: '50'
+    pods: '50'
+    replicationcontrollers: '20'
+    services.nodeports: '5'
+    services.loadbalancers: '3'
 
 ---
-
 # Limit Range for pod resource limits
 apiVersion: v1
 kind: LimitRange
@@ -59,32 +57,31 @@ metadata:
   name: astral-turf-limits
   namespace: astral-turf-production
   labels:
-    atlas.resource/managed: "true"
+    atlas.resource/managed: 'true'
 spec:
   limits:
-  - default:
-      cpu: "2"
-      memory: "4Gi"
-    defaultRequest:
-      cpu: "500m"
-      memory: "1Gi"
-    max:
-      cpu: "4"
-      memory: "8Gi"
-    min:
-      cpu: "100m"
-      memory: "256Mi"
-    type: Container
-  - default:
-      storage: "10Gi"
-    max:
-      storage: "100Gi"
-    min:
-      storage: "1Gi"
-    type: PersistentVolumeClaim
+    - default:
+        cpu: '2'
+        memory: '4Gi'
+      defaultRequest:
+        cpu: '500m'
+        memory: '1Gi'
+      max:
+        cpu: '4'
+        memory: '8Gi'
+      min:
+        cpu: '100m'
+        memory: '256Mi'
+      type: Container
+    - default:
+        storage: '10Gi'
+      max:
+        storage: '100Gi'
+      min:
+        storage: '1Gi'
+      type: PersistentVolumeClaim
 
 ---
-
 # Network Policy for secure communication
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -92,54 +89,54 @@ metadata:
   name: astral-turf-network-policy
   namespace: astral-turf-production
   labels:
-    atlas.security/managed: "true"
+    atlas.security/managed: 'true'
 spec:
   podSelector:
     matchLabels:
       app: astral-turf
   policyTypes:
-  - Ingress
-  - Egress
+    - Ingress
+    - Egress
   ingress:
-  - from:
-    - namespaceSelector:
-        matchLabels:
-          name: ingress-nginx
-    - namespaceSelector:
-        matchLabels:
-          name: monitoring
-    - podSelector:
-        matchLabels:
-          app: astral-turf
-    ports:
-    - protocol: TCP
-      port: 3000
-    - protocol: TCP
-      port: 8080
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
+        - podSelector:
+            matchLabels:
+              app: astral-turf
+      ports:
+        - protocol: TCP
+          port: 3000
+        - protocol: TCP
+          port: 8080
   egress:
-  - to:
-    - namespaceSelector:
-        matchLabels:
-          name: kube-system
-  - to:
-    - podSelector:
-        matchLabels:
-          app: postgres
-    ports:
-    - protocol: TCP
-      port: 5432
-  - to:
-    - podSelector:
-        matchLabels:
-          app: redis
-    ports:
-    - protocol: TCP
-      port: 6379
-  - to: []
-    ports:
-    - protocol: TCP
-      port: 443
-    - protocol: TCP
-      port: 80
-    - protocol: UDP
-      port: 53
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: kube-system
+    - to:
+        - podSelector:
+            matchLabels:
+              app: postgres
+      ports:
+        - protocol: TCP
+          port: 5432
+    - to:
+        - podSelector:
+            matchLabels:
+              app: redis
+      ports:
+        - protocol: TCP
+          port: 6379
+    - to: []
+      ports:
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 80
+        - protocol: UDP
+          port: 53

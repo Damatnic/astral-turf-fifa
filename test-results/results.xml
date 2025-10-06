@@ -1,0 +1,386 @@
+<testsuites id="" name="" tests="21" failures="16" skipped="5" errors="0" time="13.459624">
+<testsuite name="MobileResponsiveness.comprehensive.spec.ts" timestamp="2025-10-04T19:02:22.694Z" hostname="Mobile Chrome" tests="21" failures="16" skipped="5" time="85.976" errors="0">
+<testcase name="Mobile Responsiveness › Dashboard page should be fully responsive" classname="MobileResponsiveness.comprehensive.spec.ts" time="5.337">
+<failure message="MobileResponsiveness.comprehensive.spec.ts:32:5 Dashboard page should be fully responsive" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › MobileResponsiveness.comprehensive.spec.ts:32:5 › Mobile Responsiveness › Dashboard page should be fully responsive 
+
+    Error: page.goto: Target page, context or browser has been closed
+    Call log:
+      - navigating to "http://localhost:8081/", waiting until "load"
+
+
+      32 |     test(`${pageName} page should be fully responsive`, async ({ page }) => {
+      33 |       // Navigate to page
+    > 34 |       await page.goto(path);
+         |                  ^
+      35 |
+      36 |       // Wait for page to load
+      37 |       await page.waitForLoadState('networkidle');
+        at C:\Users\damat\_REPOS\Astral Turf\src\__tests__\e2e\MobileResponsiveness.comprehensive.spec.ts:34:18
+]]>
+</failure>
+</testcase>
+<testcase name="Mobile Responsiveness › Tactics Board page should be fully responsive" classname="MobileResponsiveness.comprehensive.spec.ts" time="5.672">
+<failure message="MobileResponsiveness.comprehensive.spec.ts:32:5 Tactics Board page should be fully responsive" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › MobileResponsiveness.comprehensive.spec.ts:32:5 › Mobile Responsiveness › Tactics Board page should be fully responsive 
+
+    Error: page.goto: Target page, context or browser has been closed
+    Call log:
+      - navigating to "http://localhost:8081/tactics", waiting until "load"
+
+
+      32 |     test(`${pageName} page should be fully responsive`, async ({ page }) => {
+      33 |       // Navigate to page
+    > 34 |       await page.goto(path);
+         |                  ^
+      35 |
+      36 |       // Wait for page to load
+      37 |       await page.waitForLoadState('networkidle');
+        at C:\Users\damat\_REPOS\Astral Turf\src\__tests__\e2e\MobileResponsiveness.comprehensive.spec.ts:34:18
+
+    Error: browserContext.close: Target page, context or browser has been closed
+]]>
+</failure>
+</testcase>
+<testcase name="Mobile Responsiveness › Training page should be fully responsive" classname="MobileResponsiveness.comprehensive.spec.ts" time="5.166">
+<failure message="MobileResponsiveness.comprehensive.spec.ts:32:5 Training page should be fully responsive" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › MobileResponsiveness.comprehensive.spec.ts:32:5 › Mobile Responsiveness › Training page should be fully responsive 
+
+    Error: page.goto: Target page, context or browser has been closed
+    Call log:
+      - navigating to "http://localhost:8081/training", waiting until "load"
+
+
+      32 |     test(`${pageName} page should be fully responsive`, async ({ page }) => {
+      33 |       // Navigate to page
+    > 34 |       await page.goto(path);
+         |                  ^
+      35 |
+      36 |       // Wait for page to load
+      37 |       await page.waitForLoadState('networkidle');
+        at C:\Users\damat\_REPOS\Astral Turf\src\__tests__\e2e\MobileResponsiveness.comprehensive.spec.ts:34:18
+
+    Error: browserContext.close: Target page, context or browser has been closed
+]]>
+</failure>
+</testcase>
+<testcase name="Mobile Responsiveness › Transfers page should be fully responsive" classname="MobileResponsiveness.comprehensive.spec.ts" time="5.346">
+<failure message="MobileResponsiveness.comprehensive.spec.ts:32:5 Transfers page should be fully responsive" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › MobileResponsiveness.comprehensive.spec.ts:32:5 › Mobile Responsiveness › Transfers page should be fully responsive 
+
+    Error: page.goto: Target page, context or browser has been closed
+    Call log:
+      - navigating to "http://localhost:8081/transfers", waiting until "load"
+
+
+      32 |     test(`${pageName} page should be fully responsive`, async ({ page }) => {
+      33 |       // Navigate to page
+    > 34 |       await page.goto(path);
+         |                  ^
+      35 |
+      36 |       // Wait for page to load
+      37 |       await page.waitForLoadState('networkidle');
+        at C:\Users\damat\_REPOS\Astral Turf\src\__tests__\e2e\MobileResponsiveness.comprehensive.spec.ts:34:18
+
+    Error: browserContext.close: Target page, context or browser has been closed
+]]>
+</failure>
+</testcase>
+<testcase name="Mobile Responsiveness › Analytics page should be fully responsive" classname="MobileResponsiveness.comprehensive.spec.ts" time="5.779">
+<failure message="MobileResponsiveness.comprehensive.spec.ts:32:5 Analytics page should be fully responsive" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › MobileResponsiveness.comprehensive.spec.ts:32:5 › Mobile Responsiveness › Analytics page should be fully responsive 
+
+    Error: page.goto: Target page, context or browser has been closed
+    Call log:
+      - navigating to "http://localhost:8081/analytics", waiting until "load"
+
+
+      32 |     test(`${pageName} page should be fully responsive`, async ({ page }) => {
+      33 |       // Navigate to page
+    > 34 |       await page.goto(path);
+         |                  ^
+      35 |
+      36 |       // Wait for page to load
+      37 |       await page.waitForLoadState('networkidle');
+        at C:\Users\damat\_REPOS\Astral Turf\src\__tests__\e2e\MobileResponsiveness.comprehensive.spec.ts:34:18
+
+    Error: browserContext.close: Test ended.
+    Browser logs:
+
+    <launching> C:\Users\damat\AppData\Local\ms-playwright\chromium_headless_shell-1193\chrome-win\headless_shell.exe --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=C:\Users\damat\AppData\Local\Temp\playwright_chromiumdev_profile-AB1r9O --remote-debugging-pipe --no-startup-window
+    <launched> pid=73916
+]]>
+</failure>
+</testcase>
+<testcase name="Mobile Responsiveness › Finances page should be fully responsive" classname="MobileResponsiveness.comprehensive.spec.ts" time="5.403">
+<failure message="MobileResponsiveness.comprehensive.spec.ts:32:5 Finances page should be fully responsive" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › MobileResponsiveness.comprehensive.spec.ts:32:5 › Mobile Responsiveness › Finances page should be fully responsive 
+
+    Error: page.goto: Target page, context or browser has been closed
+    Call log:
+      - navigating to "http://localhost:8081/finances", waiting until "load"
+
+
+      32 |     test(`${pageName} page should be fully responsive`, async ({ page }) => {
+      33 |       // Navigate to page
+    > 34 |       await page.goto(path);
+         |                  ^
+      35 |
+      36 |       // Wait for page to load
+      37 |       await page.waitForLoadState('networkidle');
+        at C:\Users\damat\_REPOS\Astral Turf\src\__tests__\e2e\MobileResponsiveness.comprehensive.spec.ts:34:18
+
+    Error: browserContext.close: Test ended.
+    Browser logs:
+
+    <launching> C:\Users\damat\AppData\Local\ms-playwright\chromium_headless_shell-1193\chrome-win\headless_shell.exe --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=C:\Users\damat\AppData\Local\Temp\playwright_chromiumdev_profile-6f09Mi --remote-debugging-pipe --no-startup-window
+    <launched> pid=109544
+]]>
+</failure>
+</testcase>
+<testcase name="Mobile Responsiveness › Settings page should be fully responsive" classname="MobileResponsiveness.comprehensive.spec.ts" time="5.415">
+<failure message="MobileResponsiveness.comprehensive.spec.ts:32:5 Settings page should be fully responsive" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › MobileResponsiveness.comprehensive.spec.ts:32:5 › Mobile Responsiveness › Settings page should be fully responsive 
+
+    Error: page.goto: Target page, context or browser has been closed
+    Call log:
+      - navigating to "http://localhost:8081/settings", waiting until "load"
+
+
+      32 |     test(`${pageName} page should be fully responsive`, async ({ page }) => {
+      33 |       // Navigate to page
+    > 34 |       await page.goto(path);
+         |                  ^
+      35 |
+      36 |       // Wait for page to load
+      37 |       await page.waitForLoadState('networkidle');
+        at C:\Users\damat\_REPOS\Astral Turf\src\__tests__\e2e\MobileResponsiveness.comprehensive.spec.ts:34:18
+]]>
+</failure>
+</testcase>
+<testcase name="Mobile Responsiveness › Dashboard should have responsive coach cards" classname="MobileResponsiveness.comprehensive.spec.ts" time="5.29">
+<failure message="MobileResponsiveness.comprehensive.spec.ts:94:5 Dashboard should have responsive coach cards" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › MobileResponsiveness.comprehensive.spec.ts:94:5 › Mobile Responsiveness › Dashboard should have responsive coach cards 
+
+    Error: page.goto: Target page, context or browser has been closed
+    Call log:
+      - navigating to "http://localhost:8081/", waiting until "load"
+
+
+      93 |
+      94 |     test('Dashboard should have responsive coach cards', async ({ page }) => {
+    > 95 |       await page.goto('/');
+         |                  ^
+      96 |       await page.waitForLoadState('networkidle');
+      97 |       
+      98 |       // Coach cards should be present
+        at C:\Users\damat\_REPOS\Astral Turf\src\__tests__\e2e\MobileResponsiveness.comprehensive.spec.ts:95:18
+
+    Error: browserContext.close: Target page, context or browser has been closed
+]]>
+</failure>
+</testcase>
+<testcase name="Mobile Responsiveness › Tactics Board should support touch gestures" classname="MobileResponsiveness.comprehensive.spec.ts" time="5.685">
+<failure message="MobileResponsiveness.comprehensive.spec.ts:114:5 Tactics Board should support touch gestures" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › MobileResponsiveness.comprehensive.spec.ts:114:5 › Mobile Responsiveness › Tactics Board should support touch gestures 
+
+    Error: page.goto: Target page, context or browser has been closed
+    Call log:
+      - navigating to "http://localhost:8081/tactics", waiting until "load"
+
+
+      113 |
+      114 |     test('Tactics Board should support touch gestures', async ({ page }) => {
+    > 115 |       await page.goto('/tactics');
+          |                  ^
+      116 |       await page.waitForLoadState('networkidle');
+      117 |       
+      118 |       // Find the tactics board canvas or main container
+        at C:\Users\damat\_REPOS\Astral Turf\src\__tests__\e2e\MobileResponsiveness.comprehensive.spec.ts:115:18
+]]>
+</failure>
+</testcase>
+<testcase name="Mobile Responsiveness › Training page should have responsive grids" classname="MobileResponsiveness.comprehensive.spec.ts" time="5.009">
+<failure message="MobileResponsiveness.comprehensive.spec.ts:134:5 Training page should have responsive grids" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › MobileResponsiveness.comprehensive.spec.ts:134:5 › Mobile Responsiveness › Training page should have responsive grids 
+
+    Error: page.goto: Target page, context or browser has been closed
+    Call log:
+      - navigating to "http://localhost:8081/training", waiting until "load"
+
+
+      133 |
+      134 |     test('Training page should have responsive grids', async ({ page }) => {
+    > 135 |       await page.goto('/training');
+          |                  ^
+      136 |       await page.waitForLoadState('networkidle');
+      137 |       
+      138 |       // Day selector should be responsive
+        at C:\Users\damat\_REPOS\Astral Turf\src\__tests__\e2e\MobileResponsiveness.comprehensive.spec.ts:135:18
+
+    Error: browserContext.close: Test ended.
+    Browser logs:
+
+    <launching> C:\Users\damat\AppData\Local\ms-playwright\chromium_headless_shell-1193\chrome-win\headless_shell.exe --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=C:\Users\damat\AppData\Local\Temp\playwright_chromiumdev_profile-p6IwjU --remote-debugging-pipe --no-startup-window
+    <launched> pid=140812
+]]>
+</failure>
+</testcase>
+<testcase name="Mobile Responsiveness › Transfers page should have responsive player listings" classname="MobileResponsiveness.comprehensive.spec.ts" time="4.833">
+<failure message="MobileResponsiveness.comprehensive.spec.ts:158:5 Transfers page should have responsive player listings" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › MobileResponsiveness.comprehensive.spec.ts:158:5 › Mobile Responsiveness › Transfers page should have responsive player listings 
+
+    Error: page.goto: Target page, context or browser has been closed
+    Call log:
+      - navigating to "http://localhost:8081/transfers", waiting until "load"
+
+
+      157 |
+      158 |     test('Transfers page should have responsive player listings', async ({ page }) => {
+    > 159 |       await page.goto('/transfers');
+          |                  ^
+      160 |       await page.waitForLoadState('networkidle');
+      161 |       
+      162 |       // Filter tabs should be responsive
+        at C:\Users\damat\_REPOS\Astral Turf\src\__tests__\e2e\MobileResponsiveness.comprehensive.spec.ts:159:18
+
+    Error: browserContext.close: Test ended.
+    Browser logs:
+
+    <launching> C:\Users\damat\AppData\Local\ms-playwright\chromium_headless_shell-1193\chrome-win\headless_shell.exe --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=C:\Users\damat\AppData\Local\Temp\playwright_chromiumdev_profile-I0bPCA --remote-debugging-pipe --no-startup-window
+    <launched> pid=77912
+]]>
+</failure>
+</testcase>
+<testcase name="Mobile Responsiveness › Analytics page should have responsive metrics and grids" classname="MobileResponsiveness.comprehensive.spec.ts" time="5.223">
+<failure message="MobileResponsiveness.comprehensive.spec.ts:193:5 Analytics page should have responsive metrics and grids" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › MobileResponsiveness.comprehensive.spec.ts:193:5 › Mobile Responsiveness › Analytics page should have responsive metrics and grids 
+
+    Error: page.goto: Target page, context or browser has been closed
+    Call log:
+      - navigating to "http://localhost:8081/analytics", waiting until "load"
+
+
+      192 |
+      193 |     test('Analytics page should have responsive metrics and grids', async ({ page }) => {
+    > 194 |       await page.goto('/analytics');
+          |                  ^
+      195 |       await page.waitForLoadState('networkidle');
+      196 |       
+      197 |       // Team selector should be responsive
+        at C:\Users\damat\_REPOS\Astral Turf\src\__tests__\e2e\MobileResponsiveness.comprehensive.spec.ts:194:18
+
+    Error: browserContext.close: Target page, context or browser has been closed
+]]>
+</failure>
+</testcase>
+<testcase name="Mobile Responsiveness › Finances page should have responsive budget cards" classname="MobileResponsiveness.comprehensive.spec.ts" time="5.546">
+<failure message="MobileResponsiveness.comprehensive.spec.ts:220:5 Finances page should have responsive budget cards" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › MobileResponsiveness.comprehensive.spec.ts:220:5 › Mobile Responsiveness › Finances page should have responsive budget cards 
+
+    Error: page.goto: Target page, context or browser has been closed
+    Call log:
+      - navigating to "http://localhost:8081/finances", waiting until "load"
+
+
+      219 |
+      220 |     test('Finances page should have responsive budget cards', async ({ page }) => {
+    > 221 |       await page.goto('/finances');
+          |                  ^
+      222 |       await page.waitForLoadState('networkidle');
+      223 |       
+      224 |       // Financial cards should be present
+        at C:\Users\damat\_REPOS\Astral Turf\src\__tests__\e2e\MobileResponsiveness.comprehensive.spec.ts:221:18
+]]>
+</failure>
+</testcase>
+<testcase name="Mobile Responsiveness › Settings page should have responsive controls" classname="MobileResponsiveness.comprehensive.spec.ts" time="5.729">
+<failure message="MobileResponsiveness.comprehensive.spec.ts:253:5 Settings page should have responsive controls" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › MobileResponsiveness.comprehensive.spec.ts:253:5 › Mobile Responsiveness › Settings page should have responsive controls 
+
+    Error: page.goto: Target page, context or browser has been closed
+    Call log:
+      - navigating to "http://localhost:8081/settings", waiting until "load"
+
+
+      252 |
+      253 |     test('Settings page should have responsive controls', async ({ page }) => {
+    > 254 |       await page.goto('/settings');
+          |                  ^
+      255 |       await page.waitForLoadState('networkidle');
+      256 |       
+      257 |       // Settings options should be responsive
+        at C:\Users\damat\_REPOS\Astral Turf\src\__tests__\e2e\MobileResponsiveness.comprehensive.spec.ts:254:18
+]]>
+</failure>
+</testcase>
+<testcase name="Mobile Responsiveness › PWA manifest should be configured" classname="MobileResponsiveness.comprehensive.spec.ts" time="5.331">
+<failure message="MobileResponsiveness.comprehensive.spec.ts:272:5 PWA manifest should be configured" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › MobileResponsiveness.comprehensive.spec.ts:272:5 › Mobile Responsiveness › PWA manifest should be configured 
+
+    Error: page.goto: Target page, context or browser has been closed
+    Call log:
+      - navigating to "http://localhost:8081/", waiting until "load"
+
+
+      271 |
+      272 |     test('PWA manifest should be configured', async ({ page }) => {
+    > 273 |       await page.goto('/');
+          |                  ^
+      274 |       
+      275 |       // Check for manifest link
+      276 |       const manifest = await page.locator('link[rel="manifest"]').getAttribute('href');
+        at C:\Users\damat\_REPOS\Astral Turf\src\__tests__\e2e\MobileResponsiveness.comprehensive.spec.ts:273:18
+
+    Error: browserContext.close: Test ended.
+    Browser logs:
+
+    <launching> C:\Users\damat\AppData\Local\ms-playwright\chromium_headless_shell-1193\chrome-win\headless_shell.exe --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=C:\Users\damat\AppData\Local\Temp\playwright_chromiumdev_profile-47BO4V --remote-debugging-pipe --no-startup-window
+    <launched> pid=117264
+]]>
+</failure>
+</testcase>
+<testcase name="Mobile Performance › Pages should load quickly on mobile" classname="MobileResponsiveness.comprehensive.spec.ts" time="5.212">
+<failure message="MobileResponsiveness.comprehensive.spec.ts:291:3 Pages should load quickly on mobile" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › MobileResponsiveness.comprehensive.spec.ts:291:3 › Mobile Performance › Pages should load quickly on mobile 
+
+    Error: page.goto: Target page, context or browser has been closed
+    Call log:
+      - navigating to "http://localhost:8081/", waiting until "load"
+
+
+      292 |     for (const { path, name } of CORE_PAGES) {
+      293 |       const startTime = Date.now();
+    > 294 |       await page.goto(path);
+          |                  ^
+      295 |       await page.waitForLoadState('domcontentloaded');
+      296 |       const loadTime = Date.now() - startTime;
+      297 |       
+        at C:\Users\damat\_REPOS\Astral Turf\src\__tests__\e2e\MobileResponsiveness.comprehensive.spec.ts:294:18
+
+    Error: browserContext.close: Target page, context or browser has been closed
+]]>
+</failure>
+</testcase>
+<testcase name="Mobile Performance › Touch interactions should be responsive" classname="MobileResponsiveness.comprehensive.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Mobile Performance › Animations should run smoothly (60fps target)" classname="MobileResponsiveness.comprehensive.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Mobile Accessibility › All pages should have proper heading hierarchy" classname="MobileResponsiveness.comprehensive.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Mobile Accessibility › Interactive elements should be keyboard accessible" classname="MobileResponsiveness.comprehensive.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Mobile Accessibility › Touch targets should not overlap" classname="MobileResponsiveness.comprehensive.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+</testsuites>

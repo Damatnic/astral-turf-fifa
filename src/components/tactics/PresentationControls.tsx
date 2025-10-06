@@ -92,7 +92,7 @@ const PresentationControls: React.FC<PresentationControlsProps> = ({
   // Timer for presentation
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    
+
     if (isPresenting && presentationState.isPlaying) {
       interval = setInterval(() => {
         setPresentationState(prev => ({
@@ -110,7 +110,9 @@ const PresentationControls: React.FC<PresentationControlsProps> = ({
     }
 
     return () => {
-      if (interval) clearInterval(interval);
+      if (interval) {
+        clearInterval(interval);
+      }
     };
   }, [isPresenting, presentationState.isPlaying, settings.autoAdvance, settings.autoAdvanceDelay]);
 
@@ -146,20 +148,20 @@ const PresentationControls: React.FC<PresentationControlsProps> = ({
 
   const handlePreviousSlide = () => {
     if (presentationState.currentSlide > 1) {
-      setPresentationState(prev => ({ 
-        ...prev, 
+      setPresentationState(prev => ({
+        ...prev,
         currentSlide: prev.currentSlide - 1,
-        elapsedTime: 0 
+        elapsedTime: 0,
       }));
     }
   };
 
   const handleNextSlide = () => {
     if (presentationState.currentSlide < presentationState.totalSlides) {
-      setPresentationState(prev => ({ 
-        ...prev, 
+      setPresentationState(prev => ({
+        ...prev,
         currentSlide: prev.currentSlide + 1,
-        elapsedTime: 0 
+        elapsedTime: 0,
       }));
     }
   };
@@ -284,7 +286,7 @@ const PresentationControls: React.FC<PresentationControlsProps> = ({
                     whileTap={{ scale: 0.9 }}
                     onClick={presentationState.isPlaying ? handlePause : handlePlay}
                     className="p-3 bg-blue-600 hover:bg-blue-500 text-white rounded-full transition-colors"
-                    title={presentationState.isPlaying ? "Pause" : "Play"}
+                    title={presentationState.isPlaying ? 'Pause' : 'Play'}
                   >
                     {presentationState.isPlaying ? (
                       <Pause className="w-6 h-6" />
@@ -319,12 +321,19 @@ const PresentationControls: React.FC<PresentationControlsProps> = ({
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs text-slate-400">
                     <span>Progress</span>
-                    <span>{Math.round((presentationState.currentSlide / presentationState.totalSlides) * 100)}%</span>
+                    <span>
+                      {Math.round(
+                        (presentationState.currentSlide / presentationState.totalSlides) * 100
+                      )}
+                      %
+                    </span>
                   </div>
                   <div className="w-full bg-slate-700/50 rounded-full h-2">
                     <motion.div
                       initial={{ width: 0 }}
-                      animate={{ width: `${(presentationState.currentSlide / presentationState.totalSlides) * 100}%` }}
+                      animate={{
+                        width: `${(presentationState.currentSlide / presentationState.totalSlides) * 100}%`,
+                      }}
                       className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full"
                       transition={{ duration: 0.3 }}
                     />
@@ -337,10 +346,12 @@ const PresentationControls: React.FC<PresentationControlsProps> = ({
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      onClick={() => updateSetting('enablePointerMode', !settings.enablePointerMode)}
+                      onClick={() =>
+                        updateSetting('enablePointerMode', !settings.enablePointerMode)
+                      }
                       className={`p-2 rounded-lg transition-colors ${
-                        settings.enablePointerMode 
-                          ? 'bg-blue-600 text-white' 
+                        settings.enablePointerMode
+                          ? 'bg-blue-600 text-white'
                           : 'bg-slate-700/50 text-slate-300 hover:text-white'
                       }`}
                       title="Pointer Mode"
@@ -353,8 +364,8 @@ const PresentationControls: React.FC<PresentationControlsProps> = ({
                       whileTap={{ scale: 0.95 }}
                       onClick={() => updateSetting('showPlayerNames', !settings.showPlayerNames)}
                       className={`p-2 rounded-lg transition-colors ${
-                        settings.showPlayerNames 
-                          ? 'bg-green-600 text-white' 
+                        settings.showPlayerNames
+                          ? 'bg-green-600 text-white'
                           : 'bg-slate-700/50 text-slate-300 hover:text-white'
                       }`}
                       title="Show Player Names"
@@ -365,10 +376,12 @@ const PresentationControls: React.FC<PresentationControlsProps> = ({
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      onClick={() => updateSetting('enableSoundEffects', !settings.enableSoundEffects)}
+                      onClick={() =>
+                        updateSetting('enableSoundEffects', !settings.enableSoundEffects)
+                      }
                       className={`p-2 rounded-lg transition-colors ${
-                        settings.enableSoundEffects 
-                          ? 'bg-yellow-600 text-white' 
+                        settings.enableSoundEffects
+                          ? 'bg-yellow-600 text-white'
                           : 'bg-slate-700/50 text-slate-300 hover:text-white'
                       }`}
                       title="Sound Effects"
@@ -408,8 +421,8 @@ const PresentationControls: React.FC<PresentationControlsProps> = ({
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setShowSettings(!showSettings)}
                     className={`p-2 rounded-lg transition-colors ${
-                      showSettings 
-                        ? 'bg-purple-600 text-white' 
+                      showSettings
+                        ? 'bg-purple-600 text-white'
                         : 'bg-slate-700/50 text-slate-300 hover:text-white'
                     }`}
                     title="Presentation Settings"
@@ -436,13 +449,15 @@ const PresentationControls: React.FC<PresentationControlsProps> = ({
                     <div className="grid grid-cols-2 gap-4">
                       {/* Display Settings */}
                       <div className="space-y-3">
-                        <h5 className="text-xs font-medium text-slate-400 uppercase tracking-wider">Display</h5>
-                        
+                        <h5 className="text-xs font-medium text-slate-400 uppercase tracking-wider">
+                          Display
+                        </h5>
+
                         <label className="flex items-center gap-2 text-sm text-slate-300">
                           <input
                             type="checkbox"
                             checked={settings.showPlayerNames}
-                            onChange={(e) => updateSetting('showPlayerNames', e.target.checked)}
+                            onChange={e => updateSetting('showPlayerNames', e.target.checked)}
                             className="rounded"
                           />
                           Player Names
@@ -452,7 +467,7 @@ const PresentationControls: React.FC<PresentationControlsProps> = ({
                           <input
                             type="checkbox"
                             checked={settings.showPlayerNumbers}
-                            onChange={(e) => updateSetting('showPlayerNumbers', e.target.checked)}
+                            onChange={e => updateSetting('showPlayerNumbers', e.target.checked)}
                             className="rounded"
                           />
                           Player Numbers
@@ -462,7 +477,7 @@ const PresentationControls: React.FC<PresentationControlsProps> = ({
                           <input
                             type="checkbox"
                             checked={settings.showFormationName}
-                            onChange={(e) => updateSetting('showFormationName', e.target.checked)}
+                            onChange={e => updateSetting('showFormationName', e.target.checked)}
                             className="rounded"
                           />
                           Formation Name
@@ -472,7 +487,7 @@ const PresentationControls: React.FC<PresentationControlsProps> = ({
                           <input
                             type="checkbox"
                             checked={settings.showTactics}
-                            onChange={(e) => updateSetting('showTactics', e.target.checked)}
+                            onChange={e => updateSetting('showTactics', e.target.checked)}
                             className="rounded"
                           />
                           Tactical Instructions
@@ -481,13 +496,15 @@ const PresentationControls: React.FC<PresentationControlsProps> = ({
 
                       {/* Animation Settings */}
                       <div className="space-y-3">
-                        <h5 className="text-xs font-medium text-slate-400 uppercase tracking-wider">Animation</h5>
+                        <h5 className="text-xs font-medium text-slate-400 uppercase tracking-wider">
+                          Animation
+                        </h5>
 
                         <div>
                           <label className="block text-xs text-slate-400 mb-1">Speed</label>
                           <select
                             value={settings.animationSpeed}
-                            onChange={(e) => updateSetting('animationSpeed', e.target.value as any)}
+                            onChange={e => updateSetting('animationSpeed', e.target.value as any)}
                             className="w-full p-1 text-xs bg-slate-700 border border-slate-600 rounded"
                           >
                             <option value="slow">Slow</option>
@@ -500,7 +517,7 @@ const PresentationControls: React.FC<PresentationControlsProps> = ({
                           <input
                             type="checkbox"
                             checked={settings.autoAdvance}
-                            onChange={(e) => updateSetting('autoAdvance', e.target.checked)}
+                            onChange={e => updateSetting('autoAdvance', e.target.checked)}
                             className="rounded"
                           />
                           Auto Advance
@@ -516,7 +533,9 @@ const PresentationControls: React.FC<PresentationControlsProps> = ({
                               min={2}
                               max={15}
                               value={settings.autoAdvanceDelay}
-                              onChange={(e) => updateSetting('autoAdvanceDelay', parseInt(e.target.value))}
+                              onChange={e =>
+                                updateSetting('autoAdvanceDelay', parseInt(e.target.value))
+                              }
                               className="w-full"
                             />
                           </div>

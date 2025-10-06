@@ -1,6 +1,6 @@
 /**
  * Guardian Secure File Handler
- * 
+ *
  * Military-grade file handling for formation imports/exports
  * Provides comprehensive validation, sanitization, and encryption
  */
@@ -76,12 +76,12 @@ export class GuardianSecureFileHandler {
       'application/xml',
       'text/xml',
       'text/plain',
-      'image/svg+xml'
+      'image/svg+xml',
     ],
     allowedExtensions: ['.json', '.xml', '.txt', '.svg'],
     requireSignature: true,
     encryptOutput: true,
-    validateContent: true
+    validateContent: true,
   };
 
   /**
@@ -99,7 +99,7 @@ export class GuardianSecureFileHandler {
       allowPartialData: false,
       maxRetries: 3,
       backupOriginal: true,
-      ...options
+      ...options,
     };
 
     const errors: string[] = [];
@@ -110,7 +110,7 @@ export class GuardianSecureFileHandler {
       if (!validationResult.valid) {
         return {
           success: false,
-          errors: validationResult.errors
+          errors: validationResult.errors,
         };
       }
 
@@ -133,11 +133,16 @@ export class GuardianSecureFileHandler {
       if (importOptions.sanitizeContent) {
         parsedContent = validateAndSanitize(parsedContent, {
           allowedFields: [
-            'name', 'description', 'formation', 'playerPositions',
-            'tacticalInstructions', 'opponentAnalysis', 'classification'
+            'name',
+            'description',
+            'formation',
+            'playerPositions',
+            'tacticalInstructions',
+            'opponentAnalysis',
+            'classification',
           ],
           sanitizeStrings: true,
-          maxStringLength: 10000
+          maxStringLength: 10000,
         });
       }
 
@@ -148,7 +153,7 @@ export class GuardianSecureFileHandler {
           if (!importOptions.allowPartialData) {
             return {
               success: false,
-              errors: tacticalValidation.errors
+              errors: tacticalValidation.errors,
             };
           } else {
             errors.push(...tacticalValidation.errors.map(e => `Warning: ${e}`));
@@ -159,7 +164,7 @@ export class GuardianSecureFileHandler {
 
       // Step 5: Create formation object
       const formation: TacticalFormation = {
-        ...(parsedContent as Partial<TacticalFormation>),
+        ...(parsedContent as any),
         id: crypto.randomUUID(),
         teamId,
         createdBy: userId,
@@ -172,8 +177,8 @@ export class GuardianSecureFileHandler {
           accessCount: 0,
           sharedWith: [],
           tags: ['imported'],
-          ...(parsedContent as any)?.metadata
-        }
+          ...(parsedContent as any)?.metadata,
+        },
       };
 
       // Step 6: Log successful import
@@ -184,28 +189,27 @@ export class GuardianSecureFileHandler {
           fileSize: file.size,
           formationId: formation.id,
           teamId,
-          classification: formation.classification
-        }
+          classification: formation.classification,
+        },
       });
 
       return {
         success: true,
         formation,
-        errors
+        errors,
       };
-
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown import error';
       securityLogger.error('Secure import failed', {
         error: errorMessage,
         fileName: file.name,
         userId,
-        teamId
+        teamId,
       });
 
       return {
         success: false,
-        errors: [errorMessage]
+        errors: [errorMessage],
       };
     }
   }
@@ -225,7 +229,7 @@ export class GuardianSecureFileHandler {
       if (!this.canExportFormation(formation, userId, options.classification)) {
         return {
           success: false,
-          errors: ['Insufficient permissions to export this formation']
+          errors: ['Insufficient permissions to export this formation'],
         };
       }
 
@@ -241,28 +245,28 @@ export class GuardianSecureFileHandler {
           exportData = JSON.stringify(sanitizedFormation, null, 2);
           mimeType = 'application/json';
           break;
-        
+
         case 'xml':
           exportData = this.generateXMLExport(sanitizedFormation);
           mimeType = 'application/xml';
           break;
-        
+
         case 'pdf':
           // Generate PDF export (simplified implementation)
           exportData = await this.generatePDFExport(sanitizedFormation, options);
           mimeType = 'application/pdf';
           break;
-        
+
         case 'image':
           // Generate image export
           exportData = await this.generateImageExport(sanitizedFormation, options);
           mimeType = 'image/svg+xml';
           break;
-        
+
         default:
           return {
             success: false,
-            errors: [`Unsupported export format: ${options.format}`]
+            errors: [`Unsupported export format: ${options.format}`],
           };
       }
 
@@ -274,7 +278,7 @@ export class GuardianSecureFileHandler {
         exportedBy: userId,
         signature: await this.generateExportSignature(exportData, userId),
         expiresAt: options.expiresAt,
-        data: exportData
+        data: exportData,
       };
 
       // Step 5: Encrypt if required
@@ -287,7 +291,7 @@ export class GuardianSecureFileHandler {
         finalData = JSON.stringify({
           encrypted: true,
           data: encryptedData,
-          hint: 'Use provided password to decrypt'
+          hint: 'Use provided password to decrypt',
         });
       } else {
         finalData = JSON.stringify(secureExportData);
@@ -304,28 +308,27 @@ export class GuardianSecureFileHandler {
           format: options.format,
           classification: options.classification,
           passwordProtected: !!options.passwordProtect,
-          dataSize: blob.size
-        }
+          dataSize: blob.size,
+        },
       });
 
       return {
         success: true,
         data: blob,
-        errors
+        errors,
       };
-
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown export error';
       securityLogger.error('Secure export failed', {
         error: errorMessage,
         formationId: formation.id,
         userId,
-        format: options.format
+        format: options.format,
       });
 
       return {
         success: false,
-        errors: [errorMessage]
+        errors: [errorMessage],
       };
     }
   }
@@ -364,8 +367,16 @@ export class GuardianSecureFileHandler {
 
     // Check for suspicious file names
     const suspiciousPatterns = [
-      /\.exe$/i, /\.bat$/i, /\.cmd$/i, /\.scr$/i, /\.pif$/i,
-      /\.com$/i, /\.sys$/i, /\.dll$/i, /\.vbs$/i, /\.js$/i
+      /\.exe$/i,
+      /\.bat$/i,
+      /\.cmd$/i,
+      /\.scr$/i,
+      /\.pif$/i,
+      /\.com$/i,
+      /\.sys$/i,
+      /\.dll$/i,
+      /\.vbs$/i,
+      /\.js$/i,
     ];
 
     if (suspiciousPatterns.some(pattern => pattern.test(file.name))) {
@@ -384,7 +395,7 @@ export class GuardianSecureFileHandler {
       checksum,
       uploadedAt: new Date().toISOString(),
       uploadedBy: userId,
-      scanResults: await this.performSecurityScan(content, file.name)
+      scanResults: await this.performSecurityScan(content, file.name),
     };
 
     // Check security scan results
@@ -392,19 +403,24 @@ export class GuardianSecureFileHandler {
       errors.push('Malware detected in file');
     }
 
-    if (metadata.scanResults.riskLevel === 'critical' || metadata.scanResults.riskLevel === 'high') {
+    if (
+      metadata.scanResults.riskLevel === 'critical' ||
+      metadata.scanResults.riskLevel === 'high'
+    ) {
       errors.push(`File poses ${metadata.scanResults.riskLevel} security risk`);
     }
 
     if (metadata.scanResults.suspiciousPatterns.length > 0) {
-      warnings.push(`Suspicious patterns detected: ${metadata.scanResults.suspiciousPatterns.join(', ')}`);
+      warnings.push(
+        `Suspicious patterns detected: ${metadata.scanResults.suspiciousPatterns.join(', ')}`
+      );
     }
 
     return {
       valid: errors.length === 0,
       errors,
       warnings,
-      metadata
+      metadata,
     };
   }
 
@@ -414,8 +430,8 @@ export class GuardianSecureFileHandler {
   private async readFileSecurely(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      
-      reader.onload = (event) => {
+
+      reader.onload = event => {
         try {
           const content = event.target?.result as string;
           resolve(content);
@@ -423,11 +439,11 @@ export class GuardianSecureFileHandler {
           reject(new Error('Failed to read file content'));
         }
       };
-      
+
       reader.onerror = () => {
         reject(new Error('File reading failed'));
       };
-      
+
       reader.readAsText(file);
     });
   }
@@ -446,7 +462,10 @@ export class GuardianSecureFileHandler {
   /**
    * Perform security scan on content
    */
-  private async performSecurityScan(content: string, fileName: string): Promise<SecurityScanResult> {
+  private async performSecurityScan(
+    content: string,
+    fileName: string
+  ): Promise<SecurityScanResult> {
     const suspiciousPatterns: string[] = [];
     let riskLevel: 'low' | 'medium' | 'high' | 'critical' = 'low';
 
@@ -457,7 +476,7 @@ export class GuardianSecureFileHandler {
       /on\w+\s*=/gi,
       /eval\s*\(/gi,
       /document\.write/gi,
-      /innerHTML/gi
+      /innerHTML/gi,
     ];
 
     scriptPatterns.forEach(pattern => {
@@ -472,28 +491,27 @@ export class GuardianSecureFileHandler {
       /fetch\s*\(/gi,
       /XMLHttpRequest/gi,
       /\.send\s*\(/gi,
-      /postMessage/gi
+      /postMessage/gi,
     ];
 
     exfiltrationPatterns.forEach(pattern => {
       if (pattern.test(content)) {
         suspiciousPatterns.push(`Data exfiltration pattern: ${pattern.source}`);
-        if (riskLevel === 'low') riskLevel = 'medium';
+        if (riskLevel === 'low') {
+          riskLevel = 'medium';
+        }
       }
     });
 
     // Check for file system access patterns
-    const fileSystemPatterns = [
-      /fs\./gi,
-      /readFile/gi,
-      /writeFile/gi,
-      /require\s*\(/gi
-    ];
+    const fileSystemPatterns = [/fs\./gi, /readFile/gi, /writeFile/gi, /require\s*\(/gi];
 
     fileSystemPatterns.forEach(pattern => {
       if (pattern.test(content)) {
         suspiciousPatterns.push(`File system access: ${pattern.source}`);
-        if (riskLevel === 'low') riskLevel = 'medium';
+        if (riskLevel === 'low') {
+          riskLevel = 'medium';
+        }
       }
     });
 
@@ -502,7 +520,7 @@ export class GuardianSecureFileHandler {
       malwareDetected: suspiciousPatterns.length > 5,
       suspiciousPatterns,
       riskLevel,
-      scanTimestamp: new Date().toISOString()
+      scanTimestamp: new Date().toISOString(),
     };
   }
 
@@ -524,7 +542,7 @@ export class GuardianSecureFileHandler {
       [TacticalClassification.PUBLIC_FORMATION]: 1,
       [TacticalClassification.TEAM_INTERNAL]: 2,
       [TacticalClassification.COACH_CONFIDENTIAL]: 3,
-      [TacticalClassification.STRATEGIC_SECRET]: 4
+      [TacticalClassification.STRATEGIC_SECRET]: 4,
     };
 
     const formationLevel = classificationLevels[formation.classification];
@@ -546,12 +564,13 @@ export class GuardianSecureFileHandler {
       formation: formation.formation,
       playerPositions: formation.playerPositions.map(pos => ({
         ...pos,
-        playerId: options.classification === TacticalClassification.PUBLIC_FORMATION 
-          ? 'REDACTED' 
-          : pos.playerId
+        playerId:
+          options.classification === TacticalClassification.PUBLIC_FORMATION
+            ? 'REDACTED'
+            : pos.playerId,
       })),
       classification: options.classification,
-      isActive: formation.isActive
+      isActive: formation.isActive,
     };
 
     // Include additional data based on classification level
@@ -560,15 +579,17 @@ export class GuardianSecureFileHandler {
       sanitized.tacticalInstructions = formation.tacticalInstructions;
     }
 
-    if (options.classification === TacticalClassification.COACH_CONFIDENTIAL ||
-        options.classification === TacticalClassification.STRATEGIC_SECRET) {
+    if (
+      options.classification === TacticalClassification.COACH_CONFIDENTIAL ||
+      options.classification === TacticalClassification.STRATEGIC_SECRET
+    ) {
       sanitized.opponentAnalysis = formation.opponentAnalysis;
     }
 
     if (options.includeMetadata) {
       sanitized.metadata = {
         ...formation.metadata,
-        sharedWith: [] // Don't expose sharing information
+        sharedWith: [], // Don't expose sharing information
       };
     }
 
@@ -645,7 +666,7 @@ ${options.watermark ? `Watermark: ${options.watermark}` : ''}`;
     // Simplified XML parsing - would use proper XML parser in production
     const parser = new DOMParser();
     const xmlDoc = parser.parseFromString(xmlContent, 'text/xml');
-    
+
     if (xmlDoc.getElementsByTagName('parsererror').length > 0) {
       throw new Error('Invalid XML format');
     }
@@ -654,7 +675,7 @@ ${options.watermark ? `Watermark: ${options.watermark}` : ''}`;
     return {
       name: xmlDoc.querySelector('name')?.textContent || 'Imported Formation',
       formation: xmlDoc.querySelector('formation')?.textContent || '4-4-2',
-      classification: TacticalClassification.TEAM_INTERNAL
+      classification: TacticalClassification.TEAM_INTERNAL,
     };
   }
 }

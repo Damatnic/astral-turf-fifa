@@ -10,7 +10,7 @@ interface ErrorBoundaryState {
   retryCount: number;
 }
 
-interface ErrorBoundaryProps {
+export interface ErrorBoundaryProps {
   children: ReactNode;
   fallback?: ReactNode;
   onError?: (error: Error, errorInfo: ErrorInfo) => void;
@@ -39,7 +39,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     };
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     this.setState({
       error,
       errorInfo,
@@ -77,7 +77,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
   handleReportError = () => {
     const { error, errorInfo } = this.state;
-    
+
     // Create error report
     const errorReport = {
       message: error?.message || 'Unknown error',
@@ -94,13 +94,13 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     });
   };
 
-  componentWillUnmount() {
+  override componentWillUnmount() {
     if (this.retryTimeoutId) {
       clearTimeout(this.retryTimeoutId);
     }
   }
 
-  render() {
+  override render() {
     const { hasError, error, errorInfo, retryCount } = this.state;
     const { children, fallback, maxRetries = 3, showDetails = false, className } = this.props;
 
@@ -115,14 +115,17 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       const errorMessage = error?.message || 'Something went wrong';
 
       return (
-        <div className={cn('min-h-screen bg-secondary-950 flex items-center justify-center p-4', className)}>
+        <div
+          className={cn(
+            'min-h-screen bg-secondary-950 flex items-center justify-center p-4',
+            className
+          )}
+        >
           <Card className="max-w-2xl w-full">
             <CardHeader>
               <div className="text-center">
                 <div className="text-6xl mb-4">⚠️</div>
-                <h1 className="text-2xl font-bold text-white mb-2">
-                  Oops! Something went wrong
-                </h1>
+                <h1 className="text-2xl font-bold text-white mb-2">Oops! Something went wrong</h1>
                 <p className="text-secondary-400">
                   We're sorry, but an error occurred while loading this page.
                 </p>
@@ -187,29 +190,17 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             <CardFooter>
               <div className="flex flex-col sm:flex-row gap-3 w-full">
                 {canRetry && (
-                  <Button
-                    onClick={this.handleRetry}
-                    variant="primary"
-                    className="flex-1"
-                  >
+                  <Button onClick={this.handleRetry} variant="primary" className="flex-1">
                     Try Again ({maxRetries - retryCount} left)
                   </Button>
                 )}
-                
-                <Button
-                  onClick={this.handleReload}
-                  variant="secondary"
-                  className="flex-1"
-                >
+
+                <Button onClick={this.handleReload} variant="secondary" className="flex-1">
                   Reload Page
                 </Button>
 
                 {showDetails && (
-                  <Button
-                    onClick={this.handleReportError}
-                    variant="outline"
-                    className="flex-1"
-                  >
+                  <Button onClick={this.handleReportError} variant="outline" className="flex-1">
                     Copy Error Report
                   </Button>
                 )}
@@ -265,7 +256,7 @@ export const withErrorBoundary = <P extends object>(
 export const NetworkError: React.FC<{
   onRetry?: () => void;
   message?: string;
-}> = ({ onRetry, message = "Network connection failed" }) => (
+}> = ({ onRetry, message = 'Network connection failed' }) => (
   <div className="text-center py-8">
     <div className="text-4xl mb-4">🌐</div>
     <h3 className="text-lg font-semibold text-white mb-2">Connection Error</h3>
@@ -281,7 +272,7 @@ export const NetworkError: React.FC<{
 export const NotFoundError: React.FC<{
   resource?: string;
   onGoBack?: () => void;
-}> = ({ resource = "page", onGoBack }) => (
+}> = ({ resource = 'page', onGoBack }) => (
   <div className="text-center py-8">
     <div className="text-4xl mb-4">🔍</div>
     <h3 className="text-lg font-semibold text-white mb-2">
@@ -301,13 +292,11 @@ export const NotFoundError: React.FC<{
 export const PermissionError: React.FC<{
   action?: string;
   onRequestAccess?: () => void;
-}> = ({ action = "access this resource", onRequestAccess }) => (
+}> = ({ action = 'access this resource', onRequestAccess }) => (
   <div className="text-center py-8">
     <div className="text-4xl mb-4">🔒</div>
     <h3 className="text-lg font-semibold text-white mb-2">Access Denied</h3>
-    <p className="text-secondary-400 mb-4">
-      You don't have permission to {action}.
-    </p>
+    <p className="text-secondary-400 mb-4">You don't have permission to {action}.</p>
     {onRequestAccess && (
       <Button onClick={onRequestAccess} variant="primary">
         Request Access

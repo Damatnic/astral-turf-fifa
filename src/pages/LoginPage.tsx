@@ -104,8 +104,9 @@ const LoginPage: React.FC = () => {
       // Navigate to the intended destination or dashboard
       const from = (location.state as any)?.from?.pathname || '/dashboard';
       navigate(from);
-    } catch (_error) {
-      const message = error instanceof Error ? error.message : 'An unknown error occurred';
+    } catch (err) {
+      const error = err instanceof Error ? err : new Error('An unknown error occurred');
+      const message = error.message;
       setErrors({ general: message });
       dispatch({ type: 'LOGIN_FAILURE', payload: message });
     } finally {
@@ -145,8 +146,9 @@ const LoginPage: React.FC = () => {
 
         const from = (location.state as any)?.from?.pathname || '/dashboard';
         navigate(from);
-      } catch (_error) {
-        const message = error instanceof Error ? error.message : 'Login failed';
+      } catch (err) {
+        const error = err instanceof Error ? err : new Error('Login failed');
+        const message = error.message;
         setErrors({ general: message });
         dispatch({ type: 'LOGIN_FAILURE', payload: message });
       } finally {

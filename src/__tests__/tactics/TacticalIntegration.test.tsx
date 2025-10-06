@@ -1,61 +1,65 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '../test-utils';
-import { tacticalIntegrationService } from '../../services/tacticalIntegrationService';
+import { TacticalIntegrationService } from '../../services/tacticalIntegrationService';
 import { type Formation, type Player } from '../../types';
+import { createMockPlayer } from '../../test-utils/mock-factories/player.factory';
 
 // Mock the service
 vi.mock('../../services/tacticalIntegrationService', () => ({
-  tacticalIntegrationService: {
+  TacticalIntegrationService: {
     analyzeFormation: vi.fn(),
     calculateMatchup: vi.fn(),
     exportFormation: vi.fn(),
     createSimulationConfig: vi.fn(),
     calculatePlayerChemistry: vi.fn(),
-    generateHeatMapData: vi.fn()
-  }
+    generateHeatMapData: vi.fn(),
+  },
 }));
+
+// Type assertion for mocked service to allow mock methods
+const MockedService = TacticalIntegrationService as any;
 
 describe('Tactical Integration Service', () => {
   const mockFormation: Formation = {
     id: 'test-formation',
     name: '4-3-3',
-    positions: {
-      '1': { x: 50, y: 80 },
-      '2': { x: 30, y: 60 },
-      '3': { x: 70, y: 60 },
-      '4': { x: 50, y: 40 }
-    }
+    slots: [
+      { id: '1', role: 'Goalkeeper', defaultPosition: { x: 50, y: 80 }, playerId: null },
+      { id: '2', role: 'Left Back', defaultPosition: { x: 30, y: 60 }, playerId: null },
+      { id: '3', role: 'Right Back', defaultPosition: { x: 70, y: 60 }, playerId: null },
+      { id: '4', role: 'Center Mid', defaultPosition: { x: 50, y: 40 }, playerId: null },
+    ],
   };
 
   const mockPlayers: Player[] = [
-    {
+    createMockPlayer({
       id: '1',
       name: 'Striker',
-      position: 'CF',
+      roleId: 'striker',
       currentPotential: 90,
-      age: 25
-    },
-    {
+      age: 25,
+    }),
+    createMockPlayer({
       id: '2',
       name: 'Left Midfielder',
-      position: 'LM',
+      roleId: 'left-midfielder',
       currentPotential: 85,
-      age: 23
-    },
-    {
+      age: 23,
+    }),
+    createMockPlayer({
       id: '3',
-      name: 'Right Midfielder', 
-      position: 'RM',
+      name: 'Right Midfielder',
+      roleId: 'right-midfielder',
       currentPotential: 82,
-      age: 24
-    },
-    {
+      age: 24,
+    }),
+    createMockPlayer({
       id: '4',
       name: 'Defensive Midfielder',
-      position: 'DM',
+      roleId: 'defensive-midfielder',
       currentPotential: 78,
-      age: 26
-    }
+      age: 26,
+    }),
   ];
 
   beforeEach(() => {
@@ -69,24 +73,32 @@ describe('Tactical Integration Service', () => {
         weaknesses: ['Vulnerable on flanks'],
         recommendations: ['Improve defensive coverage'],
         effectiveness: 85,
-        riskLevel: 'medium' as const
+        riskLevel: 'medium' as const,
       };
 
-      vi.mocked(tacticalIntegrationService.analyzeFormation).mockResolvedValue(mockAnalysis);
+      vi.mocked((TacticalIntegrationService as any).analyzeFormation).mockResolvedValue(
+        mockAnalysis
+      );
 
-      const result = await tacticalIntegrationService.analyzeFormation(mockFormation, mockPlayers);
+      const result = await (TacticalIntegrationService as any).analyzeFormation(
+        mockFormation,
+        mockPlayers
+      );
 
-      expect(tacticalIntegrationService.analyzeFormation).toHaveBeenCalledWith(mockFormation, mockPlayers);
+      expect((TacticalIntegrationService as any).analyzeFormation).toHaveBeenCalledWith(
+        mockFormation,
+        mockPlayers
+      );
       expect(result).toEqual(mockAnalysis);
-      expect(result.effectiveness).toBe(85);
-      expect(result.riskLevel).toBe('medium');
+      expect((result as any).effectiveness).toBe(85);
+      expect((result as any).riskLevel).toBe('medium');
     });
 
     it('should handle empty formation gracefully', async () => {
       const emptyFormation: Formation = {
         id: 'empty',
         name: 'Empty',
-        positions: {}
+        slots: [],
       };
 
       const mockAnalysis = {
@@ -94,14 +106,14 @@ describe('Tactical Integration Service', () => {
         weaknesses: ['No players positioned'],
         recommendations: ['Add players to formation'],
         effectiveness: 0,
-        riskLevel: 'high' as const
+        riskLevel: 'high' as const,
       };
 
-      vi.mocked(tacticalIntegrationService.analyzeFormation).mockResolvedValue(mockAnalysis);
+      vi.mocked(MockedService.analyzeFormation).mockResolvedValue(mockAnalysis);
 
-      const result = await tacticalIntegrationService.analyzeFormation(emptyFormation, []);
-      expect(result.effectiveness).toBe(0);
-      expect(result.riskLevel).toBe('high');
+      const result = await MockedService.analyzeFormation(emptyFormation, []);
+      expect((result as any).effectiveness).toBe(0);
+      expect((result as any).riskLevel).toBe('high');
     });
   });
 
@@ -113,19 +125,22 @@ describe('Tactical Integration Service', () => {
           '1': 90,
           '2': 85,
           '3': 82,
-          '4': 85
+          '4': 85,
         },
-        suggestions: ['Good chemistry overall']
+        suggestions: ['Good chemistry overall'],
       };
 
-      vi.mocked(tacticalIntegrationService.calculatePlayerChemistry).mockReturnValue(mockChemistry);
+      vi.mocked(MockedService.calculatePlayerChemistry).mockReturnValue(mockChemistry);
 
-      const result = tacticalIntegrationService.calculatePlayerChemistry(mockPlayers, mockFormation);
+      const result = MockedService.calculatePlayerChemistry(mockPlayers, mockFormation);
 
-      expect(tacticalIntegrationService.calculatePlayerChemistry).toHaveBeenCalledWith(mockPlayers, mockFormation);
-      expect(result.overall).toBe(85);
-      expect(result.individual['1']).toBe(90);
-      expect(result.suggestions).toContain('Good chemistry overall');
+      expect(MockedService.calculatePlayerChemistry).toHaveBeenCalledWith(
+        mockPlayers,
+        mockFormation
+      );
+      expect((result as any).overall).toBe(85);
+      expect((result as any).individual['1']).toBe(90);
+      expect((result as any).suggestions).toContain('Good chemistry overall');
     });
 
     it('should identify low chemistry players', () => {
@@ -135,17 +150,17 @@ describe('Tactical Integration Service', () => {
           '1': 90,
           '2': 45, // Low chemistry
           '3': 82,
-          '4': 85
+          '4': 85,
         },
-        suggestions: ['Consider repositioning Left Midfielder for better chemistry']
+        suggestions: ['Consider repositioning Left Midfielder for better chemistry'],
       };
 
-      vi.mocked(tacticalIntegrationService.calculatePlayerChemistry).mockReturnValue(mockChemistry);
+      vi.mocked(MockedService.calculatePlayerChemistry).mockReturnValue(mockChemistry);
 
-      const result = tacticalIntegrationService.calculatePlayerChemistry(mockPlayers, mockFormation);
-      
-      expect(result.individual['2']).toBe(45);
-      expect(result.suggestions[0]).toContain('repositioning');
+      const result = MockedService.calculatePlayerChemistry(mockPlayers, mockFormation);
+
+      expect((result as any).individual['2']).toBe(45);
+      expect((result as any).suggestions[0]).toContain('repositioning');
     });
   });
 
@@ -156,19 +171,19 @@ describe('Tactical Integration Service', () => {
           { x: 50, y: 80, intensity: 0.9, type: 'attack' as const },
           { x: 30, y: 60, intensity: 0.7, type: 'midfield' as const },
           { x: 70, y: 60, intensity: 0.7, type: 'midfield' as const },
-          { x: 50, y: 40, intensity: 0.6, type: 'defense' as const }
+          { x: 50, y: 40, intensity: 0.6, type: 'defense' as const },
         ],
-        coverage: 85
+        coverage: 85,
       };
 
-      vi.mocked(tacticalIntegrationService.generateHeatMapData).mockReturnValue(mockHeatMap);
+      vi.mocked(MockedService.generateHeatMapData).mockReturnValue(mockHeatMap);
 
-      const result = tacticalIntegrationService.generateHeatMapData(mockFormation, mockPlayers);
+      const result = MockedService.generateHeatMapData(mockFormation, mockPlayers);
 
-      expect(tacticalIntegrationService.generateHeatMapData).toHaveBeenCalledWith(mockFormation, mockPlayers);
-      expect(result.zones).toHaveLength(4);
-      expect(result.coverage).toBe(85);
-      expect(result.zones[0].type).toBe('attack');
+      expect(MockedService.generateHeatMapData).toHaveBeenCalledWith(mockFormation, mockPlayers);
+      expect((result as any).zones).toHaveLength(4);
+      expect((result as any).coverage).toBe(85);
+      expect((result as any).zones[0].type).toBe('attack');
     });
 
     it('should handle different zone types correctly', () => {
@@ -176,18 +191,18 @@ describe('Tactical Integration Service', () => {
         zones: [
           { x: 50, y: 90, intensity: 0.9, type: 'attack' as const },
           { x: 50, y: 50, intensity: 0.7, type: 'midfield' as const },
-          { x: 50, y: 10, intensity: 0.6, type: 'defense' as const }
+          { x: 50, y: 10, intensity: 0.6, type: 'defense' as const },
         ],
-        coverage: 75
+        coverage: 75,
       };
 
-      vi.mocked(tacticalIntegrationService.generateHeatMapData).mockReturnValue(mockHeatMap);
+      vi.mocked(MockedService.generateHeatMapData).mockReturnValue(mockHeatMap);
 
-      const result = tacticalIntegrationService.generateHeatMapData(mockFormation, mockPlayers);
+      const result = MockedService.generateHeatMapData(mockFormation, mockPlayers);
 
-      const attackZones = result.zones.filter(z => z.type === 'attack');
-      const midfieldZones = result.zones.filter(z => z.type === 'midfield');
-      const defenseZones = result.zones.filter(z => z.type === 'defense');
+      const attackZones = (result as any).zones.filter((z: any) => z.type === 'attack');
+      const midfieldZones = (result as any).zones.filter((z: any) => z.type === 'midfield');
+      const defenseZones = (result as any).zones.filter((z: any) => z.type === 'defense');
 
       expect(attackZones).toHaveLength(1);
       expect(midfieldZones).toHaveLength(1);
@@ -203,23 +218,23 @@ describe('Tactical Integration Service', () => {
         tactics: {
           playStyle: 'attacking' as const,
           tempo: 'fast' as const,
-          aggression: 75
-        }
+          aggression: 75,
+        },
       };
 
-      vi.mocked(tacticalIntegrationService.createSimulationConfig).mockReturnValue(mockConfig);
+      vi.mocked(MockedService.createSimulationConfig).mockReturnValue(mockConfig);
 
-      const result = tacticalIntegrationService.createSimulationConfig(
-        mockFormation, 
-        mockPlayers,
-        { playStyle: 'attacking', tempo: 'fast', aggression: 75 }
-      );
+      const result = MockedService.createSimulationConfig(mockFormation, mockPlayers, {
+        playStyle: 'attacking',
+        tempo: 'fast',
+        aggression: 75,
+      });
 
-      expect(result.formation).toEqual(mockFormation);
-      expect(result.players).toEqual(mockPlayers);
-      expect(result.tactics.playStyle).toBe('attacking');
-      expect(result.tactics.tempo).toBe('fast');
-      expect(result.tactics.aggression).toBe(75);
+      expect((result as any).formation).toEqual(mockFormation);
+      expect((result as any).players).toEqual(mockPlayers);
+      expect((result as any).tactics.playStyle).toBe('attacking');
+      expect((result as any).tactics.tempo).toBe('fast');
+      expect((result as any).tactics.aggression).toBe(75);
     });
 
     it('should use default tactics when not specified', () => {
@@ -229,17 +244,17 @@ describe('Tactical Integration Service', () => {
         tactics: {
           playStyle: 'balanced' as const,
           tempo: 'medium' as const,
-          aggression: 50
-        }
+          aggression: 50,
+        },
       };
 
-      vi.mocked(tacticalIntegrationService.createSimulationConfig).mockReturnValue(mockConfig);
+      vi.mocked(MockedService.createSimulationConfig).mockReturnValue(mockConfig);
 
-      const result = tacticalIntegrationService.createSimulationConfig(mockFormation, mockPlayers);
+      const result = MockedService.createSimulationConfig(mockFormation, mockPlayers);
 
-      expect(result.tactics.playStyle).toBe('balanced');
-      expect(result.tactics.tempo).toBe('medium');
-      expect(result.tactics.aggression).toBe(50);
+      expect((result as any).tactics.playStyle).toBe('balanced');
+      expect((result as any).tactics.tempo).toBe('medium');
+      expect((result as any).tactics.aggression).toBe(50);
     });
   });
 
@@ -250,7 +265,7 @@ describe('Tactical Integration Service', () => {
         weaknesses: ['Minor issues'],
         recommendations: ['Keep it up'],
         effectiveness: 88,
-        riskLevel: 'low' as const
+        riskLevel: 'low' as const,
       };
 
       const mockExport = {
@@ -259,17 +274,17 @@ describe('Tactical Integration Service', () => {
         formation: mockFormation,
         players: mockPlayers,
         analysis: mockAnalysis,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
-      vi.mocked(tacticalIntegrationService.exportFormation).mockReturnValue(mockExport);
+      vi.mocked(MockedService.exportFormation).mockReturnValue(mockExport);
 
-      const result = tacticalIntegrationService.exportFormation(mockFormation, mockPlayers, mockAnalysis);
+      const result = MockedService.exportFormation(mockFormation, mockPlayers, mockAnalysis);
 
-      expect(result.formation).toEqual(mockFormation);
-      expect(result.players).toEqual(mockPlayers);
-      expect(result.analysis).toEqual(mockAnalysis);
-      expect(result.timestamp).toBeDefined();
+      expect((result as any).formation).toEqual(mockFormation);
+      expect((result as any).players).toEqual(mockPlayers);
+      expect((result as any).analysis).toEqual(mockAnalysis);
+      expect((result as any).timestamp).toBeDefined();
     });
   });
 
@@ -278,36 +293,38 @@ describe('Tactical Integration Service', () => {
       const opponentFormation: Formation = {
         id: 'opponent',
         name: '4-4-2',
-        positions: {
-          '1': { x: 50, y: 85 },
-          '2': { x: 35, y: 85 }
-        }
+        slots: [
+          { id: '1', role: 'Goalkeeper', defaultPosition: { x: 50, y: 85 }, playerId: null },
+          { id: '2', role: 'Left Back', defaultPosition: { x: 35, y: 85 }, playerId: null },
+        ],
       };
 
       const mockMatchup = {
         homeAdvantage: 65,
         awayAdvantage: 35,
         keyBattles: ['Midfield control', 'Wing play'],
-        predictions: ['Home team likely to dominate']
+        predictions: ['Home team likely to dominate'],
       };
 
-      vi.mocked(tacticalIntegrationService.calculateMatchup).mockReturnValue(mockMatchup);
+      vi.mocked(MockedService.calculateMatchup).mockReturnValue(mockMatchup);
 
-      const result = tacticalIntegrationService.calculateMatchup(mockFormation, opponentFormation);
+      const result = MockedService.calculateMatchup(mockFormation, opponentFormation);
 
-      expect(result.homeAdvantage).toBe(65);
-      expect(result.awayAdvantage).toBe(35);
-      expect(result.keyBattles).toContain('Midfield control');
-      expect(result.predictions).toContain('Home team likely to dominate');
+      expect((result as any).homeAdvantage).toBe(65);
+      expect((result as any).awayAdvantage).toBe(35);
+      expect((result as any).keyBattles).toContain('Midfield control');
+      expect((result as any).predictions).toContain('Home team likely to dominate');
     });
   });
 });
 
 describe('Tactical Integration Error Handling', () => {
   it('should handle service errors gracefully', async () => {
-    vi.mocked(tacticalIntegrationService.analyzeFormation).mockRejectedValue(new Error('Service unavailable'));
+    vi.mocked(MockedService.analyzeFormation).mockRejectedValue(new Error('Service unavailable'));
 
-    await expect(tacticalIntegrationService.analyzeFormation({} as Formation, [])).rejects.toThrow('Service unavailable');
+    await expect(MockedService.analyzeFormation({} as Formation, [])).rejects.toThrow(
+      'Service unavailable'
+    );
   });
 
   it('should handle invalid formation data', () => {
@@ -315,13 +332,13 @@ describe('Tactical Integration Error Handling', () => {
     const mockChemistry = {
       overall: 0,
       individual: {},
-      suggestions: ['Invalid formation data']
+      suggestions: ['Invalid formation data'],
     };
 
-    vi.mocked(tacticalIntegrationService.calculatePlayerChemistry).mockReturnValue(mockChemistry);
+    vi.mocked(MockedService.calculatePlayerChemistry).mockReturnValue(mockChemistry);
 
-    const result = tacticalIntegrationService.calculatePlayerChemistry([], invalidFormation);
-    expect(result.overall).toBe(0);
-    expect(result.suggestions[0]).toContain('Invalid');
+    const result = MockedService.calculatePlayerChemistry([], invalidFormation);
+    expect((result as any).overall).toBe(0);
+    expect((result as any).suggestions[0]).toContain('Invalid');
   });
 });

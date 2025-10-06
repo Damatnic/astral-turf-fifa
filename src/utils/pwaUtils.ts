@@ -52,7 +52,9 @@ export const usePWA = () => {
 
   // Register service worker
   const registerSW = useCallback(async () => {
-    if (!state.isSupported) return;
+    if (!state.isSupported) {
+      return;
+    }
 
     try {
       const reg = await navigator.serviceWorker.register('/sw.js', {
@@ -82,14 +84,16 @@ export const usePWA = () => {
 
   // Install app
   const installApp = useCallback(async () => {
-    if (!state.installPrompt) return false;
+    if (!state.installPrompt) {
+      return false;
+    }
 
     try {
       await state.installPrompt.prompt();
       const choice = await state.installPrompt.userChoice;
-      
-      setState(prev => ({ 
-        ...prev, 
+
+      setState(prev => ({
+        ...prev,
         installPrompt: null,
         isInstallable: false,
         isInstalled: choice.outcome === 'accepted',
@@ -104,7 +108,9 @@ export const usePWA = () => {
 
   // Update app
   const updateApp = useCallback(async () => {
-    if (!registration || !state.hasUpdate) return;
+    if (!registration || !state.hasUpdate) {
+      return;
+    }
 
     const waitingWorker = registration.waiting;
     if (waitingWorker) {
@@ -118,7 +124,7 @@ export const usePWA = () => {
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
     const isIOSInstalled = (window.navigator as any).standalone === true;
     const isInstalled = isStandalone || isIOSInstalled;
-    
+
     setState(prev => ({ ...prev, isInstalled }));
   }, []);
 
@@ -126,12 +132,12 @@ export const usePWA = () => {
   const updateNetworkStatus = useCallback(() => {
     const connection = (navigator as any).connection;
     let connectionType: 'online' | 'offline' | 'slow' = navigator.onLine ? 'online' : 'offline';
-    
+
     if (connection && navigator.onLine) {
       const slowConnections = ['slow-2g', '2g', '3g'];
       connectionType = slowConnections.includes(connection.effectiveType) ? 'slow' : 'online';
     }
-    
+
     setState(prev => ({ ...prev, isOnline: navigator.onLine, connectionType }));
   }, []);
 
@@ -157,7 +163,7 @@ export const usePWA = () => {
 
     // Check installation status
     checkInstallation();
-    
+
     // Update network and storage info
     updateNetworkStatus();
     updateStorageInfo();
@@ -165,8 +171,8 @@ export const usePWA = () => {
     // Listen for install prompt
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
-      setState(prev => ({ 
-        ...prev, 
+      setState(prev => ({
+        ...prev,
         isInstallable: true,
         installPrompt: e as BeforeInstallPromptEvent,
       }));
@@ -174,8 +180,8 @@ export const usePWA = () => {
 
     // Listen for app installation
     const handleAppInstalled = () => {
-      setState(prev => ({ 
-        ...prev, 
+      setState(prev => ({
+        ...prev,
         isInstalled: true,
         isInstallable: false,
         installPrompt: null,
@@ -186,7 +192,7 @@ export const usePWA = () => {
     // Enhanced network monitoring
     const handleOnline = () => updateNetworkStatus();
     const handleOffline = () => updateNetworkStatus();
-    
+
     // Connection change monitoring
     const handleConnectionChange = () => updateNetworkStatus();
 
@@ -194,7 +200,7 @@ export const usePWA = () => {
     window.addEventListener('appinstalled', handleAppInstalled);
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
-    
+
     if ((navigator as any).connection) {
       (navigator as any).connection.addEventListener('change', handleConnectionChange);
     }
@@ -204,7 +210,7 @@ export const usePWA = () => {
       window.removeEventListener('appinstalled', handleAppInstalled);
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
-      
+
       if ((navigator as any).connection) {
         (navigator as any).connection.removeEventListener('change', handleConnectionChange);
       }
@@ -212,33 +218,39 @@ export const usePWA = () => {
   }, [registerSW, checkInstallation, updateNetworkStatus, updateStorageInfo]);
 
   // App badge management
-  const updateBadge = useCallback((count: number) => {
-    if (state.supportsBadging) {
-      try {
-        if (count > 0) {
-          (navigator as any).setAppBadge(count);
-        } else {
-          (navigator as any).clearAppBadge();
+  const updateBadge = useCallback(
+    (count: number) => {
+      if (state.supportsBadging) {
+        try {
+          if (count > 0) {
+            (navigator as any).setAppBadge(count);
+          } else {
+            (navigator as any).clearAppBadge();
+          }
+        } catch (error) {
+          console.warn('Could not update app badge:', error);
         }
-      } catch (error) {
-        console.warn('Could not update app badge:', error);
       }
-    }
-  }, [state.supportsBadging]);
+    },
+    [state.supportsBadging]
+  );
 
   // Share functionality
-  const shareContent = useCallback(async (data: ShareData): Promise<boolean> => {
-    if (state.supportsShare) {
-      try {
-        await navigator.share(data);
-        return true;
-      } catch (error) {
-        console.error('Share failed:', error);
-        return false;
+  const shareContent = useCallback(
+    async (data: ShareData): Promise<boolean> => {
+      if (state.supportsShare) {
+        try {
+          await navigator.share(data);
+          return true;
+        } catch (error) {
+          console.error('Share failed:', error);
+          return false;
+        }
       }
-    }
-    return false;
-  }, [state.supportsShare]);
+      return false;
+    },
+    [state.supportsShare]
+  );
 
   // Wake lock management
   const requestWakeLock = useCallback(async (): Promise<WakeLockSentinel | null> => {
@@ -277,26 +289,26 @@ export const useOfflineData = () => {
         type: 'SYNC_DATA',
         data: { type, payload: data },
       });
-      
+
       setPendingSyncs(prev => prev + 1);
     }
   }, []);
 
   // Get offline data from IndexedDB
   const getOfflineData = useCallback(async (storeName: string, id?: string) => {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const request = indexedDB.open('AstralTurfDB', 1);
-      
+
       request.onsuccess = () => {
         const db = request.result;
         const transaction = db.transaction([storeName], 'readonly');
         const store = transaction.objectStore(storeName);
-        
+
         const getRequest = id ? store.get(id) : store.getAll();
         getRequest.onsuccess = () => resolve(getRequest.result);
         getRequest.onerror = () => resolve(null);
       };
-      
+
       request.onerror = () => resolve(null);
     });
   }, []);
@@ -306,7 +318,7 @@ export const useOfflineData = () => {
       setIsOffline(false);
       // Trigger background sync when coming online
       if ('serviceWorker' in navigator && 'sync' in window.ServiceWorkerRegistration.prototype) {
-        navigator.serviceWorker.ready.then(registration => {
+        navigator.serviceWorker.ready.then((registration: any) => {
           return registration.sync.register('background-sync');
         });
       }
@@ -365,7 +377,7 @@ export const usePushNotifications = () => {
       });
 
       setSubscription(sub);
-      
+
       // Send subscription to server
       await fetch('/api/notifications/subscribe', {
         method: 'POST',
@@ -382,12 +394,14 @@ export const usePushNotifications = () => {
 
   // Unsubscribe from push notifications
   const unsubscribe = useCallback(async () => {
-    if (!subscription) return;
+    if (!subscription) {
+      return;
+    }
 
     try {
       await subscription.unsubscribe();
       setSubscription(null);
-      
+
       // Notify server
       await fetch('/api/notifications/unsubscribe', {
         method: 'POST',
@@ -438,7 +452,8 @@ export const getPWACapabilities = () => {
   return {
     serviceWorker: 'serviceWorker' in navigator,
     pushNotifications: 'PushManager' in window && 'Notification' in window,
-    backgroundSync: 'serviceWorker' in navigator && 'sync' in window.ServiceWorkerRegistration.prototype,
+    backgroundSync:
+      'serviceWorker' in navigator && 'sync' in window.ServiceWorkerRegistration.prototype,
     installPrompt: 'BeforeInstallPromptEvent' in window,
     webShare: 'share' in navigator,
     fileSystemAccess: 'showOpenFilePicker' in window,
@@ -451,7 +466,9 @@ export const getPWACapabilities = () => {
  * Utility function to trigger app update check
  */
 export const checkForUpdates = async (): Promise<boolean> => {
-  if (!('serviceWorker' in navigator)) return false;
+  if (!('serviceWorker' in navigator)) {
+    return false;
+  }
 
   try {
     const registration = await navigator.serviceWorker.getRegistration();
@@ -462,7 +479,7 @@ export const checkForUpdates = async (): Promise<boolean> => {
   } catch (error) {
     console.error('Update check failed:', error);
   }
-  
+
   return false;
 };
 
@@ -476,49 +493,49 @@ export class OfflineDataManager {
   private dbName = 'AstralTurfOffline';
   private dbVersion = 2;
   private db: IDBDatabase | null = null;
-  
+
   constructor() {
     this.initDB();
   }
-  
+
   private async initDB(): Promise<void> {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(this.dbName, this.dbVersion);
-      
+
       request.onerror = () => reject(request.error);
       request.onsuccess = () => {
         this.db = request.result;
         resolve();
       };
-      
-      request.onupgradeneeded = (event) => {
+
+      request.onupgradeneeded = event => {
         const db = (event.target as IDBOpenDBRequest).result;
-        
+
         // Formations store
         if (!db.objectStoreNames.contains('formations')) {
           const formationsStore = db.createObjectStore('formations', { keyPath: 'id' });
           formationsStore.createIndex('lastModified', 'lastModified');
           formationsStore.createIndex('offline', 'offline');
         }
-        
+
         // Players store
         if (!db.objectStoreNames.contains('players')) {
           const playersStore = db.createObjectStore('players', { keyPath: 'id' });
           playersStore.createIndex('teamId', 'teamId');
           playersStore.createIndex('position', 'position');
         }
-        
+
         // Settings store
         if (!db.objectStoreNames.contains('settings')) {
           const settingsStore = db.createObjectStore('settings', { keyPath: 'key' });
         }
-        
+
         // Cache store
         if (!db.objectStoreNames.contains('cache')) {
           const cacheStore = db.createObjectStore('cache', { keyPath: 'key' });
           cacheStore.createIndex('expiry', 'expiry');
         }
-        
+
         // Sync queue store
         if (!db.objectStoreNames.contains('syncQueue')) {
           const syncStore = db.createObjectStore('syncQueue', { keyPath: 'id' });
@@ -528,47 +545,53 @@ export class OfflineDataManager {
       };
     });
   }
-  
+
   async saveFormation(formation: any): Promise<void> {
-    if (!this.db) await this.initDB();
-    
+    if (!this.db) {
+      await this.initDB();
+    }
+
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction(['formations'], 'readwrite');
       const store = transaction.objectStore('formations');
-      
+
       const formationWithMeta = {
         ...formation,
         lastModified: Date.now(),
         offline: true,
-        syncStatus: 'pending'
+        syncStatus: 'pending',
       };
-      
+
       const request = store.put(formationWithMeta);
       request.onerror = () => reject(request.error);
       request.onsuccess = () => resolve();
     });
   }
-  
+
   async getFormations(): Promise<any[]> {
-    if (!this.db) await this.initDB();
-    
+    if (!this.db) {
+      await this.initDB();
+    }
+
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction(['formations'], 'readonly');
       const store = transaction.objectStore('formations');
       const request = store.getAll();
-      
+
       request.onerror = () => reject(request.error);
       request.onsuccess = () => resolve(request.result);
     });
   }
-  
+
   async addToSyncQueue(type: string, action: string, data: any): Promise<void> {
-    if (!this.db) await this.initDB();
-    
+    if (!this.db) {
+      await this.initDB();
+    }
+
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction(['syncQueue'], 'readwrite');
       const store = transaction.objectStore('syncQueue');
-      
+
       const syncItem = {
         id: `${type}-${action}-${Date.now()}-${Math.random()}`,
         type,
@@ -576,41 +599,45 @@ export class OfflineDataManager {
         data,
         timestamp: Date.now(),
         retries: 0,
-        maxRetries: 3
+        maxRetries: 3,
       };
-      
+
       const request = store.add(syncItem);
       request.onerror = () => reject(request.error);
       request.onsuccess = () => resolve();
     });
   }
-  
+
   async getSyncQueue(): Promise<any[]> {
-    if (!this.db) await this.initDB();
-    
+    if (!this.db) {
+      await this.initDB();
+    }
+
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction(['syncQueue'], 'readonly');
       const store = transaction.objectStore('syncQueue');
       const request = store.getAll();
-      
+
       request.onerror = () => reject(request.error);
       request.onsuccess = () => resolve(request.result);
     });
   }
-  
+
   async clearSyncItem(id: string): Promise<void> {
-    if (!this.db) await this.initDB();
-    
+    if (!this.db) {
+      await this.initDB();
+    }
+
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction(['syncQueue'], 'readwrite');
       const store = transaction.objectStore('syncQueue');
       const request = store.delete(id);
-      
+
       request.onerror = () => reject(request.error);
       request.onsuccess = () => resolve();
     });
   }
-  
+
   async getStorageUsage(): Promise<{ used: number; available: number; percentage: number }> {
     if ('storage' in navigator && 'estimate' in navigator.storage) {
       try {
@@ -619,13 +646,13 @@ export class OfflineDataManager {
         const quota = estimate.quota || 0;
         const available = quota - used;
         const percentage = quota > 0 ? (used / quota) * 100 : 0;
-        
+
         return { used, available, percentage };
       } catch (error) {
         console.warn('Could not get storage usage:', error);
       }
     }
-    
+
     return { used: 0, available: 0, percentage: 0 };
   }
 }
@@ -635,43 +662,45 @@ export class OfflineDataManager {
  */
 export class BackgroundSyncManager {
   private offlineData: OfflineDataManager;
-  
+
   constructor() {
     this.offlineData = new OfflineDataManager();
     this.setupSyncHandlers();
   }
-  
+
   private setupSyncHandlers(): void {
     // Register for background sync when online
     window.addEventListener('online', () => {
       this.processSyncQueue();
     });
-    
+
     // Setup service worker message handling
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.addEventListener('message', (event) => {
+      navigator.serviceWorker.addEventListener('message', event => {
         if (event.data?.type === 'BACKGROUND_SYNC') {
           this.processSyncQueue();
         }
       });
     }
   }
-  
+
   async addToQueue(type: string, action: string, data: any): Promise<void> {
     await this.offlineData.addToSyncQueue(type, action, data);
-    
+
     // Try immediate sync if online
     if (navigator.onLine) {
       this.processSyncQueue();
     }
   }
-  
+
   async processSyncQueue(): Promise<void> {
-    if (!navigator.onLine) return;
-    
+    if (!navigator.onLine) {
+      return;
+    }
+
     try {
       const queue = await this.offlineData.getSyncQueue();
-      
+
       for (const item of queue) {
         try {
           await this.syncItem(item);
@@ -685,39 +714,40 @@ export class BackgroundSyncManager {
       console.error('Sync queue processing failed:', error);
     }
   }
-  
+
   private async syncItem(item: any): Promise<void> {
     // Implement actual API synchronization
     console.log('Syncing item:', item);
-    
+
     // This would make actual API calls
     // Example: await api.syncFormation(item.action, item.data);
   }
 }
 
 export const clearAppCache = async (): Promise<void> => {
-  if (!('caches' in window)) return;
+  if (!('caches' in window)) {
+    return;
+  }
 
   try {
     const cacheNames = await caches.keys();
-    await Promise.all(
-      cacheNames.map(cacheName => caches.delete(cacheName))
-    );
-    
+    await Promise.all(cacheNames.map(cacheName => caches.delete(cacheName)));
+
     // Also clear IndexedDB
     const databases = await indexedDB.databases();
     await Promise.all(
       databases.map(db => {
         if (db.name?.includes('AstralTurf')) {
           const deleteRequest = indexedDB.deleteDatabase(db.name);
-          return new Promise((resolve) => {
+          return new Promise(resolve => {
             deleteRequest.onsuccess = () => resolve(undefined);
             deleteRequest.onerror = () => resolve(undefined);
           });
         }
+        return Promise.resolve();
       })
     );
-    
+
     console.log('App cache cleared successfully');
   } catch (error) {
     console.error('Cache clearing failed:', error);

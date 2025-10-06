@@ -1,20 +1,28 @@
 /**
  * Comprehensive Help System Component
- * 
+ *
  * Provides contextual help, tooltips, guided tours, and interactive tutorials
  * for the Astral Turf application. Supports multiple languages and accessibility.
  */
 
-import React, { useState, useEffect, useRef, useCallback, useMemo, createContext, useContext } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+  createContext,
+  useContext,
+} from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  HelpCircle, 
-  X, 
-  ChevronLeft, 
-  ChevronRight, 
-  Search, 
-  Book, 
-  Video, 
+import {
+  HelpCircle,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  Search,
+  Book,
+  Video,
   FileText,
   Lightbulb,
   Target,
@@ -30,7 +38,7 @@ import {
   Star,
   ThumbsUp,
   ThumbsDown,
-  Share2
+  Share2,
 } from 'lucide-react';
 import { useUIContext, useAuthContext } from '../../hooks';
 import { useTheme, useAccessibility } from '../../context/ThemeContext';
@@ -190,7 +198,7 @@ Ready to begin? Let's start with creating your first formation!
     videoUrl: '/videos/getting-started.mp4',
     interactiveDemo: true,
     relatedArticles: ['tactical-board-basics', 'player-management-101'],
-    prerequisites: []
+    prerequisites: [],
   },
   {
     id: 'tactical-board-basics',
@@ -269,7 +277,7 @@ Master these fundamentals, and you'll be creating professional-level tactics in 
     videoUrl: '/videos/tactical-board-guide.mp4',
     interactiveDemo: true,
     relatedArticles: ['formation-guide', 'chemistry-system'],
-    prerequisites: ['getting-started-basics']
+    prerequisites: ['getting-started-basics'],
   },
   {
     id: 'ai-analysis-guide',
@@ -358,8 +366,8 @@ The AI is your tactical assistant - use it wisely to elevate your coaching game!
     videoUrl: '/videos/ai-analysis-guide.mp4',
     interactiveDemo: false,
     relatedArticles: ['tactical-board-basics', 'formation-optimization'],
-    prerequisites: ['getting-started-basics', 'tactical-board-basics']
-  }
+    prerequisites: ['getting-started-basics', 'tactical-board-basics'],
+  },
 ];
 
 // Tutorial Definitions
@@ -372,26 +380,29 @@ const TUTORIALS = {
       {
         id: 'welcome',
         title: 'Welcome to Formation Creator',
-        description: 'Let\'s create your first tactical formation together. This tutorial will guide you through the basics.',
+        description:
+          "Let's create your first tactical formation together. This tutorial will guide you through the basics.",
         target: '.tactical-board',
         position: 'top',
         skippable: true,
-        waitForElement: true
+        waitForElement: true,
       },
       {
         id: 'select-formation',
         title: 'Choose a Formation Template',
-        description: 'Click on the formation selector to choose a starting template. We recommend 4-3-3 for beginners.',
+        description:
+          'Click on the formation selector to choose a starting template. We recommend 4-3-3 for beginners.',
         target: '.formation-selector',
         position: 'bottom',
         action: 'click',
         skippable: false,
-        waitForElement: true
+        waitForElement: true,
       },
       {
         id: 'position-player',
         title: 'Position Your First Player',
-        description: 'Drag a player token to position them on the field. Try moving the striker to a different position.',
+        description:
+          'Drag a player token to position them on the field. Try moving the striker to a different position.',
         target: '.player-token[data-position="ST"]',
         position: 'top',
         action: 'drag',
@@ -400,54 +411,58 @@ const TUTORIALS = {
           // Check if player was moved from default position
           const player = document.querySelector('.player-token[data-position="ST"]');
           return player?.getAttribute('data-moved') === 'true';
-        }
+        },
       },
       {
         id: 'view-chemistry',
         title: 'Check Player Chemistry',
-        description: 'Click the chemistry button to see how your players work together. Good chemistry improves team performance.',
+        description:
+          'Click the chemistry button to see how your players work together. Good chemistry improves team performance.',
         target: '.chemistry-button',
         position: 'left',
         action: 'click',
         skippable: false,
-        waitForElement: true
+        waitForElement: true,
       },
       {
         id: 'ai-analysis',
         title: 'Get AI Insights',
-        description: 'Click the AI analysis button to get intelligent feedback on your formation. The AI will suggest improvements.',
+        description:
+          'Click the AI analysis button to get intelligent feedback on your formation. The AI will suggest improvements.',
         target: '.ai-analysis-button',
         position: 'right',
         action: 'click',
         skippable: false,
-        waitForElement: true
+        waitForElement: true,
       },
       {
         id: 'save-formation',
         title: 'Save Your Formation',
-        description: 'Don\'t forget to save your formation! Click the save button and give it a memorable name.',
+        description:
+          "Don't forget to save your formation! Click the save button and give it a memorable name.",
         target: '.save-button',
         position: 'top',
         action: 'click',
         skippable: true,
-        waitForElement: true
+        waitForElement: true,
       },
       {
         id: 'completion',
         title: 'Congratulations!',
-        description: 'You\'ve created your first formation! Explore the advanced features or start a new formation.',
+        description:
+          "You've created your first formation! Explore the advanced features or start a new formation.",
         target: '.tactical-board',
         position: 'center',
         skippable: true,
-        waitForElement: false
-      }
-    ]
-  }
+        waitForElement: false,
+      },
+    ],
+  },
 };
 
 // Main Help System Component
 export const HelpSystem: React.FC = () => {
-  const { theme, accessibility } = useTheme();
+  const { theme } = useTheme();
   const [state, setState] = useState<HelpSystemState>({
     isVisible: false,
     currentTutorial: null,
@@ -460,11 +475,11 @@ export const HelpSystem: React.FC = () => {
     viewedArticles: [],
     userPreferences: {
       autoPlayVideos: false,
-      showAnimations: !accessibility.reducedMotion,
+      showAnimations: true,
       voiceGuidance: false,
       keyboardShortcuts: true,
-      highContrast: accessibility.highContrast
-    }
+      highContrast: false,
+    },
   });
 
   const [activeTooltip, setActiveTooltip] = useState<{
@@ -479,125 +494,134 @@ export const HelpSystem: React.FC = () => {
   // Filter articles based on search and category
   const filteredArticles = useMemo(() => {
     return HELP_ARTICLES.filter(article => {
-      const matchesSearch = !state.searchQuery || 
+      const matchesSearch =
+        !state.searchQuery ||
         article.title.toLowerCase().includes(state.searchQuery.toLowerCase()) ||
         article.content.toLowerCase().includes(state.searchQuery.toLowerCase()) ||
         article.tags.some(tag => tag.toLowerCase().includes(state.searchQuery.toLowerCase()));
-      
-      const matchesCategory = !state.selectedCategory || article.category === state.selectedCategory;
-      
+
+      const matchesCategory =
+        !state.selectedCategory || article.category === state.selectedCategory;
+
       return matchesSearch && matchesCategory;
     });
   }, [state.searchQuery, state.selectedCategory]);
 
   // Help system actions
-  const actions = useMemo(() => ({
-    showHelp: (articleId?: string) => {
-      setState(prev => ({ 
-        ...prev, 
-        isVisible: true,
-        searchQuery: articleId ? '' : prev.searchQuery
-      }));
-      
-      if (articleId) {
-        // Scroll to specific article
-        setTimeout(() => {
-          const element = document.getElementById(`article-${articleId}`);
-          element?.scrollIntoView({ behavior: 'smooth' });
-        }, 100);
-      }
-    },
+  const actions = useMemo(
+    () => ({
+      showHelp: (articleId?: string) => {
+        setState(prev => ({
+          ...prev,
+          isVisible: true,
+          searchQuery: articleId ? '' : prev.searchQuery,
+        }));
 
-    hideHelp: () => {
-      setState(prev => ({ ...prev, isVisible: false }));
-    },
-
-    startTutorial: (tutorialId: string) => {
-      setState(prev => ({
-        ...prev,
-        currentTutorial: tutorialId,
-        currentStep: 0,
-        isVisible: false
-      }));
-    },
-
-    nextStep: () => {
-      setState(prev => {
-        const tutorial = TUTORIALS[prev.currentTutorial as keyof typeof TUTORIALS];
-        if (!tutorial) return prev;
-        
-        const nextStep = prev.currentStep + 1;
-        if (nextStep >= tutorial.steps.length) {
-          // Tutorial completed
-          return {
-            ...prev,
-            currentTutorial: null,
-            currentStep: 0,
-            completedTutorials: [...prev.completedTutorials, tutorial.id]
-          };
+        if (articleId) {
+          // Scroll to specific article
+          setTimeout(() => {
+            const element = document.getElementById(`article-${articleId}`);
+            element?.scrollIntoView({ behavior: 'smooth' });
+          }, 100);
         }
-        
-        return { ...prev, currentStep: nextStep };
-      });
-    },
+      },
 
-    previousStep: () => {
-      setState(prev => ({
-        ...prev,
-        currentStep: Math.max(0, prev.currentStep - 1)
-      }));
-    },
+      hideHelp: () => {
+        setState(prev => ({ ...prev, isVisible: false }));
+      },
 
-    skipTutorial: () => {
-      setState(prev => ({
-        ...prev,
-        currentTutorial: null,
-        currentStep: 0
-      }));
-    },
+      startTutorial: (tutorialId: string) => {
+        setState(prev => ({
+          ...prev,
+          currentTutorial: tutorialId,
+          currentStep: 0,
+          isVisible: false,
+        }));
+      },
 
-    showTooltip: (elementId: string, content: string) => {
-      const element = document.getElementById(elementId);
-      if (element) {
-        const rect = element.getBoundingClientRect();
-        setActiveTooltip({
-          id: elementId,
-          content,
-          position: { x: rect.left + rect.width / 2, y: rect.top }
+      nextStep: () => {
+        setState(prev => {
+          const tutorial = TUTORIALS[prev.currentTutorial as keyof typeof TUTORIALS];
+          if (!tutorial) {
+            return prev;
+          }
+
+          const nextStep = prev.currentStep + 1;
+          if (nextStep >= tutorial.steps.length) {
+            // Tutorial completed
+            return {
+              ...prev,
+              currentTutorial: null,
+              currentStep: 0,
+              completedTutorials: [...prev.completedTutorials, tutorial.id],
+            };
+          }
+
+          return { ...prev, currentStep: nextStep };
         });
-      }
-    },
+      },
 
-    hideTooltip: () => {
-      setActiveTooltip(null);
-    },
+      previousStep: () => {
+        setState(prev => ({
+          ...prev,
+          currentStep: Math.max(0, prev.currentStep - 1),
+        }));
+      },
 
-    searchHelp: (query: string) => {
-      setState(prev => ({ ...prev, searchQuery: query }));
-    },
+      skipTutorial: () => {
+        setState(prev => ({
+          ...prev,
+          currentTutorial: null,
+          currentStep: 0,
+        }));
+      },
 
-    rateArticle: (articleId: string, rating: number) => {
-      // Implementation for rating articles
-      console.log(`Rating article ${articleId}: ${rating}`);
-    },
+      showTooltip: (elementId: string, content: string) => {
+        const element = document.getElementById(elementId);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          setActiveTooltip({
+            id: elementId,
+            content,
+            position: { x: rect.left + rect.width / 2, y: rect.top },
+          });
+        }
+      },
 
-    markHelpful: (articleId: string, helpful: boolean) => {
-      // Implementation for marking articles as helpful
-      console.log(`Article ${articleId} marked as ${helpful ? 'helpful' : 'not helpful'}`);
-    },
+      hideTooltip: () => {
+        setActiveTooltip(null);
+      },
 
-    updatePreferences: (preferences: Partial<HelpSystemState['userPreferences']>) => {
-      setState(prev => ({
-        ...prev,
-        userPreferences: { ...prev.userPreferences, ...preferences }
-      }));
-    }
-  }), []);
+      searchHelp: (query: string) => {
+        setState(prev => ({ ...prev, searchQuery: query }));
+      },
+
+      rateArticle: (articleId: string, rating: number) => {
+        // Implementation for rating articles
+        console.log(`Rating article ${articleId}: ${rating}`);
+      },
+
+      markHelpful: (articleId: string, helpful: boolean) => {
+        // Implementation for marking articles as helpful
+        console.log(`Article ${articleId} marked as ${helpful ? 'helpful' : 'not helpful'}`);
+      },
+
+      updatePreferences: (preferences: Partial<HelpSystemState['userPreferences']>) => {
+        setState(prev => ({
+          ...prev,
+          userPreferences: { ...prev.userPreferences, ...preferences },
+        }));
+      },
+    }),
+    []
+  );
 
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyboard = (event: KeyboardEvent) => {
-      if (!state.userPreferences.keyboardShortcuts) return;
+      if (!state.userPreferences.keyboardShortcuts) {
+        return;
+      }
 
       // F1 - Toggle help
       if (event.key === 'F1') {
@@ -639,8 +663,10 @@ export const HelpSystem: React.FC = () => {
 
   // Current tutorial step
   const currentTutorialStep = useMemo(() => {
-    if (!state.currentTutorial) return null;
-    
+    if (!state.currentTutorial) {
+      return null;
+    }
+
     const tutorial = TUTORIALS[state.currentTutorial as keyof typeof TUTORIALS];
     return tutorial?.steps[state.currentStep] || null;
   }, [state.currentTutorial, state.currentStep]);
@@ -650,11 +676,7 @@ export const HelpSystem: React.FC = () => {
       {/* Help Panel */}
       <AnimatePresence>
         {state.isVisible && (
-          <Dialog
-            open={state.isVisible}
-            onOpenChange={actions.hideHelp}
-            className="help-system-dialog"
-          >
+          <Dialog open={state.isVisible} onOpenChange={actions.hideHelp}>
             <motion.div
               ref={helpPanelRef}
               initial={{ opacity: 0, scale: 0.95 }}
@@ -671,7 +693,7 @@ export const HelpSystem: React.FC = () => {
                       Help & Documentation
                     </h2>
                   </div>
-                  
+
                   <div className="flex items-center space-x-2">
                     <Button
                       variant="ghost"
@@ -682,12 +704,8 @@ export const HelpSystem: React.FC = () => {
                       <Lightbulb className="w-4 h-4 mr-2" />
                       Start Tutorial
                     </Button>
-                    
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={actions.hideHelp}
-                    >
+
+                    <Button variant="ghost" size="sm" onClick={actions.hideHelp}>
                       <X className="w-4 h-4" />
                     </Button>
                   </div>
@@ -703,7 +721,7 @@ export const HelpSystem: React.FC = () => {
                         ref={searchInputRef}
                         placeholder="Search help articles..."
                         value={state.searchQuery}
-                        onChange={(e) => actions.searchHelp(e.target.value)}
+                        onChange={e => actions.searchHelp(e.target.value)}
                         className="pl-10"
                       />
                     </div>
@@ -713,25 +731,31 @@ export const HelpSystem: React.FC = () => {
                       <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                         Categories
                       </h3>
-                      
-                      {['getting-started', 'tactics', 'players', 'analysis', 'advanced'].map((category) => (
-                        <button
-                          key={category}
-                          onClick={() => setState(prev => ({
-                            ...prev,
-                            selectedCategory: prev.selectedCategory === category ? null : category
-                          }))}
-                          className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
-                            state.selectedCategory === category
-                              ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
-                              : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
-                          }`}
-                        >
-                          {category.split('-').map(word => 
-                            word.charAt(0).toUpperCase() + word.slice(1)
-                          ).join(' ')}
-                        </button>
-                      ))}
+
+                      {['getting-started', 'tactics', 'players', 'analysis', 'advanced'].map(
+                        category => (
+                          <button
+                            key={category}
+                            onClick={() =>
+                              setState(prev => ({
+                                ...prev,
+                                selectedCategory:
+                                  prev.selectedCategory === category ? null : category,
+                              }))
+                            }
+                            className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
+                              state.selectedCategory === category
+                                ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
+                                : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
+                            }`}
+                          >
+                            {category
+                              .split('-')
+                              .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                              .join(' ')}
+                          </button>
+                        )
+                      )}
                     </div>
 
                     {/* Quick Actions */}
@@ -739,7 +763,7 @@ export const HelpSystem: React.FC = () => {
                       <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                         Quick Actions
                       </h3>
-                      
+
                       <Button
                         variant="ghost"
                         size="sm"
@@ -749,21 +773,13 @@ export const HelpSystem: React.FC = () => {
                         <Play className="w-4 h-4 mr-2" />
                         Interactive Tutorial
                       </Button>
-                      
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="w-full justify-start"
-                      >
+
+                      <Button variant="ghost" size="sm" className="w-full justify-start">
                         <Video className="w-4 h-4 mr-2" />
                         Video Guides
                       </Button>
-                      
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="w-full justify-start"
-                      >
+
+                      <Button variant="ghost" size="sm" className="w-full justify-start">
                         <Keyboard className="w-4 h-4 mr-2" />
                         Keyboard Shortcuts
                       </Button>
@@ -784,7 +800,7 @@ export const HelpSystem: React.FC = () => {
                       </div>
                     ) : (
                       <div className="space-y-6">
-                        {filteredArticles.map((article) => (
+                        {filteredArticles.map(article => (
                           <HelpArticleCard
                             key={article.id}
                             article={article}
@@ -804,7 +820,7 @@ export const HelpSystem: React.FC = () => {
 
       {/* Tutorial Overlay */}
       <TutorialOverlay
-        step={currentTutorialStep}
+        step={currentTutorialStep as any}
         onNext={actions.nextStep}
         onPrevious={actions.previousStep}
         onSkip={actions.skipTutorial}
@@ -822,7 +838,7 @@ export const HelpSystem: React.FC = () => {
             style={{
               left: activeTooltip.position.x,
               top: activeTooltip.position.y - 10,
-              transform: 'translateX(-50%) translateY(-100%)'
+              transform: 'translateX(-50%) translateY(-100%)',
             }}
           >
             {activeTooltip.content}
@@ -836,7 +852,7 @@ export const HelpSystem: React.FC = () => {
         <Button
           onClick={() => actions.showHelp()}
           className="fixed bottom-6 right-6 z-40 rounded-full w-12 h-12 shadow-lg"
-          variant="default"
+          variant="primary"
         >
           <HelpCircle className="w-5 h-5" />
         </Button>
@@ -852,11 +868,7 @@ interface HelpArticleCardProps {
   onMarkHelpful: (articleId: string, helpful: boolean) => void;
 }
 
-const HelpArticleCard: React.FC<HelpArticleCardProps> = ({
-  article,
-  onRate,
-  onMarkHelpful
-}) => {
+const HelpArticleCard: React.FC<HelpArticleCardProps> = ({ article, onRate, onMarkHelpful }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [userRating, setUserRating] = useState<number | null>(null);
 
@@ -865,15 +877,20 @@ const HelpArticleCard: React.FC<HelpArticleCardProps> = ({
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
           <div className="flex items-center space-x-2 mb-2">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              {article.title}
-            </h3>
-            <Badge variant={article.difficulty === 'beginner' ? 'default' : 
-                          article.difficulty === 'intermediate' ? 'secondary' : 'destructive'}>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{article.title}</h3>
+            <Badge
+              variant={
+                article.difficulty === 'beginner'
+                  ? 'primary'
+                  : article.difficulty === 'intermediate'
+                    ? 'secondary'
+                    : ('error' as any)
+              }
+            >
               {article.difficulty}
             </Badge>
           </div>
-          
+
           <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400 mb-3">
             <span className="flex items-center">
               <Eye className="w-4 h-4 mr-1" />
@@ -885,29 +902,29 @@ const HelpArticleCard: React.FC<HelpArticleCardProps> = ({
               {article.rating.toFixed(1)}
             </span>
           </div>
-          
+
           <div className="flex flex-wrap gap-2 mb-4">
-            {article.tags.map((tag) => (
+            {article.tags.map(tag => (
               <Badge key={tag} variant="outline" className="text-xs">
                 {tag}
               </Badge>
             ))}
           </div>
         </div>
-        
+
         <div className="flex items-center space-x-2">
           {article.videoUrl && (
             <Button variant="ghost" size="sm">
               <Video className="w-4 h-4" />
             </Button>
           )}
-          
+
           {article.interactiveDemo && (
             <Button variant="ghost" size="sm">
               <Target className="w-4 h-4" />
             </Button>
           )}
-          
+
           <Button variant="ghost" size="sm">
             <Share2 className="w-4 h-4" />
           </Button>
@@ -917,47 +934,36 @@ const HelpArticleCard: React.FC<HelpArticleCardProps> = ({
       {/* Content Preview/Full */}
       <div className="prose dark:prose-invert max-w-none">
         {isExpanded ? (
-          <div dangerouslySetInnerHTML={{ 
-            __html: article.content.replace(/\n/g, '<br>') 
-          }} />
+          <div
+            dangerouslySetInnerHTML={{
+              __html: article.content.replace(/\n/g, '<br>'),
+            }}
+          />
         ) : (
-          <p className="text-gray-600 dark:text-gray-300">
-            {article.content.substring(0, 200)}...
-          </p>
+          <p className="text-gray-600 dark:text-gray-300">{article.content.substring(0, 200)}...</p>
         )}
       </div>
 
       {/* Actions */}
       <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-        <Button
-          variant="ghost"
-          onClick={() => setIsExpanded(!isExpanded)}
-        >
+        <Button variant="ghost" onClick={() => setIsExpanded(!isExpanded)}>
           {isExpanded ? 'Show Less' : 'Read More'}
         </Button>
-        
+
         <div className="flex items-center space-x-4">
           {/* Helpful buttons */}
           <div className="flex items-center space-x-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onMarkHelpful(article.id, true)}
-            >
+            <Button variant="ghost" size="sm" onClick={() => onMarkHelpful(article.id, true)}>
               <ThumbsUp className="w-4 h-4" />
             </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onMarkHelpful(article.id, false)}
-            >
+            <Button variant="ghost" size="sm" onClick={() => onMarkHelpful(article.id, false)}>
               <ThumbsDown className="w-4 h-4" />
             </Button>
           </div>
-          
+
           {/* Star rating */}
           <div className="flex items-center space-x-1">
-            {[1, 2, 3, 4, 5].map((star) => (
+            {[1, 2, 3, 4, 5].map(star => (
               <button
                 key={star}
                 onClick={() => {
@@ -965,9 +971,7 @@ const HelpArticleCard: React.FC<HelpArticleCardProps> = ({
                   onRate(article.id, star);
                 }}
                 className={`text-lg ${
-                  star <= (userRating || 0) 
-                    ? 'text-yellow-500' 
-                    : 'text-gray-300 dark:text-gray-600'
+                  star <= (userRating || 0) ? 'text-yellow-500' : 'text-gray-300 dark:text-gray-600'
                 } hover:text-yellow-500 transition-colors`}
               >
                 <Star className="w-4 h-4" fill="currentColor" />
@@ -994,7 +998,7 @@ const TutorialOverlay: React.FC<TutorialOverlayProps> = ({
   onNext,
   onPrevious,
   onSkip,
-  preferences
+  preferences,
 }) => {
   const [targetElement, setTargetElement] = useState<HTMLElement | null>(null);
   const [highlightPosition, setHighlightPosition] = useState<{
@@ -1005,7 +1009,9 @@ const TutorialOverlay: React.FC<TutorialOverlayProps> = ({
   } | null>(null);
 
   useEffect(() => {
-    if (!step) return;
+    if (!step) {
+      return undefined;
+    }
 
     const findTarget = () => {
       const element = document.querySelector(step.target) as HTMLElement;
@@ -1016,7 +1022,7 @@ const TutorialOverlay: React.FC<TutorialOverlayProps> = ({
           x: rect.left,
           y: rect.top,
           width: rect.width,
-          height: rect.height
+          height: rect.height,
         });
       }
     };
@@ -1025,25 +1031,28 @@ const TutorialOverlay: React.FC<TutorialOverlayProps> = ({
       const observer = new MutationObserver(() => {
         findTarget();
       });
-      
+
       observer.observe(document.body, {
         childList: true,
-        subtree: true
+        subtree: true,
       });
-      
+
       return () => observer.disconnect();
     } else {
       findTarget();
+      return undefined;
     }
   }, [step]);
 
-  if (!step || !highlightPosition) return null;
+  if (!step || !highlightPosition) {
+    return null;
+  }
 
   return (
     <div className="fixed inset-0 z-50 pointer-events-none">
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/50" />
-      
+
       {/* Highlight */}
       <motion.div
         initial={{ opacity: 0 }}
@@ -1054,39 +1063,41 @@ const TutorialOverlay: React.FC<TutorialOverlayProps> = ({
           top: highlightPosition.y - 4,
           width: highlightPosition.width + 8,
           height: highlightPosition.height + 8,
-          boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.5)'
+          boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.5)',
         }}
       />
-      
+
       {/* Tutorial Card */}
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         className="absolute pointer-events-auto bg-white dark:bg-gray-900 rounded-xl shadow-xl max-w-sm p-6"
         style={{
-          left: step.position === 'left' ? highlightPosition.x - 300 : 
-                step.position === 'right' ? highlightPosition.x + highlightPosition.width + 20 :
-                highlightPosition.x + highlightPosition.width / 2 - 150,
-          top: step.position === 'top' ? highlightPosition.y - 200 :
-               step.position === 'bottom' ? highlightPosition.y + highlightPosition.height + 20 :
-               highlightPosition.y + highlightPosition.height / 2 - 100
+          left:
+            step.position === 'left'
+              ? highlightPosition.x - 300
+              : step.position === 'right'
+                ? highlightPosition.x + highlightPosition.width + 20
+                : highlightPosition.x + highlightPosition.width / 2 - 150,
+          top:
+            step.position === 'top'
+              ? highlightPosition.y - 200
+              : step.position === 'bottom'
+                ? highlightPosition.y + highlightPosition.height + 20
+                : highlightPosition.y + highlightPosition.height / 2 - 100,
         }}
       >
         <div className="flex items-start justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            {step.title}
-          </h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{step.title}</h3>
           {step.skippable && (
             <Button variant="ghost" size="sm" onClick={onSkip}>
               <X className="w-4 h-4" />
             </Button>
           )}
         </div>
-        
-        <p className="text-gray-600 dark:text-gray-300 mb-6">
-          {step.description}
-        </p>
-        
+
+        <p className="text-gray-600 dark:text-gray-300 mb-6">{step.description}</p>
+
         <div className="flex items-center justify-between">
           <Button
             variant="ghost"
@@ -1097,11 +1108,8 @@ const TutorialOverlay: React.FC<TutorialOverlayProps> = ({
             <ChevronLeft className="w-4 h-4 mr-1" />
             Previous
           </Button>
-          
-          <Button
-            onClick={onNext}
-            size="sm"
-          >
+
+          <Button onClick={onNext} size="sm">
             Next
             <ChevronRight className="w-4 h-4 ml-1" />
           </Button>

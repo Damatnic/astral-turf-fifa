@@ -170,7 +170,7 @@ const ChallengeHubPage: React.FC = () => {
                   >
                     {tab === 'all' ? 'All Challenges' : tab}
                   </button>
-                ),
+                )
               )}
             </div>
 
@@ -424,7 +424,7 @@ const ChallengeHubPage: React.FC = () => {
                   <p className="text-xs text-gray-500">Completed Today</p>
                   <p className="text-lg font-bold text-green-400">
                     {state.currentPlayerProfile.weeklyProgress.dailyActivity.filter(
-                      d => new Date(d.date).toDateString() === new Date().toDateString(),
+                      d => new Date(d.date).toDateString() === new Date().toDateString()
                     )[0]?.challengesCompleted.length || 0}
                   </p>
                 </div>

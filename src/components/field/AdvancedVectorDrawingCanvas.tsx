@@ -43,7 +43,9 @@ const SelectionHandles: React.FC<{
   const [isDragging, setIsDragging] = useState(false);
   const [dragHandle, setDragHandle] = useState<'move' | 'resize' | null>(null);
 
-  if (!shape.points || shape.points.length === 0) return null;
+  if (!shape.points || shape.points.length === 0) {
+    return null;
+  }
 
   const firstPoint = shape.points[0];
   const lastPoint = shape.points[shape.points.length - 1];
@@ -60,13 +62,13 @@ const SelectionHandles: React.FC<{
   }, []);
 
   const handles = useMemo(() => {
-    const result = [];
+    const result: JSX.Element[] = [];
 
     // Move handle (center)
     if (shape.tool === 'zone' && shape.points.length >= 2) {
       const centerX = (firstPoint.x + lastPoint.x) / 2;
       const centerY = (firstPoint.y + lastPoint.y) / 2;
-      
+
       result.push(
         <circle
           key="move-handle"
@@ -113,7 +115,7 @@ const SelectionHandles: React.FC<{
           stroke="white"
           strokeWidth="0.2"
           className="cursor-pointer"
-          onClick={(e) => {
+          onClick={e => {
             e.stopPropagation();
             onDelete();
           }}
@@ -131,14 +133,16 @@ const SelectionHandles: React.FC<{
   }, [shape, firstPoint, lastPoint, handleMouseDown, onDelete]);
 
   useEffect(() => {
-    if (!isDragging) return;
+    if (!isDragging) {
+      return;
+    }
 
     const handleMouseMove = (e: MouseEvent) => {
       if (dragHandle === 'move') {
         // Move entire shape
         const deltaX = e.movementX * 0.1; // Scale movement
         const deltaY = e.movementY * 0.1;
-        
+
         const updatedPoints = shape.points.map(point => ({
           x: Math.max(0, Math.min(100, point.x + deltaX)),
           y: Math.max(0, Math.min(100, point.y + deltaY)),
@@ -174,9 +178,21 @@ const VectorShapeRenderer: React.FC<{
   onUpdate: (shape: VectorShape) => void;
   onDelete: () => void;
 }> = React.memo(({ shape, isSelected, isHovered, onSelect, onUpdate, onDelete }) => {
-  if (!shape || !shape.points || shape.points.length === 0) return null;
+  if (!shape || !shape.points || shape.points.length === 0) {
+    return null;
+  }
 
-  const { id, tool, color = '#ffffff', points, strokeWidth = 0.5, opacity = 1, dashArray, gradient, shadow } = shape;
+  const {
+    id,
+    tool,
+    color = '#ffffff',
+    points,
+    strokeWidth = 0.5,
+    opacity = 1,
+    dashArray,
+    gradient,
+    shadow,
+  } = shape;
 
   // Generate unique IDs for gradients and filters
   const gradientId = `gradient-${id}`;
@@ -185,8 +201,8 @@ const VectorShapeRenderer: React.FC<{
   const renderDefs = () => (
     <defs>
       {/* Gradient definition */}
-      {gradient && (
-        gradient.direction === 'radial' ? (
+      {gradient &&
+        (gradient.direction === 'radial' ? (
           <radialGradient id={gradientId}>
             <stop offset="0%" stopColor={gradient.start} />
             <stop offset="100%" stopColor={gradient.end} />
@@ -202,8 +218,7 @@ const VectorShapeRenderer: React.FC<{
             <stop offset="0%" stopColor={gradient.start} />
             <stop offset="100%" stopColor={gradient.end} />
           </linearGradient>
-        )
-      )}
+        ))}
 
       {/* Shadow filter */}
       {shadow && (
@@ -221,13 +236,17 @@ const VectorShapeRenderer: React.FC<{
   );
 
   const getStroke = () => {
-    if (gradient) return `url(#${gradientId})`;
+    if (gradient) {
+      return `url(#${gradientId})`;
+    }
     return color;
   };
 
   const getFill = () => {
     if (tool === 'zone') {
-      if (gradient) return `url(#${gradientId})`;
+      if (gradient) {
+        return `url(#${gradientId})`;
+      }
       return `${color}33`; // 20% opacity
     }
     return 'none';
@@ -251,10 +270,12 @@ const VectorShapeRenderer: React.FC<{
   const renderShape = () => {
     switch (tool) {
       case 'arrow': {
-        if (points.length < 2) return null;
+        if (points.length < 2) {
+          return null;
+        }
         const start = points[0];
         const end = points[points.length - 1];
-        
+
         return (
           <g>
             <line
@@ -281,14 +302,16 @@ const VectorShapeRenderer: React.FC<{
       }
 
       case 'zone': {
-        if (points.length < 2) return null;
+        if (points.length < 2) {
+          return null;
+        }
         const start = points[0];
         const end = points[points.length - 1];
         const x = Math.min(start.x, end.x);
         const y = Math.min(start.y, end.y);
         const width = Math.abs(start.x - end.x);
         const height = Math.abs(start.y - end.y);
-        
+
         return (
           <g>
             <rect
@@ -314,48 +337,50 @@ const VectorShapeRenderer: React.FC<{
       }
 
       case 'pen': {
-        if (points.length < 2) return null;
-        
+        if (points.length < 2) {
+          return null;
+        }
+
         // Validate first point before accessing properties
         if (!points[0] || typeof points[0].x !== 'number' || typeof points[0].y !== 'number') {
           return null;
         }
-        
+
         // Create smooth curve using quadratic bezier
         let pathData = `M ${points[0].x} ${points[0].y}`;
-        
+
         for (let i = 1; i < points.length - 1; i++) {
           const current = points[i];
           const next = points[i + 1];
-          
+
           // Validate current and next points before accessing properties
-          if (!current || !next || 
-              typeof current.x !== 'number' || typeof current.y !== 'number' ||
-              typeof next.x !== 'number' || typeof next.y !== 'number') {
+          if (
+            !current ||
+            !next ||
+            typeof current.x !== 'number' ||
+            typeof current.y !== 'number' ||
+            typeof next.x !== 'number' ||
+            typeof next.y !== 'number'
+          ) {
             continue;
           }
-          
+
           const controlX = (current.x + next.x) / 2;
           const controlY = (current.y + next.y) / 2;
-          
+
           pathData += ` Q ${current.x} ${current.y} ${controlX} ${controlY}`;
         }
-        
+
         if (points.length > 1) {
           const lastPoint = points[points.length - 1];
           if (lastPoint && typeof lastPoint.x === 'number' && typeof lastPoint.y === 'number') {
             pathData += ` L ${lastPoint.x} ${lastPoint.y}`;
           }
         }
-        
+
         return (
           <g>
-            <path
-              d={pathData}
-              {...commonProps}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
+            <path d={pathData} {...commonProps} strokeLinecap="round" strokeLinejoin="round" />
             {/* Glow effect for pen strokes */}
             <path
               d={pathData}
@@ -372,9 +397,11 @@ const VectorShapeRenderer: React.FC<{
       }
 
       case 'text': {
-        if (!shape.text || points.length < 1) return null;
+        if (!shape.text || points.length < 1) {
+          return null;
+        }
         const point = points[0];
-        
+
         return (
           <g>
             {/* Text background */}
@@ -413,13 +440,7 @@ const VectorShapeRenderer: React.FC<{
     <g className={`vector-shape-container layer-${shape.layer || 0}`}>
       {renderDefs()}
       {renderShape()}
-      {isSelected && (
-        <SelectionHandles
-          shape={shape}
-          onUpdate={onUpdate}
-          onDelete={onDelete}
-        />
-      )}
+      {isSelected && <SelectionHandles shape={shape} onUpdate={onUpdate} onDelete={onDelete} />}
     </g>
   );
 });
@@ -431,7 +452,7 @@ const AdvancedVectorDrawingCanvas: React.FC<AdvancedVectorDrawingCanvasProps> = 
   const { drawings } = tacticsState;
 
   const canvasRef = useRef<SVGSVGElement>(null);
-  
+
   const [drawingState, setDrawingState] = useState<DrawingState>({
     isDrawing: false,
     currentDrawing: null,
@@ -449,117 +470,153 @@ const AdvancedVectorDrawingCanvas: React.FC<AdvancedVectorDrawingCanvasProps> = 
   } | null>(null);
 
   // Enhanced coordinate conversion with field boundaries
-  const getFieldCoordinates = useCallback((e: React.MouseEvent<SVGSVGElement>): Position | null => {
-    if (!fieldRef?.current || !canvasRef.current) return null;
+  const getFieldCoordinates = useCallback(
+    (e: React.MouseEvent<SVGSVGElement>): Position | null => {
+      if (!fieldRef?.current || !canvasRef.current) {
+        return null;
+      }
 
-    const svg = canvasRef.current;
-    const fieldRect = fieldRef.current.getBoundingClientRect();
-    const svgRect = svg.getBoundingClientRect();
+      const svg = canvasRef.current;
+      const fieldRect = fieldRef.current.getBoundingClientRect();
+      const svgRect = svg.getBoundingClientRect();
 
-    // Calculate relative position within the field
-    const relativeX = ((e.clientX - fieldRect.left) / fieldRect.width) * 100;
-    const relativeY = ((e.clientY - fieldRect.top) / fieldRect.height) * 100;
+      // Calculate relative position within the field
+      const relativeX = ((e.clientX - fieldRect.left) / fieldRect.width) * 100;
+      const relativeY = ((e.clientY - fieldRect.top) / fieldRect.height) * 100;
 
-    return {
-      x: Math.max(0, Math.min(100, relativeX)),
-      y: Math.max(0, Math.min(100, relativeY)),
-    };
-  }, [fieldRef]);
+      return {
+        x: Math.max(0, Math.min(100, relativeX)),
+        y: Math.max(0, Math.min(100, relativeY)),
+      };
+    },
+    [fieldRef]
+  );
 
   // Grid snapping functionality
-  const snapToGrid = useCallback((position: Position): Position => {
-    if (!drawingState.snapToGrid) return position;
+  const snapToGrid = useCallback(
+    (position: Position): Position => {
+      if (!drawingState.snapToGrid) {
+        return position;
+      }
 
-    const gridSize = 5; // 5% grid
-    return {
-      x: Math.round(position.x / gridSize) * gridSize,
-      y: Math.round(position.y / gridSize) * gridSize,
-    };
-  }, [drawingState.snapToGrid]);
+      const gridSize = 5; // 5% grid
+      return {
+        x: Math.round(position.x / gridSize) * gridSize,
+        y: Math.round(position.y / gridSize) * gridSize,
+      };
+    },
+    [drawingState.snapToGrid]
+  );
 
   // Enhanced drawing handlers
-  const handleMouseDown = useCallback((e: React.MouseEvent<SVGSVGElement>) => {
-    if (drawingTool === 'select' || e.button !== 0 || isPresentationMode) return;
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent<SVGSVGElement>) => {
+      if (drawingTool === 'select' || e.button !== 0 || isPresentationMode) {
+        return;
+      }
 
-    const startPoint = getFieldCoordinates(e);
-    if (!startPoint) return;
+      const startPoint = getFieldCoordinates(e);
+      if (!startPoint) {
+        return;
+      }
 
-    const snappedPoint = snapToGrid(startPoint);
+      const snappedPoint = snapToGrid(startPoint);
 
-    if (drawingTool === 'text') {
-      setTextInput({ position: snappedPoint, value: '' });
+      if (drawingTool === 'text') {
+        setTextInput({ position: snappedPoint, value: '' });
+        return;
+      }
+
+      setDrawingState(prev => ({ ...prev, isDrawing: true }));
+
+      const newDrawing: VectorShape = {
+        id: `vector-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        tool: drawingTool || 'pen',
+        color: drawingColor || '#ffffff',
+        points: [snappedPoint],
+        strokeWidth: drawingTool === 'pen' ? 0.5 : 0.8,
+        opacity: 1,
+        layer: 0,
+        shadow:
+          drawingTool === 'zone'
+            ? {
+                blur: 2,
+                color: drawingColor || '#ffffff',
+                offset: { x: 1, y: 1 },
+              }
+            : undefined,
+      };
+
+      setDrawingState(prev => ({ ...prev, currentDrawing: newDrawing }));
+    },
+    [drawingTool, drawingColor, isPresentationMode, getFieldCoordinates, snapToGrid]
+  );
+
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent<SVGSVGElement>) => {
+      if (!drawingState.isDrawing || !drawingState.currentDrawing) {
+        return;
+      }
+
+      const currentPoint = getFieldCoordinates(e);
+      if (!currentPoint) {
+        return;
+      }
+
+      const snappedPoint = snapToGrid(currentPoint);
+
+      setDrawingState(prev => {
+        if (!prev.currentDrawing) {
+          return prev;
+        }
+
+        const updatedPoints = [...prev.currentDrawing.points];
+
+        if (drawingTool === 'arrow' || drawingTool === 'zone') {
+          updatedPoints[1] = snappedPoint;
+        } else if (drawingTool === 'pen') {
+          // Add smoothing for pen tool
+          const lastPoint = updatedPoints[updatedPoints.length - 1];
+          const distance = Math.sqrt(
+            Math.pow(snappedPoint.x - lastPoint.x, 2) + Math.pow(snappedPoint.y - lastPoint.y, 2)
+          );
+
+          // Only add point if it's far enough for smooth drawing
+          if (distance > 1) {
+            updatedPoints.push(snappedPoint);
+          }
+        }
+
+        return {
+          ...prev,
+          currentDrawing: { ...prev.currentDrawing, points: updatedPoints },
+        };
+      });
+    },
+    [
+      drawingState.isDrawing,
+      drawingState.currentDrawing,
+      getFieldCoordinates,
+      snapToGrid,
+      drawingTool,
+    ]
+  );
+
+  const handleMouseUp = useCallback(() => {
+    if (!drawingState.isDrawing || !drawingState.currentDrawing) {
       return;
     }
 
-    setDrawingState(prev => ({ ...prev, isDrawing: true }));
-
-    const newDrawing: VectorShape = {
-      id: `vector-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      tool: drawingTool || 'pen',
-      color: drawingColor || '#ffffff',
-      points: [snappedPoint],
-      strokeWidth: drawingTool === 'pen' ? 0.5 : 0.8,
-      opacity: 1,
-      layer: 0,
-      shadow: drawingTool === 'zone' ? {
-        blur: 2,
-        color: drawingColor || '#ffffff',
-        offset: { x: 1, y: 1 }
-      } : undefined,
-    };
-
-    setDrawingState(prev => ({ ...prev, currentDrawing: newDrawing }));
-  }, [drawingTool, drawingColor, isPresentationMode, getFieldCoordinates, snapToGrid]);
-
-  const handleMouseMove = useCallback((e: React.MouseEvent<SVGSVGElement>) => {
-    if (!drawingState.isDrawing || !drawingState.currentDrawing) return;
-
-    const currentPoint = getFieldCoordinates(e);
-    if (!currentPoint) return;
-
-    const snappedPoint = snapToGrid(currentPoint);
-
-    setDrawingState(prev => {
-      if (!prev.currentDrawing) return prev;
-
-      const updatedPoints = [...prev.currentDrawing.points];
-
-      if (drawingTool === 'arrow' || drawingTool === 'zone') {
-        updatedPoints[1] = snappedPoint;
-      } else if (drawingTool === 'pen') {
-        // Add smoothing for pen tool
-        const lastPoint = updatedPoints[updatedPoints.length - 1];
-        const distance = Math.sqrt(
-          Math.pow(snappedPoint.x - lastPoint.x, 2) + 
-          Math.pow(snappedPoint.y - lastPoint.y, 2)
-        );
-        
-        // Only add point if it's far enough for smooth drawing
-        if (distance > 1) {
-          updatedPoints.push(snappedPoint);
-        }
-      }
-
-      return {
-        ...prev,
-        currentDrawing: { ...prev.currentDrawing, points: updatedPoints },
-      };
-    });
-  }, [drawingState.isDrawing, drawingState.currentDrawing, getFieldCoordinates, snapToGrid, drawingTool]);
-
-  const handleMouseUp = useCallback(() => {
-    if (!drawingState.isDrawing || !drawingState.currentDrawing) return;
-
     const points = drawingState.currentDrawing.points;
-    const shouldSave = 
-      points.length > 1 || 
+    const shouldSave =
+      points.length > 1 ||
       (drawingTool === 'pen' && points.length > 1) ||
       (drawingTool === 'text' && drawingState.currentDrawing.text);
 
     if (shouldSave) {
-      tacticsDispatch({ 
-        type: 'ADD_DRAWING', 
-        payload: drawingState.currentDrawing 
+      tacticsDispatch({
+        type: 'ADD_DRAWING',
+        payload: drawingState.currentDrawing,
       });
     }
 
@@ -592,14 +649,17 @@ const AdvancedVectorDrawingCanvas: React.FC<AdvancedVectorDrawingCanvasProps> = 
     setTextInput(null);
   }, [textInput, drawingColor, tacticsDispatch]);
 
-  const handleTextKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      finalizeText();
-    } else if (e.key === 'Escape') {
-      setTextInput(null);
-    }
-  }, [finalizeText]);
+  const handleTextKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        finalizeText();
+      } else if (e.key === 'Escape') {
+        setTextInput(null);
+      }
+    },
+    [finalizeText]
+  );
 
   // Shape selection and manipulation
   const handleShapeSelect = useCallback((shapeId: string) => {
@@ -610,44 +670,56 @@ const AdvancedVectorDrawingCanvas: React.FC<AdvancedVectorDrawingCanvasProps> = 
     }));
   }, []);
 
-  const handleShapeUpdate = useCallback((updatedShape: VectorShape) => {
-    tacticsDispatch({
-      type: 'UPDATE_DRAWING',
-      payload: updatedShape,
-    });
-  }, [tacticsDispatch]);
+  const handleShapeUpdate = useCallback(
+    (updatedShape: VectorShape) => {
+      tacticsDispatch({
+        type: 'UPDATE_DRAWING',
+        payload: updatedShape,
+      });
+    },
+    [tacticsDispatch]
+  );
 
-  const handleShapeDelete = useCallback((shapeId: string) => {
-    tacticsDispatch({
-      type: 'DELETE_DRAWING',
-      payload: shapeId,
-    });
-    setDrawingState(prev => ({ ...prev, selectedShapeId: null }));
-  }, [tacticsDispatch]);
+  const handleShapeDelete = useCallback(
+    (shapeId: string) => {
+      tacticsDispatch({
+        type: 'DELETE_DRAWING',
+        payload: shapeId,
+      });
+      setDrawingState(prev => ({ ...prev, selectedShapeId: null }));
+    },
+    [tacticsDispatch]
+  );
 
   // Render all arrow markers
-  const uniqueColors = useMemo(() => [
-    ...new Set([
-      ...(drawings || []).map(d => d.color).filter(Boolean),
-      drawingColor || '#ffffff'
-    ])
-  ], [drawings, drawingColor]);
+  const uniqueColors = useMemo(
+    () => [
+      ...new Set([
+        ...(drawings || []).map(d => d.color).filter(Boolean),
+        drawingColor || '#ffffff',
+      ]),
+    ],
+    [drawings, drawingColor]
+  );
 
-  const eventHandlers = drawingTool !== 'select' && !textInput ? {
-    onMouseDown: handleMouseDown,
-    onMouseMove: handleMouseMove,
-    onMouseUp: handleMouseUp,
-    onMouseLeave: handleMouseUp,
-  } : {};
+  const eventHandlers =
+    drawingTool !== 'select' && !textInput
+      ? {
+          onMouseDown: handleMouseDown,
+          onMouseMove: handleMouseMove,
+          onMouseUp: handleMouseUp,
+          onMouseLeave: handleMouseUp,
+        }
+      : {};
 
   return (
     <>
       <svg
         ref={canvasRef}
         className="absolute inset-0 w-full h-full"
-        style={{ 
+        style={{
           pointerEvents: drawingTool === 'select' || !!textInput ? 'auto' : 'auto',
-          zIndex: 15 
+          zIndex: 15,
         }}
         viewBox="0 0 100 100"
         preserveAspectRatio="none"
@@ -681,12 +753,7 @@ const AdvancedVectorDrawingCanvas: React.FC<AdvancedVectorDrawingCanvasProps> = 
 
           {/* Grid pattern */}
           {drawingState.snapToGrid && (
-            <pattern
-              id="grid-pattern"
-              width="5"
-              height="5"
-              patternUnits="userSpaceOnUse"
-            >
+            <pattern id="grid-pattern" width="5" height="5" patternUnits="userSpaceOnUse">
               <circle cx="2.5" cy="2.5" r="0.1" fill="rgba(255,255,255,0.3)" />
             </pattern>
           )}
@@ -708,7 +775,9 @@ const AdvancedVectorDrawingCanvas: React.FC<AdvancedVectorDrawingCanvasProps> = 
           .sort((a, b) => parseInt(a) - parseInt(b))
           .map(layerNum => {
             const layer = parseInt(layerNum);
-            if (!drawingState.layers[layer]) return null;
+            if (!drawingState.layers[layer]) {
+              return null;
+            }
 
             return (
               <g key={`layer-${layer}`} className={`drawing-layer-${layer}`}>
@@ -782,23 +851,25 @@ const AdvancedVectorDrawingCanvas: React.FC<AdvancedVectorDrawingCanvasProps> = 
               <input
                 type="checkbox"
                 checked={drawingState.layers[layer]}
-                onChange={(e) => setDrawingState(prev => ({
-                  ...prev,
-                  layers: { ...prev.layers, [layer]: e.target.checked }
-                }))}
+                onChange={e =>
+                  setDrawingState(prev => ({
+                    ...prev,
+                    layers: { ...prev.layers, [layer]: e.target.checked },
+                  }))
+                }
                 className="w-3 h-3"
               />
               <span className="text-xs text-white/80">Layer {layer}</span>
             </label>
           );
         })}
-        
+
         <div className="border-t border-white/20 mt-2 pt-2">
           <label className="flex items-center space-x-2">
             <input
               type="checkbox"
               checked={drawingState.snapToGrid}
-              onChange={(e) => setDrawingState(prev => ({ ...prev, snapToGrid: e.target.checked }))}
+              onChange={e => setDrawingState(prev => ({ ...prev, snapToGrid: e.target.checked }))}
               className="w-3 h-3"
             />
             <span className="text-xs text-white/80">Snap to Grid</span>

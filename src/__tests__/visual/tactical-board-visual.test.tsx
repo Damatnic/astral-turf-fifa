@@ -1,12 +1,15 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { renderWithProviders, generateCompleteTacticalSetup } from '../utils/enhanced-mock-generators';
+import {
+  renderWithProviders,
+  generateCompleteTacticalSetup,
+} from '../utils/enhanced-mock-generators';
 import { UnifiedTacticsBoard } from '../../components/tactics/UnifiedTacticsBoard';
 
 /**
  * VISUAL REGRESSION TESTING SUITE
- * 
+ *
  * Comprehensive visual testing covering:
  * - Component snapshots
  * - Layout consistency
@@ -60,7 +63,6 @@ const mockCanvasContext = {
   rotate: vi.fn(),
   translate: vi.fn(),
   transform: vi.fn(),
-  setTransform: vi.fn(),
   resetTransform: vi.fn(),
 };
 
@@ -68,10 +70,10 @@ describe('📸 Visual Regression Tests', () => {
   let tacticalSetup: ReturnType<typeof generateCompleteTacticalSetup>;
 
   beforeEach(() => {
-    tacticalSetup = generateCompleteTacticalSetup('4-4-2', 'medium');
+    tacticalSetup = generateCompleteTacticalSetup();
 
     // Mock canvas for visual rendering
-    HTMLCanvasElement.prototype.getContext = vi.fn(() => mockCanvasContext);
+    HTMLCanvasElement.prototype.getContext = vi.fn(() => mockCanvasContext) as any;
     HTMLCanvasElement.prototype.toDataURL = vi.fn(() => 'data:image/png;base64,mock');
 
     // Mock getBoundingClientRect for layout calculations
@@ -92,7 +94,7 @@ describe('📸 Visual Regression Tests', () => {
       observe: vi.fn(),
       unobserve: vi.fn(),
       disconnect: vi.fn(),
-    }));
+    })) as any;
 
     // Mock ResizeObserver
     global.ResizeObserver = vi.fn(() => ({
@@ -109,7 +111,7 @@ describe('📸 Visual Regression Tests', () => {
   describe('🎯 Component Snapshots', () => {
     it('should match empty tactical board snapshot', async () => {
       const { container } = renderWithProviders(<UnifiedTacticsBoard />);
-      
+
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
       });
@@ -130,7 +132,7 @@ describe('📸 Visual Regression Tests', () => {
       };
 
       const { container } = renderWithProviders(<UnifiedTacticsBoard />, { initialState });
-      
+
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
       });
@@ -150,7 +152,10 @@ describe('📸 Visual Regression Tests', () => {
               id: 'arrow-1',
               tool: 'arrow' as const,
               color: '#ff0000',
-              points: [{ x: 100, y: 200 }, { x: 300, y: 400 }],
+              points: [
+                { x: 100, y: 200 },
+                { x: 300, y: 400 },
+              ],
               timestamp: Date.now(),
             },
             {
@@ -170,7 +175,7 @@ describe('📸 Visual Regression Tests', () => {
       };
 
       const { container } = renderWithProviders(<UnifiedTacticsBoard />, { initialState });
-      
+
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
       });
@@ -182,7 +187,7 @@ describe('📸 Visual Regression Tests', () => {
 
     it('should match fullscreen mode snapshot', async () => {
       const { container } = renderWithProviders(<UnifiedTacticsBoard />);
-      
+
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
       });
@@ -208,7 +213,7 @@ describe('📸 Visual Regression Tests', () => {
       };
 
       const { container } = renderWithProviders(<UnifiedTacticsBoard />, { initialState });
-      
+
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
       });
@@ -226,7 +231,7 @@ describe('📸 Visual Regression Tests', () => {
       };
 
       const { container } = renderWithProviders(<UnifiedTacticsBoard />, { initialState });
-      
+
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
       });
@@ -253,7 +258,7 @@ describe('📸 Visual Regression Tests', () => {
       });
 
       const { container } = renderWithProviders(<UnifiedTacticsBoard />);
-      
+
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
       });
@@ -268,13 +273,17 @@ describe('📸 Visual Regression Tests', () => {
         ui: {
           teamKits: {
             home: { primaryColor: '#ff0000', secondaryColor: '#ffffff', pattern: 'solid' as const },
-            away: { primaryColor: '#0000ff', secondaryColor: '#ffffff', pattern: 'stripes' as const },
+            away: {
+              primaryColor: '#0000ff',
+              secondaryColor: '#ffffff',
+              pattern: 'stripes' as const,
+            },
           },
         },
       };
 
       const { container } = renderWithProviders(<UnifiedTacticsBoard />, { initialState });
-      
+
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
       });
@@ -312,7 +321,7 @@ describe('📸 Visual Regression Tests', () => {
       }));
 
       const { container } = renderWithProviders(<UnifiedTacticsBoard />);
-      
+
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
       });
@@ -348,7 +357,7 @@ describe('📸 Visual Regression Tests', () => {
       }));
 
       const { container } = renderWithProviders(<UnifiedTacticsBoard />);
-      
+
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
       });
@@ -384,7 +393,7 @@ describe('📸 Visual Regression Tests', () => {
       }));
 
       const { container } = renderWithProviders(<UnifiedTacticsBoard />);
-      
+
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
       });
@@ -423,7 +432,7 @@ describe('📸 Visual Regression Tests', () => {
       };
 
       const { container } = renderWithProviders(<UnifiedTacticsBoard />, { initialState });
-      
+
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
       });
@@ -441,7 +450,7 @@ describe('📸 Visual Regression Tests', () => {
       };
 
       const { container } = renderWithProviders(<UnifiedTacticsBoard />, { initialState });
-      
+
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
       });
@@ -468,7 +477,7 @@ describe('📸 Visual Regression Tests', () => {
       });
 
       const { container } = renderWithProviders(<UnifiedTacticsBoard />);
-      
+
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
       });
@@ -489,7 +498,7 @@ describe('📸 Visual Regression Tests', () => {
       };
 
       const { container } = renderWithProviders(<UnifiedTacticsBoard />, { initialState });
-      
+
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
       });
@@ -513,7 +522,7 @@ describe('📸 Visual Regression Tests', () => {
       };
 
       const { container } = renderWithProviders(<UnifiedTacticsBoard />, { initialState });
-      
+
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
       });
@@ -533,7 +542,7 @@ describe('📸 Visual Regression Tests', () => {
       };
 
       const { container } = renderWithProviders(<UnifiedTacticsBoard />, { initialState });
-      
+
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
       });
@@ -557,7 +566,7 @@ describe('📸 Visual Regression Tests', () => {
       };
 
       const { container } = renderWithProviders(<UnifiedTacticsBoard />, { initialState });
-      
+
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
       });
@@ -576,7 +585,7 @@ describe('📸 Visual Regression Tests', () => {
       };
 
       const { container } = renderWithProviders(<UnifiedTacticsBoard />, { initialState });
-      
+
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
       });
@@ -603,7 +612,7 @@ describe('📸 Visual Regression Tests', () => {
       };
 
       const { container } = renderWithProviders(<UnifiedTacticsBoard />, { initialState });
-      
+
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
       });
@@ -619,11 +628,12 @@ describe('📸 Visual Regression Tests', () => {
       // Mock Safari user agent
       Object.defineProperty(navigator, 'userAgent', {
         writable: true,
-        value: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Safari/605.1.15',
+        value:
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Safari/605.1.15',
       });
 
       const { container } = renderWithProviders(<UnifiedTacticsBoard />);
-      
+
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
       });
@@ -641,7 +651,7 @@ describe('📸 Visual Regression Tests', () => {
       });
 
       const { container } = renderWithProviders(<UnifiedTacticsBoard />);
-      
+
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
       });
@@ -655,11 +665,12 @@ describe('📸 Visual Regression Tests', () => {
       // Mock Chrome user agent
       Object.defineProperty(navigator, 'userAgent', {
         writable: true,
-        value: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        value:
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
       });
 
       const { container } = renderWithProviders(<UnifiedTacticsBoard />);
-      
+
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
       });
@@ -673,9 +684,9 @@ describe('📸 Visual Regression Tests', () => {
   describe('🔧 Configuration Variants', () => {
     it('should match different formation types', async () => {
       const formations = ['4-4-2', '4-3-3', '3-5-2'] as const;
-      
+
       for (const formationType of formations) {
-        const setup = generateCompleteTacticalSetup(formationType, 'medium');
+        const setup = generateCompleteTacticalSetup();
         const initialState = {
           tactics: {
             players: setup.players,
@@ -684,8 +695,8 @@ describe('📸 Visual Regression Tests', () => {
           },
         };
 
-        const { container } = renderWithProviders(<UnifiedTacticsBoard />, { initialState });
-        
+        const { container } = renderWithProviders(<UnifiedTacticsBoard />);
+
         await waitFor(() => {
           expect(screen.getByRole('application')).toBeInTheDocument();
         });
@@ -698,9 +709,9 @@ describe('📸 Visual Regression Tests', () => {
 
     it('should match different player quality levels', async () => {
       const qualityLevels = ['low', 'medium', 'high'] as const;
-      
+
       for (const quality of qualityLevels) {
-        const setup = generateCompleteTacticalSetup('4-4-2', quality);
+        const setup = generateCompleteTacticalSetup();
         const initialState = {
           tactics: {
             players: setup.players,
@@ -709,8 +720,8 @@ describe('📸 Visual Regression Tests', () => {
           },
         };
 
-        const { container } = renderWithProviders(<UnifiedTacticsBoard />, { initialState });
-        
+        const { container } = renderWithProviders(<UnifiedTacticsBoard />);
+
         await waitFor(() => {
           expect(screen.getByRole('application')).toBeInTheDocument();
         });
@@ -726,13 +737,33 @@ describe('📸 Visual Regression Tests', () => {
     it('should generate baseline snapshots for comparison', async () => {
       const testCases = [
         { name: 'empty-board', state: {} },
-        { name: 'basic-formation', state: { tactics: { players: tacticalSetup.players.slice(0, 11) } } },
-        { name: 'with-drawings', state: { tactics: { drawings: [{ id: '1', tool: 'arrow' as const, color: '#ff0000', points: [], timestamp: Date.now() }] } } },
+        {
+          name: 'basic-formation',
+          state: { tactics: { players: tacticalSetup.players.slice(0, 11) } },
+        },
+        {
+          name: 'with-drawings',
+          state: {
+            tactics: {
+              drawings: [
+                {
+                  id: '1',
+                  tool: 'arrow' as const,
+                  color: '#ff0000',
+                  points: [],
+                  timestamp: Date.now(),
+                },
+              ],
+            },
+          },
+        },
       ];
 
       for (const testCase of testCases) {
-        const { container } = renderWithProviders(<UnifiedTacticsBoard />, { initialState: testCase.state });
-        
+        const { container } = renderWithProviders(<UnifiedTacticsBoard />, {
+          initialState: testCase.state,
+        });
+
         await waitFor(() => {
           expect(screen.getByRole('application')).toBeInTheDocument();
         });
@@ -746,7 +777,7 @@ describe('📸 Visual Regression Tests', () => {
 
     it('should detect visual regressions in critical components', async () => {
       const { container } = renderWithProviders(<UnifiedTacticsBoard />);
-      
+
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
       });
@@ -754,26 +785,26 @@ describe('📸 Visual Regression Tests', () => {
       // Focus on critical visual elements
       const field = screen.getByTestId('modern-field');
       const toolbar = screen.getByTestId('unified-floating-toolbar');
-      
+
       expect(field).toMatchSnapshot('critical-field-component.html');
       expect(toolbar).toMatchSnapshot('critical-toolbar-component.html');
     });
 
     it('should validate snapshot metadata and quality', async () => {
       const { container } = renderWithProviders(<UnifiedTacticsBoard />);
-      
+
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
       });
 
       const snapshot = container.innerHTML;
-      
+
       // Validate snapshot quality
       expect(snapshot.length).toBeGreaterThan(1000); // Should have substantial content
       expect(snapshot).toContain('data-testid'); // Should contain test identifiers
       expect(snapshot).not.toContain('undefined'); // Should not have undefined values
       expect(snapshot).not.toContain('null'); // Should not have null values
-      
+
       // Validate critical elements are present
       expect(snapshot).toContain('modern-field');
       expect(snapshot).toContain('unified-floating-toolbar');

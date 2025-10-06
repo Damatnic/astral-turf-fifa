@@ -11,20 +11,19 @@ metadata:
   labels:
     name: atlas-database-production
     tier: data
-    atlas.database: "enterprise"
-    atlas.backup: "enabled"
-    atlas.monitoring: "enabled"
-    atlas.replication: "multi-region"
-    atlas.encryption: "at-rest-and-transit"
-    atlas.compliance: "sox-gdpr-pci"
+    atlas.database: 'enterprise'
+    atlas.backup: 'enabled'
+    atlas.monitoring: 'enabled'
+    atlas.replication: 'multi-region'
+    atlas.encryption: 'at-rest-and-transit'
+    atlas.compliance: 'sox-gdpr-pci'
   annotations:
-    atlas.backup/schedule: "0 */6 * * *"
-    atlas.monitoring/alerting: "enabled"
-    atlas.compliance/level: "banking-grade"
-    atlas.encryption/algorithm: "AES-256-GCM"
+    atlas.backup/schedule: '0 */6 * * *'
+    atlas.monitoring/alerting: 'enabled'
+    atlas.compliance/level: 'banking-grade'
+    atlas.encryption/algorithm: 'AES-256-GCM'
 
 ---
-
 # Enterprise Database Secrets with Encryption
 apiVersion: v1
 kind: Secret
@@ -32,35 +31,34 @@ metadata:
   name: atlas-enterprise-db-secrets
   namespace: atlas-database-production
   labels:
-    atlas.security/managed: "true"
-    atlas.encryption/enabled: "true"
+    atlas.security/managed: 'true'
+    atlas.encryption/enabled: 'true'
 type: Opaque
 data:
   # Production PostgreSQL credentials (base64 encoded)
-  postgres-master-password: QXRsYXNFbnRlcnByaXNlUHJvZFBhc3N3b3JkMjAyNCEhIQ==  # AtlasEnterpriseProPassword2024!!!
-  postgres-user: YXN0cmFsX3R1cmZfcHJvZA==  # astral_turf_prod
-  postgres-database: YXN0cmFsX3R1cmZfZW50ZXJwcmlzZQ==  # astral_turf_enterprise
-  
+  postgres-master-password: QXRsYXNFbnRlcnByaXNlUHJvZFBhc3N3b3JkMjAyNCEhIQ== # AtlasEnterpriseProPassword2024!!!
+  postgres-user: YXN0cmFsX3R1cmZfcHJvZA== # astral_turf_prod
+  postgres-database: YXN0cmFsX3R1cmZfZW50ZXJwcmlzZQ== # astral_turf_enterprise
+
   # Replication credentials
-  replication-user: YXRsYXNfcmVwbGljYQ==  # atlas_replica
-  replication-password: QXRsYXNSZXBsaWNhUGFzc3dvcmQyMDI0ISEh  # AtlasReplicaPassword2024!!!
-  
+  replication-user: YXRsYXNfcmVwbGljYQ== # atlas_replica
+  replication-password: QXRsYXNSZXBsaWNhUGFzc3dvcmQyMDI0ISEh # AtlasReplicaPassword2024!!!
+
   # Backup and monitoring credentials
-  backup-user: YXRsYXNfYmFja3Vw  # atlas_backup
-  backup-password: QXRsYXNCYWNrdXBQYXNzd29yZDIwMjQhISE=  # AtlasBackupPassword2024!!!
-  monitor-user: YXRsYXNfbW9uaXRvcg==  # atlas_monitor
-  monitor-password: QXRsYXNNb25pdG9yUGFzc3dvcmQyMDI0ISEh  # AtlasMonitorPassword2024!!!
-  
+  backup-user: YXRsYXNfYmFja3Vw # atlas_backup
+  backup-password: QXRsYXNCYWNrdXBQYXNzd29yZDIwMjQhISE= # AtlasBackupPassword2024!!!
+  monitor-user: YXRsYXNfbW9uaXRvcg== # atlas_monitor
+  monitor-password: QXRsYXNNb25pdG9yUGFzc3dvcmQyMDI0ISEh # AtlasMonitorPassword2024!!!
+
   # Redis credentials
-  redis-password: QXRsYXNSZWRpc1Bhc3N3b3JkMjAyNCEhIQ==  # AtlasRedisPassword2024!!!
-  redis-sentinel-password: QXRsYXNTZW50aW5lbFBhc3N3b3JkMjAyNCEhIQ==  # AtlasSentinelPassword2024!!!
-  
+  redis-password: QXRsYXNSZWRpc1Bhc3N3b3JkMjAyNCEhIQ== # AtlasRedisPassword2024!!!
+  redis-sentinel-password: QXRsYXNTZW50aW5lbFBhc3N3b3JkMjAyNCEhIQ== # AtlasSentinelPassword2024!!!
+
   # Encryption keys
-  database-encryption-key: QXRsYXNEYXRhYmFzZUVuY3J5cHRpb25LZXkyMDI0ISEh  # AtlasDatabaseEncryptionKey2024!!!
-  backup-encryption-key: QXRsYXNCYWNrdXBFbmNyeXB0aW9uS2V5MjAyNCEhIQ==  # AtlasBackupEncryptionKey2024!!!
+  database-encryption-key: QXRsYXNEYXRhYmFzZUVuY3J5cHRpb25LZXkyMDI0ISEh # AtlasDatabaseEncryptionKey2024!!!
+  backup-encryption-key: QXRsYXNCYWNrdXBFbmNyeXB0aW9uS2V5MjAyNCEhIQ== # AtlasBackupEncryptionKey2024!!!
 
 ---
-
 # Enterprise PostgreSQL Configuration
 apiVersion: v1
 kind: ConfigMap
@@ -68,21 +66,21 @@ metadata:
   name: atlas-postgres-enterprise-config
   namespace: atlas-database-production
   labels:
-    atlas.config/type: "database-enterprise"
+    atlas.config/type: 'database-enterprise'
 data:
   postgresql.conf: |
     # ===================================================================
     # ATLAS ENTERPRISE POSTGRESQL CONFIGURATION
     # Optimized for high-performance, multi-region deployment
     # ===================================================================
-    
+
     # Connection settings
     listen_addresses = '*'
     port = 5432
     max_connections = 5000
     superuser_reserved_connections = 50
     shared_preload_libraries = 'pg_stat_statements,auto_explain,pg_cron,pg_repack,passwordcheck'
-    
+
     # Memory settings - Enterprise optimized
     shared_buffers = 16GB
     effective_cache_size = 48GB
@@ -90,7 +88,7 @@ data:
     maintenance_work_mem = 4GB
     temp_buffers = 64MB
     max_stack_depth = 7MB
-    
+
     # WAL and replication - Multi-region setup
     wal_level = replica
     max_wal_senders = 50
@@ -103,18 +101,18 @@ data:
     hot_standby_feedback = on
     max_standby_streaming_delay = 30s
     max_standby_archive_delay = 30s
-    
+
     # Synchronous replication for critical data
     synchronous_standby_names = 'FIRST 2 (replica_us_east, replica_us_west, replica_eu_west)'
     synchronous_commit = on
-    
+
     # Archiving and point-in-time recovery
     archive_mode = on
     archive_command = '/usr/local/bin/atlas-archive-wal %p %f'
     archive_timeout = 300
     restore_command = '/usr/local/bin/atlas-restore-wal %f %p'
     recovery_target_timeline = 'latest'
-    
+
     # Logging - Comprehensive audit trail
     log_destination = 'stderr,csvlog,jsonlog'
     logging_collector = on
@@ -135,7 +133,7 @@ data:
     log_error_verbosity = verbose
     log_hostname = on
     log_line_prefix = '%t [%p]: [%l-1] user=%u,db=%d,app=%a,client=%h '
-    
+
     # Performance optimization
     checkpoint_completion_target = 0.9
     checkpoint_timeout = 10min
@@ -143,7 +141,7 @@ data:
     wal_buffers = 128MB
     wal_writer_delay = 200ms
     wal_writer_flush_after = 1MB
-    
+
     # Query planning
     default_statistics_target = 1000
     constraint_exclusion = partition
@@ -153,7 +151,7 @@ data:
     cpu_tuple_cost = 0.01
     cpu_index_tuple_cost = 0.005
     cpu_operator_cost = 0.0025
-    
+
     # Parallel query execution
     max_worker_processes = 32
     max_parallel_workers = 32
@@ -165,13 +163,13 @@ data:
     min_parallel_index_scan_size = 512kB
     effective_io_concurrency = 500
     maintenance_io_concurrency = 100
-    
+
     # Background writer
     bgwriter_delay = 200ms
     bgwriter_lru_maxpages = 1000
     bgwriter_lru_multiplier = 2.0
     bgwriter_flush_after = 512kB
-    
+
     # Autovacuum
     autovacuum = on
     autovacuum_max_workers = 8
@@ -184,7 +182,7 @@ data:
     autovacuum_multixact_freeze_max_age = 400000000
     autovacuum_vacuum_cost_delay = 10ms
     autovacuum_vacuum_cost_limit = 2000
-    
+
     # Security
     ssl = on
     ssl_cert_file = '/var/lib/postgresql/certs/server.crt'
@@ -195,10 +193,10 @@ data:
     ssl_ciphers = 'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384'
     ssl_ecdh_curve = 'prime256v1'
     password_encryption = scram-sha-256
-    
+
     # Row security
     row_security = on
-    
+
     # Monitoring and statistics
     track_activities = on
     track_counts = on
@@ -206,7 +204,7 @@ data:
     track_functions = all
     track_activity_query_size = 4096
     stats_temp_directory = '/tmp'
-    
+
     # Query explain
     auto_explain.log_min_duration = 1000
     auto_explain.log_analyze = on
@@ -216,16 +214,16 @@ data:
     auto_explain.log_timing = on
     auto_explain.log_triggers = on
     auto_explain.log_nested_statements = on
-    
+
     # Statement statistics
     pg_stat_statements.max = 10000
     pg_stat_statements.track = all
     pg_stat_statements.track_utility = on
     pg_stat_statements.save = on
-    
+
     # Cron extension
     cron.database_name = 'astral_turf_enterprise'
-    
+
     # Custom Atlas settings
     atlas.deployment_region = 'us-east-1'
     atlas.cluster_name = 'production'
@@ -238,45 +236,45 @@ data:
     # ATLAS ENTERPRISE HOST-BASED AUTHENTICATION
     # Zero-trust security model with encrypted connections
     # ===================================================================
-    
+
     # TYPE  DATABASE        USER            ADDRESS                 METHOD
-    
+
     # Local connections (Unix domain sockets)
     local   all             postgres                                peer
     local   all             all                                     scram-sha-256
-    
+
     # Local TCP connections
     host    all             all             127.0.0.1/32            scram-sha-256
     host    all             all             ::1/128                 scram-sha-256
-    
+
     # Kubernetes cluster internal networks
     hostssl all             all             10.0.0.0/8              scram-sha-256
     hostssl all             all             172.16.0.0/12           scram-sha-256
     hostssl all             all             192.168.0.0/16          scram-sha-256
-    
+
     # Application connections (SSL required)
     hostssl astral_turf_enterprise astral_turf_prod 10.0.0.0/8     scram-sha-256
     hostssl astral_turf_enterprise astral_turf_prod 172.16.0.0/12  scram-sha-256
     hostssl astral_turf_enterprise astral_turf_prod 192.168.0.0/16 scram-sha-256
-    
+
     # Replication connections (SSL required)
     hostssl replication     atlas_replica   10.0.0.0/8              scram-sha-256
     hostssl replication     atlas_replica   172.16.0.0/12           scram-sha-256
     hostssl replication     atlas_replica   192.168.0.0/16          scram-sha-256
-    
+
     # Backup connections (SSL required)
     hostssl all             atlas_backup    10.0.0.0/8              scram-sha-256
     hostssl all             atlas_backup    172.16.0.0/12           scram-sha-256
     hostssl all             atlas_backup    192.168.0.0/16          scram-sha-256
-    
+
     # Monitoring connections (SSL required)
     hostssl all             atlas_monitor   10.0.0.0/8              scram-sha-256
     hostssl all             atlas_monitor   172.16.0.0/12           scram-sha-256
     hostssl all             atlas_monitor   192.168.0.0/16          scram-sha-256
-    
+
     # External SSL connections (requires client certificates)
     hostssl all             all             0.0.0.0/0               cert clientcert=1
-    
+
     # Deny all other connections
     host    all             all             all                     reject
 
@@ -285,7 +283,7 @@ data:
     -- ATLAS ENTERPRISE DATABASE INITIALIZATION
     -- Creates users, extensions, and security policies
     -- ===================================================================
-    
+
     -- Extensions
     CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
     CREATE EXTENSION IF NOT EXISTS "pgcrypto";
@@ -298,36 +296,36 @@ data:
     CREATE EXTENSION IF NOT EXISTS "pg_repack";
     CREATE EXTENSION IF NOT EXISTS "postgres_fdw";
     CREATE EXTENSION IF NOT EXISTS "file_fdw";
-    
+
     -- Create roles and users
     CREATE ROLE atlas_app_role;
     CREATE ROLE atlas_readonly_role;
     CREATE ROLE atlas_admin_role;
-    
+
     -- Application user
     CREATE USER astral_turf_prod WITH 
       ENCRYPTED PASSWORD 'AtlasEnterpriseProPassword2024!!!'
       LOGIN
       CONNECTION LIMIT 1000
       IN ROLE atlas_app_role;
-    
+
     -- Replication user
     CREATE USER atlas_replica WITH 
       REPLICATION 
       ENCRYPTED PASSWORD 'AtlasReplicaPassword2024!!!'
       CONNECTION LIMIT 20;
-    
+
     -- Backup user
     CREATE USER atlas_backup WITH 
       ENCRYPTED PASSWORD 'AtlasBackupPassword2024!!!'
       CONNECTION LIMIT 10
       IN ROLE atlas_readonly_role;
-    
+
     -- Monitoring user
     CREATE USER atlas_monitor WITH 
       ENCRYPTED PASSWORD 'AtlasMonitorPassword2024!!!'
       CONNECTION LIMIT 20;
-    
+
     -- Grant permissions
     GRANT CONNECT ON DATABASE astral_turf_enterprise TO atlas_app_role;
     GRANT USAGE ON SCHEMA public TO atlas_app_role;
@@ -335,13 +333,13 @@ data:
     GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO atlas_app_role;
     GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO atlas_app_role;
     GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public TO atlas_app_role;
-    
+
     -- Read-only permissions
     GRANT CONNECT ON DATABASE astral_turf_enterprise TO atlas_readonly_role;
     GRANT USAGE ON SCHEMA public TO atlas_readonly_role;
     GRANT SELECT ON ALL TABLES IN SCHEMA public TO atlas_readonly_role;
     GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO atlas_readonly_role;
-    
+
     -- Monitoring permissions
     GRANT CONNECT ON DATABASE astral_turf_enterprise TO atlas_monitor;
     GRANT SELECT ON pg_stat_database TO atlas_monitor;
@@ -350,16 +348,16 @@ data:
     GRANT SELECT ON pg_stat_activity TO atlas_monitor;
     GRANT SELECT ON pg_stat_statements TO atlas_monitor;
     GRANT SELECT ON pg_stat_replication TO atlas_monitor;
-    
+
     -- Default privileges for future objects
     ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO atlas_app_role;
     ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO atlas_app_role;
     ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON FUNCTIONS TO atlas_app_role;
     ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO atlas_readonly_role;
-    
+
     -- Row Level Security policies
     ALTER SYSTEM SET row_security = on;
-    
+
     -- Audit table for security
     CREATE TABLE IF NOT EXISTS atlas_audit_log (
       id BIGSERIAL PRIMARY KEY,
@@ -375,7 +373,7 @@ data:
       client_ip INET,
       application_name TEXT
     );
-    
+
     -- Create audit trigger function
     CREATE OR REPLACE FUNCTION atlas_audit_trigger_function()
     RETURNS TRIGGER AS $$
@@ -392,18 +390,17 @@ data:
       RETURN CASE WHEN TG_OP = 'DELETE' THEN OLD ELSE NEW END;
     END;
     $$ LANGUAGE plpgsql;
-    
+
     -- Scheduled maintenance jobs
     SELECT cron.schedule('atlas-vacuum-analyze', '0 2 * * *', 'VACUUM ANALYZE;');
     SELECT cron.schedule('atlas-repack-tables', '0 3 * * 0', 'SELECT pg_repack.repack_database();');
     SELECT cron.schedule('atlas-update-stats', '0 */6 * * *', 'ANALYZE;');
-    
+
     -- Performance optimization
     CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_audit_log_timestamp ON atlas_audit_log (timestamp);
     CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_audit_log_user_operation ON atlas_audit_log (user_name, operation);
 
 ---
-
 # Enterprise Redis Configuration
 apiVersion: v1
 kind: ConfigMap
@@ -411,20 +408,20 @@ metadata:
   name: atlas-redis-enterprise-config
   namespace: atlas-database-production
   labels:
-    atlas.config/type: "cache-enterprise"
+    atlas.config/type: 'cache-enterprise'
 data:
   redis.conf: |
     # ===================================================================
     # ATLAS ENTERPRISE REDIS CONFIGURATION
     # High-availability cluster with intelligent caching
     # ===================================================================
-    
+
     # Network
     bind 0.0.0.0
     port 6379
     protected-mode yes
     requirepass AtlasRedisPassword2024!!!
-    
+
     # General
     daemonize no
     supervised systemd
@@ -432,12 +429,12 @@ data:
     loglevel notice
     logfile /var/log/redis/redis-server.log
     databases 16
-    
+
     # Memory management
     maxmemory 8gb
     maxmemory-policy allkeys-lru
     maxmemory-samples 10
-    
+
     # Persistence - Hybrid AOF + RDB
     save 900 1
     save 300 10
@@ -447,7 +444,7 @@ data:
     rdbchecksum yes
     dbfilename dump.rdb
     dir /data
-    
+
     # AOF
     appendonly yes
     appendfilename "appendonly.aof"
@@ -457,7 +454,7 @@ data:
     auto-aof-rewrite-min-size 64mb
     aof-load-truncated yes
     aof-use-rdb-preamble yes
-    
+
     # Security
     rename-command FLUSHDB ""
     rename-command FLUSHALL ""
@@ -465,27 +462,27 @@ data:
     rename-command CONFIG "CONFIG_abc123def456"
     rename-command SHUTDOWN "SHUTDOWN_abc123def456"
     rename-command EVAL ""
-    
+
     # Performance
     tcp-backlog 2048
     tcp-keepalive 300
     timeout 300
-    
+
     # Slow log
     slowlog-log-slower-than 10000
     slowlog-max-len 1000
-    
+
     # Latency monitoring
     latency-monitor-threshold 100
-    
+
     # Client output buffer limits
     client-output-buffer-limit normal 0 0 0
     client-output-buffer-limit replica 256mb 64mb 60
     client-output-buffer-limit pubsub 32mb 8mb 60
-    
+
     # Client query buffer
     client-query-buffer-limit 1gb
-    
+
     # TLS/SSL (when enabled)
     tls-port 0
     tls-cert-file /tls/redis.crt
@@ -495,7 +492,7 @@ data:
     tls-protocols "TLSv1.2 TLSv1.3"
     tls-ciphersuites "TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256"
     tls-prefer-server-ciphers yes
-    
+
     # Memory optimization
     hash-max-ziplist-entries 512
     hash-max-ziplist-value 64
@@ -507,17 +504,17 @@ data:
     hll-sparse-max-bytes 3000
     stream-node-max-bytes 4kb
     stream-node-max-entries 100
-    
+
     # Active rehashing
     activerehashing yes
-    
+
     # Jemalloc background thread
     jemalloc-bg-thread yes
-    
+
     # IO threads
     io-threads 8
     io-threads-do-reads yes
-    
+
     # Atlas specific
     # Custom Lua scripts path
     lua-load-script /etc/redis/scripts/atlas-cache-optimizer.lua
@@ -527,26 +524,26 @@ data:
     # ATLAS REDIS SENTINEL CONFIGURATION
     # Automatic failover and service discovery
     # ===================================================================
-    
+
     port 26379
     bind 0.0.0.0
-    
+
     # Sentinel authentication
     requirepass AtlasSentinelPassword2024!!!
-    
+
     # Master configuration
     sentinel monitor atlas-redis-master redis-master.atlas-database-production.svc.cluster.local 6379 2
     sentinel auth-pass atlas-redis-master AtlasRedisPassword2024!!!
     sentinel down-after-milliseconds atlas-redis-master 10000
     sentinel parallel-syncs atlas-redis-master 1
     sentinel failover-timeout atlas-redis-master 60000
-    
+
     # Notification script
     sentinel notification-script atlas-redis-master /etc/redis/scripts/notify-failover.sh
-    
+
     # Logging
     logfile /var/log/redis/redis-sentinel.log
     loglevel notice
-    
+
     # Security
     sentinel deny-scripts-reconfig yes

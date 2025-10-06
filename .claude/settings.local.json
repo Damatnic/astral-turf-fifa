@@ -11,27 +11,12 @@
       "Bash(git remote add:*)",
       "Bash(git push:*)",
       "Read(H:\\Astral-Turf-Lite/**)",
-      "Read(H:\\Astral-Turf-Lite/**)",
-      "Read(H:\\Astral-Turf-Lite/**)",
       "Bash(mkdir:*)",
       "Bash(npm run build:*)",
       "Bash(npm run dev:*)",
       "mcp__ide__getDiagnostics",
       "Bash(npx vite:*)",
-      "Read(H:\\Astral-Turf-Lite/**)",
-      "Read(H:\\Astral-Turf-Lite/**)",
-      "Read(H:\\Astral-Turf-Lite/**)",
-      "Read(H:\\Astral-Turf-Lite/**)",
-      "Read(H:\\Astral-Turf-Lite/**)",
-      "Read(H:\\Astral-Turf-Lite/**)",
-      "Read(H:\\Astral-Turf-Lite/**)",
-      "Read(H:\\Astral-Turf-Lite/**)",
-      "Read(H:\\Astral-Turf-Lite/**)",
-      "Read(H:\\Astral-Turf-Lite/**)",
-      "Read(H:\\Astral-Turf-Lite/**)",
-<<<<<<< Updated upstream
-      "Bash(git stash:*)"
-=======
+      "Bash(git stash:*)",
       "Bash(find:*)",
       "Bash(timeout 10 npm run dev)",
       "Bash(timeout 10 npm run vite:dev)",
@@ -56,7 +41,6 @@
       "Bash(npm test:*)",
       "Bash(npx husky init:*)",
       "Bash(npx playwright:*)"
->>>>>>> Stashed changes
     ],
     "deny": [],
     "ask": []

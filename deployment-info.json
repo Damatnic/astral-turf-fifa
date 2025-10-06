@@ -52,7 +52,7 @@
     "environment": "OpenAI API key configured via Vercel env vars",
     "apiKeys": {
       "OPENAI_API_KEY": "✅ Set (production & development)",
-      "VITE_OPENAI_API_KEY": "✅ Set (production & development)", 
+      "VITE_OPENAI_API_KEY": "✅ Set (production & development)",
       "API_KEY": "✅ Set (production & development)"
     },
     "dependencies": {
@@ -75,7 +75,7 @@
     "status": "✅ Enhanced version live and accessible",
     "newFeaturesLive": [
       "🎯 Smart Coaching Assistant - Click 'Coaching' tab",
-      "📊 Advanced Analytics - Click 'Analytics' tab", 
+      "📊 Advanced Analytics - Click 'Analytics' tab",
       "🤝 Real-time Collaboration - Click 'Collaboration' tab",
       "📱 Mobile Interface - Click 'Mobile' button",
       "⚡ WebGL Rendering - Click 'WebGL' button",

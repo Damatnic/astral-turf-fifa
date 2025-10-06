@@ -6,7 +6,13 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { cleanup } from '@testing-library/react';
-import { usePWA, useOfflineData, usePushNotifications, isPWAInstalled, getPWACapabilities } from '../../utils/pwaUtils';
+import {
+  usePWA,
+  useOfflineData,
+  usePushNotifications,
+  isPWAInstalled,
+  getPWACapabilities,
+} from '../../utils/pwaUtils';
 
 // Mock global APIs
 const mockServiceWorkerRegistration = {
@@ -195,9 +201,10 @@ describe('PWA Core Features', () => {
       const { result } = renderHook(() => usePWA());
 
       act(() => {
-        const updateFoundCallback = mockServiceWorkerRegistration.addEventListener.mock.calls
-          .find(call => call[0] === 'updatefound')?.[1];
-        
+        const updateFoundCallback = mockServiceWorkerRegistration.addEventListener.mock.calls.find(
+          call => call[0] === 'updatefound'
+        )?.[1];
+
         if (updateFoundCallback) {
           // Mock installing worker
           mockServiceWorkerRegistration.installing = {
@@ -227,12 +234,12 @@ describe('PWA Core Features', () => {
 
       // Set up update state
       act(() => {
-        (result.current as any).setState(prev => ({ ...prev, hasUpdate: true }));
+        (result.current as any).setState((prev: any) => ({ ...prev, hasUpdate: true }));
       });
 
       const mockWaitingWorker = {
         postMessage: vi.fn(),
-      };
+      } as any;
 
       mockServiceWorkerRegistration.waiting = mockWaitingWorker;
 

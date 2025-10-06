@@ -8,7 +8,9 @@ interface PlayerDragLayerProps {
 }
 
 const PlayerDragLayer: React.FC<PlayerDragLayerProps> = ({ isDragging, currentPlayer }) => {
-  if (!isDragging || !currentPlayer) {return null;}
+  if (!isDragging || !currentPlayer) {
+    return null;
+  }
 
   return (
     <AnimatePresence>
@@ -29,7 +31,7 @@ const PlayerDragLayer: React.FC<PlayerDragLayerProps> = ({ isDragging, currentPl
         >
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-full bg-blue-600/80 flex items-center justify-center text-white font-bold">
-              {currentPlayer.number || '?'}
+              {(currentPlayer as any).number || '?'}
             </div>
             <div>
               <div className="text-white font-semibold">{currentPlayer.name}</div>

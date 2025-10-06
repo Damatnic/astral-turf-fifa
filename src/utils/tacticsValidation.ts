@@ -5,22 +5,28 @@
 
 import type { Player, Formation, FormationSlot, Team, Position } from '../types';
 
+type FormationMap = Record<string, Formation>;
+type ActiveFormationIds = { home: string; away: string };
+
 /**
  * Validates if a position object is valid
  */
 export const isValidPosition = (position: unknown): position is Position => {
-  return (
-    position &&
-    typeof position === 'object' &&
-    typeof position.x === 'number' &&
-    typeof position.y === 'number' &&
-    !isNaN(position.x) &&
-    !isNaN(position.y) &&
-    position.x >= 0 &&
-    position.x <= 100 &&
-    position.y >= 0 &&
-    position.y <= 100
-  );
+  if (!position || typeof position !== 'object') {
+    return false;
+  }
+
+  const candidate = position as { x?: unknown; y?: unknown };
+
+  if (typeof candidate.x !== 'number' || typeof candidate.y !== 'number') {
+    return false;
+  }
+
+  if (Number.isNaN(candidate.x) || Number.isNaN(candidate.y)) {
+    return false;
+  }
+
+  return candidate.x >= 0 && candidate.x <= 100 && candidate.y >= 0 && candidate.y <= 100;
 };
 
 /**
@@ -31,28 +37,37 @@ export const isValidPlayer = (player: unknown): player is Player => {
     return false;
   }
 
+  const candidate = player as {
+    id?: unknown;
+    name?: unknown;
+    position?: unknown;
+    team?: unknown;
+    overall?: unknown;
+    availability?: { status?: string };
+  };
+
   const hasRequiredFields =
-    typeof player.id === 'string' &&
-    player.id.length > 0 &&
-    typeof player.name === 'string' &&
-    player.name.length > 0;
+    typeof candidate.id === 'string' &&
+    candidate.id.length > 0 &&
+    typeof candidate.name === 'string' &&
+    candidate.name.length > 0;
 
   if (!hasRequiredFields) {
     return false;
   }
 
   // Validate optional fields if they exist
-  if (player.position && !isValidPosition(player.position)) {
+  if (candidate.position && !isValidPosition(candidate.position)) {
     return false;
   }
 
-  if (player.team && !['home', 'away'].includes(player.team)) {
+  if (candidate.team && !['home', 'away'].includes(String(candidate.team))) {
     return false;
   }
 
   if (
-    player.overall !== undefined &&
-    (typeof player.overall !== 'number' || player.overall < 0 || player.overall > 100)
+    candidate.overall !== undefined &&
+    (typeof candidate.overall !== 'number' || candidate.overall < 0 || candidate.overall > 100)
   ) {
     return false;
   }
@@ -68,15 +83,27 @@ export const isValidFormationSlot = (slot: unknown): slot is FormationSlot => {
     return false;
   }
 
+  const candidate = slot as {
+    id?: unknown;
+    position?: unknown;
+    playerId?: unknown;
+  };
+
   const hasRequiredFields =
-    typeof slot.id === 'string' && slot.id.length > 0 && isValidPosition(slot.position);
+    typeof candidate.id === 'string' &&
+    candidate.id.length > 0 &&
+    isValidPosition(candidate.position);
 
   if (!hasRequiredFields) {
     return false;
   }
 
   // Validate optional playerId if it exists
-  if (slot.playerId !== undefined && slot.playerId !== null && typeof slot.playerId !== 'string') {
+  if (
+    candidate.playerId !== undefined &&
+    candidate.playerId !== null &&
+    typeof candidate.playerId !== 'string'
+  ) {
     return false;
   }
 
@@ -91,19 +118,25 @@ export const isValidFormation = (formation: unknown): formation is Formation => 
     return false;
   }
 
+  const candidate = formation as {
+    id?: unknown;
+    name?: unknown;
+    slots?: unknown;
+  };
+
   const hasRequiredFields =
-    typeof formation.id === 'string' &&
-    formation.id.length > 0 &&
-    typeof formation.name === 'string' &&
-    formation.name.length > 0 &&
-    Array.isArray(formation.slots);
+    typeof candidate.id === 'string' &&
+    candidate.id.length > 0 &&
+    typeof candidate.name === 'string' &&
+    candidate.name.length > 0 &&
+    Array.isArray(candidate.slots);
 
   if (!hasRequiredFields) {
     return false;
   }
 
   // Validate all slots
-  const hasValidSlots = formation.slots.every((slot: unknown) => isValidFormationSlot(slot));
+  const hasValidSlots = (candidate.slots as unknown[]).every(slot => isValidFormationSlot(slot));
   if (!hasValidSlots) {
     return false;
   }
@@ -121,14 +154,16 @@ export const isValidTeam = (team: unknown): team is Team => {
 /**
  * Validates formations object structure
  */
-export const validateFormationsObject = (formations: unknown): boolean => {
+export const validateFormationsObject = (formations: unknown): formations is FormationMap => {
   if (!formations || typeof formations !== 'object') {
     // // console.warn('validateFormationsObject: Invalid formations object');
     return false;
   }
 
+  const formationRecord = formations as Record<string, unknown>;
+
   // Check if formations has valid structure
-  const formationKeys = Object.keys(formations);
+  const formationKeys = Object.keys(formationRecord);
   if (formationKeys.length === 0) {
     // // console.warn('validateFormationsObject: No formations found');
     return false;
@@ -136,7 +171,7 @@ export const validateFormationsObject = (formations: unknown): boolean => {
 
   // Validate each formation
   for (const key of formationKeys) {
-    const formation = formations[key];
+    const formation = formationRecord[key];
     if (!isValidFormation(formation)) {
       // // console.warn(`validateFormationsObject: Invalid formation at key ${key}`, formation);
       return false;
@@ -151,22 +186,17 @@ export const validateFormationsObject = (formations: unknown): boolean => {
  */
 export const validateActiveFormationIds = (
   activeFormationIds: unknown,
-  formations: unknown,
-): boolean => {
+  formations: FormationMap
+): activeFormationIds is ActiveFormationIds => {
   if (!activeFormationIds || typeof activeFormationIds !== 'object') {
     // // console.warn('validateActiveFormationIds: Invalid activeFormationIds object');
     return false;
   }
 
-  const { home, away } = activeFormationIds;
+  const { home, away } = activeFormationIds as Record<string, unknown>;
 
   if (typeof home !== 'string' || typeof away !== 'string') {
     // // console.warn('validateActiveFormationIds: Invalid home or away formation ID');
-    return false;
-  }
-
-  if (!formations) {
-    // // console.warn('validateActiveFormationIds: No formations provided for validation');
     return false;
   }
 
@@ -190,7 +220,7 @@ export const validateActiveFormationIds = (
 /**
  * Validates players array
  */
-export const validatePlayersArray = (players: unknown): boolean => {
+export const validatePlayersArray = (players: unknown): players is Player[] => {
   if (!Array.isArray(players)) {
     // // console.warn('validatePlayersArray: Players is not an array');
     return false;
@@ -217,7 +247,11 @@ export const validateTacticsState = (tacticsState: unknown): boolean => {
     return false;
   }
 
-  const { players, formations, activeFormationIds } = tacticsState;
+  const { players, formations, activeFormationIds } = tacticsState as {
+    players?: unknown;
+    formations?: unknown;
+    activeFormationIds?: unknown;
+  };
 
   // Validate players
   if (players && !validatePlayersArray(players)) {
@@ -233,6 +267,7 @@ export const validateTacticsState = (tacticsState: unknown): boolean => {
   if (
     activeFormationIds &&
     formations &&
+    validateFormationsObject(formations) &&
     !validateActiveFormationIds(activeFormationIds, formations)
   ) {
     return false;
@@ -249,7 +284,7 @@ export const safeGetPlayer = (players: unknown, playerId: string): Player | null
     return null;
   }
 
-  const player = players.find((p: unknown) => p?.id === playerId);
+  const player = players.find(p => p.id === playerId);
   return isValidPlayer(player) ? player : null;
 };
 
@@ -270,7 +305,7 @@ export const safeGetFormation = (formations: unknown, formationId: string): Form
  */
 export const safeGetFormationSlot = (
   formation: Formation | null,
-  slotId: string,
+  slotId: string
 ): FormationSlot | null => {
   if (!isValidFormation(formation)) {
     return null;
@@ -288,7 +323,7 @@ export const validateDragDropOperation = (
   targetSlotId?: string,
   players?: unknown,
   formations?: unknown,
-  activeFormationIds?: unknown,
+  activeFormationIds?: unknown
 ): { isValid: boolean; reason?: string } => {
   // Validate player ID
   if (!playerId || typeof playerId !== 'string') {
@@ -308,12 +343,18 @@ export const validateDragDropOperation = (
 
   // If targeting a specific slot, validate it
   if (targetSlotId) {
-    if (!validateActiveFormationIds(activeFormationIds, formations)) {
+    if (!validateFormationsObject(formations)) {
       return { isValid: false, reason: 'Invalid formation configuration' };
     }
 
-    const homeFormation = safeGetFormation(formations, activeFormationIds.home);
-    const awayFormation = safeGetFormation(formations, activeFormationIds.away);
+    const formationMap = formations;
+
+    if (!validateActiveFormationIds(activeFormationIds, formationMap)) {
+      return { isValid: false, reason: 'Invalid formation configuration' };
+    }
+
+    const homeFormation = safeGetFormation(formationMap, activeFormationIds.home);
+    const awayFormation = safeGetFormation(formationMap, activeFormationIds.away);
 
     if (!homeFormation || !awayFormation) {
       return { isValid: false, reason: 'Formation data not available' };
@@ -378,10 +419,11 @@ export const devValidationLog = (
   component: string,
   validation: string,
   data: unknown,
-  isValid: boolean,
+  isValid: boolean
 ) => {
   if (import.meta.env.DEV) {
     const status = isValid ? '✅' : '❌';
-    // // console.log(`${status} [${component}] ${validation}:`, data);
+    const consoleRef = globalThis.console;
+    consoleRef?.debug?.(`${status} [${component}] ${validation}`, data);
   }
 };

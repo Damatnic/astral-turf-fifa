@@ -5,7 +5,7 @@
  * and automated response to security incidents.
  */
 
-import { securityLogger, SecurityEventType, LogLevel } from './logging';
+import { securityLogger, SecurityEventType, SecurityEventMetadata } from './logging';
 import { RATE_LIMIT_CONFIG } from './config';
 
 // Threat severity levels
@@ -45,7 +45,7 @@ export interface SecurityIncident {
   status: 'active' | 'investigating' | 'resolved';
   mitigationActions: string[];
   riskScore: number;
-  metadata: Record<string, unknown>;
+  metadata: SecurityEventMetadata;
 }
 
 // Rate limiting tracker
@@ -116,7 +116,7 @@ class RateLimitManager {
             maxRequests,
             windowMs,
           },
-        },
+        }
       );
 
       return true; // Rate limited
@@ -190,13 +190,15 @@ class AnomalyDetector {
   detectAnomalies(
     userId: string,
     action: string,
-    metadata: Record<string, unknown>,
+    metadata: SecurityEventMetadata
   ): SecurityIncident[] {
     const incidents: SecurityIncident[] = [];
     const baseline = this.getUserBehavior(userId);
+    const ipAddress = typeof metadata.ipAddress === 'string' ? metadata.ipAddress : undefined;
+    const userAgent = typeof metadata.userAgent === 'string' ? metadata.userAgent : undefined;
 
     // Check for unusual login times
-    if (action === 'login' && metadata.timestamp) {
+    if (action === 'login' && typeof metadata.timestamp === 'string') {
       const hour = new Date(metadata.timestamp).getHours();
       if (baseline && !baseline.typicalLoginTimes.includes(hour)) {
         incidents.push(
@@ -205,27 +207,27 @@ class AnomalyDetector {
             severity: ThreatSeverity.LOW,
             description: `User ${userId} logged in at unusual hour: ${hour}`,
             affectedUsers: [userId],
-            sourceIp: metadata.ipAddress,
-            userAgent: metadata.userAgent,
+            sourceIp: ipAddress,
+            userAgent,
             metadata: { hour, typicalHours: baseline.typicalLoginTimes },
-          }),
+          })
         );
       }
     }
 
     // Check for unusual IP addresses
-    if (metadata.ipAddress && baseline) {
-      if (!baseline.commonIpAddresses.includes(metadata.ipAddress)) {
+    if (ipAddress && baseline) {
+      if (!baseline.commonIpAddresses.includes(ipAddress)) {
         incidents.push(
           this.createIncident({
             threatType: ThreatType.SUSPICIOUS_ACTIVITY,
             severity: ThreatSeverity.MEDIUM,
-            description: `User ${userId} accessed from new IP: ${metadata.ipAddress}`,
+            description: `User ${userId} accessed from new IP: ${ipAddress}`,
             affectedUsers: [userId],
-            sourceIp: metadata.ipAddress,
-            userAgent: metadata.userAgent,
-            metadata: { newIp: metadata.ipAddress, knownIps: baseline.commonIpAddresses },
-          }),
+            sourceIp: ipAddress,
+            userAgent,
+            metadata: { newIp: ipAddress, knownIps: baseline.commonIpAddresses },
+          })
         );
       }
     }
@@ -234,8 +236,10 @@ class AnomalyDetector {
   }
 
   // Update user behavior baseline
-  updateUserBehavior(userId: string, action: string, metadata: Record<string, unknown>): void {
+  updateUserBehavior(userId: string, action: string, metadata: SecurityEventMetadata): void {
     let behavior = this.userBehaviors.get(userId);
+    const ipAddress = typeof metadata.ipAddress === 'string' ? metadata.ipAddress : undefined;
+    const userAgent = typeof metadata.userAgent === 'string' ? metadata.userAgent : undefined;
 
     if (!behavior) {
       behavior = {
@@ -252,16 +256,16 @@ class AnomalyDetector {
     }
 
     // Update IP addresses
-    if (metadata.ipAddress && !behavior.commonIpAddresses.includes(metadata.ipAddress)) {
-      behavior.commonIpAddresses.push(metadata.ipAddress);
+    if (ipAddress && !behavior.commonIpAddresses.includes(ipAddress)) {
+      behavior.commonIpAddresses.push(ipAddress);
       if (behavior.commonIpAddresses.length > 10) {
         behavior.commonIpAddresses = behavior.commonIpAddresses.slice(-10);
       }
     }
 
     // Update user agents
-    if (metadata.userAgent && !behavior.commonUserAgents.includes(metadata.userAgent)) {
-      behavior.commonUserAgents.push(metadata.userAgent);
+    if (userAgent && !behavior.commonUserAgents.includes(userAgent)) {
+      behavior.commonUserAgents.push(userAgent);
       if (behavior.commonUserAgents.length > 5) {
         behavior.commonUserAgents = behavior.commonUserAgents.slice(-5);
       }
@@ -447,7 +451,7 @@ class AutomatedResponse {
           incidentId: incident.id,
           actions: incident.mitigationActions,
         });
-      } catch (_error) {
+      } catch (error) {
         securityLogger.error(`Automated response failed for ${incident.threatType}`, {
           incidentId: incident.id,
           error: error instanceof Error ? error.message : 'Unknown error',
@@ -477,70 +481,76 @@ class SecurityMonitor {
   private automatedResponse = new AutomatedResponse();
 
   // Monitor security events
-  monitorEvent(eventType: SecurityEventType, metadata: Record<string, unknown>): void {
+  monitorEvent(eventType: SecurityEventType, metadata: SecurityEventMetadata): void {
+    const userId = typeof metadata.userId === 'string' ? metadata.userId : undefined;
+    const ipAddress = typeof metadata.ipAddress === 'string' ? metadata.ipAddress : undefined;
+
     // Rate limiting checks
     this.checkRateLimits(metadata);
 
     // Anomaly detection
-    if (metadata.userId) {
-      const anomalies = this.anomalyDetector.detectAnomalies(metadata.userId, eventType, metadata);
+    if (userId) {
+      const anomalies = this.anomalyDetector.detectAnomalies(userId, eventType, metadata);
 
       anomalies.forEach(incident => {
         this.recordIncident(incident);
       });
 
       // Update user behavior baseline
-      this.anomalyDetector.updateUserBehavior(metadata.userId, eventType, metadata);
+      this.anomalyDetector.updateUserBehavior(userId, eventType, metadata);
     }
 
     // Threat intelligence checks
-    if (metadata.ipAddress && threatIntelligence.isKnownBadIp(metadata.ipAddress)) {
+    if (ipAddress && threatIntelligence.isKnownBadIp(ipAddress)) {
       const incident = this.createThreatIncident(
         ThreatType.SUSPICIOUS_ACTIVITY,
         ThreatSeverity.HIGH,
-        `Request from known bad IP: ${metadata.ipAddress}`,
-        metadata,
+        `Request from known bad IP: ${ipAddress}`,
+        metadata
       );
       this.recordIncident(incident);
     }
   }
 
-  private checkRateLimits(metadata: Record<string, unknown>): void {
-    if (metadata.ipAddress) {
+  private checkRateLimits(metadata: SecurityEventMetadata): void {
+    const ipAddress = typeof metadata.ipAddress === 'string' ? metadata.ipAddress : undefined;
+    const action = typeof metadata.action === 'string' ? metadata.action : undefined;
+
+    if (ipAddress) {
       // Check login rate limiting
-      if (metadata.action === 'login') {
-        const key = `login:${metadata.ipAddress}`;
+      if (action === 'login') {
+        const key = `login:${ipAddress}`;
         const isLimited = this.rateLimit.checkRateLimit(
           key,
           RATE_LIMIT_CONFIG.LOGIN_ATTEMPTS.MAX_ATTEMPTS,
-          RATE_LIMIT_CONFIG.LOGIN_ATTEMPTS.WINDOW_MS,
+          RATE_LIMIT_CONFIG.LOGIN_ATTEMPTS.WINDOW_MS
         );
 
         if (isLimited) {
           const incident = this.createThreatIncident(
             ThreatType.BRUTE_FORCE,
             ThreatSeverity.HIGH,
-            `Login rate limit exceeded for IP: ${metadata.ipAddress}`,
-            metadata,
+            `Login rate limit exceeded for IP: ${ipAddress}`,
+            metadata
           );
           this.recordIncident(incident);
         }
       }
 
       // Check API rate limiting
-      const apiKey = `api:${metadata.ipAddress}`;
+      const apiKey = `api:${ipAddress}`;
       const isApiLimited = this.rateLimit.checkRateLimit(
         apiKey,
         RATE_LIMIT_CONFIG.API_REQUESTS.MAX_REQUESTS,
-        RATE_LIMIT_CONFIG.API_REQUESTS.WINDOW_MS,
+        RATE_LIMIT_CONFIG.API_REQUESTS.WINDOW_MS
       );
 
       if (isApiLimited) {
         const incident = this.createThreatIncident(
           ThreatType.DOS_ATTACK,
           ThreatSeverity.MEDIUM,
-          `API rate limit exceeded for IP: ${metadata.ipAddress}`,
-          metadata,
+          `API rate limit exceeded for IP: ${ipAddress}`,
+          metadata
         );
         this.recordIncident(incident);
       }
@@ -551,17 +561,21 @@ class SecurityMonitor {
     threatType: ThreatType,
     severity: ThreatSeverity,
     description: string,
-    metadata: Record<string, unknown>,
+    metadata: SecurityEventMetadata
   ): SecurityIncident {
+    const userId = typeof metadata.userId === 'string' ? metadata.userId : undefined;
+    const sourceIp = typeof metadata.ipAddress === 'string' ? metadata.ipAddress : undefined;
+    const userAgent = typeof metadata.userAgent === 'string' ? metadata.userAgent : undefined;
+
     return {
       id: `incident_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       timestamp: new Date().toISOString(),
       threatType,
       severity,
       description,
-      affectedUsers: metadata.userId ? [metadata.userId] : [],
-      sourceIp: metadata.ipAddress,
-      userAgent: metadata.userAgent,
+      affectedUsers: userId ? [userId] : [],
+      sourceIp,
+      userAgent,
       evidenceEvents: [],
       status: 'active',
       mitigationActions: [],
@@ -570,7 +584,7 @@ class SecurityMonitor {
     };
   }
 
-  private calculateRiskScore(severity: ThreatSeverity, threatType: ThreatType): number {
+  private calculateRiskScore(severity: ThreatSeverity, _threatType: ThreatType): number {
     // Same logic as in AnomalyDetector
     const severityScores = {
       [ThreatSeverity.LOW]: 25,
@@ -599,7 +613,7 @@ class SecurityMonitor {
           severity: incident.severity,
           riskScore: incident.riskScore,
         },
-      },
+      }
     );
   }
 
@@ -638,9 +652,7 @@ class SecurityMonitor {
 
 // Global instances
 const rateLimitManager = new RateLimitManager();
-const anomalyDetector = new AnomalyDetector();
 const threatIntelligence = new ThreatIntelligence();
-const automatedResponse = new AutomatedResponse();
 const securityMonitor = new SecurityMonitor();
 
 // Rate limiting utilities for external use
@@ -655,7 +667,7 @@ export function resetRateLimit(key: string): void {
 // Security monitoring utilities
 export function monitorSecurityEvent(
   eventType: SecurityEventType,
-  metadata: Record<string, unknown>,
+  metadata: SecurityEventMetadata
 ): void {
   securityMonitor.monitorEvent(eventType, metadata);
 }
@@ -675,13 +687,10 @@ export function initializeSecurityMonitoring(): void {
     () => {
       securityMonitor.cleanup();
     },
-    60 * 60 * 1000,
+    60 * 60 * 1000
   ); // Every hour
 
   securityLogger.info('Security monitoring system initialized', {
     features: ['rate_limiting', 'anomaly_detection', 'threat_intelligence', 'automated_response'],
   });
 }
-
-// Export additional types and utilities (ThreatSeverity and ThreatType already exported with enum declarations)
-export type { SecurityIncident, RateLimit, AnomalyPattern, UserBehavior };

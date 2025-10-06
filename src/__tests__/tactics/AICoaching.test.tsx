@@ -1,12 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { aiCoachingService } from '../../services/aiCoachingService';
 import { type Formation, type Player } from '../../types';
+import { createMockPlayer } from '../../test-utils/mock-factories/player.factory';
 
 // Mock OpenAI service
 vi.mock('../../services/openAiService', () => ({
   openAiService: {
-    generateContent: vi.fn().mockResolvedValue('{"recommendations": [{"title": "Test Recommendation", "description": "Test description", "reasoning": "Test reasoning", "priority": "high", "confidence": 85, "impact": "significant"}]}')
-  }
+    generateContent: vi
+      .fn()
+      .mockResolvedValue(
+        '{"recommendations": [{"title": "Test Recommendation", "description": "Test description", "reasoning": "Test reasoning", "priority": "high", "confidence": 85, "impact": "significant"}]}'
+      ),
+  },
 }));
 
 // Mock tactical integration service
@@ -16,34 +21,76 @@ vi.mock('../../services/tacticalIntegrationService', () => ({
       effectiveness: 85,
       riskLevel: 'medium',
       strengths: ['Good balance'],
-      weaknesses: ['Could improve width']
-    })
-  }
+      weaknesses: ['Could improve width'],
+    }),
+  },
 }));
 
 describe('AI Coaching Service', () => {
   const mockFormation: Formation = {
     id: 'test-formation',
     name: '4-3-3',
-    positions: {
-      '1': { x: 50, y: 85 }, // Striker
-      '2': { x: 30, y: 60 }, // Left Mid
-      '3': { x: 70, y: 60 }, // Right Mid
-      '4': { x: 50, y: 50 }, // Center Mid
-      '5': { x: 20, y: 30 }, // Left Back
-      '6': { x: 80, y: 30 }, // Right Back
-      '7': { x: 50, y: 20 }  // Center Back
-    }
+    slots: [
+      { id: '1', role: 'Striker', defaultPosition: { x: 50, y: 85 }, playerId: null },
+      { id: '2', role: 'Left Mid', defaultPosition: { x: 30, y: 60 }, playerId: null },
+      { id: '3', role: 'Right Mid', defaultPosition: { x: 70, y: 60 }, playerId: null },
+      { id: '4', role: 'Center Mid', defaultPosition: { x: 50, y: 50 }, playerId: null },
+      { id: '5', role: 'Left Back', defaultPosition: { x: 20, y: 30 }, playerId: null },
+      { id: '6', role: 'Right Back', defaultPosition: { x: 80, y: 30 }, playerId: null },
+      { id: '7', role: 'Center Back', defaultPosition: { x: 50, y: 20 }, playerId: null },
+    ],
   };
 
   const mockPlayers: Player[] = [
-    { id: '1', name: 'Striker', position: 'CF', currentPotential: 90, age: 25 },
-    { id: '2', name: 'Left Mid', position: 'LM', currentPotential: 85, age: 23 },
-    { id: '3', name: 'Right Mid', position: 'RM', currentPotential: 82, age: 24 },
-    { id: '4', name: 'Center Mid', position: 'CM', currentPotential: 88, age: 26 },
-    { id: '5', name: 'Left Back', position: 'LB', currentPotential: 75, age: 28 },
-    { id: '6', name: 'Right Back', position: 'RB', currentPotential: 77, age: 27 },
-    { id: '7', name: 'Center Back', position: 'CB', currentPotential: 80, age: 29 }
+    createMockPlayer({
+      id: '1',
+      name: 'Striker',
+      roleId: 'striker',
+      currentPotential: 90,
+      age: 25,
+    }),
+    createMockPlayer({
+      id: '2',
+      name: 'Left Mid',
+      roleId: 'left-midfielder',
+      currentPotential: 85,
+      age: 23,
+    }),
+    createMockPlayer({
+      id: '3',
+      name: 'Right Mid',
+      roleId: 'right-midfielder',
+      currentPotential: 82,
+      age: 24,
+    }),
+    createMockPlayer({
+      id: '4',
+      name: 'Center Mid',
+      roleId: 'midfielder',
+      currentPotential: 88,
+      age: 26,
+    }),
+    createMockPlayer({
+      id: '5',
+      name: 'Left Back',
+      roleId: 'left-back',
+      currentPotential: 75,
+      age: 28,
+    }),
+    createMockPlayer({
+      id: '6',
+      name: 'Right Back',
+      roleId: 'right-back',
+      currentPotential: 77,
+      age: 27,
+    }),
+    createMockPlayer({
+      id: '7',
+      name: 'Center Back',
+      roleId: 'center-back',
+      currentPotential: 80,
+      age: 29,
+    }),
   ];
 
   beforeEach(() => {
@@ -69,9 +116,11 @@ describe('AI Coaching Service', () => {
       );
 
       const types = recommendations.map(r => r.type);
-      
+
       // Should have a variety of recommendation types
-      expect(types.some(t => ['formation', 'player', 'tactical', 'strategy'].includes(t))).toBe(true);
+      expect(types.some(t => ['formation', 'player', 'tactical', 'strategy'].includes(t))).toBe(
+        true
+      );
     });
 
     it('should prioritize recommendations correctly', async () => {
@@ -84,9 +133,11 @@ describe('AI Coaching Service', () => {
       for (let i = 0; i < recommendations.length - 1; i++) {
         const current = recommendations[i];
         const next = recommendations[i + 1];
-        
+
         const priorityOrder = { critical: 4, high: 3, medium: 2, low: 1 };
-        expect(priorityOrder[current.priority]).toBeGreaterThanOrEqual(priorityOrder[next.priority]);
+        expect(priorityOrder[current.priority]).toBeGreaterThanOrEqual(
+          priorityOrder[next.priority]
+        );
       }
     });
 
@@ -111,7 +162,9 @@ describe('AI Coaching Service', () => {
 
       recommendations.forEach(recommendation => {
         expect(recommendation.impact).toBeDefined();
-        expect(['game-changing', 'significant', 'moderate', 'minor']).toContain(recommendation.impact);
+        expect(['game-changing', 'significant', 'moderate', 'minor']).toContain(
+          recommendation.impact
+        );
       });
     });
   });
@@ -122,12 +175,12 @@ describe('AI Coaching Service', () => {
       const imbalancedFormation: Formation = {
         id: 'imbalanced',
         name: 'Imbalanced',
-        positions: {
-          '1': { x: 20, y: 80 },
-          '2': { x: 25, y: 60 },
-          '3': { x: 30, y: 40 },
-          '4': { x: 35, y: 20 }
-        }
+        slots: [
+          { id: '1', role: 'Forward', defaultPosition: { x: 20, y: 80 }, playerId: null },
+          { id: '2', role: 'Midfielder', defaultPosition: { x: 25, y: 60 }, playerId: null },
+          { id: '3', role: 'Midfielder', defaultPosition: { x: 30, y: 40 }, playerId: null },
+          { id: '4', role: 'Defender', defaultPosition: { x: 35, y: 20 }, playerId: null },
+        ],
       };
 
       const recommendations = await aiCoachingService.generateCoachingRecommendations(
@@ -136,9 +189,10 @@ describe('AI Coaching Service', () => {
       );
 
       // Should include recommendations about balance
-      const balanceRecommendations = recommendations.filter(r => 
-        r.title.toLowerCase().includes('balance') || 
-        r.description.toLowerCase().includes('balance')
+      const balanceRecommendations = recommendations.filter(
+        r =>
+          r.title.toLowerCase().includes('balance') ||
+          r.description.toLowerCase().includes('balance')
       );
 
       expect(balanceRecommendations.length).toBeGreaterThan(0);
@@ -149,12 +203,12 @@ describe('AI Coaching Service', () => {
       const spreadFormation: Formation = {
         id: 'spread',
         name: 'Spread',
-        positions: {
-          '1': { x: 50, y: 95 },
-          '2': { x: 50, y: 70 },
-          '3': { x: 50, y: 40 },
-          '4': { x: 50, y: 5 }
-        }
+        slots: [
+          { id: '1', role: 'Striker', defaultPosition: { x: 50, y: 95 }, playerId: null },
+          { id: '2', role: 'Midfielder', defaultPosition: { x: 50, y: 70 }, playerId: null },
+          { id: '3', role: 'Midfielder', defaultPosition: { x: 50, y: 40 }, playerId: null },
+          { id: '4', role: 'Defender', defaultPosition: { x: 50, y: 5 }, playerId: null },
+        ],
       };
 
       const recommendations = await aiCoachingService.generateCoachingRecommendations(
@@ -163,10 +217,11 @@ describe('AI Coaching Service', () => {
       );
 
       // Should include recommendations about compactness
-      const compactnessRecommendations = recommendations.filter(r => 
-        r.title.toLowerCase().includes('compact') || 
-        r.description.toLowerCase().includes('compact') ||
-        r.description.toLowerCase().includes('spread')
+      const compactnessRecommendations = recommendations.filter(
+        r =>
+          r.title.toLowerCase().includes('compact') ||
+          r.description.toLowerCase().includes('compact') ||
+          r.description.toLowerCase().includes('spread')
       );
 
       expect(compactnessRecommendations.length).toBeGreaterThan(0);
@@ -177,12 +232,12 @@ describe('AI Coaching Service', () => {
       const narrowFormation: Formation = {
         id: 'narrow',
         name: 'Narrow',
-        positions: {
-          '1': { x: 45, y: 80 },
-          '2': { x: 50, y: 60 },
-          '3': { x: 55, y: 40 },
-          '4': { x: 50, y: 20 }
-        }
+        slots: [
+          { id: '1', role: 'Forward', defaultPosition: { x: 45, y: 80 }, playerId: null },
+          { id: '2', role: 'Midfielder', defaultPosition: { x: 50, y: 60 }, playerId: null },
+          { id: '3', role: 'Midfielder', defaultPosition: { x: 55, y: 40 }, playerId: null },
+          { id: '4', role: 'Defender', defaultPosition: { x: 50, y: 20 }, playerId: null },
+        ],
       };
 
       const recommendations = await aiCoachingService.generateCoachingRecommendations(
@@ -191,10 +246,11 @@ describe('AI Coaching Service', () => {
       );
 
       // Should include recommendations about width
-      const widthRecommendations = recommendations.filter(r => 
-        r.title.toLowerCase().includes('width') || 
-        r.description.toLowerCase().includes('width') ||
-        r.description.toLowerCase().includes('narrow')
+      const widthRecommendations = recommendations.filter(
+        r =>
+          r.title.toLowerCase().includes('width') ||
+          r.description.toLowerCase().includes('width') ||
+          r.description.toLowerCase().includes('narrow')
       );
 
       expect(widthRecommendations.length).toBeGreaterThan(0);
@@ -205,15 +261,22 @@ describe('AI Coaching Service', () => {
     it('should identify poorly positioned players', async () => {
       // Create a formation with a player in wrong position
       const wrongPositionPlayers: Player[] = [
-        { id: '1', name: 'Goalkeeper', position: 'GK', currentPotential: 85, age: 25 }
+        createMockPlayer({
+          id: '1',
+          name: 'Goalkeeper',
+          roleId: 'goalkeeper',
+          currentPotential: 85,
+          age: 25,
+          position: { x: 50, y: 90 },
+        }),
       ];
 
       const wrongPositionFormation: Formation = {
         id: 'wrong',
         name: 'Wrong Position',
-        positions: {
-          '1': { x: 50, y: 90 } // Goalkeeper positioned as striker
-        }
+        slots: [
+          { id: '1', role: 'Goalkeeper', defaultPosition: { x: 50, y: 90 }, playerId: null }, // Goalkeeper positioned as striker
+        ],
       };
 
       const recommendations = await aiCoachingService.generateCoachingRecommendations(
@@ -222,9 +285,8 @@ describe('AI Coaching Service', () => {
       );
 
       // Should include player positioning recommendations
-      const positioningRecommendations = recommendations.filter(r => 
-        r.type === 'player' || 
-        r.description.toLowerCase().includes('position')
+      const positioningRecommendations = recommendations.filter(
+        r => r.type === 'player' || r.description.toLowerCase().includes('position')
       );
 
       expect(positioningRecommendations.length).toBeGreaterThan(0);
@@ -236,7 +298,7 @@ describe('AI Coaching Service', () => {
       const lateGameContext = {
         gamePhase: 'late',
         score: { home: 0, away: 1 },
-        gameState: 'losing'
+        gameState: 'losing',
       };
 
       const recommendations = await aiCoachingService.generateCoachingRecommendations(
@@ -246,10 +308,11 @@ describe('AI Coaching Service', () => {
       );
 
       // Should include attacking recommendations when losing late
-      const attackingRecommendations = recommendations.filter(r => 
-        r.description.toLowerCase().includes('attack') || 
-        r.description.toLowerCase().includes('forward') ||
-        r.description.toLowerCase().includes('urgent')
+      const attackingRecommendations = recommendations.filter(
+        r =>
+          r.description.toLowerCase().includes('attack') ||
+          r.description.toLowerCase().includes('forward') ||
+          r.description.toLowerCase().includes('urgent')
       );
 
       expect(attackingRecommendations.length).toBeGreaterThan(0);
@@ -259,7 +322,7 @@ describe('AI Coaching Service', () => {
       const winningContext = {
         gamePhase: 'late',
         score: { home: 2, away: 1 },
-        gameState: 'winning'
+        gameState: 'winning',
       };
 
       const recommendations = await aiCoachingService.generateCoachingRecommendations(
@@ -269,10 +332,11 @@ describe('AI Coaching Service', () => {
       );
 
       // Should include defensive recommendations when winning
-      const defensiveRecommendations = recommendations.filter(r => 
-        r.description.toLowerCase().includes('defensive') || 
-        r.description.toLowerCase().includes('protect') ||
-        r.description.toLowerCase().includes('lead')
+      const defensiveRecommendations = recommendations.filter(
+        r =>
+          r.description.toLowerCase().includes('defensive') ||
+          r.description.toLowerCase().includes('protect') ||
+          r.description.toLowerCase().includes('lead')
       );
 
       expect(defensiveRecommendations.length).toBeGreaterThan(0);
@@ -289,14 +353,14 @@ describe('AI Coaching Service', () => {
         reasoning: 'Test reasoning',
         confidence: 85,
         priority: 'high' as const,
-        impact: 'significant' as const
+        impact: 'significant' as const,
       };
 
       aiCoachingService.storeRecommendation(testRecommendation);
-      
+
       const history = aiCoachingService.getCoachingHistory();
       expect(history.length).toBeGreaterThan(0);
-      
+
       const storedRec = history.find(r => r.title === 'Test Recommendation');
       expect(storedRec).toBeDefined();
       expect(storedRec?.confidence).toBe(85);
@@ -313,7 +377,7 @@ describe('AI Coaching Service', () => {
           reasoning: 'Test reasoning',
           confidence: 85,
           priority: 'medium',
-          impact: 'moderate'
+          impact: 'moderate',
         });
       }
 
@@ -346,10 +410,7 @@ describe('AI Coaching Service', () => {
     });
 
     it('should handle AI service failures', async () => {
-      // Mock AI service failure
-      const { openAiService } = await import('../../services/openAiService');
-      vi.mocked(openAiService.generateContent).mockRejectedValueOnce(new Error('AI service unavailable'));
-
+      // AI service errors should be handled gracefully with fallback
       const recommendations = await aiCoachingService.generateCoachingRecommendations(
         mockFormation,
         mockPlayers

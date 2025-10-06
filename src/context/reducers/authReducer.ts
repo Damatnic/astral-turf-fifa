@@ -6,7 +6,7 @@ export const authReducer = (draft: AuthState, action: Action): AuthState | void 
       draft.isAuthenticated = true;
       draft.isLoading = false;
       draft.user = {
-        ...action.payload,
+        ...(action.payload as any),
         lastLoginAt: new Date().toISOString(),
       };
       draft.error = null;
@@ -24,7 +24,7 @@ export const authReducer = (draft: AuthState, action: Action): AuthState | void 
       break;
     case 'SIGNUP_SUCCESS':
       draft.isAuthenticated = true;
-      draft.user = action.payload;
+      draft.user = action.payload as any;
       draft.error = null;
       break;
     case 'SIGNUP_FAILURE':
@@ -38,21 +38,23 @@ export const authReducer = (draft: AuthState, action: Action): AuthState | void 
       }
       break;
     case 'ADD_FAMILY_ASSOCIATION':
-      draft.familyAssociations.push(action.payload);
+      draft.familyAssociations.push(action.payload as any);
       break;
     case 'UPDATE_FAMILY_ASSOCIATION':
-      const index = draft.familyAssociations.findIndex(assoc => assoc.id === action.payload.id);
+      const index = draft.familyAssociations.findIndex(
+        assoc => assoc.id === (action.payload as any).id
+      );
       if (index !== -1) {
-        draft.familyAssociations[index] = action.payload;
+        draft.familyAssociations[index] = action.payload as any;
       }
       break;
     case 'REMOVE_FAMILY_ASSOCIATION':
       draft.familyAssociations = draft.familyAssociations.filter(
-        assoc => assoc.id !== action.payload,
+        assoc => assoc.id !== action.payload
       );
       break;
     case 'LOAD_FAMILY_ASSOCIATIONS':
-      draft.familyAssociations = action.payload;
+      draft.familyAssociations = action.payload as any;
       break;
     case 'UPDATE_NOTIFICATION_SETTINGS':
       if (draft.user) {

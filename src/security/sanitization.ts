@@ -79,8 +79,8 @@ export function sanitizeHtml(html: string, level: SanitizationLevel = 'strict'):
   }
 
   try {
-    const config = PURIFY_CONFIGS[level];
-    const sanitized = DOMPurify.sanitize(html, config);
+    const config = PURIFY_CONFIGS[level] as any;
+    const sanitized = DOMPurify.sanitize(html, config) as unknown as string;
 
     // Log if significant changes were made
     if (sanitized !== html && sanitized.length < html.length * 0.8) {
@@ -94,7 +94,7 @@ export function sanitizeHtml(html: string, level: SanitizationLevel = 'strict'):
     return sanitized;
   } catch (_error) {
     securityLogger.error('HTML sanitization failed', {
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: _error instanceof Error ? _error.message : 'Unknown error',
       inputLength: html.length,
     });
 
@@ -342,7 +342,7 @@ export function sanitizePlayerData(playerData: unknown): unknown {
     return playerData;
   }
 
-  const sanitized = { ...playerData };
+  const sanitized: Record<string, any> = { ...playerData };
 
   // Sanitize text fields
   const textFields = ['name', 'notes', 'nationality'];
@@ -354,15 +354,17 @@ export function sanitizePlayerData(playerData: unknown): unknown {
 
   // Sanitize communication history
   if (Array.isArray(sanitized.conversationHistory)) {
-    sanitized.conversationHistory = sanitized.conversationHistory.map((message: unknown) => ({
-      ...message,
-      text: typeof message.text === 'string' ? sanitizeHtml(message.text, 'basic') : message.text,
-    }));
+    sanitized.conversationHistory = sanitized.conversationHistory.map(
+      (message: Record<string, any>) => ({
+        ...message,
+        text: typeof message.text === 'string' ? sanitizeHtml(message.text, 'basic') : message.text,
+      })
+    );
   }
 
   // Sanitize development log
   if (Array.isArray(sanitized.developmentLog)) {
-    sanitized.developmentLog = sanitized.developmentLog.map((log: unknown) => ({
+    sanitized.developmentLog = sanitized.developmentLog.map((log: Record<string, any>) => ({
       ...log,
       note: typeof log.note === 'string' ? sanitizeHtml(log.note, 'basic') : log.note,
     }));

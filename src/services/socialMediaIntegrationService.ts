@@ -129,7 +129,7 @@ class SocialMediaIntegrationService {
       clientId: string;
       clientSecret: string;
       redirectUri?: string;
-    },
+    }
   ): Promise<string> {
     const platform = Array.from(this.platforms.values()).find(p => p.type === platformType);
 
@@ -148,7 +148,7 @@ class SocialMediaIntegrationService {
       return authUrl;
     } catch (_error) {
       console.error(`❌ Failed to connect ${platform.name}:`, _error);
-      throw error;
+      throw _error;
     }
   }
 
@@ -166,7 +166,7 @@ class SocialMediaIntegrationService {
       highlights?: string[];
       playerOfTheMatch?: string;
     },
-    platforms: string[] = [],
+    platforms: string[] = []
   ): Promise<string[]> {
     const template = this.templates.get('match_result');
     if (!template) {
@@ -178,8 +178,8 @@ class SocialMediaIntegrationService {
 
     const content = this.processTemplate(template.content, {
       opponent: matchResult.opponent,
-      homeScore: matchResult.homeScore,
-      awayScore: matchResult.awayScore,
+      homeScore: String(matchResult.homeScore),
+      awayScore: String(matchResult.awayScore),
       result:
         matchResult.homeScore > matchResult.awayScore
           ? 'WIN'
@@ -228,7 +228,7 @@ class SocialMediaIntegrationService {
       statistic?: number;
       image?: string;
     },
-    platforms: string[] = [],
+    platforms: string[] = []
   ): Promise<string[]> {
     // Check privacy settings first
     const privacy = this.privacySettings.get(playerId);
@@ -294,7 +294,7 @@ class SocialMediaIntegrationService {
       images?: string[];
       playerSpotlight?: string;
     },
-    platforms: string[] = [],
+    platforms: string[] = []
   ): Promise<string[]> {
     const template = this.templates.get('training_update');
     if (!template) {
@@ -348,7 +348,7 @@ class SocialMediaIntegrationService {
       deadline?: string;
       tryoutInfo?: string;
     },
-    platforms: string[] = [],
+    platforms: string[] = []
   ): Promise<string[]> {
     const template = this.templates.get('recruitment');
     if (!template) {
@@ -401,7 +401,7 @@ class SocialMediaIntegrationService {
       hashtags?: string[];
       mentions?: string[];
       media?: { type: 'image' | 'video'; url: string }[];
-    } = {},
+    } = {}
   ): Promise<string> {
     const postId = uuidv4();
 
@@ -440,7 +440,7 @@ class SocialMediaIntegrationService {
    */
   async getEngagementMetrics(
     platformId: string,
-    period: 'day' | 'week' | 'month' = 'week',
+    period: 'day' | 'week' | 'month' = 'week'
   ): Promise<EngagementMetrics> {
     const platform = this.platforms.get(platformId);
     if (!platform?.isConnected) {
@@ -458,7 +458,7 @@ class SocialMediaIntegrationService {
     const cutoff = now - periods[period];
 
     const periodPosts = Array.from(this.posts.values()).filter(
-      post => post.platformId === platformId && post.publishedTime && post.publishedTime >= cutoff,
+      post => post.platformId === platformId && post.publishedTime && post.publishedTime >= cutoff
     );
 
     const totalPosts = periodPosts.length;
@@ -476,7 +476,7 @@ class SocialMediaIntegrationService {
           b.engagement.likes +
           b.engagement.shares +
           b.engagement.comments -
-          (a.engagement.likes + a.engagement.shares + a.engagement.comments),
+          (a.engagement.likes + a.engagement.shares + a.engagement.comments)
       )
       .slice(0, 5);
 
@@ -630,13 +630,13 @@ class SocialMediaIntegrationService {
       }, 60000); // After 1 minute
     } catch (_error) {
       post.status = 'failed';
-      throw error;
+      throw _error;
     }
   }
 
   private async publishToTwitter(
     platform: SocialMediaPlatform,
-    post: SocialMediaPost,
+    post: SocialMediaPost
   ): Promise<void> {
     // Twitter API implementation
     // // // // console.log('🐦 Publishing to Twitter:', post.content.substring(0, 50) + '...');
@@ -647,7 +647,7 @@ class SocialMediaIntegrationService {
 
   private async publishToFacebook(
     platform: SocialMediaPlatform,
-    post: SocialMediaPost,
+    post: SocialMediaPost
   ): Promise<void> {
     // Facebook API implementation
     // // // // console.log('📘 Publishing to Facebook:', post.content.substring(0, 50) + '...');
@@ -658,7 +658,7 @@ class SocialMediaIntegrationService {
 
   private async publishToInstagram(
     platform: SocialMediaPlatform,
-    post: SocialMediaPost,
+    post: SocialMediaPost
   ): Promise<void> {
     // Instagram API implementation
     // // // // console.log('📷 Publishing to Instagram:', post.content.substring(0, 50) + '...');
@@ -669,7 +669,7 @@ class SocialMediaIntegrationService {
 
   private async publishToLinkedIn(
     platform: SocialMediaPlatform,
-    post: SocialMediaPost,
+    post: SocialMediaPost
   ): Promise<void> {
     // LinkedIn API implementation
     // // // // console.log('💼 Publishing to LinkedIn:', post.content.substring(0, 50) + '...');
@@ -691,21 +691,22 @@ class SocialMediaIntegrationService {
 
   private async generateAuthUrl(
     platform: SocialMediaPlatform,
-    credentials: unknown,
+    credentials: unknown
   ): Promise<string> {
     // Generate OAuth URLs for different platforms
+    const creds = credentials as { clientId?: string };
     switch (platform.type) {
       case 'twitter':
-        return `https://api.twitter.com/oauth/authorize?client_id=${credentials.clientId}`;
+        return `https://api.twitter.com/oauth/authorize?client_id=${creds.clientId}`;
 
       case 'facebook':
-        return `https://www.facebook.com/v18.0/dialog/oauth?client_id=${credentials.clientId}`;
+        return `https://www.facebook.com/v18.0/dialog/oauth?client_id=${creds.clientId}`;
 
       case 'instagram':
-        return `https://api.instagram.com/oauth/authorize?client_id=${credentials.clientId}`;
+        return `https://api.instagram.com/oauth/authorize?client_id=${creds.clientId}`;
 
       case 'linkedin':
-        return `https://www.linkedin.com/oauth/v2/authorization?client_id=${credentials.clientId}`;
+        return `https://www.linkedin.com/oauth/v2/authorization?client_id=${creds.clientId}`;
 
       default:
         return 'https://example.com/oauth/authorize';
@@ -770,8 +771,9 @@ class SocialMediaIntegrationService {
   }
 
   private initializeTemplates(): void {
-    const templates = [
+    const templates: ContentTemplate[] = [
       {
+        id: 'match-result-1',
         name: 'Match Result',
         type: 'match_result' as const,
         platforms: ['twitter', 'facebook', 'instagram'],
@@ -783,6 +785,7 @@ class SocialMediaIntegrationService {
         privacyLevel: 'public' as const,
       },
       {
+        id: 'player-achievement-1',
         name: 'Player Achievement',
         type: 'player_achievement' as const,
         platforms: ['twitter', 'facebook', 'instagram'],
@@ -794,6 +797,7 @@ class SocialMediaIntegrationService {
         privacyLevel: 'public' as const,
       },
       {
+        id: 'training-update-1',
         name: 'Training Update',
         type: 'training_update' as const,
         platforms: ['twitter', 'facebook'],
@@ -805,6 +809,7 @@ class SocialMediaIntegrationService {
         privacyLevel: 'public' as const,
       },
       {
+        id: 'recruitment-1',
         name: 'Recruitment',
         type: 'recruitment' as const,
         platforms: ['facebook', 'linkedin'],

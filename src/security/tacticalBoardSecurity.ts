@@ -1,21 +1,36 @@
 /**
  * Guardian Tactical Board Security Module
- * 
+ *
  * Military-grade security implementation for football tactical information
  * Provides comprehensive protection for formations, strategies, and sensitive tactical data
  */
 
-import { encryptData, decryptData, DataClassification, EncryptionAlgorithm, EncryptedData } from './encryption';
+import {
+  encryptData,
+  decryptData,
+  DataClassification,
+  EncryptionAlgorithm,
+  EncryptedData,
+} from './encryption';
 import { validateAndSanitize } from './validation';
 import { securityLogger } from './logging';
-import { checkPermission, UserRole } from './rbac';
+// import { checkPermission } from './rbac';
+
+// Define UserRole locally since it's not exported from rbac
+type UserRole = 'HEAD_COACH' | 'COACH' | 'PLAYER' | 'ADMIN';
+const UserRole = {
+  HEAD_COACH: 'HEAD_COACH' as UserRole,
+  COACH: 'COACH' as UserRole,
+  PLAYER: 'PLAYER' as UserRole,
+  ADMIN: 'ADMIN' as UserRole,
+};
 
 // Tactical data classification levels
 export enum TacticalClassification {
   PUBLIC_FORMATION = 'public_formation',
-  TEAM_INTERNAL = 'team_internal', 
+  TEAM_INTERNAL = 'team_internal',
   COACH_CONFIDENTIAL = 'coach_confidential',
-  STRATEGIC_SECRET = 'strategic_secret'
+  STRATEGIC_SECRET = 'strategic_secret',
 }
 
 // Tactical data types requiring protection
@@ -96,7 +111,7 @@ export interface TacticalPermission {
 
 export interface PermissionCondition {
   type: 'time_based' | 'location_based' | 'match_based' | 'role_based';
-  value: unknown;
+  value: any;
 }
 
 export interface SecurityAuditEntry {
@@ -106,7 +121,7 @@ export interface SecurityAuditEntry {
   resource: string;
   result: 'success' | 'failure' | 'blocked';
   riskLevel: 'low' | 'medium' | 'high' | 'critical';
-  details: unknown;
+  details: any;
   ipAddress?: string;
   userAgent?: string;
 }
@@ -147,7 +162,7 @@ export class GuardianTacticalSecurity {
           userId,
           operation: 'encrypt',
           dataType: 'tactical_formation',
-          classification
+          classification,
         }
       );
 
@@ -169,32 +184,35 @@ export class GuardianTacticalSecurity {
           formationId: formation.id,
           classification: formation.classification,
           teamId: formation.teamId,
-          encryptionAlgorithm: EncryptionAlgorithm.AES_256_GCM
+          encryptionAlgorithm: EncryptionAlgorithm.AES_256_GCM,
         },
         ipAddress: context.ipAddress,
-        userAgent: context.userAgent
+        userAgent: context.userAgent,
       };
 
       // Log security event
-      this.auditLogger.logSecurityEvent('DATA_MODIFICATION' as any, 'Tactical formation encrypted', {
-        userId,
-        metadata: auditEntry.details
-      });
+      this.auditLogger.logSecurityEvent(
+        'DATA_MODIFICATION' as any,
+        'Tactical formation encrypted',
+        {
+          userId,
+          metadata: auditEntry.details,
+        }
+      );
 
       return {
         encryptedFormation,
         accessControlList,
         auditTrail: [auditEntry],
         integrityHash,
-        lastSecurityCheck: new Date().toISOString()
+        lastSecurityCheck: new Date().toISOString(),
       };
-
     } catch (error) {
       this.auditLogger.error('Tactical formation encryption failed', {
         error: error instanceof Error ? error.message : 'Unknown error',
         userId,
         formationId: formation?.id,
-        teamId: formation?.teamId
+        teamId: formation?.teamId,
       });
 
       throw new Error('Tactical formation encryption failed');
@@ -229,32 +247,33 @@ export class GuardianTacticalSecurity {
           details: {
             reason: 'insufficient_permissions',
             requestedAction,
-            accessControlEntries: secureTacticalData.accessControlList.length
+            accessControlEntries: secureTacticalData.accessControlList.length,
           },
           ipAddress: context.ipAddress,
-          userAgent: context.userAgent
+          userAgent: context.userAgent,
         };
 
         secureTacticalData.auditTrail.push(auditEntry);
 
-        this.auditLogger.logSecurityEvent('ACCESS_DENIED' as any, 'Tactical formation access denied', {
-          userId,
-          metadata: auditEntry.details
-        });
+        this.auditLogger.logSecurityEvent(
+          'ACCESS_DENIED' as any,
+          'Tactical formation access denied',
+          {
+            userId,
+            metadata: auditEntry.details,
+          }
+        );
 
         throw new Error('Access denied: Insufficient permissions for tactical data');
       }
 
       // Decrypt the formation
-      const decryptedText = decryptData(
-        secureTacticalData.encryptedFormation,
-        {
-          userId,
-          operation: 'decrypt',
-          dataType: 'tactical_formation',
-          classification: secureTacticalData.encryptedFormation.classification
-        }
-      );
+      const decryptedText = decryptData(secureTacticalData.encryptedFormation, {
+        userId,
+        operation: 'decrypt',
+        dataType: 'tactical_formation',
+        classification: secureTacticalData.encryptedFormation.classification,
+      });
 
       const formation: TacticalFormation = JSON.parse(decryptedText);
 
@@ -276,26 +295,25 @@ export class GuardianTacticalSecurity {
           formationId: formation.id,
           classification: formation.classification,
           teamId: formation.teamId,
-          requestedAction
+          requestedAction,
         },
         ipAddress: context.ipAddress,
-        userAgent: context.userAgent
+        userAgent: context.userAgent,
       };
 
       secureTacticalData.auditTrail.push(auditEntry);
 
       this.auditLogger.logSecurityEvent('DATA_ACCESS' as any, 'Tactical formation decrypted', {
         userId,
-        metadata: auditEntry.details
+        metadata: auditEntry.details,
       });
 
       return formation;
-
     } catch (error) {
       this.auditLogger.error('Tactical formation decryption failed', {
         error: error instanceof Error ? error.message : 'Unknown error',
         userId,
-        requestedAction
+        requestedAction,
       });
 
       throw new Error('Tactical formation decryption failed');
@@ -326,7 +344,7 @@ export class GuardianTacticalSecurity {
         permissions,
         grantedBy: fromUserId,
         grantedAt: new Date().toISOString(),
-        expiresAt
+        expiresAt,
       };
 
       // Add to access control list
@@ -343,24 +361,23 @@ export class GuardianTacticalSecurity {
         details: {
           sharedWith: toUserId,
           permissions: permissions.map(p => `${p.action}:${p.resource}`),
-          expiresAt
-        }
+          expiresAt,
+        },
       };
 
       secureTacticalData.auditTrail.push(auditEntry);
 
       this.auditLogger.logSecurityEvent('DATA_SHARING' as any, 'Tactical formation shared', {
         userId: fromUserId,
-        metadata: auditEntry.details
+        metadata: auditEntry.details,
       });
 
       return secureTacticalData;
-
     } catch (error) {
       this.auditLogger.error('Tactical formation sharing failed', {
         error: error instanceof Error ? error.message : 'Unknown error',
         fromUserId,
-        toUserId
+        toUserId,
       });
 
       throw new Error('Tactical formation sharing failed');
@@ -376,9 +393,7 @@ export class GuardianTacticalSecurity {
     action: string
   ): Promise<boolean> {
     // Find user's access control entry
-    const userAccess = secureTacticalData.accessControlList.find(
-      entry => entry.userId === userId
-    );
+    const userAccess = secureTacticalData.accessControlList.find(entry => entry.userId === userId);
 
     if (!userAccess) {
       return false;
@@ -391,7 +406,7 @@ export class GuardianTacticalSecurity {
 
     // Check if user has the required permission
     const hasPermission = userAccess.permissions.some(
-      permission => permission.action === action || permission.action === 'admin'
+      permission => permission.action === action || permission.action === ('admin' as any)
     );
 
     return hasPermission;
@@ -406,7 +421,7 @@ export class GuardianTacticalSecurity {
       [TacticalClassification.PUBLIC_FORMATION]: DataClassification.PUBLIC,
       [TacticalClassification.TEAM_INTERNAL]: DataClassification.INTERNAL,
       [TacticalClassification.COACH_CONFIDENTIAL]: DataClassification.CONFIDENTIAL,
-      [TacticalClassification.STRATEGIC_SECRET]: DataClassification.RESTRICTED
+      [TacticalClassification.STRATEGIC_SECRET]: DataClassification.RESTRICTED,
     };
 
     return classificationMap[formation.classification] || DataClassification.INTERNAL;
@@ -428,10 +443,10 @@ export class GuardianTacticalSecurity {
         { action: 'edit', resource: 'formation' },
         { action: 'share', resource: 'formation' },
         { action: 'export', resource: 'formation' },
-        { action: 'delete', resource: 'formation' }
+        { action: 'delete', resource: 'formation' },
       ],
       grantedBy: creatorUserId,
-      grantedAt: new Date().toISOString()
+      grantedAt: new Date().toISOString(),
     };
 
     return [creatorEntry];
@@ -463,8 +478,12 @@ export class GuardianTacticalSecurity {
 
     // Validate player positions are within field boundaries
     formation.playerPositions.forEach((position, index) => {
-      if (position.position.x < 0 || position.position.x > 100 ||
-          position.position.y < 0 || position.position.y > 100) {
+      if (
+        position.position.x < 0 ||
+        position.position.x > 100 ||
+        position.position.y < 0 ||
+        position.position.y > 100
+      ) {
         throw new Error(`Invalid player position ${index}: coordinates out of bounds`);
       }
     });
@@ -494,8 +513,8 @@ export class GuardianTacticalSecurity {
         playerId: exportLevel === 'public' ? 'REDACTED' : pos.playerId,
         position: pos.position,
         role: pos.role,
-        instructions: exportLevel === 'public' ? [] : pos.instructions
-      }))
+        instructions: exportLevel === 'public' ? [] : pos.instructions,
+      })),
     };
 
     if (exportLevel !== 'public') {
@@ -514,7 +533,7 @@ export class GuardianTacticalSecurity {
    * Secure formation import with validation
    */
   async secureFormationImport(
-    importData: unknown,
+    importData: any,
     userId: string,
     teamId: string,
     context: { ipAddress?: string; userAgent?: string } = {}
@@ -523,16 +542,20 @@ export class GuardianTacticalSecurity {
       // Validate and sanitize import data
       const sanitizedData = validateAndSanitize(importData, {
         allowedFields: [
-          'name', 'description', 'formation', 'playerPositions', 
-          'tacticalInstructions', 'classification'
+          'name',
+          'description',
+          'formation',
+          'playerPositions',
+          'tacticalInstructions',
+          'classification',
         ],
         sanitizeStrings: true,
-        maxStringLength: 10000
+        maxStringLength: 10000,
       });
 
       // Create formation object with security metadata
       const formation: TacticalFormation = {
-        ...sanitizedData as Partial<TacticalFormation>,
+        ...(sanitizedData as any),
         id: crypto.randomUUID(),
         teamId,
         createdBy: userId,
@@ -544,21 +567,20 @@ export class GuardianTacticalSecurity {
           modifiedBy: userId,
           accessCount: 0,
           sharedWith: [],
-          tags: []
-        }
-      };
+          tags: [],
+        },
+      } as TacticalFormation;
 
       // Validate the formation
       this.validateFormationData(formation);
 
       // Encrypt and secure the formation
       return await this.encryptTacticalFormation(formation, userId, context);
-
     } catch (error) {
       this.auditLogger.error('Secure formation import failed', {
         error: error instanceof Error ? error.message : 'Unknown error',
         userId,
-        teamId
+        teamId,
       });
 
       throw new Error('Secure formation import failed');
@@ -571,9 +593,12 @@ export const guardianTacticalSecurity = new GuardianTacticalSecurity();
 
 // Export tactical security utilities
 export const tacticalSecurityUtils = {
-  encryptFormation: guardianTacticalSecurity.encryptTacticalFormation.bind(guardianTacticalSecurity),
-  decryptFormation: guardianTacticalSecurity.decryptTacticalFormation.bind(guardianTacticalSecurity),
+  encryptFormation:
+    guardianTacticalSecurity.encryptTacticalFormation.bind(guardianTacticalSecurity),
+  decryptFormation:
+    guardianTacticalSecurity.decryptTacticalFormation.bind(guardianTacticalSecurity),
   shareFormation: guardianTacticalSecurity.shareFormation.bind(guardianTacticalSecurity),
-  sanitizeForExport: guardianTacticalSecurity.sanitizeFormationForExport.bind(guardianTacticalSecurity),
-  secureImport: guardianTacticalSecurity.secureFormationImport.bind(guardianTacticalSecurity)
+  sanitizeForExport:
+    guardianTacticalSecurity.sanitizeFormationForExport.bind(guardianTacticalSecurity),
+  secureImport: guardianTacticalSecurity.secureFormationImport.bind(guardianTacticalSecurity),
 };

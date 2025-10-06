@@ -17,8 +17,8 @@ export interface Position {
   x: number;
   y: number;
 }
-export type PlayerMorale = 'Excellent' | 'Good' | 'Okay' | 'Poor' | 'Very Poor';
-export type PlayerForm = 'Excellent' | 'Good' | 'Average' | 'Poor' | 'Very Poor';
+export type PlayerMorale = 'Excellent' | 'Good' | 'Okay' | 'Poor' | 'Very Poor' | 'Terrible';
+export type PlayerForm = 'Excellent' | 'Good' | 'Average' | 'Poor' | 'Very Poor' | 'Terrible';
 export type PlayerAvailabilityStatus =
   | 'Available'
   | 'Minor Injury'
@@ -78,6 +78,14 @@ export interface PlayerStats {
   passesCompleted: number;
   passesAttempted: number;
   careerHistory: readonly PlayerHistoryStats[];
+
+  // Additional optional stats for extended functionality
+  pace?: number;
+  shooting?: number;
+  passing?: number;
+  defending?: number;
+  physical?: number;
+  dribbling?: number;
 }
 
 export interface LoanStatus {
@@ -100,8 +108,15 @@ export interface IndividualTrainingFocus {
 
 export interface ChatMessage {
   id: string;
-  sender: 'user' | 'ai';
+  sender: 'user' | 'ai' | 'system';
   text: string;
+  content?: string; // Alternative property name used in some components
+  timestamp?: string;
+  metadata?: {
+    playerId?: string;
+    formationId?: string;
+    context?: string;
+  };
 }
 
 export interface AttributeLogEntry {
@@ -130,6 +145,40 @@ export interface PlayerContract {
   clauses: ContractClause[];
 }
 
+// Extended player statistics interfaces
+export interface PlayerSkills {
+  passing: number;
+  shooting: number;
+  dribbling: number;
+  defending: number;
+  physical: number;
+  pace: number;
+}
+
+export interface PhysicalStats {
+  height: number;
+  weight: number;
+  speed: number;
+  stamina: number;
+  strength: number;
+}
+
+export interface MentalStats {
+  aggression: number;
+  positioning: number;
+  vision: number;
+  composure: number;
+  workRate: number;
+}
+
+export interface TechnicalStats {
+  ballControl: number;
+  crossing: number;
+  finishing: number;
+  heading: number;
+  longShots: number;
+}
+
 // WeeklySchedule is imported from training.ts
 
 export interface Player {
@@ -141,6 +190,7 @@ export interface Player {
   potential: readonly [number, number];
   currentPotential: number;
   roleId: string;
+  positionRole?: string; // Position abbreviation like 'GK', 'CB', 'ST', etc.
   instructions: Record<string, string>;
   team: Team;
   teamColor: string;
@@ -167,10 +217,36 @@ export interface Player {
   lastConversationInitiatedWeek: number;
   moraleBoost: { duration: number; effect: number } | null;
   completedChallenges: string[];
+
+  // Additional optional stats for extended functionality
+  pace?: number;
+  shooting?: number;
+  passing?: number;
+  defending?: number;
+  physical?: number;
+  dribbling?: number;
+  overall?: number; // Overall rating (0-100)
+  overallRating?: number; // Alternative overall rating field
+  rating?: number; // Current form/performance rating (0-100)
+  isCaptain?: boolean; // Whether player is team captain
+  skills?: PlayerSkills; // Detailed skill breakdown
+  value?: number; // Market value in currency
+  coachRating?: number; // Coach's assessment rating
+  potentialRating?: number; // Future potential rating
+  physicalAttributes?: PhysicalStats; // Physical measurements
+  mentalAttributes?: MentalStats; // Mental/personality traits
+  technicalAbilities?: TechnicalStats; // Technical skills
 }
 
 export type TransferPlayer = Omit<Player, 'position' | 'teamColor' | 'attributeHistory'> & {
   askingPrice: number;
+  value?: number; // Market value estimate
+  sellingClub?: string; // Current club
+  contractExpiry?: string; // Contract end date
+  transferStatus?: 'available' | 'negotiating' | 'sold' | 'withdrawn';
+  interestedClubs?: string[]; // Clubs showing interest
+  agentFee?: number; // Agent commission
+  wagesDemand?: number; // Salary demands
 };
 
 export interface YouthProspect

@@ -16,57 +16,60 @@ interface UltraModernPlayerTokenProps {
 }
 
 // Modern availability indicator with animations
-const ModernAvailabilityIndicator: React.FC<{ 
+const ModernAvailabilityIndicator: React.FC<{
   availability: Player['availability'];
   size: 'small' | 'medium' | 'large';
 }> = React.memo(({ availability, size }) => {
   const indicators = {
-    available: { 
-      color: 'rgb(16, 185, 129)', 
+    available: {
+      color: 'rgb(16, 185, 129)',
       bgColor: 'rgba(16, 185, 129, 0.2)',
-      icon: '✓', 
+      icon: '✓',
       tooltip: 'Available',
-      pulseColor: 'rgba(16, 185, 129, 0.6)'
+      pulseColor: 'rgba(16, 185, 129, 0.6)',
     },
-    injured: { 
-      color: 'rgb(239, 68, 68)', 
+    injured: {
+      color: 'rgb(239, 68, 68)',
       bgColor: 'rgba(239, 68, 68, 0.2)',
-      icon: '🏥', 
+      icon: '🏥',
       tooltip: 'Injured',
-      pulseColor: 'rgba(239, 68, 68, 0.6)'
+      pulseColor: 'rgba(239, 68, 68, 0.6)',
     },
-    suspended: { 
-      color: 'rgb(245, 158, 11)', 
+    suspended: {
+      color: 'rgb(245, 158, 11)',
       bgColor: 'rgba(245, 158, 11, 0.2)',
-      icon: '⚠️', 
+      icon: '⚠️',
       tooltip: 'Suspended',
-      pulseColor: 'rgba(245, 158, 11, 0.6)'
+      pulseColor: 'rgba(245, 158, 11, 0.6)',
     },
-    rested: { 
-      color: 'rgb(107, 114, 128)', 
+    rested: {
+      color: 'rgb(107, 114, 128)',
       bgColor: 'rgba(107, 114, 128, 0.2)',
-      icon: '😴', 
+      icon: '😴',
       tooltip: 'Rested',
-      pulseColor: 'rgba(107, 114, 128, 0.6)'
+      pulseColor: 'rgba(107, 114, 128, 0.6)',
     },
-    international: { 
-      color: 'rgb(59, 130, 246)', 
+    international: {
+      color: 'rgb(59, 130, 246)',
       bgColor: 'rgba(59, 130, 246, 0.2)',
-      icon: '🌍', 
+      icon: '🌍',
       tooltip: 'International Duty',
-      pulseColor: 'rgba(59, 130, 246, 0.6)'
+      pulseColor: 'rgba(59, 130, 246, 0.6)',
     },
   };
 
   const safeAvailability = availability || 'available';
-  const indicator = indicators[safeAvailability] || indicators.available;
+  const availabilityKey = typeof safeAvailability === 'string' ? safeAvailability : 'available';
+  const indicator = indicators[availabilityKey as keyof typeof indicators] || indicators.available;
   const sizeClasses = {
     small: 'w-3 h-3 text-[8px]',
     medium: 'w-4 h-4 text-[10px]',
-    large: 'w-5 h-5 text-xs'
+    large: 'w-5 h-5 text-xs',
   };
 
-  if (availability === 'available') return null;
+  if (availabilityKey === 'available') {
+    return null;
+  }
 
   return (
     <div className="absolute -top-1 -right-1 z-10">
@@ -79,7 +82,7 @@ const ModernAvailabilityIndicator: React.FC<{
       />
       <div
         className={`relative rounded-full border border-white/70 flex items-center justify-center ${sizeClasses[size]} backdrop-blur-sm`}
-        style={{ 
+        style={{
           backgroundColor: indicator.bgColor,
           borderColor: indicator.color,
           boxShadow: `0 0 10px ${indicator.pulseColor}`,
@@ -98,7 +101,9 @@ const ModernPlayerStatsOverlay: React.FC<{
   isVisible: boolean;
   position: { x: number; y: number };
 }> = React.memo(({ player, isVisible, position }) => {
-  if (!isVisible) return null;
+  if (!isVisible) {
+    return null;
+  }
 
   const stats = {
     overall: player.overallRating || 75,
@@ -110,9 +115,15 @@ const ModernPlayerStatsOverlay: React.FC<{
   };
 
   const getStatColor = (value: number) => {
-    if (value >= 85) return 'rgb(16, 185, 129)'; // Green
-    if (value >= 75) return 'rgb(245, 158, 11)'; // Yellow
-    if (value >= 65) return 'rgb(249, 115, 22)'; // Orange
+    if (value >= 85) {
+      return 'rgb(16, 185, 129)';
+    } // Green
+    if (value >= 75) {
+      return 'rgb(245, 158, 11)';
+    } // Yellow
+    if (value >= 65) {
+      return 'rgb(249, 115, 22)';
+    } // Orange
     return 'rgb(239, 68, 68)'; // Red
   };
 
@@ -142,7 +153,11 @@ const ModernPlayerStatsOverlay: React.FC<{
                 boxShadow: `0 0 20px ${getStatColor(stats.overall)}44`,
               }}
             >
-              {player.name?.split(' ').map(n => n[0]).join('').slice(0, 2) || '??'}
+              {player.name
+                ?.split(' ')
+                .map(n => n[0])
+                .join('')
+                .slice(0, 2) || '??'}
             </div>
             <div
               className="absolute -bottom-1 -right-1 bg-gray-800 text-white text-xs px-1.5 py-0.5 rounded-full border"
@@ -152,7 +167,9 @@ const ModernPlayerStatsOverlay: React.FC<{
             </div>
           </div>
           <div>
-            <div className="text-white font-semibold text-sm">{player.name || 'Unknown Player'}</div>
+            <div className="text-white font-semibold text-sm">
+              {player.name || 'Unknown Player'}
+            </div>
             <div className="text-gray-400 text-xs">
               {PLAYER_ROLES.find(r => r.id === player.roleId)?.name || 'Unknown Position'}
             </div>
@@ -161,29 +178,31 @@ const ModernPlayerStatsOverlay: React.FC<{
 
         {/* Stats grid */}
         <div className="grid grid-cols-2 gap-2">
-          {Object.entries(stats).filter(([key]) => key !== 'overall').map(([key, value]) => (
-            <div key={key} className="flex items-center justify-between">
-              <span className="text-gray-300 text-xs capitalize">{key}</span>
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-1.5 bg-gray-700 rounded-full overflow-hidden">
-                  <div
-                    className="h-full rounded-full transition-all duration-300"
-                    style={{
-                      width: `${value}%`,
-                      backgroundColor: getStatColor(value),
-                      boxShadow: `0 0 4px ${getStatColor(value)}`,
-                    }}
-                  />
+          {Object.entries(stats)
+            .filter(([key]) => key !== 'overall')
+            .map(([key, value]) => (
+              <div key={key} className="flex items-center justify-between">
+                <span className="text-gray-300 text-xs capitalize">{key}</span>
+                <div className="flex items-center space-x-2">
+                  <div className="w-8 h-1.5 bg-gray-700 rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-300"
+                      style={{
+                        width: `${value}%`,
+                        backgroundColor: getStatColor(value),
+                        boxShadow: `0 0 4px ${getStatColor(value)}`,
+                      }}
+                    />
+                  </div>
+                  <span
+                    className="text-xs font-medium w-6 text-right"
+                    style={{ color: getStatColor(value) }}
+                  >
+                    {value}
+                  </span>
                 </div>
-                <span
-                  className="text-xs font-medium w-6 text-right"
-                  style={{ color: getStatColor(value) }}
-                >
-                  {value}
-                </span>
               </div>
-            </div>
-          ))}
+            ))}
         </div>
 
         {/* Form indicator */}
@@ -191,24 +210,35 @@ const ModernPlayerStatsOverlay: React.FC<{
           <div className="flex items-center justify-between">
             <span className="text-gray-400 text-xs">Current Form</span>
             <div className="flex space-x-1">
-              {Array.from({ length: 5 }, (_, i) => (
-                <div
-                  key={i}
-                  className="w-2 h-2 rounded-full"
-                  style={{
-                    backgroundColor: i < (player.form || 3) 
-                      ? getStatColor(stats.overall) 
-                      : 'rgb(55, 65, 81)',
-                  }}
-                />
-              ))}
+              {Array.from({ length: 5 }, (_, i) => {
+                const formValue =
+                  player.form === 'Excellent'
+                    ? 5
+                    : player.form === 'Good'
+                      ? 4
+                      : player.form === 'Average'
+                        ? 3
+                        : player.form === 'Poor'
+                          ? 2
+                          : 1;
+                return (
+                  <div
+                    key={i}
+                    className="w-2 h-2 rounded-full"
+                    style={{
+                      backgroundColor:
+                        i < formValue ? getStatColor(stats.overall) : 'rgb(55, 65, 81)',
+                    }}
+                  />
+                );
+              })}
             </div>
           </div>
         </div>
       </div>
 
       {/* Tooltip arrow */}
-      <div 
+      <div
         className="absolute top-full left-6 w-0 h-0 border-l-4 border-r-4 border-t-8 border-transparent"
         style={{ borderTopColor: 'rgba(15, 23, 42, 0.95)' }}
       />
@@ -217,22 +247,28 @@ const ModernPlayerStatsOverlay: React.FC<{
 });
 
 // Performance halo effect
-const PerformanceHalo: React.FC<{ 
-  rating: number; 
+const PerformanceHalo: React.FC<{
+  rating: number;
   size: 'small' | 'medium' | 'large';
   isHighlighted: boolean;
 }> = React.memo(({ rating, size, isHighlighted }) => {
   const getHaloColor = (rating: number) => {
-    if (rating >= 85) return 'rgba(16, 185, 129, 0.4)'; // Elite - Green
-    if (rating >= 75) return 'rgba(245, 158, 11, 0.4)'; // Good - Yellow
-    if (rating >= 65) return 'rgba(249, 115, 22, 0.4)'; // Average - Orange
+    if (rating >= 85) {
+      return 'rgba(16, 185, 129, 0.4)';
+    } // Elite - Green
+    if (rating >= 75) {
+      return 'rgba(245, 158, 11, 0.4)';
+    } // Good - Yellow
+    if (rating >= 65) {
+      return 'rgba(249, 115, 22, 0.4)';
+    } // Average - Orange
     return 'rgba(239, 68, 68, 0.4)'; // Poor - Red
   };
 
   const sizeMap = {
     small: { scale: 1.2, blur: 4 },
     medium: { scale: 1.3, blur: 6 },
-    large: { scale: 1.4, blur: 8 }
+    large: { scale: 1.4, blur: 8 },
   };
 
   const config = sizeMap[size];
@@ -254,13 +290,13 @@ const PerformanceHalo: React.FC<{
 });
 
 // Captain armband component
-const CaptainArmband: React.FC<{ 
+const CaptainArmband: React.FC<{
   size: 'small' | 'medium' | 'large';
 }> = React.memo(({ size }) => {
   const sizeClasses = {
     small: 'w-2 h-3 text-[6px]',
     medium: 'w-3 h-4 text-[8px]',
-    large: 'w-4 h-5 text-[10px]'
+    large: 'w-4 h-5 text-[10px]',
   };
 
   return (
@@ -290,7 +326,7 @@ const UltraModernPlayerToken: React.FC<UltraModernPlayerTokenProps> = ({
   const { uiState } = useUIContext();
   const { tacticsState } = useTacticsContext();
   const tacticsBoard = useTacticsBoard();
-  
+
   const tokenRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -306,26 +342,26 @@ const UltraModernPlayerToken: React.FC<UltraModernPlayerTokenProps> = ({
 
   // Size configurations
   const sizeConfig = {
-    small: { 
-      width: 32, 
-      height: 32, 
-      fontSize: '10px', 
+    small: {
+      width: 32,
+      height: 32,
+      fontSize: '10px',
       borderWidth: 1,
-      shadowSize: 4 
+      shadowSize: 4,
     },
-    medium: { 
-      width: 48, 
-      height: 48, 
-      fontSize: '12px', 
+    medium: {
+      width: 48,
+      height: 48,
+      fontSize: '12px',
       borderWidth: 2,
-      shadowSize: 8 
+      shadowSize: 8,
     },
-    large: { 
-      width: 64, 
-      height: 64, 
-      fontSize: '14px', 
+    large: {
+      width: 64,
+      height: 64,
+      fontSize: '14px',
       borderWidth: 3,
-      shadowSize: 12 
+      shadowSize: 12,
     },
   };
 
@@ -335,9 +371,15 @@ const UltraModernPlayerToken: React.FC<UltraModernPlayerTokenProps> = ({
 
   // Performance-based styling
   const getPerformanceColor = useCallback((rating: number) => {
-    if (rating >= 85) return { main: '#10b981', accent: '#059669' }; // Elite
-    if (rating >= 75) return { main: '#f59e0b', accent: '#d97706' }; // Good
-    if (rating >= 65) return { main: '#f97316', accent: '#ea580c' }; // Average
+    if (rating >= 85) {
+      return { main: '#10b981', accent: '#059669' };
+    } // Elite
+    if (rating >= 75) {
+      return { main: '#f59e0b', accent: '#d97706' };
+    } // Good
+    if (rating >= 65) {
+      return { main: '#f97316', accent: '#ea580c' };
+    } // Average
     return { main: '#ef4444', accent: '#dc2626' }; // Needs improvement
   }, []);
 
@@ -352,51 +394,78 @@ const UltraModernPlayerToken: React.FC<UltraModernPlayerTokenProps> = ({
   const colors = player.team ? teamColors[player.team] || teamColors.home : teamColors.home;
 
   // Enhanced event handlers
-  const handleMouseEnter = useCallback((e: React.MouseEvent) => {
-    if (!interactive) return;
-    setIsHovered(true);
-    setMousePosition({ x: e.clientX, y: e.clientY });
-  }, [interactive]);
+  const handleMouseEnter = useCallback(
+    (e: React.MouseEvent) => {
+      if (!interactive) {
+        return;
+      }
+      setIsHovered(true);
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    },
+    [interactive]
+  );
 
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (!isHovered) return;
-    setMousePosition({ x: e.clientX, y: e.clientY });
-  }, [isHovered]);
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      if (!isHovered) {
+        return;
+      }
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    },
+    [isHovered]
+  );
 
   const handleMouseLeave = useCallback(() => {
     setIsHovered(false);
   }, []);
 
-  const handleDragStart = useCallback((e: React.DragEvent) => {
-    if (!interactive || !startDrag) return;
-    setIsAnimating(true);
-    startDrag(player, e);
-  }, [interactive, startDrag, player]);
+  const handleDragStart = useCallback(
+    (e: React.DragEvent) => {
+      if (!interactive || !startDrag) {
+        return;
+      }
+      setIsAnimating(true);
+      startDrag(player, e);
+    },
+    [interactive, startDrag, player]
+  );
 
   const handleDragEnd = useCallback(() => {
     setIsAnimating(false);
   }, []);
 
-  const handleClick = useCallback((e: React.MouseEvent) => {
-    if (!interactive) return;
-    e.stopPropagation();
-    // Handle player selection logic here
-  }, [interactive]);
+  const handleClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (!interactive) {
+        return;
+      }
+      e.stopPropagation();
+      // Handle player selection logic here
+    },
+    [interactive]
+  );
 
-  const handleDoubleClick = useCallback((e: React.MouseEvent) => {
-    if (!interactive) return;
-    e.stopPropagation();
-    // Handle player info modal or quick actions
-  }, [interactive]);
+  const handleDoubleClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (!interactive) {
+        return;
+      }
+      e.stopPropagation();
+      // Handle player info modal or quick actions
+    },
+    [interactive]
+  );
 
   // Player initials for display
   const playerInitials = useMemo(() => {
-    return player.name
-      ?.split(' ')
-      .map(n => n[0] || '')
-      .join('')
-      .slice(0, 2)
-      .toUpperCase() || '??';
+    return (
+      player.name
+        ?.split(' ')
+        .map(n => n[0] || '')
+        .join('')
+        .slice(0, 2)
+        .toUpperCase() || '??'
+    );
   }, [player.name]);
 
   // Animation effects
@@ -406,6 +475,7 @@ const UltraModernPlayerToken: React.FC<UltraModernPlayerTokenProps> = ({
       const timer = setTimeout(() => setIsAnimating(false), 2000);
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [isHighlightedByAI]);
 
   return (
@@ -433,10 +503,10 @@ const UltraModernPlayerToken: React.FC<UltraModernPlayerTokenProps> = ({
         onDoubleClick={handleDoubleClick}
       >
         {/* Performance halo */}
-        <PerformanceHalo 
-          rating={overallRating} 
-          size={size} 
-          isHighlighted={isHighlightedByAI || isSelected} 
+        <PerformanceHalo
+          rating={overallRating}
+          size={size}
+          isHighlighted={isHighlightedByAI || isSelected}
         />
 
         {/* Main token body */}
@@ -461,9 +531,7 @@ const UltraModernPlayerToken: React.FC<UltraModernPlayerTokenProps> = ({
           }}
         >
           {/* Player initials */}
-          <span className="relative z-10 select-none">
-            {playerInitials}
-          </span>
+          <span className="relative z-10 select-none">{playerInitials}</span>
 
           {/* Glossy overlay effect */}
           <div

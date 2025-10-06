@@ -6,38 +6,38 @@
  */
 
 // Only import database services on server side
-let databaseService: unknown = null;
-let initializeDatabase: unknown = null;
-let healthService: unknown = null;
-let redisService: unknown = null;
-let securityLogger: unknown = null;
-let initializeSecurityMonitoring: unknown = null;
-let initSecurityMonitoring: unknown = null;
-let performanceService: unknown = null;
-let backupService: unknown = null;
+let databaseService: any = null;
+let initializeDatabase: any = null;
+let healthService: any = null;
+let redisService: any = null;
+let securityLogger: any = null;
+let initializeSecurityMonitoring: any = null;
+let initSecurityMonitoring: any = null;
+let performanceService: any = null;
+let backupService: any = null;
 
 // Check if we're on the server side (Node.js environment)
 const isServerSide = typeof window === 'undefined' && typeof process !== 'undefined';
 
 if (isServerSide) {
   try {
-    // const dbModule = await import('./databaseService');
+    const dbModule: any = await import('./databaseService');
     databaseService = dbModule.databaseService;
     initializeDatabase = dbModule.initializeDatabase;
 
-    // const healthModule = await import('./healthService');
+    const healthModule: any = await import('./healthService');
     healthService = healthModule.healthService;
 
-    // const redisModule = await import('./redisService');
+    const redisModule: any = await import('./redisService');
     redisService = redisModule.redisService;
 
-    // const loggingModule = await import('../security/logging');
+    const loggingModule: any = await import('../security/logging');
     securityLogger = loggingModule.securityLogger;
     initializeSecurityMonitoring = loggingModule.initializeSecurityMonitoring;
 
-    // const monitoringModule = await import('../security/monitoring');
+    const monitoringModule: any = await import('../security/monitoring');
     initSecurityMonitoring = monitoringModule.initializeSecurityMonitoring;
-  } catch (_error) {
+  } catch (_error: any) {
     // // // // console.warn('Server-side modules not available in client environment');
   }
 }
@@ -77,7 +77,7 @@ class InitializationService {
         }
         await performanceService.initialize();
       },
-      services,
+      services
     );
 
     // Skip server-side initialization on client
@@ -106,7 +106,7 @@ class InitializationService {
             initializeSecurityMonitoring();
             initSecurityMonitoring();
           },
-          services,
+          services
         );
       }
 
@@ -117,7 +117,7 @@ class InitializationService {
           async () => {
             await initializeDatabase();
           },
-          services,
+          services
         );
       }
 
@@ -128,12 +128,12 @@ class InitializationService {
           async () => {
             try {
               await redisService.initialize();
-            } catch (_error) {
+            } catch (_error: any) {
               // // // // console.warn('⚠️ Redis not available - using in-memory fallback');
               // Don't throw error - Redis is optional
             }
           },
-          services,
+          services
         );
       }
 
@@ -144,7 +144,7 @@ class InitializationService {
           async () => {
             healthService.initialize();
           },
-          services,
+          services
         );
       }
 
@@ -158,7 +158,7 @@ class InitializationService {
           }
           await backupService.initialize();
         },
-        services,
+        services
       );
 
       // 5. Validate all services are healthy
@@ -182,7 +182,7 @@ class InitializationService {
       });
 
       return result;
-    } catch (_error) {
+    } catch (_error: any) {
       const totalDuration = Date.now() - startTime;
 
       const result: InitializationResult = {
@@ -193,14 +193,14 @@ class InitializationService {
 
       this.initializationResult = result;
 
-      console.error('❌ Astral Turf initialization failed:', error);
+      console.error('❌ Astral Turf initialization failed:', _error);
       securityLogger.error('Application initialization failed', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
         duration: totalDuration,
         services: Object.keys(services),
       });
 
-      throw error;
+      throw _error;
     }
   }
 
@@ -210,7 +210,7 @@ class InitializationService {
   private async initializeService(
     name: string,
     initFunction: () => Promise<void> | void,
-    services: InitializationResult['services'],
+    services: InitializationResult['services']
   ): Promise<void> {
     const startTime = Date.now();
 
@@ -225,9 +225,9 @@ class InitializationService {
       };
 
       // // // // console.log(`  ✅ ${name} initialized (${duration}ms)`);
-    } catch (_error) {
+    } catch (_error: any) {
       const duration = Date.now() - startTime;
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage = _error instanceof Error ? _error.message : 'Unknown error';
 
       services[name] = {
         initialized: false,
@@ -270,9 +270,9 @@ class InitializationService {
       }
 
       // // // // console.log('  ✅ All services are healthy');
-    } catch (_error) {
+    } catch (_error: any) {
       console.error('  ❌ Service validation failed:', _error);
-      throw error;
+      throw _error;
     }
   }
 
@@ -292,7 +292,7 @@ class InitializationService {
         // // // // console.log('  ⚡ Shutting down performance service...');
         await performanceService.destroy();
       }
-    } catch (_error) {
+    } catch (_error: any) {
       console.error('  ❌ Performance service shutdown error:', _error);
     }
 
@@ -319,7 +319,7 @@ class InitializationService {
         // // // // console.log('  📦 Shutting down Redis...');
         try {
           await redisService.disconnect();
-        } catch (_error) {
+        } catch (_error: any) {
           // // // // console.warn('⚠️ Redis disconnect failed (may not have been connected)');
         }
       }
@@ -333,10 +333,10 @@ class InitializationService {
       // // // // console.log('✅ Astral Turf shut down successfully');
 
       securityLogger.info('Application shutdown completed');
-    } catch (_error) {
+    } catch (_error: any) {
       console.error('❌ Error during shutdown:', _error);
       securityLogger.error('Application shutdown failed', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
       });
     }
   }
@@ -398,7 +398,7 @@ export const setupGracefulShutdown = (): void => {
     try {
       await shutdownApplication();
       process.exit(0);
-    } catch (_error) {
+    } catch (_error: any) {
       console.error('Error during graceful shutdown:', _error);
       process.exit(1);
     }

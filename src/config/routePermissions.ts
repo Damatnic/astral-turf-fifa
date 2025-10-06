@@ -165,7 +165,7 @@ export const ROUTE_PERMISSIONS: RoutePermission[] = [
 export const canAccessRoute = (
   path: string,
   userRole: UserRole,
-  userPermissions?: string[],
+  userPermissions?: string[]
 ): { canAccess: boolean; fallbackPath?: string } => {
   // Find matching route permission (exact match first, then pattern match)
   const permission = ROUTE_PERMISSIONS.find(p => {
@@ -194,7 +194,7 @@ export const canAccessRoute = (
   // Check required permissions if specified
   if (permission.requiredPermissions && userPermissions) {
     const hasRequiredPermissions = permission.requiredPermissions.every(perm =>
-      userPermissions.includes(perm),
+      userPermissions.includes(perm)
     );
     if (!hasRequiredPermissions) {
       return {
@@ -212,7 +212,7 @@ export const canAccessRoute = (
  */
 export const getAvailableRoutes = (userRole: UserRole): string[] => {
   return ROUTE_PERMISSIONS.filter(permission => permission.allowedRoles.includes(userRole)).map(
-    permission => permission.path,
+    permission => permission.path
   );
 };
 

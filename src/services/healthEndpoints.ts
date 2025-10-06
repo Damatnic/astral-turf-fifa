@@ -36,7 +36,7 @@ export async function healthEndpoint(): Promise<HealthEndpointResponse> {
     };
   } catch (_error) {
     securityLogger.error('Health endpoint error', {
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: _error instanceof Error ? _error.message : 'Unknown error',
     });
 
     return {
@@ -73,7 +73,7 @@ export async function readinessEndpoint(): Promise<HealthEndpointResponse> {
     };
   } catch (_error) {
     securityLogger.error('Readiness endpoint error', {
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: _error instanceof Error ? _error.message : 'Unknown error',
     });
 
     return {
@@ -171,7 +171,7 @@ astralturf_memory_usage_percent{version="${health.version}",environment="${healt
     };
   } catch (_error) {
     securityLogger.error('Metrics endpoint error', {
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: _error instanceof Error ? _error.message : 'Unknown error',
     });
 
     return {
@@ -226,34 +226,34 @@ export async function pingEndpoint(): Promise<HealthEndpointResponse> {
  * Initialize health endpoints in a web server
  * This is a helper function to set up routes in Express or similar
  */
-export function setupHealthRoutes(app: unknown): void {
+export function setupHealthRoutes(app: any): void {
   // Health check endpoints
-  app.get('/health', async (req: unknown, res: unknown) => {
+  app.get('/health', async (req: any, res: any) => {
     const response = await healthEndpoint();
     res.status(response.status).set(response.headers).json(response.body);
   });
 
-  app.get('/ready', async (req: unknown, res: unknown) => {
+  app.get('/ready', async (req: any, res: any) => {
     const response = await readinessEndpoint();
     res.status(response.status).set(response.headers).json(response.body);
   });
 
-  app.get('/live', async (req: unknown, res: unknown) => {
+  app.get('/live', async (req: any, res: any) => {
     const response = await livenessEndpoint();
     res.status(response.status).set(response.headers).json(response.body);
   });
 
-  app.get('/metrics', async (req: unknown, res: unknown) => {
+  app.get('/metrics', async (req: any, res: any) => {
     const response = await metricsEndpoint();
     res.status(response.status).set(response.headers).send(response.body);
   });
 
-  app.get('/version', async (req: unknown, res: unknown) => {
+  app.get('/version', async (req: any, res: any) => {
     const response = await versionEndpoint();
     res.status(response.status).set(response.headers).json(response.body);
   });
 
-  app.get('/ping', async (req: unknown, res: unknown) => {
+  app.get('/ping', async (req: any, res: any) => {
     const response = await pingEndpoint();
     res.status(response.status).set(response.headers).send(response.body);
   });
@@ -267,7 +267,7 @@ export function setupHealthRoutes(app: unknown): void {
  * For Vite dev server integration, we can create a simple middleware
  */
 export function createHealthMiddleware() {
-  return async (req: unknown, res: unknown, next: unknown) => {
+  return async (req: any, res: any, next: any) => {
     const url = new URL(req.url, `http://${req.headers.host}`);
 
     let response: HealthEndpointResponse | null = null;

@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Play, 
-  Pause, 
-  RotateCcw, 
-  SkipBack, 
-  SkipForward, 
-  Plus, 
-  Trash2, 
+import {
+  Play,
+  Pause,
+  RotateCcw,
+  SkipBack,
+  SkipForward,
+  Plus,
+  Trash2,
   Edit3,
   Target,
   Flag,
   AlertTriangle,
   X,
   Save,
-  Settings
+  Settings,
 } from 'lucide-react';
 import { useTacticsContext, useUIContext } from '../../hooks';
 import type { PlaybookEvent } from '../../types';
@@ -43,32 +43,28 @@ interface StepEventEditorProps {
   onClose: () => void;
 }
 
-const StepEventEditor: React.FC<StepEventEditorProps> = ({ 
-  stepIndex, 
-  event, 
-  onClose 
-}) => {
+const StepEventEditor: React.FC<StepEventEditorProps> = ({ stepIndex, event, onClose }) => {
   const { dispatch } = useTacticsContext();
   const [type, setType] = useState<PlaybookEvent['type']>(event?.type || 'Goal');
   const [description, setDescription] = useState(event?.description || '');
 
   const handleSave = () => {
     if (description?.trim()) {
-      dispatch({ 
-        type: 'SET_PLAYBOOK_EVENT', 
-        payload: { 
-          stepIndex, 
-          event: { type, description: description.trim() } 
-        } 
+      dispatch({
+        type: 'SET_PLAYBOOK_EVENT',
+        payload: {
+          stepIndex,
+          event: { type, description: description.trim() },
+        },
       });
     }
     onClose();
   };
 
   const handleRemove = () => {
-    dispatch({ 
-      type: 'SET_PLAYBOOK_EVENT', 
-      payload: { stepIndex, event: null } 
+    dispatch({
+      type: 'SET_PLAYBOOK_EVENT',
+      payload: { stepIndex, event: null },
     });
     onClose();
   };
@@ -85,22 +81,17 @@ const StepEventEditor: React.FC<StepEventEditorProps> = ({
           <Settings className="w-4 h-4 text-blue-400" />
           Edit Step Event
         </h4>
-        <button
-          onClick={onClose}
-          className="p-1 text-slate-400 hover:text-white transition-colors"
-        >
+        <button onClick={onClose} className="p-1 text-slate-400 hover:text-white transition-colors">
           <X className="w-4 h-4" />
         </button>
       </div>
 
       <div className="space-y-3">
         <div>
-          <label className="block text-xs font-medium text-slate-300 mb-1">
-            Event Type
-          </label>
-          <select 
-            value={type} 
-            onChange={(e) => setType(e.target.value as PlaybookEvent['type'])}
+          <label className="block text-xs font-medium text-slate-300 mb-1">Event Type</label>
+          <select
+            value={type}
+            onChange={e => setType(e.target.value as PlaybookEvent['type'])}
             className="w-full p-2 text-sm bg-slate-700/70 border border-slate-600/50 rounded-lg focus:border-blue-500 focus:outline-none text-white"
           >
             <option value="Goal">Goal</option>
@@ -110,21 +101,19 @@ const StepEventEditor: React.FC<StepEventEditorProps> = ({
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-slate-300 mb-1">
-            Description
-          </label>
+          <label className="block text-xs font-medium text-slate-300 mb-1">Description</label>
           <input
             type="text"
             placeholder="e.g., Header from corner kick"
             value={description}
-            onChange={(e) => setDescription(e.target.value || '')}
+            onChange={e => setDescription(e.target.value || '')}
             className="w-full p-2 text-sm bg-slate-700/70 border border-slate-600/50 rounded-lg focus:border-blue-500 focus:outline-none text-white placeholder-slate-400"
           />
         </div>
       </div>
 
       <div className="flex justify-between mt-4 pt-3 border-t border-slate-700/50">
-        <button 
+        <button
           onClick={handleRemove}
           className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-red-400 hover:bg-red-500/20 rounded-lg transition-colors"
         >
@@ -132,13 +121,13 @@ const StepEventEditor: React.FC<StepEventEditorProps> = ({
           Remove
         </button>
         <div className="flex gap-2">
-          <button 
+          <button
             onClick={onClose}
             className="px-3 py-1.5 text-xs font-medium text-slate-400 hover:bg-slate-700/50 rounded-lg transition-colors"
           >
             Cancel
           </button>
-          <button 
+          <button
             onClick={handleSave}
             className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors"
           >
@@ -189,7 +178,7 @@ const StepButton: React.FC<StepButtonProps> = ({ index }) => {
         dispatch({ type: 'DELETE_PLAYBOOK_STEP', payload: index });
       }
     } else {
-      window.alert("You cannot delete the only step in a play.");
+      window.alert('You cannot delete the only step in a play.');
     }
   };
 
@@ -249,10 +238,10 @@ const StepButton: React.FC<StepButtonProps> = ({ index }) => {
       {/* Event editor */}
       <AnimatePresence>
         {isEditingEvent && (
-          <StepEventEditor 
-            stepIndex={index} 
-            event={event} 
-            onClose={() => setIsEditingEvent(false)} 
+          <StepEventEditor
+            stepIndex={index}
+            event={event}
+            onClose={() => setIsEditingEvent(false)}
           />
         )}
       </AnimatePresence>
@@ -303,13 +292,9 @@ const PlaybackControls: React.FC<PlaybackControlsProps> = ({
         whileTap={{ scale: 0.9 }}
         onClick={isAnimating && !isPaused ? onPause : onPlay}
         className="p-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors"
-        title={isAnimating && !isPaused ? "Pause" : "Play"}
+        title={isAnimating && !isPaused ? 'Pause' : 'Play'}
       >
-        {isAnimating && !isPaused ? (
-          <Pause className="w-4 h-4" />
-        ) : (
-          <Play className="w-4 h-4" />
-        )}
+        {isAnimating && !isPaused ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
       </motion.button>
 
       {/* Reset */}
@@ -391,7 +376,7 @@ const AnimationTimeline: React.FC = () => {
   const totalSteps = activeItem?.steps?.length ?? 0;
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 20 }}

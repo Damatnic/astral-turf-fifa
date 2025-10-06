@@ -8,17 +8,17 @@ import {
   generateTacticalFormation,
   generatePerformanceTestData,
   generateConflictScenario,
-  generateDragDropScenario
+  generateDragDropScenario,
 } from '../utils/enhanced-mock-generators';
 import {
   simulateDragAndDrop,
   testPlayerDragWithConflict,
-  createDataTransferMock
+  createDataTransferMock,
 } from '../utils/drag-drop-test-utils';
 
 /**
  * Comprehensive Integration Tests for Enhanced UnifiedTacticsBoard
- * 
+ *
  * Tests the complete tactical board ecosystem including:
  * - Formation auto-assignment integration
  * - Positioning mode switching workflow
@@ -44,21 +44,21 @@ const MockUnifiedTacticsBoard = React.forwardRef<HTMLDivElement, any>((props, re
     <div ref={ref} data-testid="unified-tactics-board" className="tactics-board">
       {/* Header Controls */}
       <div className="board-header" data-testid="board-header">
-        <button 
+        <button
           data-testid="toggle-positioning-mode"
-          onClick={() => setPositioningMode(mode => mode === 'snap' ? 'free' : 'snap')}
+          onClick={() => setPositioningMode(mode => (mode === 'snap' ? 'free' : 'snap'))}
         >
           Mode: {positioningMode}
         </button>
-        
-        <button 
+
+        <button
           data-testid="toggle-drawing-tools"
           onClick={() => setShowDrawingTools(!showDrawingTools)}
         >
           Drawing Tools
         </button>
-        
-        <button 
+
+        <button
           data-testid="auto-assign-formation"
           onClick={() => {
             // Mock auto-assignment
@@ -71,29 +71,31 @@ const MockUnifiedTacticsBoard = React.forwardRef<HTMLDivElement, any>((props, re
       </div>
 
       {/* Main Field Area */}
-      <div 
-        className="field-container" 
+      <div
+        className="field-container"
         data-testid="field-container"
-        onDrop={(e) => {
+        onDrop={e => {
           e.preventDefault();
           const data = e.dataTransfer.getData('application/json');
           if (data) {
             const { playerId, targetSlotId } = JSON.parse(data);
-            const existingPlayer = players.find(p => formation?.slots?.find(s => s.id === targetSlotId && s.playerId));
-            
+            const existingPlayer = players.find(p =>
+              formation?.slots?.find(s => s.id === targetSlotId && s.playerId)
+            );
+
             if (existingPlayer && existingPlayer.id !== playerId) {
               setConflictData({ playerId, targetSlotId, existingPlayer });
               setShowConflictMenu(true);
             } else {
               // Direct assignment
-              const updatedPlayers = players.map(p => 
+              const updatedPlayers = players.map(p =>
                 p.id === playerId ? { ...p, assigned: true, slotId: targetSlotId } : p
               );
               setPlayers(updatedPlayers);
             }
           }
         }}
-        onDragOver={(e) => e.preventDefault()}
+        onDragOver={e => e.preventDefault()}
       >
         {/* Formation Slots */}
         {formation?.slots?.map(slot => (
@@ -109,7 +111,7 @@ const MockUnifiedTacticsBoard = React.forwardRef<HTMLDivElement, any>((props, re
               width: '40px',
               height: '40px',
               border: '2px dashed #ccc',
-              borderRadius: '50%'
+              borderRadius: '50%',
             }}
           >
             {slot.playerId && (
@@ -118,11 +120,14 @@ const MockUnifiedTacticsBoard = React.forwardRef<HTMLDivElement, any>((props, re
                 data-player-id={slot.playerId}
                 className="player-token"
                 draggable
-                onDragStart={(e) => {
-                  e.dataTransfer.setData('application/json', JSON.stringify({
-                    playerId: slot.playerId,
-                    sourceSlotId: slot.id
-                  }));
+                onDragStart={e => {
+                  e.dataTransfer.setData(
+                    'application/json',
+                    JSON.stringify({
+                      playerId: slot.playerId,
+                      sourceSlotId: slot.id,
+                    })
+                  );
                 }}
                 style={{
                   width: '36px',
@@ -134,7 +139,7 @@ const MockUnifiedTacticsBoard = React.forwardRef<HTMLDivElement, any>((props, re
                   justifyContent: 'center',
                   color: 'white',
                   fontSize: '12px',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
                 }}
               >
                 {players.find(p => p.id === slot.playerId)?.jerseyNumber || '?'}
@@ -154,11 +159,14 @@ const MockUnifiedTacticsBoard = React.forwardRef<HTMLDivElement, any>((props, re
                 data-player-id={player.id}
                 className="bench-player"
                 draggable
-                onDragStart={(e) => {
-                  e.dataTransfer.setData('application/json', JSON.stringify({
-                    playerId: player.id,
-                    sourceBench: true
-                  }));
+                onDragStart={e => {
+                  e.dataTransfer.setData(
+                    'application/json',
+                    JSON.stringify({
+                      playerId: player.id,
+                      sourceBench: true,
+                    })
+                  );
                 }}
                 style={{
                   width: '32px',
@@ -171,7 +179,7 @@ const MockUnifiedTacticsBoard = React.forwardRef<HTMLDivElement, any>((props, re
                   justifyContent: 'center',
                   color: 'white',
                   fontSize: '10px',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
                 }}
               >
                 {player.jerseyNumber}
@@ -194,12 +202,12 @@ const MockUnifiedTacticsBoard = React.forwardRef<HTMLDivElement, any>((props, re
             padding: '20px',
             border: '1px solid #ccc',
             borderRadius: '8px',
-            zIndex: 1000
+            zIndex: 1000,
           }}
         >
           <h3>Position Conflict</h3>
           <p>Resolve player placement conflict</p>
-          
+
           <button
             data-testid="conflict-swap"
             onClick={() => {
@@ -210,7 +218,7 @@ const MockUnifiedTacticsBoard = React.forwardRef<HTMLDivElement, any>((props, re
           >
             Swap Players
           </button>
-          
+
           <button
             data-testid="conflict-replace"
             onClick={() => {
@@ -221,7 +229,7 @@ const MockUnifiedTacticsBoard = React.forwardRef<HTMLDivElement, any>((props, re
           >
             Replace Player
           </button>
-          
+
           <button
             data-testid="conflict-cancel"
             onClick={() => {
@@ -246,7 +254,7 @@ const MockUnifiedTacticsBoard = React.forwardRef<HTMLDivElement, any>((props, re
             right: 0,
             bottom: 0,
             background: 'rgba(0,0,0,0.1)',
-            zIndex: 100
+            zIndex: 100,
           }}
         >
           <div className="drawing-toolbar">
@@ -287,11 +295,11 @@ describe('Enhanced UnifiedTacticsBoard Integration Tests', () => {
   beforeEach(() => {
     cleanup();
     vi.clearAllMocks();
-    
+
     // Generate test data
     mockFormation = generateTacticalFormation('4-4-2');
     mockPlayers = generatePerformanceTestData.medium().players.slice(0, 15);
-    
+
     // Assign some players to formation
     mockFormation.slots.slice(0, 11).forEach((slot: any, index: number) => {
       slot.playerId = mockPlayers[index]?.id;
@@ -305,10 +313,7 @@ describe('Enhanced UnifiedTacticsBoard Integration Tests', () => {
   describe('Component Integration', () => {
     it('should render all major components together', () => {
       render(
-        <MockUnifiedTacticsBoard 
-          initialFormation={mockFormation}
-          initialPlayers={mockPlayers}
-        />
+        <MockUnifiedTacticsBoard initialFormation={mockFormation} initialPlayers={mockPlayers} />
       );
 
       expect(screen.getByTestId('unified-tactics-board')).toBeInTheDocument();
@@ -320,10 +325,7 @@ describe('Enhanced UnifiedTacticsBoard Integration Tests', () => {
 
     it('should display formation slots correctly', () => {
       render(
-        <MockUnifiedTacticsBoard 
-          initialFormation={mockFormation}
-          initialPlayers={mockPlayers}
-        />
+        <MockUnifiedTacticsBoard initialFormation={mockFormation} initialPlayers={mockPlayers} />
       );
 
       mockFormation.slots.forEach((slot: any) => {
@@ -333,10 +335,7 @@ describe('Enhanced UnifiedTacticsBoard Integration Tests', () => {
 
     it('should show players in assigned positions', () => {
       render(
-        <MockUnifiedTacticsBoard 
-          initialFormation={mockFormation}
-          initialPlayers={mockPlayers}
-        />
+        <MockUnifiedTacticsBoard initialFormation={mockFormation} initialPlayers={mockPlayers} />
       );
 
       mockFormation.slots
@@ -348,18 +347,15 @@ describe('Enhanced UnifiedTacticsBoard Integration Tests', () => {
 
     it('should display bench players', () => {
       render(
-        <MockUnifiedTacticsBoard 
-          initialFormation={mockFormation}
-          initialPlayers={mockPlayers}
-        />
+        <MockUnifiedTacticsBoard initialFormation={mockFormation} initialPlayers={mockPlayers} />
       );
 
       const assignedPlayerIds = mockFormation.slots
         .filter((slot: any) => slot.playerId)
         .map((slot: any) => slot.playerId);
-      
+
       const benchPlayers = mockPlayers.filter(p => !assignedPlayerIds.includes(p.id));
-      
+
       benchPlayers.forEach(player => {
         expect(screen.getByTestId(`bench-player-${player.id}`)).toBeInTheDocument();
       });
@@ -369,10 +365,7 @@ describe('Enhanced UnifiedTacticsBoard Integration Tests', () => {
   describe('Positioning Mode Integration', () => {
     it('should toggle between snap and free positioning modes', async () => {
       render(
-        <MockUnifiedTacticsBoard 
-          initialFormation={mockFormation}
-          initialPlayers={mockPlayers}
-        />
+        <MockUnifiedTacticsBoard initialFormation={mockFormation} initialPlayers={mockPlayers} />
       );
 
       const modeToggle = screen.getByTestId('toggle-positioning-mode');
@@ -387,21 +380,18 @@ describe('Enhanced UnifiedTacticsBoard Integration Tests', () => {
 
     it('should affect player positioning behavior based on mode', async () => {
       const { container } = render(
-        <MockUnifiedTacticsBoard 
-          initialFormation={mockFormation}
-          initialPlayers={mockPlayers}
-        />
+        <MockUnifiedTacticsBoard initialFormation={mockFormation} initialPlayers={mockPlayers} />
       );
 
       const modeToggle = screen.getByTestId('toggle-positioning-mode');
-      
+
       // Test in snap mode
       expect(modeToggle).toHaveTextContent('Mode: snap');
-      
+
       // Switch to free mode
       await user.click(modeToggle);
       expect(modeToggle).toHaveTextContent('Mode: free');
-      
+
       // Mode change should be reflected in the board state
       const board = screen.getByTestId('unified-tactics-board');
       expect(board).toBeInTheDocument();
@@ -411,10 +401,7 @@ describe('Enhanced UnifiedTacticsBoard Integration Tests', () => {
   describe('Drag and Drop Integration', () => {
     it('should handle player drag from bench to formation slot', async () => {
       const { container } = render(
-        <MockUnifiedTacticsBoard 
-          initialFormation={mockFormation}
-          initialPlayers={mockPlayers}
-        />
+        <MockUnifiedTacticsBoard initialFormation={mockFormation} initialPlayers={mockPlayers} />
       );
 
       const benchPlayer = screen.getByTestId(`bench-player-${mockPlayers[11].id}`);
@@ -429,9 +416,9 @@ describe('Enhanced UnifiedTacticsBoard Integration Tests', () => {
         customDropData: {
           'application/json': JSON.stringify({
             playerId: mockPlayers[11].id,
-            targetSlotId: mockFormation.slots[5].id
-          })
-        }
+            targetSlotId: mockFormation.slots[5].id,
+          }),
+        },
       });
 
       expect(dragResult.success).toBe(true);
@@ -439,10 +426,7 @@ describe('Enhanced UnifiedTacticsBoard Integration Tests', () => {
 
     it('should trigger conflict resolution for occupied slots', async () => {
       const { container } = render(
-        <MockUnifiedTacticsBoard 
-          initialFormation={mockFormation}
-          initialPlayers={mockPlayers}
-        />
+        <MockUnifiedTacticsBoard initialFormation={mockFormation} initialPlayers={mockPlayers} />
       );
 
       const benchPlayer = screen.getByTestId(`bench-player-${mockPlayers[12].id}`);
@@ -452,8 +436,8 @@ describe('Enhanced UnifiedTacticsBoard Integration Tests', () => {
       const dataTransfer = createDataTransferMock({
         'application/json': JSON.stringify({
           playerId: mockPlayers[12].id,
-          targetSlotId: mockFormation.slots[0].id
-        })
+          targetSlotId: mockFormation.slots[0].id,
+        }),
       });
 
       fireEvent.dragStart(benchPlayer, { dataTransfer });
@@ -468,10 +452,7 @@ describe('Enhanced UnifiedTacticsBoard Integration Tests', () => {
 
     it('should resolve conflicts through user choice', async () => {
       const { container } = render(
-        <MockUnifiedTacticsBoard 
-          initialFormation={mockFormation}
-          initialPlayers={mockPlayers}
-        />
+        <MockUnifiedTacticsBoard initialFormation={mockFormation} initialPlayers={mockPlayers} />
       );
 
       // Trigger conflict first
@@ -482,9 +463,9 @@ describe('Enhanced UnifiedTacticsBoard Integration Tests', () => {
         dataTransfer: createDataTransferMock({
           'application/json': JSON.stringify({
             playerId: mockPlayers[12].id,
-            targetSlotId: mockFormation.slots[0].id
-          })
-        })
+            targetSlotId: mockFormation.slots[0].id,
+          }),
+        }),
       });
 
       await waitFor(() => {
@@ -502,10 +483,7 @@ describe('Enhanced UnifiedTacticsBoard Integration Tests', () => {
 
     it('should handle player-to-player drag operations', async () => {
       const { container } = render(
-        <MockUnifiedTacticsBoard 
-          initialFormation={mockFormation}
-          initialPlayers={mockPlayers}
-        />
+        <MockUnifiedTacticsBoard initialFormation={mockFormation} initialPlayers={mockPlayers} />
       );
 
       const sourcePlayer = screen.getByTestId(`player-${mockFormation.slots[0].playerId}`);
@@ -518,9 +496,9 @@ describe('Enhanced UnifiedTacticsBoard Integration Tests', () => {
         customDropData: {
           'application/json': JSON.stringify({
             playerId: mockFormation.slots[0].playerId,
-            targetSlotId: mockFormation.slots[1].id
-          })
-        }
+            targetSlotId: mockFormation.slots[1].id,
+          }),
+        },
       });
 
       expect(dragResult.success).toBe(true);
@@ -530,10 +508,7 @@ describe('Enhanced UnifiedTacticsBoard Integration Tests', () => {
   describe('Formation Auto-Assignment Integration', () => {
     it('should trigger auto-assignment correctly', async () => {
       const { container } = render(
-        <MockUnifiedTacticsBoard 
-          initialFormation={mockFormation}
-          initialPlayers={mockPlayers}
-        />
+        <MockUnifiedTacticsBoard initialFormation={mockFormation} initialPlayers={mockPlayers} />
       );
 
       const autoAssignButton = screen.getByTestId('auto-assign-formation');
@@ -545,10 +520,7 @@ describe('Enhanced UnifiedTacticsBoard Integration Tests', () => {
 
     it('should respect positioning mode during auto-assignment', async () => {
       const { container } = render(
-        <MockUnifiedTacticsBoard 
-          initialFormation={mockFormation}
-          initialPlayers={mockPlayers}
-        />
+        <MockUnifiedTacticsBoard initialFormation={mockFormation} initialPlayers={mockPlayers} />
       );
 
       // Switch to free mode
@@ -570,14 +542,14 @@ describe('Enhanced UnifiedTacticsBoard Integration Tests', () => {
       });
 
       const { container } = render(
-        <MockUnifiedTacticsBoard 
+        <MockUnifiedTacticsBoard
           initialFormation={conflictFormation}
           initialPlayers={mockPlayers}
         />
       );
 
       const autoAssignButton = screen.getByTestId('auto-assign-formation');
-      
+
       expect(() => {
         fireEvent.click(autoAssignButton);
       }).not.toThrow();
@@ -587,14 +559,11 @@ describe('Enhanced UnifiedTacticsBoard Integration Tests', () => {
   describe('Drawing Tools Integration', () => {
     it('should toggle drawing tools overlay', async () => {
       render(
-        <MockUnifiedTacticsBoard 
-          initialFormation={mockFormation}
-          initialPlayers={mockPlayers}
-        />
+        <MockUnifiedTacticsBoard initialFormation={mockFormation} initialPlayers={mockPlayers} />
       );
 
       const drawingToggle = screen.getByTestId('toggle-drawing-tools');
-      
+
       // Should not be visible initially
       expect(screen.queryByTestId('drawing-tools-overlay')).not.toBeInTheDocument();
 
@@ -612,10 +581,7 @@ describe('Enhanced UnifiedTacticsBoard Integration Tests', () => {
 
     it('should provide drawing tools when overlay is active', async () => {
       render(
-        <MockUnifiedTacticsBoard 
-          initialFormation={mockFormation}
-          initialPlayers={mockPlayers}
-        />
+        <MockUnifiedTacticsBoard initialFormation={mockFormation} initialPlayers={mockPlayers} />
       );
 
       const drawingToggle = screen.getByTestId('toggle-drawing-tools');
@@ -628,17 +594,14 @@ describe('Enhanced UnifiedTacticsBoard Integration Tests', () => {
 
     it('should handle drawing interactions on the field', async () => {
       render(
-        <MockUnifiedTacticsBoard 
-          initialFormation={mockFormation}
-          initialPlayers={mockPlayers}
-        />
+        <MockUnifiedTacticsBoard initialFormation={mockFormation} initialPlayers={mockPlayers} />
       );
 
       const drawingToggle = screen.getByTestId('toggle-drawing-tools');
       await user.click(drawingToggle);
 
       const drawingCanvas = screen.getByTestId('drawing-canvas');
-      
+
       // Simulate drawing interaction
       fireEvent.mouseDown(drawingCanvas, { clientX: 100, clientY: 100 });
       fireEvent.mouseMove(drawingCanvas, { clientX: 200, clientY: 200 });
@@ -651,10 +614,7 @@ describe('Enhanced UnifiedTacticsBoard Integration Tests', () => {
   describe('Chemistry Visualization Integration', () => {
     it('should display team chemistry information', () => {
       render(
-        <MockUnifiedTacticsBoard 
-          initialFormation={mockFormation}
-          initialPlayers={mockPlayers}
-        />
+        <MockUnifiedTacticsBoard initialFormation={mockFormation} initialPlayers={mockPlayers} />
       );
 
       expect(screen.getByTestId('chemistry-panel')).toBeInTheDocument();
@@ -664,10 +624,7 @@ describe('Enhanced UnifiedTacticsBoard Integration Tests', () => {
 
     it('should update chemistry when players are moved', async () => {
       const { container } = render(
-        <MockUnifiedTacticsBoard 
-          initialFormation={mockFormation}
-          initialPlayers={mockPlayers}
-        />
+        <MockUnifiedTacticsBoard initialFormation={mockFormation} initialPlayers={mockPlayers} />
       );
 
       const initialChemistry = screen.getByTestId('chemistry-score');
@@ -682,9 +639,9 @@ describe('Enhanced UnifiedTacticsBoard Integration Tests', () => {
           dataTransfer: createDataTransferMock({
             'application/json': JSON.stringify({
               playerId: mockPlayers[11].id,
-              targetSlotId: emptySlot.getAttribute('data-slot-id')
-            })
-          })
+              targetSlotId: emptySlot.getAttribute('data-slot-id'),
+            }),
+          }),
         });
 
         // Chemistry should still be displayed (exact value may change)
@@ -696,10 +653,7 @@ describe('Enhanced UnifiedTacticsBoard Integration Tests', () => {
   describe('Cross-Component Communication', () => {
     it('should coordinate state changes across all components', async () => {
       render(
-        <MockUnifiedTacticsBoard 
-          initialFormation={mockFormation}
-          initialPlayers={mockPlayers}
-        />
+        <MockUnifiedTacticsBoard initialFormation={mockFormation} initialPlayers={mockPlayers} />
       );
 
       // Change positioning mode
@@ -722,10 +676,7 @@ describe('Enhanced UnifiedTacticsBoard Integration Tests', () => {
 
     it('should handle rapid state changes gracefully', async () => {
       render(
-        <MockUnifiedTacticsBoard 
-          initialFormation={mockFormation}
-          initialPlayers={mockPlayers}
-        />
+        <MockUnifiedTacticsBoard initialFormation={mockFormation} initialPlayers={mockPlayers} />
       );
 
       // Rapid interactions
@@ -750,12 +701,12 @@ describe('Enhanced UnifiedTacticsBoard Integration Tests', () => {
       const invalidFormation = {
         id: 'invalid',
         name: 'Invalid Formation',
-        slots: null
+        slots: null,
       };
 
       expect(() => {
         render(
-          <MockUnifiedTacticsBoard 
+          <MockUnifiedTacticsBoard
             initialFormation={invalidFormation}
             initialPlayers={mockPlayers}
           />
@@ -765,19 +716,16 @@ describe('Enhanced UnifiedTacticsBoard Integration Tests', () => {
 
     it('should recover from drag and drop errors', async () => {
       const { container } = render(
-        <MockUnifiedTacticsBoard 
-          initialFormation={mockFormation}
-          initialPlayers={mockPlayers}
-        />
+        <MockUnifiedTacticsBoard initialFormation={mockFormation} initialPlayers={mockPlayers} />
       );
 
       const benchPlayer = screen.getByTestId(`bench-player-${mockPlayers[11].id}`);
-      
+
       // Invalid drop data
       fireEvent.drop(container, {
         dataTransfer: createDataTransferMock({
-          'application/json': 'invalid json'
-        })
+          'application/json': 'invalid json',
+        }),
       });
 
       // Should not crash
@@ -789,13 +737,13 @@ describe('Enhanced UnifiedTacticsBoard Integration Tests', () => {
         ...mockFormation,
         slots: mockFormation.slots.map((slot: any) => ({
           ...slot,
-          playerId: 'non-existent-player-id'
-        }))
+          playerId: 'non-existent-player-id',
+        })),
       };
 
       expect(() => {
         render(
-          <MockUnifiedTacticsBoard 
+          <MockUnifiedTacticsBoard
             initialFormation={incompleteFormation}
             initialPlayers={mockPlayers}
           />
@@ -809,10 +757,7 @@ describe('Enhanced UnifiedTacticsBoard Integration Tests', () => {
       const startTime = performance.now();
 
       const { container } = render(
-        <MockUnifiedTacticsBoard 
-          initialFormation={mockFormation}
-          initialPlayers={mockPlayers}
-        />
+        <MockUnifiedTacticsBoard initialFormation={mockFormation} initialPlayers={mockPlayers} />
       );
 
       // Perform multiple complex operations
@@ -846,7 +791,7 @@ describe('Enhanced UnifiedTacticsBoard Integration Tests', () => {
       const startTime = performance.now();
 
       const { container } = render(
-        <MockUnifiedTacticsBoard 
+        <MockUnifiedTacticsBoard
           initialFormation={largeFormation}
           initialPlayers={largePlayerSet}
         />
@@ -863,10 +808,7 @@ describe('Enhanced UnifiedTacticsBoard Integration Tests', () => {
   describe('Complete Workflow Integration', () => {
     it('should execute a complete tactical setup workflow', async () => {
       render(
-        <MockUnifiedTacticsBoard 
-          initialFormation={mockFormation}
-          initialPlayers={mockPlayers}
-        />
+        <MockUnifiedTacticsBoard initialFormation={mockFormation} initialPlayers={mockPlayers} />
       );
 
       // Step 1: Switch positioning mode
@@ -881,15 +823,15 @@ describe('Enhanced UnifiedTacticsBoard Integration Tests', () => {
       // Step 3: Manual player adjustments
       const benchPlayer = screen.getByTestId(`bench-player-${mockPlayers[11].id}`);
       const fieldContainer = screen.getByTestId('field-container');
-      
+
       fireEvent.dragStart(benchPlayer);
       fireEvent.drop(fieldContainer, {
         dataTransfer: createDataTransferMock({
           'application/json': JSON.stringify({
             playerId: mockPlayers[11].id,
-            targetSlotId: mockFormation.slots[0].id
-          })
-        })
+            targetSlotId: mockFormation.slots[0].id,
+          }),
+        }),
       });
 
       // Step 4: Resolve any conflicts
@@ -914,10 +856,7 @@ describe('Enhanced UnifiedTacticsBoard Integration Tests', () => {
 
     it('should maintain data consistency throughout workflow', async () => {
       const { container } = render(
-        <MockUnifiedTacticsBoard 
-          initialFormation={mockFormation}
-          initialPlayers={mockPlayers}
-        />
+        <MockUnifiedTacticsBoard initialFormation={mockFormation} initialPlayers={mockPlayers} />
       );
 
       const initialPlayerCount = mockPlayers.length;

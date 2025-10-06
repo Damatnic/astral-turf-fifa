@@ -151,7 +151,7 @@ const SlotActionMenu: React.FC = () => {
       return { onField: [], benched: [] };
     }
     const playersOnFieldIds = new Set(
-      activeFormation.slots.map(slot => slot.playerId).filter(Boolean),
+      activeFormation.slots.map(slot => slot.playerId).filter(Boolean)
     );
     const filtered = players.filter(p => p.id !== sourcePlayerId && p.team === activeTeam);
 

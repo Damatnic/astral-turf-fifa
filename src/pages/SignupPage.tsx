@@ -101,11 +101,11 @@ const SignupPage: React.FC = () => {
     setErrors({});
 
     try {
-      const user = await authService.signup(formData.email, formData.password, formData.role);
+      const user = await authService.signup(formData as any);
       dispatch({ type: 'SIGNUP_SUCCESS', payload: user });
       navigate('/dashboard');
     } catch (_error) {
-      const message = error instanceof Error ? error.message : 'An unknown error occurred';
+      const message = _error instanceof Error ? _error.message : 'An unknown error occurred';
       setErrors({ general: message });
       dispatch({ type: 'SIGNUP_FAILURE', payload: message });
     } finally {

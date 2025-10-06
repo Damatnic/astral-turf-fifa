@@ -1,8 +1,28 @@
-import React, { useState, useCallback, useRef, useEffect, useMemo, memo, lazy, Suspense, startTransition, useDeferredValue } from 'react';
+import React, {
+  useState,
+  useCallback,
+  useRef,
+  useEffect,
+  useMemo,
+  memo,
+  lazy,
+  Suspense,
+  startTransition,
+  useDeferredValue,
+  useReducer,
+} from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTacticsContext, useUIContext, useResponsive } from '../../hooks';
-import { useTheme, useAccessibility, useMotionSafe, useKeyboardNavigation } from '../../context/ThemeContext';
+import { useFormationHistory, createHistorySnapshot } from '../../hooks/useFormationHistory';
+import type { HistoryState } from '../../hooks/useFormationHistory';
+import {
+  useTheme,
+  useAccessibility,
+  useMotionSafe,
+  useKeyboardNavigation,
+} from '../../context/ThemeContext';
 import { useMobileCapabilities, useMobileViewport } from '../../utils/mobileOptimizations';
+import { useOfflineStorage, STORES } from '../../services/offlineStorageManager';
 import { ModernField } from './ModernField';
 import { LeftSidebar } from './LeftSidebar';
 import { RightSidebar } from './RightSidebar';
@@ -15,32 +35,65 @@ import PlayerDisplaySettings, { PlayerDisplayConfig } from './PlayerDisplaySetti
 import DrawingCanvas from './DrawingCanvas';
 import AITacticalIntelligence from './AITacticalIntelligence';
 import PositionalBench from './PositionalBench';
+import { HistoryTimeline } from './HistoryTimeline';
+import { KeyboardShortcutsPanel } from './KeyboardShortcutsPanel';
+import QuickStartTemplates from './QuickStartTemplates';
 import type { DrawingShape, DrawingTool } from '../../types';
-import { type Player, type Formation } from '../../types';
+import { type Player, type Formation, type Team, type PlayerAttributes } from '../../types';
+import { type TacticalPreset } from '../../types/presets';
 import { initializeSampleData, getBenchPlayers } from '../../utils/sampleTacticsData';
+import { uiReducer, getInitialUIState } from '../../reducers/tacticsBoardUIReducer';
+
+// Mobile optimization components (lazy-loaded for code splitting)
+const MobileTacticsBoardContainer = lazy(() =>
+  import('./mobile/MobileTacticsBoardContainer').then(m => ({
+    default: m.MobileTacticsBoardContainer,
+  })),
+);
+
+const TouchGestureController = lazy(() =>
+  import('./mobile/TouchGestureController').then(m => ({
+    default: m.TouchGestureController,
+  })),
+);
 
 // Performance optimizations
-import { 
-  useFastMemo, 
+import {
+  useFastMemo,
   useThrottleCallback,
   PerformanceMonitor,
   useBatteryAwarePerformance,
   useVirtualization,
-  createWebWorker
+  createWebWorker,
 } from '../../utils/performanceOptimizations';
-import { createOptimizedLazy, withLazyLoading } from '../../utils/lazyLoadingOptimizations';
-import { useCachedFormation, formationCache, playerCache, useCachedQuery } from '../../utils/cachingOptimizations';
+// Removed optimized lazy loading to fix reference errors
+import {
+  useCachedFormation,
+  formationCache,
+  playerCache,
+  useCachedQuery,
+} from '../../utils/cachingOptimizations';
 import { useOptimizedRaf } from '../../utils/animationOptimizations';
 import { useVirtualList, useIntersectionObserver } from '../../utils/virtualizationOptimizations';
 import { FormationWebWorker } from '../../workers/formationCalculationWorker';
 
-// Lazy load heavy components with optimized loading
-const AnimationTimeline = createOptimizedLazy(() => import('./AnimationTimeline'), { preloadStrategy: 'hover' });
-const PresentationControls = createOptimizedLazy(() => import('./PresentationControls'), { preloadStrategy: 'instant' });
-const DugoutManagement = createOptimizedLazy(() => import('./DugoutManagement'), { preloadStrategy: 'hover' });
-const ChallengeManagement = createOptimizedLazy(() => import('./ChallengeManagement'), { preloadStrategy: 'hover' });
-const CollaborationFeatures = createOptimizedLazy(() => import('./CollaborationFeatures'), { preloadStrategy: 'hover' });
-const EnhancedExportImport = createOptimizedLazy(() => import('./EnhancedExportImport'), { preloadStrategy: 'hover' });
+// Type definitions for PWA
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
+
+interface WindowWithGtag extends Window {
+  gtag?: (event: string, action: string, params: Record<string, string>) => void;
+}
+
+// Lazy load heavy components with standard React lazy loading
+const AnimationTimeline = lazy(() => import('./AnimationTimeline'));
+const PresentationControls = lazy(() => import('./PresentationControls'));
+const DugoutManagement = lazy(() => import('./DugoutManagement'));
+const ChallengeManagement = lazy(() => import('./ChallengeManagement'));
+const CollaborationFeatures = lazy(() => import('./CollaborationFeatures'));
+const EnhancedExportImport = lazy(() => import('./EnhancedExportImport'));
 import {
   Users,
   Zap,
@@ -59,27 +112,16 @@ import {
   Archive,
   Heart,
   Pen,
+  Keyboard,
+  History,
+  Sparkles,
 } from 'lucide-react';
 
-// Ultra-optimized lazy loading with preloading strategies
-const IntelligentAssistant = createOptimizedLazy(() => import('./IntelligentAssistant'), { 
-  preloadStrategy: 'hover',
-  timeout: 8000,
-  retryAttempts: 2
-});
-const FormationTemplates = createOptimizedLazy(() => import('./FormationTemplates'), { 
-  preloadStrategy: 'hover',
-  timeout: 5000
-});
-const TacticalPlaybook = createOptimizedLazy(() => import('./TacticalPlaybook'), { 
-  preloadStrategy: 'viewport',
-  timeout: 8000
-});
-const AdvancedAnalyticsDashboard = createOptimizedLazy(() => import('../analytics/AdvancedAnalyticsDashboard'), { 
-  preloadStrategy: 'hover',
-  timeout: 10000,
-  retryAttempts: 2
-});
+// Standard React lazy loading
+const IntelligentAssistant = lazy(() => import('./IntelligentAssistant'));
+const FormationTemplates = lazy(() => import('./FormationTemplates'));
+const TacticalPlaybook = lazy(() => import('./TacticalPlaybook'));
+const AdvancedAnalyticsDashboard = lazy(() => import('../analytics/AdvancedAnalyticsDashboard'));
 
 interface UnifiedTacticsBoardProps {
   className?: string;
@@ -98,18 +140,28 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
   onAnalyticsView,
   onExportFormation,
 }) => {
-  const { tacticsState, dispatch } = useTacticsContext();
-  const { uiState } = useUIContext();
+  const { tacticsState, dispatch: tacticsDispatch } = useTacticsContext();
+  const { uiState: contextUIState } = useUIContext();
   const { isMobile, isTablet, isTouchDevice, prefersReducedMotion } = useResponsive();
-  
+
+  // Initialize UI state with useReducer (consolidates 30+ useState hooks)
+  const [boardUIState, uiDispatch] = useReducer(uiReducer, getInitialUIState(isMobile));
+
+  // Mobile zoom and pan state
+  const [mobileZoom, setMobileZoom] = useState(1);
+  const [mobilePanOffset, setMobilePanOffset] = useState({ x: 0, y: 0 });
+
+  // Offline storage for mobile
+  const { isOnline, save: saveOffline, syncPendingData } = useOfflineStorage();
+
   // Core data access - must be declared before useDeferredValue usage
   const activeFormationId = tacticsState?.activeFormationIds?.home;
   const currentFormation = useCachedQuery(
-    () => activeFormationId ? tacticsState?.formations?.[activeFormationId] : undefined,
+    () => (activeFormationId ? tacticsState?.formations?.[activeFormationId] : undefined),
     [activeFormationId, tacticsState?.formations],
     `formation-${activeFormationId}`
   );
-  
+
   // Virtualized players access for large datasets
   const currentPlayers = useCachedQuery(
     () => tacticsState?.players || [],
@@ -117,109 +169,139 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
     'current-players'
   );
   // Mobile optimizations (inline implementation to avoid hook issues)
-  const mobileOptimizations = useMemo(() => ({
-    shouldReduceAnimations: isMobile || prefersReducedMotion,
-    reducedEffects: isMobile,
-    animationDuration: isMobile ? 150 : 300,
-    minTouchTarget: 44,
-    enableVirtualization: isMobile,
-    enableLazyLoading: true
-  }), [isMobile, prefersReducedMotion]);
+  const mobileOptimizations = useMemo(
+    () => ({
+      shouldReduceAnimations: isMobile || prefersReducedMotion,
+      reducedEffects: isMobile,
+      animationDuration: isMobile ? 150 : 300,
+      minTouchTarget: 44,
+      enableVirtualization: isMobile,
+      enableLazyLoading: true,
+    }),
+    [isMobile, prefersReducedMotion]
+  );
   const mobileCapabilities = useMobileCapabilities();
   const mobileViewport = useMobileViewport();
-  // PWA placeholder (not implemented yet)
-  const isInstallable = false;
-  const installApp = () => console.log('PWA installation not implemented');
+
+  // PWA Installation Support
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+
+  // Listen for beforeinstallprompt event
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
+    };
+
+    const handleAppInstalled = () => {
+      setDeferredPrompt(null);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener('appinstalled', handleAppInstalled);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('appinstalled', handleAppInstalled);
+    };
+  }, []);
+
+  // Install PWA function (can be called from UI components)
+  const installPWA = useCallback(async () => {
+    if (!deferredPrompt) {
+      return;
+    }
+
+    try {
+      await deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+
+      if (typeof window !== 'undefined' && (window as WindowWithGtag).gtag) {
+        (window as WindowWithGtag).gtag?.(
+          'event',
+          outcome === 'accepted' ? 'pwa_install_accepted' : 'pwa_install_dismissed',
+          {
+            event_category: 'PWA',
+            event_label: outcome === 'accepted' ? 'Install Accepted' : 'Install Dismissed',
+          }
+        );
+      }
+
+      setDeferredPrompt(null);
+    } catch {
+      // Silent error handling
+    }
+  }, [deferredPrompt]);
+
   const { isLowPower, getOptimizedConfig } = useBatteryAwarePerformance();
-  
+
   // Theme and accessibility
   const { theme, isDark } = useTheme();
   const { reducedMotion, highContrast, shouldAnimate } = useAccessibility();
   const motionSafe = useMotionSafe();
-  
+
   // Performance monitoring
   const performanceMonitor = useRef(PerformanceMonitor.getInstance());
   const renderStartTime = useRef(Date.now());
   const componentMountTime = useRef(Date.now());
-  
+
   // Track render performance with detailed metrics
   useEffect(() => {
     const endRender = performanceMonitor.current.startRender();
-    
+
     // Track component lifecycle metrics
     const mountTime = Date.now() - componentMountTime.current;
-    if (mountTime > 100) { // Log slow mounts
+    if (mountTime > 100) {
+      // Log slow mounts
       console.warn(`[Performance] Slow component mount: ${mountTime}ms`);
     }
-    
+
     return endRender;
   });
-  
+
   // Performance-aware state updates
   const deferredPlayers = useDeferredValue(currentPlayers);
   const deferredFormation = useDeferredValue(currentFormation);
 
-  // Core UI state
-  const [viewMode, setViewMode] = useState<ViewMode>('standard');
-  const [showLeftSidebar, setShowLeftSidebar] = useState(!isMobile);
-  const [showRightSidebar, setShowRightSidebar] = useState(!isMobile);
-  const [showFormationTemplates, setShowFormationTemplates] = useState(false);
-  const [showAIAssistant, setShowAIAssistant] = useState(false);
-  const [showTacticalPlaybook, setShowTacticalPlaybook] = useState(false);
-  const [showAnalyticsPanel, setShowAnalyticsPanel] = useState(false);
-  const [showAIAnalysis, setShowAIAnalysis] = useState(false);
-  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [showHeatMap, setShowHeatMap] = useState(false);
-  const [showPlayerStats, setShowPlayerStats] = useState(false);
-  const [isPresenting, setIsPresenting] = useState(false);
-  const [showDugoutManagement, setShowDugoutManagement] = useState(false);
-  const [showChallengeManagement, setShowChallengeManagement] = useState(false);
-  const [showCollaboration, setShowCollaboration] = useState(false);
-  const [showExportImport, setShowExportImport] = useState(false);
-  const [positioningMode, setPositioningMode] = useState<'snap' | 'free'>('snap');
-  const [showConflictMenu, setShowConflictMenu] = useState(false);
-  const [conflictData, setConflictData] = useState<{
-    sourcePlayer: Player;
-    targetPlayer: Player;
-    position: { x: number; y: number };
-  } | null>(null);
-  const [showExpandedPlayerCard, setShowExpandedPlayerCard] = useState(false);
-  const [expandedPlayerPosition, setExpandedPlayerPosition] = useState({ x: 0, y: 0 });
-  const [showChemistry, setShowChemistry] = useState(false);
-  
-  // Player display configuration state
-  const [playerDisplayConfig, setPlayerDisplayConfig] = useState<PlayerDisplayConfig>({
-    showNames: true,
-    showNumbers: true,
-    showStats: false,
-    showStamina: true,
-    showMorale: true,
-    showAvailability: true,
-    iconType: 'circle',
-    namePosition: 'below',
-    size: 'medium'
-  });
+  // Extract UI state for easier access
+  const {
+    viewMode,
+    sidebars,
+    panels,
+    display,
+    interaction,
+    conflict,
+    expandedCard,
+    playerDisplayConfig,
+    aiMinimized,
+  } = boardUIState;
+
+  // Destructure commonly used values
+  const { selectedPlayer, isDragging, isPresenting, positioningMode } = interaction;
+  const { showMenu: showConflictMenu, data: conflictData } = conflict;
+  const { visible: showExpandedPlayerCard, position: expandedPlayerPosition } = expandedCard;
+  const showLeftSidebar = sidebars.left;
+  const showRightSidebar = sidebars.right;
 
   // Sample data initialization
   useEffect(() => {
     // Only initialize sample data if no current data exists
     if (!currentPlayers.length && !currentFormation) {
       const sampleData = initializeSampleData();
-      
+
       // Dispatch sample players
-      dispatch({
+      tacticsDispatch({
         type: 'SET_PLAYERS',
-        payload: sampleData.players
+        payload: sampleData.players,
       });
-      
+
       // Dispatch sample formation
-      dispatch({
+      tacticsDispatch({
         type: 'SET_FORMATION',
-        payload: sampleData.formation
+        payload: sampleData.formation,
       });
     }
-  }, [currentPlayers.length, currentFormation, dispatch]);
+  }, [currentPlayers.length, currentFormation, tacticsDispatch]);
 
   // Calculate bench players
   const benchPlayers = useMemo(() => {
@@ -228,25 +310,73 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
     }
     return [];
   }, [currentPlayers, currentFormation]);
-  const [isGridVisible, setIsGridVisible] = useState(false);
-  const [isFormationStrengthVisible, setIsFormationStrengthVisible] = useState(false);
-  const [showAIIntelligence, setShowAIIntelligence] = useState(false);
-  const [isAIMinimized, setIsAIMinimized] = useState(false);
+
+  // Extract display flags for easier access
+  const isGridVisible = display.grid;
+  const isFormationStrengthVisible = display.formationStrength;
+  const showAIIntelligence = panels.aiIntelligence;
+  const isAIMinimized = aiMinimized;
+
+  // Undo/Redo History System
+  const historySystem = useFormationHistory(
+    createHistorySnapshot(currentFormation || null, currentPlayers, tacticsState?.drawings || []),
+    {
+      enableKeyboardShortcuts: true,
+      onUndo: (state: HistoryState) => {
+        // Restore state from history
+        if (state.formation) {
+          tacticsDispatch({
+            type: 'SET_FORMATION',
+            payload: { id: activeFormationId || 'default', formation: state.formation } as any,
+          });
+        }
+        tacticsDispatch({ type: 'SET_PLAYERS', payload: state.players });
+        tacticsDispatch({ type: 'UPDATE_STATE', payload: { drawings: state.drawings } } as any);
+      },
+      onRedo: (state: HistoryState) => {
+        // Restore state from history
+        if (state.formation) {
+          tacticsDispatch({
+            type: 'SET_FORMATION',
+            payload: { id: activeFormationId || 'default', formation: state.formation } as any,
+          });
+        }
+        tacticsDispatch({ type: 'SET_PLAYERS', payload: state.players });
+        tacticsDispatch({ type: 'UPDATE_STATE', payload: { drawings: state.drawings } } as any);
+      },
+    }
+  );
+
+  // Push state to history whenever tactical changes occur
+  useEffect(() => {
+    if (currentFormation || currentPlayers.length > 0) {
+      historySystem.pushState(
+        createHistorySnapshot(
+          currentFormation || null,
+          currentPlayers,
+          tacticsState?.drawings || []
+        )
+      );
+    }
+  }, [currentFormation, currentPlayers, tacticsState?.drawings]);
 
   // Performance optimizations
   const fieldRef = useRef<HTMLDivElement>(null);
   const animationFrameRef = useRef<number | null>(null);
   const lastUpdateTime = useRef(Date.now());
   const batchedUpdates = useRef<Array<() => void>>([]);
-  
+
   // Performance-aware configuration with mobile optimizations
   const optimizedConfig = useFastMemo(() => {
     const config = getOptimizedConfig();
     return {
       ...config,
-      enableHeavyAnimations: !isLowPower && !mobileOptimizations.shouldReduceAnimations && config.enableAnimations,
+      enableHeavyAnimations:
+        !isLowPower && !mobileOptimizations.shouldReduceAnimations && config.enableAnimations,
       enableParticleEffects: !isLowPower && !isMobile && !mobileOptimizations.reducedEffects,
-      animationDuration: mobileOptimizations.shouldReduceAnimations ? 0 : mobileOptimizations.animationDuration,
+      animationDuration: mobileOptimizations.shouldReduceAnimations
+        ? 0
+        : mobileOptimizations.animationDuration,
       minTouchTarget: mobileOptimizations.minTouchTarget,
       enableVirtualization: mobileOptimizations.enableVirtualization,
       enableLazyLoading: mobileOptimizations.enableLazyLoading,
@@ -254,34 +384,34 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
   }, [isLowPower, isMobile, mobileOptimizations]);
 
   // Data access has been moved up to prevent hoisting issues
-  
+
   // Memoized player counts for optimization decisions
   const playerCount = useFastMemo(
     () => currentPlayers.length,
     [currentPlayers],
     (a, b) => a === b
   );
-  
+
   // Enable virtualization for large player sets
   const shouldVirtualize = playerCount > 50;
-  
+
   // Intersection observer for viewport optimizations
   const [containerRef, isIntersecting] = useIntersectionObserver({
     threshold: 0.1,
-    rootMargin: '50px'
+    rootMargin: '50px',
   });
 
   // Responsive sidebar management with mobile viewport considerations
   useEffect(() => {
     if (isMobile) {
-      setShowLeftSidebar(false);
-      setShowRightSidebar(false);
+      uiDispatch({ type: 'SET_LEFT_SIDEBAR', payload: false });
+      uiDispatch({ type: 'SET_RIGHT_SIDEBAR', payload: false });
     } else if (isTablet) {
-      setShowLeftSidebar(true);
-      setShowRightSidebar(false);
+      uiDispatch({ type: 'SET_LEFT_SIDEBAR', payload: true });
+      uiDispatch({ type: 'SET_RIGHT_SIDEBAR', payload: false });
     } else {
-      setShowLeftSidebar(true);
-      setShowRightSidebar(true);
+      uiDispatch({ type: 'SET_LEFT_SIDEBAR', payload: true });
+      uiDispatch({ type: 'SET_RIGHT_SIDEBAR', payload: true });
     }
   }, [isMobile, isTablet]);
 
@@ -289,233 +419,289 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
   useEffect(() => {
     if (isMobile && mobileCapabilities.hasHapticFeedback) {
       // Enable haptic feedback for mobile interactions
-      document.addEventListener('touchstart', () => {
-        if (navigator.vibrate) {
-          navigator.vibrate(10);
-        }
-      }, { passive: true });
+      document.addEventListener(
+        'touchstart',
+        () => {
+          if (navigator.vibrate) {
+            navigator.vibrate(10);
+          }
+        },
+        { passive: true }
+      );
     }
   }, [isMobile, mobileCapabilities.hasHapticFeedback]);
 
+  // Offline sync on reconnect
+  useEffect(() => {
+    if (isOnline && isMobile) {
+      syncPendingData();
+    }
+  }, [isOnline, isMobile, syncPendingData]);
+
+  // Save formation to offline storage on change (mobile only)
+  useEffect(() => {
+    if (isMobile && tacticsState?.activeFormationIds?.home && tacticsState?.formations) {
+      const activeFormationId = tacticsState.activeFormationIds.home;
+      const activeFormation = tacticsState.formations[activeFormationId];
+      
+      if (activeFormation) {
+        const formationId = activeFormation.id || `formation-${Date.now()}`;
+        saveOffline(STORES.FORMATIONS, formationId, activeFormation, isOnline).catch(
+          error => {
+            // eslint-disable-next-line no-console
+            console.error('Failed to save formation offline:', error);
+          },
+        );
+      }
+    }
+  }, [isMobile, tacticsState?.activeFormationIds?.home, tacticsState?.formations, saveOffline, isOnline]);
+
   // Ultra-optimized player movement with intelligent batching and Web Workers
   const formationWorker = useRef<FormationWebWorker | null>(null);
-  
+
   useEffect(() => {
     formationWorker.current = new FormationWebWorker();
     return () => formationWorker.current?.terminate();
   }, []);
-  
-  const handlePlayerMove = useThrottleCallback(async (playerId: string, position: { x: number; y: number }) => {
-    // Immediate visual feedback for sub-16ms response
-    startTransition(() => {
-      batchedUpdates.current.push(() => {
-        dispatch({
-          type: 'UPDATE_PLAYER_POSITION_OPTIMISTIC',
-          payload: { playerId, position },
+
+  const handlePlayerMove = useThrottleCallback(
+    async (playerId: string, position: { x: number; y: number }) => {
+      // Immediate visual feedback for sub-16ms response
+      startTransition(() => {
+        batchedUpdates.current.push(() => {
+          tacticsDispatch({
+            type: 'UPDATE_PLAYER_POSITION_OPTIMISTIC',
+            payload: { playerId, position },
+          });
         });
       });
-    });
-    
-    // Heavy calculations in Web Worker
-    if (shouldVirtualize && formationWorker.current) {
-      try {
-        const validationResult = await formationWorker.current.validatePlayerPosition({
-          playerId,
-          position,
-          formation: currentFormation,
-          players: currentPlayers
-        });
-        
-        if (validationResult.isValid) {
-          startTransition(() => {
-            dispatch({
-              type: 'UPDATE_PLAYER_POSITION',
-              payload: { playerId, position: validationResult.optimizedPosition || position },
+
+      // Heavy calculations in Web Worker
+      if (shouldVirtualize && formationWorker.current && currentFormation) {
+        try {
+          const validationResult = await formationWorker.current.validatePlayerPosition({
+            playerId,
+            position,
+            formation: currentFormation,
+            players: currentPlayers,
+          });
+
+          if (validationResult.isValid) {
+            startTransition(() => {
+              tacticsDispatch({
+                type: 'UPDATE_PLAYER_POSITION',
+                payload: { playerId, position: validationResult.optimizedPosition || position },
+              });
             });
+          }
+        } catch (error) {
+          console.warn('Worker validation failed, falling back to sync:', error);
+          // Fallback to synchronous update
+          tacticsDispatch({
+            type: 'UPDATE_PLAYER_POSITION',
+            payload: { playerId, position },
           });
         }
-      } catch (error) {
-        console.warn('Worker validation failed, falling back to sync:', error);
-        // Fallback to synchronous update
-        dispatch({
-          type: 'UPDATE_PLAYER_POSITION',
-          payload: { playerId, position },
-        });
-      }
-    } else {
-      // Process batched updates for smaller datasets
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
+      } else {
+        // Process batched updates for smaller datasets
+        if (animationFrameRef.current) {
+          cancelAnimationFrame(animationFrameRef.current);
+        }
 
-      animationFrameRef.current = requestAnimationFrame(() => {
-        const updates = batchedUpdates.current.splice(0);
-        startTransition(() => {
-          updates.forEach(update => update());
+        animationFrameRef.current = requestAnimationFrame(() => {
+          const updates = batchedUpdates.current.splice(0);
+          startTransition(() => {
+            updates.forEach(update => update());
+          });
         });
-      });
-    }
-  }, 8); // Increased to 120fps for ultra-responsive feel
+      }
+    },
+    8
+  ); // Increased to 120fps for ultra-responsive feel
 
   // Simple formation change handler
-  const handleFormationChange = useCallback((formation: Formation) => {
-    dispatch({
-      type: 'UPDATE_FORMATION',
-      payload: formation,
-    });
-  }, [dispatch]);
+  const handleFormationChange = useCallback(
+    (formation: Formation) => {
+      tacticsDispatch({
+        type: 'UPDATE_FORMATION',
+        payload: formation,
+      });
+    },
+    [tacticsDispatch]
+  );
 
   // Player selection handler
   const handlePlayerSelect = useCallback((player: Player, position?: { x: number; y: number }) => {
-    setSelectedPlayer(player);
-    if (isMobile) {
-      setRightPanelState('expanded');
-    }
-    
+    uiDispatch({ type: 'SELECT_PLAYER', payload: player });
+
     // Show expanded card if position provided (for right-click/long-press)
     if (position) {
-      setExpandedPlayerPosition(position);
-      setShowExpandedPlayerCard(true);
+      uiDispatch({ type: 'SHOW_EXPANDED_CARD', payload: position });
     }
-  }, [isMobile]);
+  }, []);
 
   // Enhanced player move with conflict resolution
-  const handlePlayerMoveWithConflict = useThrottleCallback((playerId: string, position: { x: number; y: number }, targetPlayerId?: string) => {
-    // If there's a conflict with another player
-    if (targetPlayerId && targetPlayerId !== playerId) {
-      const sourcePlayer = currentPlayers.find(p => p.id === playerId);
-      const targetPlayer = currentPlayers.find(p => p.id === targetPlayerId);
-      
-      if (sourcePlayer && targetPlayer) {
-        setConflictData({
-          sourcePlayer,
-          targetPlayer,
-          position
-        });
-        setShowConflictMenu(true);
-        return;
+  const handlePlayerMoveWithConflict = useThrottleCallback(
+    (playerId: string, position: { x: number; y: number }, targetPlayerId?: string) => {
+      // If there's a conflict with another player
+      if (targetPlayerId && targetPlayerId !== playerId) {
+        const sourcePlayer = currentPlayers.find(p => p.id === playerId);
+        const targetPlayer = currentPlayers.find(p => p.id === targetPlayerId);
+
+        if (sourcePlayer && targetPlayer) {
+          uiDispatch({
+            type: 'SHOW_CONFLICT_MENU',
+            payload: {
+              sourcePlayer,
+              targetPlayer,
+              position,
+            },
+          });
+          return;
+        }
       }
-    }
-    
-    // No conflict - proceed with normal move
-    handlePlayerMove(playerId, position);
-  }, 16);
+
+      // No conflict - proceed with normal move
+      handlePlayerMove(playerId, position);
+    },
+    16
+  );
 
   // Conflict resolution handler
-  const handleConflictResolve = useCallback((action: 'swap' | 'replace' | 'cancel' | 'find_alternative') => {
-    if (!conflictData) return;
-    
-    const { sourcePlayer, targetPlayer, position } = conflictData;
-    
-    switch (action) {
-      case 'swap':
-        // Swap positions
-        dispatch({
-          type: 'SWAP_PLAYERS',
-          payload: {
-            playerId1: sourcePlayer.id,
-            playerId2: targetPlayer.id
-          }
-        });
-        break;
-        
-      case 'replace':
-        // Move target to bench and place source
-        dispatch({
-          type: 'MOVE_TO_BENCH',
-          payload: { playerId: targetPlayer.id }
-        });
-        handlePlayerMove(sourcePlayer.id, position);
-        break;
-        
-      case 'find_alternative':
-        // This would trigger alternative position finding logic
-        // For now, we'll just show a message
-        console.log('Finding alternative position for', targetPlayer.name);
-        break;
-        
-      case 'cancel':
-      default:
-        // Do nothing - return to previous position
-        break;
-    }
-    
-    setShowConflictMenu(false);
-    setConflictData(null);
-  }, [conflictData, dispatch, handlePlayerMove]);
+  const handleConflictResolve = useCallback(
+    (action: 'swap' | 'replace' | 'cancel' | 'find_alternative') => {
+      if (!conflictData) {
+        return;
+      }
+
+      const { sourcePlayer, targetPlayer, position } = conflictData;
+
+      switch (action) {
+        case 'swap':
+          // Swap positions
+          tacticsDispatch({
+            type: 'SWAP_PLAYERS',
+            payload: {
+              sourcePlayerId: sourcePlayer.id,
+              targetPlayerId: targetPlayer.id,
+            },
+          });
+          break;
+
+        case 'replace':
+          // Move target to bench and place source
+          tacticsDispatch({
+            type: 'MOVE_TO_BENCH',
+            payload: { playerId: targetPlayer.id },
+          });
+          handlePlayerMove(sourcePlayer.id, position);
+          break;
+
+        case 'find_alternative':
+          // This would trigger alternative position finding logic
+          // For now, we'll just show a message
+          console.log('Finding alternative position for', targetPlayer.name);
+          break;
+
+        case 'cancel':
+        default:
+          // Do nothing - return to previous position
+          break;
+      }
+
+      uiDispatch({ type: 'HIDE_CONFLICT_MENU' });
+    },
+    [conflictData, tacticsDispatch, handlePlayerMove]
+  );
 
   // Player action handler (from expanded card)
-  const handlePlayerAction = useCallback((action: 'swap' | 'bench' | 'instructions' | 'stats') => {
-    if (!selectedPlayer) return;
-    
-    switch (action) {
-      case 'swap':
-        // Enter swap mode - could set a flag and change cursor
-        console.log('Entering swap mode for', selectedPlayer.name);
-        break;
-        
-      case 'bench':
-        dispatch({
-          type: 'MOVE_TO_BENCH',
-          payload: { playerId: selectedPlayer.id }
-        });
-        break;
-        
-      case 'instructions':
-        // Open tactical instructions
-        console.log('Opening instructions for', selectedPlayer.name);
-        break;
-        
-      case 'stats':
-        // Open detailed stats view
-        setShowPlayerStats(true);
-        break;
-    }
-    
-    setShowExpandedPlayerCard(false);
-  }, [selectedPlayer, dispatch]);
+  const handlePlayerAction = useCallback(
+    (action: 'swap' | 'bench' | 'instructions' | 'stats') => {
+      if (!selectedPlayer) {
+        return;
+      }
+
+      switch (action) {
+        case 'swap':
+          // Enter swap mode - could set a flag and change cursor
+          console.log('Entering swap mode for', selectedPlayer.name);
+          break;
+
+        case 'bench':
+          tacticsDispatch({
+            type: 'MOVE_TO_BENCH',
+            payload: { playerId: selectedPlayer.id },
+          });
+          break;
+
+        case 'instructions':
+          // Open tactical instructions
+          console.log('Opening instructions for', selectedPlayer.name);
+          break;
+
+        case 'stats':
+          // Open detailed stats view
+          uiDispatch({ type: 'SET_DISPLAY', payload: { key: 'playerStats', value: true } });
+          break;
+      }
+
+      uiDispatch({ type: 'HIDE_EXPANDED_CARD' });
+    },
+    [selectedPlayer, tacticsDispatch]
+  );
 
   // Drawing state from UI context
-  const { drawingTool, drawingColor, drawings } = uiState;
-  
+  const { drawingTool, drawingColor } = contextUIState;
+
   // Drawing handlers
-  const handleToolChange = useCallback((tool: DrawingTool) => {
-    dispatch({ type: 'SET_DRAWING_TOOL', payload: tool });
-  }, [dispatch]);
-  
-  const handleColorChange = useCallback((color: string) => {
-    dispatch({ type: 'SET_DRAWING_COLOR', payload: color });
-  }, [dispatch]);
-  
-  const handleAddDrawing = useCallback((shape: DrawingShape) => {
-    dispatch({ type: 'ADD_DRAWING', payload: shape });
-  }, [dispatch]);
-  
+  const handleToolChange = useCallback(
+    (tool?: DrawingTool) => {
+      if (tool) {
+        tacticsDispatch({ type: 'SET_DRAWING_TOOL', payload: tool });
+      }
+    },
+    [tacticsDispatch]
+  );
+
+  const handleColorChange = useCallback(
+    (color: string) => {
+      tacticsDispatch({ type: 'SET_DRAWING_COLOR', payload: color });
+    },
+    [tacticsDispatch]
+  );
+
+  const handleAddDrawing = useCallback(
+    (shape: DrawingShape) => {
+      tacticsDispatch({ type: 'ADD_DRAWING', payload: shape });
+    },
+    [tacticsDispatch]
+  );
+
   const handleUndoDrawing = useCallback(() => {
-    dispatch({ type: 'UNDO_LAST_DRAWING' });
-  }, [dispatch]);
-  
+    tacticsDispatch({ type: 'UNDO_LAST_DRAWING' });
+  }, [tacticsDispatch]);
+
   const handleClearDrawings = useCallback(() => {
     if (confirm('Are you sure you want to clear all drawings?')) {
-      dispatch({ type: 'CLEAR_DRAWINGS' });
+      tacticsDispatch({ type: 'CLEAR_DRAWINGS' });
     }
-  }, [dispatch]);
-  
+  }, [tacticsDispatch]);
+
   const handleGridToggle = useCallback(() => {
-    setIsGridVisible(prev => !prev);
+    uiDispatch({ type: 'TOGGLE_DISPLAY', payload: 'grid' });
   }, []);
-  
+
   const handleFormationStrengthToggle = useCallback(() => {
-    setIsFormationStrengthVisible(prev => !prev);
+    uiDispatch({ type: 'TOGGLE_DISPLAY', payload: 'formationStrength' });
   }, []);
 
   // Sidebar toggle functions
   const toggleLeftSidebar = useCallback(() => {
-    setShowLeftSidebar(prev => !prev);
+    uiDispatch({ type: 'TOGGLE_LEFT_SIDEBAR' });
   }, []);
 
   const toggleRightSidebar = useCallback(() => {
-    setShowRightSidebar(prev => !prev);
+    uiDispatch({ type: 'TOGGLE_RIGHT_SIDEBAR' });
   }, []);
 
   // Dugout management handlers
@@ -598,54 +784,63 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
   }, []);
 
   // AI Intelligence handlers
-  const handlePlayerAssignmentSuggestion = useCallback((assignments: any) => {
-    console.log('Applying AI player assignments:', assignments);
-    // Apply optimized assignments to formation
-    assignments.assignments.forEach((assignment: any) => {
-      dispatch({
-        type: 'ASSIGN_PLAYER_TO_SLOT',
-        payload: {
-          slotId: assignment.slotId,
-          playerId: assignment.playerId,
-          team: 'home' // Adjust based on current team context
-        }
+  const handlePlayerAssignmentSuggestion = useCallback(
+    (assignments: any) => {
+      console.log('Applying AI player assignments:', assignments);
+      // Apply optimized assignments to formation
+      assignments.assignments.forEach((assignment: any) => {
+        tacticsDispatch({
+          type: 'ASSIGN_PLAYER_TO_SLOT',
+          payload: {
+            slotId: assignment.slotId,
+            playerId: assignment.playerId,
+            team: 'home', // Adjust based on current team context
+          },
+        });
       });
-    });
-  }, [dispatch]);
+    },
+    [tacticsDispatch]
+  );
 
-  const handleTacticalSuggestion = useCallback((suggestion: string) => {
-    console.log('AI Tactical Suggestion:', suggestion);
-    // Could show notification or update UI with suggestion
-    dispatch({
-      type: 'ADD_NOTIFICATION',
-      payload: {
-        message: `AI Suggestion: ${suggestion}`,
-        type: 'info',
-        duration: 5000
-      }
-    });
-  }, [dispatch]);
+  const handleTacticalSuggestion = useCallback(
+    (suggestion: string) => {
+      console.log('AI Tactical Suggestion:', suggestion);
+      // Could show notification or update UI with suggestion
+      tacticsDispatch({
+        type: 'ADD_NOTIFICATION',
+        payload: {
+          message: `AI Suggestion: ${suggestion}`,
+          type: 'info',
+          duration: 5000,
+        },
+      });
+    },
+    [tacticsDispatch]
+  );
 
-  const handleDrawingSuggestion = useCallback((suggestion: any) => {
-    console.log('AI Drawing Suggestion:', suggestion);
-    // Could automatically add suggested drawing or show as suggestion
-    const drawingShape = {
-      id: Date.now().toString(),
-      tool: suggestion.tool,
-      color: '#3b82f6',
-      points: suggestion.suggestedPositions || [],
-      timestamp: Date.now()
-    };
-    
-    dispatch({
-      type: 'ADD_DRAWING',
-      payload: drawingShape
-    });
-  }, [dispatch]);
+  const handleDrawingSuggestion = useCallback(
+    (suggestion: any) => {
+      console.log('AI Drawing Suggestion:', suggestion);
+      // Could automatically add suggested drawing or show as suggestion
+      const drawingShape = {
+        id: Date.now().toString(),
+        tool: suggestion.tool,
+        color: '#3b82f6',
+        points: suggestion.suggestedPositions || [],
+        timestamp: Date.now(),
+      };
+
+      tacticsDispatch({
+        type: 'ADD_DRAWING',
+        payload: drawingShape,
+      });
+    },
+    [tacticsDispatch]
+  );
 
   // View mode handlers
   const enterFullscreen = useCallback(() => {
-    setViewMode('fullscreen');
+    uiDispatch({ type: 'ENTER_FULLSCREEN' });
     if (fieldRef.current?.requestFullscreen) {
       fieldRef.current.requestFullscreen();
     }
@@ -653,177 +848,427 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
 
   // Presentation mode handlers
   const togglePresentationMode = useCallback(() => {
-    setIsPresenting(prev => !prev);
+    uiDispatch({ type: 'TOGGLE_PRESENTATION_MODE' });
     if (!isPresenting) {
-      setViewMode('presentation');
-      dispatch({ type: 'ENTER_PRESENTATION_MODE' });
+      tacticsDispatch({ type: 'ENTER_PRESENTATION_MODE' });
     } else {
-      setViewMode('standard');
-      dispatch({ type: 'EXIT_PRESENTATION_MODE' });
+      tacticsDispatch({ type: 'EXIT_PRESENTATION_MODE' });
     }
-  }, [isPresenting, dispatch]);
+  }, [isPresenting, tacticsDispatch]);
 
   const exitFullscreen = useCallback(() => {
-    setViewMode('standard');
+    uiDispatch({ type: 'EXIT_FULLSCREEN' });
     if (document.fullscreenElement && document.exitFullscreen) {
       document.exitFullscreen();
     }
   }, []);
 
+  // Apply preset formation handler
+  const handleApplyPreset = useCallback(
+    (preset: TacticalPreset) => {
+      console.log('Applying preset:', preset);
+
+      // Convert preset positions to actual player assignments
+      const newPlayers: Player[] = preset.players.map((presetPlayer, index) => {
+        // Find existing player to assign or create placeholder
+        const existingPlayer = currentPlayers.find(
+          p => !currentFormation?.slots.some(s => s.playerId === p.id)
+        );
+
+        if (existingPlayer) {
+          // Use existing unassigned player
+          return {
+            ...existingPlayer,
+            position: presetPlayer.position,
+            roleId: presetPlayer.role || existingPlayer.roleId,
+          };
+        }
+
+        // Create new placeholder player
+        const playerNumber = index + 1;
+        return {
+          id: `preset-player-${preset.metadata.id}-${index}`,
+          name: `Player ${playerNumber}`,
+          jerseyNumber: playerNumber,
+          age: 25,
+          nationality: 'Astralian',
+          potential: [70, 85] as [number, number],
+          currentPotential: 78,
+          roleId: presetPlayer.role || 'midfielder',
+          instructions: presetPlayer.instructions?.reduce((acc, inst) => ({ ...acc, [inst]: true }), {}) || {},
+          team: 'home' as Team,
+          teamColor: '#1f2937',
+          attributes: presetPlayer.attributes || {
+            speed: 70,
+            passing: 72,
+            tackling: 68,
+            shooting: 65,
+            dribbling: 70,
+            positioning: 72,
+            stamina: 85,
+          },
+          position: presetPlayer.position,
+          availability: { status: 'Available' as const },
+          morale: 'Good' as const,
+          form: 'Good' as const,
+          stamina: 85,
+          developmentLog: [],
+          contract: { clauses: [] },
+          stats: {
+            goals: 0,
+            assists: 0,
+            matchesPlayed: 0,
+            shotsOnTarget: 0,
+            tacklesWon: 0,
+            saves: 0,
+            passesCompleted: 0,
+            passesAttempted: 0,
+            careerHistory: [],
+          },
+          loan: { isLoaned: false },
+          traits: [],
+          individualTrainingFocus: null,
+          conversationHistory: [],
+          attributeHistory: [],
+          attributeDevelopmentProgress: {},
+          communicationLog: [],
+          customTrainingSchedule: null,
+          fatigue: 10,
+          injuryRisk: 12,
+          lastConversationInitiatedWeek: 0,
+          moraleBoost: null,
+          completedChallenges: [],
+        };
+      });
+
+      // Create formation structure from preset
+      const newFormation: Formation = {
+        id: `formation-${preset.metadata.id}-${Date.now()}`,
+        name: preset.metadata.name,
+        slots: preset.players.map((presetPlayer, index) => ({
+          id: `slot-${index}`,
+          role: presetPlayer.role || 'midfielder',
+          defaultPosition: presetPlayer.position,
+          position: presetPlayer.position,
+          playerId: newPlayers[index].id,
+          roleId: presetPlayer.role,
+          preferredRoles: [presetPlayer.role || 'midfielder'],
+        })),
+        isCustom: false,
+        notes: preset.metadata.description || '',
+      };
+
+      // Validate formation before applying
+      const validation = validateFormation(newFormation, newPlayers);
+      if (!validation.isValid) {
+        tacticsDispatch({
+          type: 'ADD_NOTIFICATION',
+          payload: {
+            message: `Formation validation failed: ${validation.errors.join(', ')}`,
+            type: 'error',
+            duration: 5000,
+          },
+        });
+        return;
+      }
+
+      // Apply tactical instructions if provided
+      if (preset.tacticalInstructions) {
+        const tacticalSettings = {
+          mentality: mapTacticalValue(preset.tacticalInstructions.tempo),
+          pressing: mapTacticalValue(preset.tacticalInstructions.pressingIntensity),
+          defensiveLine: preset.tacticalInstructions.defensiveLine || 'medium',
+          attackingWidth: preset.tacticalInstructions.width || 'standard',
+        };
+
+        tacticsDispatch({
+          type: 'UPDATE_STATE',
+          payload: {
+            teamTactics: {
+              home: tacticalSettings as any,
+              away: tacticalSettings as any,
+            },
+          },
+        });
+      }
+
+      // Update players and formation
+      tacticsDispatch({
+        type: 'SET_PLAYERS',
+        payload: newPlayers,
+      });
+
+      tacticsDispatch({
+        type: 'SET_FORMATION',
+        payload: {
+          id: newFormation.id,
+          formation: newFormation,
+        },
+      });
+
+      // Save to history
+      historySystem.saveSnapshot(
+        createHistorySnapshot(newFormation, newPlayers, `Applied preset: ${preset.metadata.name}`)
+      );
+
+      // Show success notification
+      tacticsDispatch({
+        type: 'ADD_NOTIFICATION',
+        payload: {
+          message: `Applied ${preset.metadata.name} formation with ${newPlayers.length} players`,
+          type: 'success',
+          duration: 3000,
+        },
+      });
+
+      // Close the panel
+      uiDispatch({ type: 'CLOSE_PANEL', payload: 'quickStart' });
+    },
+    [currentPlayers, currentFormation, tacticsDispatch, historySystem]
+  );
+
+  // Helper function to map tactical instruction values
+  const mapTacticalValue = (value?: string): any => {
+    const mapping: Record<string, string> = {
+      slow: 'defensive',
+      medium: 'balanced',
+      fast: 'attacking',
+      low: 'defensive',
+      high: 'attacking',
+    };
+    return mapping[value || 'medium'] || 'balanced';
+  };
+
+  // Formation validation function
+  const validateFormation = (
+    formation: Formation,
+    players: Player[]
+  ): { isValid: boolean; errors: string[]; warnings: string[] } => {
+    const errors: string[] = [];
+    const warnings: string[] = [];
+
+    // Check minimum players (must have at least 1 GK and 10 outfield players)
+    const playerCount = formation.slots.filter(s => s.playerId).length;
+    if (playerCount < 11) {
+      errors.push(`Formation requires 11 players, currently has ${playerCount}`);
+    }
+
+    // Check for goalkeeper
+    const hasGoalkeeper = formation.slots.some(
+      s => s.role === 'GK' || s.roleId === 'goalkeeper'
+    );
+    if (!hasGoalkeeper) {
+      errors.push('Formation must include a goalkeeper');
+    }
+
+    // Check for duplicate player assignments
+    const assignedPlayerIds = formation.slots
+      .map(s => s.playerId)
+      .filter(Boolean) as string[];
+    const uniquePlayerIds = new Set(assignedPlayerIds);
+    if (assignedPlayerIds.length !== uniquePlayerIds.size) {
+      errors.push('Players cannot be assigned to multiple positions');
+    }
+
+    // Check position validity (players should be within field bounds)
+    formation.slots.forEach((slot, index) => {
+      const pos = slot.position || slot.defaultPosition;
+      if (pos.x < 0 || pos.x > 100 || pos.y < 0 || pos.y > 100) {
+        errors.push(`Position ${index + 1} is outside field bounds`);
+      }
+    });
+
+    // Warnings for formation quality
+    const defenderCount = formation.slots.filter(
+      s => s.role === 'DF' || s.roleId?.includes('back')
+    ).length;
+    if (defenderCount < 3) {
+      warnings.push('Formation has fewer than 3 defenders - may be vulnerable defensively');
+    }
+
+    const midfielderCount = formation.slots.filter(
+      s => s.role === 'MF' || s.roleId?.includes('midfield')
+    ).length;
+    if (midfielderCount < 2) {
+      warnings.push('Formation has fewer than 2 midfielders - may struggle with possession');
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors,
+      warnings,
+    };
+  };
+
   // Quick action handlers
-  const quickActions = useMemo(() => [
-    {
-      id: 'formations',
-      icon: Users,
-      label: 'Formations',
-      action: () => setShowFormationTemplates(true),
-      isActive: showFormationTemplates,
-    },
-    {
-      id: 'simulate',
-      icon: Play,
-      label: 'Simulate Match',
-      action: () => {
-        if (currentFormation && onSimulateMatch) {
-          onSimulateMatch(currentFormation);
-        }
+  const quickActions = useMemo(
+    () => [
+      {
+        id: 'formations',
+        icon: Users,
+        label: 'Formations',
+        action: () => uiDispatch({ type: 'OPEN_PANEL', payload: 'formationTemplates' }),
+        isActive: panels.formationTemplates,
       },
-      disabled: !currentFormation || !onSimulateMatch,
-    },
-    {
-      id: 'ai-analysis',
-      icon: Brain,
-      label: 'AI Analysis',
-      action: () => setShowAIAnalysis(!showAIAnalysis),
-      isActive: showAIAnalysis,
-    },
-    {
-      id: 'ai-intelligence',
-      icon: Zap,
-      label: 'AI Intelligence',
-      action: () => setShowAIIntelligence(!showAIIntelligence),
-      isActive: showAIIntelligence,
-    },
-    {
-      id: 'analytics',
-      icon: BarChart3,
-      label: 'Analytics',
-      action: () => {
-        if (onAnalyticsView) {
-          onAnalyticsView();
-        }
+      {
+        id: 'quick-start',
+        icon: Sparkles,
+        label: 'Quick Start Templates',
+        action: () => uiDispatch({ type: 'OPEN_PANEL', payload: 'quickStart' }),
+        isActive: panels.quickStart,
       },
-      disabled: !onAnalyticsView,
-    },
-    {
-      id: 'playbook',
-      icon: Save,
-      label: 'Tactical Playbook',
-      action: () => setShowTacticalPlaybook(true),
-      isActive: showTacticalPlaybook,
-    },
-    {
-      id: 'export',
-      icon: Share2,
-      label: 'Export & Share',
-      action: () => {
-        if (currentFormation && onExportFormation) {
-          onExportFormation(currentFormation);
-        }
+      {
+        id: 'simulate',
+        icon: Play,
+        label: 'Simulate Match',
+        action: () => {
+          if (currentFormation && onSimulateMatch) {
+            onSimulateMatch(currentFormation);
+          }
+        },
+        disabled: !currentFormation || !onSimulateMatch,
       },
-      disabled: !currentFormation || !onExportFormation,
-    },
-    {
-      id: 'ai-assistant',
-      icon: Brain,
-      label: 'AI Assistant',
-      action: () => setShowAIAssistant(true),
-      isActive: showAIAssistant,
-    },
-    {
-      id: 'heatmap',
-      icon: Activity,
-      label: 'Heat Map',
-      action: () => setShowHeatMap(!showHeatMap),
-      isActive: showHeatMap,
-    },
-    {
-      id: 'chemistry',
-      icon: Heart,
-      label: 'Player Chemistry',
-      action: () => setShowChemistry(!showChemistry),
-      isActive: showChemistry,
-    },
-    {
-      id: 'player-stats',
-      icon: Eye,
-      label: 'Player Stats',
-      action: () => setShowPlayerStats(!showPlayerStats),
-      isActive: showPlayerStats,
-    },
-    {
-      id: 'analysis',
-      icon: Zap,
-      label: 'Live Analysis',
-      action: () => setShowAnalyticsPanel(true),
-      isActive: showAnalyticsPanel,
-    },
-    {
-      id: 'dugout',
-      icon: Users2,
-      label: 'Dugout Management',
-      action: () => setShowDugoutManagement(true),
-      isActive: showDugoutManagement,
-    },
-    {
-      id: 'challenges',
-      icon: Trophy,
-      label: 'Challenge Center',
-      action: () => setShowChallengeManagement(true),
-      isActive: showChallengeManagement,
-    },
-    {
-      id: 'collaboration',
-      icon: Users,
-      label: 'Collaborate',
-      action: () => setShowCollaboration(true),
-      isActive: showCollaboration,
-    },
-    {
-      id: 'export-import',
-      icon: Archive,
-      label: 'Export & Import',
-      action: () => setShowExportImport(true),
-      isActive: showExportImport,
-    },
-    {
-      id: 'fullscreen',
-      icon: viewMode === 'fullscreen' ? Minimize2 : Maximize2,
-      label: viewMode === 'fullscreen' ? 'Exit Fullscreen' : 'Fullscreen',
-      action: viewMode === 'fullscreen' ? exitFullscreen : enterFullscreen,
-    },
-  ], [
-    showFormationTemplates,
-    showAIAssistant,
-    showTacticalPlaybook,
-    showAnalyticsPanel,
-    showHeatMap,
-    showChemistry,
-    showPlayerStats,
-    showDugoutManagement,
-    showChallengeManagement,
-    showCollaboration,
-    showExportImport,
-    viewMode,
-    currentFormation,
-    onSimulateMatch,
-    onAnalyticsView,
-    onSaveFormation,
-    onExportFormation,
-    dispatch,
-    enterFullscreen,
-    exitFullscreen,
-  ]);
+      {
+        id: 'ai-analysis',
+        icon: Brain,
+        label: 'AI Analysis',
+        action: () => uiDispatch({ type: 'TOGGLE_PANEL', payload: 'aiAnalysis' }),
+        isActive: panels.aiAnalysis,
+      },
+      {
+        id: 'ai-intelligence',
+        icon: Zap,
+        label: 'AI Intelligence',
+        action: () => uiDispatch({ type: 'TOGGLE_PANEL', payload: 'aiIntelligence' }),
+        isActive: panels.aiIntelligence,
+      },
+      {
+        id: 'analytics',
+        icon: BarChart3,
+        label: 'Analytics',
+        action: () => {
+          if (onAnalyticsView) {
+            onAnalyticsView();
+          }
+        },
+        disabled: !onAnalyticsView,
+      },
+      {
+        id: 'playbook',
+        icon: Save,
+        label: 'Tactical Playbook',
+        action: () => uiDispatch({ type: 'OPEN_PANEL', payload: 'tacticalPlaybook' }),
+        isActive: panels.tacticalPlaybook,
+      },
+      {
+        id: 'export',
+        icon: Share2,
+        label: 'Export & Share',
+        action: () => {
+          if (currentFormation && onExportFormation) {
+            onExportFormation(currentFormation);
+          }
+        },
+        disabled: !currentFormation || !onExportFormation,
+      },
+      {
+        id: 'ai-assistant',
+        icon: Brain,
+        label: 'AI Assistant',
+        action: () => uiDispatch({ type: 'OPEN_PANEL', payload: 'aiAssistant' }),
+        isActive: panels.aiAssistant,
+      },
+      {
+        id: 'heatmap',
+        icon: Activity,
+        label: 'Heat Map',
+        action: () => uiDispatch({ type: 'TOGGLE_DISPLAY', payload: 'heatMap' }),
+        isActive: display.heatMap,
+      },
+      {
+        id: 'chemistry',
+        icon: Heart,
+        label: 'Player Chemistry',
+        action: () => uiDispatch({ type: 'TOGGLE_DISPLAY', payload: 'chemistry' }),
+        isActive: display.chemistry,
+      },
+      {
+        id: 'player-stats',
+        icon: Eye,
+        label: 'Player Stats',
+        action: () => uiDispatch({ type: 'TOGGLE_DISPLAY', payload: 'playerStats' }),
+        isActive: display.playerStats,
+      },
+      {
+        id: 'analysis',
+        icon: Zap,
+        label: 'Live Analysis',
+        action: () => uiDispatch({ type: 'OPEN_PANEL', payload: 'analytics' }),
+        isActive: panels.analytics,
+      },
+      {
+        id: 'dugout',
+        icon: Users2,
+        label: 'Dugout Management',
+        action: () => uiDispatch({ type: 'OPEN_PANEL', payload: 'dugout' }),
+        isActive: panels.dugout,
+      },
+      {
+        id: 'challenges',
+        icon: Trophy,
+        label: 'Challenge Center',
+        action: () => uiDispatch({ type: 'OPEN_PANEL', payload: 'challenges' }),
+        isActive: panels.challenges,
+      },
+      {
+        id: 'collaboration',
+        icon: Users,
+        label: 'Collaborate',
+        action: () => uiDispatch({ type: 'OPEN_PANEL', payload: 'collaboration' }),
+        isActive: panels.collaboration,
+      },
+      {
+        id: 'export-import',
+        icon: Archive,
+        label: 'Export & Import',
+        action: () => uiDispatch({ type: 'OPEN_PANEL', payload: 'exportImport' }),
+        isActive: panels.exportImport,
+      },
+      {
+        id: 'keyboard-shortcuts',
+        icon: Keyboard,
+        label: 'Keyboard Shortcuts',
+        action: () => uiDispatch({ type: 'TOGGLE_PANEL', payload: 'keyboardShortcuts' }),
+        isActive: panels.keyboardShortcuts,
+      },
+      {
+        id: 'history',
+        icon: History,
+        label: 'Undo/Redo History',
+        action: () => uiDispatch({ type: 'TOGGLE_PANEL', payload: 'history' }),
+        isActive: panels.history,
+      },
+      {
+        id: 'fullscreen',
+        icon: viewMode === 'fullscreen' ? Minimize2 : Maximize2,
+        label: viewMode === 'fullscreen' ? 'Exit Fullscreen' : 'Fullscreen',
+        action: viewMode === 'fullscreen' ? exitFullscreen : enterFullscreen,
+      },
+    ],
+    [
+      panels,
+      display,
+      viewMode,
+      currentFormation,
+      onSimulateMatch,
+      onAnalyticsView,
+      onSaveFormation,
+      onExportFormation,
+      enterFullscreen,
+      exitFullscreen,
+      uiDispatch,
+    ]
+  );
 
   // Layout calculations
   const layoutClasses = useMemo(() => {
@@ -835,7 +1280,33 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
     };
   }, [viewMode]);
 
-  return (
+  // Mobile gesture handlers
+  const handlePinchZoom = useCallback(
+    (scale: number) => {
+      setMobileZoom(prev => Math.max(0.5, Math.min(3, prev * scale)));
+    },
+    [],
+  );
+
+  const handlePan = useCallback((delta: { x: number; y: number }) => {
+    setMobilePanOffset(prev => ({
+      x: prev.x + delta.x,
+      y: prev.y + delta.y,
+    }));
+  }, []);
+
+  const handleDoubleTap = useCallback(() => {
+    setMobileZoom(1);
+    setMobilePanOffset({ x: 0, y: 0 });
+  }, []);
+
+  const handleResetView = useCallback(() => {
+    setMobileZoom(1);
+    setMobilePanOffset({ x: 0, y: 0 });
+  }, []);
+
+  // Main board content
+  const boardContent = (
     <div
       ref={fieldRef}
       className={`
@@ -853,6 +1324,9 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
           paddingRight: mobileViewport.safeAreaRight,
           minHeight: '-webkit-fill-available', // iOS Safari support
           touchAction: 'manipulation', // Prevent zoom on double-tap
+          transform: `scale(${mobileZoom}) translate(${mobilePanOffset.x}px, ${mobilePanOffset.y}px)`,
+          transformOrigin: 'center',
+          transition: 'transform 0.2s ease-out',
         }),
       }}
       role="application"
@@ -872,12 +1346,18 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
           {showLeftSidebar && (
             <motion.div
               initial={optimizedConfig.enableAnimations ? { x: -320, opacity: 0 } : false}
-              animate={optimizedConfig.enableAnimations ? { x: 0, opacity: 1 } : { x: 0, opacity: 1 }}
+              animate={
+                optimizedConfig.enableAnimations ? { x: 0, opacity: 1 } : { x: 0, opacity: 1 }
+              }
               exit={optimizedConfig.enableAnimations ? { x: -320, opacity: 0 } : { opacity: 0 }}
-              transition={optimizedConfig.enableAnimations ? {
-                duration: optimizedConfig.animationDuration / 1000,
-                ease: "easeOut"
-              } : { duration: 0 }}
+              transition={
+                optimizedConfig.enableAnimations
+                  ? {
+                      duration: optimizedConfig.animationDuration / 1000,
+                      ease: 'easeOut',
+                    }
+                  : { duration: 0 }
+              }
               className={layoutClasses.leftSidebar}
               aria-label="Left sidebar"
               role="complementary"
@@ -889,7 +1369,6 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
 
         {/* Main Tactics Area */}
         <div className="flex-1 flex flex-col min-h-0">
-
           {/* Field Container */}
           <main
             className="flex-1 relative overflow-hidden"
@@ -899,25 +1378,22 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
             <ModernField
               formation={shouldVirtualize ? deferredFormation : currentFormation}
               selectedPlayer={selectedPlayer}
-              onPlayerMove={positioningMode === 'snap' ? handlePlayerMove : handlePlayerMoveWithConflict}
+              onPlayerMove={
+                positioningMode === 'snap' ? handlePlayerMove : handlePlayerMoveWithConflict
+              }
               onPlayerSelect={handlePlayerSelect}
               isDragging={isDragging}
-              setIsDragging={setIsDragging}
+              setIsDragging={dragging => uiDispatch({ type: 'SET_DRAGGING', payload: dragging })}
               viewMode={viewMode}
               players={shouldVirtualize ? deferredPlayers : currentPlayers}
-              showHeatMap={showHeatMap && optimizedConfig.enableParticleEffects && isIntersecting}
-              showPlayerStats={showPlayerStats && isIntersecting}
+              showHeatMap={
+                display.heatMap && optimizedConfig.enableParticleEffects && isIntersecting
+              }
+              showPlayerStats={display.playerStats && isIntersecting}
               performanceMode={isLowPower || !isIntersecting}
               positioningMode={positioningMode}
-              virtualizationEnabled={shouldVirtualize}
-              renderOptimizations={{
-                enableOcclusion: playerCount > 100,
-                enableLOD: playerCount > 200,
-                batchRendering: playerCount > 50,
-                useCanvasRenderer: playerCount > 150
-              }}
             />
-            
+
             {/* Drawing Canvas Overlay */}
             <DrawingCanvas
               fieldRef={fieldRef}
@@ -932,15 +1408,12 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
             {/* Chemistry Visualization */}
             <ChemistryVisualization
               players={currentPlayers}
-              showChemistry={showChemistry}
+              showChemistry={display.chemistry}
               viewMode={viewMode}
             />
 
             {/* Player Drag Layer */}
-            <PlayerDragLayer
-              isDragging={isDragging}
-              currentPlayer={selectedPlayer}
-            />
+            <PlayerDragLayer isDragging={isDragging} currentPlayer={selectedPlayer} />
 
             {/* Conflict Resolution Menu */}
             {showConflictMenu && conflictData && (
@@ -950,10 +1423,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
                 sourcePlayer={conflictData.sourcePlayer}
                 targetPlayer={conflictData.targetPlayer}
                 onResolve={handleConflictResolve}
-                onClose={() => {
-                  setShowConflictMenu(false);
-                  setConflictData(null);
-                }}
+                onClose={() => uiDispatch({ type: 'HIDE_CONFLICT_MENU' })}
               />
             )}
 
@@ -963,13 +1433,13 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
                 player={selectedPlayer}
                 isVisible={showExpandedPlayerCard}
                 position={expandedPlayerPosition}
-                onClose={() => setShowExpandedPlayerCard(false)}
+                onClose={() => uiDispatch({ type: 'HIDE_EXPANDED_CARD' })}
                 onPlayerAction={handlePlayerAction}
               />
             )}
 
             {/* Animation Timeline */}
-            {uiState.activePlaybookItemId && uiState.activeStepIndex !== null && (
+            {contextUIState.activePlaybookItemId && contextUIState.activeStepIndex !== null && (
               <AnimationTimeline />
             )}
           </main>
@@ -980,12 +1450,18 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
           {showRightSidebar && (
             <motion.div
               initial={optimizedConfig.enableAnimations ? { x: 320, opacity: 0 } : false}
-              animate={optimizedConfig.enableAnimations ? { x: 0, opacity: 1 } : { x: 0, opacity: 1 }}
+              animate={
+                optimizedConfig.enableAnimations ? { x: 0, opacity: 1 } : { x: 0, opacity: 1 }
+              }
               exit={optimizedConfig.enableAnimations ? { x: 320, opacity: 0 } : { opacity: 0 }}
-              transition={optimizedConfig.enableAnimations ? {
-                duration: optimizedConfig.animationDuration / 1000,
-                ease: "easeOut"
-              } : { duration: 0 }}
+              transition={
+                optimizedConfig.enableAnimations
+                  ? {
+                      duration: optimizedConfig.animationDuration / 1000,
+                      ease: 'easeOut',
+                    }
+                  : { duration: 0 }
+              }
               className={layoutClasses.rightSidebar}
               aria-label="Right sidebar"
               role="complementary"
@@ -998,91 +1474,99 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
 
       {/* Modal Overlays */}
       <AnimatePresence>
-        {showFormationTemplates && (
-          <Suspense fallback={
-            <div
-              className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center"
-              aria-live="polite"
-              aria-label="Loading formation templates"
-            >
-              <div className="bg-slate-900/95 rounded-xl p-8 text-white">
-                <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4" />
-                <div>Loading Formation Templates...</div>
+        {panels.formationTemplates && (
+          <Suspense
+            fallback={
+              <div
+                className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center"
+                aria-live="polite"
+                aria-label="Loading formation templates"
+              >
+                <div className="bg-slate-900/95 rounded-xl p-8 text-white">
+                  <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4" />
+                  <div>Loading Formation Templates...</div>
+                </div>
               </div>
-            </div>
-          }>
+            }
+          >
             <FormationTemplates
               onSelect={handleFormationChange}
-              onClose={() => setShowFormationTemplates(false)}
+              onClose={() => uiDispatch({ type: 'CLOSE_PANEL', payload: 'formationTemplates' })}
             />
           </Suspense>
         )}
 
-        {showAIAssistant && (
-          <Suspense fallback={
-            <div
-              className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center"
-              aria-live="polite"
-              aria-label="Loading AI assistant"
-            >
-              <div className="bg-slate-900/95 rounded-xl p-8 text-white">
-                <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4" />
-                <div>Loading AI Assistant...</div>
+        {panels.aiAssistant && (
+          <Suspense
+            fallback={
+              <div
+                className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center"
+                aria-live="polite"
+                aria-label="Loading AI assistant"
+              >
+                <div className="bg-slate-900/95 rounded-xl p-8 text-white">
+                  <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4" />
+                  <div>Loading AI Assistant...</div>
+                </div>
               </div>
-            </div>
-          }>
+            }
+          >
             <IntelligentAssistant
               currentFormation={currentFormation}
               selectedPlayer={selectedPlayer}
               onFormationChange={handleFormationChange}
               onPlayerSelect={handlePlayerSelect}
-              onClose={() => setShowAIAssistant(false)}
+              onClose={() => uiDispatch({ type: 'CLOSE_PANEL', payload: 'aiAssistant' })}
               players={currentPlayers}
             />
           </Suspense>
         )}
 
-        {showTacticalPlaybook && (
-          <Suspense fallback={
-            <div
-              className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center"
-              aria-live="polite"
-              aria-label="Loading tactical playbook"
-            >
-              <div className="bg-slate-900/95 rounded-xl p-8 text-white">
-                <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4" />
-                <div>Loading Tactical Playbook...</div>
+        {panels.tacticalPlaybook && (
+          <Suspense
+            fallback={
+              <div
+                className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center"
+                aria-live="polite"
+                aria-label="Loading tactical playbook"
+              >
+                <div className="bg-slate-900/95 rounded-xl p-8 text-white">
+                  <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4" />
+                  <div>Loading Tactical Playbook...</div>
+                </div>
               </div>
-            </div>
-          }>
+            }
+          >
             <TacticalPlaybook
               currentFormation={currentFormation}
               currentPlayers={currentPlayers}
               onLoadFormation={handleFormationChange}
-              onClose={() => setShowTacticalPlaybook(false)}
-              isOpen={showTacticalPlaybook}
+              onClose={() => uiDispatch({ type: 'CLOSE_PANEL', payload: 'tacticalPlaybook' })}
+              isOpen={panels.tacticalPlaybook}
             />
           </Suspense>
         )}
 
-        {showAnalyticsPanel && (
-          <Suspense fallback={
-            <div
-              className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center"
-              aria-live="polite"
-              aria-label="Loading tactical analytics"
-            >
-              <div className="bg-slate-900/95 rounded-xl p-8 text-white">
-                <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4" />
-                <div>Loading Tactical Analytics...</div>
+        {panels.analytics && (
+          <Suspense
+            fallback={
+              <div
+                className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center"
+                aria-live="polite"
+                aria-label="Loading tactical analytics"
+              >
+                <div className="bg-slate-900/95 rounded-xl p-8 text-white">
+                  <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4" />
+                  <div>Loading Tactical Analytics...</div>
+                </div>
               </div>
-            </div>
-          }>
+            }
+          >
             <div className="fixed inset-0 z-30 bg-black/50 backdrop-blur-sm">
               <div className="fixed inset-4 z-31 overflow-auto">
                 <AdvancedAnalyticsDashboard
                   players={currentPlayers}
-                  onClose={() => setShowAnalyticsPanel(false)}
+                  onClose={() => uiDispatch({ type: 'CLOSE_PANEL', payload: 'analytics' })}
                   className="h-full"
                 />
               </div>
@@ -1090,7 +1574,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
           </Suspense>
         )}
 
-        {showAIAnalysis && (
+        {panels.aiAnalysis && (
           <div className="fixed top-20 right-4 z-25 bg-gray-900/95 backdrop-blur-sm border border-gray-700 rounded-lg max-w-md">
             <div className="flex items-center justify-between p-3 border-b border-gray-700">
               <div className="flex items-center space-x-2">
@@ -1098,12 +1582,17 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
                 <span className="text-white text-sm font-medium">AI Tactical Analysis</span>
               </div>
               <button
-                onClick={() => setShowAIAnalysis(false)}
+                onClick={() => uiDispatch({ type: 'CLOSE_PANEL', payload: 'aiAnalysis' })}
                 className="text-gray-400 hover:text-white transition-colors p-1 rounded"
                 title="Close"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
@@ -1117,7 +1606,9 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
                   <div>• Formation strength: 8.2/10</div>
                   <div>• Defensive stability: High</div>
                   <div>• Attacking potential: Medium</div>
-                  <div className="text-yellow-400">• Suggestion: Consider stronger midfield presence</div>
+                  <div className="text-yellow-400">
+                    • Suggestion: Consider stronger midfield presence
+                  </div>
                 </div>
                 <button className="mt-3 w-full bg-blue-600 hover:bg-blue-700 text-white text-xs py-2 px-3 rounded transition-colors">
                   Get Detailed Analysis
@@ -1127,7 +1618,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
           </div>
         )}
 
-        {showDugoutManagement && (
+        {panels.dugout && (
           <DugoutManagement
             players={currentPlayers}
             formation={currentFormation}
@@ -1137,24 +1628,24 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
             onSubstitution={handleSubstitution}
             onTacticalChange={handleTacticalChange}
             onPlayerInstruction={handlePlayerInstruction}
-            isOpen={showDugoutManagement}
-            onClose={() => setShowDugoutManagement(false)}
+            isOpen={panels.dugout}
+            onClose={() => uiDispatch({ type: 'CLOSE_PANEL', payload: 'dugout' })}
           />
         )}
 
-        {showChallengeManagement && (
+        {panels.challenges && (
           <ChallengeManagement
             players={currentPlayers}
             formations={tacticsState?.formations || {}}
             completedChallenges={[]} // This would come from state
             onChallengeStart={handleChallengeStart}
             onChallengeComplete={handleChallengeComplete}
-            isOpen={showChallengeManagement}
-            onClose={() => setShowChallengeManagement(false)}
+            isOpen={panels.challenges}
+            onClose={() => uiDispatch({ type: 'CLOSE_PANEL', payload: 'challenges' })}
           />
         )}
 
-        {showCollaboration && (
+        {panels.collaboration && (
           <CollaborationFeatures
             formation={currentFormation}
             players={currentPlayers}
@@ -1164,12 +1655,12 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
             onAddComment={handleAddComment}
             onResolveComment={handleResolveComment}
             onUpdatePermissions={handleUpdatePermissions}
-            isOpen={showCollaboration}
-            onClose={() => setShowCollaboration(false)}
+            isOpen={panels.collaboration}
+            onClose={() => uiDispatch({ type: 'CLOSE_PANEL', payload: 'collaboration' })}
           />
         )}
 
-        {showExportImport && (
+        {panels.exportImport && (
           <EnhancedExportImport
             formations={tacticsState?.formations || {}}
             playbook={tacticsState?.playbook || {}}
@@ -1178,13 +1669,43 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
             onImport={handleImportData}
             onSaveToLibrary={handleSaveToLibrary}
             onLoadFromLibrary={handleLoadFromLibrary}
-            isOpen={showExportImport}
-            onClose={() => setShowExportImport(false)}
+            isOpen={panels.exportImport}
+            onClose={() => uiDispatch({ type: 'CLOSE_PANEL', payload: 'exportImport' })}
           />
         )}
 
+        {/* Quick Start Templates Panel */}
+        <QuickStartTemplates
+          isOpen={panels.quickStart}
+          onClose={() => uiDispatch({ type: 'CLOSE_PANEL', payload: 'quickStart' })}
+          onApplyPreset={handleApplyPreset}
+          currentFormation={currentFormation?.name}
+        />
+
+        {/* Keyboard Shortcuts Panel */}
+        <KeyboardShortcutsPanel
+          isOpen={panels.keyboardShortcuts}
+          onClose={() => uiDispatch({ type: 'CLOSE_PANEL', payload: 'keyboardShortcuts' })}
+        />
+
+        {/* History Timeline Panel */}
+        {panels.history && (
+          <div className="fixed top-20 right-4 z-40 w-96">
+            <HistoryTimeline
+              timeline={historySystem.timeline}
+              currentIndex={historySystem.currentIndex}
+              canUndo={historySystem.canUndo}
+              canRedo={historySystem.canRedo}
+              onUndo={historySystem.undo}
+              onRedo={historySystem.redo}
+              onJumpToState={historySystem.jumpToState}
+              onClearHistory={historySystem.clearHistory}
+            />
+          </div>
+        )}
+
         {/* AI Tactical Intelligence */}
-        {showAIIntelligence && (
+        {panels.aiIntelligence && (
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -1192,12 +1713,12 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
             className="fixed top-20 right-4 z-40 w-96 max-h-[calc(100vh-6rem)]"
           >
             <AITacticalIntelligence
-              formation={currentFormation}
+              formation={currentFormation || null}
               players={currentPlayers}
               drawings={tacticsState?.drawings || []}
               team="home"
               isMinimized={isAIMinimized}
-              onMinimizeToggle={() => setIsAIMinimized(!isAIMinimized)}
+              onMinimizeToggle={() => uiDispatch({ type: 'TOGGLE_AI_MINIMIZED' })}
               onPlayerAssignmentSuggestion={handlePlayerAssignmentSuggestion}
               onTacticalSuggestion={handleTacticalSuggestion}
               onDrawingSuggestion={handleDrawingSuggestion}
@@ -1205,7 +1726,6 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
             />
           </motion.div>
         )}
-
       </AnimatePresence>
 
       {/* Presentation Controls */}
@@ -1232,9 +1752,9 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
         currentPlayers={currentPlayers}
         onFormationChange={handleFormationChange}
         onNotification={(message, type) => {
-          dispatch({
+          tacticsDispatch({
             type: 'ADD_NOTIFICATION',
-            payload: { message, type }
+            payload: { message, type },
           });
         }}
         showLeftSidebar={showLeftSidebar}
@@ -1251,20 +1771,67 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
         positioningMode={positioningMode}
         isGridVisible={isGridVisible}
         isFormationStrengthVisible={isFormationStrengthVisible}
-        onPositioningModeToggle={() => setPositioningMode(prev => prev === 'snap' ? 'free' : 'snap')}
+        onPositioningModeToggle={() => uiDispatch({ type: 'TOGGLE_POSITIONING_MODE' })}
         onGridToggle={handleGridToggle}
         onFormationStrengthToggle={handleFormationStrengthToggle}
-        isAnimating={uiState.isAnimating || false}
-        canPlayAnimation={!!(uiState.activePlaybookItemId && tacticsState?.playbook?.[uiState.activePlaybookItemId]?.steps?.length > 1)}
-        onPlayAnimation={() => dispatch({ type: 'START_ANIMATION' })}
-        onResetAnimation={() => dispatch({ type: 'RESET_ANIMATION' })}
+        isAnimating={contextUIState.isAnimating || false}
+        canPlayAnimation={
+          !!(
+            contextUIState.activePlaybookItemId &&
+            tacticsState?.playbook?.[contextUIState.activePlaybookItemId]?.steps?.length > 1
+          )
+        }
+        onPlayAnimation={() => tacticsDispatch({ type: 'START_ANIMATION' })}
+        onResetAnimation={() => tacticsDispatch({ type: 'RESET_ANIMATION' })}
         viewMode={viewMode}
         onToggleFullscreen={viewMode === 'fullscreen' ? exitFullscreen : enterFullscreen}
         playerDisplayConfig={playerDisplayConfig}
-        onPlayerDisplayConfigChange={setPlayerDisplayConfig}
+        onPlayerDisplayConfigChange={config =>
+          uiDispatch({ type: 'UPDATE_PLAYER_DISPLAY_CONFIG', payload: config })
+        }
       />
     </div>
   );
+
+  // Return with mobile optimization wrapper if on mobile
+  if (isMobile) {
+    return (
+      <Suspense
+        fallback={
+          <div className="flex items-center justify-center h-screen bg-slate-900">
+            <div className="text-white text-lg">Loading mobile controls...</div>
+          </div>
+        }
+      >
+        <MobileTacticsBoardContainer
+          onZoomChange={setMobileZoom}
+          onReset={handleResetView}
+          isMobile={true}
+        >
+          <TouchGestureController
+            handlers={{
+              onPinch: handlePinchZoom,
+              onPan: handlePan,
+              onDoubleTap: handleDoubleTap,
+              onTap: (_event) => {
+                // Tap handling for player selection (if needed)
+                // Can be extended to handle field clicks
+              },
+            }}
+            enablePinchZoom={true}
+            enablePan={true}
+            enableHaptics={mobileCapabilities.hasHapticFeedback}
+            minScale={0.5}
+            maxScale={3}
+          >
+            {boardContent}
+          </TouchGestureController>
+        </MobileTacticsBoardContainer>
+      </Suspense>
+    );
+  }
+
+  return boardContent;
 };
 
 export { UnifiedTacticsBoard };

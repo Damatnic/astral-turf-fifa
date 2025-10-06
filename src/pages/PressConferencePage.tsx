@@ -89,9 +89,9 @@ const PressConferencePage: React.FC = () => {
       payload: {
         fanConfidenceEffect: option.fanConfidenceEffect,
         teamMoraleEffect: option.teamMoraleEffect,
-        narrativeId: option.narrativeId,
+        narrativeId: selectedQuestion?.narrativeId,
       },
-    });
+    } as any);
 
     uiDispatch({
       type: 'ADD_NOTIFICATION',

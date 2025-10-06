@@ -3,18 +3,18 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Slider } from '../ui/slider';
-import { 
-  Zap, 
-  Monitor, 
-  Settings, 
-  TrendingUp, 
+import {
+  Zap,
+  Monitor,
+  Settings,
+  TrendingUp,
   Gauge,
   Cpu,
   MemoryStick,
   Activity,
   Play,
   Pause,
-  RotateCcw
+  RotateCcw,
 } from 'lucide-react';
 import type { Player, Position } from '../../types';
 
@@ -49,7 +49,7 @@ export const WebGLTacticsRenderer: React.FC<WebGLTacticsRendererProps> = ({
   fieldWidth = 800,
   fieldHeight = 520,
   onPlayerMove,
-  enableInteraction = true
+  enableInteraction = true,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const glRef = useRef<WebGLRenderingContext | null>(null);
@@ -64,7 +64,7 @@ export const WebGLTacticsRenderer: React.FC<WebGLTacticsRendererProps> = ({
     triangles: 0,
     gpuMemory: 0,
     renderTime: 0,
-    frameTime: 16.67
+    frameTime: 16.67,
   });
 
   const [settings, setSettings] = useState<WebGLSettings>({
@@ -73,7 +73,7 @@ export const WebGLTacticsRenderer: React.FC<WebGLTacticsRendererProps> = ({
     particleCount: 100,
     fieldDetail: 'high',
     animationQuality: 'high',
-    enablePostProcessing: true
+    enablePostProcessing: true,
   });
 
   const [shaderPrograms, setShaderPrograms] = useState<{
@@ -83,7 +83,7 @@ export const WebGLTacticsRenderer: React.FC<WebGLTacticsRendererProps> = ({
   }>({
     field: null,
     player: null,
-    particle: null
+    particle: null,
   });
 
   // Vertex shader source
@@ -205,12 +205,14 @@ export const WebGLTacticsRenderer: React.FC<WebGLTacticsRendererProps> = ({
   // Initialize WebGL context and shaders
   const initializeWebGL = useCallback(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return false;
+    if (!canvas) {
+      return false;
+    }
 
     const gl = canvas.getContext('webgl', {
       antialias: settings.antialiasing,
       powerPreference: 'high-performance',
-      preserveDrawingBuffer: false
+      preserveDrawingBuffer: false,
     });
 
     if (!gl) {
@@ -223,12 +225,16 @@ export const WebGLTacticsRenderer: React.FC<WebGLTacticsRendererProps> = ({
     // Create shaders
     const fieldProgram = createShaderProgram(gl, vertexShaderSource, fieldFragmentShaderSource);
     const playerProgram = createShaderProgram(gl, vertexShaderSource, playerFragmentShaderSource);
-    const particleProgram = createShaderProgram(gl, vertexShaderSource, particleFragmentShaderSource);
+    const particleProgram = createShaderProgram(
+      gl,
+      vertexShaderSource,
+      particleFragmentShaderSource
+    );
 
     setShaderPrograms({
       field: fieldProgram,
       player: playerProgram,
-      particle: particleProgram
+      particle: particleProgram,
     });
 
     // Set initial WebGL state
@@ -239,9 +245,15 @@ export const WebGLTacticsRenderer: React.FC<WebGLTacticsRendererProps> = ({
     return true;
   }, [settings.antialiasing]);
 
-  const createShader = (gl: WebGLRenderingContext, type: number, source: string): WebGLShader | null => {
+  const createShader = (
+    gl: WebGLRenderingContext,
+    type: number,
+    source: string
+  ): WebGLShader | null => {
     const shader = gl.createShader(type);
-    if (!shader) return null;
+    if (!shader) {
+      return null;
+    }
 
     gl.shaderSource(shader, source);
     gl.compileShader(shader);
@@ -255,14 +267,22 @@ export const WebGLTacticsRenderer: React.FC<WebGLTacticsRendererProps> = ({
     return shader;
   };
 
-  const createShaderProgram = (gl: WebGLRenderingContext, vertexSource: string, fragmentSource: string): WebGLProgram | null => {
+  const createShaderProgram = (
+    gl: WebGLRenderingContext,
+    vertexSource: string,
+    fragmentSource: string
+  ): WebGLProgram | null => {
     const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexSource);
     const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentSource);
 
-    if (!vertexShader || !fragmentShader) return null;
+    if (!vertexShader || !fragmentShader) {
+      return null;
+    }
 
     const program = gl.createProgram();
-    if (!program) return null;
+    if (!program) {
+      return null;
+    }
 
     gl.attachShader(program, vertexShader);
     gl.attachShader(program, fragmentShader);
@@ -278,76 +298,78 @@ export const WebGLTacticsRenderer: React.FC<WebGLTacticsRendererProps> = ({
   };
 
   // Render function
-  const render = useCallback((timestamp: number) => {
-    const gl = glRef.current;
-    const canvas = canvasRef.current;
-    if (!gl || !canvas) return;
+  const render = useCallback(
+    (timestamp: number) => {
+      const gl = glRef.current;
+      const canvas = canvasRef.current;
+      if (!gl || !canvas) {
+        return;
+      }
 
-    // Calculate FPS
-    const deltaTime = timestamp - lastFrameTime.current;
-    lastFrameTime.current = timestamp;
-    
-    fpsCounter.current.push(1000 / deltaTime);
-    if (fpsCounter.current.length > 60) {
-      fpsCounter.current.shift();
-    }
+      // Calculate FPS
+      const deltaTime = timestamp - lastFrameTime.current;
+      lastFrameTime.current = timestamp;
 
-    const currentFPS = fpsCounter.current.reduce((a, b) => a + b, 0) / fpsCounter.current.length;
+      fpsCounter.current.push(1000 / deltaTime);
+      if (fpsCounter.current.length > 60) {
+        fpsCounter.current.shift();
+      }
 
-    // Set viewport
-    gl.viewport(0, 0, canvas.width, canvas.height);
-    gl.clear(gl.COLOR_BUFFER_BIT);
+      const currentFPS = fpsCounter.current.reduce((a, b) => a + b, 0) / fpsCounter.current.length;
 
-    let drawCalls = 0;
-    let triangles = 0;
+      // Set viewport
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.clear(gl.COLOR_BUFFER_BIT);
 
-    // Render field
-    if (shaderPrograms.field) {
-      drawCalls += renderField(gl, shaderPrograms.field, timestamp);
-      triangles += 2; // Field is made of 2 triangles
-    }
+      let drawCalls = 0;
+      let triangles = 0;
 
-    // Render players
-    if (shaderPrograms.player) {
-      const playerData = renderPlayers(gl, shaderPrograms.player, timestamp);
-      drawCalls += playerData.drawCalls;
-      triangles += playerData.triangles;
-    }
+      // Render field
+      if (shaderPrograms.field) {
+        drawCalls += renderField(gl, shaderPrograms.field, timestamp);
+        triangles += 2; // Field is made of 2 triangles
+      }
 
-    // Render particles (if enabled)
-    if (settings.particleCount > 0 && shaderPrograms.particle) {
-      const particleData = renderParticles(gl, shaderPrograms.particle, timestamp);
-      drawCalls += particleData.drawCalls;
-      triangles += particleData.triangles;
-    }
+      // Render players
+      if (shaderPrograms.player) {
+        const playerData = renderPlayers(gl, shaderPrograms.player, timestamp);
+        drawCalls += playerData.drawCalls;
+        triangles += playerData.triangles;
+      }
 
-    // Update metrics
-    setMetrics(prev => ({
-      ...prev,
-      fps: Math.round(currentFPS),
-      drawCalls,
-      triangles,
-      frameTime: deltaTime,
-      renderTime: performance.now() - timestamp
-    }));
+      // Render particles (if enabled)
+      if (settings.particleCount > 0 && shaderPrograms.particle) {
+        const particleData = renderParticles(gl, shaderPrograms.particle, timestamp);
+        drawCalls += particleData.drawCalls;
+        triangles += particleData.triangles;
+      }
 
-    if (isRunning) {
-      animationFrameRef.current = requestAnimationFrame(render);
-    }
-  }, [isRunning, shaderPrograms, settings.particleCount, players]);
+      // Update metrics
+      setMetrics(prev => ({
+        ...prev,
+        fps: Math.round(currentFPS),
+        drawCalls,
+        triangles,
+        frameTime: deltaTime,
+        renderTime: performance.now() - timestamp,
+      }));
 
-  const renderField = (gl: WebGLRenderingContext, program: WebGLProgram, timestamp: number): number => {
+      if (isRunning) {
+        animationFrameRef.current = requestAnimationFrame(render);
+      }
+    },
+    [isRunning, shaderPrograms, settings.particleCount, players]
+  );
+
+  const renderField = (
+    gl: WebGLRenderingContext,
+    program: WebGLProgram,
+    timestamp: number
+  ): number => {
     gl.useProgram(program);
 
     // Field vertices (full screen quad)
-    const vertices = new Float32Array([
-      -1, -1,
-       1, -1,
-      -1,  1,
-       1, -1,
-       1,  1,
-      -1,  1
-    ]);
+    const vertices = new Float32Array([-1, -1, 1, -1, -1, 1, 1, -1, 1, 1, -1, 1]);
 
     const buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
@@ -382,12 +404,48 @@ export const WebGLTacticsRenderer: React.FC<WebGLTacticsRendererProps> = ({
       const y = (player.position.y / 100) * fieldHeight;
 
       const vertices = new Float32Array([
-        x - size, y - size, 0.0, 0.0, 1.0, 0.0, 0.0, // position, color, texCoord
-        x + size, y - size, 0.0, 0.0, 1.0, 1.0, 0.0,
-        x - size, y + size, 0.0, 0.0, 1.0, 0.0, 1.0,
-        x + size, y - size, 0.0, 0.0, 1.0, 1.0, 0.0,
-        x + size, y + size, 0.0, 0.0, 1.0, 1.0, 1.0,
-        x - size, y + size, 0.0, 0.0, 1.0, 0.0, 1.0
+        x - size,
+        y - size,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0, // position, color, texCoord
+        x + size,
+        y - size,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        x - size,
+        y + size,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        x + size,
+        y - size,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        x + size,
+        y + size,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        x - size,
+        y + size,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
       ]);
 
       const buffer = gl.createBuffer();
@@ -420,7 +478,7 @@ export const WebGLTacticsRenderer: React.FC<WebGLTacticsRendererProps> = ({
       gl.uniform2f(resolutionLocation, fieldWidth, fieldHeight);
       gl.uniform3f(playerColorLocation, 0.2, 0.4, 0.8);
       gl.uniform1f(selectedLocation, 0.0);
-      gl.uniform1f(performanceLocation, player.performance || 0.7);
+      gl.uniform1f(performanceLocation, (player as any).performance || 0.7);
 
       gl.drawArrays(gl.TRIANGLES, 0, 6);
 
@@ -444,12 +502,30 @@ export const WebGLTacticsRenderer: React.FC<WebGLTacticsRendererProps> = ({
       const size = 5;
 
       const vertices = new Float32Array([
-        x - size, y - size, 0.0, 0.0,
-        x + size, y - size, 1.0, 0.0,
-        x - size, y + size, 0.0, 1.0,
-        x + size, y - size, 1.0, 0.0,
-        x + size, y + size, 1.0, 1.0,
-        x - size, y + size, 0.0, 1.0
+        x - size,
+        y - size,
+        0.0,
+        0.0,
+        x + size,
+        y - size,
+        1.0,
+        0.0,
+        x - size,
+        y + size,
+        0.0,
+        1.0,
+        x + size,
+        y - size,
+        1.0,
+        0.0,
+        x + size,
+        y + size,
+        1.0,
+        1.0,
+        x - size,
+        y + size,
+        0.0,
+        1.0,
       ]);
 
       const buffer = gl.createBuffer();
@@ -501,7 +577,9 @@ export const WebGLTacticsRenderer: React.FC<WebGLTacticsRendererProps> = ({
   // Resize canvas
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) {
+      return;
+    }
 
     const resizeCanvas = () => {
       const rect = canvas.getBoundingClientRect();
@@ -518,17 +596,25 @@ export const WebGLTacticsRenderer: React.FC<WebGLTacticsRendererProps> = ({
   }, []);
 
   const getPerformanceColor = (value: number) => {
-    if (value >= 55) return 'text-green-400';
-    if (value >= 30) return 'text-yellow-400';
+    if (value >= 55) {
+      return 'text-green-400';
+    }
+    if (value >= 30) {
+      return 'text-yellow-400';
+    }
     return 'text-red-400';
   };
 
   const getQualityLabel = (quality: string) => {
     switch (quality) {
-      case 'low': return { color: 'text-yellow-400', label: 'Low' };
-      case 'medium': return { color: 'text-blue-400', label: 'Medium' };
-      case 'high': return { color: 'text-green-400', label: 'High' };
-      default: return { color: 'text-gray-400', label: 'Unknown' };
+      case 'low':
+        return { color: 'text-yellow-400', label: 'Low' };
+      case 'medium':
+        return { color: 'text-blue-400', label: 'Medium' };
+      case 'high':
+        return { color: 'text-green-400', label: 'High' };
+      default:
+        return { color: 'text-gray-400', label: 'Unknown' };
     }
   };
 
@@ -541,11 +627,9 @@ export const WebGLTacticsRenderer: React.FC<WebGLTacticsRendererProps> = ({
             <div className="flex items-center gap-2">
               <Zap className="w-6 h-6 text-yellow-400" />
               WebGL Tactics Renderer
-              <Badge className="bg-green-500/20 text-green-400">
-                60 FPS
-              </Badge>
+              <Badge className="bg-green-500/20 text-green-400">60 FPS</Badge>
             </div>
-            
+
             <div className="flex items-center gap-2">
               <Button
                 size="sm"
@@ -555,7 +639,7 @@ export const WebGLTacticsRenderer: React.FC<WebGLTacticsRendererProps> = ({
                 {isRunning ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
                 {isRunning ? 'Pause' : 'Play'}
               </Button>
-              
+
               <Button
                 size="sm"
                 onClick={() => {
@@ -604,9 +688,7 @@ export const WebGLTacticsRenderer: React.FC<WebGLTacticsRendererProps> = ({
                   <Activity className="w-4 h-4 text-blue-400" />
                   <span className="text-gray-300">Frame Time</span>
                 </div>
-                <span className="text-white font-bold">
-                  {metrics.frameTime.toFixed(1)}ms
-                </span>
+                <span className="text-white font-bold">{metrics.frameTime.toFixed(1)}ms</span>
               </div>
 
               <div className="flex items-center justify-between">
@@ -614,9 +696,7 @@ export const WebGLTacticsRenderer: React.FC<WebGLTacticsRendererProps> = ({
                   <Cpu className="w-4 h-4 text-purple-400" />
                   <span className="text-gray-300">Draw Calls</span>
                 </div>
-                <span className="text-white font-bold">
-                  {metrics.drawCalls}
-                </span>
+                <span className="text-white font-bold">{metrics.drawCalls}</span>
               </div>
 
               <div className="flex items-center justify-between">
@@ -624,9 +704,7 @@ export const WebGLTacticsRenderer: React.FC<WebGLTacticsRendererProps> = ({
                   <MemoryStick className="w-4 h-4 text-orange-400" />
                   <span className="text-gray-300">Triangles</span>
                 </div>
-                <span className="text-white font-bold">
-                  {metrics.triangles.toLocaleString()}
-                </span>
+                <span className="text-white font-bold">{metrics.triangles.toLocaleString()}</span>
               </div>
             </div>
 
@@ -638,10 +716,13 @@ export const WebGLTacticsRenderer: React.FC<WebGLTacticsRendererProps> = ({
                 </span>
               </div>
               <div className="w-full bg-white/10 rounded-full h-2">
-                <div 
+                <div
                   className={`h-2 rounded-full transition-all duration-300 ${
-                    metrics.fps >= 55 ? 'bg-green-400' : 
-                    metrics.fps >= 30 ? 'bg-yellow-400' : 'bg-red-400'
+                    metrics.fps >= 55
+                      ? 'bg-green-400'
+                      : metrics.fps >= 30
+                        ? 'bg-yellow-400'
+                        : 'bg-red-400'
                   }`}
                   style={{ width: `${Math.min((metrics.fps / 60) * 100, 100)}%` }}
                 />
@@ -688,7 +769,9 @@ export const WebGLTacticsRenderer: React.FC<WebGLTacticsRendererProps> = ({
                 </div>
                 <Slider
                   value={[settings.particleCount]}
-                  onValueChange={(value) => setSettings(prev => ({ ...prev, particleCount: value[0] }))}
+                  onValueChange={value =>
+                    setSettings(prev => ({ ...prev, particleCount: value[0] }))
+                  }
                   max={200}
                   min={0}
                   step={10}
@@ -700,10 +783,13 @@ export const WebGLTacticsRenderer: React.FC<WebGLTacticsRendererProps> = ({
                 <span className="text-gray-300">Antialiasing</span>
                 <Button
                   size="sm"
-                  onClick={() => setSettings(prev => ({ ...prev, antialiasing: !prev.antialiasing }))}
-                  className={settings.antialiasing 
-                    ? "bg-green-500/20 text-green-400 border-green-500/30" 
-                    : "bg-red-500/20 text-red-400 border-red-500/30"
+                  onClick={() =>
+                    setSettings(prev => ({ ...prev, antialiasing: !prev.antialiasing }))
+                  }
+                  className={
+                    settings.antialiasing
+                      ? 'bg-green-500/20 text-green-400 border-green-500/30'
+                      : 'bg-red-500/20 text-red-400 border-red-500/30'
                   }
                 >
                   {settings.antialiasing ? 'On' : 'Off'}
@@ -714,10 +800,16 @@ export const WebGLTacticsRenderer: React.FC<WebGLTacticsRendererProps> = ({
                 <span className="text-gray-300">Post Processing</span>
                 <Button
                   size="sm"
-                  onClick={() => setSettings(prev => ({ ...prev, enablePostProcessing: !prev.enablePostProcessing }))}
-                  className={settings.enablePostProcessing 
-                    ? "bg-green-500/20 text-green-400 border-green-500/30" 
-                    : "bg-red-500/20 text-red-400 border-red-500/30"
+                  onClick={() =>
+                    setSettings(prev => ({
+                      ...prev,
+                      enablePostProcessing: !prev.enablePostProcessing,
+                    }))
+                  }
+                  className={
+                    settings.enablePostProcessing
+                      ? 'bg-green-500/20 text-green-400 border-green-500/30'
+                      : 'bg-red-500/20 text-red-400 border-red-500/30'
                   }
                 >
                   {settings.enablePostProcessing ? 'On' : 'Off'}

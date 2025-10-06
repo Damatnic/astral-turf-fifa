@@ -48,7 +48,7 @@ export const Badge: React.FC<BadgeProps> = ({
           'inline-flex items-center justify-center rounded-full',
           badgeVariants[variant],
           dotSizes[size],
-          className,
+          className
         )}
         {...props}
       />
@@ -62,7 +62,7 @@ export const Badge: React.FC<BadgeProps> = ({
         rounded ? 'rounded-full' : 'rounded-md',
         badgeVariants[variant],
         badgeSizes[size],
-        className,
+        className
       )}
       {...props}
     >

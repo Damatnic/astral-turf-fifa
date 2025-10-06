@@ -9,6 +9,8 @@ interface AvatarImageProps {
   src?: string;
   alt?: string;
   className?: string;
+  loading?: 'lazy' | 'eager';
+  decoding?: 'async' | 'sync' | 'auto';
 }
 
 interface AvatarFallbackProps {
@@ -25,25 +27,36 @@ export const Avatar: React.FC<AvatarProps> = ({ className = '', children }) => {
   );
 };
 
-export const AvatarImage: React.FC<AvatarImageProps> = ({ src, alt = '', className = '' }) => {
-  if (!src) return null;
-  
+export const AvatarImage: React.FC<AvatarImageProps> = ({
+  src,
+  alt = '',
+  className = '',
+  loading = 'lazy',
+  decoding = 'async',
+}) => {
+  if (!src) {
+    return null;
+  }
+
   return (
     <img
       className={`aspect-square h-full w-full object-cover ${className}`}
       src={src}
       alt={alt}
+      loading={loading}
+      decoding={decoding}
+      referrerPolicy="no-referrer"
     />
   );
 };
 
-export const AvatarFallback: React.FC<AvatarFallbackProps> = ({ 
-  className = '', 
+export const AvatarFallback: React.FC<AvatarFallbackProps> = ({
+  className = '',
   style,
-  children 
+  children,
 }) => {
   return (
-    <div 
+    <div
       className={`flex h-full w-full items-center justify-center rounded-full bg-muted text-muted-foreground ${className}`}
       style={style}
     >

@@ -294,7 +294,9 @@ class GDPRComplianceService {
   /**
    * Register personal data collection
    */
-  registerPersonalData(data: Omit<PersonalDataItem, 'id' | 'collectedAt' | 'lastModified'>): string {
+  registerPersonalData(
+    data: Omit<PersonalDataItem, 'id' | 'collectedAt' | 'lastModified'>
+  ): string {
     const id = this.generateId('pd');
     const personalDataItem: PersonalDataItem = {
       ...data,
@@ -375,7 +377,9 @@ class GDPRComplianceService {
   /**
    * Submit data subject request
    */
-  submitDataSubjectRequest(request: Omit<DataSubjectRequest, 'id' | 'submittedAt' | 'status'>): string {
+  submitDataSubjectRequest(
+    request: Omit<DataSubjectRequest, 'id' | 'submittedAt' | 'status'>
+  ): string {
     const dsrRequest: DataSubjectRequest = {
       ...request,
       id: this.generateId('dsr'),
@@ -458,7 +462,6 @@ class GDPRComplianceService {
         dataSubjectId: request.dataSubjectId,
         processingTime: this.calculateProcessingTime(request),
       });
-
     } catch (error) {
       request.status = DSRStatus.REJECTED;
       request.response = {
@@ -530,7 +533,7 @@ class GDPRComplianceService {
   /**
    * Handle erasure request (Article 17 - Right to be forgotten)
    */
-  private async handleErasureRequest(request: DataSubjectRequest): DSRResponse {
+  private async handleErasureRequest(request: DataSubjectRequest): Promise<DSRResponse> {
     const personalData = this.getPersonalDataBySubject(request.dataSubjectId);
     const actions_taken: string[] = [];
     const processingNotes: string[] = [];
@@ -541,7 +544,7 @@ class GDPRComplianceService {
     for (const item of personalData) {
       // Check if erasure is legally required
       const canErase = this.canErasePersonalData(item);
-      
+
       if (canErase) {
         // Perform erasure
         await this.erasePersonalDataItem(item.id);
@@ -572,12 +575,10 @@ class GDPRComplianceService {
   /**
    * Handle data portability request (Article 20)
    */
-  private async handlePortabilityRequest(request: DataSubjectRequest): DSRResponse {
-    const personalData = this.getPersonalDataBySubject(request.dataSubjectId)
-      .filter(item => 
-        item.legalBasis === LegalBasis.CONSENT || 
-        item.legalBasis === LegalBasis.CONTRACT
-      );
+  private async handlePortabilityRequest(request: DataSubjectRequest): Promise<DSRResponse> {
+    const personalData = this.getPersonalDataBySubject(request.dataSubjectId).filter(
+      item => item.legalBasis === LegalBasis.CONSENT || item.legalBasis === LegalBasis.CONTRACT
+    );
 
     if (personalData.length === 0) {
       return {
@@ -622,11 +623,11 @@ class GDPRComplianceService {
 
     // Check if notification is required (within 72 hours)
     const notificationDeadline = new Date(Date.now() + 72 * 60 * 60 * 1000);
-    
+
     if (breachIncident.assessmentResults.riskToRights === 'high') {
       breachIncident.assessmentResults.notificationRequired = true;
       breachIncident.assessmentResults.notificationDeadline = notificationDeadline.toISOString();
-      
+
       // Auto-schedule notification tasks
       this.scheduleBreachNotifications(breachIncident);
     }
@@ -647,17 +648,21 @@ class GDPRComplianceService {
    */
   generateComplianceReport(startDate: string, endDate: string): GDPRComplianceReport {
     const period = { startDate, endDate };
-    const personalDataItems = Array.from(this.personalDataRegistry.values())
-      .filter(item => item.collectedAt >= startDate && item.collectedAt <= endDate);
+    const personalDataItems = Array.from(this.personalDataRegistry.values()).filter(
+      item => item.collectedAt >= startDate && item.collectedAt <= endDate
+    );
 
-    const allConsents = Array.from(this.consentRecords.values()).flat()
+    const allConsents = Array.from(this.consentRecords.values())
+      .flat()
       .filter(consent => consent.givenAt >= startDate && consent.givenAt <= endDate);
 
-    const dsrRequestsInPeriod = Array.from(this.dsrRequests.values())
-      .filter(request => request.submittedAt >= startDate && request.submittedAt <= endDate);
+    const dsrRequestsInPeriod = Array.from(this.dsrRequests.values()).filter(
+      request => request.submittedAt >= startDate && request.submittedAt <= endDate
+    );
 
-    const dataBreachesInPeriod = Array.from(this.dataBreaches.values())
-      .filter(breach => breach.discoveredAt >= startDate && breach.discoveredAt <= endDate);
+    const dataBreachesInPeriod = Array.from(this.dataBreaches.values()).filter(
+      breach => breach.discoveredAt >= startDate && breach.discoveredAt <= endDate
+    );
 
     const report: GDPRComplianceReport = {
       id: this.generateId('report'),
@@ -689,16 +694,23 @@ class GDPRComplianceService {
       dataSubjectRights: {
         requestsByType: this.groupByField(dsrRequestsInPeriod, 'requestType'),
         averageResponseTime: this.calculateAverageResponseTime(dsrRequestsInPeriod),
-        completionRate: dsrRequestsInPeriod.filter(r => r.status === DSRStatus.COMPLETED).length / dsrRequestsInPeriod.length,
-        rejectionRate: dsrRequestsInPeriod.filter(r => r.status === DSRStatus.REJECTED).length / dsrRequestsInPeriod.length,
+        completionRate:
+          dsrRequestsInPeriod.filter(r => r.status === DSRStatus.COMPLETED).length /
+          dsrRequestsInPeriod.length,
+        rejectionRate:
+          dsrRequestsInPeriod.filter(r => r.status === DSRStatus.REJECTED).length /
+          dsrRequestsInPeriod.length,
       },
       riskAssessment: {
-        highRiskProcessing: Array.from(this.processingActivities.values())
-          .filter(activity => activity.riskAssessment.riskLevel === 'high').length,
-        dpiaRequired: Array.from(this.processingActivities.values())
-          .filter(activity => activity.riskAssessment.dpiaRequired).length,
-        dpiaCompleted: Array.from(this.processingActivities.values())
-          .filter(activity => activity.riskAssessment.dpiaCompletedAt).length,
+        highRiskProcessing: Array.from(this.processingActivities.values()).filter(
+          activity => activity.riskAssessment.riskLevel === 'high'
+        ).length,
+        dpiaRequired: Array.from(this.processingActivities.values()).filter(
+          activity => activity.riskAssessment.dpiaRequired
+        ).length,
+        dpiaCompleted: Array.from(this.processingActivities.values()).filter(
+          activity => activity.riskAssessment.dpiaCompletedAt
+        ).length,
         overdueDPIAs: this.calculateOverdueDPIAs(),
       },
       thirdPartySharing: this.calculateThirdPartySharingMetrics(personalDataItems),
@@ -739,14 +751,16 @@ class GDPRComplianceService {
 
       try {
         const collectedDate = new Date(item.collectedAt);
-        const retentionEndDate = new Date(collectedDate.getTime() + item.retentionPeriod * 24 * 60 * 60 * 1000);
+        const retentionEndDate = new Date(
+          collectedDate.getTime() + item.retentionPeriod * 24 * 60 * 60 * 1000
+        );
 
         if (now > retentionEndDate) {
           // Check if we can delete based on legal obligations
           if (this.canErasePersonalData(item)) {
             this.personalDataRegistry.delete(id);
             results.deleted++;
-            
+
             this.logGDPREvent('data_retention_cleanup', {
               dataItemId: id,
               action: 'deleted',
@@ -755,7 +769,7 @@ class GDPRComplianceService {
             });
           } else {
             results.retained++;
-            
+
             this.logGDPREvent('data_retention_cleanup', {
               dataItemId: id,
               action: 'retained',
@@ -794,15 +808,11 @@ class GDPRComplianceService {
           'Service improvement and analytics',
           'Communication with users',
         ],
-        legalBases: [
-          LegalBasis.CONSENT,
-          LegalBasis.CONTRACT,
-          LegalBasis.LEGITIMATE_INTERESTS,
-        ],
+        legalBases: [LegalBasis.CONSENT, LegalBasis.CONTRACT, LegalBasis.LEGITIMATE_INTERESTS],
         retentionPeriods: {
-          'user_account': 365 * 3, // 3 years
-          'usage_analytics': 365 * 2, // 2 years
-          'support_communications': 365, // 1 year
+          user_account: 365 * 3, // 3 years
+          usage_analytics: 365 * 2, // 2 years
+          support_communications: 365, // 1 year
         },
         thirdPartyRecipients: [
           'Cloud hosting providers',
@@ -839,21 +849,25 @@ class GDPRComplianceService {
     }
   }
 
-  private handleConsentWithdrawal(dataSubjectId: string, consent: ConsentRecord, reason?: string): void {
+  private handleConsentWithdrawal(
+    dataSubjectId: string,
+    consent: ConsentRecord,
+    reason?: string
+  ): void {
     // Find and handle data that was processed based on this consent
-    const affectedData = Array.from(this.personalDataRegistry.values())
-      .filter(item => 
-        item.dataSubjectId === dataSubjectId && 
+    const affectedData = Array.from(this.personalDataRegistry.values()).filter(
+      item =>
+        item.dataSubjectId === dataSubjectId &&
         item.legalBasis === LegalBasis.CONSENT &&
         item.consentRecord?.id === consent.id
-      );
+    );
 
     for (const item of affectedData) {
       // Check if processing can continue under a different legal basis
       if (!this.hasAlternativeLegalBasis(item)) {
         // Must stop processing and potentially erase
         this.personalDataRegistry.delete(item.id);
-        
+
         this.logGDPREvent('data_processing_stopped', {
           dataItemId: item.id,
           reason: 'consent_withdrawn',
@@ -866,7 +880,7 @@ class GDPRComplianceService {
   private async initiateIdentityVerification(request: DataSubjectRequest): Promise<void> {
     // Implementation would send verification email/SMS
     // For now, we'll simulate the process
-    
+
     this.logGDPREvent('identity_verification_initiated', {
       requestId: request.id,
       dataSubjectId: request.dataSubjectId,
@@ -875,8 +889,9 @@ class GDPRComplianceService {
   }
 
   private getPersonalDataBySubject(dataSubjectId: string): PersonalDataItem[] {
-    return Array.from(this.personalDataRegistry.values())
-      .filter(item => item.dataSubjectId === dataSubjectId);
+    return Array.from(this.personalDataRegistry.values()).filter(
+      item => item.dataSubjectId === dataSubjectId
+    );
   }
 
   private getProcessingActivitiesForSubject(dataSubjectId: string): DataProcessingActivity[] {
@@ -934,20 +949,18 @@ class GDPRComplianceService {
 
   private async notifyThirdPartiesOfErasure(dataSubjectId: string): Promise<string[]> {
     const notifications: string[] = [];
-    
+
     // Find all third-party sharing for this data subject
     const personalData = this.getPersonalDataBySubject(dataSubjectId);
     const thirdParties = new Set(
-      personalData
-        .flatMap(item => item.thirdPartySharing)
-        .map(sharing => sharing.recipientName)
+      personalData.flatMap(item => item.thirdPartySharing).map(sharing => sharing.recipientName)
     );
 
     for (const thirdParty of thirdParties) {
       // Send erasure notification to third party
       // Implementation would vary based on integration method
       notifications.push(`Notified ${thirdParty} of erasure requirement`);
-      
+
       this.logGDPREvent('third_party_erasure_notification', {
         dataSubjectId,
         thirdParty,
@@ -962,10 +975,10 @@ class GDPRComplianceService {
     // Generate secure, time-limited download URL
     const token = this.generateSecureToken();
     const url = `/api/gdpr/download/${token}`;
-    
+
     // Store data temporarily for download (implement with proper security)
     // In production, use secure cloud storage with expiration
-    
+
     return url;
   }
 
@@ -973,7 +986,7 @@ class GDPRComplianceService {
     if (!request.completedAt) {
       return 0;
     }
-    
+
     const submitted = new Date(request.submittedAt).getTime();
     const completed = new Date(request.completedAt).getTime();
     return Math.round((completed - submitted) / (24 * 60 * 60 * 1000)); // days
@@ -1002,7 +1015,7 @@ class GDPRComplianceService {
 
   private calculateComplianceScore(): number {
     let score = 100;
-    
+
     // Deduct points for various compliance gaps
     const personalDataItems = Array.from(this.personalDataRegistry.values());
     const unencryptedItems = personalDataItems.filter(item => !item.isEncrypted);
@@ -1014,8 +1027,9 @@ class GDPRComplianceService {
     const overdueDPIAs = this.calculateOverdueDPIAs();
     score -= Math.min(overdueDPIAs * 5, 20);
 
-    const pendingDSRs = Array.from(this.dsrRequests.values())
-      .filter(request => request.status === DSRStatus.IN_PROGRESS);
+    const pendingDSRs = Array.from(this.dsrRequests.values()).filter(
+      request => request.status === DSRStatus.IN_PROGRESS
+    );
     score -= Math.min(pendingDSRs.length * 2, 10);
 
     return Math.max(0, Math.round(score));
@@ -1023,12 +1037,12 @@ class GDPRComplianceService {
 
   private calculateOverdueDPIAs(): number {
     const now = new Date();
-    return Array.from(this.processingActivities.values())
-      .filter(activity => 
-        activity.riskAssessment.dpiaRequired && 
+    return Array.from(this.processingActivities.values()).filter(
+      activity =>
+        activity.riskAssessment.dpiaRequired &&
         !activity.riskAssessment.dpiaCompletedAt &&
         new Date(activity.nextReview) < now
-      ).length;
+    ).length;
   }
 
   private calculateThirdPartySharingMetrics(personalDataItems: PersonalDataItem[]) {
@@ -1050,7 +1064,7 @@ class GDPRComplianceService {
     const total = personalDataItems.length;
     const encrypted = personalDataItems.filter(item => item.isEncrypted).length;
     const anonymized = personalDataItems.filter(item => item.isAnonymized).length;
-    
+
     return {
       encryptionCoverage: total > 0 ? Math.round((encrypted / total) * 100) : 0,
       anonymizationCoverage: total > 0 ? Math.round((anonymized / total) * 100) : 0,
@@ -1070,10 +1084,12 @@ class GDPRComplianceService {
 
   private generateComplianceRecommendations(): string[] {
     const recommendations: string[] = [];
-    
+
     const complianceScore = this.calculateComplianceScore();
     if (complianceScore < 80) {
-      recommendations.push('Overall compliance score is below target - review and address identified gaps');
+      recommendations.push(
+        'Overall compliance score is below target - review and address identified gaps'
+      );
     }
 
     const overdueDPIAs = this.calculateOverdueDPIAs();
@@ -1081,10 +1097,13 @@ class GDPRComplianceService {
       recommendations.push(`Complete ${overdueDPIAs} overdue Data Protection Impact Assessments`);
     }
 
-    const pendingDSRs = Array.from(this.dsrRequests.values())
-      .filter(request => request.status === DSRStatus.IN_PROGRESS);
+    const pendingDSRs = Array.from(this.dsrRequests.values()).filter(
+      request => request.status === DSRStatus.IN_PROGRESS
+    );
     if (pendingDSRs.length > 0) {
-      recommendations.push(`Process ${pendingDSRs.length} pending data subject requests within legal timeframes`);
+      recommendations.push(
+        `Process ${pendingDSRs.length} pending data subject requests within legal timeframes`
+      );
     }
 
     const personalDataItems = Array.from(this.personalDataRegistry.values());
@@ -1102,32 +1121,42 @@ class GDPRComplianceService {
   }
 
   private generateSecureToken(): string {
-    return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    return (
+      Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+    );
   }
 
   private hasAlternativeLegalBasis(item: PersonalDataItem): boolean {
     // Check if processing can continue under contract, legal obligation, etc.
-    return item.processingPurpose.includes('contract_fulfillment') ||
-           item.processingPurpose.includes('legal_compliance');
+    return (
+      item.processingPurpose.includes('contract_fulfillment') ||
+      item.processingPurpose.includes('legal_compliance')
+    );
   }
 
   private groupByField<T extends Record<string, any>>(
     items: T[],
     field: keyof T
   ): Record<string, number> {
-    return items.reduce((acc, item) => {
-      const value = String(item[field]);
-      acc[value] = (acc[value] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    return items.reduce(
+      (acc, item) => {
+        const value = String(item[field]);
+        acc[value] = (acc[value] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
   }
 
   private groupPersonalDataByRetention(items: PersonalDataItem[]): Record<string, number> {
-    return items.reduce((acc, item) => {
-      const key = `${item.retentionPeriod}_days`;
-      acc[key] = (acc[key] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    return items.reduce(
+      (acc, item) => {
+        const key = `${item.retentionPeriod}_days`;
+        acc[key] = (acc[key] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
   }
 
   private calculateConsentRate(): number {
@@ -1143,7 +1172,9 @@ class GDPRComplianceService {
 
   private calculateAverageResponseTime(requests: DataSubjectRequest[]): number {
     const completedRequests = requests.filter(r => r.completedAt);
-    if (completedRequests.length === 0) return 0;
+    if (completedRequests.length === 0) {
+      return 0;
+    }
 
     const totalTime = completedRequests.reduce((sum, request) => {
       return sum + this.calculateProcessingTime(request);
@@ -1210,8 +1241,9 @@ export const gdprCompliance = new GDPRComplianceService({
 });
 
 // Export convenience functions
-export const registerPersonalData = (data: Omit<PersonalDataItem, 'id' | 'collectedAt' | 'lastModified'>) =>
-  gdprCompliance.registerPersonalData(data);
+export const registerPersonalData = (
+  data: Omit<PersonalDataItem, 'id' | 'collectedAt' | 'lastModified'>
+) => gdprCompliance.registerPersonalData(data);
 
 export const recordConsent = (consent: Omit<ConsentRecord, 'id' | 'givenAt'>) =>
   gdprCompliance.recordConsent(consent);
@@ -1219,8 +1251,9 @@ export const recordConsent = (consent: Omit<ConsentRecord, 'id' | 'givenAt'>) =>
 export const withdrawConsent = (dataSubjectId: string, consentId: string, reason?: string) =>
   gdprCompliance.withdrawConsent(dataSubjectId, consentId, reason);
 
-export const submitDataSubjectRequest = (request: Omit<DataSubjectRequest, 'id' | 'submittedAt' | 'status'>) =>
-  gdprCompliance.submitDataSubjectRequest(request);
+export const submitDataSubjectRequest = (
+  request: Omit<DataSubjectRequest, 'id' | 'submittedAt' | 'status'>
+) => gdprCompliance.submitDataSubjectRequest(request);
 
 export const reportDataBreach = (breach: Omit<DataBreachIncident, 'id' | 'discoveredAt'>) =>
   gdprCompliance.reportDataBreach(breach);

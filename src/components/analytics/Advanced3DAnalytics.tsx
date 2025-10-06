@@ -4,18 +4,18 @@ import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Slider } from '../ui/slider';
-import { 
-  BarChart3, 
-  TrendingUp, 
-  Activity, 
-  Zap, 
-  Eye, 
+import {
+  BarChart3,
+  TrendingUp,
+  Activity,
+  Zap,
+  Eye,
   Target,
   Layers,
   Play,
   Pause,
   RotateCcw,
-  Settings
+  Settings,
 } from 'lucide-react';
 import type { Player, Position } from '../../types';
 
@@ -56,7 +56,7 @@ interface Advanced3DAnalyticsProps {
 export const Advanced3DAnalytics: React.FC<Advanced3DAnalyticsProps> = ({
   players,
   matchData,
-  onMetricSelect
+  onMetricSelect,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [selectedMetric, setSelectedMetric] = useState<string>('heat-map');
@@ -72,12 +72,12 @@ export const Advanced3DAnalytics: React.FC<Advanced3DAnalyticsProps> = ({
     { name: 'Possession %', value: 64.8, unit: '%', trend: 'down', category: 'tactical' },
     { name: 'Shots on Target', value: 7, unit: '', trend: 'up', category: 'performance' },
     { name: 'Tackles Won', value: 12, unit: '', trend: 'stable', category: 'performance' },
-    { name: 'Sprint Speed', value: 28.4, unit: 'km/h', trend: 'up', category: 'physical' }
+    { name: 'Sprint Speed', value: 28.4, unit: 'km/h', trend: 'up', category: 'physical' },
   ];
 
   const generateHeatMapData = (): HeatMapData[] => {
     const data: HeatMapData[] = [];
-    
+
     // Generate realistic heat map data for each player
     players.forEach(player => {
       // Main position cluster
@@ -87,12 +87,12 @@ export const Advanced3DAnalytics: React.FC<Advanced3DAnalyticsProps> = ({
           y: player.position.y + (Math.random() - 0.5) * 15,
           intensity: 0.8 + Math.random() * 0.2,
           playerName: player.name,
-          actions: Math.floor(Math.random() * 15) + 5
+          actions: Math.floor(Math.random() * 15) + 5,
         });
       }
 
       // Secondary position clusters (movement patterns)
-      if (player.role === 'midfielder') {
+      if (player.roleId === 'midfielder') {
         // Midfielders cover more area
         for (let i = 0; i < 15; i++) {
           data.push({
@@ -100,12 +100,12 @@ export const Advanced3DAnalytics: React.FC<Advanced3DAnalyticsProps> = ({
             y: player.position.y + (Math.random() - 0.5) * 30,
             intensity: 0.4 + Math.random() * 0.4,
             playerName: player.name,
-            actions: Math.floor(Math.random() * 10) + 2
+            actions: Math.floor(Math.random() * 10) + 2,
           });
         }
       }
 
-      if (player.role === 'forward') {
+      if (player.roleId === 'forward') {
         // Forwards concentrate in attacking third
         for (let i = 0; i < 10; i++) {
           data.push({
@@ -113,7 +113,7 @@ export const Advanced3DAnalytics: React.FC<Advanced3DAnalyticsProps> = ({
             y: 20 + Math.random() * 30,
             intensity: 0.6 + Math.random() * 0.3,
             playerName: player.name,
-            actions: Math.floor(Math.random() * 8) + 3
+            actions: Math.floor(Math.random() * 8) + 3,
           });
         }
       }
@@ -138,6 +138,7 @@ export const Advanced3DAnalytics: React.FC<Advanced3DAnalyticsProps> = ({
 
       return () => clearInterval(interval);
     }
+    return undefined;
   }, [isPlaying, timeRange]);
 
   useEffect(() => {
@@ -146,10 +147,14 @@ export const Advanced3DAnalytics: React.FC<Advanced3DAnalyticsProps> = ({
 
   const drawHeatMap = () => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) {
+      return;
+    }
 
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      return;
+    }
 
     // Set canvas size
     canvas.width = 800;
@@ -205,23 +210,24 @@ export const Advanced3DAnalytics: React.FC<Advanced3DAnalyticsProps> = ({
   };
 
   const drawHeatMapVisualization = (ctx: CanvasRenderingContext2D) => {
-    const filteredData = selectedPlayer === 'all' 
-      ? heatMapData 
-      : heatMapData.filter(d => d.playerName === selectedPlayer);
+    const filteredData =
+      selectedPlayer === 'all'
+        ? heatMapData
+        : heatMapData.filter(d => d.playerName === selectedPlayer);
 
     filteredData.forEach(point => {
       const x = (point.x / 100) * 720 + 40;
       const y = (point.y / 100) * 440 + 40;
       const radius = 25 * intensity;
-      
+
       // Create radial gradient for heat effect
       const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
       const alpha = point.intensity * intensity;
-      
+
       gradient.addColorStop(0, `rgba(255, 0, 0, ${alpha * 0.8})`);
       gradient.addColorStop(0.5, `rgba(255, 165, 0, ${alpha * 0.4})`);
       gradient.addColorStop(1, `rgba(255, 255, 0, 0)`);
-      
+
       ctx.fillStyle = gradient;
       ctx.beginPath();
       ctx.arc(x, y, radius, 0, 2 * Math.PI);
@@ -236,18 +242,18 @@ export const Advanced3DAnalytics: React.FC<Advanced3DAnalyticsProps> = ({
     players.forEach((player, index) => {
       const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3'];
       const color = colors[index % colors.length];
-      
+
       ctx.strokeStyle = color;
       ctx.lineWidth = 3;
       ctx.setLineDash([5, 5]);
-      
+
       // Generate random movement trail
       ctx.beginPath();
       let startX = (player.position.x / 100) * 720 + 40;
       let startY = (player.position.y / 100) * 440 + 40;
-      
+
       ctx.moveTo(startX, startY);
-      
+
       for (let i = 0; i < 20; i++) {
         const progress = (currentTime / 90) * 20;
         if (i <= progress) {
@@ -258,10 +264,10 @@ export const Advanced3DAnalytics: React.FC<Advanced3DAnalyticsProps> = ({
           ctx.lineTo(startX, startY);
         }
       }
-      
+
       ctx.stroke();
       ctx.setLineDash([]);
-      
+
       // Player dot
       ctx.fillStyle = color;
       ctx.beginPath();
@@ -274,19 +280,19 @@ export const Advanced3DAnalytics: React.FC<Advanced3DAnalyticsProps> = ({
     players.forEach((player, i) => {
       const x1 = (player.position.x / 100) * 720 + 40;
       const y1 = (player.position.y / 100) * 440 + 40;
-      
+
       // Draw connections to nearby players
       players.forEach((otherPlayer, j) => {
         if (i !== j) {
           const x2 = (otherPlayer.position.x / 100) * 720 + 40;
           const y2 = (otherPlayer.position.y / 100) * 440 + 40;
           const distance = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
-          
+
           if (distance < 150) {
             const strength = Math.random();
             ctx.strokeStyle = `rgba(74, 144, 226, ${strength * 0.6})`;
             ctx.lineWidth = strength * 4 + 1;
-            
+
             ctx.beginPath();
             ctx.moveTo(x1, y1);
             ctx.lineTo(x2, y2);
@@ -294,13 +300,13 @@ export const Advanced3DAnalytics: React.FC<Advanced3DAnalyticsProps> = ({
           }
         }
       });
-      
+
       // Player nodes
       ctx.fillStyle = '#4a90e2';
       ctx.beginPath();
       ctx.arc(x1, y1, 8, 0, 2 * Math.PI);
       ctx.fill();
-      
+
       ctx.fillStyle = 'white';
       ctx.font = '10px Arial';
       ctx.textAlign = 'center';
@@ -313,7 +319,7 @@ export const Advanced3DAnalytics: React.FC<Advanced3DAnalyticsProps> = ({
     const pressureZones = [
       { x: 300, y: 200, radius: 80, intensity: 0.8 },
       { x: 500, y: 300, radius: 60, intensity: 0.6 },
-      { x: 150, y: 150, radius: 70, intensity: 0.7 }
+      { x: 150, y: 150, radius: 70, intensity: 0.7 },
     ];
 
     pressureZones.forEach(zone => {
@@ -321,7 +327,7 @@ export const Advanced3DAnalytics: React.FC<Advanced3DAnalyticsProps> = ({
       gradient.addColorStop(0, `rgba(255, 0, 0, ${zone.intensity * 0.5})`);
       gradient.addColorStop(0.7, `rgba(255, 100, 0, ${zone.intensity * 0.3})`);
       gradient.addColorStop(1, 'rgba(255, 200, 0, 0)');
-      
+
       ctx.fillStyle = gradient;
       ctx.beginPath();
       ctx.arc(zone.x, zone.y, zone.radius, 0, 2 * Math.PI);
@@ -353,18 +359,25 @@ export const Advanced3DAnalytics: React.FC<Advanced3DAnalyticsProps> = ({
 
   const getTrendIcon = (trend: string) => {
     switch (trend) {
-      case 'up': return <TrendingUp className="w-4 h-4 text-green-400" />;
-      case 'down': return <TrendingUp className="w-4 h-4 text-red-400 rotate-180" />;
-      default: return <Activity className="w-4 h-4 text-gray-400" />;
+      case 'up':
+        return <TrendingUp className="w-4 h-4 text-green-400" />;
+      case 'down':
+        return <TrendingUp className="w-4 h-4 text-red-400 rotate-180" />;
+      default:
+        return <Activity className="w-4 h-4 text-gray-400" />;
     }
   };
 
   const getCategoryColor = (category: string) => {
     switch (category) {
-      case 'performance': return 'bg-blue-500/20 text-blue-400';
-      case 'tactical': return 'bg-green-500/20 text-green-400';
-      case 'physical': return 'bg-orange-500/20 text-orange-400';
-      default: return 'bg-gray-500/20 text-gray-400';
+      case 'performance':
+        return 'bg-blue-500/20 text-blue-400';
+      case 'tactical':
+        return 'bg-green-500/20 text-green-400';
+      case 'physical':
+        return 'bg-orange-500/20 text-orange-400';
+      default:
+        return 'bg-gray-500/20 text-gray-400';
     }
   };
 
@@ -427,9 +440,7 @@ export const Advanced3DAnalytics: React.FC<Advanced3DAnalyticsProps> = ({
                   >
                     <RotateCcw className="w-4 h-4" />
                   </Button>
-                  <span className="text-white text-sm">
-                    {currentTime.toFixed(1)}'
-                  </span>
+                  <span className="text-white text-sm">{currentTime.toFixed(1)}'</span>
                 </div>
 
                 <div className="flex items-center gap-4">
@@ -438,7 +449,7 @@ export const Advanced3DAnalytics: React.FC<Advanced3DAnalyticsProps> = ({
                     <span className="text-white text-sm">Intensity:</span>
                     <Slider
                       value={[intensity]}
-                      onValueChange={(value) => setIntensity(value[0])}
+                      onValueChange={value => setIntensity(value[0])}
                       max={1}
                       min={0.1}
                       step={0.1}
@@ -448,7 +459,7 @@ export const Advanced3DAnalytics: React.FC<Advanced3DAnalyticsProps> = ({
 
                   <select
                     value={selectedPlayer}
-                    onChange={(e) => setSelectedPlayer(e.target.value)}
+                    onChange={e => setSelectedPlayer(e.target.value)}
                     className="bg-white/10 border border-white/20 rounded px-2 py-1 text-white text-sm"
                   >
                     <option value="all">All Players</option>
@@ -473,7 +484,10 @@ export const Advanced3DAnalytics: React.FC<Advanced3DAnalyticsProps> = ({
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {metrics.map((metric, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/10">
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/10"
+                    >
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           <span className="text-white font-medium text-sm">{metric.name}</span>
@@ -506,7 +520,7 @@ export const Advanced3DAnalytics: React.FC<Advanced3DAnalyticsProps> = ({
                     <label className="text-white text-sm block mb-2">Time Range (min)</label>
                     <Slider
                       value={timeRange}
-                      onValueChange={setTimeRange}
+                      onValueChange={(value: number[]) => setTimeRange([value[0], value[1]])}
                       max={90}
                       min={0}
                       step={1}

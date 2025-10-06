@@ -127,9 +127,8 @@ class CloudStorageService {
       }
 
       // // // // console.log('💾 State saved locally and queued for cloud sync');
-
-    } catch (_error) {
-      console.error('❌ Failed to save state:', _error);
+    } catch (error) {
+      console.error('❌ Failed to save state:', error);
       throw error;
     }
   }
@@ -163,7 +162,6 @@ class CloudStorageService {
       }
 
       return localState?.state || null;
-
     } catch (_error) {
       console.error('❌ Failed to load state:', _error);
       return null;
@@ -196,15 +194,14 @@ class CloudStorageService {
       }
 
       // // // // console.log(`☁️ Synced ${pendingStates.length} states to cloud`);
-
     } catch (_error) {
-      await this.logSync('SYNC_TO_CLOUD', false, 0, error.message);
+      await this.logSync('SYNC_TO_CLOUD', false, 0, (_error as Error).message);
 
       if (this.onSyncCompleteCallback) {
-        this.onSyncCompleteCallback(false, error.message);
+        this.onSyncCompleteCallback(false, (_error as Error).message);
       }
 
-      console.error('❌ Cloud sync failed:', error);
+      console.error('❌ Cloud sync failed:', _error);
     } finally {
       this.syncInProgress = false;
     }
@@ -256,9 +253,8 @@ class CloudStorageService {
 
       // // // // console.log(`💾 Backup created: ${backupId}`);
       return backupId;
-
-    } catch (_error) {
-      console.error('❌ Backup creation failed:', _error);
+    } catch (error) {
+      console.error('❌ Backup creation failed:', error);
       throw error;
     }
   }
@@ -278,13 +274,12 @@ class CloudStorageService {
       // Load backup data from cloud
       if (this.isOnline && this.config) {
         const backupData = await this.downloadBackupFromCloud(backupId);
-        return backupData.state;
+        return (backupData as any).state;
       }
 
       throw new Error('Backup data not available offline');
-
-    } catch (_error) {
-      console.error('❌ Backup restoration failed:', _error);
+    } catch (error) {
+      console.error('❌ Backup restoration failed:', error);
       throw error;
     }
   }
@@ -293,12 +288,11 @@ class CloudStorageService {
    * Get backup history
    */
   async getBackupHistory(): Promise<BackupMetadata[]> {
-    if (!this.currentUserId) {return [];}
+    if (!this.currentUserId) {
+      return [];
+    }
 
-    return this.db.backups
-      .where({ userId: this.currentUserId })
-      .reverse()
-      .sortBy('timestamp');
+    return this.db.backups.where({ userId: this.currentUserId }).reverse().sortBy('timestamp');
   }
 
   /**
@@ -326,7 +320,7 @@ class CloudStorageService {
    * Clean up old data
    */
   async cleanup(daysToKeep: number = 30): Promise<void> {
-    const cutoffTime = Date.now() - (daysToKeep * 24 * 60 * 60 * 1000);
+    const cutoffTime = Date.now() - daysToKeep * 24 * 60 * 60 * 1000;
 
     await this.db.states.where('timestamp').below(cutoffTime).delete();
     await this.db.syncLogs.where('timestamp').below(cutoffTime).delete();
@@ -351,7 +345,9 @@ class CloudStorageService {
   // Private methods
 
   private async loadLocalState(): Promise<{ state: RootState; version: number } | null> {
-    if (!this.currentUserId) {return null;}
+    if (!this.currentUserId) {
+      return null;
+    }
 
     const latestState = await this.db.states
       .where({ userId: this.currentUserId })
@@ -359,7 +355,9 @@ class CloudStorageService {
       .sortBy('timestamp')
       .then(states => states[0]);
 
-    if (!latestState) {return null;}
+    if (!latestState) {
+      return null;
+    }
 
     try {
       const decryptedState = await decrypt(latestState.state);
@@ -372,12 +370,14 @@ class CloudStorageService {
   }
 
   private async loadCloudState(): Promise<{ state: RootState; version: number } | null> {
-    if (!this.config || !this.currentUserId) {return null;}
+    if (!this.config || !this.currentUserId) {
+      return null;
+    }
 
     try {
       const response = await fetch(`${this.config.endpoint}/states/${this.currentUserId}/latest`, {
         headers: {
-          'Authorization': `Bearer ${this.config.apiKey}`,
+          Authorization: `Bearer ${this.config.apiKey}`,
           'Content-Type': 'application/json',
         },
       });
@@ -391,7 +391,6 @@ class CloudStorageService {
       const state = JSON.parse(decryptedState);
 
       return { state, version: data.version };
-
     } catch (_error) {
       console.error('❌ Failed to load cloud state:', _error);
       return null;
@@ -399,12 +398,14 @@ class CloudStorageService {
   }
 
   private async uploadStateToCloud(storedState: StoredState): Promise<void> {
-    if (!this.config) {return;}
+    if (!this.config) {
+      return;
+    }
 
     const response = await fetch(`${this.config.endpoint}/states`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${this.config.apiKey}`,
+        Authorization: `Bearer ${this.config.apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -427,12 +428,14 @@ class CloudStorageService {
   }
 
   private async uploadBackupToCloud(backupId: string, backupData: unknown): Promise<void> {
-    if (!this.config) {return;}
+    if (!this.config) {
+      return;
+    }
 
     const response = await fetch(`${this.config.endpoint}/backups`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${this.config.apiKey}`,
+        Authorization: `Bearer ${this.config.apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -447,11 +450,13 @@ class CloudStorageService {
   }
 
   private async downloadBackupFromCloud(backupId: string): Promise<unknown> {
-    if (!this.config) {throw new Error('Cloud config not available');}
+    if (!this.config) {
+      throw new Error('Cloud config not available');
+    }
 
     const response = await fetch(`${this.config.endpoint}/backups/${backupId}`, {
       headers: {
-        'Authorization': `Bearer ${this.config.apiKey}`,
+        Authorization: `Bearer ${this.config.apiKey}`,
         'Content-Type': 'application/json',
       },
     });
@@ -470,15 +475,21 @@ class CloudStorageService {
       return 'checksum-unavailable';
     }
     const encoder = typeof TextEncoder !== 'undefined' ? new TextEncoder() : null;
-    if (!encoder) return 'checksum-unavailable';
+    if (!encoder) {
+      return 'checksum-unavailable';
+    }
     const dataBuffer = encoder.encode(data);
-    const hashBuffer = await (typeof crypto !== 'undefined' ? crypto.subtle.digest('SHA-256', dataBuffer) : new ArrayBuffer(0));
+    const hashBuffer = await (typeof crypto !== 'undefined'
+      ? crypto.subtle.digest('SHA-256', dataBuffer)
+      : new ArrayBuffer(0));
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
   }
 
   private async getNextVersion(): Promise<number> {
-    if (!this.currentUserId) {return 1;}
+    if (!this.currentUserId) {
+      return 1;
+    }
 
     const latestState = await this.db.states
       .where({ userId: this.currentUserId })
@@ -489,7 +500,12 @@ class CloudStorageService {
     return (latestState?.version || 0) + 1;
   }
 
-  private async logSync(action: string, success: boolean, dataSize: number, error?: string): Promise<void> {
+  private async logSync(
+    action: string,
+    success: boolean,
+    dataSize: number,
+    error?: string
+  ): Promise<void> {
     const log: SyncLog = {
       id: uuidv4(),
       action,

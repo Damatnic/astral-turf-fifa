@@ -2,13 +2,18 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import React from 'react';
-import TacticalDrawingTools, { type DrawingShape } from '../../components/tactics/TacticalDrawingTools';
-import { generateTacticalAnnotations, generatePerformanceTestData } from '../utils/enhanced-mock-generators';
+import TacticalDrawingTools, {
+  type DrawingShape,
+} from '../../components/tactics/TacticalDrawingTools';
+import {
+  generateTacticalAnnotations,
+  generatePerformanceTestData,
+} from '../utils/enhanced-mock-generators';
 import { performanceDragTest } from '../utils/drag-drop-test-utils';
 
 /**
  * Performance Benchmarking Suite for Drawing Tools
- * 
+ *
  * Benchmarks cover:
  * - Rendering performance with many shapes
  * - Drawing operation speed and responsiveness
@@ -40,15 +45,15 @@ interface BenchmarkResult {
 // Mock framer-motion for performance testing
 vi.mock('framer-motion', () => ({
   motion: {
-    div: React.forwardRef<HTMLDivElement, any>(({ children, ...props }, ref) => 
+    div: React.forwardRef<HTMLDivElement, any>(({ children, ...props }, ref) =>
       React.createElement('div', { ref, ...props }, children)
     ),
-    button: React.forwardRef<HTMLButtonElement, any>(({ children, ...props }, ref) => 
+    button: React.forwardRef<HTMLButtonElement, any>(({ children, ...props }, ref) =>
       React.createElement('button', { ref, ...props }, children)
-    )
+    ),
   },
   AnimatePresence: ({ children }: { children: React.ReactNode }) => children,
-  PanInfo: {} as any
+  PanInfo: {} as any,
 }));
 
 // Mock icons for performance
@@ -64,19 +69,19 @@ vi.mock('lucide-react', () => ({
   Palette: () => React.createElement('span', { 'data-testid': 'palette-icon' }),
   Settings: () => React.createElement('span', { 'data-testid': 'settings-icon' }),
   Save: () => React.createElement('span', { 'data-testid': 'save-icon' }),
-  Trash2: () => React.createElement('span', { 'data-testid': 'trash-icon' })
+  Trash2: () => React.createElement('span', { 'data-testid': 'trash-icon' }),
 }));
 
 describe('Drawing Tools Performance Benchmarks', () => {
   const mockOnClose = vi.fn();
   const mockOnSaveDrawing = vi.fn();
-  
+
   const defaultProps = {
     isVisible: true,
     onClose: mockOnClose,
     onSaveDrawing: mockOnSaveDrawing,
     fieldDimensions: { width: 1200, height: 800 },
-    viewMode: 'standard' as const
+    viewMode: 'standard' as const,
   };
 
   // Performance baselines (adjust based on target requirements)
@@ -85,7 +90,7 @@ describe('Drawing Tools Performance Benchmarks', () => {
     maxMemoryIncrease: 50 * 1024 * 1024, // 50MB
     minFrameRate: 30, // fps
     maxOperationTime: 16, // ms (60fps = 16.67ms per frame)
-    maxShapesPerSecond: 1000
+    maxShapesPerSecond: 1000,
   };
 
   let performanceObserver: PerformanceObserver | null = null;
@@ -93,10 +98,10 @@ describe('Drawing Tools Performance Benchmarks', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    
+
     // Setup performance monitoring
     if ('PerformanceObserver' in window) {
-      performanceObserver = new PerformanceObserver((list) => {
+      performanceObserver = new PerformanceObserver(list => {
         // Monitor performance entries
       });
       performanceObserver.observe({ entryTypes: ['measure', 'navigation', 'paint'] });
@@ -112,10 +117,10 @@ describe('Drawing Tools Performance Benchmarks', () => {
         memory: {
           usedJSHeapSize: 10 * 1024 * 1024, // 10MB baseline
           totalJSHeapSize: 20 * 1024 * 1024,
-          jsHeapSizeLimit: 100 * 1024 * 1024
-        }
+          jsHeapSizeLimit: 100 * 1024 * 1024,
+        },
       },
-      writable: true
+      writable: true,
     });
 
     // Frame rate monitoring
@@ -145,7 +150,7 @@ describe('Drawing Tools Performance Benchmarks', () => {
       memoryUsage: endMemory - startMemory,
       frameRate: calculateFrameRate(),
       operationTime: endTime - startTime,
-      shapesProcessed: 0 // Set by specific tests
+      shapesProcessed: 0, // Set by specific tests
     };
 
     return { result, metrics };
@@ -154,24 +159,27 @@ describe('Drawing Tools Performance Benchmarks', () => {
   const calculateFrameRate = (): number => {
     const currentTime = performance.now();
     frameRateCounter.frames++;
-    
+
     if (currentTime - frameRateCounter.lastTime >= 1000) {
       const fps = frameRateCounter.frames;
       frameRateCounter.frames = 0;
       frameRateCounter.lastTime = currentTime;
       return fps;
     }
-    
+
     return 60; // Default assumption
   };
 
   describe('Rendering Performance', () => {
     it('should render small datasets efficiently', () => {
       const shapes = generateTacticalAnnotations(10);
-      
+
       const { metrics } = measurePerformance(() => {
         const { container } = render(
-          <TacticalDrawingTools {...defaultProps} initialShapes={shapes} />
+          <TacticalDrawingTools
+            {...defaultProps}
+            initialShapes={shapes as unknown as DrawingShape[]}
+          />
         );
         return container;
       }, 'small-dataset-render');
@@ -182,10 +190,13 @@ describe('Drawing Tools Performance Benchmarks', () => {
 
     it('should render medium datasets within acceptable limits', () => {
       const shapes = generateTacticalAnnotations(100);
-      
+
       const { metrics } = measurePerformance(() => {
         const { container } = render(
-          <TacticalDrawingTools {...defaultProps} initialShapes={shapes} />
+          <TacticalDrawingTools
+            {...defaultProps}
+            initialShapes={shapes as unknown as DrawingShape[]}
+          />
         );
         return container;
       }, 'medium-dataset-render');
@@ -197,10 +208,13 @@ describe('Drawing Tools Performance Benchmarks', () => {
 
     it('should handle large datasets gracefully', () => {
       const shapes = generateTacticalAnnotations(500);
-      
+
       const { metrics } = measurePerformance(() => {
         const { container } = render(
-          <TacticalDrawingTools {...defaultProps} initialShapes={shapes} />
+          <TacticalDrawingTools
+            {...defaultProps}
+            initialShapes={shapes as unknown as DrawingShape[]}
+          />
         );
         return container;
       }, 'large-dataset-render');
@@ -218,19 +232,19 @@ describe('Drawing Tools Performance Benchmarks', () => {
         color: '#3b82f6',
         strokeWidth: 2,
         opacity: 1,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       }));
 
       const { metrics } = measurePerformance(() => {
         const { container } = render(
           <TacticalDrawingTools {...defaultProps} initialShapes={complexShapes} />
         );
-        
+
         // Simulate frame rendering
         for (let i = 0; i < 10; i++) {
           frameRateCounter.frames++;
         }
-        
+
         return container;
       }, 'complex-shapes-render');
 
@@ -255,7 +269,7 @@ describe('Drawing Tools Performance Benchmarks', () => {
       }, 'rapid-drawing-operations');
 
       metrics.shapesProcessed = 100;
-      
+
       expect(metrics.operationTime / metrics.shapesProcessed).toBeLessThan(
         performanceBaselines.maxOperationTime
       );
@@ -268,20 +282,20 @@ describe('Drawing Tools Performance Benchmarks', () => {
       const { metrics } = measurePerformance(() => {
         // Create complex stroke with many points
         fireEvent.mouseDown(drawingArea, { clientX: 0, clientY: 0 });
-        
+
         for (let i = 0; i < 1000; i++) {
-          fireEvent.mouseMove(drawingArea, { 
-            clientX: Math.sin(i * 0.1) * 100 + 200, 
-            clientY: Math.cos(i * 0.1) * 100 + 200 
+          fireEvent.mouseMove(drawingArea, {
+            clientX: Math.sin(i * 0.1) * 100 + 200,
+            clientY: Math.cos(i * 0.1) * 100 + 200,
           });
         }
-        
+
         fireEvent.mouseUp(drawingArea);
         return 1000;
       }, 'complex-stroke-rendering');
 
       metrics.shapesProcessed = 1000;
-      
+
       // Should handle complex strokes efficiently
       expect(metrics.operationTime).toBeLessThan(500); // 500ms max for 1000 points
     });
@@ -289,7 +303,10 @@ describe('Drawing Tools Performance Benchmarks', () => {
     it('should perform shape manipulations quickly', () => {
       const shapes = generateTacticalAnnotations(50);
       const { container } = render(
-        <TacticalDrawingTools {...defaultProps} initialShapes={shapes} />
+        <TacticalDrawingTools
+          {...defaultProps}
+          initialShapes={shapes as unknown as DrawingShape[]}
+        />
       );
 
       const { metrics } = measurePerformance(() => {
@@ -304,7 +321,7 @@ describe('Drawing Tools Performance Benchmarks', () => {
       }, 'shape-manipulations');
 
       metrics.shapesProcessed = shapes.length;
-      
+
       expect(metrics.operationTime / metrics.shapesProcessed).toBeLessThan(5); // 5ms per shape max
     });
   });
@@ -323,10 +340,12 @@ describe('Drawing Tools Performance Benchmarks', () => {
           fireEvent.mouseMove(drawingArea, { clientX: i + 50, clientY: i + 50 });
           fireEvent.mouseUp(drawingArea);
         }
-        
+
         // Clear shapes periodically
         if (session % 3 === 0) {
-          const trashButton = container.querySelector('[data-testid="trash-icon"]')?.closest('button');
+          const trashButton = container
+            .querySelector('[data-testid="trash-icon"]')
+            ?.closest('button');
           if (trashButton) {
             fireEvent.click(trashButton);
           }
@@ -352,18 +371,22 @@ describe('Drawing Tools Performance Benchmarks', () => {
           // Draw
           fireEvent.mouseDown(drawingArea, { clientX: i, clientY: i });
           fireEvent.mouseUp(drawingArea);
-          
+
           // Undo
           if (i % 10 === 0) {
-            const undoButton = container.querySelector('[data-testid="undo-icon"]')?.closest('button');
+            const undoButton = container
+              .querySelector('[data-testid="undo-icon"]')
+              ?.closest('button');
             if (undoButton) {
               fireEvent.click(undoButton);
             }
           }
-          
+
           // Redo
           if (i % 15 === 0) {
-            const redoButton = container.querySelector('[data-testid="redo-icon"]')?.closest('button');
+            const redoButton = container
+              .querySelector('[data-testid="redo-icon"]')
+              ?.closest('button');
             if (redoButton) {
               fireEvent.click(redoButton);
             }
@@ -373,7 +396,7 @@ describe('Drawing Tools Performance Benchmarks', () => {
       }, 'undo-redo-performance');
 
       metrics.shapesProcessed = 100;
-      
+
       expect(metrics.operationTime / metrics.shapesProcessed).toBeLessThan(10); // 10ms per operation max
     });
   });
@@ -386,69 +409,75 @@ describe('Drawing Tools Performance Benchmarks', () => {
       const { metrics } = measurePerformance(() => {
         // Simulate high-frequency touch events (120Hz)
         const touchStartEvent = new TouchEvent('touchstart', {
-          touches: [{
-            identifier: 0,
-            target: drawingArea,
-            clientX: 100,
-            clientY: 100,
-            pageX: 100,
-            pageY: 100,
-            screenX: 100,
-            screenY: 100,
-            radiusX: 10,
-            radiusY: 10,
-            rotationAngle: 0,
-            force: 1
-          }] as any
+          touches: [
+            {
+              identifier: 0,
+              target: drawingArea,
+              clientX: 100,
+              clientY: 100,
+              pageX: 100,
+              pageY: 100,
+              screenX: 100,
+              screenY: 100,
+              radiusX: 10,
+              radiusY: 10,
+              rotationAngle: 0,
+              force: 1,
+            },
+          ] as any,
         });
 
         fireEvent(drawingArea, touchStartEvent);
 
         for (let i = 0; i < 120; i++) {
           const touchMoveEvent = new TouchEvent('touchmove', {
-            touches: [{
-              identifier: 0,
-              target: drawingArea,
-              clientX: 100 + i,
-              clientY: 100 + i,
-              pageX: 100 + i,
-              pageY: 100 + i,
-              screenX: 100 + i,
-              screenY: 100 + i,
-              radiusX: 10,
-              radiusY: 10,
-              rotationAngle: 0,
-              force: 1
-            }] as any
+            touches: [
+              {
+                identifier: 0,
+                target: drawingArea,
+                clientX: 100 + i,
+                clientY: 100 + i,
+                pageX: 100 + i,
+                pageY: 100 + i,
+                screenX: 100 + i,
+                screenY: 100 + i,
+                radiusX: 10,
+                radiusY: 10,
+                rotationAngle: 0,
+                force: 1,
+              },
+            ] as any,
           });
 
           fireEvent(drawingArea, touchMoveEvent);
         }
 
         const touchEndEvent = new TouchEvent('touchend', {
-          changedTouches: [{
-            identifier: 0,
-            target: drawingArea,
-            clientX: 220,
-            clientY: 220,
-            pageX: 220,
-            pageY: 220,
-            screenX: 220,
-            screenY: 220,
-            radiusX: 10,
-            radiusY: 10,
-            rotationAngle: 0,
-            force: 1
-          }] as any
+          changedTouches: [
+            {
+              identifier: 0,
+              target: drawingArea,
+              clientX: 220,
+              clientY: 220,
+              pageX: 220,
+              pageY: 220,
+              screenX: 220,
+              screenY: 220,
+              radiusX: 10,
+              radiusY: 10,
+              rotationAngle: 0,
+              force: 1,
+            },
+          ] as any,
         });
 
         fireEvent(drawingArea, touchEndEvent);
-        
+
         return 120;
       }, 'high-frequency-touch-events');
 
       metrics.shapesProcessed = 120;
-      
+
       // Should handle high-frequency events without lag
       expect(metrics.operationTime / metrics.shapesProcessed).toBeLessThan(1); // 1ms per event max
     });
@@ -471,7 +500,7 @@ describe('Drawing Tools Performance Benchmarks', () => {
             pointerType: 'pen',
             isPrimary: true,
             bubbles: true,
-            cancelable: true
+            cancelable: true,
           });
 
           fireEvent(drawingArea, pointerEvent);
@@ -480,7 +509,7 @@ describe('Drawing Tools Performance Benchmarks', () => {
       }, 'pointer-event-processing');
 
       metrics.shapesProcessed = 100;
-      
+
       expect(metrics.operationTime / metrics.shapesProcessed).toBeLessThan(2); // 2ms per event max
     });
   });
@@ -489,23 +518,23 @@ describe('Drawing Tools Performance Benchmarks', () => {
     it('should optimize path simplification algorithms', () => {
       const complexPath = Array.from({ length: 10000 }, (_, i) => ({
         x: i * 0.1,
-        y: Math.sin(i * 0.01) * 100 + Math.random() * 10
+        y: Math.sin(i * 0.01) * 100 + Math.random() * 10,
       }));
 
       const { metrics } = measurePerformance(() => {
         // Simulate path simplification (Douglas-Peucker or similar)
         let simplifiedPath = complexPath;
-        
+
         // Mock simplification algorithm
         for (let tolerance = 1; tolerance <= 10; tolerance++) {
           simplifiedPath = complexPath.filter((_, index) => index % tolerance === 0);
         }
-        
+
         return simplifiedPath.length;
       }, 'path-simplification');
 
       metrics.shapesProcessed = complexPath.length;
-      
+
       // Path simplification should be fast
       expect(metrics.operationTime).toBeLessThan(100); // 100ms max for 10k points
     });
@@ -515,14 +544,14 @@ describe('Drawing Tools Performance Benchmarks', () => {
 
       const { metrics } = measurePerformance(() => {
         let intersectionCount = 0;
-        
+
         // Mock intersection detection
         for (let i = 0; i < shapes.length; i++) {
           for (let j = i + 1; j < shapes.length; j++) {
             // Simplified bounding box intersection
             const shape1 = shapes[i];
             const shape2 = shapes[j];
-            
+
             if (shape1.points.length > 0 && shape2.points.length > 0) {
               const overlap = !(
                 shape1.points[0].x > shape2.points[0].x + 10 ||
@@ -530,17 +559,19 @@ describe('Drawing Tools Performance Benchmarks', () => {
                 shape1.points[0].y > shape2.points[0].y + 10 ||
                 shape2.points[0].y > shape1.points[0].y + 10
               );
-              
-              if (overlap) intersectionCount++;
+
+              if (overlap) {
+                intersectionCount++;
+              }
             }
           }
         }
-        
+
         return intersectionCount;
       }, 'intersection-detection');
 
       metrics.shapesProcessed = shapes.length * shapes.length;
-      
+
       // Intersection detection should be efficient
       expect(metrics.operationTime / metrics.shapesProcessed).toBeLessThan(0.01); // 0.01ms per comparison
     });
@@ -556,36 +587,38 @@ describe('Drawing Tools Performance Benchmarks', () => {
         for (let session = 0; session < 50; session++) {
           // Draw many shapes quickly
           for (let i = 0; i < 20; i++) {
-            fireEvent.mouseDown(drawingArea, { 
-              clientX: Math.random() * 800, 
-              clientY: Math.random() * 600 
+            fireEvent.mouseDown(drawingArea, {
+              clientX: Math.random() * 800,
+              clientY: Math.random() * 600,
             });
-            
+
             // Complex path
             for (let j = 0; j < 10; j++) {
-              fireEvent.mouseMove(drawingArea, { 
-                clientX: Math.random() * 800, 
-                clientY: Math.random() * 600 
+              fireEvent.mouseMove(drawingArea, {
+                clientX: Math.random() * 800,
+                clientY: Math.random() * 600,
               });
             }
-            
+
             fireEvent.mouseUp(drawingArea);
           }
-          
+
           // Occasionally clear
           if (session % 10 === 0) {
-            const trashButton = container.querySelector('[data-testid="trash-icon"]')?.closest('button');
+            const trashButton = container
+              .querySelector('[data-testid="trash-icon"]')
+              ?.closest('button');
             if (trashButton) {
               fireEvent.click(trashButton);
             }
           }
         }
-        
+
         return 50 * 20;
       }, 'extreme-stress-test');
 
       metrics.shapesProcessed = 1000;
-      
+
       // Should survive extreme conditions
       expect(metrics.operationTime).toBeLessThan(5000); // 5 seconds max
       expect(container.querySelector('svg')).toBeInTheDocument();
@@ -594,7 +627,10 @@ describe('Drawing Tools Performance Benchmarks', () => {
     it('should handle concurrent shape operations', () => {
       const largeShapeSet = generateTacticalAnnotations(200);
       const { container } = render(
-        <TacticalDrawingTools {...defaultProps} initialShapes={largeShapeSet} />
+        <TacticalDrawingTools
+          {...defaultProps}
+          initialShapes={largeShapeSet as unknown as DrawingShape[]}
+        />
       );
 
       const { metrics } = measurePerformance(() => {
@@ -617,23 +653,25 @@ describe('Drawing Tools Performance Benchmarks', () => {
           },
           () => {
             // Undo operations
-            const undoButton = container.querySelector('[data-testid="undo-icon"]')?.closest('button');
+            const undoButton = container
+              .querySelector('[data-testid="undo-icon"]')
+              ?.closest('button');
             if (undoButton) {
               for (let i = 0; i < 3; i++) {
                 fireEvent.click(undoButton);
               }
             }
-          }
+          },
         ];
 
         // Execute operations concurrently (simulated)
         operations.forEach(op => op());
-        
+
         return operations.length;
       }, 'concurrent-operations');
 
       metrics.shapesProcessed = 200;
-      
+
       // Should handle concurrent operations gracefully
       expect(metrics.operationTime).toBeLessThan(1000); // 1 second max
     });
@@ -646,10 +684,13 @@ describe('Drawing Tools Performance Benchmarks', () => {
 
       testSizes.forEach(size => {
         const shapes = generateTacticalAnnotations(size);
-        
+
         const { metrics } = measurePerformance(() => {
           const { container } = render(
-            <TacticalDrawingTools {...defaultProps} initialShapes={shapes} />
+            <TacticalDrawingTools
+              {...defaultProps}
+              initialShapes={shapes as unknown as DrawingShape[]}
+            />
           );
           return container;
         }, `regression-test-${size}`);
@@ -661,7 +702,7 @@ describe('Drawing Tools Performance Benchmarks', () => {
       for (let i = 1; i < renderTimes.length; i++) {
         const scaleFactor = testSizes[i] / testSizes[i - 1];
         const timeRatio = renderTimes[i] / renderTimes[i - 1];
-        
+
         // Time should not scale worse than linear + constant factor
         expect(timeRatio).toBeLessThan(scaleFactor * 2);
       }
@@ -671,21 +712,17 @@ describe('Drawing Tools Performance Benchmarks', () => {
       const { container } = render(<TacticalDrawingTools {...defaultProps} />);
       const frameRates: number[] = [];
 
-      const operations = [
-        'drawing',
-        'erasing',
-        'undoing',
-        'saving'
-      ];
+      const operations = ['drawing', 'erasing', 'undoing', 'saving'];
 
       operations.forEach(operation => {
         frameRateCounter = { frames: 0, lastTime: performance.now() };
-        
+
         // Simulate different operations
-        for (let i = 0; i < 30; i++) { // 30 frames worth
+        for (let i = 0; i < 30; i++) {
+          // 30 frames worth
           frameRateCounter.frames++;
         }
-        
+
         frameRates.push(calculateFrameRate());
       });
 
@@ -703,15 +740,18 @@ describe('Drawing Tools Performance Benchmarks', () => {
       const testSuites = [
         { name: 'Small Dataset', shapes: 10 },
         { name: 'Medium Dataset', shapes: 50 },
-        { name: 'Large Dataset', shapes: 100 }
+        { name: 'Large Dataset', shapes: 100 },
       ];
 
       testSuites.forEach(suite => {
         const shapes = generateTacticalAnnotations(suite.shapes);
-        
+
         const { metrics } = measurePerformance(() => {
           const { container } = render(
-            <TacticalDrawingTools {...defaultProps} initialShapes={shapes} />
+            <TacticalDrawingTools
+              {...defaultProps}
+              initialShapes={shapes as unknown as DrawingShape[]}
+            />
           );
           return container;
         }, suite.name);
@@ -721,7 +761,7 @@ describe('Drawing Tools Performance Benchmarks', () => {
           memoryUsage: 5 * 1024 * 1024, // 5MB baseline
           frameRate: 60,
           operationTime: 10,
-          shapesProcessed: suite.shapes
+          shapesProcessed: suite.shapes,
         };
 
         const performanceRatio = metrics.renderTime / baseline.renderTime;
@@ -733,7 +773,7 @@ describe('Drawing Tools Performance Benchmarks', () => {
           baseline,
           performanceRatio,
           passed,
-          notes: passed ? 'Performance within acceptable limits' : 'Performance below expectations'
+          notes: passed ? 'Performance within acceptable limits' : 'Performance below expectations',
         });
       });
 
@@ -745,9 +785,11 @@ describe('Drawing Tools Performance Benchmarks', () => {
       const summary = {
         totalTests: testResults.length,
         passedTests: passedTests.length,
-        averagePerformanceRatio: testResults.reduce((sum, result) => sum + result.performanceRatio, 0) / testResults.length,
+        averagePerformanceRatio:
+          testResults.reduce((sum, result) => sum + result.performanceRatio, 0) /
+          testResults.length,
         worstPerformance: Math.max(...testResults.map(result => result.performanceRatio)),
-        bestPerformance: Math.min(...testResults.map(result => result.performanceRatio))
+        bestPerformance: Math.min(...testResults.map(result => result.performanceRatio)),
       };
 
       expect(summary.averagePerformanceRatio).toBeLessThan(1.5); // Average within 1.5x baseline

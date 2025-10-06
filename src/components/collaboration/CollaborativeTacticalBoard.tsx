@@ -1,5 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { findSlotById, isValidPlayer, isValidFormation, getFormationSlots } from '../../utils/tacticalDataGuards';
+import {
+  findSlotById,
+  isValidPlayer,
+  isValidFormation,
+  getFormationSlots,
+} from '../../utils/tacticalDataGuards';
 import type { Player, Formation, DrawingShape, User } from '../../types';
 
 interface CollaborationState {
@@ -35,8 +40,8 @@ interface CollaborativeTacticalBoardProps {
   players: Player[];
   currentUser: User;
   sessionId: string;
-  onPositionChange?: (playerId: string, position: { x: number; y: number }) => void;
-  onDrawingAdd?: (drawing: DrawingShape) => void;
+  _onPositionChange?: (playerId: string, position: { x: number; y: number }) => void;
+  _onDrawingAdd?: (drawing: DrawingShape) => void;
   className?: string;
 }
 
@@ -67,7 +72,7 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
   });
 
   const [selectedTool, setSelectedTool] = useState<'select' | 'arrow' | 'zone' | 'comment'>(
-    'select',
+    'select'
   );
   const [_isDrawing, _setIsDrawing] = useState(false);
   const [_currentDrawing, _setCurrentDrawing] = useState<DrawingShape | null>(null);
@@ -160,10 +165,12 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
     if (!isValidFormation(formation) || !Array.isArray(players)) {
       return;
     }
-    
+
     players.forEach(player => {
-      if (!isValidPlayer(player)) return;
-      
+      if (!isValidPlayer(player)) {
+        return;
+      }
+
       const validSlots = getFormationSlots(formation);
       const slot = validSlots.find(s => s.playerId === player.id);
       if (!slot) {
@@ -223,12 +230,12 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
         ctx.moveTo(end.x, end.y);
         ctx.lineTo(
           end.x - headLen * Math.cos(angle - Math.PI / 6),
-          end.y - headLen * Math.sin(angle - Math.PI / 6),
+          end.y - headLen * Math.sin(angle - Math.PI / 6)
         );
         ctx.moveTo(end.x, end.y);
         ctx.lineTo(
           end.x - headLen * Math.cos(angle + Math.PI / 6),
-          end.y - headLen * Math.sin(angle + Math.PI / 6),
+          end.y - headLen * Math.sin(angle + Math.PI / 6)
         );
         ctx.stroke();
       }
@@ -335,7 +342,7 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
       ctx.fillText(
         `${comment.userName} - ${new Date(comment.timestamp).toLocaleTimeString()}`,
         x + 5,
-        y + bubbleHeight - 5,
+        y + bubbleHeight - 5
       );
 
       // Comment indicator dot

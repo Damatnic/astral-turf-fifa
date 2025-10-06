@@ -62,7 +62,7 @@ const PlayerComparePopup: React.FC = () => {
         player1,
         player2,
         activeFormation,
-        settings.aiPersonality,
+        settings.aiPersonality
       );
       dispatch({ type: 'GENERATE_AI_COMPARISON_SUCCESS', payload: result });
     } catch (_error) {
@@ -76,13 +76,13 @@ const PlayerComparePopup: React.FC = () => {
   }
 
   const attributeLabels = Object.keys(player1.attributes);
-  const radarChartDatasets = [];
+  const radarChartDatasets: Array<{ label: string; color: string; values: number[] }> = [];
   if (player1) {
     radarChartDatasets.push({
       label: player1.name,
       color: player1.teamColor,
       values: attributeLabels.map(
-        label => player1.attributes[label as keyof typeof player1.attributes],
+        label => player1.attributes[label as keyof typeof player1.attributes]
       ),
     });
   }
@@ -91,7 +91,7 @@ const PlayerComparePopup: React.FC = () => {
       label: player2.name,
       color: player2.teamColor,
       values: attributeLabels.map(
-        label => player2.attributes[label as keyof typeof player2.attributes],
+        label => player2.attributes[label as keyof typeof player2.attributes]
       ),
     });
   }

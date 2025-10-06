@@ -2,16 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useFranchiseContext, useTacticsContext, useUIContext } from '../hooks';
 import { matchStrategyService } from '../services/matchStrategyService';
 import { aiService } from '../services/aiService';
-import type {
-  Team,
-  MatchResult,
-  MatchEvent,
-  Player,
-  LiveMatchAnalysis,
-  MatchStrategyPlan,
-  TeamTactics,
-  Formation,
-} from '../types';
+import type { Team, MatchResult, MatchEvent, Player, TeamTactics, Formation } from '../types';
 
 interface MatchSimulation {
   id: string;
@@ -49,8 +40,8 @@ const MatchSimulationPage: React.FC = () => {
   const [matchSimulation, setMatchSimulation] = useState<MatchSimulation | null>(null);
   const [isSimulating, setIsSimulating] = useState(false);
   const [simulationSpeed, setSimulationSpeed] = useState<'slow' | 'medium' | 'fast'>('medium');
-  const [matchStrategy, setMatchStrategy] = useState<MatchStrategyPlan | null>(null);
-  const [liveAnalysis, setLiveAnalysis] = useState<LiveMatchAnalysis | null>(null);
+  const [matchStrategy, setMatchStrategy] = useState<any>(null);
+  const [liveAnalysis, setLiveAnalysis] = useState<any>(null);
   const [substitutionPlan, setSubstitutionPlan] = useState<
     Array<{ out: string; in: string; minute: number }>
   >([]);
@@ -60,7 +51,7 @@ const MatchSimulationPage: React.FC = () => {
     return franchiseState.season.fixtures.filter(
       fixture =>
         fixture.week >= franchiseState.gameWeek &&
-        (fixture.homeTeam === 'Astral FC' || fixture.awayTeam === 'Astral FC'),
+        (fixture.homeTeam === 'Astral FC' || fixture.awayTeam === 'Astral FC')
     );
   }, [franchiseState.season.fixtures, franchiseState.gameWeek]);
 
@@ -131,7 +122,7 @@ const MatchSimulationPage: React.FC = () => {
   const generateEventDescription = (
     eventType: string,
     playerName: string,
-    minute: number,
+    minute: number
   ): string => {
     const descriptions = {
       goal: [
@@ -188,9 +179,16 @@ const MatchSimulationPage: React.FC = () => {
     // Generate pre-match strategy
     try {
       const strategy = await matchStrategyService.generateMatchStrategy(
-        selectedFixture.awayTeam,
-        tacticsState.players.filter(p => p.team === 'home'),
-        'medium', // difficulty
+        {
+          players: tacticsState.players.filter(p => p.team === 'home'),
+          availableFormations: [],
+          currentTactics: (tacticsState as any).tactics,
+        },
+        {} as any, // opponentAnalysis
+        {
+          importance: 'medium',
+          venue: 'home',
+        } as any
       );
       setMatchStrategy(strategy);
     } catch (error) {

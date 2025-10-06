@@ -45,9 +45,10 @@ const ContextualToolbar: React.FC<ContextualToolbarProps> = ({
           onClick={onToggleLeftSidebar}
           className={`
             p-2 rounded-lg transition-all
-            ${ showLeftSidebar
-              ? 'bg-blue-600/80 text-white'
-              : 'bg-slate-700/50 text-slate-300 hover:bg-slate-600/50'
+            ${
+              showLeftSidebar
+                ? 'bg-blue-600/80 text-white'
+                : 'bg-slate-700/50 text-slate-300 hover:bg-slate-600/50'
             }
           `}
           title="Toggle Left Sidebar"
@@ -59,9 +60,10 @@ const ContextualToolbar: React.FC<ContextualToolbarProps> = ({
           onClick={onToggleRightSidebar}
           className={`
             p-2 rounded-lg transition-all
-            ${ showRightSidebar
-              ? 'bg-blue-600/80 text-white'
-              : 'bg-slate-700/50 text-slate-300 hover:bg-slate-600/50'
+            ${
+              showRightSidebar
+                ? 'bg-blue-600/80 text-white'
+                : 'bg-slate-700/50 text-slate-300 hover:bg-slate-600/50'
             }
           `}
           title="Toggle Right Sidebar"
@@ -72,12 +74,11 @@ const ContextualToolbar: React.FC<ContextualToolbarProps> = ({
         {/* Formation Info */}
         {currentFormation && (
           <div className="flex items-center gap-2 bg-slate-800/50 rounded-lg px-3 py-1.5">
-            <div className="text-white font-medium text-sm">
-              {currentFormation.name}
-            </div>
+            <div className="text-white font-medium text-sm">{currentFormation.name}</div>
             <div className="w-1 h-1 bg-slate-400 rounded-full" />
             <div className="text-slate-400 text-xs">
-              {currentFormation.slots?.filter(slot => slot.playerId).length || 0}/{currentFormation.slots?.length || 11} players
+              {currentFormation.slots?.filter(slot => slot.playerId).length || 0}/
+              {currentFormation.slots?.length || 11} players
             </div>
           </div>
         )}

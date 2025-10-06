@@ -34,22 +34,24 @@ class AnimationScheduler {
   private tick = (currentTime: number) => {
     const deltaTime = currentTime - this.lastFrameTime;
     this.lastFrameTime = currentTime;
-    
+
     // Update performance metrics
     this.updatePerformanceMetrics(deltaTime);
-    
+
     // Execute all batched animations
     if (this.animationCallbacks.size > 0) {
       // Check if we need to enable performance mode
-      if (deltaTime > ANIMATION_PERFORMANCE.CRITICAL_FRAME_TIME && 
-          this.animationCallbacks.size > ANIMATION_PERFORMANCE.ANIMATION_BATCHING_THRESHOLD) {
+      if (
+        deltaTime > ANIMATION_PERFORMANCE.CRITICAL_FRAME_TIME &&
+        this.animationCallbacks.size > ANIMATION_PERFORMANCE.ANIMATION_BATCHING_THRESHOLD
+      ) {
         this.isPerformanceMode = true;
       }
-      
+
       // Execute callbacks in batches to avoid frame drops
       const callbacks = Array.from(this.animationCallbacks);
       const batchSize = this.isPerformanceMode ? 3 : 5;
-      
+
       for (let i = 0; i < callbacks.length; i += batchSize) {
         const batch = callbacks.slice(i, i + batchSize);
         batch.forEach(callback => {
@@ -59,7 +61,7 @@ class AnimationScheduler {
             console.warn('Animation callback error:', error);
           }
         });
-        
+
         // If we're running slow, yield to the browser
         if (deltaTime > ANIMATION_PERFORMANCE.FRAME_BUDGET_MS && i + batchSize < callbacks.length) {
           setTimeout(() => this.tick(performance.now()), 0);
@@ -67,7 +69,7 @@ class AnimationScheduler {
         }
       }
     }
-    
+
     // Schedule next frame if we have callbacks
     if (this.animationCallbacks.size > 0) {
       this.rafId = requestAnimationFrame(this.tick);
@@ -78,8 +80,8 @@ class AnimationScheduler {
 
   private updatePerformanceMetrics(deltaTime: number) {
     this.frameCount++;
-    this.averageFrameTime = (this.averageFrameTime * 0.9) + (deltaTime * 0.1);
-    
+    this.averageFrameTime = this.averageFrameTime * 0.9 + deltaTime * 0.1;
+
     // Disable performance mode if we're running smoothly
     if (this.isPerformanceMode && this.averageFrameTime < ANIMATION_PERFORMANCE.FRAME_BUDGET_MS) {
       this.isPerformanceMode = false;
@@ -88,12 +90,12 @@ class AnimationScheduler {
 
   schedule(callback: () => void): () => void {
     this.animationCallbacks.add(callback);
-    
+
     // Start animation loop if not running
     if (!this.rafId) {
       this.rafId = requestAnimationFrame(this.tick);
     }
-    
+
     // Return unsubscribe function
     return () => {
       this.animationCallbacks.delete(callback);
@@ -106,7 +108,7 @@ class AnimationScheduler {
       averageFrameTime: this.averageFrameTime,
       activeAnimations: this.animationCallbacks.size,
       isPerformanceMode: this.isPerformanceMode,
-      frameCount: this.frameCount
+      frameCount: this.frameCount,
     };
   }
 
@@ -119,18 +121,18 @@ class AnimationScheduler {
 export function useOptimizedRaf(callback: (deltaTime: number) => void) {
   const callbackRef = useRef(callback);
   const deltaTimeRef = useRef(0);
-  
+
   // Update callback reference
   callbackRef.current = callback;
-  
+
   const animationCallback = useCallback(() => {
     callbackRef.current(deltaTimeRef.current);
   }, []);
-  
+
   useLayoutEffect(() => {
     const scheduler = AnimationScheduler.getInstance();
     const unsubscribe = scheduler.schedule(animationCallback);
-    
+
     return unsubscribe;
   }, [animationCallback]);
 }
@@ -151,7 +153,7 @@ export class CSSTransformOptimizer {
 
   setTransform(property: string, value: any) {
     this.pendingTransforms.set(property, value);
-    
+
     if (!this.rafId) {
       this.rafId = requestAnimationFrame(() => {
         this.applyTransforms();
@@ -162,10 +164,19 @@ export class CSSTransformOptimizer {
 
   private applyTransforms() {
     const transforms: string[] = [];
-    
+
     // Apply transforms in optimal order for GPU
-    const orderedProps = ['translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ', 'scale', 'skew'];
-    
+    const orderedProps = [
+      'translateX',
+      'translateY',
+      'translateZ',
+      'rotateX',
+      'rotateY',
+      'rotateZ',
+      'scale',
+      'skew',
+    ];
+
     for (const prop of orderedProps) {
       if (this.pendingTransforms.has(prop)) {
         const value = this.pendingTransforms.get(prop);
@@ -175,15 +186,15 @@ export class CSSTransformOptimizer {
         }
       }
     }
-    
+
     const finalTransform = transforms.join(' ');
-    
+
     // Only update if transform actually changed
     if (!this.transformCache.has('final') || this.transformCache.get('final') !== finalTransform) {
       this.element.style.transform = finalTransform;
       this.transformCache.set('final', finalTransform);
     }
-    
+
     this.pendingTransforms.clear();
   }
 
@@ -233,7 +244,7 @@ export class OptimizedSpring {
     tension = 120,
     friction = 14,
     threshold = 0.01,
-    onUpdate = () => {}
+    onUpdate = () => {},
   }: {
     initialValue?: number;
     tension?: number;
@@ -259,7 +270,7 @@ export class OptimizedSpring {
     const delta = this.target - this.value;
     const force = delta * this.tension;
     this.velocity += force * 0.016; // Assume 60fps
-    this.velocity *= (1 - this.friction * 0.016);
+    this.velocity *= 1 - this.friction * 0.016;
     this.value += this.velocity * 0.016;
 
     this.onUpdate(this.value);
@@ -298,16 +309,17 @@ export const easingFunctions = {
   linear: (t: number) => t,
   easeInQuad: (t: number) => t * t,
   easeOutQuad: (t: number) => t * (2 - t),
-  easeInOutQuad: (t: number) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t,
+  easeInOutQuad: (t: number) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t),
   easeInCubic: (t: number) => t * t * t,
-  easeOutCubic: (t: number) => (--t) * t * t + 1,
-  easeInOutCubic: (t: number) => t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1,
+  easeOutCubic: (t: number) => --t * t * t + 1,
+  easeInOutCubic: (t: number) =>
+    t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1,
   easeInQuart: (t: number) => t * t * t * t,
-  easeOutQuart: (t: number) => 1 - (--t) * t * t * t,
-  easeInOutQuart: (t: number) => t < 0.5 ? 8 * t * t * t * t : 1 - 8 * (--t) * t * t * t,
+  easeOutQuart: (t: number) => 1 - --t * t * t * t,
+  easeInOutQuart: (t: number) => (t < 0.5 ? 8 * t * t * t * t : 1 - 8 * --t * t * t * t),
   easeInQuint: (t: number) => t * t * t * t * t,
-  easeOutQuint: (t: number) => 1 + (--t) * t * t * t * t,
-  easeInOutQuint: (t: number) => t < 0.5 ? 16 * t * t * t * t * t : 1 + 16 * (--t) * t * t * t * t,
+  easeOutQuint: (t: number) => 1 + --t * t * t * t * t,
+  easeInOutQuint: (t: number) => (t < 0.5 ? 16 * t * t * t * t * t : 1 + 16 * --t * t * t * t * t),
   // High-performance elastic and bounce functions
   easeOutElastic: (t: number) => {
     const c4 = (2 * Math.PI) / 3;
@@ -316,7 +328,7 @@ export const easingFunctions = {
   easeOutBounce: (t: number) => {
     const n1 = 7.5625;
     const d1 = 2.75;
-    
+
     if (t < 1 / d1) {
       return n1 * t * t;
     } else if (t < 2 / d1) {
@@ -326,16 +338,16 @@ export const easingFunctions = {
     } else {
       return n1 * (t -= 2.625 / d1) * t + 0.984375;
     }
-  }
+  },
 };
 
 // Intersection Observer for animation culling
 export class AnimationCuller {
   private observer: IntersectionObserver;
   private animatedElements = new Map<Element, () => void>();
-  
+
   constructor(options: IntersectionObserverInit = { threshold: 0.1 }) {
-    this.observer = new IntersectionObserver((entries) => {
+    this.observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         const stopAnimation = this.animatedElements.get(entry.target);
         if (stopAnimation) {
@@ -349,17 +361,17 @@ export class AnimationCuller {
       });
     }, options);
   }
-  
+
   observe(element: Element, stopAnimation: () => void) {
     this.animatedElements.set(element, stopAnimation);
     this.observer.observe(element);
-    
+
     return () => {
       this.animatedElements.delete(element);
       this.observer.unobserve(element);
     };
   }
-  
+
   disconnect() {
     this.observer.disconnect();
     this.animatedElements.clear();
@@ -374,32 +386,34 @@ export function usePerformanceAnimation(
 ) {
   const elementRef = useRef<HTMLElement>(null);
   const cullerRef = useRef<AnimationCuller | null>(null);
-  
+
   useLayoutEffect(() => {
-    if (!enabled || !elementRef.current) return;
-    
+    if (!enabled || !elementRef.current) {
+      return;
+    }
+
     const scheduler = AnimationScheduler.getInstance();
     const metrics = scheduler.getPerformanceMetrics();
-    
+
     // Skip animation if performance is poor
     if (metrics.fps < 30 || metrics.isPerformanceMode) {
       return;
     }
-    
+
     // Set up intersection observer for animation culling
     if (!cullerRef.current) {
       cullerRef.current = new AnimationCuller();
     }
-    
+
     const unsubscribeAnimation = scheduler.schedule(animationFn);
     const unsubserveCuller = cullerRef.current.observe(elementRef.current, unsubscribeAnimation);
-    
+
     return () => {
       unsubscribeAnimation();
       unsubserveCuller();
     };
   }, [enabled, ...deps]);
-  
+
   return elementRef;
 }
 
@@ -407,12 +421,12 @@ export function usePerformanceAnimation(
 export function useGPUTransform() {
   const elementRef = useRef<HTMLElement>(null);
   const optimizerRef = useRef<CSSTransformOptimizer | null>(null);
-  
+
   useLayoutEffect(() => {
     if (elementRef.current && !optimizerRef.current) {
       optimizerRef.current = new CSSTransformOptimizer(elementRef.current);
     }
-    
+
     return () => {
       if (optimizerRef.current) {
         optimizerRef.current.destroy();
@@ -420,7 +434,7 @@ export function useGPUTransform() {
       }
     };
   }, []);
-  
+
   const setTransform = useCallback((transforms: Record<string, any>) => {
     if (optimizerRef.current) {
       Object.entries(transforms).forEach(([property, value]) => {
@@ -428,7 +442,7 @@ export function useGPUTransform() {
       });
     }
   }, []);
-  
+
   return { elementRef, setTransform };
 }
 
@@ -441,5 +455,5 @@ export default {
   useOptimizedRaf,
   usePerformanceAnimation,
   useGPUTransform,
-  ANIMATION_PERFORMANCE
+  ANIMATION_PERFORMANCE,
 };

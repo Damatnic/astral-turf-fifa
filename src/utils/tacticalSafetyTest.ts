@@ -18,7 +18,7 @@ import {
   getFormationPlayerIds,
   safeCalculation,
   validateTrailPoints,
-  safeMirrorPosition
+  safeMirrorPosition,
 } from './tacticalDataGuards';
 
 // Test data with various edge cases
@@ -31,14 +31,14 @@ const validPlayer = {
   id: 'player1',
   name: 'Test Player',
   position: validPosition,
-  team: 'home'
+  team: 'home',
 };
 
 const invalidPlayer1 = {
   id: 'player2',
   name: 'Invalid Player',
   position: invalidPosition1,
-  team: 'home'
+  team: 'home',
 };
 
 const invalidPlayer2 = null;
@@ -47,13 +47,13 @@ const validSlot = {
   id: 'slot1',
   defaultPosition: validPosition,
   playerId: 'player1',
-  roleId: 'MF'
+  roleId: 'MF',
 };
 
 const invalidSlot1 = {
   id: 'slot2',
   defaultPosition: invalidPosition1,
-  playerId: 'player2'
+  playerId: 'player2',
 };
 
 const invalidSlot2 = null;
@@ -61,13 +61,13 @@ const invalidSlot2 = null;
 const validFormation = {
   id: 'formation1',
   name: '4-4-2',
-  slots: [validSlot, invalidSlot1].filter(Boolean)
+  slots: [validSlot, invalidSlot1].filter(Boolean),
 };
 
 const invalidFormation1 = {
   id: 'formation2',
   name: 'Invalid Formation',
-  slots: null
+  slots: null,
 };
 
 const invalidFormation2 = null;
@@ -76,7 +76,7 @@ const invalidFormation2 = null;
 const testResults = {
   passed: 0,
   failed: 0,
-  errors: [] as string[]
+  errors: [] as string[],
 };
 
 function runTest(testName: string, testFn: () => boolean) {
@@ -91,8 +91,8 @@ function runTest(testName: string, testFn: () => boolean) {
     }
   } catch (error) {
     testResults.failed++;
-    testResults.errors.push(`${testName} - ${error.message}`);
-    console.log(`💥 ${testName} - ${error.message}`);
+    testResults.errors.push(`${testName} - ${(error as Error).message}`);
+    console.log(`💥 ${testName} - ${(error as Error).message}`);
   }
 }
 
@@ -110,16 +110,22 @@ export function runTacticalSafetyTests() {
   runTest('isValidPlayer rejects null player', () => !isValidPlayer(invalidPlayer2));
 
   runTest('isValidFormationSlot accepts valid slot', () => isValidFormationSlot(validSlot));
-  runTest('isValidFormationSlot rejects invalid slot position', () => !isValidFormationSlot(invalidSlot1));
+  runTest(
+    'isValidFormationSlot rejects invalid slot position',
+    () => !isValidFormationSlot(invalidSlot1)
+  );
   runTest('isValidFormationSlot rejects null slot', () => !isValidFormationSlot(invalidSlot2));
 
   runTest('isValidFormation accepts valid formation', () => isValidFormation(validFormation));
-  runTest('isValidFormation rejects formation with null slots', () => !isValidFormation(invalidFormation1));
+  runTest(
+    'isValidFormation rejects formation with null slots',
+    () => !isValidFormation(invalidFormation1)
+  );
   runTest('isValidFormation rejects null formation', () => !isValidFormation(invalidFormation2));
 
   // Safe accessor tests
   runTest('getFormationSlots filters invalid slots', () => {
-    const slots = getFormationSlots(validFormation);
+    const slots = getFormationSlots(validFormation as any);
     return slots.length === 1 && slots[0].id === 'slot1';
   });
 
@@ -129,22 +135,22 @@ export function runTacticalSafetyTests() {
   });
 
   runTest('findPlayerById finds valid player', () => {
-    const player = findPlayerById([validPlayer, invalidPlayer1], 'player1');
+    const player = findPlayerById([validPlayer as any, invalidPlayer1 as any], 'player1');
     return player?.id === 'player1';
   });
 
   runTest('findPlayerById returns null for invalid players', () => {
-    const player = findPlayerById([invalidPlayer1], 'player2');
+    const player = findPlayerById([invalidPlayer1 as any], 'player2');
     return player === null;
   });
 
   runTest('getPlayerPosition returns valid position', () => {
-    const pos = getPlayerPosition(validPlayer);
+    const pos = getPlayerPosition(validPlayer as any);
     return pos.x === 50 && pos.y === 50;
   });
 
   runTest('getPlayerPosition returns fallback for invalid player', () => {
-    const pos = getPlayerPosition(invalidPlayer1, { x: 25, y: 25 });
+    const pos = getPlayerPosition(invalidPlayer1 as any, { x: 25, y: 25 });
     return pos.x === 25 && pos.y === 25;
   });
 
@@ -154,7 +160,7 @@ export function runTacticalSafetyTests() {
       validPosition,
       invalidPosition1,
       invalidPosition2,
-      { x: 75, y: 75 }
+      { x: 75, y: 75 },
     ]);
     return points.length === 2;
   });
@@ -171,7 +177,13 @@ export function runTacticalSafetyTests() {
   });
 
   runTest('safeCalculation returns fallback for throwing calculation', () => {
-    const result = safeCalculation(() => { throw new Error('test'); }, 99, 'test');
+    const result = safeCalculation(
+      () => {
+        throw new Error('test');
+      },
+      99,
+      'test'
+    );
     return result === 99;
   });
 
@@ -193,7 +205,7 @@ export function runTacticalSafetyTests() {
 
   // Formation statistics
   runTest('getFormationStats calculates correctly', () => {
-    const stats = getFormationStats(validFormation);
+    const stats = getFormationStats(validFormation as any);
     return stats.totalSlots === 1 && stats.assignedSlots === 1 && stats.isValid;
   });
 
@@ -204,7 +216,7 @@ export function runTacticalSafetyTests() {
 
   // Formation player IDs
   runTest('getFormationPlayerIds extracts valid player IDs', () => {
-    const ids = getFormationPlayerIds(validFormation);
+    const ids = getFormationPlayerIds(validFormation as any);
     return ids.has('player1') && ids.size === 1;
   });
 
@@ -217,7 +229,9 @@ export function runTacticalSafetyTests() {
   console.log('\n📊 Test Results:');
   console.log(`✅ Passed: ${testResults.passed}`);
   console.log(`❌ Failed: ${testResults.failed}`);
-  console.log(`📈 Success Rate: ${((testResults.passed / (testResults.passed + testResults.failed)) * 100).toFixed(1)}%`);
+  console.log(
+    `📈 Success Rate: ${((testResults.passed / (testResults.passed + testResults.failed)) * 100).toFixed(1)}%`
+  );
 
   if (testResults.failed > 0) {
     console.log('\n❌ Failed Tests:');
@@ -237,5 +251,5 @@ export const testData = {
   validSlot,
   invalidSlot1,
   validFormation,
-  invalidFormation1
+  invalidFormation1,
 };

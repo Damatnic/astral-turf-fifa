@@ -111,7 +111,7 @@ async function generateJson(prompt: string, schema: unknown, systemInstruction: 
       },
     });
 
-    const jsonText = response.text.trim();
+    const jsonText = response.text?.trim();
     if (!jsonText) {
       throw new Error('AI returned an empty response.');
     }
@@ -142,7 +142,7 @@ export const generateIntelligentTrainingPlan = async (
   duration: number,
   currentFormation: Formation,
   teamTactics: TeamTactics,
-  personality: AIPersonality = 'balanced',
+  personality: AIPersonality = 'balanced'
 ): Promise<IntelligentTrainingPlan> => {
   if (!aiInstance) {
     throw new Error('AI is offline.');
@@ -252,7 +252,7 @@ export const optimizeTeamTraining = async (
   teamTactics: TeamTactics,
   upcomingOpponents: string[],
   seasonPhase: 'preseason' | 'inseason' | 'postseason',
-  personality: AIPersonality = 'balanced',
+  personality: AIPersonality = 'balanced'
 ): Promise<TeamTrainingOptimization> => {
   if (!aiInstance) {
     throw new Error('AI is offline.');
@@ -337,7 +337,7 @@ export const analyzeTrainingSession = async (
   participants: Player[],
   drillsPerformed: string[],
   coachObservations: string[],
-  personality: AIPersonality = 'balanced',
+  personality: AIPersonality = 'balanced'
 ): Promise<TrainingSessionAnalytics> => {
   if (!aiInstance) {
     throw new Error('AI is offline.');
@@ -415,7 +415,7 @@ export const adaptTrainingPlan = async (
     fatigueLevel: number;
     injuryIncidents: number;
   },
-  personality: AIPersonality = 'balanced',
+  personality: AIPersonality = 'balanced'
 ): Promise<IntelligentTrainingPlan> => {
   if (!aiInstance) {
     throw new Error('AI is offline.');

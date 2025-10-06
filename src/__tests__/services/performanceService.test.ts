@@ -17,11 +17,13 @@ Object.defineProperty(global, 'performance', {
 });
 
 // Mock PerformanceObserver
-global.PerformanceObserver = vi.fn().mockImplementation((callback) => ({
+const mockPerformanceObserver = vi.fn().mockImplementation(callback => ({
   observe: vi.fn(),
   disconnect: vi.fn(),
   takeRecords: vi.fn(() => []),
-}));
+})) as any;
+mockPerformanceObserver.supportedEntryTypes = ['measure', 'navigation', 'resource'];
+global.PerformanceObserver = mockPerformanceObserver;
 
 describe('PerformanceService', () => {
   beforeEach(() => {
@@ -39,8 +41,8 @@ describe('PerformanceService', () => {
       const mockNow = vi.spyOn(performance, 'now');
       mockNow.mockReturnValueOnce(1000).mockReturnValueOnce(1500);
 
-      performanceService.startTimer('testOperation');
-      const duration = performanceService.endTimer('testOperation');
+      (performanceService as any).startTimer('testOperation');
+      const duration = (performanceService as any).endTimer('testOperation');
 
       expect(duration).toBe(500);
       expect(mockNow).toHaveBeenCalledTimes(2);
@@ -54,18 +56,18 @@ describe('PerformanceService', () => {
         .mockReturnValueOnce(1800) // end timer1
         .mockReturnValueOnce(2000); // end timer2
 
-      performanceService.startTimer('operation1');
-      performanceService.startTimer('operation2');
-      
-      const duration1 = performanceService.endTimer('operation1');
-      const duration2 = performanceService.endTimer('operation2');
+      (performanceService as any).startTimer('operation1');
+      (performanceService as any).startTimer('operation2');
+
+      const duration1 = (performanceService as any).endTimer('operation1');
+      const duration2 = (performanceService as any).endTimer('operation2');
 
       expect(duration1).toBe(800);
       expect(duration2).toBe(800);
     });
 
     it('should return null for non-existent timer', () => {
-      const duration = performanceService.endTimer('nonExistent');
+      const duration = (performanceService as any).endTimer('nonExistent');
       expect(duration).toBeNull();
     });
 
@@ -78,7 +80,7 @@ describe('PerformanceService', () => {
         return 'completed';
       };
 
-      const result = await performanceService.measureAsync('asyncOp', asyncOperation);
+      const result = await (performanceService as any).measureAsync('asyncOp', asyncOperation);
 
       expect(result.result).toBe('completed');
       expect(result.duration).toBe(250);
@@ -91,12 +93,12 @@ describe('PerformanceService', () => {
         { name: 'first-contentful-paint', startTime: 1200 },
         { name: 'largest-contentful-paint', startTime: 2500 },
         { name: 'first-input-delay', duration: 50 },
-        { name: 'cumulative-layout-shift', value: 0.1 }
+        { name: 'cumulative-layout-shift', value: 0.1 },
       ];
 
-      vi.spyOn(performance, 'getEntriesByType').mockReturnValue(mockEntries);
+      vi.spyOn(performance, 'getEntriesByType').mockReturnValue(mockEntries as any);
 
-      const vitals = performanceService.getCoreWebVitals();
+      const vitals = (performanceService as any).getCoreWebVitals();
 
       expect(vitals).toEqual({
         fcp: 1200,
@@ -104,7 +106,7 @@ describe('PerformanceService', () => {
         fid: 50,
         cls: 0.1,
         ttfb: null,
-        tti: null
+        tti: null,
       });
     });
 
@@ -114,18 +116,18 @@ describe('PerformanceService', () => {
         value: {
           usedJSHeapSize: 25000000,
           totalJSHeapSize: 50000000,
-          jsHeapSizeLimit: 2147483648
+          jsHeapSizeLimit: 2147483648,
         },
-        configurable: true
+        configurable: true,
       });
 
-      const memory = performanceService.getMemoryMetrics();
+      const memory = (performanceService as any).getMemoryMetrics();
 
       expect(memory).toEqual({
         used: 25000000,
         total: 50000000,
         limit: 2147483648,
-        usagePercentage: 50
+        usagePercentage: 50,
       });
     });
 
@@ -133,38 +135,40 @@ describe('PerformanceService', () => {
       // Remove memory API
       delete (performance as any).memory;
 
-      const memory = performanceService.getMemoryMetrics();
+      const memory = (performanceService as any).getMemoryMetrics();
 
       expect(memory).toEqual({
         used: 0,
         total: 0,
         limit: 0,
-        usagePercentage: 0
+        usagePercentage: 0,
       });
     });
 
     it('should collect network timing metrics', () => {
-      const mockNavigationEntries = [{
-        type: 'navigation',
-        name: 'https://example.com',
-        startTime: 0,
-        fetchStart: 100,
-        domainLookupStart: 120,
-        domainLookupEnd: 140,
-        connectStart: 140,
-        connectEnd: 180,
-        requestStart: 200,
-        responseStart: 400,
-        responseEnd: 500,
-        domContentLoadedEventStart: 800,
-        domContentLoadedEventEnd: 850,
-        loadEventStart: 1000,
-        loadEventEnd: 1050
-      }];
+      const mockNavigationEntries = [
+        {
+          type: 'navigation',
+          name: 'https://example.com',
+          startTime: 0,
+          fetchStart: 100,
+          domainLookupStart: 120,
+          domainLookupEnd: 140,
+          connectStart: 140,
+          connectEnd: 180,
+          requestStart: 200,
+          responseStart: 400,
+          responseEnd: 500,
+          domContentLoadedEventStart: 800,
+          domContentLoadedEventEnd: 850,
+          loadEventStart: 1000,
+          loadEventEnd: 1050,
+        },
+      ];
 
-      vi.spyOn(performance, 'getEntriesByType').mockReturnValue(mockNavigationEntries);
+      vi.spyOn(performance, 'getEntriesByType').mockReturnValue(mockNavigationEntries as any);
 
-      const networkMetrics = performanceService.getNetworkMetrics();
+      const networkMetrics = (performanceService as any).getNetworkMetrics();
 
       expect(networkMetrics).toEqual({
         dns: 20,
@@ -173,7 +177,7 @@ describe('PerformanceService', () => {
         response: 100,
         domContentLoaded: 50,
         pageLoad: 50,
-        totalTime: 1050
+        totalTime: 1050,
       });
     });
   });
@@ -184,16 +188,23 @@ describe('PerformanceService', () => {
       const mockObserver = {
         observe: observeSpy,
         disconnect: vi.fn(),
-        takeRecords: vi.fn()
+        takeRecords: vi.fn(),
       };
 
       (global.PerformanceObserver as any).mockReturnValue(mockObserver);
 
-      performanceService.startMonitoring();
+      (performanceService as any).startMonitoring();
 
       expect(global.PerformanceObserver).toHaveBeenCalled();
       expect(observeSpy).toHaveBeenCalledWith({
-        entryTypes: ['navigation', 'resource', 'paint', 'largest-contentful-paint', 'first-input', 'layout-shift']
+        entryTypes: [
+          'navigation',
+          'resource',
+          'paint',
+          'largest-contentful-paint',
+          'first-input',
+          'layout-shift',
+        ],
       });
     });
 
@@ -202,13 +213,13 @@ describe('PerformanceService', () => {
       const mockObserver = {
         observe: vi.fn(),
         disconnect: disconnectSpy,
-        takeRecords: vi.fn()
+        takeRecords: vi.fn(),
       };
 
       (global.PerformanceObserver as any).mockReturnValue(mockObserver);
 
-      performanceService.startMonitoring();
-      performanceService.stopMonitoring();
+      (performanceService as any).startMonitoring();
+      (performanceService as any).stopMonitoring();
 
       expect(disconnectSpy).toHaveBeenCalled();
     });
@@ -222,7 +233,7 @@ describe('PerformanceService', () => {
           transferSize: 50000,
           decodedBodySize: 120000,
           duration: 250,
-          responseEnd: 1000
+          responseEnd: 1000,
         },
         {
           name: 'https://cdn.example.com/style.css',
@@ -231,13 +242,12 @@ describe('PerformanceService', () => {
           transferSize: 15000,
           decodedBodySize: 35000,
           duration: 180,
-          responseEnd: 800
-        }
+          responseEnd: 800,
+        },
       ];
 
-      vi.spyOn(performance, 'getEntriesByType').mockReturnValue(mockResourceEntries);
-
-      const resourceMetrics = performanceService.getResourceMetrics();
+      vi.spyOn(performance, 'getEntriesByType').mockReturnValue(mockResourceEntries as any);
+      const resourceMetrics = (performanceService as any).getResourceMetrics();
 
       expect(resourceMetrics).toHaveLength(2);
       expect(resourceMetrics[0]).toEqual({
@@ -245,7 +255,7 @@ describe('PerformanceService', () => {
         type: 'script',
         size: 50000,
         duration: 250,
-        compressionRatio: 0.42
+        compressionRatio: 0.42,
       });
     });
   });
@@ -255,13 +265,13 @@ describe('PerformanceService', () => {
       const metrics = {
         fcp: 3000, // Slow
         lcp: 5000, // Very slow
-        fid: 200,  // Slow
-        cls: 0.3,  // Poor
+        fid: 200, // Slow
+        cls: 0.3, // Poor
         ttfb: 1500, // Slow
-        tti: 6000   // Very slow
+        tti: 6000, // Very slow
       };
 
-      const bottlenecks = performanceService.detectBottlenecks(metrics);
+      const bottlenecks = (performanceService as any).detectBottlenecks(metrics);
 
       expect(bottlenecks).toContain('Slow First Contentful Paint');
       expect(bottlenecks).toContain('Poor Largest Contentful Paint');
@@ -276,10 +286,10 @@ describe('PerformanceService', () => {
         fid: 300,
         cls: 0.4,
         resourceCount: 150,
-        bundleSize: 2000000
+        bundleSize: 2000000,
       };
 
-      const suggestions = performanceService.getOptimizationSuggestions(slowMetrics);
+      const suggestions = (performanceService as any).getOptimizationSuggestions(slowMetrics);
 
       expect(suggestions).toContain('Optimize bundle size');
       expect(suggestions).toContain('Implement code splitting');
@@ -294,10 +304,10 @@ describe('PerformanceService', () => {
         fid: 50,
         cls: 0.05,
         ttfb: 200,
-        tti: 2000
+        tti: 2000,
       };
 
-      const score = performanceService.calculatePerformanceScore(goodMetrics);
+      const score = (performanceService as any).calculatePerformanceScore(goodMetrics);
 
       expect(score).toBeGreaterThan(90);
       expect(score).toBeLessThanOrEqual(100);
@@ -310,10 +320,10 @@ describe('PerformanceService', () => {
         fid: 500,
         cls: 0.5,
         ttfb: 2000,
-        tti: 10000
+        tti: 10000,
       };
 
-      const score = performanceService.calculatePerformanceScore(poorMetrics);
+      const score = (performanceService as any).calculatePerformanceScore(poorMetrics);
 
       expect(score).toBeLessThan(50);
       expect(score).toBeGreaterThanOrEqual(0);
@@ -325,11 +335,11 @@ describe('PerformanceService', () => {
       const bundleInfo = {
         'main.js': 500000,
         'vendor.js': 800000,
-        'styles.css': 50000
+        'styles.css': 50000,
       };
 
-      performanceService.trackBundleSize(bundleInfo);
-      const bundleMetrics = performanceService.getBundleMetrics();
+      (performanceService as any).trackBundleSize(bundleInfo);
+      const bundleMetrics = (performanceService as any).getBundleMetrics();
 
       expect(bundleMetrics.totalSize).toBe(1350000);
       expect(bundleMetrics.largestBundle).toBe('vendor.js');
@@ -340,12 +350,12 @@ describe('PerformanceService', () => {
       const longTaskEntries = [
         { name: 'self', duration: 120, startTime: 1000 },
         { name: 'script', duration: 80, startTime: 2000 },
-        { name: 'render', duration: 150, startTime: 3000 }
+        { name: 'render', duration: 150, startTime: 3000 },
       ];
 
-      vi.spyOn(performance, 'getEntriesByType').mockReturnValue(longTaskEntries);
+      vi.spyOn(performance, 'getEntriesByType').mockReturnValue(longTaskEntries as any);
 
-      const jsMetrics = performanceService.getJavaScriptMetrics();
+      const jsMetrics = (performanceService as any).getJavaScriptMetrics();
 
       expect(jsMetrics.longTasks).toBe(3);
       expect(jsMetrics.totalBlockingTime).toBe(350);
@@ -355,12 +365,12 @@ describe('PerformanceService', () => {
     it('should track rendering performance', () => {
       const paintEntries = [
         { name: 'first-paint', startTime: 800 },
-        { name: 'first-contentful-paint', startTime: 1200 }
+        { name: 'first-contentful-paint', startTime: 1200 },
       ];
 
-      vi.spyOn(performance, 'getEntriesByType').mockReturnValue(paintEntries);
+      vi.spyOn(performance, 'getEntriesByType').mockReturnValue(paintEntries as any);
 
-      const renderMetrics = performanceService.getRenderingMetrics();
+      const renderMetrics = (performanceService as any).getRenderingMetrics();
 
       expect(renderMetrics.firstPaint).toBe(800);
       expect(renderMetrics.firstContentfulPaint).toBe(1200);
@@ -371,14 +381,14 @@ describe('PerformanceService', () => {
   describe('Performance Alerts', () => {
     it('should trigger alerts for poor performance', () => {
       const alertCallback = vi.fn();
-      performanceService.setPerformanceAlerts({
+      (performanceService as any).setPerformanceAlerts({
         fcp: { threshold: 2000, callback: alertCallback },
-        lcp: { threshold: 2500, callback: alertCallback }
+        lcp: { threshold: 2500, callback: alertCallback },
       });
 
       // Simulate poor performance metrics
-      performanceService.reportMetric('fcp', 3000);
-      performanceService.reportMetric('lcp', 4000);
+      (performanceService as any).reportMetric('fcp', 3000);
+      (performanceService as any).reportMetric('lcp', 4000);
 
       expect(alertCallback).toHaveBeenCalledTimes(2);
       expect(alertCallback).toHaveBeenCalledWith('fcp', 3000, 2000);
@@ -387,14 +397,14 @@ describe('PerformanceService', () => {
 
     it('should not trigger alerts for good performance', () => {
       const alertCallback = vi.fn();
-      performanceService.setPerformanceAlerts({
+      (performanceService as any).setPerformanceAlerts({
         fcp: { threshold: 2000, callback: alertCallback },
-        lcp: { threshold: 2500, callback: alertCallback }
+        lcp: { threshold: 2500, callback: alertCallback },
       });
 
       // Simulate good performance metrics
-      performanceService.reportMetric('fcp', 1200);
-      performanceService.reportMetric('lcp', 1800);
+      (performanceService as any).reportMetric('fcp', 1200);
+      (performanceService as any).reportMetric('lcp', 1800);
 
       expect(alertCallback).not.toHaveBeenCalled();
     });
@@ -407,25 +417,23 @@ describe('PerformanceService', () => {
           fcp: 1200,
           lcp: 1800,
           fid: 50,
-          cls: 0.1
+          cls: 0.1,
         },
         memory: {
           used: 25000000,
           total: 50000000,
-          usagePercentage: 50
+          usagePercentage: 50,
         },
         network: {
           dns: 20,
           tcp: 40,
           request: 200,
-          response: 100
+          response: 100,
         },
-        resources: [
-          { name: 'main.js', size: 500000, duration: 250 }
-        ]
+        resources: [{ name: 'main.js', size: 500000, duration: 250 }],
       };
 
-      const report = performanceService.generateReport(mockMetrics);
+      const report = (performanceService as any).generateReport(mockMetrics);
 
       expect(report).toHaveProperty('timestamp');
       expect(report).toHaveProperty('score');
@@ -441,10 +449,10 @@ describe('PerformanceService', () => {
         userAgent: 'Mozilla/5.0...',
         url: 'https://example.com',
         timestamp: Date.now(),
-        metrics: { fcp: 1200, lcp: 1800 }
+        metrics: { fcp: 1200, lcp: 1800 },
       };
 
-      const exportedData = performanceService.exportData(mockData);
+      const exportedData = (performanceService as any).exportData(mockData);
 
       expect(exportedData).toHaveProperty('format', 'json');
       expect(exportedData).toHaveProperty('data');
@@ -459,16 +467,16 @@ describe('PerformanceService', () => {
       const originalPerformance = global.performance;
       delete (global as any).performance;
 
-      expect(() => performanceService.getCoreWebVitals()).not.toThrow();
-      
-      const vitals = performanceService.getCoreWebVitals();
+      expect(() => (performanceService as any).getCoreWebVitals()).not.toThrow();
+
+      const vitals = (performanceService as any).getCoreWebVitals();
       expect(vitals).toEqual({
         fcp: null,
         lcp: null,
         fid: null,
         cls: null,
         ttfb: null,
-        tti: null
+        tti: null,
       });
 
       // Restore Performance API
@@ -480,22 +488,22 @@ describe('PerformanceService', () => {
       const originalObserver = global.PerformanceObserver;
       delete (global as any).PerformanceObserver;
 
-      expect(() => performanceService.startMonitoring()).not.toThrow();
+      expect(() => (performanceService as any).startMonitoring()).not.toThrow();
 
       // Restore PerformanceObserver
       global.PerformanceObserver = originalObserver;
     });
 
     it('should handle timer cleanup on page unload', () => {
-      performanceService.startTimer('operation1');
-      performanceService.startTimer('operation2');
+      (performanceService as any).startTimer('operation1');
+      (performanceService as any).startTimer('operation2');
 
       // Simulate page unload
-      performanceService.cleanup();
+      (performanceService as any).cleanup();
 
       // Timers should be cleared
-      expect(performanceService.endTimer('operation1')).toBeNull();
-      expect(performanceService.endTimer('operation2')).toBeNull();
+      expect((performanceService as any).endTimer('operation1')).toBeNull();
+      expect((performanceService as any).endTimer('operation2')).toBeNull();
     });
   });
 });

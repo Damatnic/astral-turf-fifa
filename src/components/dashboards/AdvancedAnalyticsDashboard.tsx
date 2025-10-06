@@ -34,7 +34,7 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
   const [developmentPrediction, setDevelopmentPrediction] =
     useState<PlayerDevelopmentPrediction | null>(null);
   const [formationAnalysis, setFormationAnalysis] = useState<FormationEffectivenessAnalysis | null>(
-    null,
+    null
   );
   const [matchPrediction, setMatchPrediction] = useState<MatchPrediction | null>(null);
   const [tacticalHeatMap, setTacticalHeatMap] = useState<TacticalHeatMap | null>(null);
@@ -57,7 +57,7 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
       const prediction = await advancedAiService.generatePlayerDevelopmentPrediction(
         player,
         {} as any, // Would need to pass actual training schedule
-        aiPersonality,
+        aiPersonality
       );
       setDevelopmentPrediction(prediction);
     } catch (_error) {
@@ -79,7 +79,7 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
         homeFormation,
         homePlayers,
         ['4-3-3', '3-5-2', '4-4-2'],
-        aiPersonality,
+        aiPersonality
       );
       setFormationAnalysis(analysis);
     } catch (_error) {
@@ -111,7 +111,7 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
           venue: 'home',
           importance: 'medium',
         },
-        aiPersonality,
+        aiPersonality
       );
       setMatchPrediction(prediction);
     } catch (_error) {
@@ -132,7 +132,7 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
         player,
         matchHistory,
         formations[activeFormationIds.home],
-        aiPersonality,
+        aiPersonality
       );
       setTacticalHeatMap(heatMap);
     } catch (_error) {
@@ -152,7 +152,7 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
       const metrics = await advancedAiService.generateAdvancedPlayerMetrics(
         player,
         matchHistory,
-        aiPersonality,
+        aiPersonality
       );
       setPlayerMetrics(metrics);
     } catch (_error) {
@@ -354,7 +354,7 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
                       <li key={i} className="text-sm text-gray-300">
                         • {vulnerability}
                       </li>
-                    ),
+                    )
                   )}
                 </ul>
               </div>

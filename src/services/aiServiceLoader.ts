@@ -29,7 +29,7 @@ import type {
 } from '../types';
 
 // Cache for the lazy-loaded aiService module
-let aiServiceModule: unknown = null;
+let aiServiceModule: any = null;
 
 /**
  * Dynamically imports the aiService module when first needed
@@ -39,7 +39,7 @@ async function getAIService() {
     try {
       // Use OpenAI service instead of Gemini
       aiServiceModule = await import('./openAiService');
-    } catch (_error) {
+    } catch (_error: any) {
       console.error('Failed to load OpenAI service:', _error);
       throw new Error('OpenAI service is currently unavailable');
     }
@@ -56,7 +56,7 @@ export async function getTacticalAdvice(
   homeTactics: TeamTactics,
   awayTactics: TeamTactics,
   personality: AIPersonality,
-  coach: HeadCoach | null,
+  coach: HeadCoach | null
 ): Promise<AIInsight> {
   const aiService = await getAIService();
   return aiService.getTacticalAdvice(
@@ -67,13 +67,13 @@ export async function getTacticalAdvice(
     homeTactics,
     awayTactics,
     personality,
-    coach,
+    coach
   );
 }
 
 export async function getAIFormationSuggestion(
   allPlayers: Player[],
-  personality: AIPersonality,
+  personality: AIPersonality
 ): Promise<AISuggestedFormation> {
   const aiService = await getAIService();
   return aiService.getAIFormationSuggestion(allPlayers, personality);
@@ -82,7 +82,7 @@ export async function getAIFormationSuggestion(
 export async function getAISubstitutionSuggestion(
   onFieldPlayers: Player[],
   benchedPlayers: Player[],
-  personality: AIPersonality,
+  personality: AIPersonality
 ): Promise<AISubstitutionSuggestion> {
   const aiService = await getAIService();
   return aiService.getAISubstitutionSuggestion(onFieldPlayers, benchedPlayers, personality);
@@ -93,7 +93,7 @@ export async function getAIPlayerComparison(
   player1: Player,
   player2: Player,
   formation: Formation,
-  personality: AIPersonality,
+  personality: AIPersonality
 ): Promise<AIComparison> {
   const aiService = await getAIService();
   return aiService.getAIPlayerComparison(player1, player2, formation, personality);
@@ -113,7 +113,7 @@ export async function getPlayerScoutingReport(
   player: TransferPlayer,
   formation: Formation,
   tactics: TeamTactics,
-  personality: AIPersonality,
+  personality: AIPersonality
 ): Promise<AIScoutReport> {
   const aiService = await getAIService();
   return aiService.getPlayerScoutingReport(player, formation, tactics, personality);
@@ -123,7 +123,7 @@ export async function analyzePlayerCompatibility(
   player1: Player,
   player2: Player,
   relationshipType: 'potential_signing' | 'formation_pairing' | 'mentorship',
-  personality: AIPersonality,
+  personality: AIPersonality
 ): Promise<{
   compatibilityScore: number;
   reasoning: string;
@@ -138,7 +138,7 @@ export async function getPostMatchAnalysis(
   result: MatchResult,
   homeTeamName: string,
   awayTeamName: string,
-  personality: AIPersonality,
+  personality: AIPersonality
 ): Promise<AIPostMatchAnalysis> {
   const aiService = await getAIService();
   return aiService.getPostMatchAnalysis(result, homeTeamName, awayTeamName, personality);
@@ -149,7 +149,7 @@ export async function getOppositionAnalysis(
   formation: string,
   keyPlayers: string,
   personality: AIPersonality,
-  scoutRating: number,
+  scoutRating: number
 ): Promise<AIOppositionReport> {
   const aiService = await getAIService();
   return aiService.getOppositionAnalysis(
@@ -157,7 +157,7 @@ export async function getOppositionAnalysis(
     formation,
     keyPlayers,
     personality,
-    scoutRating,
+    scoutRating
   );
 }
 
@@ -165,7 +165,7 @@ export async function generateSocialMediaReactions(
   matchResult: MatchResult,
   homeTeam: string,
   awayTeam: string,
-  keyPlayers: Player[],
+  keyPlayers: Player[]
 ): Promise<string[]> {
   const aiService = await getAIService();
   return aiService.generateSocialMediaReactions(matchResult, homeTeam, awayTeam, keyPlayers);
@@ -176,7 +176,7 @@ export async function generateSeasonReview(
   totalTeams: number,
   topScorer: { name: string; goals: number },
   seasonHighlights: string[],
-  personality: AIPersonality,
+  personality: AIPersonality
 ): Promise<{
   overallAssessment: string;
   keyAchievements: string[];
@@ -189,7 +189,7 @@ export async function generateSeasonReview(
     totalTeams,
     topScorer,
     seasonHighlights,
-    personality,
+    personality
   );
 }
 
@@ -198,7 +198,7 @@ export async function getAIChatResponse(
   chatHistory: ChatMessage[],
   playersInFormation: Player[],
   formation: Formation,
-  personality: AIPersonality,
+  personality: AIPersonality
 ): Promise<{ text: string; playerIdsToHighlight: string[] }> {
   const aiService = await getAIService();
   return aiService.getAIChatResponse(chatHistory, playersInFormation, formation, personality);
@@ -207,7 +207,7 @@ export async function getAIChatResponse(
 export async function getAIPlayerConversationResponse(
   player: Player,
   userMessage: string,
-  personality: AIPersonality,
+  personality: AIPersonality
 ): Promise<{ response: string; moraleEffect: number; promiseRequest?: PromiseRequest }> {
   const aiService = await getAIService();
   return aiService.getAIPlayerConversationResponse(player, userMessage, personality);
@@ -218,7 +218,7 @@ export async function getTeamTalkOptions(
   opponentName: string,
   isHalftime: boolean,
   currentScore: string,
-  personality: AIPersonality,
+  personality: AIPersonality
 ): Promise<AITeamTalkResponse> {
   const aiService = await getAIService();
   return aiService.getTeamTalkOptions(
@@ -226,13 +226,13 @@ export async function getTeamTalkOptions(
     opponentName,
     isHalftime,
     currentScore,
-    personality,
+    personality
   );
 }
 
 export async function getPressConferenceQuestions(
   personality: AIPersonality,
-  narratives: PressNarrative[],
+  narratives: PressNarrative[]
 ): Promise<AIPressConferenceResponse> {
   const aiService = await getAIService();
   return aiService.getPressConferenceQuestions(personality, narratives);
@@ -243,7 +243,7 @@ export async function getAgentNegotiationResponse(
   playerValue: number,
   agentPersonality: string,
   userOffer: string,
-  conversationHistory: string,
+  conversationHistory: string
 ): Promise<AIAgentResponse> {
   const aiService = await getAIService();
   return aiService.getAgentNegotiationResponse(
@@ -251,7 +251,7 @@ export async function getAgentNegotiationResponse(
     playerValue,
     agentPersonality,
     userOffer,
-    conversationHistory,
+    conversationHistory
   );
 }
 
@@ -262,7 +262,7 @@ export async function generatePressNarratives(
   upcomingOpponent: string,
   leaguePosition: number,
   topScorer: { name: string; goals: number } | null,
-  playerInPoorForm: Player | null,
+  playerInPoorForm: Player | null
 ): Promise<PressNarrative[]> {
   const aiService = await getAIService();
   return aiService.generatePressNarratives(
@@ -271,13 +271,13 @@ export async function generatePressNarratives(
     upcomingOpponent,
     leaguePosition,
     topScorer,
-    playerInPoorForm,
+    playerInPoorForm
   );
 }
 
 export async function generateInjuryReport(
   player: Player,
-  injuryType: 'Minor Injury' | 'Major Injury',
+  injuryType: 'Minor Injury' | 'Major Injury'
 ): Promise<{
   description: string;
   estimatedRecovery: string;

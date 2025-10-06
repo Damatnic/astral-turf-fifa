@@ -1,7 +1,7 @@
 import React from 'react';
 import { screen, fireEvent, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach, type MockInstance } from 'vitest';
 import { renderWithProviders, testUtils, mockCanvas } from '../../utils/test-helpers';
 import { generateFormation, generatePlayer, createTestDataSet } from '../../utils/mock-generators';
 import { QuickActionsPanel } from '../../../components/tactics/QuickActionsPanel';
@@ -38,6 +38,7 @@ vi.mock('lucide-react', () => ({
 describe('QuickActionsPanel', () => {
   let mockProps: any;
   let user: ReturnType<typeof userEvent.setup>;
+  let clipboardWriteSpy: MockInstance;
 
   beforeEach(() => {
     // Setup component props
@@ -68,17 +69,17 @@ describe('QuickActionsPanel', () => {
     // Setup canvas mock
     mockCanvas();
 
-    // Mock clipboard API
-    Object.assign(navigator, {
-      clipboard: {
-        writeText: vi.fn().mockResolvedValue(undefined),
-        readText: vi.fn().mockResolvedValue('mock clipboard content'),
-      },
-    });
+    // Mock clipboard API using spies to avoid redefining navigator.clipboard
+    if (!navigator.clipboard?.writeText) {
+      throw new Error('Clipboard API is required for QuickActionsPanel tests');
+    }
+
+    clipboardWriteSpy = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue(undefined);
+    vi.spyOn(navigator.clipboard, 'readText').mockResolvedValue('mock clipboard content');
   });
 
   afterEach(() => {
-    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe('Component Rendering', () => {
@@ -179,7 +180,7 @@ describe('QuickActionsPanel', () => {
 
       const panel = screen.getByTestId('quick-actions-panel');
       
-      const file = new File(['{"formation": "test"}'], 'formation.json', {
+  const file = new window.File(['{"formation": "test"}'], 'formation.json', {
         type: 'application/json',
       });
 
@@ -619,12 +620,7 @@ describe('QuickActionsPanel', () => {
     });
 
     it('should handle clipboard errors', async () => {
-      // Mock clipboard error
-      Object.assign(navigator, {
-        clipboard: {
-          writeText: vi.fn().mockRejectedValue(new Error('Clipboard error')),
-        },
-      });
+      clipboardWriteSpy.mockRejectedValueOnce(new Error('Clipboard error'));
 
       renderWithProviders(<QuickActionsPanel {...mockProps} />);
 

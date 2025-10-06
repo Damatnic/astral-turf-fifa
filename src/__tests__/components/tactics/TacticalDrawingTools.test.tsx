@@ -3,12 +3,17 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, cleanup, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/vitest';
-import TacticalDrawingTools, { type DrawingShape } from '../../../components/tactics/TacticalDrawingTools';
-import { generateDrawingShape, generateTacticalAnnotations } from '../../utils/enhanced-mock-generators';
+import TacticalDrawingTools, {
+  type DrawingShape,
+} from '../../../components/tactics/TacticalDrawingTools';
+import {
+  generateDrawingShape,
+  generateTacticalAnnotations,
+} from '../../utils/enhanced-mock-generators';
 
 /**
  * Comprehensive Test Suite for TacticalDrawingTools Component
- * 
+ *
  * Tests cover:
  * - Canvas drawing interactions (mouse/touch)
  * - Drawing tool selection and functionality
@@ -30,14 +35,16 @@ vi.mock('framer-motion', () => ({
         {children}
       </div>
     )),
-    button: React.forwardRef<HTMLButtonElement, any>(({ children, onClick, className, ...props }, ref) => (
-      <button ref={ref} onClick={onClick} className={className} {...props}>
-        {children}
-      </button>
-    ))
+    button: React.forwardRef<HTMLButtonElement, any>(
+      ({ children, onClick, className, ...props }, ref) => (
+        <button ref={ref} onClick={onClick} className={className} {...props}>
+          {children}
+        </button>
+      )
+    ),
   },
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-  PanInfo: {} as any
+  PanInfo: {} as any,
 }));
 
 // Mock Lucide React icons
@@ -53,7 +60,7 @@ vi.mock('lucide-react', () => ({
   Palette: () => <span data-testid="palette-icon">Palette</span>,
   Settings: () => <span data-testid="settings-icon">Settings</span>,
   Save: () => <span data-testid="save-icon">Save</span>,
-  Trash2: () => <span data-testid="trash-icon">Trash</span>
+  Trash2: () => <span data-testid="trash-icon">Trash</span>,
 }));
 
 describe('TacticalDrawingTools', () => {
@@ -66,35 +73,41 @@ describe('TacticalDrawingTools', () => {
     onClose: mockOnClose,
     onSaveDrawing: mockOnSaveDrawing,
     fieldDimensions: { width: 800, height: 600 },
-    viewMode: 'standard' as const
+    viewMode: 'standard' as const,
   };
 
   const mockInitialShapes: DrawingShape[] = [
     {
       id: 'shape-1',
       type: 'line',
-      points: [{ x: 10, y: 10 }, { x: 20, y: 20 }],
+      points: [
+        { x: 10, y: 10 },
+        { x: 20, y: 20 },
+      ],
       color: '#3b82f6',
       strokeWidth: 2,
       opacity: 1,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     },
     {
       id: 'shape-2',
       type: 'arrow',
-      points: [{ x: 30, y: 30 }, { x: 40, y: 40 }],
+      points: [
+        { x: 30, y: 30 },
+        { x: 40, y: 40 },
+      ],
       color: '#ef4444',
       strokeWidth: 3,
       opacity: 0.8,
-      timestamp: Date.now()
-    }
+      timestamp: Date.now(),
+    },
   ];
 
   beforeEach(() => {
     cleanup();
     vi.clearAllMocks();
     vi.useFakeTimers();
-    
+
     // Mock SVG methods for canvas testing
     Object.defineProperty(SVGElement.prototype, 'getBoundingClientRect', {
       value: () => ({
@@ -106,9 +119,9 @@ describe('TacticalDrawingTools', () => {
         right: 800,
         bottom: 600,
         left: 0,
-        toJSON: () => {}
+        toJSON: () => {},
       }),
-      writable: true
+      writable: true,
     });
   });
 
@@ -135,15 +148,12 @@ describe('TacticalDrawingTools', () => {
 
     it('should render with initial shapes', () => {
       const { container } = render(
-        <TacticalDrawingTools 
-          {...defaultProps} 
-          initialShapes={mockInitialShapes} 
-        />
+        <TacticalDrawingTools {...defaultProps} initialShapes={mockInitialShapes} />
       );
 
       const svg = container.querySelector('svg');
       expect(svg).toBeInTheDocument();
-      
+
       // Check for rendered shapes
       const paths = container.querySelectorAll('path');
       const lines = container.querySelectorAll('line');
@@ -282,54 +292,60 @@ describe('TacticalDrawingTools', () => {
 
       // Simulate touch drawing
       const touchStart = new TouchEvent('touchstart', {
-        touches: [{
-          identifier: 0,
-          target: drawingArea,
-          clientX: 100,
-          clientY: 100,
-          pageX: 100,
-          pageY: 100,
-          screenX: 100,
-          screenY: 100,
-          radiusX: 10,
-          radiusY: 10,
-          rotationAngle: 0,
-          force: 1
-        }] as any
+        touches: [
+          {
+            identifier: 0,
+            target: drawingArea,
+            clientX: 100,
+            clientY: 100,
+            pageX: 100,
+            pageY: 100,
+            screenX: 100,
+            screenY: 100,
+            radiusX: 10,
+            radiusY: 10,
+            rotationAngle: 0,
+            force: 1,
+          },
+        ] as any,
       });
 
       const touchMove = new TouchEvent('touchmove', {
-        touches: [{
-          identifier: 0,
-          target: drawingArea,
-          clientX: 200,
-          clientY: 150,
-          pageX: 200,
-          pageY: 150,
-          screenX: 200,
-          screenY: 150,
-          radiusX: 10,
-          radiusY: 10,
-          rotationAngle: 0,
-          force: 1
-        }] as any
+        touches: [
+          {
+            identifier: 0,
+            target: drawingArea,
+            clientX: 200,
+            clientY: 150,
+            pageX: 200,
+            pageY: 150,
+            screenX: 200,
+            screenY: 150,
+            radiusX: 10,
+            radiusY: 10,
+            rotationAngle: 0,
+            force: 1,
+          },
+        ] as any,
       });
 
       const touchEnd = new TouchEvent('touchend', {
-        changedTouches: [{
-          identifier: 0,
-          target: drawingArea,
-          clientX: 200,
-          clientY: 150,
-          pageX: 200,
-          pageY: 150,
-          screenX: 200,
-          screenY: 150,
-          radiusX: 10,
-          radiusY: 10,
-          rotationAngle: 0,
-          force: 1
-        }] as any
+        changedTouches: [
+          {
+            identifier: 0,
+            target: drawingArea,
+            clientX: 200,
+            clientY: 150,
+            pageX: 200,
+            pageY: 150,
+            screenX: 200,
+            screenY: 150,
+            radiusX: 10,
+            radiusY: 10,
+            rotationAngle: 0,
+            force: 1,
+          },
+        ] as any,
       });
 
       fireEvent(drawingArea, touchStart);
@@ -361,10 +377,7 @@ describe('TacticalDrawingTools', () => {
   describe('Shape Management', () => {
     it('should delete shapes with eraser tool', async () => {
       const { container } = render(
-        <TacticalDrawingTools 
-          {...defaultProps} 
-          initialShapes={mockInitialShapes} 
-        />
+        <TacticalDrawingTools {...defaultProps} initialShapes={mockInitialShapes} />
       );
 
       // Select eraser tool
@@ -413,12 +426,7 @@ describe('TacticalDrawingTools', () => {
     });
 
     it('should clear all shapes', async () => {
-      render(
-        <TacticalDrawingTools 
-          {...defaultProps} 
-          initialShapes={mockInitialShapes} 
-        />
-      );
+      render(<TacticalDrawingTools {...defaultProps} initialShapes={mockInitialShapes} />);
 
       const trashButton = screen.getByTestId('trash-icon').closest('button');
       await user.click(trashButton!);
@@ -486,12 +494,7 @@ describe('TacticalDrawingTools', () => {
 
   describe('Save/Load Functionality', () => {
     it('should save drawing with all shapes', async () => {
-      render(
-        <TacticalDrawingTools 
-          {...defaultProps} 
-          initialShapes={mockInitialShapes} 
-        />
-      );
+      render(<TacticalDrawingTools {...defaultProps} initialShapes={mockInitialShapes} />);
 
       const saveButton = screen.getByTestId('save-icon').closest('button');
       await user.click(saveButton!);
@@ -502,8 +505,8 @@ describe('TacticalDrawingTools', () => {
             id: expect.any(String),
             type: expect.any(String),
             points: expect.any(Array),
-            color: expect.any(String)
-          })
+            color: expect.any(String),
+          }),
         ])
       );
     });
@@ -519,10 +522,7 @@ describe('TacticalDrawingTools', () => {
 
     it('should load initial shapes correctly', () => {
       const { container } = render(
-        <TacticalDrawingTools 
-          {...defaultProps} 
-          initialShapes={mockInitialShapes} 
-        />
+        <TacticalDrawingTools {...defaultProps} initialShapes={mockInitialShapes} />
       );
 
       // Should render initial shapes
@@ -534,13 +534,10 @@ describe('TacticalDrawingTools', () => {
   describe('Performance and Optimization', () => {
     it('should handle many shapes efficiently', async () => {
       const manyShapes = generateTacticalAnnotations(100);
-      
+
       const startTime = performance.now();
       const { container } = render(
-        <TacticalDrawingTools 
-          {...defaultProps} 
-          initialShapes={manyShapes} 
-        />
+        <TacticalDrawingTools {...defaultProps} initialShapes={manyShapes as any} />
       );
       const endTime = performance.now();
 
@@ -613,16 +610,19 @@ describe('TacticalDrawingTools', () => {
   describe('Error Handling', () => {
     it('should handle invalid initial shapes', () => {
       const invalidShapes = [
-        { id: 'invalid', type: 'unknown', points: [], color: '', strokeWidth: 0, opacity: 1, timestamp: 0 }
+        {
+          id: 'invalid',
+          type: 'unknown',
+          points: [],
+          color: '',
+          strokeWidth: 0,
+          opacity: 1,
+          timestamp: 0,
+        },
       ] as any;
 
       expect(() => {
-        render(
-          <TacticalDrawingTools 
-            {...defaultProps} 
-            initialShapes={invalidShapes} 
-          />
-        );
+        render(<TacticalDrawingTools {...defaultProps} initialShapes={invalidShapes} />);
       }).not.toThrow();
     });
 
@@ -645,12 +645,7 @@ describe('TacticalDrawingTools', () => {
 
     it('should handle missing field dimensions', () => {
       expect(() => {
-        render(
-          <TacticalDrawingTools 
-            {...defaultProps} 
-            fieldDimensions={undefined as any} 
-          />
-        );
+        render(<TacticalDrawingTools {...defaultProps} fieldDimensions={undefined as any} />);
       }).not.toThrow();
     });
   });
@@ -661,9 +656,8 @@ describe('TacticalDrawingTools', () => {
 
       // Find close button (implementation may vary)
       const buttons = screen.getAllByRole('button');
-      const closeButton = buttons.find(btn => 
-        btn.textContent?.includes('×') || 
-        btn.getAttribute('aria-label')?.includes('close')
+      const closeButton = buttons.find(
+        btn => btn.textContent?.includes('×') || btn.getAttribute('aria-label')?.includes('close')
       );
 
       if (closeButton) {
@@ -676,12 +670,7 @@ describe('TacticalDrawingTools', () => {
       const modes = ['standard', 'fullscreen', 'presentation'] as const;
 
       modes.forEach(mode => {
-        const { unmount } = render(
-          <TacticalDrawingTools 
-            {...defaultProps} 
-            viewMode={mode} 
-          />
-        );
+        const { unmount } = render(<TacticalDrawingTools {...defaultProps} viewMode={mode} />);
 
         expect(screen.getByTestId('pen-icon')).toBeInTheDocument();
         unmount();
@@ -692,15 +681,12 @@ describe('TacticalDrawingTools', () => {
       const dimensions = [
         { width: 400, height: 300 },
         { width: 1200, height: 800 },
-        { width: 1920, height: 1080 }
+        { width: 1920, height: 1080 },
       ];
 
       dimensions.forEach(dim => {
         const { unmount, container } = render(
-          <TacticalDrawingTools 
-            {...defaultProps} 
-            fieldDimensions={dim} 
-          />
+          <TacticalDrawingTools {...defaultProps} fieldDimensions={dim} />
         );
 
         const svg = container.querySelector('svg');

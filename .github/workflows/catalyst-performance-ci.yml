@@ -2,9 +2,9 @@ name: 🚀 Catalyst Performance CI
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main ]
+    branches: [main]
   schedule:
     # Run performance tests daily at 6 AM UTC
     - cron: '0 6 * * *'
@@ -19,11 +19,11 @@ jobs:
     name: 🔍 Performance Audit
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    
+
     strategy:
       matrix:
         viewport: [mobile, desktop]
-        
+
     steps:
       - name: 📦 Checkout Repository
         uses: actions/checkout@v4
@@ -89,7 +89,7 @@ jobs:
     name: 📦 Bundle Analysis
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    
+
     steps:
       - name: 📦 Checkout Repository
         uses: actions/checkout@v4
@@ -208,7 +208,7 @@ jobs:
     name: ⚡ Load Testing
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    
+
     steps:
       - name: 📦 Checkout Repository
         uses: actions/checkout@v4
@@ -236,10 +236,10 @@ jobs:
       - name: ⚡ Run Load Tests
         run: |
           echo "Running load tests..."
-          
+
           # Basic load test
           autocannon -c 10 -d 30 -j http://localhost:4173 > load-test-results.json
-          
+
           # Parse results
           node -e "
             const results = JSON.parse(require('fs').readFileSync('load-test-results.json', 'utf8'));
@@ -285,7 +285,7 @@ jobs:
     name: 🧠 Memory Profiling
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    
+
     steps:
       - name: 📦 Checkout Repository
         uses: actions/checkout@v4
@@ -331,7 +331,7 @@ jobs:
     needs: [performance-audit, bundle-analysis]
     if: github.event_name == 'pull_request'
     timeout-minutes: 10
-    
+
     steps:
       - name: 📦 Checkout Repository
         uses: actions/checkout@v4
@@ -348,7 +348,7 @@ jobs:
         run: |
           # Get performance data from main branch
           git checkout origin/main -- performance-report.json || echo "No baseline found"
-          
+
           # Compare current vs baseline
           node -e "
             const fs = require('fs');
@@ -412,7 +412,7 @@ jobs:
     needs: [performance-audit, bundle-analysis, load-testing, memory-profiling]
     if: always()
     timeout-minutes: 5
-    
+
     steps:
       - name: 📦 Checkout Repository
         uses: actions/checkout@v4
@@ -428,32 +428,32 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## 📊 Performance Audit Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          
+
           # Check job statuses
           if [[ "${{ needs.performance-audit.result }}" == "success" ]]; then
             echo "✅ **Performance Audit**: Passed" >> $GITHUB_STEP_SUMMARY
           else
             echo "❌ **Performance Audit**: Failed" >> $GITHUB_STEP_SUMMARY
           fi
-          
+
           if [[ "${{ needs.bundle-analysis.result }}" == "success" ]]; then
             echo "✅ **Bundle Analysis**: Passed" >> $GITHUB_STEP_SUMMARY
           else
             echo "❌ **Bundle Analysis**: Failed" >> $GITHUB_STEP_SUMMARY
           fi
-          
+
           if [[ "${{ needs.load-testing.result }}" == "success" ]]; then
             echo "✅ **Load Testing**: Passed" >> $GITHUB_STEP_SUMMARY
           else
             echo "❌ **Load Testing**: Failed" >> $GITHUB_STEP_SUMMARY
           fi
-          
+
           if [[ "${{ needs.memory-profiling.result }}" == "success" ]]; then
             echo "✅ **Memory Profiling**: Passed" >> $GITHUB_STEP_SUMMARY
           else
             echo "❌ **Memory Profiling**: Failed" >> $GITHUB_STEP_SUMMARY
           fi
-          
+
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## 🎯 Performance Targets" >> $GITHUB_STEP_SUMMARY
           echo "- **LCP**: < 2.5s" >> $GITHUB_STEP_SUMMARY
@@ -461,7 +461,7 @@ jobs:
           echo "- **CLS**: < 0.1" >> $GITHUB_STEP_SUMMARY
           echo "- **Bundle Size**: < 500KB" >> $GITHUB_STEP_SUMMARY
           echo "- **Lighthouse Score**: > 90" >> $GITHUB_STEP_SUMMARY
-          
+
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "⚡ **Catalyst Performance System Active** ⚡" >> $GITHUB_STEP_SUMMARY
 

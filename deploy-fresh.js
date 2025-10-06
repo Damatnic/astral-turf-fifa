@@ -50,7 +50,7 @@ async function deployToVercel() {
   return new Promise((resolve, reject) => {
     // Use --confirm to skip interactive prompts
     const deployCommand = 'vercel deploy --prod --confirm';
-    
+
     exec(deployCommand, (error, stdout, stderr) => {
       if (error) {
         console.error('❌ Deployment failed:', error.message);
@@ -58,46 +58,46 @@ async function deployToVercel() {
         reject(error);
         return;
       }
-      
+
       console.log('✅ Deployment successful!');
       console.log(stdout);
-      
+
       // Extract URL from output
       const urlMatch = stdout.match(/https:\/\/[^\s]+/);
       if (urlMatch) {
         const deploymentUrl = urlMatch[0];
         console.log(`🌐 Application deployed to: ${deploymentUrl}`);
-        
+
         // Save deployment info
         const deploymentInfo = {
           deployment: {
             url: deploymentUrl,
-            status: "successful",
+            status: 'successful',
             timestamp: new Date().toISOString(),
-            platform: "Vercel",
-            framework: "Vite",
-            buildTime: "Fresh deployment",
-            region: "iad1"
+            platform: 'Vercel',
+            framework: 'Vite',
+            buildTime: 'Fresh deployment',
+            region: 'iad1',
           },
           github: {
-            repository: "https://github.com/Damatnic/ASTRAL_TURF",
-            branch: "master"
+            repository: 'https://github.com/Damatnic/ASTRAL_TURF',
+            branch: 'master',
           },
           application: {
-            name: "Astral Turf",
-            version: "8.0.0",
-            description: "Enterprise-grade football management application"
-          }
+            name: 'Astral Turf',
+            version: '8.0.0',
+            description: 'Enterprise-grade football management application',
+          },
         };
-        
+
         fs.writeFileSync(
           path.join(__dirname, 'deployment-info.json'),
           JSON.stringify(deploymentInfo, null, 2)
         );
-        
+
         console.log('📝 Deployment info saved to deployment-info.json');
       }
-      
+
       resolve(stdout);
     });
   });
@@ -106,29 +106,33 @@ async function deployToVercel() {
 // Set up environment variables
 async function setupEnvironment() {
   console.log('⚙️ Setting up environment variables...');
-  
+
   const envVars = [
     'NODE_ENV=production',
     'VITE_APP_NAME=Astral Turf',
     'VITE_APP_VERSION=8.0.0',
     'VITE_GEMINI_API_KEY=demo-api-key-for-development',
     'GEMINI_API_KEY=demo-api-key-for-development',
-    'API_KEY=demo-api-key-for-development'
+    'API_KEY=demo-api-key-for-development',
   ];
-  
+
   for (const envVar of envVars) {
     await new Promise((resolve, reject) => {
-      exec(`vercel env add ${envVar.split('=')[0]} production`, {
-        input: envVar.split('=')[1] + '\n'
-      }, (error) => {
-        if (error && !error.message.includes('already exists')) {
-          console.warn(`⚠️ Could not set ${envVar.split('=')[0]}:`, error.message);
+      exec(
+        `vercel env add ${envVar.split('=')[0]} production`,
+        {
+          input: envVar.split('=')[1] + '\n',
+        },
+        error => {
+          if (error && !error.message.includes('already exists')) {
+            console.warn(`⚠️ Could not set ${envVar.split('=')[0]}:`, error.message);
+          }
+          resolve();
         }
-        resolve();
-      });
+      );
     });
   }
-  
+
   console.log('✅ Environment variables configured');
 }
 
@@ -137,11 +141,11 @@ async function main() {
   try {
     console.log('🎯 Astral Turf - Fresh Deployment Setup');
     console.log('🔧 Creating new Vercel project...\n');
-    
+
     await cleanInstall();
     await buildApp();
     await deployToVercel();
-    
+
     console.log('\n🎉 Fresh deployment completed successfully!');
     console.log('🏆 Astral Turf is now live on Vercel');
     console.log('📊 Monitor your deployment at https://vercel.com/dashboard');
@@ -149,7 +153,6 @@ async function main() {
     console.log('   1. Update environment variables with real API keys');
     console.log('   2. Configure database connections');
     console.log('   3. Set up custom domain if needed');
-    
   } catch (error) {
     console.error('\n❌ Deployment failed:', error.message);
     console.log('\n🔧 Troubleshooting tips:');

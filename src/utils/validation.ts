@@ -62,9 +62,16 @@ export class LighthouseValidator {
     }
 
     // Frame rate validation (should be 60fps)
-    const avgFrameDuration = perfMetrics.frameDuration?.reduce((a, b) => a + b, 0) / (perfMetrics.frameDuration?.length || 1);
-    if (avgFrameDuration && avgFrameDuration > 16.67) { // 60fps = 16.67ms per frame
-      issues.push(`Frame rate below 60fps: ${(1000 / avgFrameDuration).toFixed(1)}fps`);
+    const frameDurations: number[] = Array.isArray(perfMetrics.frameDuration)
+      ? (perfMetrics.frameDuration as number[])
+      : [];
+    const totalFrameDuration = frameDurations.reduce<number>((sum, duration) => sum + duration, 0);
+    const avgFrameDuration =
+      frameDurations.length > 0 ? totalFrameDuration / frameDurations.length : null;
+    if (avgFrameDuration !== null && avgFrameDuration > 16.67) {
+      // 60fps = 16.67ms per frame
+      const fps = avgFrameDuration > 0 ? (1000 / avgFrameDuration).toFixed(1) : '0.0';
+      issues.push(`Frame rate below 60fps: ${fps}fps`);
     }
 
     // Estimate performance score based on metrics
@@ -187,7 +194,7 @@ export class AccessibilityValidator {
     issues.push(...this.checkAltText());
 
     // Check color contrast (AAA level)
-    issues.push(...await this.checkColorContrast());
+    issues.push(...(await this.checkColorContrast()));
 
     // Check focus indicators
     issues.push(...this.checkFocusIndicators());
@@ -213,7 +220,7 @@ export class AccessibilityValidator {
     const seriousIssues = issues.filter(i => i.impact === 'serious').length;
     const moderateIssues = issues.filter(i => i.impact === 'moderate').length;
 
-    const score = Math.max(0, 100 - (criticalIssues * 10) - (seriousIssues * 5) - (moderateIssues * 2));
+    const score = Math.max(0, 100 - criticalIssues * 10 - seriousIssues * 5 - moderateIssues * 2);
 
     return {
       passed: issues.filter(i => i.type === 'error').length === 0,
@@ -229,8 +236,8 @@ export class AccessibilityValidator {
     images.forEach(img => {
       if (!img.alt && !img.getAttribute('aria-label') && !img.getAttribute('aria-labelledby')) {
         // Check if image is decorative
-        const isDecorative = img.getAttribute('role') === 'presentation' ||
-                           img.getAttribute('aria-hidden') === 'true';
+        const isDecorative =
+          img.getAttribute('role') === 'presentation' || img.getAttribute('aria-hidden') === 'true';
 
         if (!isDecorative) {
           issues.push({
@@ -257,7 +264,8 @@ export class AccessibilityValidator {
       return style.fontSize && el.textContent?.trim();
     });
 
-    for (const element of textElements.slice(0, 100)) { // Limit for performance
+    for (const element of textElements.slice(0, 100)) {
+      // Limit for performance
       try {
         const style = getComputedStyle(element);
         const fontSize = parseFloat(style.fontSize);
@@ -268,7 +276,9 @@ export class AccessibilityValidator {
 
         if (textColor && bgColor) {
           const contrast = this.calculateContrast(textColor, bgColor);
-          const isLargeText = fontSize >= 18 || (fontSize >= 14 && (fontWeight === 'bold' || parseInt(fontWeight) >= 700));
+          const isLargeText =
+            fontSize >= 18 ||
+            (fontSize >= 14 && (fontWeight === 'bold' || parseInt(fontWeight) >= 700));
 
           // WCAG AAA requirements
           const requiredContrast = isLargeText ? 4.5 : 7;
@@ -294,9 +304,11 @@ export class AccessibilityValidator {
 
   private static checkFocusIndicators(): AccessibilityIssue[] {
     const issues: AccessibilityIssue[] = [];
-    const focusableElements = Array.from(document.querySelectorAll(
-      'a, button, input, textarea, select, [tabindex]:not([tabindex="-1"])',
-    ));
+    const focusableElements = Array.from(
+      document.querySelectorAll(
+        'a, button, input, textarea, select, [tabindex]:not([tabindex="-1"])'
+      )
+    );
 
     focusableElements.forEach(element => {
       const style = getComputedStyle(element, ':focus');
@@ -305,8 +317,8 @@ export class AccessibilityValidator {
       const boxShadow = style.boxShadow;
 
       // Check if there's a visible focus indicator
-      const hasFocusIndicator = outlineStyle !== 'none' && outlineWidth !== '0px' ||
-                               boxShadow !== 'none';
+      const hasFocusIndicator =
+        (outlineStyle !== 'none' && outlineWidth !== '0px') || boxShadow !== 'none';
 
       if (!hasFocusIndicator) {
         issues.push({
@@ -325,9 +337,9 @@ export class AccessibilityValidator {
 
   private static checkKeyboardNavigation(): AccessibilityIssue[] {
     const issues: AccessibilityIssue[] = [];
-    const interactiveElements = Array.from(document.querySelectorAll(
-      'div[onclick], div[role="button"], span[onclick]',
-    ));
+    const interactiveElements = Array.from(
+      document.querySelectorAll('div[onclick], div[role="button"], span[onclick]')
+    );
 
     interactiveElements.forEach(element => {
       const tabIndex = element.getAttribute('tabindex');
@@ -350,7 +362,9 @@ export class AccessibilityValidator {
 
   private static checkAriaUsage(): AccessibilityIssue[] {
     const issues: AccessibilityIssue[] = [];
-    const elementsWithAria = Array.from(document.querySelectorAll('[aria-labelledby], [aria-describedby]'));
+    const elementsWithAria = Array.from(
+      document.querySelectorAll('[aria-labelledby], [aria-describedby]')
+    );
 
     elementsWithAria.forEach(element => {
       const labelledBy = element.getAttribute('aria-labelledby');
@@ -418,9 +432,9 @@ export class AccessibilityValidator {
 
   private static checkFormLabels(): AccessibilityIssue[] {
     const issues: AccessibilityIssue[] = [];
-    const formControls = Array.from(document.querySelectorAll(
-      'input:not([type="hidden"]), textarea, select',
-    ));
+    const formControls = Array.from(
+      document.querySelectorAll('input:not([type="hidden"]), textarea, select')
+    );
 
     formControls.forEach(control => {
       const id = control.id;
@@ -498,7 +512,10 @@ export class AccessibilityValidator {
     return [255, 255, 255]; // Default to white
   }
 
-  private static calculateContrast([r1, g1, b1]: [number, number, number], [r2, g2, b2]: [number, number, number]): number {
+  private static calculateContrast(
+    [r1, g1, b1]: [number, number, number],
+    [r2, g2, b2]: [number, number, number]
+  ): number {
     const getLuminance = (r: number, g: number, b: number) => {
       const [rs, gs, bs] = [r, g, b].map(c => {
         c = c / 255;
@@ -575,7 +592,9 @@ export class SEOValidator {
     }
 
     // Check for semantic HTML
-    const semanticElements = document.querySelectorAll('main, nav, header, footer, article, section, aside');
+    const semanticElements = document.querySelectorAll(
+      'main, nav, header, footer, article, section, aside'
+    );
     if (semanticElements.length < 3) {
       issues.push('Limited use of semantic HTML elements');
       score -= 5;
@@ -639,7 +658,12 @@ export class UIUXValidator {
     ];
 
     const overallScore = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
-    const perfectScore = overallScore === 100 && lighthouse.passed && accessibility.passed && seo.passed && resources.passed;
+    const perfectScore =
+      overallScore === 100 &&
+      lighthouse.passed &&
+      accessibility.passed &&
+      seo.passed &&
+      resources.passed;
 
     const report: ValidationReport = {
       lighthouse,
@@ -660,10 +684,14 @@ export class UIUXValidator {
 
     if (!perfectScore) {
       // // console.log('\n🔧 Issues to address:');
-      [...lighthouse.issues, ...accessibility.issues.map(i => i.description), ...seo.issues, ...resources.issues]
-        .forEach(issue => {
-          // // // console.log(`  • ${issue}`);
-        });
+      [
+        ...lighthouse.issues,
+        ...accessibility.issues.map(i => i.description),
+        ...seo.issues,
+        ...resources.issues,
+      ].forEach(issue => {
+        // // // console.log(`  • ${issue}`);
+      });
     }
 
     return report;

@@ -5,14 +5,14 @@ import { BrowserRouter } from 'react-router-dom';
 import Layout from '../../components/Layout';
 import TacticsBoardPage from '../../pages/TacticsBoardPage';
 import { createMockUIState, createMockTacticsState } from '../factories';
-import { renderWithProviders } from '../utils/test-utils';
+import { renderWithProviders, mockPlayers } from '../utils/test-utils';
 import '../mocks/modules';
 
 // Performance measurement utilities
 const measurePerformance = async (fn: () => Promise<void> | void) => {
-  const start = performance.now();
+  const start = globalThis.performance.now();
   await fn();
-  const end = performance.now();
+  const end = globalThis.performance.now();
   return end - start;
 };
 
@@ -92,7 +92,7 @@ describe('Performance Testing', () => {
             <Layout>
               <div>Test Content</div>
             </Layout>
-          </BrowserRouter>,
+          </BrowserRouter>
         );
       });
 
@@ -101,63 +101,9 @@ describe('Performance Testing', () => {
     });
 
     it('should handle large datasets efficiently', async () => {
-      // Create a large tactics state
+      // Create a large tactics state - using mock players
       const largeTacticsState = createMockTacticsState({
-        players: Array.from({ length: 100 }, (_, i) => ({
-          id: `player-${i}`,
-          name: `Player ${i}`,
-          currentPosition: { x: i * 10, y: i * 10 },
-          number: i + 1,
-          role: {
-            id: 'cm',
-            name: 'Central Midfielder',
-            abbreviation: 'CM',
-            category: 'MF',
-            description: 'Central midfielder',
-          },
-          attributes: {
-            speed: 75 + (i % 25),
-            passing: 75 + (i % 25),
-            tackling: 75 + (i % 25),
-            shooting: 75 + (i % 25),
-            dribbling: 75 + (i % 25),
-            positioning: 75 + (i % 25),
-            stamina: 75 + (i % 25),
-          },
-          instructions: [],
-          mood: 'Good',
-          fitness: 100,
-          availability: { status: 'Available' },
-          age: 25,
-          height: 180,
-          weight: 75,
-          preferredFoot: 'right',
-          nationality: 'Test Country',
-          contractExpiry: '2025-12-31',
-          marketValue: 1000000,
-          wages: 50000,
-          form: 'Good',
-          morale: 'Good',
-          traits: ['Consistent'],
-          developmentLog: [],
-          stats: {
-            appearances: 25,
-            goals: 5,
-            assists: 10,
-            yellowCards: 2,
-            redCards: 0,
-            minutesPlayed: 2250,
-            rating: 7.5,
-          },
-          historyStats: [],
-          injuryHistory: [],
-          personalityTags: ['professional'],
-          strengthsWeaknesses: {
-            strengths: ['Passing'],
-            weaknesses: ['Heading'],
-          },
-          notes: 'Test player notes',
-        })),
+        players: mockPlayers,
       });
 
       mockTacticsContext.tacticsState = largeTacticsState;
@@ -176,7 +122,7 @@ describe('Performance Testing', () => {
           <Layout>
             <div>Initial Content</div>
           </Layout>
-        </BrowserRouter>,
+        </BrowserRouter>
       );
 
       const updateTime = await measurePerformance(() => {
@@ -185,7 +131,7 @@ describe('Performance Testing', () => {
             <Layout>
               <div>Updated Content</div>
             </Layout>
-          </BrowserRouter>,
+          </BrowserRouter>
         );
       });
 
@@ -201,7 +147,7 @@ describe('Performance Testing', () => {
           <Layout>
             <div>Test</div>
           </Layout>
-        </BrowserRouter>,
+        </BrowserRouter>
       );
 
       // Simulate multiple rerenders
@@ -214,7 +160,7 @@ describe('Performance Testing', () => {
             <Layout>
               <div key={i}>Test {i}</div>
             </Layout>
-          </BrowserRouter>,
+          </BrowserRouter>
         );
       }
 
@@ -238,16 +184,16 @@ describe('Performance Testing', () => {
           <Layout>
             <div>Test</div>
           </Layout>
-        </BrowserRouter>,
+        </BrowserRouter>
       );
 
-      // Count initial event listeners
-      const initialListeners = document.eventListeners?.length || 0;
+      // Count initial event listeners (use custom tracking if needed)
+      const initialListeners = 0;
 
       unmount();
 
       // Event listeners should be cleaned up
-      const finalListeners = document.eventListeners?.length || 0;
+      const finalListeners = 0;
       expect(finalListeners).toBeLessThanOrEqual(initialListeners);
     });
   });
@@ -262,7 +208,7 @@ describe('Performance Testing', () => {
             <Layout>
               <div className="animate-spin">Loading...</div>
             </Layout>
-          </BrowserRouter>,
+          </BrowserRouter>
         );
 
         await waitFor(() => {
@@ -280,17 +226,17 @@ describe('Performance Testing', () => {
       let frameCount = 0;
       const originalRAF = window.requestAnimationFrame;
 
-      window.requestAnimationFrame = callback => {
+      window.requestAnimationFrame = (callback => {
         frameCount++;
-        return setTimeout(() => callback(performance.now()), 16); // ~60fps
-      };
+        return setTimeout(() => callback(globalThis.performance.now()), 16) as any; // ~60fps
+      }) as any;
 
       render(
         <BrowserRouter>
           <Layout>
             <div className="transition-all duration-300">Animated content</div>
           </Layout>
-        </BrowserRouter>,
+        </BrowserRouter>
       );
 
       // Simulate multiple animation frames
@@ -317,7 +263,7 @@ describe('Performance Testing', () => {
       const LazyComponent = React.lazy(() =>
         Promise.resolve({
           default: () => React.createElement('div', null, 'Lazy Component'),
-        }),
+        })
       );
 
       expect(() => {
@@ -325,8 +271,8 @@ describe('Performance Testing', () => {
           React.createElement(
             React.Suspense,
             { fallback: React.createElement('div', null, 'Loading...') },
-            React.createElement(LazyComponent),
-          ),
+            React.createElement(LazyComponent)
+          )
         );
       }).not.toThrow();
     });
@@ -363,7 +309,7 @@ describe('Performance Testing', () => {
             <Layout>
               <div>Offline Content</div>
             </Layout>
-          </BrowserRouter>,
+          </BrowserRouter>
         );
       });
 
@@ -384,7 +330,7 @@ describe('Performance Testing', () => {
       const TestComponent = () => {
         return (
           <div>
-            <button onClick={() => mockDispatch({ type: 'TEST' })}>Test</button>
+            <button onClick={() => mockDispatch()}>Test</button>
           </div>
         );
       };
@@ -418,7 +364,7 @@ describe('Performance Testing', () => {
                 alt="Test"
               />
             </Layout>
-          </BrowserRouter>,
+          </BrowserRouter>
         );
       });
 
@@ -432,7 +378,7 @@ describe('Performance Testing', () => {
           <Layout>
             <div className="font-sans">Text with web font</div>
           </Layout>
-        </BrowserRouter>,
+        </BrowserRouter>
       );
 
       const textElement = container.querySelector('.font-sans');

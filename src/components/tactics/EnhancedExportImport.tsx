@@ -115,7 +115,9 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
     createBackup: true,
   });
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<'all' | 'formation' | 'playbook' | 'complete'>('all');
+  const [selectedCategory, setSelectedCategory] = useState<
+    'all' | 'formation' | 'playbook' | 'complete'
+  >('all');
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [dragActive, setDragActive] = useState(false);
@@ -124,69 +126,73 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Mock tactical library data
-  const tacticalLibrary = useMemo((): TacticalLibrary[] => [
-    {
-      id: 'lib-1',
-      name: 'Premier League Masterclass',
-      description: 'Professional formations and tactics used by top Premier League teams',
-      author: 'TacticalGuru',
-      createdAt: new Date('2024-01-15'),
-      updatedAt: new Date('2024-02-20'),
-      tags: ['Premier League', 'Professional', '4-3-3', 'Pressing'],
-      category: 'complete',
-      rating: 4.8,
-      downloads: 1250,
-      isPublic: true,
-      formations: [],
-      playbook: [],
-      preview: 'preview-1.png',
-      fileSize: 2.4, // MB
-    },
-    {
-      id: 'lib-2',
-      name: 'Pep Guardiola Style',
-      description: 'Possession-based football with high defensive line',
-      author: 'CityCoachs',
-      createdAt: new Date('2024-02-01'),
-      updatedAt: new Date('2024-02-15'),
-      tags: ['Pep', 'Possession', 'Tiki-taka', '4-3-3'],
-      category: 'formation',
-      rating: 4.9,
-      downloads: 890,
-      isPublic: true,
-      formations: [],
-      playbook: [],
-      preview: 'preview-2.png',
-      fileSize: 1.8,
-    },
-    {
-      id: 'lib-3',
-      name: 'Counter-Attack Masterpiece',
-      description: 'Devastating counter-attacking playbook with set pieces',
-      author: 'TacticalMind',
-      createdAt: new Date('2024-01-20'),
-      updatedAt: new Date('2024-02-10'),
-      tags: ['Counter-attack', 'Set pieces', 'Quick transitions'],
-      category: 'playbook',
-      rating: 4.6,
-      downloads: 650,
-      isPublic: true,
-      formations: [],
-      playbook: [],
-      preview: 'preview-3.png',
-      fileSize: 3.1,
-    },
-  ], []);
+  const tacticalLibrary = useMemo(
+    (): TacticalLibrary[] => [
+      {
+        id: 'lib-1',
+        name: 'Premier League Masterclass',
+        description: 'Professional formations and tactics used by top Premier League teams',
+        author: 'TacticalGuru',
+        createdAt: new Date('2024-01-15'),
+        updatedAt: new Date('2024-02-20'),
+        tags: ['Premier League', 'Professional', '4-3-3', 'Pressing'],
+        category: 'complete',
+        rating: 4.8,
+        downloads: 1250,
+        isPublic: true,
+        formations: [],
+        playbook: [],
+        preview: 'preview-1.png',
+        fileSize: 2.4, // MB
+      },
+      {
+        id: 'lib-2',
+        name: 'Pep Guardiola Style',
+        description: 'Possession-based football with high defensive line',
+        author: 'CityCoachs',
+        createdAt: new Date('2024-02-01'),
+        updatedAt: new Date('2024-02-15'),
+        tags: ['Pep', 'Possession', 'Tiki-taka', '4-3-3'],
+        category: 'formation',
+        rating: 4.9,
+        downloads: 890,
+        isPublic: true,
+        formations: [],
+        playbook: [],
+        preview: 'preview-2.png',
+        fileSize: 1.8,
+      },
+      {
+        id: 'lib-3',
+        name: 'Counter-Attack Masterpiece',
+        description: 'Devastating counter-attacking playbook with set pieces',
+        author: 'TacticalMind',
+        createdAt: new Date('2024-01-20'),
+        updatedAt: new Date('2024-02-10'),
+        tags: ['Counter-attack', 'Set pieces', 'Quick transitions'],
+        category: 'playbook',
+        rating: 4.6,
+        downloads: 650,
+        isPublic: true,
+        formations: [],
+        playbook: [],
+        preview: 'preview-3.png',
+        fileSize: 3.1,
+      },
+    ],
+    []
+  );
 
   // Filter library items
   const filteredLibrary = useMemo(() => {
     return tacticalLibrary.filter(item => {
-      const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      const matchesSearch =
+        item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
-      
+
       const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
-      
+
       return matchesSearch && matchesCategory;
     });
   }, [tacticalLibrary, searchQuery, selectedCategory]);
@@ -224,37 +230,43 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
     onExport(exportOptions, exportData);
   }, [exportOptions, formations, playbook, players, onExport]);
 
-  const handleImport = useCallback(async (file: File) => {
-    setIsImporting(true);
-    
-    try {
-      const text = await file.text();
-      const data = JSON.parse(text);
-      
-      // Validate data structure
-      if (importOptions.validateData) {
-        // Perform validation logic here
-        console.log('Validating import data...');
-      }
-      
-      onImport(data, importOptions);
-      setPreviewData(data);
-    } catch (error) {
-      console.error('Import failed:', error);
-    } finally {
-      setIsImporting(false);
-    }
-  }, [importOptions, onImport]);
+  const handleImport = useCallback(
+    async (file: File) => {
+      setIsImporting(true);
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setDragActive(false);
-    
-    const files = Array.from(e.dataTransfer.files);
-    if (files.length > 0) {
-      handleImport(files[0]);
-    }
-  }, [handleImport]);
+      try {
+        const text = await file.text();
+        const data = JSON.parse(text);
+
+        // Validate data structure
+        if (importOptions.validateData) {
+          // Perform validation logic here
+          console.log('Validating import data...');
+        }
+
+        onImport(data, importOptions);
+        setPreviewData(data);
+      } catch (error) {
+        console.error('Import failed:', error);
+      } finally {
+        setIsImporting(false);
+      }
+    },
+    [importOptions, onImport]
+  );
+
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      setDragActive(false);
+
+      const files = Array.from(e.dataTransfer.files);
+      if (files.length > 0) {
+        handleImport(files[0]);
+      }
+    },
+    [handleImport]
+  );
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -268,21 +280,32 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
 
   const getFormatIcon = (format: string) => {
     switch (format) {
-      case 'json': return Code;
-      case 'csv': return FileText;
-      case 'pdf': return FileText;
-      case 'png': case 'svg': return FileImage;
-      case 'xml': return Code;
-      default: return FileText;
+      case 'json':
+        return Code;
+      case 'csv':
+        return FileText;
+      case 'pdf':
+        return FileText;
+      case 'png':
+      case 'svg':
+        return FileImage;
+      case 'xml':
+        return Code;
+      default:
+        return FileText;
     }
   };
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
-      case 'formation': return Users;
-      case 'playbook': return FileText;
-      case 'complete': return Package;
-      default: return Folder;
+      case 'formation':
+        return Users;
+      case 'playbook':
+        return FileText;
+      case 'complete':
+        return Package;
+      default:
+        return Folder;
     }
   };
 
@@ -293,7 +316,9 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
     { id: 'cloud', name: 'Cloud Sync', icon: Cloud, count: 0 },
   ];
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return null;
+  }
 
   return (
     <motion.div
@@ -350,19 +375,22 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
                 onClick={() => setActiveTab(tab.id as TabType)}
                 className={`
                   flex items-center gap-2 px-6 py-4 text-sm font-medium transition-all relative
-                  ${activeTab === tab.id
-                    ? 'text-emerald-400 bg-emerald-500/10'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-700/30'
+                  ${
+                    activeTab === tab.id
+                      ? 'text-emerald-400 bg-emerald-500/10'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-700/30'
                   }
                 `}
               >
                 <IconComponent className="w-4 h-4" />
                 {tab.name}
                 {tab.count > 0 && (
-                  <span className={`
+                  <span
+                    className={`
                     px-1.5 py-0.5 rounded text-xs
                     ${activeTab === tab.id ? 'bg-emerald-500/20 text-emerald-300' : 'bg-slate-700/50 text-slate-300'}
-                  `}>
+                  `}
+                  >
                     {tab.count}
                   </span>
                 )}
@@ -410,18 +438,25 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
                           return (
                             <button
                               key={format.id}
-                              onClick={() => setExportOptions(prev => ({ ...prev, format: format.id as any }))}
+                              onClick={() =>
+                                setExportOptions(prev => ({ ...prev, format: format.id as any }))
+                              }
                               className={`
                                 p-3 rounded-lg border transition-all text-left
-                                ${exportOptions.format === format.id
-                                  ? 'border-emerald-500/70 bg-emerald-600/25'
-                                  : 'border-slate-600/50 bg-slate-800/40 hover:border-slate-500/60'
+                                ${
+                                  exportOptions.format === format.id
+                                    ? 'border-emerald-500/70 bg-emerald-600/25'
+                                    : 'border-slate-600/50 bg-slate-800/40 hover:border-slate-500/60'
                                 }
                               `}
                             >
-                              <IconComponent className={`w-5 h-5 mb-2 ${
-                                exportOptions.format === format.id ? 'text-emerald-400' : 'text-slate-400'
-                              }`} />
+                              <IconComponent
+                                className={`w-5 h-5 mb-2 ${
+                                  exportOptions.format === format.id
+                                    ? 'text-emerald-400'
+                                    : 'text-slate-400'
+                                }`}
+                              />
                               <div className="font-medium text-white text-sm">{format.label}</div>
                               <div className="text-xs text-slate-400">{format.desc}</div>
                             </button>
@@ -435,10 +470,26 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
                       <h4 className="font-medium text-white mb-4">Include Content</h4>
                       <div className="space-y-3">
                         {[
-                          { key: 'includePlayerData', label: 'Player Data', desc: 'All player information and stats' },
-                          { key: 'includeFormations', label: 'Formations', desc: 'Formation layouts and tactics' },
-                          { key: 'includePlaybook', label: 'Playbook', desc: 'Plays and tactical sequences' },
-                          { key: 'includeAnalytics', label: 'Analytics', desc: 'Performance data and insights' },
+                          {
+                            key: 'includePlayerData',
+                            label: 'Player Data',
+                            desc: 'All player information and stats',
+                          },
+                          {
+                            key: 'includeFormations',
+                            label: 'Formations',
+                            desc: 'Formation layouts and tactics',
+                          },
+                          {
+                            key: 'includePlaybook',
+                            label: 'Playbook',
+                            desc: 'Plays and tactical sequences',
+                          },
+                          {
+                            key: 'includeAnalytics',
+                            label: 'Analytics',
+                            desc: 'Performance data and insights',
+                          },
                         ].map(option => (
                           <label
                             key={option.key}
@@ -447,10 +498,12 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
                             <input
                               type="checkbox"
                               checked={exportOptions[option.key as keyof ExportOptions] as boolean}
-                              onChange={(e) => setExportOptions(prev => ({
-                                ...prev,
-                                [option.key]: e.target.checked
-                              }))}
+                              onChange={e =>
+                                setExportOptions(prev => ({
+                                  ...prev,
+                                  [option.key]: e.target.checked,
+                                }))
+                              }
                               className="w-4 h-4 text-emerald-600 rounded"
                             />
                             <div>
@@ -471,22 +524,26 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
                           <input
                             type="checkbox"
                             checked={exportOptions.compression}
-                            onChange={(e) => setExportOptions(prev => ({
-                              ...prev,
-                              compression: e.target.checked
-                            }))}
+                            onChange={e =>
+                              setExportOptions(prev => ({
+                                ...prev,
+                                compression: e.target.checked,
+                              }))
+                            }
                             className="w-4 h-4 text-emerald-600 rounded"
                           />
                         </label>
-                        
+
                         <div>
                           <label className="text-white mb-2 block">Quality</label>
                           <select
                             value={exportOptions.quality}
-                            onChange={(e) => setExportOptions(prev => ({
-                              ...prev,
-                              quality: e.target.value as any
-                            }))}
+                            onChange={e =>
+                              setExportOptions(prev => ({
+                                ...prev,
+                                quality: e.target.value as any,
+                              }))
+                            }
                             className="w-full bg-slate-700/50 border border-slate-600/50 rounded-lg px-3 py-2 text-white text-sm"
                           >
                             <option value="low">Low (Fast)</option>
@@ -508,7 +565,9 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
                       <div className="text-center text-slate-400">
                         <Camera className="w-12 h-12 mx-auto mb-3 opacity-50" />
                         <div className="font-medium mb-1">Export Preview</div>
-                        <div className="text-sm">Preview will appear here based on selected options</div>
+                        <div className="text-sm">
+                          Preview will appear here based on selected options
+                        </div>
                       </div>
                     </div>
 
@@ -580,10 +639,12 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
                           <input
                             type="checkbox"
                             checked={importOptions.replaceExisting}
-                            onChange={(e) => setImportOptions(prev => ({
-                              ...prev,
-                              replaceExisting: e.target.checked
-                            }))}
+                            onChange={e =>
+                              setImportOptions(prev => ({
+                                ...prev,
+                                replaceExisting: e.target.checked,
+                              }))
+                            }
                             className="w-4 h-4 text-emerald-600 rounded"
                           />
                         </label>
@@ -592,10 +653,12 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
                           <label className="text-white mb-2 block">Merge Strategy</label>
                           <select
                             value={importOptions.mergeStrategy}
-                            onChange={(e) => setImportOptions(prev => ({
-                              ...prev,
-                              mergeStrategy: e.target.value as any
-                            }))}
+                            onChange={e =>
+                              setImportOptions(prev => ({
+                                ...prev,
+                                mergeStrategy: e.target.value as any,
+                              }))
+                            }
                             className="w-full bg-slate-700/50 border border-slate-600/50 rounded-lg px-3 py-2 text-white text-sm"
                           >
                             <option value="overwrite">Overwrite Conflicts</option>
@@ -609,10 +672,12 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
                           <input
                             type="checkbox"
                             checked={importOptions.validateData}
-                            onChange={(e) => setImportOptions(prev => ({
-                              ...prev,
-                              validateData: e.target.checked
-                            }))}
+                            onChange={e =>
+                              setImportOptions(prev => ({
+                                ...prev,
+                                validateData: e.target.checked,
+                              }))
+                            }
                             className="w-4 h-4 text-emerald-600 rounded"
                           />
                         </label>
@@ -622,10 +687,12 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
                           <input
                             type="checkbox"
                             checked={importOptions.createBackup}
-                            onChange={(e) => setImportOptions(prev => ({
-                              ...prev,
-                              createBackup: e.target.checked
-                            }))}
+                            onChange={e =>
+                              setImportOptions(prev => ({
+                                ...prev,
+                                createBackup: e.target.checked,
+                              }))
+                            }
                             className="w-4 h-4 text-emerald-600 rounded"
                           />
                         </label>
@@ -644,15 +711,18 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
                       onDragLeave={handleDragLeave}
                       className={`
                         border-2 border-dashed rounded-xl p-8 text-center transition-all
-                        ${dragActive 
-                          ? 'border-emerald-500 bg-emerald-500/10' 
-                          : 'border-slate-600 hover:border-slate-500'
+                        ${
+                          dragActive
+                            ? 'border-emerald-500 bg-emerald-500/10'
+                            : 'border-slate-600 hover:border-slate-500'
                         }
                       `}
                     >
-                      <Upload className={`w-12 h-12 mx-auto mb-4 ${
-                        dragActive ? 'text-emerald-400' : 'text-slate-400'
-                      }`} />
+                      <Upload
+                        className={`w-12 h-12 mx-auto mb-4 ${
+                          dragActive ? 'text-emerald-400' : 'text-slate-400'
+                        }`}
+                      />
                       <div className="text-white font-medium mb-2">
                         Drop files here or click to browse
                       </div>
@@ -663,7 +733,7 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
                         ref={fileInputRef}
                         type="file"
                         accept=".json,.csv,.xml"
-                        onChange={(e) => e.target.files?.[0] && handleImport(e.target.files[0])}
+                        onChange={e => e.target.files?.[0] && handleImport(e.target.files[0])}
                         className="hidden"
                       />
                       <button
@@ -700,9 +770,7 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
                           </div>
                           <div className="flex justify-between">
                             <span className="text-slate-400">Players:</span>
-                            <span className="text-white">
-                              {(previewData.players || []).length}
-                            </span>
+                            <span className="text-white">{(previewData.players || []).length}</span>
                           </div>
                           <div className="flex justify-between">
                             <span className="text-slate-400">Playbook Items:</span>
@@ -748,14 +816,14 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
                         type="text"
                         placeholder="Search library..."
                         value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onChange={e => setSearchQuery(e.target.value)}
                         className="w-full pl-10 pr-4 py-2 bg-slate-800/50 border border-slate-600/50 rounded-lg text-white text-sm focus:outline-none focus:border-emerald-500/50"
                       />
                     </div>
-                    
+
                     <select
                       value={selectedCategory}
-                      onChange={(e) => setSelectedCategory(e.target.value as any)}
+                      onChange={e => setSelectedCategory(e.target.value as any)}
                       className="bg-slate-800/50 border border-slate-600/50 rounded-lg px-3 py-2 text-white text-sm"
                     >
                       <option value="all">All Categories</option>
@@ -846,7 +914,9 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
                 <div className="text-center text-slate-400">
                   <Cloud className="w-16 h-16 mx-auto mb-4 opacity-50" />
                   <h3 className="text-lg font-medium mb-2">Cloud Sync</h3>
-                  <p className="text-sm">Sync your tactical data across devices with cloud storage.</p>
+                  <p className="text-sm">
+                    Sync your tactical data across devices with cloud storage.
+                  </p>
                   <button className="mt-4 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors">
                     Connect to Cloud
                   </button>

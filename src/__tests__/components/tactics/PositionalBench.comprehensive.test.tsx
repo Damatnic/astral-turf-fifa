@@ -13,7 +13,7 @@ import {
   fireEvent,
   waitFor,
   within,
-  userEvent
+  userEvent,
 } from '../../utils/comprehensive-test-providers';
 import PositionalBench from '../../../components/tactics/PositionalBench';
 import type { Player } from '../../../types';
@@ -26,12 +26,12 @@ describe('PositionalBench - Comprehensive Test Suite', () => {
   beforeEach(() => {
     const testData = createTestData.complete();
     testPlayers = testData.players.slice(11, 22); // Get bench players
-    
+
     mockProps = {
       ...createMockProps.positionalBench(),
-      players: testPlayers
+      players: testPlayers,
     };
-    
+
     user = userEvent.setup();
   });
 
@@ -48,9 +48,7 @@ describe('PositionalBench - Comprehensive Test Suite', () => {
     });
 
     it('should group players by position when groupBy is set to position', () => {
-      renderWithProviders(
-        <PositionalBench {...mockProps} groupBy="position" />
-      );
+      renderWithProviders(<PositionalBench {...(mockProps as any)} groupBy="position" />);
 
       // Check for position group headers
       expect(screen.getByText(/goalkeepers/i)).toBeInTheDocument();
@@ -60,9 +58,7 @@ describe('PositionalBench - Comprehensive Test Suite', () => {
     });
 
     it('should group players by availability when groupBy is set to availability', () => {
-      renderWithProviders(
-        <PositionalBench {...mockProps} groupBy="availability" />
-      );
+      renderWithProviders(<PositionalBench {...(mockProps as any)} groupBy="availability" />);
 
       // Check for availability group headers
       expect(screen.getByText(/available/i)).toBeInTheDocument();
@@ -70,9 +66,7 @@ describe('PositionalBench - Comprehensive Test Suite', () => {
     });
 
     it('should show all players in a single list when groupBy is not set', () => {
-      renderWithProviders(
-        <PositionalBench {...mockProps} groupBy={undefined} />
-      );
+      renderWithProviders(<PositionalBench {...(mockProps as any)} groupBy={undefined} />);
 
       const benchContainer = screen.getByTestId('positional-bench');
       const playerCards = within(benchContainer).getAllByTestId(/player-card/);
@@ -81,9 +75,7 @@ describe('PositionalBench - Comprehensive Test Suite', () => {
 
     it('should apply custom className when provided', () => {
       const customClass = 'custom-bench';
-      renderWithProviders(
-        <PositionalBench {...mockProps} className={customClass} />
-      );
+      renderWithProviders(<PositionalBench {...mockProps} className={customClass} />);
 
       const bench = screen.getByTestId('positional-bench');
       expect(bench).toHaveClass(customClass);
@@ -101,22 +93,18 @@ describe('PositionalBench - Comprehensive Test Suite', () => {
     });
 
     it('should show player stats when showStats is enabled', () => {
-      renderWithProviders(
-        <PositionalBench {...mockProps} showStats={true} />
-      );
+      renderWithProviders(<PositionalBench {...(mockProps as any)} showStats={true} />);
 
       // Should show stats for at least the first player
       const firstPlayer = testPlayers[0];
       const playerCard = screen.getByTestId(`player-card-${firstPlayer.id}`);
-      
+
       // Check for common stats display
       expect(within(playerCard).getByText(/pace|shooting|passing/i)).toBeInTheDocument();
     });
 
     it('should hide player stats when showStats is disabled', () => {
-      renderWithProviders(
-        <PositionalBench {...mockProps} showStats={false} />
-      );
+      renderWithProviders(<PositionalBench {...(mockProps as any)} showStats={false} />);
 
       // Stats should not be visible
       expect(screen.queryByText(/pace:|shooting:|passing:/i)).not.toBeInTheDocument();
@@ -127,7 +115,7 @@ describe('PositionalBench - Comprehensive Test Suite', () => {
 
       testPlayers.forEach(player => {
         const playerCard = screen.getByTestId(`player-card-${player.id}`);
-        expect(within(playerCard).getByText(player.position)).toBeInTheDocument();
+        expect(within(playerCard).getByText(String(player.position))).toBeInTheDocument();
       });
     });
 
@@ -136,11 +124,15 @@ describe('PositionalBench - Comprehensive Test Suite', () => {
 
       testPlayers.forEach(player => {
         const playerCard = screen.getByTestId(`player-card-${player.id}`);
-        
-        if (player.isAvailable) {
-          expect(within(playerCard).getByTestId('availability-indicator')).toHaveClass(/available|ready/);
+
+        if ((player as any).isAvailable) {
+          expect(within(playerCard).getByTestId('availability-indicator')).toHaveClass(
+            /available|ready/
+          );
         } else {
-          expect(within(playerCard).getByTestId('availability-indicator')).toHaveClass(/unavailable|injured/);
+          expect(within(playerCard).getByTestId('availability-indicator')).toHaveClass(
+            /unavailable|injured/
+          );
         }
       });
     });
@@ -152,7 +144,7 @@ describe('PositionalBench - Comprehensive Test Suite', () => {
 
       const firstPlayer = testPlayers[0];
       const playerCard = screen.getByTestId(`player-card-${firstPlayer.id}`);
-      
+
       await user.click(playerCard);
 
       expect(mockProps.onPlayerSelect).toHaveBeenCalledWith(firstPlayer);
@@ -163,7 +155,7 @@ describe('PositionalBench - Comprehensive Test Suite', () => {
 
       const firstPlayer = testPlayers[0];
       const playerCard = screen.getByTestId(`player-card-${firstPlayer.id}`);
-      
+
       playerCard.focus();
       await user.keyboard('{Enter}');
 
@@ -175,7 +167,7 @@ describe('PositionalBench - Comprehensive Test Suite', () => {
 
       const firstPlayer = testPlayers[0];
       const playerCard = screen.getByTestId(`player-card-${firstPlayer.id}`);
-      
+
       playerCard.focus();
       await user.keyboard(' ');
 
@@ -187,13 +179,13 @@ describe('PositionalBench - Comprehensive Test Suite', () => {
 
       const firstPlayer = testPlayers[0];
       const playerCard = screen.getByTestId(`player-card-${firstPlayer.id}`);
-      
+
       // Start drag
       fireEvent.dragStart(playerCard, {
         dataTransfer: {
           setData: vi.fn(),
           getData: vi.fn(),
-        }
+        },
       });
 
       // Verify drag data setup
@@ -205,13 +197,13 @@ describe('PositionalBench - Comprehensive Test Suite', () => {
 
       const firstPlayer = testPlayers[0];
       const playerCard = screen.getByTestId(`player-card-${firstPlayer.id}`);
-      
+
       // Simulate drag and drop
       fireEvent.dragStart(playerCard);
       fireEvent.dragEnd(playerCard, {
         dataTransfer: {
-          dropEffect: 'move'
-        }
+          dropEffect: 'move',
+        },
       });
 
       // The onPlayerMove should be called when drop is completed on a valid target
@@ -221,20 +213,16 @@ describe('PositionalBench - Comprehensive Test Suite', () => {
 
   describe('Filtering and Searching', () => {
     it('should filter players by position when position filter is applied', () => {
-      renderWithProviders(
-        <PositionalBench {...mockProps} positionFilter="midfielder" />
-      );
+      renderWithProviders(<PositionalBench {...(mockProps as any)} positionFilter="midfielder" />);
 
-      const midfielders = testPlayers.filter(p => p.position === 'midfielder');
+      const midfielders = testPlayers.filter(p => String(p.position) === 'midfielder');
       const visibleCards = screen.getAllByTestId(/player-card/);
-      
+
       expect(visibleCards.length).toBe(midfielders.length);
     });
 
     it('should show search input when searchable is enabled', () => {
-      renderWithProviders(
-        <PositionalBench {...mockProps} searchable={true} />
-      );
+      renderWithProviders(<PositionalBench {...(mockProps as any)} searchable={true} />);
 
       expect(screen.getByPlaceholderText(/search players/i)).toBeInTheDocument();
     });
@@ -246,11 +234,7 @@ describe('PositionalBench - Comprehensive Test Suite', () => {
       searchablePlayers[2].name = 'Mike Johnson';
 
       renderWithProviders(
-        <PositionalBench 
-          {...mockProps} 
-          players={searchablePlayers}
-          searchable={true} 
-        />
+        <PositionalBench {...(mockProps as any)} players={searchablePlayers} searchable={true} />
       );
 
       const searchInput = screen.getByPlaceholderText(/search players/i);
@@ -265,15 +249,13 @@ describe('PositionalBench - Comprehensive Test Suite', () => {
     });
 
     it('should clear search when search input is cleared', async () => {
-      renderWithProviders(
-        <PositionalBench {...mockProps} searchable={true} />
-      );
+      renderWithProviders(<PositionalBench {...(mockProps as any)} searchable={true} />);
 
       const searchInput = screen.getByPlaceholderText(/search players/i);
-      
+
       // Type search term
       await user.type(searchInput, 'test');
-      
+
       // Clear search
       await user.clear(searchInput);
 
@@ -287,13 +269,11 @@ describe('PositionalBench - Comprehensive Test Suite', () => {
 
   describe('Sorting and Organization', () => {
     it('should sort players by name when sortBy is set to name', () => {
-      renderWithProviders(
-        <PositionalBench {...mockProps} sortBy="name" />
-      );
+      renderWithProviders(<PositionalBench {...(mockProps as any)} sortBy="name" />);
 
       const playerCards = screen.getAllByTestId(/player-card/);
-      const playerNames = playerCards.map(card => 
-        within(card).getByTestId('player-name').textContent
+      const playerNames = playerCards.map(
+        card => within(card).getByTestId('player-name').textContent
       );
 
       // Names should be in alphabetical order
@@ -302,23 +282,19 @@ describe('PositionalBench - Comprehensive Test Suite', () => {
     });
 
     it('should sort players by position when sortBy is set to position', () => {
-      renderWithProviders(
-        <PositionalBench {...mockProps} sortBy="position" />
-      );
+      renderWithProviders(<PositionalBench {...(mockProps as any)} sortBy="position" />);
 
       const playerCards = screen.getAllByTestId(/player-card/);
-      
+
       // Positions should be grouped together
       expect(playerCards.length).toBeGreaterThan(0);
     });
 
     it('should sort players by jersey number when sortBy is set to number', () => {
-      renderWithProviders(
-        <PositionalBench {...mockProps} sortBy="number" />
-      );
+      renderWithProviders(<PositionalBench {...(mockProps as any)} sortBy="number" />);
 
       const playerCards = screen.getAllByTestId(/player-card/);
-      const jerseyNumbers = playerCards.map(card => 
+      const jerseyNumbers = playerCards.map(card =>
         parseInt(within(card).getByTestId('jersey-number').textContent || '0')
       );
 
@@ -333,7 +309,7 @@ describe('PositionalBench - Comprehensive Test Suite', () => {
       // Mock mobile viewport
       Object.defineProperty(window, 'innerWidth', {
         value: 480,
-        configurable: true
+        configurable: true,
       });
 
       renderWithProviders(<PositionalBench {...mockProps} />);
@@ -343,27 +319,21 @@ describe('PositionalBench - Comprehensive Test Suite', () => {
     });
 
     it('should handle empty player list gracefully', () => {
-      renderWithProviders(
-        <PositionalBench {...mockProps} players={[]} />
-      );
+      renderWithProviders(<PositionalBench {...mockProps} players={[]} />);
 
       expect(screen.getByText(/no substitute players/i)).toBeInTheDocument();
     });
 
     it('should show loading state when players are being loaded', () => {
-      renderWithProviders(
-        <PositionalBench {...mockProps} loading={true} />
-      );
+      renderWithProviders(<PositionalBench {...(mockProps as any)} loading={true} />);
 
       expect(screen.getByTestId('loading-indicator')).toBeInTheDocument();
     });
 
     it('should handle very large player lists efficiently', () => {
       const largePlayerList = createTestData.performance(50).players;
-      
-      renderWithProviders(
-        <PositionalBench {...mockProps} players={largePlayerList} />
-      );
+
+      renderWithProviders(<PositionalBench {...mockProps} players={largePlayerList} />);
 
       // Should render without performance issues
       expect(screen.getByTestId('positional-bench')).toBeInTheDocument();
@@ -395,9 +365,7 @@ describe('PositionalBench - Comprehensive Test Suite', () => {
     });
 
     it('should announce position groups to screen readers', () => {
-      renderWithProviders(
-        <PositionalBench {...mockProps} groupBy="position" />
-      );
+      renderWithProviders(<PositionalBench {...(mockProps as any)} groupBy="position" />);
 
       const positionHeaders = screen.getAllByRole('heading', { level: 3 });
       positionHeaders.forEach(header => {
@@ -412,7 +380,7 @@ describe('PositionalBench - Comprehensive Test Suite', () => {
       const secondPlayerCard = screen.getByTestId(`player-card-${testPlayers[1].id}`);
 
       firstPlayerCard.focus();
-      
+
       // Navigate with arrow keys
       await user.keyboard('{ArrowDown}');
       expect(secondPlayerCard).toHaveFocus();
@@ -422,13 +390,9 @@ describe('PositionalBench - Comprehensive Test Suite', () => {
   describe('Performance and Optimization', () => {
     it('should virtualize large player lists', () => {
       const largePlayerList = createTestData.performance(100).players;
-      
+
       renderWithProviders(
-        <PositionalBench 
-          {...mockProps} 
-          players={largePlayerList}
-          virtualized={true} 
-        />
+        <PositionalBench {...(mockProps as any)} players={largePlayerList} virtualized={true} />
       );
 
       // Should only render visible players
@@ -437,19 +401,20 @@ describe('PositionalBench - Comprehensive Test Suite', () => {
     });
 
     it('should debounce search input', async () => {
-      renderWithProviders(
-        <PositionalBench {...mockProps} searchable={true} />
-      );
+      renderWithProviders(<PositionalBench {...(mockProps as any)} searchable={true} />);
 
       const searchInput = screen.getByPlaceholderText(/search players/i);
-      
+
       // Type rapidly
-      await user.type(searchInput, 'test', { delay: 10 });
+      await user.type(searchInput, 'test');
 
       // Search should be debounced
-      await waitFor(() => {
-        expect(searchInput).toHaveValue('test');
-      }, { timeout: 1000 });
+      await waitFor(
+        () => {
+          expect(searchInput).toHaveValue('test');
+        },
+        { timeout: 1000 }
+      );
     });
 
     it('should memoize player cards to prevent unnecessary re-renders', () => {
@@ -459,9 +424,7 @@ describe('PositionalBench - Comprehensive Test Suite', () => {
         return <PositionalBench {...mockProps} players={players} />;
       };
 
-      const { rerender } = renderWithProviders(
-        <TestBench players={testPlayers} />
-      );
+      const { rerender } = renderWithProviders(<TestBench players={testPlayers} />);
 
       const initialRenderCount = renderCount;
 
@@ -483,19 +446,15 @@ describe('PositionalBench - Comprehensive Test Suite', () => {
     });
 
     it('should handle formation changes from parent', () => {
-      const { rerender } = renderWithProviders(
-        <PositionalBench {...mockProps} />
-      );
+      const { rerender } = renderWithProviders(<PositionalBench {...mockProps} />);
 
       // Simulate formation change that affects bench players
       const updatedPlayers = testPlayers.map(player => ({
         ...player,
-        isAvailable: !player.isAvailable
+        isAvailable: !(player as any).isAvailable,
       }));
 
-      rerender(
-        <PositionalBench {...mockProps} players={updatedPlayers} />
-      );
+      rerender(<PositionalBench {...mockProps} players={updatedPlayers} />);
 
       // Should update player availability indicators
       expect(screen.getByTestId('positional-bench')).toBeInTheDocument();
@@ -507,20 +466,16 @@ describe('PositionalBench - Comprehensive Test Suite', () => {
       const playersWithMissingData = testPlayers.map(player => ({
         ...player,
         name: player.name || 'Unknown Player',
-        position: player.position || 'unknown'
+        position: player.position || 'unknown',
       }));
 
-      renderWithProviders(
-        <PositionalBench {...mockProps} players={playersWithMissingData} />
-      );
+      renderWithProviders(<PositionalBench {...mockProps} players={playersWithMissingData} />);
 
       expect(screen.getByTestId('positional-bench')).toBeInTheDocument();
     });
 
     it('should handle invalid groupBy values', () => {
-      renderWithProviders(
-        <PositionalBench {...mockProps} groupBy={'invalid' as any} />
-      );
+      renderWithProviders(<PositionalBench {...(mockProps as any)} groupBy={'invalid' as any} />);
 
       // Should fall back to default behavior
       expect(screen.getByTestId('positional-bench')).toBeInTheDocument();
@@ -529,13 +484,11 @@ describe('PositionalBench - Comprehensive Test Suite', () => {
     it('should handle missing callback functions', () => {
       const propsWithoutCallbacks = {
         ...mockProps,
-        onPlayerSelect: undefined,
-        onPlayerMove: undefined
+        onPlayerSelect: undefined as any,
+        onPlayerMove: undefined,
       };
 
-      renderWithProviders(
-        <PositionalBench {...propsWithoutCallbacks} />
-      );
+      renderWithProviders(<PositionalBench {...(propsWithoutCallbacks as any)} />);
 
       // Should render without issues even without callbacks
       expect(screen.getByTestId('positional-bench')).toBeInTheDocument();

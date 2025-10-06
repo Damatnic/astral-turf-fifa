@@ -88,7 +88,16 @@ export interface LoginAttempt {
 
 export interface SecurityEvent {
   id: string;
-  type: 'login_success' | 'login_failure' | 'password_change' | 'mfa_enabled' | 'mfa_disabled' | 'suspicious_activity' | 'account_locked' | 'token_refresh' | 'logout';
+  type:
+    | 'login_success'
+    | 'login_failure'
+    | 'password_change'
+    | 'mfa_enabled'
+    | 'mfa_disabled'
+    | 'suspicious_activity'
+    | 'account_locked'
+    | 'token_refresh'
+    | 'logout';
   userId?: string;
   context: SecurityContext;
   metadata: Record<string, unknown>;
@@ -146,7 +155,10 @@ export interface RiskAssessment {
 class AuthenticationSecurity {
   private readonly jwtSecret: Uint8Array;
   private readonly encryptionKey: string;
-  private failedAttempts: Map<string, { count: number; lastAttempt: number; lockedUntil?: number }> = new Map();
+  private failedAttempts: Map<
+    string,
+    { count: number; lastAttempt: number; lockedUntil?: number }
+  > = new Map();
   private activeSessions: Map<string, UserSession[]> = new Map();
   private trustedDevices: Map<string, DeviceInfo[]> = new Map();
   private securityEvents: SecurityEvent[] = [];
@@ -180,7 +192,7 @@ class AuthenticationSecurity {
   async assessRisk(email: string, context: SecurityContext): Promise<RiskAssessment> {
     const userId = this.getUserIdFromEmail(email);
     const deviceFingerprint = this.generateDeviceFingerprint(context);
-    
+
     const factors = {
       newDevice: !this.isDeviceTrusted(userId, deviceFingerprint),
       unusualLocation: await this.isUnusualLocation(userId, context.ipAddress),
@@ -192,12 +204,24 @@ class AuthenticationSecurity {
 
     // Calculate risk score based on factors
     let score = 0;
-    if (factors.newDevice) score += 0.3;
-    if (factors.unusualLocation) score += 0.25;
-    if (factors.suspiciousActivity) score += 0.4;
-    if (factors.failedAttempts > 2) score += 0.2;
-    if (factors.timeOfDay === 'unusual') score += 0.1;
-    if (factors.vpnDetected) score += 0.15;
+    if (factors.newDevice) {
+      score += 0.3;
+    }
+    if (factors.unusualLocation) {
+      score += 0.25;
+    }
+    if (factors.suspiciousActivity) {
+      score += 0.4;
+    }
+    if (factors.failedAttempts > 2) {
+      score += 0.2;
+    }
+    if (factors.timeOfDay === 'unusual') {
+      score += 0.1;
+    }
+    if (factors.vpnDetected) {
+      score += 0.15;
+    }
 
     score = Math.min(score, 1);
 
@@ -220,7 +244,9 @@ class AuthenticationSecurity {
     const errors: string[] = [];
 
     if (password.length < SECURITY_CONFIG.PASSWORD.MIN_LENGTH) {
-      errors.push(`Password must be at least ${SECURITY_CONFIG.PASSWORD.MIN_LENGTH} characters long`);
+      errors.push(
+        `Password must be at least ${SECURITY_CONFIG.PASSWORD.MIN_LENGTH} characters long`
+      );
     }
 
     if (SECURITY_CONFIG.PASSWORD.REQUIRE_UPPERCASE && !/[A-Z]/.test(password)) {
@@ -235,7 +261,10 @@ class AuthenticationSecurity {
       errors.push('Password must contain at least one number');
     }
 
-    if (SECURITY_CONFIG.PASSWORD.REQUIRE_SYMBOLS && !/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+    if (
+      SECURITY_CONFIG.PASSWORD.REQUIRE_SYMBOLS &&
+      !/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)
+    ) {
       errors.push('Password must contain at least one special character');
     }
 
@@ -321,7 +350,10 @@ class AuthenticationSecurity {
   /**
    * Verify JWT token with enhanced security checks
    */
-  async verifyToken(token: string, context: SecurityContext): Promise<{ valid: boolean; payload?: any; error?: string }> {
+  async verifyToken(
+    token: string,
+    context: SecurityContext
+  ): Promise<{ valid: boolean; payload?: any; error?: string }> {
     try {
       const { payload } = await jwtVerify(token, this.jwtSecret, {
         issuer: SECURITY_CONFIG.JWT.ISSUER,
@@ -329,32 +361,48 @@ class AuthenticationSecurity {
       });
 
       // Additional security checks
-      if (payload.deviceFingerprint && payload.deviceFingerprint !== this.generateDeviceFingerprint(context)) {
+      if (
+        payload.deviceFingerprint &&
+        payload.deviceFingerprint !== this.generateDeviceFingerprint(context)
+      ) {
         return { valid: false, error: 'Device fingerprint mismatch' };
       }
 
       // Check if session is still active
-      if (payload.sessionId && !this.isSessionActive(payload.sub as string, payload.sessionId as string)) {
+      if (
+        payload.sessionId &&
+        !this.isSessionActive(payload.sub as string, payload.sessionId as string)
+      ) {
         return { valid: false, error: 'Session expired or invalid' };
       }
 
       // Update session activity
       if (payload.sessionId) {
-        this.updateSessionActivity(payload.sub as string, payload.sessionId as string, context.timestamp);
+        this.updateSessionActivity(
+          payload.sub as string,
+          payload.sessionId as string,
+          context.timestamp
+        );
       }
 
       return { valid: true, payload };
     } catch (error) {
-      return { valid: false, error: error instanceof Error ? error.message : 'Token verification failed' };
+      return {
+        valid: false,
+        error: error instanceof Error ? error.message : 'Token verification failed',
+      };
     }
   }
 
   /**
    * Generate MFA challenge for enhanced security
    */
-  generateMFAChallenge(user: User, type: 'totp' | 'sms' | 'email' | 'backup' = 'totp'): MFAChallenge {
+  generateMFAChallenge(
+    user: User,
+    type: 'totp' | 'sms' | 'email' | 'backup' = 'totp'
+  ): MFAChallenge {
     const challengeId = this.generateChallengeId();
-    
+
     return {
       challengeId,
       type,
@@ -366,10 +414,14 @@ class AuthenticationSecurity {
   /**
    * Verify MFA code with rate limiting and attempt tracking
    */
-  async verifyMFACode(challengeId: string, code: string, userId: string): Promise<{ valid: boolean; error?: string }> {
+  async verifyMFACode(
+    challengeId: string,
+    code: string,
+    userId: string
+  ): Promise<{ valid: boolean; error?: string }> {
     // Implement TOTP verification, SMS code verification, etc.
     // This is a simplified implementation
-    
+
     if (code.length !== SECURITY_CONFIG.MFA.CODE_LENGTH) {
       return { valid: false, error: 'Invalid code format' };
     }
@@ -382,7 +434,7 @@ class AuthenticationSecurity {
 
     // In a real implementation, verify against TOTP secret or stored SMS code
     const isValid = await this.verifyTOTPCode(userId, code);
-    
+
     if (!isValid) {
       this.recordFailedAttempt(attemptKey);
       return { valid: false, error: 'Invalid verification code' };
@@ -456,11 +508,11 @@ class AuthenticationSecurity {
     const timeframeMs = this.getTimeframeInMs(timeframe);
     const cutoff = new Date(now.getTime() - timeframeMs);
 
-    const recentEvents = this.securityEvents.filter(
-      event => new Date(event.timestamp) >= cutoff
-    );
+    const recentEvents = this.securityEvents.filter(event => new Date(event.timestamp) >= cutoff);
 
-    const loginAttempts = recentEvents.filter(e => e.type === 'login_success' || e.type === 'login_failure').length;
+    const loginAttempts = recentEvents.filter(
+      e => e.type === 'login_success' || e.type === 'login_failure'
+    ).length;
     const successfulLogins = recentEvents.filter(e => e.type === 'login_success').length;
     const failedLogins = recentEvents.filter(e => e.type === 'login_failure').length;
     const mfaChallenges = recentEvents.filter(e => e.metadata.mfaChallenge).length;
@@ -534,9 +586,10 @@ class AuthenticationSecurity {
   private hasSuspiciousActivity(userId: string, ipAddress: string): boolean {
     // Check for suspicious patterns in recent activity
     const recentEvents = this.securityEvents.filter(
-      event => event.userId === userId && 
-               event.context.ipAddress === ipAddress &&
-               new Date(event.timestamp) > new Date(Date.now() - 60 * 60 * 1000) // Last hour
+      event =>
+        event.userId === userId &&
+        event.context.ipAddress === ipAddress &&
+        new Date(event.timestamp) > new Date(Date.now() - 60 * 60 * 1000) // Last hour
     );
 
     return recentEvents.filter(e => e.type === 'login_failure').length > 3;
@@ -550,7 +603,7 @@ class AuthenticationSecurity {
   private assessTimeOfDay(timestamp: string): 'normal' | 'unusual' {
     const hour = new Date(timestamp).getHours();
     // Consider 9 PM to 6 AM as unusual
-    return (hour >= 21 || hour <= 6) ? 'unusual' : 'normal';
+    return hour >= 21 || hour <= 6 ? 'unusual' : 'normal';
   }
 
   private async detectVPN(ipAddress: string): Promise<boolean> {
@@ -570,12 +623,12 @@ class AuthenticationSecurity {
 
   private addUserSession(userId: string, session: UserSession): void {
     const userSessions = this.activeSessions.get(userId) || [];
-    
+
     // Enforce concurrent session limit
     if (userSessions.length >= SECURITY_CONFIG.SESSION.MAX_CONCURRENT_SESSIONS) {
       // Remove oldest session
-      const oldestSession = userSessions.sort((a, b) => 
-        new Date(a.lastActive).getTime() - new Date(b.lastActive).getTime()
+      const oldestSession = userSessions.sort(
+        (a, b) => new Date(a.lastActive).getTime() - new Date(b.lastActive).getTime()
       )[0];
       oldestSession.isActive = false;
     }
@@ -587,7 +640,7 @@ class AuthenticationSecurity {
   private isSessionActive(userId: string, sessionId: string): boolean {
     const userSessions = this.activeSessions.get(userId) || [];
     const session = userSessions.find(s => s.id === sessionId);
-    
+
     if (!session || !session.isActive) {
       return false;
     }
@@ -601,7 +654,7 @@ class AuthenticationSecurity {
     // Check inactivity timeout
     const lastActive = new Date(session.lastActive);
     const inactivityLimit = new Date(Date.now() - SECURITY_CONFIG.SESSION.INACTIVITY_TIMEOUT);
-    
+
     if (lastActive < inactivityLimit) {
       session.isActive = false;
       return false;
@@ -613,7 +666,7 @@ class AuthenticationSecurity {
   private updateSessionActivity(userId: string, sessionId: string, timestamp: string): void {
     const userSessions = this.activeSessions.get(userId) || [];
     const session = userSessions.find(s => s.id === sessionId);
-    
+
     if (session) {
       session.lastActive = timestamp;
     }
@@ -637,9 +690,10 @@ class AuthenticationSecurity {
 
   private maskEmail(email: string): string {
     const [username, domain] = email.split('@');
-    const maskedUsername = username.length > 2 ? 
-      username[0] + '*'.repeat(username.length - 2) + username[username.length - 1] : 
-      username;
+    const maskedUsername =
+      username.length > 2
+        ? username[0] + '*'.repeat(username.length - 2) + username[username.length - 1]
+        : username;
     return `${maskedUsername}@${domain}`;
   }
 
@@ -714,12 +768,20 @@ export class GuardianZeroTrustAuth extends AuthenticationSecurity {
     securityFlags: string[];
     nextAction: 'allow' | 'mfa' | 'step_up' | 'block';
   }> {
-    const result = {
+    const result: {
+      success: boolean;
+      tokens?: AuthTokens;
+      mfaChallenge?: MFAChallenge;
+      riskScore: number;
+      trustLevel: 'none' | 'low' | 'medium' | 'high';
+      securityFlags: string[];
+      nextAction: 'allow' | 'mfa' | 'step_up' | 'block';
+    } = {
       success: false,
       riskScore: 0,
-      trustLevel: 'none' as const,
-      securityFlags: [] as string[],
-      nextAction: 'block' as const
+      trustLevel: 'none',
+      securityFlags: [],
+      nextAction: 'block',
     };
 
     try {
@@ -733,7 +795,7 @@ export class GuardianZeroTrustAuth extends AuthenticationSecurity {
       // Step 2: Risk Assessment
       const risk = await this.riskEngine.assessAuthenticationRisk(user, context, {
         deviceFingerprint: credentials.deviceFingerprint,
-        biometricData: credentials.biometricData
+        biometricData: credentials.biometricData,
       });
 
       result.riskScore = risk.score;
@@ -788,7 +850,6 @@ export class GuardianZeroTrustAuth extends AuthenticationSecurity {
       }
 
       return result;
-
     } catch (error) {
       result.securityFlags.push('authentication_error');
       return result;
@@ -796,16 +857,31 @@ export class GuardianZeroTrustAuth extends AuthenticationSecurity {
   }
 
   private calculateTrustLevel(risk: any): 'none' | 'low' | 'medium' | 'high' {
-    if (risk.score >= 0.8) return 'none';
-    if (risk.score >= 0.6) return 'low';
-    if (risk.score >= 0.3) return 'medium';
+    if (risk.score >= 0.8) {
+      return 'none';
+    }
+    if (risk.score >= 0.6) {
+      return 'low';
+    }
+    if (risk.score >= 0.3) {
+      return 'medium';
+    }
     return 'high';
   }
 
-  private determineAuthAction(riskScore: number, trustLevel: string): 'allow' | 'mfa' | 'step_up' | 'block' {
-    if (riskScore >= 0.9) return 'block';
-    if (riskScore >= 0.7) return 'step_up';
-    if (riskScore >= 0.4 || trustLevel === 'low') return 'mfa';
+  private determineAuthAction(
+    riskScore: number,
+    trustLevel: string
+  ): 'allow' | 'mfa' | 'step_up' | 'block' {
+    if (riskScore >= 0.9) {
+      return 'block';
+    }
+    if (riskScore >= 0.7) {
+      return 'step_up';
+    }
+    if (riskScore >= 0.4 || trustLevel === 'low') {
+      return 'mfa';
+    }
     return 'allow';
   }
 
@@ -814,18 +890,26 @@ export class GuardianZeroTrustAuth extends AuthenticationSecurity {
     return { id: 'user-123', email, role: 'coach' };
   }
 
-  private async assessDeviceTrust(fingerprint?: string, userId?: string): Promise<{ trusted: boolean; score: number }> {
+  private async assessDeviceTrust(
+    fingerprint?: string,
+    userId?: string
+  ): Promise<{ trusted: boolean; score: number }> {
     // Simplified device trust assessment
     return { trusted: true, score: 0.8 };
   }
 
-  private async logSecurityIncident(userId: string, type: string, context: SecurityContext, result: any): Promise<void> {
+  private async logSecurityIncident(
+    userId: string,
+    type: string,
+    context: SecurityContext,
+    result: any
+  ): Promise<void> {
     this.logSecurityEvent({
       type: 'suspicious_activity',
       userId,
       context,
       metadata: { incidentType: type, riskScore: result.riskScore, flags: result.securityFlags },
-      severity: 'high'
+      severity: 'high',
     });
   }
 }
@@ -834,7 +918,10 @@ export class GuardianZeroTrustAuth extends AuthenticationSecurity {
  * Behavior Analysis Engine
  */
 class BehaviorAnalyzer {
-  async analyzeLoginBehavior(userId: string, context: SecurityContext): Promise<{ anomalous: boolean; score: number; factors: string[] }> {
+  async analyzeLoginBehavior(
+    userId: string,
+    context: SecurityContext
+  ): Promise<{ anomalous: boolean; score: number; factors: string[] }> {
     const factors: string[] = [];
     let anomalyScore = 0;
 
@@ -860,7 +947,7 @@ class BehaviorAnalyzer {
     return {
       anomalous: anomalyScore > 0.3,
       score: anomalyScore,
-      factors
+      factors,
     };
   }
 }
@@ -869,7 +956,11 @@ class BehaviorAnalyzer {
  * Risk Assessment Engine
  */
 class RiskAssessmentEngine {
-  async assessAuthenticationRisk(user: any, context: SecurityContext, additionalData: any): Promise<{ score: number; flags: string[]; details: any }> {
+  async assessAuthenticationRisk(
+    user: any,
+    context: SecurityContext,
+    additionalData: any
+  ): Promise<{ score: number; flags: string[]; details: any }> {
     const flags: string[] = [];
     let riskScore = 0;
 
@@ -910,29 +1001,43 @@ class RiskAssessmentEngine {
       flags,
       details: {
         ipRisk,
-        deviceRisk: additionalData.deviceFingerprint ? await this.analyzeDeviceFingerprint(additionalData.deviceFingerprint) : null,
-        biometricRisk: additionalData.biometricData ? await this.verifyBiometrics(user.id, additionalData.biometricData) : null,
-        velocityRisk
-      }
+        deviceRisk: additionalData.deviceFingerprint
+          ? await this.analyzeDeviceFingerprint(additionalData.deviceFingerprint)
+          : null,
+        biometricRisk: additionalData.biometricData
+          ? await this.verifyBiometrics(user.id, additionalData.biometricData)
+          : null,
+        velocityRisk,
+      },
     };
   }
 
-  private async checkIPReputation(ipAddress: string): Promise<{ malicious: boolean; score: number; source: string }> {
+  private async checkIPReputation(
+    ipAddress: string
+  ): Promise<{ malicious: boolean; score: number; source: string }> {
     // Simplified IP reputation check
     return { malicious: false, score: 0.1, source: 'guardian_intel' };
   }
 
-  private async analyzeDeviceFingerprint(fingerprint: string): Promise<{ suspicious: boolean; score: number; reasons: string[] }> {
+  private async analyzeDeviceFingerprint(
+    fingerprint: string
+  ): Promise<{ suspicious: boolean; score: number; reasons: string[] }> {
     // Simplified device fingerprint analysis
     return { suspicious: false, score: 0.1, reasons: [] };
   }
 
-  private async verifyBiometrics(userId: string, biometricData: string): Promise<{ verified: boolean; confidence: number }> {
+  private async verifyBiometrics(
+    userId: string,
+    biometricData: string
+  ): Promise<{ verified: boolean; confidence: number }> {
     // Simplified biometric verification
     return { verified: true, confidence: 0.95 };
   }
 
-  private async checkLoginVelocity(userId: string, ipAddress: string): Promise<{ excessive: boolean; count: number; timeWindow: number }> {
+  private async checkLoginVelocity(
+    userId: string,
+    ipAddress: string
+  ): Promise<{ excessive: boolean; count: number; timeWindow: number }> {
     // Simplified velocity check
     return { excessive: false, count: 1, timeWindow: 300000 };
   }
@@ -944,7 +1049,11 @@ class RiskAssessmentEngine {
 class SessionMonitor {
   private activeSessions: Map<string, SessionMetrics> = new Map();
 
-  async startMonitoring(userId: string, context: SecurityContext, trustLevel: string): Promise<void> {
+  async startMonitoring(
+    userId: string,
+    context: SecurityContext,
+    trustLevel: string
+  ): Promise<void> {
     const sessionId = crypto.randomUUID();
     const metrics: SessionMetrics = {
       userId,
@@ -955,7 +1064,7 @@ class SessionMonitor {
       userAgent: context.userAgent,
       activityCount: 0,
       riskEvents: [],
-      lastActivity: Date.now()
+      lastActivity: Date.now(),
     };
 
     this.activeSessions.set(sessionId, metrics);
@@ -980,13 +1089,15 @@ class SessionMonitor {
   private async checkSessionSecurity(session: SessionMetrics): Promise<void> {
     // Check for session anomalies
     const timeSinceLastActivity = Date.now() - session.lastActivity;
-    
-    if (timeSinceLastActivity > 30 * 60 * 1000) { // 30 minutes
+
+    if (timeSinceLastActivity > 30 * 60 * 1000) {
+      // 30 minutes
       await this.flagSessionRisk(session, 'inactive_session');
     }
 
     // Check for unusual activity patterns
-    if (session.activityCount > 1000) { // Too many actions
+    if (session.activityCount > 1000) {
+      // Too many actions
       await this.flagSessionRisk(session, 'excessive_activity');
     }
   }
@@ -995,7 +1106,7 @@ class SessionMonitor {
     session.riskEvents.push({
       type: riskType,
       timestamp: Date.now(),
-      severity: 'medium'
+      severity: 'medium',
     });
 
     // Could trigger session termination or step-up authentication
@@ -1018,23 +1129,23 @@ interface SessionMetrics {
 export const guardianZeroTrustAuth = new GuardianZeroTrustAuth();
 
 // Export convenience functions
-export const generateDeviceFingerprint = (context: SecurityContext) => 
+export const generateDeviceFingerprint = (context: SecurityContext) =>
   authSecurity.generateDeviceFingerprint(context);
 
-export const assessAuthenticationRisk = (email: string, context: SecurityContext) => 
+export const assessAuthenticationRisk = (email: string, context: SecurityContext) =>
   authSecurity.assessRisk(email, context);
 
-export const validatePassword = (password: string) => 
+export const validatePassword = (password: string) =>
   authSecurity.validatePasswordStrength(password);
 
-export const generateSecureTokens = (user: User, context: SecurityContext) => 
+export const generateSecureTokens = (user: User, context: SecurityContext) =>
   authSecurity.generateTokens(user, context);
 
-export const verifySecureToken = (token: string, context: SecurityContext) => 
+export const verifySecureToken = (token: string, context: SecurityContext) =>
   authSecurity.verifyToken(token, context);
 
-export const logSecurityEvent = (event: Omit<SecurityEvent, 'id' | 'timestamp'>) => 
+export const logSecurityEvent = (event: Omit<SecurityEvent, 'id' | 'timestamp'>) =>
   authSecurity.logSecurityEvent(event);
 
-export const getSecurityMetrics = (timeframe?: '1h' | '24h' | '7d' | '30d') => 
+export const getSecurityMetrics = (timeframe?: '1h' | '24h' | '7d' | '30d') =>
   authSecurity.getSecurityAnalytics(timeframe);

@@ -3,9 +3,9 @@ import { screen, fireEvent, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { renderWithProviders, mockDragAndDrop } from '../../utils/test-helpers';
-import { 
-  generatePlayerForConflict, 
-  generatePerformanceTestData 
+import {
+  generatePlayerForConflict,
+  generatePerformanceTestData,
 } from '../../utils/enhanced-mock-generators';
 import PositionalBench from '../../../components/tactics/PositionalBench';
 import type { Player } from '../../../types';
@@ -23,13 +23,19 @@ vi.mock('framer-motion', () => ({
 vi.mock('../../../utils/sampleTacticsData', () => ({
   groupPlayersByPosition: (players: Player[]) => {
     const grouped = {
-      'Goalkeepers': players.filter(p => p.roleId?.includes('gk')),
-      'Defenders': players.filter(p => p.roleId?.includes('cb') || p.roleId?.includes('fb') || p.roleId?.includes('wb')),
-      'Midfielders': players.filter(p => p.roleId?.includes('cm') || p.roleId?.includes('dm') || p.roleId?.includes('am')),
-      'Forwards': players.filter(p => p.roleId?.includes('cf') || p.roleId?.includes('w') || p.roleId?.includes('st'))
+      Goalkeepers: players.filter(p => p.roleId?.includes('gk')),
+      Defenders: players.filter(
+        p => p.roleId?.includes('cb') || p.roleId?.includes('fb') || p.roleId?.includes('wb')
+      ),
+      Midfielders: players.filter(
+        p => p.roleId?.includes('cm') || p.roleId?.includes('dm') || p.roleId?.includes('am')
+      ),
+      Forwards: players.filter(
+        p => p.roleId?.includes('cf') || p.roleId?.includes('w') || p.roleId?.includes('st')
+      ),
     };
     return grouped;
-  }
+  },
 }));
 
 // Mock constants
@@ -43,8 +49,8 @@ vi.mock('../../../constants', () => ({
     { id: 'am', name: 'Attacking Midfielder', abbreviation: 'AM', category: 'MF' },
     { id: 'w', name: 'Winger', abbreviation: 'W', category: 'FW' },
     { id: 'cf', name: 'Centre Forward', abbreviation: 'CF', category: 'FW' },
-    { id: 'st', name: 'Striker', abbreviation: 'ST', category: 'FW' }
-  ]
+    { id: 'st', name: 'Striker', abbreviation: 'ST', category: 'FW' },
+  ],
 }));
 
 describe('PositionalBench Component', () => {
@@ -54,23 +60,28 @@ describe('PositionalBench Component', () => {
 
   beforeEach(() => {
     // Generate diverse player dataset
-    const goalkeepers = Array.from({ length: 2 }, () => 
-      generatePlayerForConflict('GK')).map(p => ({ ...p, roleId: 'gk' }));
-    const defenders = Array.from({ length: 6 }, () => 
-      generatePlayerForConflict('DF')).map((p, i) => ({ 
-        ...p, 
-        roleId: i % 2 === 0 ? 'cb' : 'fb' 
-      }));
-    const midfielders = Array.from({ length: 5 }, () => 
-      generatePlayerForConflict('MF')).map((p, i) => ({ 
-        ...p, 
-        roleId: ['cm', 'dm', 'am'][i % 3] 
-      }));
-    const forwards = Array.from({ length: 4 }, () => 
-      generatePlayerForConflict('FW')).map((p, i) => ({ 
-        ...p, 
-        roleId: i % 2 === 0 ? 'w' : 'cf' 
-      }));
+    const goalkeepers = Array.from({ length: 2 }, () => generatePlayerForConflict('GK')).map(p => ({
+      ...p,
+      roleId: 'gk',
+    }));
+    const defenders = Array.from({ length: 6 }, () => generatePlayerForConflict('DF')).map(
+      (p, i) => ({
+        ...p,
+        roleId: i % 2 === 0 ? 'cb' : 'fb',
+      })
+    );
+    const midfielders = Array.from({ length: 5 }, () => generatePlayerForConflict('MF')).map(
+      (p, i) => ({
+        ...p,
+        roleId: ['cm', 'dm', 'am'][i % 3],
+      })
+    );
+    const forwards = Array.from({ length: 4 }, () => generatePlayerForConflict('FW')).map(
+      (p, i) => ({
+        ...p,
+        roleId: i % 2 === 0 ? 'w' : 'cf',
+      })
+    );
 
     mockPlayers = [...goalkeepers, ...defenders, ...midfielders, ...forwards];
 
@@ -79,7 +90,7 @@ describe('PositionalBench Component', () => {
       selectedPlayer: null,
       onPlayerSelect: vi.fn(),
       onPlayerDragStart: vi.fn(),
-      className: ''
+      className: '',
     };
 
     user = userEvent.setup();
@@ -118,11 +129,13 @@ describe('PositionalBench Component', () => {
       renderWithProviders(<PositionalBench {...mockProps} />);
 
       // Find position groups and check their player counts
-      const goalkeeperGroup = screen.getByText('Goalkeepers').closest('[data-testid="position-group"]');
-      expect(within(goalkeeperGroup!).getByText('2 players')).toBeInTheDocument();
+      const goalkeeperGroup = screen
+        .getByText('Goalkeepers')
+        .closest('[data-testid="position-group"]');
+      expect(within(goalkeeperGroup! as HTMLElement).getByText('2 players')).toBeInTheDocument();
 
       const defenderGroup = screen.getByText('Defenders').closest('[data-testid="position-group"]');
-      expect(within(defenderGroup!).getByText('6 players')).toBeInTheDocument();
+      expect(within(defenderGroup! as HTMLElement).getByText('6 players')).toBeInTheDocument();
     });
 
     it('renders appropriate icons for each position group', () => {
@@ -134,9 +147,7 @@ describe('PositionalBench Component', () => {
     });
 
     it('applies custom className when provided', () => {
-      renderWithProviders(
-        <PositionalBench {...mockProps} className="custom-bench-class" />
-      );
+      renderWithProviders(<PositionalBench {...mockProps} className="custom-bench-class" />);
 
       const bench = screen.getByTestId('positional-bench');
       expect(bench).toHaveClass('custom-bench-class');
@@ -152,9 +163,7 @@ describe('PositionalBench Component', () => {
 
       await waitFor(() => {
         const playerTokens = screen.getAllByTestId('position-group-player');
-        const goalkeeperTokens = playerTokens.filter(token => 
-          within(token).queryByText(/gk/i)
-        );
+        const goalkeeperTokens = playerTokens.filter(token => within(token).queryByText(/gk/i));
         expect(goalkeeperTokens.length).toBeGreaterThan(0);
       });
     });
@@ -163,7 +172,7 @@ describe('PositionalBench Component', () => {
       renderWithProviders(<PositionalBench {...mockProps} />);
 
       const goalkeeperHeader = screen.getByRole('button', { name: /goalkeepers/i });
-      
+
       // Expand
       await user.click(goalkeeperHeader);
       await waitFor(() => {
@@ -198,7 +207,7 @@ describe('PositionalBench Component', () => {
       renderWithProviders(<PositionalBench {...mockProps} />);
 
       const goalkeeperHeader = screen.getByRole('button', { name: /goalkeepers/i });
-      
+
       await user.hover(goalkeeperHeader);
       expect(goalkeeperHeader).toHaveClass('hover:bg-slate-700/30');
     });
@@ -223,16 +232,14 @@ describe('PositionalBench Component', () => {
 
       expect(mockProps.onPlayerSelect).toHaveBeenCalledWith(
         expect.objectContaining({
-          roleId: 'gk'
+          roleId: 'gk',
         })
       );
     });
 
     it('shows selected state for currently selected player', () => {
       const selectedPlayer = mockPlayers.find(p => p.roleId === 'gk');
-      renderWithProviders(
-        <PositionalBench {...mockProps} selectedPlayer={selectedPlayer} />
-      );
+      renderWithProviders(<PositionalBench {...mockProps} selectedPlayer={selectedPlayer} />);
 
       const selectedToken = screen.getByTestId(`player-token-${selectedPlayer!.id}`);
       expect(selectedToken).toHaveClass('bg-blue-600/20', 'border-blue-400/50');
@@ -326,7 +333,7 @@ describe('PositionalBench Component', () => {
 
       expect(mockProps.onPlayerDragStart).toHaveBeenCalledWith(
         expect.objectContaining({
-          roleId: 'gk'
+          roleId: 'gk',
         })
       );
     });
@@ -350,10 +357,7 @@ describe('PositionalBench Component', () => {
 
       fireEvent(firstToken, dragEvent);
 
-      expect(mockDataTransfer.setData).toHaveBeenCalledWith(
-        'text/plain',
-        expect.any(String)
-      );
+      expect(mockDataTransfer.setData).toHaveBeenCalledWith('text/plain', expect.any(String));
     });
   });
 
@@ -363,14 +367,12 @@ describe('PositionalBench Component', () => {
         ...mockPlayers[0],
         availability: {
           status: 'Minor Injury' as const,
-          returnDate: '2025-01-15'
-        }
+          returnDate: '2025-01-15',
+        },
       };
 
       const playersWithInjury = [injuredPlayer, ...mockPlayers.slice(1)];
-      renderWithProviders(
-        <PositionalBench {...mockProps} players={playersWithInjury} />
-      );
+      renderWithProviders(<PositionalBench {...mockProps} players={playersWithInjury} />);
 
       const goalkeeperHeader = screen.getByRole('button', { name: /goalkeepers/i });
       await user.click(goalkeeperHeader);
@@ -438,7 +440,7 @@ describe('PositionalBench Component', () => {
       renderWithProviders(<PositionalBench {...mockProps} />);
 
       const expandAllButton = screen.getByRole('button', { name: 'Expand All' });
-      
+
       await user.hover(expandAllButton);
       expect(expandAllButton).toHaveClass('hover:bg-slate-600');
     });
@@ -456,9 +458,7 @@ describe('PositionalBench Component', () => {
     it('shows empty position group message when position has no players', async () => {
       // Remove all goalkeepers
       const playersWithoutGK = mockPlayers.filter(p => p.roleId !== 'gk');
-      renderWithProviders(
-        <PositionalBench {...mockProps} players={playersWithoutGK} />
-      );
+      renderWithProviders(<PositionalBench {...mockProps} players={playersWithoutGK} />);
 
       const goalkeeperHeader = screen.getByRole('button', { name: /goalkeepers/i });
       await user.click(goalkeeperHeader);
@@ -483,11 +483,9 @@ describe('PositionalBench Component', () => {
   describe('Performance Optimizations', () => {
     it('handles large player datasets efficiently', async () => {
       const largePlayerSet = generatePerformanceTestData.large().players;
-      
+
       const renderStart = performance.now();
-      renderWithProviders(
-        <PositionalBench {...mockProps} players={largePlayerSet} />
-      );
+      renderWithProviders(<PositionalBench {...mockProps} players={largePlayerSet} />);
       const renderTime = performance.now() - renderStart;
 
       // Should render within reasonable time
@@ -510,12 +508,10 @@ describe('PositionalBench Component', () => {
       // Create many defenders
       const manyDefenders = Array.from({ length: 50 }, () => ({
         ...generatePlayerForConflict('DF'),
-        roleId: 'cb'
+        roleId: 'cb',
       }));
 
-      renderWithProviders(
-        <PositionalBench {...mockProps} players={manyDefenders} />
-      );
+      renderWithProviders(<PositionalBench {...mockProps} players={manyDefenders} />);
 
       const defenderHeader = screen.getByRole('button', { name: /defenders/i });
       await user.click(defenderHeader);
@@ -534,7 +530,10 @@ describe('PositionalBench Component', () => {
 
       const goalkeeperHeader = screen.getByRole('button', { name: /goalkeepers/i });
       expect(goalkeeperHeader).toHaveAttribute('aria-expanded', 'true');
-      expect(goalkeeperHeader).toHaveAttribute('aria-controls', expect.stringContaining('goalkeepers'));
+      expect(goalkeeperHeader).toHaveAttribute(
+        'aria-controls',
+        expect.stringContaining('goalkeepers')
+      );
     });
 
     it('provides proper ARIA labels for player tokens', async () => {
@@ -546,7 +545,7 @@ describe('PositionalBench Component', () => {
       await waitFor(() => {
         const playerTokens = screen.getAllByTestId('position-group-player');
         const firstToken = playerTokens[0];
-        
+
         expect(firstToken).toHaveAttribute('role', 'button');
         expect(firstToken).toHaveAttribute('aria-label', expect.stringContaining('player'));
         expect(firstToken).toHaveAttribute('tabindex', '0');
@@ -590,9 +589,7 @@ describe('PositionalBench Component', () => {
       const goalkeeperHeader = screen.getByRole('button', { name: /goalkeepers/i });
       await user.click(goalkeeperHeader);
 
-      expect(screen.getByTestId('sr-announcer')).toHaveTextContent(
-        /goalkeepers.*expanded/i
-      );
+      expect(screen.getByTestId('sr-announcer')).toHaveTextContent(/goalkeepers.*expanded/i);
     });
   });
 
@@ -623,13 +620,11 @@ describe('PositionalBench Component', () => {
     it('handles malformed player data gracefully', () => {
       const malformedPlayers = [
         { ...mockPlayers[0], name: null, roleId: undefined },
-        { ...mockPlayers[1], stamina: NaN, morale: null }
+        { ...mockPlayers[1], stamina: NaN, morale: null },
       ] as any;
 
       expect(() => {
-        renderWithProviders(
-          <PositionalBench {...mockProps} players={malformedPlayers} />
-        );
+        renderWithProviders(<PositionalBench {...mockProps} players={malformedPlayers} />);
       }).not.toThrow();
 
       expect(screen.getByTestId('positional-bench')).toBeInTheDocument();
@@ -637,7 +632,7 @@ describe('PositionalBench Component', () => {
 
     it('handles missing callback functions gracefully', async () => {
       renderWithProviders(
-        <PositionalBench 
+        <PositionalBench
           {...mockProps}
           onPlayerSelect={undefined as any}
           onPlayerDragStart={undefined as any}

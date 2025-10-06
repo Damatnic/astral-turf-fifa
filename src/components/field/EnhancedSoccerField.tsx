@@ -23,12 +23,12 @@ const FormationStrengthOverlay: React.FC<{ formation: Formation; team: Team }> =
           slot =>
             slot?.position &&
             typeof slot.position.x === 'number' &&
-            typeof slot.position.y === 'number',
+            typeof slot.position.y === 'number'
         )
         .map(slot => ({
           id: slot.id,
-          x: slot.position.x,
-          y: slot.position.y,
+          x: slot.position?.x ?? 0,
+          y: slot.position?.y ?? 0,
           strength: slot.playerId ? 85 : 30, // Mock strength calculation
           color: team === 'home' ? 'rgba(59, 130, 246, 0.2)' : 'rgba(239, 68, 68, 0.2)',
         }));
@@ -53,7 +53,7 @@ const FormationStrengthOverlay: React.FC<{ formation: Formation; team: Team }> =
         ))}
       </div>
     );
-  },
+  }
 );
 
 // Enhanced formation slot with better visual feedback
@@ -119,7 +119,7 @@ const FormationSlot: React.FC<{
         )}
       </div>
     );
-  },
+  }
 );
 
 const EnhancedSoccerField: React.FC<EnhancedSoccerFieldProps> = ({ className = '' }) => {
@@ -233,10 +233,10 @@ const EnhancedSoccerField: React.FC<EnhancedSoccerFieldProps> = ({ className = '
 
         dispatch({ type: 'UPDATE_PLAYER_POSITION', payload: { playerId, position: { x, y } } });
       } catch (_error) {
-        console.error('Failed to update player position:', error);
+        console.error('Failed to update player position:', _error);
       }
     },
-    [dispatch, drawingTool, positioningMode, players],
+    [dispatch, drawingTool, positioningMode, players]
   );
 
   // Enhanced slot drop handler
@@ -274,17 +274,17 @@ const EnhancedSoccerField: React.FC<EnhancedSoccerFieldProps> = ({ className = '
         if (slot.playerId && slot.playerId !== playerId) {
           dispatch({
             type: 'SWAP_PLAYERS',
-            payload: { playerId1: playerId, playerId2: slot.playerId },
+            payload: { sourcePlayerId: playerId, targetPlayerId: slot.playerId },
           });
         } else {
           // Assign player to slot
           dispatch({ type: 'ASSIGN_PLAYER_TO_SLOT', payload: { slotId: slot.id, playerId, team } });
         }
       } catch (_error) {
-        console.error('Failed to handle slot drop:', error);
+        console.error('Failed to handle slot drop:', _error);
       }
     },
-    [dispatch, players],
+    [dispatch, players]
   );
 
   const handleSlotDragOver = useCallback((e: React.DragEvent<HTMLDivElement>, slotId: string) => {
@@ -356,12 +356,12 @@ const EnhancedSoccerField: React.FC<EnhancedSoccerFieldProps> = ({ className = '
       handleSlotDrop,
       handleSlotDragOver,
       handleSlotDragLeave,
-    ],
+    ]
   );
 
   // Optimized chemistry links rendering with comprehensive validation
   const chemistryLinks = useMemo(() => {
-    if (!chemistry || activeTeamContext === 'none' || !homeFormation || !awayFormation) {
+    if (!chemistry || !homeFormation || !awayFormation) {
       return [];
     }
 
@@ -391,7 +391,7 @@ const EnhancedSoccerField: React.FC<EnhancedSoccerFieldProps> = ({ className = '
               slot1.playerId &&
               slot1.position &&
               typeof slot1.position.x === 'number' &&
-              typeof slot1.position.y === 'number',
+              typeof slot1.position.y === 'number'
           )
           .forEach(slot1 => {
             formation.slots
@@ -402,12 +402,14 @@ const EnhancedSoccerField: React.FC<EnhancedSoccerFieldProps> = ({ className = '
                   slot2.position &&
                   typeof slot2.position.x === 'number' &&
                   typeof slot2.position.y === 'number' &&
-                  slot1.id !== slot2.id,
+                  slot1.id !== slot2.id
               )
               .forEach(slot2 => {
                 const chemistryScore = chemistry[slot1.playerId!]?.[slot2.playerId!] || 0;
                 if (
                   chemistryScore > 60 &&
+                  slot1.position &&
+                  slot2.position &&
                   !isNaN(slot1.position.x) &&
                   !isNaN(slot1.position.y) &&
                   !isNaN(slot2.position.x) &&
@@ -543,7 +545,7 @@ const EnhancedSoccerField: React.FC<EnhancedSoccerFieldProps> = ({ className = '
                     typeof p.x === 'number' &&
                     typeof p.y === 'number' &&
                     !isNaN(p.x) &&
-                    !isNaN(p.y),
+                    !isNaN(p.y)
                 )
                 .map(p => `${p.x},${p.y}`)
                 .join(' ')}

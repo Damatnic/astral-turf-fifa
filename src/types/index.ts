@@ -107,6 +107,15 @@ export interface RootState {
   ui: UIState;
 }
 
+// Component Props Types
+export interface UnifiedTacticsBoardProps {
+  className?: string;
+  onSimulateMatch?: (formation: Formation) => void;
+  onSaveFormation?: (formation: Formation) => void;
+  onAnalyticsView?: () => void;
+  onExportFormation?: (formation: Formation) => void;
+}
+
 // Action types (comprehensive union type for all possible actions)
 export type Action =
   // Auth Actions
@@ -125,6 +134,7 @@ export type Action =
   | { type: 'COMPLETE_PASSWORD_RESET' }
   | { type: 'DEACTIVATE_ACCOUNT' }
   | { type: 'ACTIVATE_ACCOUNT' }
+  | { type: 'SET_AUTH_LOADING'; payload: boolean }
   | { type: 'LOAD_STATE'; payload: RootState }
   | { type: 'RESET_STATE' }
   | { type: 'SOFT_RESET_APP' }
@@ -152,8 +162,16 @@ export type Action =
       type: 'UPDATE_PLAYER_CHALLENGE_COMPLETION';
       payload: { playerId: string; challengeId: string };
     }
+  | {
+      type: 'ASSIGN_MEDICAL_TREATMENT';
+      payload: { playerId: string; treatment: string; assignedBy: string };
+    }
+  | { type: 'CLEAR_PLAYER_FOR_TRAINING'; payload: { playerId: string } }
 
   // Formation & Tactics Actions
+  | { type: 'SET_PLAYERS'; payload: Player[] }
+  | { type: 'SET_FORMATION'; payload: Formation }
+  | { type: 'UPDATE_FORMATION'; payload: Formation }
   | { type: 'SET_ACTIVE_FORMATION'; payload: { formationId: string; team: Team } }
   | { type: 'CLEAR_FORMATION' }
   | { type: 'ASSIGN_PLAYER_TO_SLOT'; payload: { slotId: string; playerId: string; team: Team } }
@@ -161,6 +179,11 @@ export type Action =
       type: 'UPDATE_PLAYER_POSITION';
       payload: { playerId: string; position: { x: number; y: number } };
     }
+  | {
+      type: 'UPDATE_PLAYER_POSITION_OPTIMISTIC';
+      payload: { playerId: string; position: { x: number; y: number } };
+    }
+  | { type: 'MOVE_TO_BENCH'; payload: { playerId: string } }
   | { type: 'SET_TEAM_TACTIC'; payload: { team: Team; tactic: unknown; value: unknown } } // TeamTactics properties
   | { type: 'SAVE_CUSTOM_FORMATION'; payload: Formation }
   | { type: 'DELETE_CUSTOM_FORMATION'; payload: string }
@@ -191,12 +214,17 @@ export type Action =
   | { type: 'START_TUTORIAL' }
   | { type: 'END_TUTORIAL' }
   | { type: 'SET_TUTORIAL_STEP'; payload: number }
+  | { type: 'SET_ROSTER_SEARCH_QUERY'; payload: string }
+  | { type: 'TOGGLE_ROSTER_ROLE_FILTER'; payload: string }
+  | { type: 'CLEAR_ROSTER_FILTERS' }
 
   // Drawing & Playbook Actions
   | { type: 'SET_DRAWING_TOOL'; payload: unknown } // DrawingTool
   | { type: 'SET_DRAWING_COLOR'; payload: string }
   | { type: 'SET_POSITIONING_MODE'; payload: 'free' | 'snap' }
   | { type: 'ADD_DRAWING'; payload: DrawingShape }
+  | { type: 'UPDATE_DRAWING'; payload: DrawingShape }
+  | { type: 'DELETE_DRAWING'; payload: string }
   | { type: 'UNDO_LAST_DRAWING' }
   | { type: 'CLEAR_DRAWINGS' }
   | { type: 'CREATE_PLAYBOOK_ITEM'; payload: { name: string; category: unknown } } // PlayCategory
@@ -251,6 +279,42 @@ export type Action =
   | { type: 'ADD_INBOX_ITEM'; payload: unknown } // InboxItem without id, week, isRead
   | { type: 'MARK_INBOX_ITEM_READ'; payload: string }
   | { type: 'REMOVE_INBOX_ITEM'; payload: string }
+  | { type: 'HIRE_STAFF'; payload: { team: Team; type: string; staff: unknown } }
+  | { type: 'UPGRADE_STADIUM_FACILITY'; payload: { facility: string; team: Team } }
+  | { type: 'SET_SPONSORSHIP_DEAL'; payload: { team: Team; deal: unknown } }
+  | {
+      type: 'SET_SESSION_DRILL';
+      payload: {
+        team: Team;
+        day: string;
+        session: string;
+        sessionPart: string;
+        drillId: string | null;
+      };
+    }
+  | { type: 'SET_DAY_AS_REST'; payload: { team: Team; day: string } }
+  | { type: 'SET_DAY_AS_TRAINING'; payload: { team: Team; day: string } }
+  | { type: 'SAVE_TRAINING_TEMPLATE'; payload: { team: Team; name: string } }
+  | { type: 'LOAD_TRAINING_TEMPLATE'; payload: { team: Team; templateId: string } }
+  | { type: 'DELETE_TRAINING_TEMPLATE'; payload: { templateId: string } }
+  | { type: 'ADD_NEWS_ITEM'; payload: unknown }
+  | { type: 'MARK_NEWS_READ'; payload: string }
+  | { type: 'UPDATE_OBJECTIVE_PROGRESS'; payload: { objectiveId: string; progress: number } }
+  | { type: 'COMPLETE_OBJECTIVE'; payload: string }
+  | { type: 'ADD_OBJECTIVE'; payload: unknown }
+  | { type: 'REQUEST_BOARD_DECISION'; payload: unknown }
+  | { type: 'RESOLVE_BOARD_DECISION'; payload: { decisionId: string; approved: boolean } }
+  | { type: 'ADD_SKILL_CHALLENGE'; payload: unknown } // SkillChallenge without id
+  | { type: 'REMOVE_SKILL_CHALLENGE'; payload: string }
+  | { type: 'START_NEGOTIATION'; payload: { playerId: string } }
+  | { type: 'SEND_NEGOTIATION_OFFER_START'; payload: { offerText: string } }
+  | { type: 'SEND_NEGOTIATION_OFFER_SUCCESS'; payload: { response: { response: string } } }
+  | { type: 'END_NEGOTIATION' }
+  | {
+      type: 'CREATE_MENTORING_GROUP';
+      payload: { team: Team; mentorId: string; menteeIds: string[] };
+    }
+  | { type: 'DISSOLVE_MENTORING_GROUP'; payload: { team: Team; mentorId: string } }
 
   // Save/Load Actions
   | { type: 'SET_ACTIVE_SAVE_SLOT'; payload: string | null }
@@ -260,4 +324,64 @@ export type Action =
 
   // Misc Actions
   | { type: 'EXPORT_LINEUP_START' }
-  | { type: 'EXPORT_LINEUP_FINISH' };
+  | { type: 'EXPORT_LINEUP_FINISH' }
+
+  // Youth Academy Actions
+  | { type: 'INVEST_IN_YOUTH_ACADEMY'; payload: { team: Team } }
+  | { type: 'SIGN_YOUTH_PLAYER'; payload: { prospectId: string; team: Team } }
+  | { type: 'ADD_YOUTH_PROSPECTS'; payload: { team: Team; prospects: any[] } }
+  | {
+      type: 'ENROLL_YOUTH_IN_PROGRAM';
+      payload: { team: Team; prospectId: string; programId: string };
+    }
+
+  // Transfer Market Actions
+  | {
+      type: 'LOAN_TRANSFER_PLAYER';
+      payload: { player: TransferPlayer; team: Team; duration: number };
+    }
+  | { type: 'SET_TRANSFER_MARKET_FILTER'; payload: { filter: string; value: any } }
+  | { type: 'RESET_TRANSFER_FILTERS' }
+  | { type: 'OPEN_PLAYER_COMPARISON'; payload: { player1Id: string; player2Id: string } }
+  | { type: 'GET_PLAYER_SCOUT_REPORT_START'; payload: { playerId: string } }
+  | { type: 'GET_PLAYER_SCOUT_REPORT_SUCCESS'; payload: { report: any } }
+  | { type: 'GET_PLAYER_SCOUT_REPORT_FAILURE' }
+
+  // Player Communication Actions
+  | { type: 'START_PLAYER_CONVERSATION'; payload: { playerId: string; openingLine?: string } }
+  | { type: 'SEND_PLAYER_MESSAGE_START'; payload: { playerId: string; message: any } }
+  | {
+      type: 'SEND_PLAYER_MESSAGE_SUCCESS';
+      payload: { playerId: string; response: any; moraleEffect: number };
+    }
+  | { type: 'SEND_PLAYER_MESSAGE_FAILURE'; payload: { playerId: string } }
+
+  // Player Training Actions
+  | {
+      type: 'SET_PLAYER_SESSION_DRILL';
+      payload: {
+        playerId: string;
+        day: string;
+        session: string;
+        sessionPart: string;
+        drillId: string | null;
+      };
+    }
+  | { type: 'SET_PLAYER_DAY_AS_REST'; payload: { playerId: string; day: string } }
+
+  // Opposition Analysis Actions
+  | { type: 'GENERATE_OPPOSITION_REPORT_START' }
+  | { type: 'GENERATE_OPPOSITION_REPORT_SUCCESS'; payload: any }
+  | { type: 'GENERATE_OPPOSITION_REPORT_FAILURE' }
+
+  // AI Development Actions
+  | { type: 'GET_AI_DEVELOPMENT_SUMMARY_START' }
+  | { type: 'GET_AI_DEVELOPMENT_SUMMARY_SUCCESS'; payload: any }
+  | { type: 'GET_AI_DEVELOPMENT_SUMMARY_FAILURE' }
+
+  // Finance Management Actions
+  | { type: 'ADD_FEE_ITEM'; payload: { team: string; item: { name: string; amount: number } } }
+  | { type: 'REMOVE_FEE_ITEM'; payload: { team: string; itemId: string } }
+  | { type: 'ADJUST_BUDGET'; payload: { team: string; category: string; amount: number } }
+  | { type: 'GENERATE_FINANCIAL_REPORT'; payload: { report: any } }
+  | { type: 'SAVE_MATCH_RESULT'; payload: { matchResult: any } };

@@ -25,8 +25,7 @@ export * from './secureSessionManager';
 export { guardianSecureSessionManager } from './secureSessionManager';
 
 // Threat Detection & Monitoring
-export * from './threatDetection';
-export { guardianThreatDetection } from './threatDetection';
+export { guardianThreatDetection, type ThreatType, type SecurityMetrics } from './threatDetection';
 
 // Compliance Framework
 export * from './complianceFramework';
@@ -41,14 +40,21 @@ export * from './securityTesting';
 export { guardianSecurityTesting } from './securityTesting';
 
 // Content Security Policy
-export * from './cspConfig';
+export {
+  type CSPDirective,
+  type CSPViolationReport,
+  generateCSPHeader,
+  generateCSPNonce,
+  applySecurityHeaders,
+  addNonceToCSP,
+} from './cspConfig';
 
 // Core security modules
 export * from './auth';
 export * from './validation';
 export * from './sanitization';
 export * from './rbac';
-export * from './logging';
+export { type SecurityIncident, initializeSecurityMonitoring } from './logging';
 export * from './csp';
 export * from './encryption';
 export * from './monitoring';

@@ -12,24 +12,33 @@ const AISubstitutionSuggestionPopup: React.FC = () => {
 
   useEffect(() => {
     if (!aiSubSuggestionData && !isLoadingAISubSuggestion) {
-      dispatch({ type: 'GET_AI_SUB_SUGGESTION_START' });
+      (dispatch as (action: { type: string }) => void)({ type: 'GET_AI_SUB_SUGGESTION_START' });
 
       const activeTeam = activeTeamContext === 'away' ? 'away' : 'home';
       const formation = formations[activeFormationIds[activeTeam]];
       if (!formation) {
         console.error('No formation found for active team');
-        dispatch({ type: 'GET_AI_SUB_SUGGESTION_FAILURE' });
+        (dispatch as (action: { type: string }) => void)({ type: 'GET_AI_SUB_SUGGESTION_FAILURE' });
         return;
       }
       const onFieldIds = getFormationPlayerIds(formation);
       const onFieldPlayers = players.filter(p => p && onFieldIds.has(p.id));
-      const benchedPlayers = players.filter(p => p && p.team === activeTeam && !onFieldIds.has(p.id));
+      const benchedPlayers = players.filter(
+        p => p && p.team === activeTeam && !onFieldIds.has(p.id)
+      );
 
       getAISubstitutionSuggestion(onFieldPlayers, benchedPlayers, settings.aiPersonality)
-        .then(data => dispatch({ type: 'GET_AI_SUB_SUGGESTION_SUCCESS', payload: data }))
+        .then(data =>
+          (dispatch as (action: { type: string; payload?: unknown }) => void)({
+            type: 'GET_AI_SUB_SUGGESTION_SUCCESS',
+            payload: data,
+          })
+        )
         .catch(err => {
           console.error(err);
-          dispatch({ type: 'GET_AI_SUB_SUGGESTION_FAILURE' });
+          (dispatch as (action: { type: string }) => void)({
+            type: 'GET_AI_SUB_SUGGESTION_FAILURE',
+          });
         });
     }
   }, [
@@ -49,11 +58,15 @@ const AISubstitutionSuggestionPopup: React.FC = () => {
     if (!aiSubSuggestionData) {
       return;
     }
+    const suggestionData = aiSubSuggestionData as { playerInId?: string; playerOutId?: string };
+    if (!suggestionData.playerInId || !suggestionData.playerOutId) {
+      return;
+    }
     tacticsDispatch({
       type: 'SWAP_PLAYERS',
       payload: {
-        sourcePlayerId: aiSubSuggestionData.playerInId,
-        targetPlayerId: aiSubSuggestionData.playerOutId,
+        sourcePlayerId: suggestionData.playerInId,
+        targetPlayerId: suggestionData.playerOutId,
       },
     });
     dispatch({
@@ -63,8 +76,13 @@ const AISubstitutionSuggestionPopup: React.FC = () => {
     handleClose();
   };
 
-  const playerOut = players.find(p => p.id === aiSubSuggestionData?.playerOutId);
-  const playerIn = players.find(p => p.id === aiSubSuggestionData?.playerInId);
+  const suggestionData = aiSubSuggestionData as {
+    playerInId?: string;
+    playerOutId?: string;
+    reasoning?: string;
+  } | null;
+  const playerOut = players.find(p => p.id === suggestionData?.playerOutId);
+  const playerIn = players.find(p => p.id === suggestionData?.playerInId);
 
   return (
     <div
@@ -93,7 +111,7 @@ const AISubstitutionSuggestionPopup: React.FC = () => {
               <LoadingSpinner />
             </div>
           )}
-          {aiSubSuggestionData && playerIn && playerOut && (
+          {suggestionData && playerIn && playerOut && (
             <div className="space-y-4">
               <div className="flex items-center justify-around text-center">
                 <div>
@@ -108,7 +126,7 @@ const AISubstitutionSuggestionPopup: React.FC = () => {
               </div>
               <div className="bg-gray-700/50 p-3 rounded-md">
                 <h4 className="font-semibold text-gray-300 mb-1">Reasoning:</h4>
-                <p className="text-sm text-gray-400 italic">"{aiSubSuggestionData.reasoning}"</p>
+                <p className="text-sm text-gray-400 italic">"{suggestionData.reasoning}"</p>
               </div>
               <div className="flex justify-end space-x-2 pt-2">
                 <button

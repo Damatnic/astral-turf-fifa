@@ -85,7 +85,7 @@ class BackupService {
       }
     } catch (_error) {
       console.error('❌ Backup Service initialization failed:', _error);
-      throw error;
+      throw _error;
     }
   }
 
@@ -185,10 +185,10 @@ class BackupService {
       return backup;
     } catch (_error) {
       backup.status = 'failed';
-      backup.error = error instanceof Error ? error.message : 'Unknown error';
+      backup.error = _error instanceof Error ? _error.message : 'Unknown error';
 
       console.error(`❌ Backup failed: ${backupId}`, _error);
-      throw error;
+      throw _error;
     }
   }
 
@@ -264,7 +264,7 @@ class BackupService {
       // // // // console.log(`✅ Restore completed from backup: ${options.backupId}`);
     } catch (_error) {
       console.error(`❌ Restore failed: ${options.backupId}`, _error);
-      throw error;
+      throw _error;
     }
   }
 
@@ -301,10 +301,10 @@ class BackupService {
     const now = new Date();
     const cutoffDaily = new Date(now.getTime() - this.config.retention.daily * 24 * 60 * 60 * 1000);
     const cutoffWeekly = new Date(
-      now.getTime() - this.config.retention.weekly * 7 * 24 * 60 * 60 * 1000,
+      now.getTime() - this.config.retention.weekly * 7 * 24 * 60 * 60 * 1000
     );
     const cutoffMonthly = new Date(
-      now.getTime() - this.config.retention.monthly * 30 * 24 * 60 * 60 * 1000,
+      now.getTime() - this.config.retention.monthly * 30 * 24 * 60 * 60 * 1000
     );
 
     // In a real implementation, this would remove old backup files

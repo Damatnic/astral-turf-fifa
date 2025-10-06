@@ -1,0 +1,1228 @@
+{
+  "config": {
+    "configFile": "C:\\Users\\damat\\_REPOS\\Astral Turf\\playwright.config.ts",
+    "rootDir": "C:/Users/damat/_REPOS/Astral Turf/src/__tests__/e2e",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 16
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      ["html", null],
+      [
+        "json",
+        {
+          "outputFile": "test-results/results.json"
+        }
+      ],
+      [
+        "junit",
+        {
+          "outputFile": "test-results/results.xml"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "C:/Users/damat/_REPOS/Astral Turf/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 16
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "C:/Users/damat/_REPOS/Astral Turf/src/__tests__/e2e",
+        "testIgnore": [],
+        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/Users/damat/_REPOS/Astral Turf/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 16
+        },
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "C:/Users/damat/_REPOS/Astral Turf/src/__tests__/e2e",
+        "testIgnore": [],
+        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/Users/damat/_REPOS/Astral Turf/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 16
+        },
+        "id": "webkit",
+        "name": "webkit",
+        "testDir": "C:/Users/damat/_REPOS/Astral Turf/src/__tests__/e2e",
+        "testIgnore": [],
+        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/Users/damat/_REPOS/Astral Turf/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 16
+        },
+        "id": "Mobile Chrome",
+        "name": "Mobile Chrome",
+        "testDir": "C:/Users/damat/_REPOS/Astral Turf/src/__tests__/e2e",
+        "testIgnore": [],
+        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/Users/damat/_REPOS/Astral Turf/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 16
+        },
+        "id": "Mobile Safari",
+        "name": "Mobile Safari",
+        "testDir": "C:/Users/damat/_REPOS/Astral Turf/src/__tests__/e2e",
+        "testIgnore": [],
+        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
+        "timeout": 30000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.55.1",
+    "workers": 16,
+    "webServer": {
+      "command": "npm run vite:dev",
+      "url": "http://localhost:8081",
+      "reuseExistingServer": true,
+      "timeout": 120000,
+      "stdout": "ignore",
+      "stderr": "pipe"
+    }
+  },
+  "suites": [
+    {
+      "title": "MobileResponsiveness.comprehensive.spec.ts",
+      "file": "MobileResponsiveness.comprehensive.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Mobile Responsiveness",
+          "file": "MobileResponsiveness.comprehensive.spec.ts",
+          "line": 30,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Dashboard page should be fully responsive",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 5337,
+                      "error": {
+                        "message": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/\", waiting until \"load\"\u001b[22m\n\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts:34:18",
+                        "location": {
+                          "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                          "column": 18,
+                          "line": 34
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 32 |\u001b[39m     test(\u001b[32m`${pageName} page should be fully responsive`\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 33 |\u001b[39m       \u001b[90m// Navigate to page\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 34 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(path)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 35 |\u001b[39m\n \u001b[90m 36 |\u001b[39m       \u001b[90m// Wait for page to load\u001b[39m\n \u001b[90m 37 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                            "column": 18,
+                            "line": 34
+                          },
+                          "message": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 32 |\u001b[39m     test(\u001b[32m`${pageName} page should be fully responsive`\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 33 |\u001b[39m       \u001b[90m// Navigate to page\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 34 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(path)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 35 |\u001b[39m\n \u001b[90m 36 |\u001b[39m       \u001b[90m// Wait for page to load\u001b[39m\n \u001b[90m 37 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts:34:18\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-10-04T19:02:24.058Z",
+                      "annotations": [],
+                      "attachments": [],
+                      "errorLocation": {
+                        "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                        "column": 18,
+                        "line": 34
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "061de3bf667c8d999f47-d0de892b6b59f07c9939",
+              "file": "MobileResponsiveness.comprehensive.spec.ts",
+              "line": 32,
+              "column": 5
+            },
+            {
+              "title": "Tactics Board page should be fully responsive",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "failed",
+                      "duration": 5672,
+                      "error": {
+                        "message": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/tactics\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/tactics\", waiting until \"load\"\u001b[22m\n\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts:34:18",
+                        "location": {
+                          "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                          "column": 18,
+                          "line": 34
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 32 |\u001b[39m     test(\u001b[32m`${pageName} page should be fully responsive`\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 33 |\u001b[39m       \u001b[90m// Navigate to page\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 34 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(path)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 35 |\u001b[39m\n \u001b[90m 36 |\u001b[39m       \u001b[90m// Wait for page to load\u001b[39m\n \u001b[90m 37 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                            "column": 18,
+                            "line": 34
+                          },
+                          "message": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/tactics\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 32 |\u001b[39m     test(\u001b[32m`${pageName} page should be fully responsive`\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 33 |\u001b[39m       \u001b[90m// Navigate to page\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 34 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(path)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 35 |\u001b[39m\n \u001b[90m 36 |\u001b[39m       \u001b[90m// Wait for page to load\u001b[39m\n \u001b[90m 37 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts:34:18\u001b[22m"
+                        },
+                        {
+                          "message": "Error: browserContext.close: Target page, context or browser has been closed"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-10-04T19:02:23.964Z",
+                      "annotations": [],
+                      "attachments": [],
+                      "errorLocation": {
+                        "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                        "column": 18,
+                        "line": 34
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "061de3bf667c8d999f47-3064de7e4e4f7cfd07bf",
+              "file": "MobileResponsiveness.comprehensive.spec.ts",
+              "line": 32,
+              "column": 5
+            },
+            {
+              "title": "Training page should be fully responsive",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "failed",
+                      "duration": 5166,
+                      "error": {
+                        "message": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/training\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/training\", waiting until \"load\"\u001b[22m\n\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts:34:18",
+                        "location": {
+                          "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                          "column": 18,
+                          "line": 34
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 32 |\u001b[39m     test(\u001b[32m`${pageName} page should be fully responsive`\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 33 |\u001b[39m       \u001b[90m// Navigate to page\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 34 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(path)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 35 |\u001b[39m\n \u001b[90m 36 |\u001b[39m       \u001b[90m// Wait for page to load\u001b[39m\n \u001b[90m 37 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                            "column": 18,
+                            "line": 34
+                          },
+                          "message": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/training\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 32 |\u001b[39m     test(\u001b[32m`${pageName} page should be fully responsive`\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 33 |\u001b[39m       \u001b[90m// Navigate to page\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 34 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(path)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 35 |\u001b[39m\n \u001b[90m 36 |\u001b[39m       \u001b[90m// Wait for page to load\u001b[39m\n \u001b[90m 37 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts:34:18\u001b[22m"
+                        },
+                        {
+                          "message": "Error: browserContext.close: Target page, context or browser has been closed"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-10-04T19:02:24.055Z",
+                      "annotations": [],
+                      "attachments": [],
+                      "errorLocation": {
+                        "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                        "column": 18,
+                        "line": 34
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "061de3bf667c8d999f47-28d42d111721c55d29d9",
+              "file": "MobileResponsiveness.comprehensive.spec.ts",
+              "line": 32,
+              "column": 5
+            },
+            {
+              "title": "Transfers page should be fully responsive",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "failed",
+                      "duration": 5346,
+                      "error": {
+                        "message": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/transfers\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/transfers\", waiting until \"load\"\u001b[22m\n\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts:34:18",
+                        "location": {
+                          "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                          "column": 18,
+                          "line": 34
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 32 |\u001b[39m     test(\u001b[32m`${pageName} page should be fully responsive`\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 33 |\u001b[39m       \u001b[90m// Navigate to page\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 34 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(path)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 35 |\u001b[39m\n \u001b[90m 36 |\u001b[39m       \u001b[90m// Wait for page to load\u001b[39m\n \u001b[90m 37 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                            "column": 18,
+                            "line": 34
+                          },
+                          "message": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/transfers\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 32 |\u001b[39m     test(\u001b[32m`${pageName} page should be fully responsive`\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 33 |\u001b[39m       \u001b[90m// Navigate to page\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 34 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(path)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 35 |\u001b[39m\n \u001b[90m 36 |\u001b[39m       \u001b[90m// Wait for page to load\u001b[39m\n \u001b[90m 37 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts:34:18\u001b[22m"
+                        },
+                        {
+                          "message": "Error: browserContext.close: Target page, context or browser has been closed"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-10-04T19:02:24.045Z",
+                      "annotations": [],
+                      "attachments": [],
+                      "errorLocation": {
+                        "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                        "column": 18,
+                        "line": 34
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "061de3bf667c8d999f47-08474354693b2d4cda54",
+              "file": "MobileResponsiveness.comprehensive.spec.ts",
+              "line": 32,
+              "column": 5
+            },
+            {
+              "title": "Analytics page should be fully responsive",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 4,
+                      "status": "failed",
+                      "duration": 5779,
+                      "error": {
+                        "message": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/analytics\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/analytics\", waiting until \"load\"\u001b[22m\n\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts:34:18",
+                        "location": {
+                          "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                          "column": 18,
+                          "line": 34
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 32 |\u001b[39m     test(\u001b[32m`${pageName} page should be fully responsive`\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 33 |\u001b[39m       \u001b[90m// Navigate to page\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 34 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(path)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 35 |\u001b[39m\n \u001b[90m 36 |\u001b[39m       \u001b[90m// Wait for page to load\u001b[39m\n \u001b[90m 37 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                            "column": 18,
+                            "line": 34
+                          },
+                          "message": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/analytics\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 32 |\u001b[39m     test(\u001b[32m`${pageName} page should be fully responsive`\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 33 |\u001b[39m       \u001b[90m// Navigate to page\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 34 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(path)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 35 |\u001b[39m\n \u001b[90m 36 |\u001b[39m       \u001b[90m// Wait for page to load\u001b[39m\n \u001b[90m 37 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts:34:18\u001b[22m"
+                        },
+                        {
+                          "message": "Error: browserContext.close: Test ended.\nBrowser logs:\n\n<launching> C:\\Users\\damat\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1193\\chrome-win\\headless_shell.exe --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=C:\\Users\\damat\\AppData\\Local\\Temp\\playwright_chromiumdev_profile-AB1r9O --remote-debugging-pipe --no-startup-window\n<launched> pid=73916"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-10-04T19:02:23.887Z",
+                      "annotations": [],
+                      "attachments": [],
+                      "errorLocation": {
+                        "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                        "column": 18,
+                        "line": 34
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "061de3bf667c8d999f47-cb133b5a1ec3040b902e",
+              "file": "MobileResponsiveness.comprehensive.spec.ts",
+              "line": 32,
+              "column": 5
+            },
+            {
+              "title": "Finances page should be fully responsive",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 5,
+                      "status": "failed",
+                      "duration": 5403,
+                      "error": {
+                        "message": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/finances\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/finances\", waiting until \"load\"\u001b[22m\n\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts:34:18",
+                        "location": {
+                          "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                          "column": 18,
+                          "line": 34
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 32 |\u001b[39m     test(\u001b[32m`${pageName} page should be fully responsive`\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 33 |\u001b[39m       \u001b[90m// Navigate to page\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 34 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(path)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 35 |\u001b[39m\n \u001b[90m 36 |\u001b[39m       \u001b[90m// Wait for page to load\u001b[39m\n \u001b[90m 37 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                            "column": 18,
+                            "line": 34
+                          },
+                          "message": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/finances\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 32 |\u001b[39m     test(\u001b[32m`${pageName} page should be fully responsive`\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 33 |\u001b[39m       \u001b[90m// Navigate to page\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 34 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(path)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 35 |\u001b[39m\n \u001b[90m 36 |\u001b[39m       \u001b[90m// Wait for page to load\u001b[39m\n \u001b[90m 37 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts:34:18\u001b[22m"
+                        },
+                        {
+                          "message": "Error: browserContext.close: Test ended.\nBrowser logs:\n\n<launching> C:\\Users\\damat\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1193\\chrome-win\\headless_shell.exe --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=C:\\Users\\damat\\AppData\\Local\\Temp\\playwright_chromiumdev_profile-6f09Mi --remote-debugging-pipe --no-startup-window\n<launched> pid=109544"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-10-04T19:02:24.033Z",
+                      "annotations": [],
+                      "attachments": [],
+                      "errorLocation": {
+                        "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                        "column": 18,
+                        "line": 34
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "061de3bf667c8d999f47-fb40ab5c5aa176fb7e3a",
+              "file": "MobileResponsiveness.comprehensive.spec.ts",
+              "line": 32,
+              "column": 5
+            },
+            {
+              "title": "Settings page should be fully responsive",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 6,
+                      "status": "failed",
+                      "duration": 5415,
+                      "error": {
+                        "message": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/settings\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/settings\", waiting until \"load\"\u001b[22m\n\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts:34:18",
+                        "location": {
+                          "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                          "column": 18,
+                          "line": 34
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 32 |\u001b[39m     test(\u001b[32m`${pageName} page should be fully responsive`\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 33 |\u001b[39m       \u001b[90m// Navigate to page\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 34 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(path)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 35 |\u001b[39m\n \u001b[90m 36 |\u001b[39m       \u001b[90m// Wait for page to load\u001b[39m\n \u001b[90m 37 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                            "column": 18,
+                            "line": 34
+                          },
+                          "message": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/settings\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 32 |\u001b[39m     test(\u001b[32m`${pageName} page should be fully responsive`\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 33 |\u001b[39m       \u001b[90m// Navigate to page\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 34 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(path)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 35 |\u001b[39m\n \u001b[90m 36 |\u001b[39m       \u001b[90m// Wait for page to load\u001b[39m\n \u001b[90m 37 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts:34:18\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-10-04T19:02:24.073Z",
+                      "annotations": [],
+                      "attachments": [],
+                      "errorLocation": {
+                        "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                        "column": 18,
+                        "line": 34
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "061de3bf667c8d999f47-7b149bc77d03ecef3c89",
+              "file": "MobileResponsiveness.comprehensive.spec.ts",
+              "line": 32,
+              "column": 5
+            },
+            {
+              "title": "Dashboard should have responsive coach cards",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 7,
+                      "status": "failed",
+                      "duration": 5290,
+                      "error": {
+                        "message": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/\", waiting until \"load\"\u001b[22m\n\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts:95:18",
+                        "location": {
+                          "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                          "column": 18,
+                          "line": 95
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 93 |\u001b[39m\n \u001b[90m 94 |\u001b[39m     test(\u001b[32m'Dashboard should have responsive coach cards'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 95 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 96 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 97 |\u001b[39m       \n \u001b[90m 98 |\u001b[39m       \u001b[90m// Coach cards should be present\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                            "column": 18,
+                            "line": 95
+                          },
+                          "message": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 93 |\u001b[39m\n \u001b[90m 94 |\u001b[39m     test(\u001b[32m'Dashboard should have responsive coach cards'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 95 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 96 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 97 |\u001b[39m       \n \u001b[90m 98 |\u001b[39m       \u001b[90m// Coach cards should be present\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts:95:18\u001b[22m"
+                        },
+                        {
+                          "message": "Error: browserContext.close: Target page, context or browser has been closed"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-10-04T19:02:24.017Z",
+                      "annotations": [],
+                      "attachments": [],
+                      "errorLocation": {
+                        "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                        "column": 18,
+                        "line": 95
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "061de3bf667c8d999f47-03b5bcc02cb09bf4718c",
+              "file": "MobileResponsiveness.comprehensive.spec.ts",
+              "line": 94,
+              "column": 5
+            },
+            {
+              "title": "Tactics Board should support touch gestures",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 8,
+                      "status": "failed",
+                      "duration": 5685,
+                      "error": {
+                        "message": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/tactics\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/tactics\", waiting until \"load\"\u001b[22m\n\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts:115:18",
+                        "location": {
+                          "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                          "column": 18,
+                          "line": 115
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 113 |\u001b[39m\n \u001b[90m 114 |\u001b[39m     test(\u001b[32m'Tactics Board should support touch gestures'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 115 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/tactics'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 116 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 117 |\u001b[39m       \n \u001b[90m 118 |\u001b[39m       \u001b[90m// Find the tactics board canvas or main container\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                            "column": 18,
+                            "line": 115
+                          },
+                          "message": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/tactics\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 113 |\u001b[39m\n \u001b[90m 114 |\u001b[39m     test(\u001b[32m'Tactics Board should support touch gestures'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 115 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/tactics'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 116 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 117 |\u001b[39m       \n \u001b[90m 118 |\u001b[39m       \u001b[90m// Find the tactics board canvas or main container\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts:115:18\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-10-04T19:02:23.948Z",
+                      "annotations": [],
+                      "attachments": [],
+                      "errorLocation": {
+                        "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                        "column": 18,
+                        "line": 115
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "061de3bf667c8d999f47-5ebb2d936d47476d23f7",
+              "file": "MobileResponsiveness.comprehensive.spec.ts",
+              "line": 114,
+              "column": 5
+            },
+            {
+              "title": "Training page should have responsive grids",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 9,
+                      "parallelIndex": 9,
+                      "status": "failed",
+                      "duration": 5009,
+                      "error": {
+                        "message": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/training\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/training\", waiting until \"load\"\u001b[22m\n\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts:135:18",
+                        "location": {
+                          "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                          "column": 18,
+                          "line": 135
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 133 |\u001b[39m\n \u001b[90m 134 |\u001b[39m     test(\u001b[32m'Training page should have responsive grids'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 135 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/training'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 136 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 137 |\u001b[39m       \n \u001b[90m 138 |\u001b[39m       \u001b[90m// Day selector should be responsive\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                            "column": 18,
+                            "line": 135
+                          },
+                          "message": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/training\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 133 |\u001b[39m\n \u001b[90m 134 |\u001b[39m     test(\u001b[32m'Training page should have responsive grids'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 135 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/training'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 136 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 137 |\u001b[39m       \n \u001b[90m 138 |\u001b[39m       \u001b[90m// Day selector should be responsive\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts:135:18\u001b[22m"
+                        },
+                        {
+                          "message": "Error: browserContext.close: Test ended.\nBrowser logs:\n\n<launching> C:\\Users\\damat\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1193\\chrome-win\\headless_shell.exe --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=C:\\Users\\damat\\AppData\\Local\\Temp\\playwright_chromiumdev_profile-p6IwjU --remote-debugging-pipe --no-startup-window\n<launched> pid=140812"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-10-04T19:02:24.334Z",
+                      "annotations": [],
+                      "attachments": [],
+                      "errorLocation": {
+                        "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                        "column": 18,
+                        "line": 135
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "061de3bf667c8d999f47-fde0f95efa90ff587c63",
+              "file": "MobileResponsiveness.comprehensive.spec.ts",
+              "line": 134,
+              "column": 5
+            },
+            {
+              "title": "Transfers page should have responsive player listings",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 10,
+                      "parallelIndex": 10,
+                      "status": "failed",
+                      "duration": 4833,
+                      "error": {
+                        "message": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/transfers\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/transfers\", waiting until \"load\"\u001b[22m\n\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts:159:18",
+                        "location": {
+                          "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                          "column": 18,
+                          "line": 159
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 157 |\u001b[39m\n \u001b[90m 158 |\u001b[39m     test(\u001b[32m'Transfers page should have responsive player listings'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 159 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/transfers'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 160 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 161 |\u001b[39m       \n \u001b[90m 162 |\u001b[39m       \u001b[90m// Filter tabs should be responsive\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                            "column": 18,
+                            "line": 159
+                          },
+                          "message": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/transfers\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 157 |\u001b[39m\n \u001b[90m 158 |\u001b[39m     test(\u001b[32m'Transfers page should have responsive player listings'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 159 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/transfers'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 160 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 161 |\u001b[39m       \n \u001b[90m 162 |\u001b[39m       \u001b[90m// Filter tabs should be responsive\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts:159:18\u001b[22m"
+                        },
+                        {
+                          "message": "Error: browserContext.close: Test ended.\nBrowser logs:\n\n<launching> C:\\Users\\damat\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1193\\chrome-win\\headless_shell.exe --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=C:\\Users\\damat\\AppData\\Local\\Temp\\playwright_chromiumdev_profile-I0bPCA --remote-debugging-pipe --no-startup-window\n<launched> pid=77912"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-10-04T19:02:24.494Z",
+                      "annotations": [],
+                      "attachments": [],
+                      "errorLocation": {
+                        "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                        "column": 18,
+                        "line": 159
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "061de3bf667c8d999f47-cfa0c1a11f387a8e8468",
+              "file": "MobileResponsiveness.comprehensive.spec.ts",
+              "line": 158,
+              "column": 5
+            },
+            {
+              "title": "Analytics page should have responsive metrics and grids",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 11,
+                      "parallelIndex": 11,
+                      "status": "failed",
+                      "duration": 5223,
+                      "error": {
+                        "message": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/analytics\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/analytics\", waiting until \"load\"\u001b[22m\n\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts:194:18",
+                        "location": {
+                          "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                          "column": 18,
+                          "line": 194
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 192 |\u001b[39m\n \u001b[90m 193 |\u001b[39m     test(\u001b[32m'Analytics page should have responsive metrics and grids'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 194 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/analytics'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 195 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 196 |\u001b[39m       \n \u001b[90m 197 |\u001b[39m       \u001b[90m// Team selector should be responsive\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                            "column": 18,
+                            "line": 194
+                          },
+                          "message": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/analytics\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 192 |\u001b[39m\n \u001b[90m 193 |\u001b[39m     test(\u001b[32m'Analytics page should have responsive metrics and grids'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 194 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/analytics'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 195 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 196 |\u001b[39m       \n \u001b[90m 197 |\u001b[39m       \u001b[90m// Team selector should be responsive\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts:194:18\u001b[22m"
+                        },
+                        {
+                          "message": "Error: browserContext.close: Target page, context or browser has been closed"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-10-04T19:02:24.074Z",
+                      "annotations": [],
+                      "attachments": [],
+                      "errorLocation": {
+                        "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                        "column": 18,
+                        "line": 194
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "061de3bf667c8d999f47-56b8076e8cea70c3b90a",
+              "file": "MobileResponsiveness.comprehensive.spec.ts",
+              "line": 193,
+              "column": 5
+            },
+            {
+              "title": "Finances page should have responsive budget cards",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 12,
+                      "parallelIndex": 12,
+                      "status": "failed",
+                      "duration": 5546,
+                      "error": {
+                        "message": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/finances\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/finances\", waiting until \"load\"\u001b[22m\n\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts:221:18",
+                        "location": {
+                          "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                          "column": 18,
+                          "line": 221
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 219 |\u001b[39m\n \u001b[90m 220 |\u001b[39m     test(\u001b[32m'Finances page should have responsive budget cards'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 221 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/finances'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 222 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 223 |\u001b[39m       \n \u001b[90m 224 |\u001b[39m       \u001b[90m// Financial cards should be present\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                            "column": 18,
+                            "line": 221
+                          },
+                          "message": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/finances\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 219 |\u001b[39m\n \u001b[90m 220 |\u001b[39m     test(\u001b[32m'Finances page should have responsive budget cards'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 221 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/finances'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 222 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 223 |\u001b[39m       \n \u001b[90m 224 |\u001b[39m       \u001b[90m// Financial cards should be present\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts:221:18\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-10-04T19:02:23.964Z",
+                      "annotations": [],
+                      "attachments": [],
+                      "errorLocation": {
+                        "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                        "column": 18,
+                        "line": 221
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "061de3bf667c8d999f47-3e8b6ab4972105a6ab19",
+              "file": "MobileResponsiveness.comprehensive.spec.ts",
+              "line": 220,
+              "column": 5
+            },
+            {
+              "title": "Settings page should have responsive controls",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 13,
+                      "parallelIndex": 13,
+                      "status": "failed",
+                      "duration": 5729,
+                      "error": {
+                        "message": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/settings\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/settings\", waiting until \"load\"\u001b[22m\n\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts:254:18",
+                        "location": {
+                          "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                          "column": 18,
+                          "line": 254
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 252 |\u001b[39m\n \u001b[90m 253 |\u001b[39m     test(\u001b[32m'Settings page should have responsive controls'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 254 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/settings'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 255 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 256 |\u001b[39m       \n \u001b[90m 257 |\u001b[39m       \u001b[90m// Settings options should be responsive\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                            "column": 18,
+                            "line": 254
+                          },
+                          "message": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/settings\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 252 |\u001b[39m\n \u001b[90m 253 |\u001b[39m     test(\u001b[32m'Settings page should have responsive controls'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 254 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/settings'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 255 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 256 |\u001b[39m       \n \u001b[90m 257 |\u001b[39m       \u001b[90m// Settings options should be responsive\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts:254:18\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-10-04T19:02:23.958Z",
+                      "annotations": [],
+                      "attachments": [],
+                      "errorLocation": {
+                        "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                        "column": 18,
+                        "line": 254
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "061de3bf667c8d999f47-689127a6ee4d2165244e",
+              "file": "MobileResponsiveness.comprehensive.spec.ts",
+              "line": 253,
+              "column": 5
+            },
+            {
+              "title": "PWA manifest should be configured",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 14,
+                      "parallelIndex": 14,
+                      "status": "failed",
+                      "duration": 5331,
+                      "error": {
+                        "message": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/\", waiting until \"load\"\u001b[22m\n\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts:273:18",
+                        "location": {
+                          "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                          "column": 18,
+                          "line": 273
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 271 |\u001b[39m\n \u001b[90m 272 |\u001b[39m     test(\u001b[32m'PWA manifest should be configured'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 273 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 274 |\u001b[39m       \n \u001b[90m 275 |\u001b[39m       \u001b[90m// Check for manifest link\u001b[39m\n \u001b[90m 276 |\u001b[39m       \u001b[36mconst\u001b[39m manifest \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'link[rel=\"manifest\"]'\u001b[39m)\u001b[33m.\u001b[39mgetAttribute(\u001b[32m'href'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                            "column": 18,
+                            "line": 273
+                          },
+                          "message": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 271 |\u001b[39m\n \u001b[90m 272 |\u001b[39m     test(\u001b[32m'PWA manifest should be configured'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 273 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 274 |\u001b[39m       \n \u001b[90m 275 |\u001b[39m       \u001b[90m// Check for manifest link\u001b[39m\n \u001b[90m 276 |\u001b[39m       \u001b[36mconst\u001b[39m manifest \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'link[rel=\"manifest\"]'\u001b[39m)\u001b[33m.\u001b[39mgetAttribute(\u001b[32m'href'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts:273:18\u001b[22m"
+                        },
+                        {
+                          "message": "Error: browserContext.close: Test ended.\nBrowser logs:\n\n<launching> C:\\Users\\damat\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1193\\chrome-win\\headless_shell.exe --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=C:\\Users\\damat\\AppData\\Local\\Temp\\playwright_chromiumdev_profile-47BO4V --remote-debugging-pipe --no-startup-window\n<launched> pid=117264"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-10-04T19:02:24.168Z",
+                      "annotations": [],
+                      "attachments": [],
+                      "errorLocation": {
+                        "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                        "column": 18,
+                        "line": 273
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "061de3bf667c8d999f47-34bcca5fabc020ffe3ac",
+              "file": "MobileResponsiveness.comprehensive.spec.ts",
+              "line": 272,
+              "column": 5
+            }
+          ]
+        },
+        {
+          "title": "Mobile Performance",
+          "file": "MobileResponsiveness.comprehensive.spec.ts",
+          "line": 290,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Pages should load quickly on mobile",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 15,
+                      "parallelIndex": 15,
+                      "status": "failed",
+                      "duration": 5212,
+                      "error": {
+                        "message": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/\", waiting until \"load\"\u001b[22m\n\n    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts:294:18",
+                        "location": {
+                          "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                          "column": 18,
+                          "line": 294
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 292 |\u001b[39m     \u001b[36mfor\u001b[39m (\u001b[36mconst\u001b[39m { path\u001b[33m,\u001b[39m name } \u001b[36mof\u001b[39m \u001b[33mCORE_PAGES\u001b[39m) {\n \u001b[90m 293 |\u001b[39m       \u001b[36mconst\u001b[39m startTime \u001b[33m=\u001b[39m \u001b[33mDate\u001b[39m\u001b[33m.\u001b[39mnow()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 294 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(path)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 295 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'domcontentloaded'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 296 |\u001b[39m       \u001b[36mconst\u001b[39m loadTime \u001b[33m=\u001b[39m \u001b[33mDate\u001b[39m\u001b[33m.\u001b[39mnow() \u001b[33m-\u001b[39m startTime\u001b[33m;\u001b[39m\n \u001b[90m 297 |\u001b[39m       \u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                            "column": 18,
+                            "line": 294
+                          },
+                          "message": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8081/\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 292 |\u001b[39m     \u001b[36mfor\u001b[39m (\u001b[36mconst\u001b[39m { path\u001b[33m,\u001b[39m name } \u001b[36mof\u001b[39m \u001b[33mCORE_PAGES\u001b[39m) {\n \u001b[90m 293 |\u001b[39m       \u001b[36mconst\u001b[39m startTime \u001b[33m=\u001b[39m \u001b[33mDate\u001b[39m\u001b[33m.\u001b[39mnow()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 294 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(path)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 295 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'domcontentloaded'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 296 |\u001b[39m       \u001b[36mconst\u001b[39m loadTime \u001b[33m=\u001b[39m \u001b[33mDate\u001b[39m\u001b[33m.\u001b[39mnow() \u001b[33m-\u001b[39m startTime\u001b[33m;\u001b[39m\n \u001b[90m 297 |\u001b[39m       \u001b[0m\n\u001b[2m    at C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts:294:18\u001b[22m"
+                        },
+                        {
+                          "message": "Error: browserContext.close: Target page, context or browser has been closed"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-10-04T19:02:24.068Z",
+                      "annotations": [],
+                      "attachments": [],
+                      "errorLocation": {
+                        "file": "C:\\Users\\damat\\_REPOS\\Astral Turf\\src\\__tests__\\e2e\\MobileResponsiveness.comprehensive.spec.ts",
+                        "column": 18,
+                        "line": 294
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "061de3bf667c8d999f47-69c67d6b403a64c84dd6",
+              "file": "MobileResponsiveness.comprehensive.spec.ts",
+              "line": 291,
+              "column": 3
+            },
+            {
+              "title": "Touch interactions should be responsive",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "061de3bf667c8d999f47-2547a69b6f5f92e0f085",
+              "file": "MobileResponsiveness.comprehensive.spec.ts",
+              "line": 304,
+              "column": 3
+            },
+            {
+              "title": "Animations should run smoothly (60fps target)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "061de3bf667c8d999f47-92067e3d795c4c677990",
+              "file": "MobileResponsiveness.comprehensive.spec.ts",
+              "line": 338,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "Mobile Accessibility",
+          "file": "MobileResponsiveness.comprehensive.spec.ts",
+          "line": 368,
+          "column": 6,
+          "specs": [
+            {
+              "title": "All pages should have proper heading hierarchy",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "061de3bf667c8d999f47-e7572f58fd78b103dfca",
+              "file": "MobileResponsiveness.comprehensive.spec.ts",
+              "line": 369,
+              "column": 3
+            },
+            {
+              "title": "Interactive elements should be keyboard accessible",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "061de3bf667c8d999f47-8b7809568657b5b265a9",
+              "file": "MobileResponsiveness.comprehensive.spec.ts",
+              "line": 380,
+              "column": 3
+            },
+            {
+              "title": "Touch targets should not overlap",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "061de3bf667c8d999f47-78d38526c8e28ce80a26",
+              "file": "MobileResponsiveness.comprehensive.spec.ts",
+              "line": 395,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2025-10-04T19:02:20.183Z",
+    "duration": 13459.624,
+    "expected": 0,
+    "skipped": 5,
+    "unexpected": 16,
+    "flaky": 0
+  }
+}

@@ -29,24 +29,24 @@ const FORMATION_CACHE = `${CACHE_VERSION}-formations`;
 const CACHE_CONFIG = {
   static: {
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-    maxEntries: 200
+    maxEntries: 200,
   },
   dynamic: {
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    maxEntries: 100
+    maxEntries: 100,
   },
   images: {
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-    maxEntries: 500
+    maxEntries: 500,
   },
   api: {
     maxAge: 5 * 60 * 1000, // 5 minutes
-    maxEntries: 50
+    maxEntries: 50,
   },
   formations: {
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    maxEntries: 200
-  }
+    maxEntries: 200,
+  },
 };
 
 // Mobile-optimized resources to cache immediately
@@ -58,40 +58,23 @@ const STATIC_RESOURCES = [
   '/favicon.png',
   '/icons/icon-192x192.png',
   '/icons/icon-512x512.png',
-  '/offline.html'
+  '/offline.html',
 ];
 
 // Critical mobile assets for immediate caching
 const MOBILE_CRITICAL_ASSETS = [
   '/static/css/mobile.css',
   '/static/js/mobile-optimizations.js',
-  '/static/js/touch-gestures.js'
+  '/static/js/touch-gestures.js',
 ];
 
 // URL patterns for different cache strategies
 const CACHE_STRATEGIES = {
-  static: [
-    /\.(?:js|css|woff2?|ttf|eot)$/,
-    /\/static\//,
-    /\/assets\//
-  ],
-  images: [
-    /\.(?:png|jpg|jpeg|svg|gif|webp|avif)$/,
-    /\/images\//,
-    /\/icons\//
-  ],
-  api: [
-    /\/api\//,
-    /\/graphql/
-  ],
-  formations: [
-    /\/formations\//,
-    /formation.*\.json$/
-  ],
-  dynamic: [
-    /\.html$/,
-    /\/$/
-  ]
+  static: [/\.(?:js|css|woff2?|ttf|eot)$/, /\/static\//, /\/assets\//],
+  images: [/\.(?:png|jpg|jpeg|svg|gif|webp|avif)$/, /\/images\//, /\/icons\//],
+  api: [/\/api\//, /\/graphql/],
+  formations: [/\/formations\//, /formation.*\.json$/],
+  dynamic: [/\.html$/, /\/$/],
 };
 
 // Performance monitoring
@@ -99,11 +82,11 @@ class PerformanceMonitor {
   static logCacheHit(cacheName, url) {
     console.log(`[SW] Cache HIT: ${cacheName} - ${url}`);
   }
-  
+
   static logCacheMiss(url) {
     console.log(`[SW] Cache MISS: ${url}`);
   }
-  
+
   static logNetworkFallback(url, reason) {
     console.log(`[SW] Network fallback: ${url} - ${reason}`);
   }
@@ -114,23 +97,23 @@ class CacheManager {
   static async cleanupCache(cacheName, config) {
     const cache = await caches.open(cacheName);
     const requests = await cache.keys();
-    
+
     const now = Date.now();
     let deletedCount = 0;
-    
+
     for (const request of requests) {
       const response = await cache.match(request);
       if (response) {
         const cachedTime = new Date(response.headers.get('sw-cached-time') || 0).getTime();
         const age = now - cachedTime;
-        
+
         if (age > config.maxAge) {
           await cache.delete(request);
           deletedCount++;
         }
       }
     }
-    
+
     // Enforce max entries limit
     if (requests.length > config.maxEntries) {
       const excessCount = requests.length - config.maxEntries;
@@ -139,15 +122,15 @@ class CacheManager {
         deletedCount++;
       }
     }
-    
+
     if (deletedCount > 0) {
       console.log(`[SW] Cleaned up ${deletedCount} entries from ${cacheName}`);
     }
   }
-  
+
   static async addToCache(cacheName, request, response, config) {
     const cache = await caches.open(cacheName);
-    
+
     // Clone response and add cache timestamp
     const responseClone = response.clone();
     const responseWithTimestamp = new Response(responseClone.body, {
@@ -155,34 +138,34 @@ class CacheManager {
       statusText: responseClone.statusText,
       headers: {
         ...Object.fromEntries(responseClone.headers.entries()),
-        'sw-cached-time': new Date().toISOString()
-      }
+        'sw-cached-time': new Date().toISOString(),
+      },
     });
-    
+
     await cache.put(request, responseWithTimestamp);
-    
+
     // Trigger cleanup if needed (async)
     setTimeout(() => this.cleanupCache(cacheName, config), 0);
   }
-  
+
   static async getFromCache(cacheName, request) {
     const cache = await caches.open(cacheName);
     const response = await cache.match(request);
-    
+
     if (response) {
       const cachedTime = new Date(response.headers.get('sw-cached-time') || 0).getTime();
       const config = CACHE_CONFIG[cacheName.split('-').pop()];
-      
+
       if (config && Date.now() - cachedTime > config.maxAge) {
         // Expired, remove from cache
         await cache.delete(request);
         return null;
       }
-      
+
       PerformanceMonitor.logCacheHit(cacheName, request.url);
       return response;
     }
-    
+
     return null;
   }
 }
@@ -190,7 +173,7 @@ class CacheManager {
 // Request categorization
 function getCacheStrategy(request) {
   const url = new URL(request.url);
-  
+
   // Check each strategy pattern
   for (const [strategy, patterns] of Object.entries(CACHE_STRATEGIES)) {
     for (const pattern of patterns) {
@@ -199,14 +182,14 @@ function getCacheStrategy(request) {
       }
     }
   }
-  
+
   return 'dynamic'; // Default strategy
 }
 
 // Install event - cache static resources
 self.addEventListener('install', event => {
   console.log('[SW] Installing enhanced service worker');
-  
+
   event.waitUntil(
     caches
       .open(STATIC_CACHE)
@@ -227,7 +210,7 @@ self.addEventListener('install', event => {
 // Activate event - clean up old caches
 self.addEventListener('activate', event => {
   console.log('[SW] Activating enhanced service worker');
-  
+
   event.waitUntil(
     Promise.all([
       // Clean up old caches
@@ -241,19 +224,22 @@ self.addEventListener('activate', event => {
           })
         );
       }),
-      
+
       // Take control of all clients
-      self.clients.claim()
+      self.clients.claim(),
     ]).then(() => {
       console.log('[SW] Enhanced service worker activated');
-      
+
       // Schedule periodic cache cleanup
-      setInterval(() => {
-        Object.entries(CACHE_CONFIG).forEach(([type, config]) => {
-          const cacheName = `${CACHE_VERSION}-${type}`;
-          CacheManager.cleanupCache(cacheName, config);
-        });
-      }, 60 * 60 * 1000); // Every hour
+      setInterval(
+        () => {
+          Object.entries(CACHE_CONFIG).forEach(([type, config]) => {
+            const cacheName = `${CACHE_VERSION}-${type}`;
+            CacheManager.cleanupCache(cacheName, config);
+          });
+        },
+        60 * 60 * 1000
+      ); // Every hour
     })
   );
 });
@@ -290,10 +276,10 @@ self.addEventListener('fetch', event => {
 async function handleEnhancedRequest(event) {
   const { request } = event;
   const strategy = getCacheStrategy(request);
-  
+
   let cacheName;
   let handler;
-  
+
   switch (strategy) {
     case 'static':
       cacheName = STATIC_CACHE;
@@ -317,36 +303,38 @@ async function handleEnhancedRequest(event) {
       handler = enhancedStaleWhileRevalidate;
       break;
   }
-  
+
   return handler(request, cacheName);
 }
 
 // Enhanced cache-first strategy
 async function enhancedCacheFirst(request, cacheName) {
   const cachedResponse = await CacheManager.getFromCache(cacheName, request);
-  
+
   if (cachedResponse) {
     return cachedResponse;
   }
-  
+
   try {
     const networkResponse = await fetch(request);
-    
+
     if (networkResponse.ok) {
       const config = CACHE_CONFIG[cacheName.split('-').pop()];
       await CacheManager.addToCache(cacheName, request, networkResponse, config);
     }
-    
+
     return networkResponse;
   } catch (error) {
     PerformanceMonitor.logNetworkFallback(request.url, error.message);
-    
+
     // Return offline fallback if available
     if (request.destination === 'document') {
-      const fallback = await caches.match('/offline.html') || await caches.match('/');
-      if (fallback) return fallback;
+      const fallback = (await caches.match('/offline.html')) || (await caches.match('/'));
+      if (fallback) {
+        return fallback;
+      }
     }
-    
+
     throw error;
   }
 }
@@ -355,22 +343,22 @@ async function enhancedCacheFirst(request, cacheName) {
 async function enhancedNetworkFirst(request, cacheName) {
   try {
     const networkResponse = await fetch(request);
-    
+
     if (networkResponse.ok) {
       const config = CACHE_CONFIG[cacheName.split('-').pop()];
       await CacheManager.addToCache(cacheName, request, networkResponse, config);
     }
-    
+
     return networkResponse;
   } catch (error) {
     PerformanceMonitor.logNetworkFallback(request.url, error.message);
-    
+
     const cachedResponse = await CacheManager.getFromCache(cacheName, request);
-    
+
     if (cachedResponse) {
       return cachedResponse;
     }
-    
+
     throw error;
   }
 }
@@ -378,33 +366,35 @@ async function enhancedNetworkFirst(request, cacheName) {
 // Enhanced stale-while-revalidate strategy
 async function enhancedStaleWhileRevalidate(request, cacheName) {
   const cachedResponse = await CacheManager.getFromCache(cacheName, request);
-  
+
   // Start network request
-  const networkPromise = fetch(request).then(async (networkResponse) => {
-    if (networkResponse.ok) {
-      const config = CACHE_CONFIG[cacheName.split('-').pop()];
-      await CacheManager.addToCache(cacheName, request, networkResponse, config);
-    }
-    return networkResponse;
-  }).catch(error => {
-    PerformanceMonitor.logNetworkFallback(request.url, error.message);
-    return null;
-  });
-  
+  const networkPromise = fetch(request)
+    .then(async networkResponse => {
+      if (networkResponse.ok) {
+        const config = CACHE_CONFIG[cacheName.split('-').pop()];
+        await CacheManager.addToCache(cacheName, request, networkResponse, config);
+      }
+      return networkResponse;
+    })
+    .catch(error => {
+      PerformanceMonitor.logNetworkFallback(request.url, error.message);
+      return null;
+    });
+
   // Return cached response immediately if available
   if (cachedResponse) {
     // Update cache in background
     networkPromise.catch(() => {}); // Ignore background errors
     return cachedResponse;
   }
-  
+
   // No cached response, wait for network
   const networkResponse = await networkPromise;
-  
+
   if (networkResponse) {
     return networkResponse;
   }
-  
+
   throw new Error('No cached response and network failed');
 }
 
@@ -492,7 +482,7 @@ async function networkWithCacheFallback(request) {
 // Enhanced background sync for mobile offline functionality
 self.addEventListener('sync', event => {
   console.log('[SW] Background sync:', event.tag);
-  
+
   switch (event.tag) {
     case 'formation-save':
       event.waitUntil(syncFormationSaves());
@@ -517,7 +507,7 @@ self.addEventListener('sync', event => {
 // Enhanced message handling for mobile features
 self.addEventListener('message', event => {
   const { type, payload } = event.data;
-  
+
   switch (type) {
     case 'SKIP_WAITING':
       self.skipWaiting();
@@ -555,8 +545,10 @@ self.addEventListener('message', event => {
 let db;
 
 async function initMobileDB() {
-  if (db) return db;
-  
+  if (db) {
+    return db;
+  }
+
   db = await idb.openDB('AstralTurfMobile', 1, {
     upgrade(db) {
       // Offline formations store
@@ -565,7 +557,7 @@ async function initMobileDB() {
         formationsStore.createIndex('timestamp', 'timestamp');
         formationsStore.createIndex('syncStatus', 'syncStatus');
       }
-      
+
       // Offline actions queue
       if (!db.objectStoreNames.contains('offlineActions')) {
         const actionsStore = db.createObjectStore('offlineActions', { keyPath: 'id' });
@@ -573,14 +565,14 @@ async function initMobileDB() {
         actionsStore.createIndex('type', 'type');
         actionsStore.createIndex('priority', 'priority');
       }
-      
+
       // Mobile telemetry
       if (!db.objectStoreNames.contains('mobileTelemetry')) {
         const telemetryStore = db.createObjectStore('mobileTelemetry', { keyPath: 'id' });
         telemetryStore.createIndex('timestamp', 'timestamp');
         telemetryStore.createIndex('type', 'type');
       }
-      
+
       // Player data cache
       if (!db.objectStoreNames.contains('playersCache')) {
         const playersStore = db.createObjectStore('playersCache', { keyPath: 'id' });
@@ -588,21 +580,21 @@ async function initMobileDB() {
       }
     },
   });
-  
+
   return db;
 }
 
 async function syncFormationSaves() {
   console.log('[SW] Syncing offline formation saves...');
-  
+
   try {
     const db = await initMobileDB();
     const tx = db.transaction('offlineFormations', 'readwrite');
     const store = tx.objectStore('offlineFormations');
-    
+
     // Get all pending formations
     const pendingFormations = await store.index('syncStatus').getAll('pending');
-    
+
     for (const formation of pendingFormations) {
       try {
         // Attempt to sync with server
@@ -613,7 +605,7 @@ async function syncFormationSaves() {
           },
           body: JSON.stringify(formation.data),
         });
-        
+
         if (response.ok) {
           // Mark as synced
           formation.syncStatus = 'synced';
@@ -626,15 +618,15 @@ async function syncFormationSaves() {
       } catch (error) {
         console.warn('[SW] Formation sync failed:', formation.id, error);
         formation.retryCount = (formation.retryCount || 0) + 1;
-        
+
         if (formation.retryCount >= MOBILE_CONFIG.syncRetryAttempts) {
           formation.syncStatus = 'failed';
         }
-        
+
         await store.put(formation);
       }
     }
-    
+
     await tx.complete;
     console.log('[SW] Formation sync completed');
   } catch (error) {
@@ -645,15 +637,15 @@ async function syncFormationSaves() {
 
 async function syncPlayerUpdates() {
   console.log('[SW] Syncing player updates...');
-  
+
   try {
     const db = await initMobileDB();
     const tx = db.transaction('offlineActions', 'readonly');
     const store = tx.objectStore('offlineActions');
-    
+
     // Get player-related actions
     const playerActions = await store.index('type').getAll('player-update');
-    
+
     for (const action of playerActions) {
       try {
         const response = await fetch(`/api/players/${action.data.playerId}`, {
@@ -663,7 +655,7 @@ async function syncPlayerUpdates() {
           },
           body: JSON.stringify(action.data.updates),
         });
-        
+
         if (response.ok) {
           // Remove from queue
           const deleteTx = db.transaction('offlineActions', 'readwrite');
@@ -674,7 +666,7 @@ async function syncPlayerUpdates() {
         console.warn('[SW] Player update sync failed:', action.id, error);
       }
     }
-    
+
     console.log('[SW] Player updates synced');
   } catch (error) {
     console.error('[SW] Player update sync failed:', error);
@@ -684,12 +676,12 @@ async function syncPlayerUpdates() {
 
 async function syncOfflineActions() {
   console.log('[SW] Syncing offline actions...');
-  
+
   try {
     const db = await initMobileDB();
     const tx = db.transaction('offlineActions', 'readwrite');
     const store = tx.objectStore('offlineActions');
-    
+
     // Get all pending actions sorted by priority and timestamp
     const actions = await store.getAll();
     const sortedActions = actions.sort((a, b) => {
@@ -698,7 +690,7 @@ async function syncOfflineActions() {
       }
       return a.timestamp - b.timestamp; // Older first within same priority
     });
-    
+
     for (const action of sortedActions) {
       try {
         await executeOfflineAction(action);
@@ -706,15 +698,15 @@ async function syncOfflineActions() {
       } catch (error) {
         console.warn('[SW] Offline action failed:', action.id, error);
         action.retryCount = (action.retryCount || 0) + 1;
-        
+
         if (action.retryCount >= MOBILE_CONFIG.syncRetryAttempts) {
           action.status = 'failed';
         }
-        
+
         await store.put(action);
       }
     }
-    
+
     await tx.complete;
     console.log('[SW] Offline actions sync completed');
   } catch (error) {
@@ -725,14 +717,14 @@ async function syncOfflineActions() {
 
 async function syncMobileTelemetry() {
   console.log('[SW] Syncing mobile telemetry...');
-  
+
   try {
     const db = await initMobileDB();
     const tx = db.transaction('mobileTelemetry', 'readwrite');
     const store = tx.objectStore('mobileTelemetry');
-    
+
     const telemetryData = await store.getAll();
-    
+
     if (telemetryData.length > 0) {
       const response = await fetch('/api/telemetry/mobile', {
         method: 'POST',
@@ -741,14 +733,14 @@ async function syncMobileTelemetry() {
         },
         body: JSON.stringify(telemetryData),
       });
-      
+
       if (response.ok) {
         // Clear synced telemetry
         await store.clear();
         console.log('[SW] Mobile telemetry synced');
       }
     }
-    
+
     await tx.complete;
   } catch (error) {
     console.error('[SW] Mobile telemetry sync failed:', error);
@@ -758,7 +750,7 @@ async function syncMobileTelemetry() {
 
 async function executeOfflineAction(action) {
   const { type, data } = action;
-  
+
   switch (type) {
     case 'formation-update':
       return await fetch(`/api/formations/${data.formationId}`, {
@@ -766,21 +758,21 @@ async function executeOfflineAction(action) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data.updates),
       });
-      
+
     case 'player-position-update':
       return await fetch(`/api/formations/${data.formationId}/positions`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data.positions),
       });
-      
+
     case 'settings-update':
       return await fetch('/api/user/settings', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data.settings),
       });
-      
+
     default:
       throw new Error(`Unknown action type: ${type}`);
   }
@@ -788,14 +780,14 @@ async function executeOfflineAction(action) {
 
 async function syncAnalytics() {
   console.log('[SW] Syncing analytics data...');
-  
+
   try {
     const db = await initMobileDB();
     const tx = db.transaction('mobileTelemetry', 'readonly');
     const store = tx.objectStore('mobileTelemetry');
-    
+
     const analyticsData = await store.index('type').getAll('analytics');
-    
+
     if (analyticsData.length > 0) {
       const response = await fetch('/api/analytics/mobile', {
         method: 'POST',
@@ -804,16 +796,16 @@ async function syncAnalytics() {
         },
         body: JSON.stringify(analyticsData.map(item => item.data)),
       });
-      
+
       if (response.ok) {
         // Remove synced analytics
         const deleteTx = db.transaction('mobileTelemetry', 'readwrite');
         const deleteStore = deleteTx.objectStore('mobileTelemetry');
-        
+
         for (const item of analyticsData) {
           await deleteStore.delete(item.id);
         }
-        
+
         await deleteTx.complete;
         console.log('[SW] Analytics synced successfully');
       }
@@ -827,27 +819,27 @@ async function syncAnalytics() {
 async function handleCacheStatsRequest(event) {
   try {
     const stats = {};
-    
+
     for (const [type, config] of Object.entries(CACHE_CONFIG)) {
       const cacheName = `${CACHE_VERSION}-${type}`;
       const cache = await caches.open(cacheName);
       const keys = await cache.keys();
-      
+
       stats[type] = {
         entryCount: keys.length,
         maxEntries: config.maxEntries,
-        maxAge: config.maxAge
+        maxAge: config.maxAge,
       };
     }
-    
+
     event.ports[0].postMessage({
       type: 'CACHE_STATS_RESPONSE',
-      payload: stats
+      payload: stats,
     });
   } catch (error) {
     event.ports[0].postMessage({
       type: 'CACHE_STATS_ERROR',
-      payload: error.message
+      payload: error.message,
     });
   }
 }
@@ -855,27 +847,25 @@ async function handleCacheStatsRequest(event) {
 async function handleClearCacheRequest(event, payload) {
   try {
     const { cacheType } = payload;
-    
+
     if (cacheType === 'all') {
       const cacheNames = await caches.keys();
       await Promise.all(
-        cacheNames
-          .filter(name => name.startsWith(CACHE_VERSION))
-          .map(name => caches.delete(name))
+        cacheNames.filter(name => name.startsWith(CACHE_VERSION)).map(name => caches.delete(name))
       );
     } else {
       const cacheName = `${CACHE_VERSION}-${cacheType}`;
       await caches.delete(cacheName);
     }
-    
+
     event.ports[0].postMessage({
       type: 'CLEAR_CACHE_SUCCESS',
-      payload: { cacheType }
+      payload: { cacheType },
     });
   } catch (error) {
     event.ports[0].postMessage({
       type: 'CLEAR_CACHE_ERROR',
-      payload: error.message
+      payload: error.message,
     });
   }
 }
@@ -885,8 +875,8 @@ async function handlePreloadRequest(event, payload) {
     const { urls, cacheType = 'dynamic' } = payload;
     const cacheName = `${CACHE_VERSION}-${cacheType}`;
     const cache = await caches.open(cacheName);
-    
-    const promises = urls.map(async (url) => {
+
+    const promises = urls.map(async url => {
       try {
         const response = await fetch(url);
         if (response.ok) {
@@ -896,17 +886,17 @@ async function handlePreloadRequest(event, payload) {
         console.warn(`[SW] Failed to preload ${url}:`, error);
       }
     });
-    
+
     await Promise.allSettled(promises);
-    
+
     event.ports[0].postMessage({
       type: 'PRELOAD_SUCCESS',
-      payload: { count: urls.length }
+      payload: { count: urls.length },
     });
   } catch (error) {
     event.ports[0].postMessage({
       type: 'PRELOAD_ERROR',
-      payload: error.message
+      payload: error.message,
     });
   }
 }
@@ -914,7 +904,7 @@ async function handlePreloadRequest(event, payload) {
 // Enhanced mobile push notifications
 self.addEventListener('push', event => {
   console.log('[SW] Push notification received');
-  
+
   let notificationData = {
     title: 'Astral Turf',
     body: 'New update available!',
@@ -929,18 +919,18 @@ self.addEventListener('push', event => {
       {
         action: 'open',
         title: 'Open App',
-        icon: '/icons/action-open.png'
+        icon: '/icons/action-open.png',
       },
       {
         action: 'dismiss',
         title: 'Dismiss',
-        icon: '/icons/action-dismiss.png'
-      }
+        icon: '/icons/action-dismiss.png',
+      },
     ],
     requireInteraction: false,
     silent: false,
   };
-  
+
   if (event.data) {
     try {
       const payload = event.data.json();
@@ -949,44 +939,41 @@ self.addEventListener('push', event => {
       notificationData.body = event.data.text() || notificationData.body;
     }
   }
-  
-  event.waitUntil(
-    self.registration.showNotification(notificationData.title, notificationData)
-  );
+
+  event.waitUntil(self.registration.showNotification(notificationData.title, notificationData));
 });
 
 // Handle notification clicks
 self.addEventListener('notificationclick', event => {
   console.log('[SW] Notification clicked:', event.action);
-  
+
   event.notification.close();
-  
+
   if (event.action === 'dismiss') {
     return;
   }
-  
+
   // Open or focus the app
   event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true })
-      .then(clients => {
-        // If app is already open, focus it
-        for (const client of clients) {
-          if (client.url.includes(self.location.origin)) {
-            return client.focus();
-          }
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clients => {
+      // If app is already open, focus it
+      for (const client of clients) {
+        if (client.url.includes(self.location.origin)) {
+          return client.focus();
         }
-        
-        // Open new window
-        const urlToOpen = event.notification.data?.url || '/';
-        return clients.openWindow(urlToOpen);
-      })
+      }
+
+      // Open new window
+      const urlToOpen = event.notification.data?.url || '/';
+      return clients.openWindow(urlToOpen);
+    })
   );
 });
 
 // Handle notification close
 self.addEventListener('notificationclose', event => {
   console.log('[SW] Notification closed');
-  
+
   // Track notification dismissal
   const telemetryData = {
     id: `notification-close-${Date.now()}`,
@@ -998,14 +985,16 @@ self.addEventListener('notificationclose', event => {
     },
     timestamp: Date.now(),
   };
-  
-  initMobileDB().then(db => {
-    const tx = db.transaction('mobileTelemetry', 'readwrite');
-    tx.objectStore('mobileTelemetry').add(telemetryData);
-    return tx.complete;
-  }).catch(error => {
-    console.warn('[SW] Failed to log notification close:', error);
-  });
+
+  initMobileDB()
+    .then(db => {
+      const tx = db.transaction('mobileTelemetry', 'readwrite');
+      tx.objectStore('mobileTelemetry').add(telemetryData);
+      return tx.complete;
+    })
+    .catch(error => {
+      console.warn('[SW] Failed to log notification close:', error);
+    });
 });
 
 // Error reporting
@@ -1023,7 +1012,7 @@ async function handleOfflineFormationStore(event, payload) {
     const db = await initMobileDB();
     const tx = db.transaction('offlineFormations', 'readwrite');
     const store = tx.objectStore('offlineFormations');
-    
+
     const formation = {
       id: payload.id || `offline-${Date.now()}`,
       data: payload.formation,
@@ -1031,18 +1020,18 @@ async function handleOfflineFormationStore(event, payload) {
       syncStatus: 'pending',
       retryCount: 0,
     };
-    
+
     await store.put(formation);
     await tx.complete;
-    
+
     event.ports[0].postMessage({
       type: 'OFFLINE_FORMATION_STORED',
-      payload: { id: formation.id }
+      payload: { id: formation.id },
     });
   } catch (error) {
     event.ports[0].postMessage({
       type: 'OFFLINE_FORMATION_ERROR',
-      payload: error.message
+      payload: error.message,
     });
   }
 }
@@ -1052,17 +1041,17 @@ async function handleOfflineFormationsGet(event) {
     const db = await initMobileDB();
     const tx = db.transaction('offlineFormations', 'readonly');
     const store = tx.objectStore('offlineFormations');
-    
+
     const formations = await store.getAll();
-    
+
     event.ports[0].postMessage({
       type: 'OFFLINE_FORMATIONS_RESPONSE',
-      payload: formations
+      payload: formations,
     });
   } catch (error) {
     event.ports[0].postMessage({
       type: 'OFFLINE_FORMATIONS_ERROR',
-      payload: error.message
+      payload: error.message,
     });
   }
 }
@@ -1072,7 +1061,7 @@ async function handleOfflineActionQueue(event, payload) {
     const db = await initMobileDB();
     const tx = db.transaction('offlineActions', 'readwrite');
     const store = tx.objectStore('offlineActions');
-    
+
     const action = {
       id: `action-${Date.now()}-${Math.random()}`,
       type: payload.type,
@@ -1081,30 +1070,32 @@ async function handleOfflineActionQueue(event, payload) {
       timestamp: Date.now(),
       retryCount: 0,
     };
-    
+
     await store.add(action);
     await tx.complete;
-    
+
     // Try immediate sync if online
     if (navigator.onLine) {
-      executeOfflineAction(action).then(() => {
-        // Remove from queue if successful
-        const deleteTx = db.transaction('offlineActions', 'readwrite');
-        deleteTx.objectStore('offlineActions').delete(action.id);
-        return deleteTx.complete;
-      }).catch(() => {
-        // Keep in queue for background sync
-      });
+      executeOfflineAction(action)
+        .then(() => {
+          // Remove from queue if successful
+          const deleteTx = db.transaction('offlineActions', 'readwrite');
+          deleteTx.objectStore('offlineActions').delete(action.id);
+          return deleteTx.complete;
+        })
+        .catch(() => {
+          // Keep in queue for background sync
+        });
     }
-    
+
     event.ports[0].postMessage({
       type: 'OFFLINE_ACTION_QUEUED',
-      payload: { id: action.id }
+      payload: { id: action.id },
     });
   } catch (error) {
     event.ports[0].postMessage({
       type: 'OFFLINE_ACTION_ERROR',
-      payload: error.message
+      payload: error.message,
     });
   }
 }
@@ -1112,18 +1103,20 @@ async function handleOfflineActionQueue(event, payload) {
 async function handleNetworkStatusRequest(event) {
   const networkStatus = {
     online: navigator.onLine,
-    connection: navigator.connection ? {
-      effectiveType: navigator.connection.effectiveType,
-      downlink: navigator.connection.downlink,
-      rtt: navigator.connection.rtt,
-      saveData: navigator.connection.saveData,
-    } : null,
+    connection: navigator.connection
+      ? {
+          effectiveType: navigator.connection.effectiveType,
+          downlink: navigator.connection.downlink,
+          rtt: navigator.connection.rtt,
+          saveData: navigator.connection.saveData,
+        }
+      : null,
     timestamp: Date.now(),
   };
-  
+
   event.ports[0].postMessage({
     type: 'NETWORK_STATUS_RESPONSE',
-    payload: networkStatus
+    payload: networkStatus,
   });
 }
 
@@ -1131,15 +1124,15 @@ async function handleMobileOptimizationsToggle(event, payload) {
   try {
     // Update mobile configuration
     Object.assign(MOBILE_CONFIG, payload.config);
-    
+
     event.ports[0].postMessage({
       type: 'MOBILE_OPTIMIZATIONS_UPDATED',
-      payload: { config: MOBILE_CONFIG }
+      payload: { config: MOBILE_CONFIG },
     });
   } catch (error) {
     event.ports[0].postMessage({
       type: 'MOBILE_OPTIMIZATIONS_ERROR',
-      payload: error.message
+      payload: error.message,
     });
   }
 }

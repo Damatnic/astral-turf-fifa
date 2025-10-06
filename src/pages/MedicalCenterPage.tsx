@@ -1,10 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { useFranchiseContext, useTacticsContext, useUIContext } from '../hooks';
-import type { Team, Player, InjuryType, TreatmentPlan } from '../types';
+import type { Team, Player } from '../types';
 
 const MedicalCenterPage: React.FC = () => {
   const { franchiseState } = useFranchiseContext();
-  const { tacticsState } = useTacticsContext();
+  const { tacticsState, dispatch } = useTacticsContext();
   const [selectedTeam, setSelectedTeam] = useState<Team>('home');
   const [selectedTab, setSelectedTab] = useState<'injured' | 'fitness' | 'prevention'>('injured');
 
@@ -13,7 +13,7 @@ const MedicalCenterPage: React.FC = () => {
 
   // Filter players by medical status
   const injuredPlayers = teamPlayers.filter(
-    p => p.availability.status === 'Minor Injury' || p.availability.status === 'Major Injury',
+    p => p.availability.status === 'Minor Injury' || p.availability.status === 'Major Injury'
   );
 
   const lowFitnessPlayers = teamPlayers.filter(p => p.stamina < 70);
@@ -84,7 +84,7 @@ const MedicalCenterPage: React.FC = () => {
 
   // Injury prevention recommendations
   const getInjuryPreventionPlan = (player: Player) => {
-    const recommendations = [];
+    const recommendations: string[] = [];
 
     if (player.fatigue > 70) {
       recommendations.push('Reduce training intensity');
@@ -146,13 +146,13 @@ const MedicalCenterPage: React.FC = () => {
     const highRiskPlayers = teamPlayers.filter(p => p.injuryRisk > 60).length;
 
     const averageFitness = Math.round(
-      teamPlayers.reduce((sum, p) => sum + p.stamina, 0) / totalPlayers,
+      teamPlayers.reduce((sum, p) => sum + p.stamina, 0) / totalPlayers
     );
     const averageFatigue = Math.round(
-      teamPlayers.reduce((sum, p) => sum + p.fatigue, 0) / totalPlayers,
+      teamPlayers.reduce((sum, p) => sum + p.fatigue, 0) / totalPlayers
     );
     const averageRisk = Math.round(
-      teamPlayers.reduce((sum, p) => sum + p.injuryRisk, 0) / totalPlayers,
+      teamPlayers.reduce((sum, p) => sum + p.injuryRisk, 0) / totalPlayers
     );
 
     return {

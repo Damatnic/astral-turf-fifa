@@ -13,12 +13,13 @@ const TeamTalkPopup: React.FC = () => {
 
   const activeTeam = activeTeamContext === 'away' ? 'away' : 'home';
   const isHalftime =
-    franchiseState.lastMatchResult === null && uiState.simulationTimeline.some(e => e.minute >= 45);
+    franchiseState.lastMatchResult === null &&
+    uiState.simulationTimeline.some((e: any) => e.minute >= 45);
   const homeScore = uiState.simulationTimeline.filter(
-    e => 'type' in e && e.type === 'Goal' && e.team === 'home',
+    (e: any) => 'type' in e && e.type === 'Goal' && e.team === 'home'
   ).length;
   const awayScore = uiState.simulationTimeline.filter(
-    e => 'type' in e && e.type === 'Goal' && e.team === 'away',
+    (e: any) => 'type' in e && e.type === 'Goal' && e.team === 'away'
   ).length;
 
   useEffect(() => {
@@ -27,18 +28,25 @@ const TeamTalkPopup: React.FC = () => {
       const opponentName = 'The Opponent'; // Simplified for now
       const currentScore = `${homeScore}-${awayScore}`;
 
-      dispatch({ type: 'GET_TEAM_TALK_OPTIONS_START' });
+      (dispatch as (action: { type: string }) => void)({ type: 'GET_TEAM_TALK_OPTIONS_START' });
       getTeamTalkOptions(
         teamPlayers,
         opponentName,
         isHalftime,
         currentScore,
-        settings.aiPersonality,
+        settings.aiPersonality
       )
-        .then(data => dispatch({ type: 'GET_TEAM_TALK_OPTIONS_SUCCESS', payload: data }))
+        .then(data =>
+          (dispatch as (action: { type: string; payload?: unknown }) => void)({
+            type: 'GET_TEAM_TALK_OPTIONS_SUCCESS',
+            payload: data,
+          })
+        )
         .catch(err => {
           console.error(err);
-          dispatch({ type: 'GET_TEAM_TALK_OPTIONS_FAILURE' });
+          (dispatch as (action: { type: string }) => void)({
+            type: 'GET_TEAM_TALK_OPTIONS_FAILURE',
+          });
           dispatch({
             type: 'ADD_NOTIFICATION',
             payload: { message: `AI Error: ${err.message}`, type: 'error' },
@@ -77,7 +85,7 @@ const TeamTalkPopup: React.FC = () => {
       onClick={closeModal}
     >
       <div
-        onClick={e => e.stopPropagation()}
+        onClick={(e: React.MouseEvent) => e.stopPropagation()}
         className="relative bg-gray-800 rounded-lg shadow-2xl w-full max-w-lg border border-gray-700/50 flex flex-col animate-fade-in-scale"
       >
         <div className="flex justify-between items-center p-4 border-b border-gray-700">
@@ -99,23 +107,32 @@ const TeamTalkPopup: React.FC = () => {
               <LoadingSpinner className="w-8 h-8" />
             </div>
           )}
-          {teamTalkData && (
-            <div className="space-y-3">
-              <p className="text-sm text-gray-400 mb-4 text-center">
-                Your assistant suggests the following approaches:
-              </p>
-              {teamTalkData.options.map((option, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleSelectTalk(option)}
-                  className="w-full text-left p-3 bg-gray-700/50 hover:bg-teal-600/30 rounded-lg border border-gray-600 hover:border-teal-500 transition-all"
-                >
-                  <p className="font-bold text-teal-400">{option.tone}</p>
-                  <p className="text-sm text-gray-300 mt-1 italic">"{option.message}"</p>
-                </button>
-              ))}
-            </div>
-          )}
+          {
+            (teamTalkData &&
+              (() => {
+                const data = teamTalkData as { options?: TeamTalkOption[] };
+                if (!data.options) {
+                  return null;
+                }
+                return (
+                  <div className="space-y-3">
+                    <p className="text-sm text-gray-400 mb-4 text-center">
+                      Your assistant suggests the following approaches:
+                    </p>
+                    {data.options.map((option, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleSelectTalk(option)}
+                        className="w-full text-left p-3 bg-gray-700/50 hover:bg-teal-600/30 rounded-lg border border-gray-600 hover:border-teal-500 transition-all"
+                      >
+                        <p className="font-bold text-teal-400">{option.tone}</p>
+                        <p className="text-sm text-gray-300 mt-1 italic">"{option.message}"</p>
+                      </button>
+                    ))}
+                  </div>
+                );
+              })()) as React.ReactNode
+          }
         </div>
       </div>
     </div>

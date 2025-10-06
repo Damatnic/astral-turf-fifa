@@ -135,7 +135,7 @@ export const authService = {
 
       const response: SecureLoginResponse = await secureAuthService.signup(
         secureSignupData,
-        context,
+        context
       );
 
       // Store tokens securely
@@ -222,7 +222,7 @@ export const authService = {
   getFamilyAssociations: (userId: string): FamilyMemberAssociation[] => {
     // Return associations where user is either family member or player
     return DEMO_FAMILY_ASSOCIATIONS.filter(
-      assoc => assoc.familyMemberId === userId || assoc.playerId === userId,
+      assoc => assoc.familyMemberId === userId || assoc.playerId === userId
     );
   },
 
@@ -280,7 +280,7 @@ export const authService = {
   createFamilyAssociation: async (
     familyMemberId: string,
     playerId: string,
-    relationship: string,
+    relationship: string
   ): Promise<FamilyMemberAssociation> => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
@@ -331,7 +331,7 @@ export const authService = {
 
   updateNotificationSettings: async (
     userId: string,
-    settings: Partial<NotificationSettings>,
+    settings: Partial<NotificationSettings>
   ): Promise<NotificationSettings> => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
@@ -433,7 +433,7 @@ export const authService = {
   checkPermission: async (
     permission: string,
     resource: string,
-    targetUserId?: string,
+    targetUserId?: string
   ): Promise<boolean> => {
     try {
       const token = localStorage.getItem('accessToken');
@@ -447,7 +447,7 @@ export const authService = {
         permission as any,
         resource as any,
         context,
-        targetUserId,
+        targetUserId
       );
     } catch (_error) {
       return false;

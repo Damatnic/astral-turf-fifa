@@ -45,7 +45,7 @@ const MobilePlayerToken: React.FC<MobilePlayerTokenProps> = ({
 }) => {
   const tokenRef = useRef<HTMLDivElement>(null);
   const capabilities = useMobileCapabilities();
-  
+
   // Motion values for smooth animations
   const x = useMotionValue(position.x);
   const y = useMotionValue(position.y);
@@ -64,135 +64,170 @@ const MobilePlayerToken: React.FC<MobilePlayerTokenProps> = ({
   }, [position.x, position.y, x, y]);
 
   // Snap to grid function
-  const snapPosition = useCallback((pos: { x: number; y: number }) => {
-    if (!snapToGrid) return pos;
-    
-    return {
-      x: Math.round(pos.x / gridSize) * gridSize,
-      y: Math.round(pos.y / gridSize) * gridSize,
-    };
-  }, [snapToGrid, gridSize]);
+  const snapPosition = useCallback(
+    (pos: { x: number; y: number }) => {
+      if (!snapToGrid) {
+        return pos;
+      }
+
+      return {
+        x: Math.round(pos.x / gridSize) * gridSize,
+        y: Math.round(pos.y / gridSize) * gridSize,
+      };
+    },
+    [snapToGrid, gridSize]
+  );
 
   // Enhanced touch gestures
   useTouchGestures(tokenRef, {
-    onTap: useCallback((event: TouchEvent, tapPosition: { x: number; y: number }) => {
-      const now = Date.now();
-      const timeSinceLastTap = now - lastTapTime;
-      
-      // Double tap detection
-      if (timeSinceLastTap < 300) {
-        setTouchCount(prev => prev + 1);
-        
-        if (touchCount === 1) {
-          // Double tap - quick action (e.g., center on player)
+    onTap: useCallback(
+      (event: TouchEvent, tapPosition: { x: number; y: number }) => {
+        const now = Date.now();
+        const timeSinceLastTap = now - lastTapTime;
+
+        // Double tap detection
+        if (timeSinceLastTap < 300) {
+          setTouchCount(prev => prev + 1);
+
+          if (touchCount === 1) {
+            // Double tap - quick action (e.g., center on player)
+            onSelect(player, tapPosition);
+
+            // Haptic feedback for double tap
+            if (capabilities.hasHapticFeedback) {
+              navigator.vibrate([30, 10, 30]);
+            }
+          }
+        } else {
+          setTouchCount(1);
           onSelect(player, tapPosition);
-          
-          // Haptic feedback for double tap
+
+          // Light haptic feedback for single tap
           if (capabilities.hasHapticFeedback) {
-            navigator.vibrate([30, 10, 30]);
+            navigator.vibrate(15);
           }
         }
-      } else {
-        setTouchCount(1);
-        onSelect(player, tapPosition);
-        
-        // Light haptic feedback for single tap
+
+        setLastTapTime(now);
+
+        // Reset touch count after delay
+        setTimeout(() => setTouchCount(0), 400);
+      },
+      [lastTapTime, touchCount, onSelect, player, capabilities.hasHapticFeedback]
+    ),
+
+    onLongPress: useCallback(
+      (event: TouchEvent, pressPosition: { x: number; y: number }) => {
+        setIsLongPressing(true);
+        onLongPress(player, pressPosition);
+
+        // Strong haptic feedback for long press
         if (capabilities.hasHapticFeedback) {
-          navigator.vibrate(15);
+          navigator.vibrate([50, 30, 50]);
         }
-      }
-      
-      setLastTapTime(now);
-      
-      // Reset touch count after delay
-      setTimeout(() => setTouchCount(0), 400);
-    }, [lastTapTime, touchCount, onSelect, player, capabilities.hasHapticFeedback]),
 
-    onLongPress: useCallback((event: TouchEvent, pressPosition: { x: number; y: number }) => {
-      setIsLongPressing(true);
-      onLongPress(player, pressPosition);
-      
-      // Strong haptic feedback for long press
-      if (capabilities.hasHapticFeedback) {
-        navigator.vibrate([50, 30, 50]);
-      }
-      
-      setTimeout(() => setIsLongPressing(false), 200);
-    }, [onLongPress, player, capabilities.hasHapticFeedback]),
+        setTimeout(() => setIsLongPressing(false), 200);
+      },
+      [onLongPress, player, capabilities.hasHapticFeedback]
+    ),
 
-    onDrag: useCallback((event: TouchEvent, delta: { x: number; y: number }) => {
-      if (!isDragging) {
-        onDragStart();
-      }
-      
+    onDrag: useCallback(
+      (event: TouchEvent, delta: { x: number; y: number }) => {
+        if (!isDragging) {
+          onDragStart();
+        }
+
+        const newPosition = {
+          x: position.x + delta.x,
+          y: position.y + delta.y,
+        };
+
+        // Constrain to field bounds
+        const constrainedPosition = {
+          x: Math.max(0, Math.min(fieldBounds.width - 40, newPosition.x)),
+          y: Math.max(0, Math.min(fieldBounds.height - 40, newPosition.y)),
+        };
+
+        const snappedPosition = snapPosition(constrainedPosition);
+        onMove(player.id, snappedPosition);
+
+        // Subtle haptic feedback during drag
+        if (capabilities.hasHapticFeedback && Math.random() < 0.1) {
+          navigator.vibrate(5);
+        }
+      },
+      [
+        isDragging,
+        position,
+        fieldBounds,
+        snapPosition,
+        onDragStart,
+        onMove,
+        player.id,
+        capabilities.hasHapticFeedback,
+      ]
+    ),
+  });
+
+  // Framer Motion drag handlers
+  const handleDrag = useCallback(
+    (event: any, info: PanInfo) => {
       const newPosition = {
-        x: position.x + delta.x,
-        y: position.y + delta.y,
+        x: position.x + info.delta.x,
+        y: position.y + info.delta.y,
       };
-      
+
       // Constrain to field bounds
       const constrainedPosition = {
         x: Math.max(0, Math.min(fieldBounds.width - 40, newPosition.x)),
         y: Math.max(0, Math.min(fieldBounds.height - 40, newPosition.y)),
       };
-      
+
       const snappedPosition = snapPosition(constrainedPosition);
       onMove(player.id, snappedPosition);
-      
-      // Subtle haptic feedback during drag
-      if (capabilities.hasHapticFeedback && Math.random() < 0.1) {
-        navigator.vibrate(5);
+    },
+    [position, fieldBounds, snapPosition, onMove, player.id]
+  );
+
+  const handleDragEnd = useCallback(
+    (event: any, info: PanInfo) => {
+      onDragEnd();
+
+      // Completion haptic feedback
+      if (capabilities.hasHapticFeedback) {
+        navigator.vibrate(25);
       }
-    }, [isDragging, position, fieldBounds, snapPosition, onDragStart, onMove, player.id, capabilities.hasHapticFeedback]),
-  });
-
-  // Framer Motion drag handlers
-  const handleDrag = useCallback((event: any, info: PanInfo) => {
-    const newPosition = {
-      x: position.x + info.delta.x,
-      y: position.y + info.delta.y,
-    };
-    
-    // Constrain to field bounds
-    const constrainedPosition = {
-      x: Math.max(0, Math.min(fieldBounds.width - 40, newPosition.x)),
-      y: Math.max(0, Math.min(fieldBounds.height - 40, newPosition.y)),
-    };
-    
-    const snappedPosition = snapPosition(constrainedPosition);
-    onMove(player.id, snappedPosition);
-  }, [position, fieldBounds, snapPosition, onMove, player.id]);
-
-  const handleDragEnd = useCallback((event: any, info: PanInfo) => {
-    onDragEnd();
-    
-    // Completion haptic feedback
-    if (capabilities.hasHapticFeedback) {
-      navigator.vibrate(25);
-    }
-  }, [onDragEnd, capabilities.hasHapticFeedback]);
+    },
+    [onDragEnd, capabilities.hasHapticFeedback]
+  );
 
   // Get player position color based on role
   const getPositionColor = useCallback(() => {
-    switch (player.position) {
-      case 'GK': return 'bg-yellow-500 border-yellow-400';
+    const posRole = player.positionRole || '';
+    switch (posRole) {
+      case 'GK':
+        return 'bg-yellow-500 border-yellow-400';
       case 'CB':
       case 'LB':
       case 'RB':
       case 'LWB':
-      case 'RWB': return 'bg-blue-500 border-blue-400';
+      case 'RWB':
+        return 'bg-blue-500 border-blue-400';
       case 'CM':
       case 'CDM':
       case 'CAM':
       case 'LM':
-      case 'RM': return 'bg-green-500 border-green-400';
+      case 'RM':
+        return 'bg-green-500 border-green-400';
       case 'LW':
       case 'RW':
       case 'CF':
-      case 'ST': return 'bg-red-500 border-red-400';
-      default: return 'bg-gray-500 border-gray-400';
+      case 'ST':
+        return 'bg-red-500 border-red-400';
+      default:
+        return 'bg-gray-500 border-gray-400';
     }
-  }, [player.position]);
+  }, [player.positionRole]);
 
   // Mobile-optimized touch targets (minimum 44px)
   const tokenSize = capabilities.isMobile ? Math.max(44, 36 * scale) : 36 * scale;
@@ -230,14 +265,14 @@ const MobilePlayerToken: React.FC<MobilePlayerTokenProps> = ({
       }}
       animate={{
         scale: isSelected ? 1.15 : 1,
-        boxShadow: isSelected 
+        boxShadow: isSelected
           ? '0 0 0 3px rgba(59, 130, 246, 0.5), 0 4px 8px rgba(0,0,0,0.2)'
           : isConflicted
-          ? '0 0 0 2px rgba(239, 68, 68, 0.7), 0 4px 8px rgba(0,0,0,0.2)'
-          : '0 2px 4px rgba(0,0,0,0.1)',
+            ? '0 0 0 2px rgba(239, 68, 68, 0.7), 0 4px 8px rgba(0,0,0,0.2)'
+            : '0 2px 4px rgba(0,0,0,0.1)',
       }}
       transition={{
-        type: "spring",
+        type: 'spring',
         stiffness: 300,
         damping: 25,
       }}
@@ -263,10 +298,7 @@ const MobilePlayerToken: React.FC<MobilePlayerTokenProps> = ({
         }}
       >
         {/* Player number */}
-        <span 
-          className="text-white font-bold"
-          style={{ fontSize }}
-        >
+        <span className="text-white font-bold" style={{ fontSize }}>
           {player.jerseyNumber || player.name.charAt(0)}
         </span>
 
@@ -317,9 +349,9 @@ const MobilePlayerToken: React.FC<MobilePlayerTokenProps> = ({
         <motion.div
           className="absolute inset-0 rounded-full bg-white/30 pointer-events-none"
           initial={{ scale: 0, opacity: 0 }}
-          animate={{ 
+          animate={{
             scale: isSelected ? [0, 1.5] : 0,
-            opacity: isSelected ? [0.3, 0] : 0 
+            opacity: isSelected ? [0.3, 0] : 0,
           }}
           transition={{ duration: 0.6 }}
         />

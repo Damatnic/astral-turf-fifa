@@ -44,7 +44,11 @@ interface MatchPrediction {
 
 interface TacticalHeatMapData {
   positions: { x: number; y: number; intensity: number }[];
-  movementPatterns: { from: { x: number; y: number }; to: { x: number; y: number }; frequency: number }[];
+  movementPatterns: {
+    from: { x: number; y: number };
+    to: { x: number; y: number };
+    frequency: number;
+  }[];
   influenceZones: { x: number; y: number; radius: number; influence: number }[];
 }
 
@@ -79,13 +83,18 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
   className = '',
   onClose,
 }) => {
-  const [activeTab, setActiveTab] = useState<'development' | 'formation' | 'match' | 'heatmap' | 'metrics'>('development');
+  const [activeTab, setActiveTab] = useState<
+    'development' | 'formation' | 'match' | 'heatmap' | 'metrics'
+  >('development');
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [loading, setLoading] = useState(false);
 
   // Mock data states
-  const [developmentPrediction, setDevelopmentPrediction] = useState<PlayerDevelopmentPrediction | null>(null);
-  const [formationAnalysis, setFormationAnalysis] = useState<FormationEffectivenessAnalysis | null>(null);
+  const [developmentPrediction, setDevelopmentPrediction] =
+    useState<PlayerDevelopmentPrediction | null>(null);
+  const [formationAnalysis, setFormationAnalysis] = useState<FormationEffectivenessAnalysis | null>(
+    null
+  );
   const [matchPrediction, setMatchPrediction] = useState<MatchPrediction | null>(null);
   const [heatMapData, setHeatMapData] = useState<TacticalHeatMapData | null>(null);
   const [playerMetrics, setPlayerMetrics] = useState<PlayerPerformanceMetrics | null>(null);
@@ -103,7 +112,7 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
     setLoading(true);
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1500));
-    
+
     const mockPrediction: PlayerDevelopmentPrediction = {
       playerId: player.id,
       projectedRatingIn1Year: (player.rating || 75) + Math.floor(Math.random() * 5) + 1,
@@ -120,9 +129,9 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
         'Focus on technical training to maximize passing development',
         'Increase physical conditioning to maintain speed advantage',
         'Work on finishing in training to reach shooting potential',
-      ]
+      ],
     };
-    
+
     setDevelopmentPrediction(mockPrediction);
     setLoading(false);
   };
@@ -130,7 +139,7 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
   const generateFormationAnalysis = async () => {
     setLoading(true);
     await new Promise(resolve => setTimeout(resolve, 1200));
-    
+
     const mockAnalysis: FormationEffectivenessAnalysis = {
       formationName: '4-3-3',
       overallRating: 8.2,
@@ -143,9 +152,9 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
         { formation: '4-4-2', effectiveness: 85, prediction: 'Favorable matchup' },
         { formation: '3-5-2', effectiveness: 72, prediction: 'Even contest' },
         { formation: '5-3-2', effectiveness: 68, prediction: 'Difficult matchup' },
-      ]
+      ],
     };
-    
+
     setFormationAnalysis(mockAnalysis);
     setLoading(false);
   };
@@ -153,7 +162,7 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
   const generateMatchPrediction = async () => {
     setLoading(true);
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
+
     const mockPrediction: MatchPrediction = {
       homeWinProbability: 45,
       awayWinProbability: 35,
@@ -168,9 +177,9 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
         'Consider more defensive approach in first 20 minutes',
         'Exploit pace on the wings against slower fullbacks',
         'Target set pieces as key scoring opportunity',
-      ]
+      ],
     };
-    
+
     setMatchPrediction(mockPrediction);
     setLoading(false);
   };
@@ -178,14 +187,14 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
   const generateHeatMap = async (player: Player) => {
     setLoading(true);
     await new Promise(resolve => setTimeout(resolve, 800));
-    
+
     // Generate mock heat map data
     const positions = Array.from({ length: 50 }, () => ({
       x: Math.random() * 100,
       y: Math.random() * 100,
       intensity: Math.random(),
     }));
-    
+
     const mockHeatMap: TacticalHeatMapData = {
       positions,
       movementPatterns: [
@@ -197,9 +206,9 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
         { x: 30, y: 70, radius: 15, influence: 0.9 },
         { x: 50, y: 50, radius: 12, influence: 0.7 },
         { x: 65, y: 30, radius: 10, influence: 0.8 },
-      ]
+      ],
     };
-    
+
     setHeatMapData(mockHeatMap);
     setLoading(false);
   };
@@ -207,7 +216,7 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
   const generatePlayerMetrics = async (player: Player) => {
     setLoading(true);
     await new Promise(resolve => setTimeout(resolve, 1100));
-    
+
     const mockMetrics: PlayerPerformanceMetrics = {
       playerId: player.id,
       overallRating: player.rating || 75,
@@ -226,10 +235,14 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
       ],
       comparisons: [
         { playerName: 'Similar Player A', similarityScore: 87, strengths: ['Speed', 'Dribbling'] },
-        { playerName: 'Similar Player B', similarityScore: 84, strengths: ['Physical', 'Shooting'] },
-      ]
+        {
+          playerName: 'Similar Player B',
+          similarityScore: 84,
+          strengths: ['Physical', 'Shooting'],
+        },
+      ],
     };
-    
+
     setPlayerMetrics(mockMetrics);
     setLoading(false);
   };
@@ -240,7 +253,7 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
         <div className="flex items-center justify-center h-64">
           <motion.div
             animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
             className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full"
           />
           <span className="ml-3 text-gray-400">Analyzing data...</span>
@@ -275,10 +288,12 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
           <label className="block text-sm font-medium mb-2 text-gray-300">Select Player:</label>
           <select
             value={selectedPlayer?.id || ''}
-            onChange={(e) => {
+            onChange={e => {
               const player = players.find(p => p.id === e.target.value);
               setSelectedPlayer(player || null);
-              if (player) generateDevelopmentPrediction(player);
+              if (player) {
+                generateDevelopmentPrediction(player);
+              }
             }}
             className="bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
@@ -320,10 +335,15 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
               </div>
 
               <div className="bg-gray-700 p-4 rounded-lg">
-                <div className={`text-2xl font-bold ${
-                  developmentPrediction.developmentRisk === 'Low' ? 'text-green-400' :
-                  developmentPrediction.developmentRisk === 'Medium' ? 'text-yellow-400' : 'text-red-400'
-                }`}>
+                <div
+                  className={`text-2xl font-bold ${
+                    developmentPrediction.developmentRisk === 'Low'
+                      ? 'text-green-400'
+                      : developmentPrediction.developmentRisk === 'Medium'
+                        ? 'text-yellow-400'
+                        : 'text-red-400'
+                  }`}
+                >
                   {developmentPrediction.developmentRisk}
                 </div>
                 <div className="text-sm text-gray-300">Development Risk</div>
@@ -338,12 +358,16 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
                     <div key={index} className="space-y-1">
                       <div className="flex justify-between text-sm">
                         <span>{attr.attribute}</span>
-                        <span>{attr.currentValue} → {attr.projectedValue}</span>
+                        <span>
+                          {attr.currentValue} → {attr.projectedValue}
+                        </span>
                       </div>
                       <div className="w-full bg-gray-600 rounded-full h-2">
-                        <div 
+                        <div
                           className="bg-blue-500 h-2 rounded-full transition-all duration-500"
-                          style={{ width: `${(attr.projectedValue / attr.developmentPotential) * 100}%` }}
+                          style={{
+                            width: `${(attr.projectedValue / attr.developmentPotential) * 100}%`,
+                          }}
                         />
                       </div>
                     </div>
@@ -452,8 +476,15 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
                     <div key={index} className="space-y-1">
                       <div className="flex justify-between text-sm">
                         <span>{matchup.formation}</span>
-                        <span className={matchup.effectiveness > 75 ? 'text-green-400' : 
-                                      matchup.effectiveness > 60 ? 'text-yellow-400' : 'text-red-400'}>
+                        <span
+                          className={
+                            matchup.effectiveness > 75
+                              ? 'text-green-400'
+                              : matchup.effectiveness > 60
+                                ? 'text-yellow-400'
+                                : 'text-red-400'
+                          }
+                        >
                           {matchup.effectiveness}%
                         </span>
                       </div>
@@ -559,13 +590,17 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
         </h3>
 
         <div className="mb-6">
-          <label className="block text-sm font-medium mb-2 text-gray-300">Select Player for Heat Map:</label>
+          <label className="block text-sm font-medium mb-2 text-gray-300">
+            Select Player for Heat Map:
+          </label>
           <select
             value={selectedPlayer?.id || ''}
-            onChange={(e) => {
+            onChange={e => {
               const player = players.find(p => p.id === e.target.value);
               setSelectedPlayer(player || null);
-              if (player) generateHeatMap(player);
+              if (player) {
+                generateHeatMap(player);
+              }
             }}
             className="bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white w-full focus:ring-2 focus:ring-red-500 focus:border-transparent"
           >
@@ -591,7 +626,7 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
                 <div className="absolute inset-0 border-2 border-white opacity-30" />
                 <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-white opacity-30" />
                 <div className="absolute left-1/2 top-1/2 w-20 h-20 border-2 border-white rounded-full opacity-30 transform -translate-x-1/2 -translate-y-1/2" />
-                
+
                 {/* Heat map points */}
                 {heatMapData.positions.map((position, index) => (
                   <div
@@ -665,13 +700,17 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
         </h3>
 
         <div className="mb-6">
-          <label className="block text-sm font-medium mb-2 text-gray-300">Select Player for Detailed Analysis:</label>
+          <label className="block text-sm font-medium mb-2 text-gray-300">
+            Select Player for Detailed Analysis:
+          </label>
           <select
             value={selectedPlayer?.id || ''}
-            onChange={(e) => {
+            onChange={e => {
               const player = players.find(p => p.id === e.target.value);
               setSelectedPlayer(player || null);
-              if (player) generatePlayerMetrics(player);
+              if (player) {
+                generatePlayerMetrics(player);
+              }
             }}
             className="bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white w-full focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
           >
@@ -698,10 +737,12 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
                     <div key={index} className="space-y-1">
                       <div className="flex justify-between text-sm">
                         <span>{attr.name}</span>
-                        <span className="font-semibold">{attr.value} ({attr.percentile}th%)</span>
+                        <span className="font-semibold">
+                          {attr.value} ({attr.percentile}th%)
+                        </span>
                       </div>
                       <div className="w-full bg-gray-600 rounded-full h-2">
-                        <div 
+                        <div
                           className="bg-yellow-500 h-2 rounded-full transition-all duration-500"
                           style={{ width: `${attr.percentile}%` }}
                         />
@@ -715,17 +756,30 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
                 <h4 className="font-semibold mb-4 text-gray-200">Trend Analysis</h4>
                 <div className="space-y-3">
                   {playerMetrics.trendAnalysis.map((trend, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-gray-600 rounded">
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-3 bg-gray-600 rounded"
+                    >
                       <span className="text-sm">{trend.attribute}</span>
                       <div className="flex items-center">
-                        <span className={`text-sm mr-2 ${
-                          trend.trend === 'improving' ? 'text-green-400' :
-                          trend.trend === 'declining' ? 'text-red-400' : 'text-gray-400'
-                        }`}>
-                          {trend.trend === 'improving' ? '↗' : trend.trend === 'declining' ? '↘' : '→'}
+                        <span
+                          className={`text-sm mr-2 ${
+                            trend.trend === 'improving'
+                              ? 'text-green-400'
+                              : trend.trend === 'declining'
+                                ? 'text-red-400'
+                                : 'text-gray-400'
+                          }`}
+                        >
+                          {trend.trend === 'improving'
+                            ? '↗'
+                            : trend.trend === 'declining'
+                              ? '↘'
+                              : '→'}
                         </span>
                         <span className="text-sm font-semibold">
-                          {trend.changeRate > 0 ? '+' : ''}{trend.changeRate.toFixed(1)}
+                          {trend.changeRate > 0 ? '+' : ''}
+                          {trend.changeRate.toFixed(1)}
                         </span>
                       </div>
                     </div>
@@ -741,7 +795,9 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
                   <div key={index} className="p-3 bg-gray-600 rounded">
                     <div className="flex justify-between items-center mb-2">
                       <span className="font-medium">{comparison.playerName}</span>
-                      <span className="text-sm text-yellow-400">{comparison.similarityScore}% match</span>
+                      <span className="text-sm text-yellow-400">
+                        {comparison.similarityScore}% match
+                      </span>
                     </div>
                     <div className="text-xs text-gray-400">
                       Similar strengths: {comparison.strengths.join(', ')}
@@ -768,7 +824,12 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
               className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           )}
@@ -776,7 +837,7 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
 
         {/* Tab Navigation */}
         <div className="flex space-x-1 mb-6 bg-gray-800 p-1 rounded-lg">
-          {tabs.map((tab) => (
+          {tabs.map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}

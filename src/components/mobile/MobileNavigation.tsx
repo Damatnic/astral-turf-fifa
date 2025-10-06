@@ -5,7 +5,11 @@
 
 import React, { useState, useCallback, useRef, useEffect, memo } from 'react';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
-import { useMobileCapabilities, useTouchGestures, useMobileViewport } from '../../utils/mobileOptimizations';
+import {
+  useMobileCapabilities,
+  useTouchGestures,
+  useMobileViewport,
+} from '../../utils/mobileOptimizations';
 import {
   Menu,
   X,
@@ -56,7 +60,7 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
   const capabilities = useMobileCapabilities();
   const viewport = useMobileViewport();
   const menuRef = useRef<HTMLDivElement>(null);
-  
+
   // Navigation state
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -69,7 +73,7 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
     const newState = !isMenuOpen;
     setIsMenuOpen(newState);
     onMenuToggle?.(newState);
-    
+
     if (capabilities.hasHapticFeedback) {
       navigator.vibrate(newState ? 25 : 15);
     }
@@ -85,53 +89,59 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
     };
 
     if (isMenuOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      document.addEventListener('touchstart', handleClickOutside);
+      document.addEventListener('mousedown', handleClickOutside as EventListener);
+      document.addEventListener('touchstart', handleClickOutside as EventListener);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('touchstart', handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside as EventListener);
+      document.removeEventListener('touchstart', handleClickOutside as EventListener);
     };
   }, [isMenuOpen]);
 
   // Swipe gestures for menu
   useTouchGestures(menuRef, {
-    onSwipe: useCallback((event: TouchEvent, direction: string, velocity: number) => {
-      if (velocity > 0.5) {
-        if (direction === 'left' && isMenuOpen) {
-          setIsMenuOpen(false);
-          setSwipeDirection('left');
-          
-          if (capabilities.hasHapticFeedback) {
-            navigator.vibrate(15);
-          }
-        } else if (direction === 'right' && !isMenuOpen) {
-          setIsMenuOpen(true);
-          setSwipeDirection('right');
-          
-          if (capabilities.hasHapticFeedback) {
-            navigator.vibrate(25);
+    onSwipe: useCallback(
+      (event: TouchEvent, direction: string, velocity: number) => {
+        if (velocity > 0.5) {
+          if (direction === 'left' && isMenuOpen) {
+            setIsMenuOpen(false);
+            setSwipeDirection('left');
+
+            if (capabilities.hasHapticFeedback) {
+              navigator.vibrate(15);
+            }
+          } else if (direction === 'right' && !isMenuOpen) {
+            setIsMenuOpen(true);
+            setSwipeDirection('right');
+
+            if (capabilities.hasHapticFeedback) {
+              navigator.vibrate(25);
+            }
           }
         }
-      }
-    }, [isMenuOpen, capabilities.hasHapticFeedback]),
+      },
+      [isMenuOpen, capabilities.hasHapticFeedback]
+    ),
   });
 
   // Handle navigation item selection
-  const handleNavigationSelect = useCallback((item: NavigationItem) => {
-    if (item.children && item.children.length > 0) {
-      setActiveSubmenu(activeSubmenu === item.id ? null : item.id);
-    } else {
-      onNavigate(item);
-      setIsMenuOpen(false);
-      setActiveSubmenu(null);
-    }
-    
-    if (capabilities.hasHapticFeedback) {
-      navigator.vibrate(10);
-    }
-  }, [activeSubmenu, onNavigate, capabilities.hasHapticFeedback]);
+  const handleNavigationSelect = useCallback(
+    (item: NavigationItem) => {
+      if (item.children && item.children.length > 0) {
+        setActiveSubmenu(activeSubmenu === item.id ? null : item.id);
+      } else {
+        onNavigate(item);
+        setIsMenuOpen(false);
+        setActiveSubmenu(null);
+      }
+
+      if (capabilities.hasHapticFeedback) {
+        navigator.vibrate(10);
+      }
+    },
+    [activeSubmenu, onNavigate, capabilities.hasHapticFeedback]
+  );
 
   // Handle search
   const handleSearch = useCallback((query: string) => {
@@ -140,8 +150,8 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
   }, []);
 
   // Navigation item component
-  const NavigationItem: React.FC<{ 
-    item: NavigationItem; 
+  const NavigationItem: React.FC<{
+    item: NavigationItem;
     level?: number;
     onSelect: (item: NavigationItem) => void;
   }> = ({ item, level = 0, onSelect }) => {
@@ -154,15 +164,16 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
         <motion.button
           className={`
             w-full flex items-center justify-between p-4 text-left transition-colors
-            ${isActive 
-              ? 'bg-blue-600 text-white' 
-              : 'text-gray-700 hover:bg-gray-100 active:bg-gray-200'
+            ${
+              isActive
+                ? 'bg-blue-600 text-white'
+                : 'text-gray-700 hover:bg-gray-100 active:bg-gray-200'
             }
             ${level > 0 ? 'pl-8 bg-gray-50' : ''}
           `}
           style={{
             minHeight: '48px', // Minimum touch target
-            paddingLeft: level > 0 ? `${32 + (level * 16)}px` : '16px',
+            paddingLeft: level > 0 ? `${32 + level * 16}px` : '16px',
           }}
           whileTap={{ scale: 0.98 }}
           onClick={() => onSelect(item)}
@@ -178,9 +189,9 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
               </span>
             )}
           </div>
-          
+
           {hasChildren && (
-            <ChevronRight 
+            <ChevronRight
               className={`w-4 h-4 transition-transform ${isSubmenuOpen ? 'rotate-90' : ''}`}
             />
           )}
@@ -196,7 +207,7 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
               transition={{ duration: 0.2 }}
               className="overflow-hidden"
             >
-              {item.children!.map((childItem) => (
+              {item.children!.map(childItem => (
                 <NavigationItem
                   key={childItem.id}
                   item={childItem}
@@ -326,7 +337,7 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
                 type="text"
                 placeholder="Search..."
                 value={searchQuery}
-                onChange={(e) => handleSearch(e.target.value)}
+                onChange={e => handleSearch(e.target.value)}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 style={{ minHeight: '48px' }}
                 autoFocus
@@ -381,12 +392,8 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
 
               {/* Menu Content */}
               <nav className="py-4" role="menu">
-                {items.map((item) => (
-                  <NavigationItem
-                    key={item.id}
-                    item={item}
-                    onSelect={handleNavigationSelect}
-                  />
+                {items.map(item => (
+                  <NavigationItem key={item.id} item={item} onSelect={handleNavigationSelect} />
                 ))}
               </nav>
 
@@ -417,7 +424,7 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
             paddingTop: viewport.safeAreaTop,
             paddingBottom: viewport.safeAreaBottom,
           }}
-          onTouchStart={(e) => {
+          onTouchStart={e => {
             const touch = e.touches[0];
             if (touch.clientX < 20) {
               setIsMenuOpen(true);
@@ -429,8 +436,12 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
       {/* Performance indicator (development only) */}
       {process.env.NODE_ENV === 'development' && (
         <div className="fixed top-20 right-2 bg-black/70 text-white text-xs p-2 rounded z-50">
-          <div>Viewport: {viewport.width}x{viewport.height}</div>
-          <div>Safe Areas: T{viewport.safeAreaTop} B{viewport.safeAreaBottom}</div>
+          <div>
+            Viewport: {viewport.width}x{viewport.height}
+          </div>
+          <div>
+            Safe Areas: T{viewport.safeAreaTop} B{viewport.safeAreaBottom}
+          </div>
           <div>Touch: {capabilities.supportsTouchEvents ? 'Yes' : 'No'}</div>
         </div>
       )}

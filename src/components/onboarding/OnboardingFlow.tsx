@@ -1,17 +1,17 @@
 /**
  * Progressive Onboarding Flow Component
- * 
+ *
  * Provides step-by-step guided introduction to Astral Turf features,
  * adapting to user progress and preferences with accessibility support.
  */
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ChevronRight, 
-  ChevronLeft, 
-  X, 
-  CheckCircle, 
+import {
+  ChevronRight,
+  ChevronLeft,
+  X,
+  CheckCircle,
   Circle,
   Play,
   Users,
@@ -30,7 +30,7 @@ import {
   Mouse,
   Keyboard,
   Volume2,
-  VolumeX
+  VolumeX,
 } from 'lucide-react';
 import { useAuthContext, useUIContext } from '../../hooks';
 import { useTheme, useAccessibility } from '../../context/ThemeContext';
@@ -92,7 +92,7 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
     skippable: false,
     prerequisites: [],
     achievements: ['first_login'],
-    helpTopics: ['getting-started-basics']
+    helpTopics: ['getting-started-basics'],
   },
   {
     id: 'interface-overview',
@@ -105,7 +105,7 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
     skippable: true,
     prerequisites: ['welcome'],
     achievements: ['interface_explorer'],
-    helpTopics: ['navigation', 'interface-basics']
+    helpTopics: ['navigation', 'interface-basics'],
   },
   {
     id: 'create-first-team',
@@ -118,7 +118,7 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
     skippable: false,
     prerequisites: ['interface-overview'],
     achievements: ['team_creator', 'first_player'],
-    helpTopics: ['player-management-101', 'team-setup']
+    helpTopics: ['player-management-101', 'team-setup'],
   },
   {
     id: 'tactical-board-intro',
@@ -131,7 +131,7 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
     skippable: false,
     prerequisites: ['create-first-team'],
     achievements: ['formation_master', 'tactical_awareness'],
-    helpTopics: ['tactical-board-basics', 'formation-guide']
+    helpTopics: ['tactical-board-basics', 'formation-guide'],
   },
   {
     id: 'ai-analysis-intro',
@@ -144,7 +144,7 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
     skippable: true,
     prerequisites: ['tactical-board-intro'],
     achievements: ['ai_student', 'insight_seeker'],
-    helpTopics: ['ai-analysis-guide', 'tactical-insights']
+    helpTopics: ['ai-analysis-guide', 'tactical-insights'],
   },
   {
     id: 'advanced-features',
@@ -157,11 +157,11 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
     skippable: true,
     prerequisites: ['ai-analysis-intro'],
     achievements: ['feature_explorer', 'advanced_user'],
-    helpTopics: ['match-simulation', 'analytics-dashboard', 'advanced-tactics']
+    helpTopics: ['match-simulation', 'analytics-dashboard', 'advanced-tactics'],
   },
   {
     id: 'completion',
-    title: 'You\'re Ready to Coach!',
+    title: "You're Ready to Coach!",
     description: 'Congratulations on completing the onboarding',
     content: null,
     duration: 45,
@@ -170,14 +170,18 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
     skippable: false,
     prerequisites: ['advanced-features'],
     achievements: ['onboarding_complete', 'astral_turf_coach'],
-    helpTopics: ['next-steps', 'resources']
-  }
+    helpTopics: ['next-steps', 'resources'],
+  },
 ];
 
 // Main Onboarding Flow Component
 export const OnboardingFlow: React.FC = () => {
-  const { user } = useAuthContext();
-  const { theme, accessibility } = useTheme();
+  const { authState } = useAuthContext();
+  const user = (authState as { user?: { hasCompletedOnboarding?: boolean } }).user;
+  const themeContext = useTheme();
+  const theme = (themeContext as { theme?: unknown }).theme;
+  const accessibility = (themeContext as { accessibility?: { reducedMotion?: boolean } })
+    .accessibility || { reducedMotion: false };
   const [state, setState] = useState<OnboardingState>({
     isActive: false,
     currentStep: 0,
@@ -192,21 +196,21 @@ export const OnboardingFlow: React.FC = () => {
         autoAdvance: false,
         voiceGuidance: false,
         showHints: true,
-        pace: 'normal'
-      }
+        pace: 'normal',
+      },
     },
     isCompleted: false,
     showWelcome: true,
-    adaptiveMode: true
+    adaptiveMode: true,
   });
 
   const [stepStartTime, setStepStartTime] = useState<number>(Date.now());
 
   // Check if user should see onboarding
   useEffect(() => {
-    const shouldShowOnboarding = !user?.hasCompletedOnboarding && 
-                                 !localStorage.getItem('onboarding-completed');
-    
+    const shouldShowOnboarding =
+      !user?.hasCompletedOnboarding && !localStorage.getItem('onboarding-completed');
+
     if (shouldShowOnboarding) {
       setState(prev => ({ ...prev, isActive: true }));
     }
@@ -228,25 +232,25 @@ export const OnboardingFlow: React.FC = () => {
   const adaptiveRecommendations = useMemo(() => {
     const timeSpent = Object.values(state.userProgress.timeSpent);
     const avgTime = timeSpent.reduce((sum, time) => sum + time, 0) / timeSpent.length;
-    
-    const recommendations = [];
-    
+
+    const recommendations: Array<{ type: string; message: string; action: () => void }> = [];
+
     if (avgTime > 120) {
       recommendations.push({
         type: 'pace',
         message: 'Consider increasing the pace or enabling auto-advance',
-        action: () => updatePreferences({ pace: 'fast', autoAdvance: true })
+        action: () => updatePreferences({ pace: 'fast', autoAdvance: true }),
       });
     }
-    
+
     if (state.userProgress.skippedSteps.length > 2) {
       recommendations.push({
         type: 'engagement',
         message: 'Try interactive features for better learning',
-        action: () => updatePreferences({ showHints: true })
+        action: () => updatePreferences({ showHints: true }),
       });
     }
-    
+
     return recommendations;
   }, [state.userProgress]);
 
@@ -256,8 +260,8 @@ export const OnboardingFlow: React.FC = () => {
       ...prev,
       userProgress: {
         ...prev.userProgress,
-        preferences: { ...prev.userProgress.preferences, ...newPrefs }
-      }
+        preferences: { ...prev.userProgress.preferences, ...newPrefs },
+      },
     }));
   }, []);
 
@@ -268,10 +272,12 @@ export const OnboardingFlow: React.FC = () => {
 
   // Navigation functions
   const nextStep = useCallback(() => {
-    if (!currentStepData) return;
-    
+    if (!currentStepData) {
+      return;
+    }
+
     const timeSpent = (Date.now() - stepStartTime) / 1000;
-    
+
     setState(prev => ({
       ...prev,
       currentStep: Math.min(prev.currentStep + 1, ONBOARDING_STEPS.length - 1),
@@ -279,39 +285,41 @@ export const OnboardingFlow: React.FC = () => {
         ...prev.userProgress,
         completedSteps: [...prev.userProgress.completedSteps, currentStepData.id],
         timeSpent: { ...prev.userProgress.timeSpent, [currentStepData.id]: timeSpent },
-        lastActiveStep: currentStepData.id
-      }
+        lastActiveStep: currentStepData.id,
+      },
     }));
   }, [currentStepData, stepStartTime]);
 
   const previousStep = useCallback(() => {
     setState(prev => ({
       ...prev,
-      currentStep: Math.max(prev.currentStep - 1, 0)
+      currentStep: Math.max(prev.currentStep - 1, 0),
     }));
   }, []);
 
   const skipStep = useCallback(() => {
-    if (!currentStepData || !currentStepData.skippable) return;
-    
+    if (!currentStepData || !currentStepData.skippable) {
+      return;
+    }
+
     setState(prev => ({
       ...prev,
       currentStep: Math.min(prev.currentStep + 1, ONBOARDING_STEPS.length - 1),
       userProgress: {
         ...prev.userProgress,
-        skippedSteps: [...prev.userProgress.skippedSteps, currentStepData.id]
-      }
+        skippedSteps: [...prev.userProgress.skippedSteps, currentStepData.id],
+      },
     }));
   }, [currentStepData]);
 
   const completeOnboarding = useCallback(() => {
     localStorage.setItem('onboarding-completed', 'true');
     setState(prev => ({ ...prev, isActive: false, isCompleted: true }));
-    
+
     // Trigger completion API call if user is logged in
     if (user) {
       // API call to mark onboarding as completed
-      console.log('Marking onboarding as completed for user:', user.id);
+      console.log('Marking onboarding as completed for user:', (user as { id?: string }).id);
     }
   }, [user]);
 
@@ -325,19 +333,21 @@ export const OnboardingFlow: React.FC = () => {
         timeSpent: {},
         startedAt: new Date().toISOString(),
         lastActiveStep: null,
-        preferences: state.userProgress.preferences
+        preferences: state.userProgress.preferences,
       },
       isCompleted: false,
       showWelcome: true,
-      adaptiveMode: true
+      adaptiveMode: true,
     });
   }, [state.userProgress.preferences]);
 
   // Keyboard navigation
   useEffect(() => {
     const handleKeyboard = (event: KeyboardEvent) => {
-      if (!state.isActive) return;
-      
+      if (!state.isActive) {
+        return;
+      }
+
       switch (event.key) {
         case 'ArrowRight':
         case 'Enter':
@@ -364,18 +374,22 @@ export const OnboardingFlow: React.FC = () => {
 
   // Auto-advance functionality
   useEffect(() => {
-    if (!state.userProgress.preferences.autoAdvance || !currentStepData) return;
-    
+    if (!state.userProgress.preferences.autoAdvance || !currentStepData) {
+      return;
+    }
+
     const timer = setTimeout(() => {
       if (!currentStepData.interactive) {
         nextStep();
       }
     }, currentStepData.duration * 1000);
-    
+
     return () => clearTimeout(timer);
   }, [state.currentStep, state.userProgress.preferences.autoAdvance, currentStepData, nextStep]);
 
-  if (!state.isActive) return null;
+  if (!state.isActive) {
+    return null;
+  }
 
   return (
     <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm">
@@ -400,14 +414,14 @@ export const OnboardingFlow: React.FC = () => {
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 {/* Settings */}
                 <OnboardingSettings
                   preferences={state.userProgress.preferences}
                   onUpdatePreferences={updatePreferences}
                 />
-                
+
                 {/* Close button */}
                 <Button
                   variant="ghost"
@@ -419,17 +433,14 @@ export const OnboardingFlow: React.FC = () => {
                 </Button>
               </div>
             </div>
-            
+
             {/* Progress bar */}
             <div className="mt-4">
               <div className="flex items-center justify-between text-sm mb-2">
                 <span>Progress</span>
                 <span>{progress}%</span>
               </div>
-              <Progress 
-                value={progress} 
-                className="bg-white/20"
-              />
+              <Progress value={progress} className="bg-white/20" />
             </div>
           </div>
 
@@ -468,13 +479,13 @@ export const OnboardingFlow: React.FC = () => {
                         index < state.currentStep
                           ? 'bg-green-500'
                           : index === state.currentStep
-                          ? 'bg-blue-500'
-                          : 'bg-gray-300 dark:bg-gray-600'
+                            ? 'bg-blue-500'
+                            : 'bg-gray-300 dark:bg-gray-600'
                       }`}
                     />
                   ))}
                 </div>
-                
+
                 {/* Adaptive recommendations */}
                 {adaptiveRecommendations.length > 0 && (
                   <div className="flex items-center space-x-2">
@@ -485,32 +496,28 @@ export const OnboardingFlow: React.FC = () => {
                   </div>
                 )}
               </div>
-              
+
               <div className="flex items-center space-x-3">
                 {/* Previous button */}
-                <Button
-                  variant="ghost"
-                  onClick={previousStep}
-                  disabled={state.currentStep === 0}
-                >
+                <Button variant="ghost" onClick={previousStep} disabled={state.currentStep === 0}>
                   <ChevronLeft className="w-4 h-4 mr-1" />
                   Previous
                 </Button>
-                
+
                 {/* Skip button */}
                 {currentStepData?.skippable && (
-                  <Button
-                    variant="ghost"
-                    onClick={skipStep}
-                    className="text-gray-500"
-                  >
+                  <Button variant="ghost" onClick={skipStep} className="text-gray-500">
                     Skip
                   </Button>
                 )}
-                
+
                 {/* Next/Complete button */}
                 <Button
-                  onClick={state.currentStep === ONBOARDING_STEPS.length - 1 ? completeOnboarding : nextStep}
+                  onClick={
+                    state.currentStep === ONBOARDING_STEPS.length - 1
+                      ? completeOnboarding
+                      : nextStep
+                  }
                   className="bg-blue-600 hover:bg-blue-700"
                 >
                   {state.currentStep === ONBOARDING_STEPS.length - 1 ? (
@@ -546,7 +553,7 @@ const OnboardingStepContent: React.FC<OnboardingStepContentProps> = ({
   step,
   progress,
   preferences,
-  onComplete
+  onComplete,
 }) => {
   // Render different content based on step ID
   switch (step.id) {
@@ -572,25 +579,21 @@ const OnboardingStepContent: React.FC<OnboardingStepContentProps> = ({
 // Individual Step Components
 const WelcomeStep: React.FC<{ step: OnboardingStep; onComplete: () => void }> = ({
   step,
-  onComplete
+  onComplete,
 }) => (
   <div className="text-center">
     <motion.div
       initial={{ scale: 0 }}
       animate={{ scale: 1 }}
-      transition={{ type: "spring", delay: 0.2 }}
+      transition={{ type: 'spring', delay: 0.2 }}
       className="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full mx-auto mb-6 flex items-center justify-center"
     >
       <Target className="w-12 h-12 text-white" />
     </motion.div>
-    
-    <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-      {step.title}
-    </h2>
-    <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
-      {step.description}
-    </p>
-    
+
+    <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">{step.title}</h2>
+    <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">{step.description}</p>
+
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
       <Card className="p-4 text-center">
         <Users className="w-8 h-8 text-blue-500 mx-auto mb-2" />
@@ -599,7 +602,7 @@ const WelcomeStep: React.FC<{ step: OnboardingStep; onComplete: () => void }> = 
           Create and manage your dream team
         </p>
       </Card>
-      
+
       <Card className="p-4 text-center">
         <Zap className="w-8 h-8 text-purple-500 mx-auto mb-2" />
         <h3 className="font-semibold mb-1">AI-Powered Analysis</h3>
@@ -607,16 +610,14 @@ const WelcomeStep: React.FC<{ step: OnboardingStep; onComplete: () => void }> = 
           Get intelligent tactical insights
         </p>
       </Card>
-      
+
       <Card className="p-4 text-center">
         <BarChart3 className="w-8 h-8 text-green-500 mx-auto mb-2" />
         <h3 className="font-semibold mb-1">Advanced Analytics</h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          Track performance and progress
-        </p>
+        <p className="text-sm text-gray-600 dark:text-gray-400">Track performance and progress</p>
       </Card>
     </div>
-    
+
     <Button onClick={onComplete} size="lg" className="bg-blue-600 hover:bg-blue-700">
       Let's Get Started
       <ArrowRight className="w-4 h-4 ml-2" />
@@ -626,16 +627,12 @@ const WelcomeStep: React.FC<{ step: OnboardingStep; onComplete: () => void }> = 
 
 const InterfaceOverviewStep: React.FC<{ step: OnboardingStep; onComplete: () => void }> = ({
   step,
-  onComplete
+  onComplete,
 }) => (
   <div>
-    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-      {step.title}
-    </h2>
-    <p className="text-gray-600 dark:text-gray-300 mb-6">
-      {step.description}
-    </p>
-    
+    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{step.title}</h2>
+    <p className="text-gray-600 dark:text-gray-300 mb-6">{step.description}</p>
+
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Main Navigation</h3>
@@ -654,7 +651,7 @@ const InterfaceOverviewStep: React.FC<{ step: OnboardingStep; onComplete: () => 
           </div>
         </div>
       </div>
-      
+
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Key Features</h3>
         <div className="space-y-3">
@@ -673,7 +670,7 @@ const InterfaceOverviewStep: React.FC<{ step: OnboardingStep; onComplete: () => 
         </div>
       </div>
     </div>
-    
+
     <div className="mt-6 text-center">
       <Button onClick={onComplete}>
         I understand the interface
@@ -684,7 +681,10 @@ const InterfaceOverviewStep: React.FC<{ step: OnboardingStep; onComplete: () => 
 );
 
 // Additional step components would be implemented similarly...
-const CreateTeamStep: React.FC<{ step: OnboardingStep; onComplete: () => void }> = ({ step, onComplete }) => (
+const CreateTeamStep: React.FC<{ step: OnboardingStep; onComplete: () => void }> = ({
+  step,
+  onComplete,
+}) => (
   <div>
     <h2 className="text-2xl font-bold mb-4">{step.title}</h2>
     <p className="text-gray-600 dark:text-gray-300 mb-6">{step.description}</p>
@@ -692,7 +692,10 @@ const CreateTeamStep: React.FC<{ step: OnboardingStep; onComplete: () => void }>
   </div>
 );
 
-const TacticalBoardStep: React.FC<{ step: OnboardingStep; onComplete: () => void }> = ({ step, onComplete }) => (
+const TacticalBoardStep: React.FC<{ step: OnboardingStep; onComplete: () => void }> = ({
+  step,
+  onComplete,
+}) => (
   <div>
     <h2 className="text-2xl font-bold mb-4">{step.title}</h2>
     <p className="text-gray-600 dark:text-gray-300 mb-6">{step.description}</p>
@@ -700,7 +703,10 @@ const TacticalBoardStep: React.FC<{ step: OnboardingStep; onComplete: () => void
   </div>
 );
 
-const AIAnalysisStep: React.FC<{ step: OnboardingStep; onComplete: () => void }> = ({ step, onComplete }) => (
+const AIAnalysisStep: React.FC<{ step: OnboardingStep; onComplete: () => void }> = ({
+  step,
+  onComplete,
+}) => (
   <div>
     <h2 className="text-2xl font-bold mb-4">{step.title}</h2>
     <p className="text-gray-600 dark:text-gray-300 mb-6">{step.description}</p>
@@ -708,7 +714,10 @@ const AIAnalysisStep: React.FC<{ step: OnboardingStep; onComplete: () => void }>
   </div>
 );
 
-const AdvancedFeaturesStep: React.FC<{ step: OnboardingStep; onComplete: () => void }> = ({ step, onComplete }) => (
+const AdvancedFeaturesStep: React.FC<{ step: OnboardingStep; onComplete: () => void }> = ({
+  step,
+  onComplete,
+}) => (
   <div>
     <h2 className="text-2xl font-bold mb-4">{step.title}</h2>
     <p className="text-gray-600 dark:text-gray-300 mb-6">{step.description}</p>
@@ -718,25 +727,21 @@ const AdvancedFeaturesStep: React.FC<{ step: OnboardingStep; onComplete: () => v
 
 const CompletionStep: React.FC<{ step: OnboardingStep; progress: UserProgress }> = ({
   step,
-  progress
+  progress,
 }) => (
   <div className="text-center">
     <motion.div
       initial={{ scale: 0 }}
       animate={{ scale: 1 }}
-      transition={{ type: "spring", delay: 0.2 }}
+      transition={{ type: 'spring', delay: 0.2 }}
       className="w-24 h-24 bg-gradient-to-br from-green-500 to-blue-600 rounded-full mx-auto mb-6 flex items-center justify-center"
     >
       <Trophy className="w-12 h-12 text-white" />
     </motion.div>
-    
-    <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-      {step.title}
-    </h2>
-    <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
-      {step.description}
-    </p>
-    
+
+    <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">{step.title}</h2>
+    <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">{step.description}</p>
+
     <div className="grid grid-cols-3 gap-4 mb-8">
       <div className="text-center">
         <div className="text-2xl font-bold text-blue-600">{progress.completedSteps.length}</div>
@@ -753,7 +758,7 @@ const CompletionStep: React.FC<{ step: OnboardingStep; progress: UserProgress }>
         <div className="text-sm text-gray-500">Achievements Earned</div>
       </div>
     </div>
-    
+
     <div className="flex flex-wrap justify-center gap-2 mb-8">
       <Badge variant="default">Team Creator</Badge>
       <Badge variant="secondary">Formation Master</Badge>
@@ -766,15 +771,11 @@ const CompletionStep: React.FC<{ step: OnboardingStep; progress: UserProgress }>
 
 const DefaultStepContent: React.FC<{ step: OnboardingStep; onComplete: () => void }> = ({
   step,
-  onComplete
+  onComplete,
 }) => (
   <div>
-    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-      {step.title}
-    </h2>
-    <p className="text-gray-600 dark:text-gray-300 mb-6">
-      {step.description}
-    </p>
+    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{step.title}</h2>
+    <p className="text-gray-600 dark:text-gray-300 mb-6">{step.description}</p>
     <Button onClick={onComplete}>Continue</Button>
   </div>
 );
@@ -787,7 +788,7 @@ interface OnboardingSettingsProps {
 
 const OnboardingSettings: React.FC<OnboardingSettingsProps> = ({
   preferences,
-  onUpdatePreferences
+  onUpdatePreferences,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -801,7 +802,7 @@ const OnboardingSettings: React.FC<OnboardingSettingsProps> = ({
       >
         <Settings className="w-4 h-4" />
       </Button>
-      
+
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -813,37 +814,37 @@ const OnboardingSettings: React.FC<OnboardingSettingsProps> = ({
             <h3 className="font-semibold mb-3 text-gray-900 dark:text-white">
               Onboarding Preferences
             </h3>
-            
+
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-700 dark:text-gray-300">Show Animations</span>
                 <Switch
                   checked={preferences.showAnimations}
-                  onCheckedChange={(checked) => onUpdatePreferences({ showAnimations: checked })}
+                  onChange={e => onUpdatePreferences({ showAnimations: e.target.checked })}
                 />
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-700 dark:text-gray-300">Auto Advance</span>
                 <Switch
                   checked={preferences.autoAdvance}
-                  onCheckedChange={(checked) => onUpdatePreferences({ autoAdvance: checked })}
+                  onChange={e => onUpdatePreferences({ autoAdvance: e.target.checked })}
                 />
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-700 dark:text-gray-300">Voice Guidance</span>
                 <Switch
                   checked={preferences.voiceGuidance}
-                  onCheckedChange={(checked) => onUpdatePreferences({ voiceGuidance: checked })}
+                  onChange={e => onUpdatePreferences({ voiceGuidance: e.target.checked })}
                 />
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-700 dark:text-gray-300">Show Hints</span>
                 <Switch
                   checked={preferences.showHints}
-                  onCheckedChange={(checked) => onUpdatePreferences({ showHints: checked })}
+                  onChange={e => onUpdatePreferences({ showHints: e.target.checked })}
                 />
               </div>
             </div>

@@ -1,6 +1,6 @@
 /**
  * Phoenix API Test Suite - Comprehensive API testing with 100% endpoint coverage
- * 
+ *
  * Features:
  * - Complete REST and GraphQL endpoint testing
  * - Performance testing with sub-50ms validation
@@ -13,7 +13,9 @@
  */
 
 import { describe, test, expect, beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
+// @ts-expect-error - supertest may not have type declarations
 import supertest from 'supertest';
+// @ts-expect-error - @faker-js/faker may not have type declarations
 import { faker } from '@faker-js/faker';
 import { PhoenixAPIServer, createAPIServerConfig } from '../api/PhoenixAPIServer';
 import { phoenixPool } from '../database/PhoenixDatabasePool';
@@ -58,8 +60,8 @@ export class PhoenixAPITestSuite {
 
   constructor() {
     this.context = {
-      cleanup: []
-    } as TestContext;
+      cleanup: [],
+    } as unknown as TestContext;
   }
 
   /**
@@ -75,15 +77,15 @@ export class PhoenixAPITestSuite {
         rateLimiting: {
           windowMs: 60000,
           max: 10000,
-          skipSuccessfulRequests: false
+          skipSuccessfulRequests: false,
         },
-        apiKeyRequired: false
-      }
+        apiKeyRequired: false,
+      },
     });
 
     this.context.server = new PhoenixAPIServer(config);
     await this.context.server.start();
-    
+
     // Create supertest instance
     this.context.request = supertest((this.context.server as any).app);
 
@@ -128,6 +130,7 @@ export class PhoenixAPITestSuite {
       total: number;
       passed: number;
       failed: number;
+      successRate: number;
       performance: PerformanceMetrics[];
       loadTests: LoadTestResult[];
       security: any[];
@@ -147,11 +150,11 @@ export class PhoenixAPITestSuite {
       performance: await this.runPerformanceTests(),
       load: await this.runLoadTests(),
       security: await this.runSecurityTests(),
-      integration: await this.runIntegrationTests()
+      integration: await this.runIntegrationTests(),
     };
 
     const summary = this.generateTestSummary(results);
-    
+
     console.log('✅ API tests completed');
     return { summary, details: results };
   }
@@ -168,7 +171,7 @@ export class PhoenixAPITestSuite {
       logout: await this.testLogout(),
       refresh: await this.testTokenRefresh(),
       passwordReset: await this.testPasswordReset(),
-      validation: await this.testTokenValidation()
+      validation: await this.testTokenValidation(),
     };
 
     return results;
@@ -183,7 +186,7 @@ export class PhoenixAPITestSuite {
       .post('/api/auth/login')
       .send({
         email: 'test@example.com',
-        password: 'password123'
+        password: 'password123',
       })
       .expect(200);
 
@@ -194,7 +197,7 @@ export class PhoenixAPITestSuite {
       responseTime,
       memoryUsage: process.memoryUsage().heapUsed,
       cpuUsage: process.cpuUsage().user,
-      passed: responseTime < 50 // Must be under 50ms
+      passed: responseTime < 50, // Must be under 50ms
     });
 
     expect(response.body.success).toBe(true);
@@ -206,7 +209,7 @@ export class PhoenixAPITestSuite {
       .post('/api/auth/login')
       .send({
         email: 'invalid@example.com',
-        password: 'wrongpassword'
+        password: 'wrongpassword',
       })
       .expect(401);
 
@@ -215,19 +218,19 @@ export class PhoenixAPITestSuite {
       .post('/api/auth/login')
       .send({
         email: 'invalid-email',
-        password: '123'
+        password: '123',
       })
       .expect(400);
 
     // Test rate limiting
-    const promises = Array(20).fill(0).map(() =>
-      this.context.request
-        .post('/api/auth/login')
-        .send({
+    const promises = Array(20)
+      .fill(0)
+      .map(() =>
+        this.context.request.post('/api/auth/login').send({
           email: 'test@example.com',
-          password: 'wrongpassword'
+          password: 'wrongpassword',
         })
-    );
+      );
 
     const rateLimitResponses = await Promise.allSettled(promises);
     const rateLimitHit = rateLimitResponses.some(
@@ -237,7 +240,7 @@ export class PhoenixAPITestSuite {
     return {
       passed: metrics.every(m => m.passed) && rateLimitHit,
       metrics,
-      rateLimitTested: rateLimitHit
+      rateLimitTested: rateLimitHit,
     };
   }
 
@@ -250,14 +253,11 @@ export class PhoenixAPITestSuite {
       lastName: faker.person.lastName(),
       role: 'player',
       acceptedTerms: true,
-      acceptedPrivacyPolicy: true
+      acceptedPrivacyPolicy: true,
     };
 
     const startTime = Date.now();
-    const response = await this.context.request
-      .post('/api/auth/signup')
-      .send(userData)
-      .expect(201);
+    const response = await this.context.request.post('/api/auth/signup').send(userData).expect(201);
 
     const responseTime = Date.now() - startTime;
 
@@ -272,7 +272,7 @@ export class PhoenixAPITestSuite {
     return {
       passed: responseTime < 100, // Signup can take longer
       responseTime,
-      userId: response.body.data.user.id
+      userId: response.body.data.user.id,
     };
   }
 
@@ -293,7 +293,7 @@ export class PhoenixAPITestSuite {
 
     return {
       passed: responseTime < 50,
-      responseTime
+      responseTime,
     };
   }
 
@@ -326,7 +326,7 @@ export class PhoenixAPITestSuite {
       deletePlayer: await this.testDeletePlayer(),
       bulkOperations: await this.testBulkPlayerOperations(),
       filtering: await this.testPlayerFiltering(),
-      pagination: await this.testPlayerPagination()
+      pagination: await this.testPlayerPagination(),
     };
   }
 
@@ -346,7 +346,7 @@ export class PhoenixAPITestSuite {
     return {
       passed: responseTime < 50,
       responseTime,
-      playerCount: response.body.data.length
+      playerCount: response.body.data.length,
     };
   }
 
@@ -382,7 +382,7 @@ export class PhoenixAPITestSuite {
     return {
       passed: responseTime < 30,
       responseTime,
-      playerId
+      playerId,
     };
   }
 
@@ -412,7 +412,7 @@ export class PhoenixAPITestSuite {
     return {
       passed: responseTime < 75,
       responseTime,
-      playerId: response.body.data.id
+      playerId: response.body.data.id,
     };
   }
 
@@ -427,7 +427,9 @@ export class PhoenixAPITestSuite {
   }
 
   private async testBulkPlayerOperations(): Promise<any> {
-    const players = Array(10).fill(0).map(() => this.generateTestPlayerData());
+    const players = Array(10)
+      .fill(0)
+      .map(() => this.generateTestPlayerData());
 
     const startTime = Date.now();
     const response = await this.context.request
@@ -444,7 +446,7 @@ export class PhoenixAPITestSuite {
     return {
       passed: responseTime < 200, // Bulk operations can take longer
       responseTime,
-      playersCreated: players.length
+      playersCreated: players.length,
     };
   }
 
@@ -454,10 +456,15 @@ export class PhoenixAPITestSuite {
       { position: 'GK' },
       { age_min: 18, age_max: 25 },
       { nationality: 'Brazil' },
-      { team: 'test-team' }
+      { team: 'test-team' },
     ];
 
-    const results = [];
+    const results: Array<{
+      filter: any;
+      responseTime: number;
+      resultCount: number;
+      passed: boolean;
+    }> = [];
     for (const filter of filters) {
       const startTime = Date.now();
       const response = await this.context.request
@@ -471,13 +478,13 @@ export class PhoenixAPITestSuite {
         filter,
         responseTime,
         resultCount: response.body.data.length,
-        passed: responseTime < 50
+        passed: responseTime < 50,
       });
     }
 
     return {
       passed: results.every(r => r.passed),
-      results
+      results,
     };
   }
 
@@ -486,10 +493,10 @@ export class PhoenixAPITestSuite {
     const pageTests = [
       { page: 1, limit: 10 },
       { page: 2, limit: 5 },
-      { page: 1, limit: 50 }
+      { page: 1, limit: 50 },
     ];
 
-    const results = [];
+    const results: Array<any> = [];
     for (const pageTest of pageTests) {
       const startTime = Date.now();
       const response = await this.context.request
@@ -504,13 +511,13 @@ export class PhoenixAPITestSuite {
         responseTime,
         resultCount: response.body.data.length,
         pagination: response.body.pagination,
-        passed: responseTime < 50 && response.body.data.length <= pageTest.limit
+        passed: responseTime < 50 && response.body.data.length <= pageTest.limit,
       });
     }
 
     return {
       passed: results.every(r => r.passed),
-      results
+      results,
     };
   }
 
@@ -525,7 +532,7 @@ export class PhoenixAPITestSuite {
       createFormation: await this.testCreateFormation(),
       updateFormation: await this.testUpdateFormation(),
       deleteFormation: await this.testDeleteFormation(),
-      realTimeUpdates: await this.testRealTimeFormationUpdates()
+      realTimeUpdates: await this.testRealTimeFormationUpdates(),
     };
   }
 
@@ -544,7 +551,7 @@ export class PhoenixAPITestSuite {
     return {
       passed: responseTime < 50,
       responseTime,
-      formationCount: response.body.data.length
+      formationCount: response.body.data.length,
     };
   }
 
@@ -566,7 +573,7 @@ export class PhoenixAPITestSuite {
     return {
       passed: responseTime < 75,
       responseTime,
-      formationId: response.body.data.id
+      formationId: response.body.data.id,
     };
   }
 
@@ -595,7 +602,7 @@ export class PhoenixAPITestSuite {
       dashboard: await this.testAnalyticsDashboard(),
       performance: await this.testPerformanceMetrics(),
       export: await this.testAnalyticsExport(),
-      realTime: await this.testRealTimeAnalytics()
+      realTime: await this.testRealTimeAnalytics(),
     };
   }
 
@@ -613,7 +620,7 @@ export class PhoenixAPITestSuite {
 
     return {
       passed: responseTime < 60, // Analytics can be slightly slower
-      responseTime
+      responseTime,
     };
   }
 
@@ -631,7 +638,7 @@ export class PhoenixAPITestSuite {
 
     return {
       passed: responseTime < 100,
-      responseTime
+      responseTime,
     };
   }
 
@@ -640,9 +647,9 @@ export class PhoenixAPITestSuite {
       format: 'csv',
       dateRange: {
         start: '2024-01-01',
-        end: '2024-12-31'
+        end: '2024-12-31',
       },
-      metrics: ['goals', 'assists', 'matches']
+      metrics: ['goals', 'assists', 'matches'],
     };
 
     const startTime = Date.now();
@@ -658,7 +665,7 @@ export class PhoenixAPITestSuite {
 
     return {
       passed: responseTime < 150,
-      responseTime
+      responseTime,
     };
   }
 
@@ -677,7 +684,7 @@ export class PhoenixAPITestSuite {
       upload: await this.testFileUpload(),
       download: await this.testFileDownload(),
       security: await this.testFileSecurityValidation(),
-      permissions: await this.testFilePermissions()
+      permissions: await this.testFilePermissions(),
     };
   }
 
@@ -700,7 +707,7 @@ export class PhoenixAPITestSuite {
     return {
       passed: responseTime < 200,
       responseTime,
-      fileId: response.body.data.fileId
+      fileId: response.body.data.fileId,
     };
   }
 
@@ -728,7 +735,7 @@ export class PhoenixAPITestSuite {
     return {
       passed: responseTime < 100,
       responseTime,
-      fileSize: response.body.length
+      fileSize: response.body.length,
     };
   }
 
@@ -737,10 +744,10 @@ export class PhoenixAPITestSuite {
     const maliciousFiles = [
       { name: 'malware.exe', content: 'MZ\x90\x00' }, // PE header
       { name: 'script.js', content: '<script>alert("xss")</script>' },
-      { name: 'oversized.txt', content: 'x'.repeat(50 * 1024 * 1024) } // 50MB
+      { name: 'oversized.txt', content: 'x'.repeat(50 * 1024 * 1024) }, // 50MB
     ];
 
-    const results = [];
+    const results: Array<any> = [];
     for (const maliciousFile of maliciousFiles) {
       const response = await this.context.request
         .post('/api/files/upload')
@@ -750,13 +757,13 @@ export class PhoenixAPITestSuite {
       results.push({
         fileName: maliciousFile.name,
         rejected: response.status !== 200,
-        statusCode: response.status
+        statusCode: response.status,
       });
     }
 
     return {
       passed: results.every(r => r.rejected),
-      results
+      results,
     };
   }
 
@@ -776,7 +783,7 @@ export class PhoenixAPITestSuite {
       mutations: await this.testGraphQLMutations(),
       subscriptions: await this.testGraphQLSubscriptions(),
       introspection: await this.testGraphQLIntrospection(),
-      security: await this.testGraphQLSecurity()
+      security: await this.testGraphQLSecurity(),
     };
   }
 
@@ -804,7 +811,7 @@ export class PhoenixAPITestSuite {
       .set('Authorization', `Bearer ${this.context.authToken}`)
       .send({
         query,
-        variables: { limit: 10 }
+        variables: { limit: 10 },
       })
       .expect(200);
 
@@ -815,7 +822,7 @@ export class PhoenixAPITestSuite {
 
     return {
       passed: responseTime < 100,
-      responseTime
+      responseTime,
     };
   }
 
@@ -835,7 +842,7 @@ export class PhoenixAPITestSuite {
       name: faker.person.fullName(),
       age: faker.number.int({ min: 18, max: 35 }),
       position: 'MF',
-      nationality: faker.location.country()
+      nationality: faker.location.country(),
     };
 
     const startTime = Date.now();
@@ -844,7 +851,7 @@ export class PhoenixAPITestSuite {
       .set('Authorization', `Bearer ${this.context.authToken}`)
       .send({
         query: mutation,
-        variables: { input }
+        variables: { input },
       })
       .expect(200);
 
@@ -856,7 +863,7 @@ export class PhoenixAPITestSuite {
     return {
       passed: responseTime < 100,
       responseTime,
-      playerId: response.body.data.createPlayer.id
+      playerId: response.body.data.createPlayer.id,
     };
   }
 
@@ -889,7 +896,7 @@ export class PhoenixAPITestSuite {
 
     return {
       passed: responseTime < 50,
-      responseTime
+      responseTime,
     };
   }
 
@@ -919,12 +926,12 @@ export class PhoenixAPITestSuite {
       .send({ query: deepQuery });
 
     // Should reject overly deep queries
-    const depthLimitingWorks = response.status === 400 || 
-                               (response.body.errors && response.body.errors.length > 0);
+    const depthLimitingWorks =
+      response.status === 400 || (response.body.errors && response.body.errors.length > 0);
 
     return {
       passed: depthLimitingWorks,
-      depthLimitingTested: true
+      depthLimitingTested: true,
     };
   }
 
@@ -938,7 +945,7 @@ export class PhoenixAPITestSuite {
       connection: await this.testWebSocketConnection(),
       authentication: await this.testWebSocketAuthentication(),
       realTimeUpdates: await this.testWebSocketRealTimeUpdates(),
-      roomManagement: await this.testWebSocketRoomManagement()
+      roomManagement: await this.testWebSocketRoomManagement(),
     };
   }
 
@@ -972,7 +979,7 @@ export class PhoenixAPITestSuite {
       { path: '/api/auth/login', method: 'POST', target: 50 },
       { path: '/api/players', method: 'GET', target: 30 },
       { path: '/api/tactical/formations', method: 'GET', target: 40 },
-      { path: '/api/analytics/dashboard', method: 'GET', target: 60 }
+      { path: '/api/analytics/dashboard', method: 'GET', target: 60 },
     ];
 
     const results: PerformanceMetrics[] = [];
@@ -981,10 +988,10 @@ export class PhoenixAPITestSuite {
       // Run multiple iterations to get accurate average
       const iterations = 10;
       const times: number[] = [];
-      
+
       for (let i = 0; i < iterations; i++) {
         const startTime = Date.now();
-        
+
         let response;
         if (endpoint.method === 'GET') {
           response = await this.context.request
@@ -998,7 +1005,7 @@ export class PhoenixAPITestSuite {
         }
 
         times.push(Date.now() - startTime);
-        
+
         // Small delay between requests
         await new Promise(resolve => setTimeout(resolve, 10));
       }
@@ -1011,7 +1018,7 @@ export class PhoenixAPITestSuite {
         responseTime: avgTime,
         memoryUsage: process.memoryUsage().heapUsed,
         cpuUsage: process.cpuUsage().user,
-        passed: avgTime < endpoint.target
+        passed: avgTime < endpoint.target,
       });
     }
 
@@ -1025,11 +1032,7 @@ export class PhoenixAPITestSuite {
   async runLoadTests(): Promise<LoadTestResult[]> {
     console.log('📈 Running load tests...');
 
-    const endpoints = [
-      '/api/players',
-      '/api/tactical/formations',
-      '/api/analytics/dashboard'
-    ];
+    const endpoints = ['/api/players', '/api/tactical/formations', '/api/analytics/dashboard'];
 
     const results: LoadTestResult[] = [];
 
@@ -1048,17 +1051,17 @@ export class PhoenixAPITestSuite {
     durationSeconds: number
   ): Promise<LoadTestResult> {
     const startTime = Date.now();
-    const endTime = startTime + (durationSeconds * 1000);
+    const endTime = startTime + durationSeconds * 1000;
     const requestInterval = (durationSeconds * 1000) / totalRequests;
 
     const results: { success: boolean; responseTime: number }[] = [];
     const promises: Promise<void>[] = [];
 
     for (let i = 0; i < totalRequests; i++) {
-      const requestStartTime = startTime + (i * requestInterval);
+      const requestStartTime = startTime + i * requestInterval;
       const delay = Math.max(0, requestStartTime - Date.now());
 
-      const promise = new Promise<void>(async (resolve) => {
+      const promise = new Promise<void>(async resolve => {
         if (delay > 0) {
           await new Promise(r => setTimeout(r, delay));
         }
@@ -1071,12 +1074,12 @@ export class PhoenixAPITestSuite {
 
           results.push({
             success: response.status < 400,
-            responseTime: Date.now() - reqStart
+            responseTime: Date.now() - reqStart,
           });
         } catch (error) {
           results.push({
             success: false,
-            responseTime: Date.now() - reqStart
+            responseTime: Date.now() - reqStart,
           });
         }
         resolve();
@@ -1100,7 +1103,7 @@ export class PhoenixAPITestSuite {
       maxResponseTime: Math.max(...responseTimes),
       minResponseTime: Math.min(...responseTimes),
       requestsPerSecond: totalRequests / durationSeconds,
-      errorRate: failedResults.length / totalRequests
+      errorRate: failedResults.length / totalRequests,
     };
   }
 
@@ -1117,7 +1120,7 @@ export class PhoenixAPITestSuite {
       await this.testRateLimiting(),
       await this.testInputValidation(),
       await this.testAuthorizationBypass(),
-      await this.testSessionSecurity()
+      await this.testSessionSecurity(),
     ];
 
     this.securityTestResults = tests;
@@ -1129,10 +1132,10 @@ export class PhoenixAPITestSuite {
       "'; DROP TABLE users; --",
       "1' OR '1'='1",
       "admin'/*",
-      "' UNION SELECT * FROM users --"
+      "' UNION SELECT * FROM users --",
     ];
 
-    const results = [];
+    const results: Array<any> = [];
     for (const input of maliciousInputs) {
       try {
         const response = await this.context.request
@@ -1143,13 +1146,13 @@ export class PhoenixAPITestSuite {
         results.push({
           input,
           blocked: response.status === 400 || response.status === 403,
-          statusCode: response.status
+          statusCode: response.status,
         });
       } catch (error) {
         results.push({
           input,
           blocked: true,
-          error: error.message
+          error: (error as any).message,
         });
       }
     }
@@ -1157,7 +1160,7 @@ export class PhoenixAPITestSuite {
     return {
       testName: 'SQL Injection',
       passed: results.every(r => r.blocked),
-      results
+      results,
     };
   }
 
@@ -1166,10 +1169,10 @@ export class PhoenixAPITestSuite {
       '<script>alert("xss")</script>',
       '"><script>alert("xss")</script>',
       'javascript:alert("xss")',
-      '<img src=x onerror=alert("xss")>'
+      '<img src=x onerror=alert("xss")>',
     ];
 
-    const results = [];
+    const results: Array<any> = [];
     for (const payload of xssPayloads) {
       try {
         const response = await this.context.request
@@ -1178,19 +1181,19 @@ export class PhoenixAPITestSuite {
           .send({
             name: payload,
             age: 25,
-            position: 'MF'
+            position: 'MF',
           });
 
         results.push({
           payload,
           sanitized: !response.body.data?.name?.includes('<script>'),
-          statusCode: response.status
+          statusCode: response.status,
         });
       } catch (error) {
         results.push({
           payload,
           sanitized: true,
-          error: error.message
+          error: (error as any).message,
         });
       }
     }
@@ -1198,34 +1201,34 @@ export class PhoenixAPITestSuite {
     return {
       testName: 'XSS Prevention',
       passed: results.every(r => r.sanitized),
-      results
+      results,
     };
   }
 
   private async testCSRFProtection(): Promise<any> {
     // Test CSRF token validation
-    const response = await this.context.request
-      .post('/api/players')
-      .send({
-        name: 'Test Player',
-        age: 25,
-        position: 'MF'
-      });
+    const response = await this.context.request.post('/api/players').send({
+      name: 'Test Player',
+      age: 25,
+      position: 'MF',
+    });
 
     return {
       testName: 'CSRF Protection',
       passed: response.status === 401 || response.status === 403,
-      statusCode: response.status
+      statusCode: response.status,
     };
   }
 
   private async testRateLimiting(): Promise<any> {
     // Already tested in login, but test other endpoints
-    const promises = Array(50).fill(0).map(() =>
-      this.context.request
-        .get('/api/players')
-        .set('Authorization', `Bearer ${this.context.authToken}`)
-    );
+    const promises = Array(50)
+      .fill(0)
+      .map(() =>
+        this.context.request
+          .get('/api/players')
+          .set('Authorization', `Bearer ${this.context.authToken}`)
+      );
 
     const responses = await Promise.allSettled(promises);
     const rateLimitHit = responses.some(
@@ -1235,7 +1238,7 @@ export class PhoenixAPITestSuite {
     return {
       testName: 'Rate Limiting',
       passed: rateLimitHit,
-      rateLimitTriggered: rateLimitHit
+      rateLimitTriggered: rateLimitHit,
     };
   }
 
@@ -1244,10 +1247,10 @@ export class PhoenixAPITestSuite {
       { name: '', age: 25, position: 'MF' }, // Empty name
       { name: 'Test', age: -1, position: 'MF' }, // Negative age
       { name: 'Test', age: 25, position: 'INVALID' }, // Invalid position
-      { name: 'x'.repeat(1000), age: 25, position: 'MF' } // Too long name
+      { name: 'x'.repeat(1000), age: 25, position: 'MF' }, // Too long name
     ];
 
-    const results = [];
+    const results: Array<any> = [];
     for (const input of invalidInputs) {
       const response = await this.context.request
         .post('/api/players')
@@ -1257,14 +1260,14 @@ export class PhoenixAPITestSuite {
       results.push({
         input,
         rejected: response.status === 400,
-        statusCode: response.status
+        statusCode: response.status,
       });
     }
 
     return {
       testName: 'Input Validation',
       passed: results.every(r => r.rejected),
-      results
+      results,
     };
   }
 
@@ -1273,24 +1276,24 @@ export class PhoenixAPITestSuite {
     const protectedEndpoints = [
       '/api/players',
       '/api/tactical/formations',
-      '/api/analytics/dashboard'
+      '/api/analytics/dashboard',
     ];
 
-    const results = [];
+    const results: Array<any> = [];
     for (const endpoint of protectedEndpoints) {
       const response = await this.context.request.get(endpoint);
 
       results.push({
         endpoint,
         properlyBlocked: response.status === 401,
-        statusCode: response.status
+        statusCode: response.status,
       });
     }
 
     return {
       testName: 'Authorization Bypass',
       passed: results.every(r => r.properlyBlocked),
-      results
+      results,
     };
   }
 
@@ -1299,7 +1302,7 @@ export class PhoenixAPITestSuite {
     return {
       testName: 'Session Security',
       passed: true,
-      details: 'Session security measures validated'
+      details: 'Session security measures validated',
     };
   }
 
@@ -1313,7 +1316,7 @@ export class PhoenixAPITestSuite {
       databaseIntegration: await this.testDatabaseIntegration(),
       cacheIntegration: await this.testCacheIntegration(),
       externalServices: await this.testExternalServiceIntegration(),
-      eventFlow: await this.testEventFlow()
+      eventFlow: await this.testEventFlow(),
     };
   }
 
@@ -1341,7 +1344,7 @@ export class PhoenixAPITestSuite {
     return {
       passed: true,
       playerCreated: true,
-      dataConsistency: true
+      dataConsistency: true,
     };
   }
 
@@ -1370,7 +1373,7 @@ export class PhoenixAPITestSuite {
       passed: time2 < time1,
       firstRequestTime: time1,
       secondRequestTime: time2,
-      cacheWorking: time2 < time1
+      cacheWorking: time2 < time1,
     };
   }
 
@@ -1378,7 +1381,7 @@ export class PhoenixAPITestSuite {
     // Test integration with external services (if any)
     return {
       passed: true,
-      servicesOnline: true
+      servicesOnline: true,
     };
   }
 
@@ -1386,7 +1389,7 @@ export class PhoenixAPITestSuite {
     // Test event-driven architecture
     return {
       passed: true,
-      eventsProcessed: true
+      eventsProcessed: true,
     };
   }
 
@@ -1402,7 +1405,7 @@ export class PhoenixAPITestSuite {
     this.context.testUser = {
       id: 'test-user-id',
       email: 'test@example.com',
-      role: 'coach'
+      role: 'coach',
     };
 
     // Mock auth token for testing
@@ -1422,8 +1425,8 @@ export class PhoenixAPITestSuite {
         speed: faker.number.int({ min: 1, max: 100 }),
         passing: faker.number.int({ min: 1, max: 100 }),
         tackling: faker.number.int({ min: 1, max: 100 }),
-        shooting: faker.number.int({ min: 1, max: 100 })
-      }
+        shooting: faker.number.int({ min: 1, max: 100 }),
+      },
     };
   }
 
@@ -1431,11 +1434,16 @@ export class PhoenixAPITestSuite {
     return {
       name: `${faker.helpers.arrayElement(['4-4-2', '4-3-3', '3-5-2', '5-3-2'])} ${faker.word.adjective()}`,
       type: 'offensive',
-      slots: Array(11).fill(0).map((_, index) => ({
-        id: `slot-${index}`,
-        position: { x: faker.number.int({ min: 0, max: 100 }), y: faker.number.int({ min: 0, max: 100 }) },
-        role: faker.helpers.arrayElement(['GK', 'DF', 'MF', 'FW'])
-      }))
+      slots: Array(11)
+        .fill(0)
+        .map((_, index) => ({
+          id: `slot-${index}`,
+          position: {
+            x: faker.number.int({ min: 0, max: 100 }),
+            y: faker.number.int({ min: 0, max: 100 }),
+          },
+          role: faker.helpers.arrayElement(['GK', 'DF', 'MF', 'FW']),
+        })),
     };
   }
 
@@ -1460,7 +1468,9 @@ export class PhoenixAPITestSuite {
       if (typeof obj === 'object' && obj !== null) {
         if (obj.passed !== undefined) {
           total++;
-          if (obj.passed) passed++;
+          if (obj.passed) {
+            passed++;
+          }
         } else {
           Object.values(obj).forEach(countResults);
         }
@@ -1476,7 +1486,7 @@ export class PhoenixAPITestSuite {
       successRate: total > 0 ? (passed / total) * 100 : 0,
       performance: this.performanceMetrics,
       loadTests: this.loadTestResults,
-      security: this.securityTestResults
+      security: this.securityTestResults,
     };
   }
 }
@@ -1484,36 +1494,37 @@ export class PhoenixAPITestSuite {
 // Export test runner function
 export async function runPhoenixAPITests(): Promise<void> {
   const testSuite = new PhoenixAPITestSuite();
-  
+
   try {
     await testSuite.setup();
     const results = await testSuite.runAllTests();
-    
+
     console.log('\n📊 TEST RESULTS SUMMARY');
     console.log('========================');
     console.log(`Total Tests: ${results.summary.total}`);
     console.log(`Passed: ${results.summary.passed}`);
     console.log(`Failed: ${results.summary.failed}`);
     console.log(`Success Rate: ${results.summary.successRate.toFixed(2)}%`);
-    
+
     console.log('\n⚡ PERFORMANCE METRICS');
     console.log('======================');
     results.summary.performance.forEach(metric => {
       console.log(`${metric.endpoint}: ${metric.responseTime}ms ${metric.passed ? '✅' : '❌'}`);
     });
-    
+
     console.log('\n📈 LOAD TEST RESULTS');
     console.log('====================');
     results.summary.loadTests.forEach(test => {
-      console.log(`${test.endpoint}: ${test.requestsPerSecond} RPS, ${test.errorRate * 100}% error rate`);
+      console.log(
+        `${test.endpoint}: ${test.requestsPerSecond} RPS, ${test.errorRate * 100}% error rate`
+      );
     });
-    
+
     console.log('\n🔒 SECURITY TEST RESULTS');
     console.log('=========================');
     results.summary.security.forEach(test => {
       console.log(`${test.testName}: ${test.passed ? '✅' : '❌'}`);
     });
-    
   } finally {
     await testSuite.teardown();
   }

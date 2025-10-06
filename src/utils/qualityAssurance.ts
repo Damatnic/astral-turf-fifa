@@ -8,7 +8,7 @@ import { UIUXValidator, type ValidationReport } from './validation';
 import { QualityMonitor, TestRunner, type MonitoringReport } from './testing';
 import { PerformanceMonitor } from './performance';
 import { AccessibilityManager } from './accessibility';
-import { ThemeManager } from './themeManager';
+import { themeManager } from './themeManager';
 
 // ===================================================================
 // QUALITY DASHBOARD
@@ -68,7 +68,9 @@ export class QualityController {
   // ===================================================================
 
   static async initialize(): Promise<void> {
-    if (this.isInitialized) return;
+    if (this.isInitialized) {
+      return;
+    }
 
     // // console.log('🚀 Initializing Quality Assurance System...');
 
@@ -86,8 +88,7 @@ export class QualityController {
 
       this.isInitialized = true;
       // // console.log('✅ Quality Assurance System initialized successfully');
-
-    } catch (_error) {
+    } catch (error) {
       console.error('❌ Failed to initialize Quality Assurance System:', error);
       throw error;
     }
@@ -95,13 +96,13 @@ export class QualityController {
 
   private static async initializePerformanceMonitoring(): Promise<void> {
     PerformanceMonitor.startMonitoring();
-    
+
     // Set up performance thresholds
     PerformanceMonitor.setThresholds({
       fcp: 1800, // First Contentful Paint
       lcp: 2500, // Largest Contentful Paint
-      fid: 100,  // First Input Delay
-      cls: 0.1,  // Cumulative Layout Shift
+      fid: 100, // First Input Delay
+      cls: 0.1, // Cumulative Layout Shift
       ttfb: 600, // Time to First Byte
     });
   }
@@ -109,10 +110,10 @@ export class QualityController {
   private static async initializeAccessibilityChecks(): Promise<void> {
     // Set WCAG AAA compliance level
     AccessibilityManager.setComplianceLevel('AAA');
-    
+
     // Enable automatic focus management
     AccessibilityManager.enableAutoFocus();
-    
+
     // Set up keyboard navigation
     AccessibilityManager.setupGlobalKeyboardNavigation();
   }
@@ -120,18 +121,19 @@ export class QualityController {
   private static async initializeThemeValidation(): Promise<void> {
     // Validate theme accessibility
     const themes = ['light', 'dark', 'high-contrast'] as const;
-    
+    const preferences = themeManager.getPreferences();
+
     for (const theme of themes) {
-      ThemeManager.setTheme({ mode: theme });
+      themeManager.setMode(theme);
       const validation = await UIUXValidator.runCompleteValidation();
-      
+
       if (!validation.accessibility.passed) {
         // // console.warn(`⚠️ Theme '${theme}' has accessibility issues`);
       }
     }
-    
+
     // Reset to user preference
-    ThemeManager.applyUserPreferences();
+    themeManager.updatePreferences(preferences);
   }
 
   private static setupRealtimeMonitoring(): void {
@@ -168,9 +170,9 @@ export class QualityController {
 
   private static async runInitialValidation(): Promise<void> {
     // // console.log('🔍 Running initial comprehensive validation...');
-    
+
     const report = await UIUXValidator.runCompleteValidation();
-    
+
     if (report.perfectScore) {
       // // console.log('🎉 PERFECT SCORE ACHIEVED! UI/UX is flawless.');
     } else {
@@ -191,16 +193,25 @@ export class QualityController {
     const latestMonitoring = QualityMonitor.getLatestReport();
     const perfMetrics = PerformanceMonitor.getMetrics();
 
-    // Calculate frame rate
-    const avgFrameDuration = perfMetrics.frameDuration?.reduce((a, b) => a + b, 0) / (perfMetrics.frameDuration?.length || 1);
-    const fps = avgFrameDuration ? Math.round(1000 / avgFrameDuration) : 60;
+    const frameDurations: number[] = Array.isArray(perfMetrics.frameDuration)
+      ? (perfMetrics.frameDuration as number[])
+      : [];
+    const totalFrameDuration = frameDurations.reduce<number>((sum, duration) => sum + duration, 0);
+    const avgFrameDuration =
+      frameDurations.length > 0 ? totalFrameDuration / frameDurations.length : null;
+    const fps = avgFrameDuration && avgFrameDuration > 0 ? Math.round(1000 / avgFrameDuration) : 60;
 
     // Determine overall status
     let status: QualityDashboard['overall']['status'] = 'poor';
-    if (report.overallScore === 100 && report.perfectScore) status = 'perfect';
-    else if (report.overallScore >= 95) status = 'excellent';
-    else if (report.overallScore >= 85) status = 'good';
-    else if (report.overallScore >= 70) status = 'needs-improvement';
+    if (report.overallScore === 100 && report.perfectScore) {
+      status = 'perfect';
+    } else if (report.overallScore >= 95) {
+      status = 'excellent';
+    } else if (report.overallScore >= 85) {
+      status = 'good';
+    } else if (report.overallScore >= 70) {
+      status = 'needs-improvement';
+    }
 
     this.dashboard = {
       overall: {
@@ -299,10 +310,10 @@ export class QualityController {
 
   static async runFullAudit(): Promise<ValidationReport> {
     // // console.log('🔍 Running comprehensive audit...');
-    
+
     // Stop monitoring during audit for accurate results
     QualityMonitor.stopMonitoring();
-    
+
     try {
       const report = await UIUXValidator.runCompleteValidation();
       await this.updateDashboard();
@@ -395,7 +406,9 @@ export class QualityController {
 
   static generateQualityReport(): string {
     const dashboard = this.getDashboard();
-    if (!dashboard) return 'Dashboard not available';
+    if (!dashboard) {
+      return 'Dashboard not available';
+    }
 
     const report = [
       '# 🎯 Astral Turf Quality Report',
@@ -426,7 +439,7 @@ export class QualityController {
       `- User Satisfaction: ${dashboard.trends.userSatisfaction.join(', ')}`,
       '',
       '---',
-      '*Generated by Quantum\'s Quality Assurance System*',
+      "*Generated by Quantum's Quality Assurance System*",
     ];
 
     return report.join('\n');
@@ -462,22 +475,35 @@ export class QualityController {
 // CONVENIENCE FUNCTIONS
 // ===================================================================
 
-// One-click quality check
-export async function quickQualityCheck(): Promise<void> {
+export interface QuickQualityCheckResult {
+  passed: boolean;
+  score: number;
+  criticalIssues: string[];
+  summary: string | null;
+}
+
+export async function quickQualityCheck(): Promise<QuickQualityCheckResult> {
   const result = await QualityController.runQuickCheck();
-  
+
   if (result.passed) {
-    // // console.log('✅ Quick quality check passed!');
-  } else {
-    // // console.warn(`⚠️ Quality issues found (Score: ${result.score}/100):`);
-    result.criticalIssues.forEach(issue => console.warn(`  • ${issue}`));
+    return {
+      ...result,
+      summary: null,
+    };
   }
+
+  const summary = result.criticalIssues.map(issue => `• ${issue}`).join('\n');
+
+  return {
+    ...result,
+    summary,
+  };
 }
 
 // Perfect score validation
 export async function validatePerfectScore(): Promise<boolean> {
   const report = await UIUXValidator.runCompleteValidation();
-  
+
   if (report.perfectScore) {
     // // console.log('🎉 PERFECT UI/UX SCORE ACHIEVED!');
     // // console.log('🏆 All metrics: 100/100');
@@ -495,7 +521,7 @@ export async function validatePerfectScore(): Promise<boolean> {
 // Auto-optimization
 export async function autoOptimize(): Promise<void> {
   // // console.log('🚀 Running auto-optimization...');
-  
+
   const [performance, accessibility] = await Promise.all([
     QualityController.optimizePerformance(),
     QualityController.fixAccessibilityIssues(),
@@ -503,11 +529,11 @@ export async function autoOptimize(): Promise<void> {
 
   // // console.log('✅ Performance optimizations:', performance.applied);
   // // console.log('✅ Accessibility fixes:', accessibility.fixed);
-  
+
   if (performance.recommendations.length > 0) {
     // // console.log('💡 Performance recommendations:', performance.recommendations);
   }
-  
+
   if (accessibility.manualRequired.length > 0) {
     // // console.log('👨‍💻 Manual accessibility fixes needed:', accessibility.manualRequired);
   }
@@ -516,13 +542,13 @@ export async function autoOptimize(): Promise<void> {
 // Initialize with perfect settings
 export async function initializePerfectQuality(): Promise<void> {
   await QualityController.initialize();
-  
+
   // Run initial optimization
   await autoOptimize();
-  
+
   // Validate perfect score
   const isPerfect = await validatePerfectScore();
-  
+
   if (isPerfect) {
     // // console.log('🎯 UI/UX PERFECTION ACHIEVED FOR ASTRAL TURF!');
   } else {
@@ -530,11 +556,6 @@ export async function initializePerfectQuality(): Promise<void> {
   }
 }
 
-export {
-  QualityController,
-  UIUXValidator,
-  QualityMonitor,
-  TestRunner,
-};
+export { UIUXValidator, QualityMonitor, TestRunner };
 
 export default QualityController;

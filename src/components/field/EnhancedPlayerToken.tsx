@@ -17,7 +17,7 @@ interface EnhancedPlayerTokenProps {
 // Player availability indicator with validation
 const AvailabilityIndicator: React.FC<{ availability: Player['availability'] }> = React.memo(
   ({ availability }) => {
-    const indicators = {
+    const indicators: Record<string, { color: string; icon: string; tooltip: string }> = {
       available: { color: '#10b981', icon: '●', tooltip: 'Available' },
       injured: { color: '#ef4444', icon: '🏥', tooltip: 'Injured' },
       suspended: { color: '#f59e0b', icon: '🟡', tooltip: 'Suspended' },
@@ -25,8 +25,11 @@ const AvailabilityIndicator: React.FC<{ availability: Player['availability'] }> 
       international: { color: '#3b82f6', icon: '🌍', tooltip: 'International Duty' },
     };
 
-    const safeAvailability = availability || 'available';
-    const indicator = indicators[safeAvailability] || indicators.available;
+    const availabilityStatus =
+      typeof availability === 'object' && availability?.status
+        ? availability.status.toLowerCase().replace(/\s+/g, '_')
+        : 'available';
+    const indicator = indicators[availabilityStatus] || indicators.available;
 
     return (
       <div
@@ -34,12 +37,12 @@ const AvailabilityIndicator: React.FC<{ availability: Player['availability'] }> 
         style={{ backgroundColor: indicator.color }}
         title={indicator.tooltip}
       >
-        {availability !== 'available' && (
+        {availabilityStatus !== 'available' && (
           <span className="text-white text-[8px]">{indicator.icon}</span>
         )}
       </div>
     );
-  },
+  }
 );
 
 // Player stats overlay with comprehensive validation
@@ -65,11 +68,11 @@ const PlayerStatsOverlay: React.FC<{
 
   const stats = [
     { label: 'OVR', value: player.overall || 75 },
-    { label: 'SPD', value: player.attributes?.pace || 70 },
+    { label: 'SPD', value: (player.attributes as { pace?: number })?.pace || 70 },
     { label: 'SHO', value: player.attributes?.shooting || 70 },
     { label: 'PAS', value: player.attributes?.passing || 70 },
-    { label: 'DEF', value: player.attributes?.defending || 70 },
-    { label: 'PHY', value: player.attributes?.physical || 70 },
+    { label: 'DEF', value: (player.attributes as { defending?: number })?.defending || 70 },
+    { label: 'PHY', value: (player.attributes as { physical?: number })?.physical || 70 },
   ];
 
   return (
@@ -148,14 +151,18 @@ const EnhancedPlayerToken: React.FC<EnhancedPlayerTokenProps> = ({
   // Player kit colors with validation
   const kitColors = useMemo(() => {
     const team = player.team || 'home';
-    const kit = player.kit;
+    const kit = (
+      player as Player & {
+        kit?: { primaryColor?: string; secondaryColor?: string; accentColor?: string };
+      }
+    ).kit;
 
     return {
       primary: kit?.primaryColor || (team === 'home' ? '#3b82f6' : '#ef4444'),
       secondary: kit?.secondaryColor || '#ffffff',
       accent: kit?.accentColor || (team === 'home' ? '#1d4ed8' : '#dc2626'),
     };
-  }, [player.team, player.kit]);
+  }, [player]);
 
   // Enhanced drag handlers with comprehensive validation
   const handleDragStart = useCallback(
@@ -175,12 +182,12 @@ const EnhancedPlayerToken: React.FC<EnhancedPlayerTokenProps> = ({
           tokenRef.current.style.opacity = '0.7';
           tokenRef.current.style.transform = 'scale(1.1)';
         }
-      } catch (_error) {
-        console.error('Failed to start drag:', error);
+      } catch {
+        // Failed to start drag
         setIsDragging(false);
       }
     },
-    [isDraggable, player, startDrag],
+    [isDraggable, player, startDrag]
   );
 
   const handleDragEnd = useCallback(
@@ -194,11 +201,11 @@ const EnhancedPlayerToken: React.FC<EnhancedPlayerTokenProps> = ({
           tokenRef.current.style.opacity = '';
           tokenRef.current.style.transform = '';
         }
-      } catch (_error) {
-        console.error('Failed to end drag:', error);
+      } catch {
+        // Failed to end drag
       }
     },
-    [endDrag],
+    [endDrag]
   );
 
   const handleClick = useCallback(
@@ -210,11 +217,11 @@ const EnhancedPlayerToken: React.FC<EnhancedPlayerTokenProps> = ({
       e.stopPropagation();
       try {
         dispatch({ type: 'SELECT_PLAYER', payload: player.id });
-      } catch (_error) {
-        console.error('Failed to select player:', error);
+      } catch {
+        // Failed to select player
       }
     },
-    [interactive, dispatch, player?.id],
+    [interactive, dispatch, player?.id]
   );
 
   const handleDoubleClick = useCallback(
@@ -227,11 +234,11 @@ const EnhancedPlayerToken: React.FC<EnhancedPlayerTokenProps> = ({
       try {
         // Open player details modal
         dispatch({ type: 'OPEN_MODAL', payload: { type: 'PLAYER_DETAILS', playerId: player.id } });
-      } catch (_error) {
-        console.error('Failed to open player modal:', error);
+      } catch {
+        // Failed to open player modal
       }
     },
-    [interactive, dispatch, player?.id],
+    [interactive, dispatch, player?.id]
   );
 
   const handleMouseEnter = useCallback(
@@ -241,7 +248,7 @@ const EnhancedPlayerToken: React.FC<EnhancedPlayerTokenProps> = ({
         setIsHovered(true);
       }
     },
-    [showStats],
+    [showStats]
   );
 
   const handleMouseLeave = useCallback(() => {
@@ -254,7 +261,7 @@ const EnhancedPlayerToken: React.FC<EnhancedPlayerTokenProps> = ({
         setMousePosition({ x: e.clientX, y: e.clientY });
       }
     },
-    [showStats, isHovered],
+    [showStats, isHovered]
   );
 
   // Performance rating color
@@ -314,8 +321,10 @@ const EnhancedPlayerToken: React.FC<EnhancedPlayerTokenProps> = ({
           ${sizeConfig.text}
         `}
         >
-          {player.number ? (
-            <span className="drop-shadow-sm">{player.number}</span>
+          {(player as Player & { number?: number }).number ? (
+            <span className="drop-shadow-sm">
+              {(player as Player & { number?: number }).number}
+            </span>
           ) : (
             <span className="drop-shadow-sm">
               {player.name

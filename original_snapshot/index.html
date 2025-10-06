@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Astral Turf</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+      /* Light & Dark Theme Variables */
+      :root {
+        --bg-primary: #0f172a; /* slate-900 */
+        --bg-secondary: #1e293b; /* slate-800 */
+        --bg-tertiary: #334155; /* slate-700 */
+        --border-primary: #475569; /* slate-600 */
+        --text-primary: #e2e8f0; /* slate-200 */
+        --text-secondary: #94a3b8; /* slate-400 */
+        --accent-primary: #2dd4bf; /* teal-400 */
+        --accent-secondary: #14b8a6; /* teal-500 */
+        --accent-tertiary: #0d9488; /* teal-600 */
+      }
+      .light {
+        --bg-primary: #f8fafc; /* slate-50 */
+        --bg-secondary: #f1f5f9; /* slate-100 */
+        --bg-tertiary: #e2e8f0; /* slate-200 */
+        --border-primary: #cbd5e1; /* slate-300 */
+        --text-primary: #1e293b; /* slate-800 */
+        --text-secondary: #64748b; /* slate-500 */
+      }
+
+      body {
+        background-color: var(--bg-primary);
+        color: var(--text-primary);
+        font-family: 'Inter', sans-serif; /* A cleaner, more modern font */
+        overflow: hidden;
+      }
+
+      /* Enhanced Tactics Board Styles */
+      .pitch-stripes {
+        background-image:
+          linear-gradient(90deg, rgba(34, 197, 94, 0.03) 50%, transparent 50%),
+          linear-gradient(rgba(34, 197, 94, 0.02) 50%, transparent 50%);
+        background-size: 20px 20px;
+      }
+
+      /* Subtle glow effects for field elements */
+      .field-glow {
+        filter: drop-shadow(0 0 8px rgba(45, 212, 191, 0.1));
+      }
+
+      /* Enhanced transitions for UI elements */
+      .tactics-transition {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      /* Custom scrollbars */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--bg-secondary);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--border-primary);
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #64748b;
+      } /* slate-500 */
+
+      /* Input range styles */
+      input[type='range'] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        background: transparent;
+      }
+      input[type='range']::-webkit-slider-runnable-track {
+        height: 0.5rem;
+        background: var(--bg-tertiary);
+        border-radius: 9999px;
+      }
+      input[type='range']::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        margin-top: -0.25rem;
+        height: 1rem;
+        width: 1rem;
+        background-color: var(--accent-secondary);
+        border-radius: 9999px;
+        border: 2px solid var(--bg-secondary);
+      }
+      input[type='range']:hover::-webkit-slider-thumb {
+        background-color: var(--accent-primary);
+      }
+
+      /* Field styles */
+      .pitch-stripes {
+        background-image: repeating-linear-gradient(
+          to right,
+          rgba(0, 0, 0, 0) 0%,
+          rgba(0, 0, 0, 0) 9.9%,
+          rgba(0, 0, 0, 0.05) 10%,
+          rgba(0, 0, 0, 0.05) 19.9%,
+          rgba(0, 0, 0, 0) 20%
+        );
+      }
+      .dragging-over {
+        background-color: rgba(45, 212, 191, 0.2);
+        border: 1px dashed rgba(45, 212, 191, 0.5);
+      }
+      .dragging {
+        opacity: 0.5;
+        cursor: grabbing !important;
+      }
+      /* Disable transitions during drag for smoother movement */
+      .dragging * {
+        transition: none !important;
+      }
+      /* Free positioning mode indicator */
+      .free-positioning-mode .absolute {
+        transition: none !important;
+      }
+      .ai-highlight {
+        animation: pulseGlow 2s infinite;
+        border-radius: 9999px;
+      }
+
+      .chemistry-glow-high {
+        box-shadow: 0 0 10px 2px rgba(45, 212, 191, 0.8);
+      }
+      .chemistry-glow-medium {
+        box-shadow: 0 0 8px 1px rgba(250, 204, 21, 0.7);
+      }
+      .chemistry-glow-low {
+        box-shadow: 0 0 6px 1px rgba(239, 68, 68, 0.6);
+      }
+
+      /* Animations */
+      @keyframes fadeInScale {
+        from {
+          opacity: 0;
+          transform: scale(0.95) translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
+      }
+      .animate-fade-in-scale {
+        animation: fadeInScale 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      }
+
+      @keyframes slideInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .animate-slide-in-up {
+        animation: slideInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      }
+
+      @keyframes bounceIn {
+        0% {
+          opacity: 0;
+          transform: scale(0.3);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1.05);
+        }
+        70% {
+          transform: scale(0.9);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+      .animate-bounce-in {
+        animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+      }
+
+      @keyframes toast-in {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+      @keyframes toast-out {
+        from {
+          transform: translateX(0);
+          opacity: 1;
+        }
+        to {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+      }
+      .animate-toast-in {
+        animation: toast-in 0.3s ease-out forwards;
+      }
+      .animate-toast-out {
+        animation: toast-out 0.3s ease-out forwards;
+      }
+
+      @keyframes pulseGlow {
+        0%,
+        100% {
+          box-shadow: 0 0 0 0 rgba(45, 212, 191, 0.7);
+        }
+        50% {
+          box-shadow: 0 0 20px 8px rgba(45, 212, 191, 0);
+        }
+      }
+
+      /* Auth page background */
+      @keyframes gradient-animation {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+      body.auth-bg {
+        background: linear-gradient(-45deg, #0f172a, #1e293b, #334155, #0f172a);
+        background-size: 400% 400%;
+        animation: gradient-animation 15s ease infinite;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>

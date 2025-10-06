@@ -8,7 +8,12 @@ import DOMPurify from 'dompurify';
 import * as crypto from 'crypto';
 
 // Data classification levels
-export type DataClassification = 'public' | 'internal' | 'confidential' | 'restricted' | 'top_secret';
+export type DataClassification =
+  | 'public'
+  | 'internal'
+  | 'confidential'
+  | 'restricted'
+  | 'top_secret';
 
 // Encryption algorithms
 export type EncryptionAlgorithm = 'AES-256-GCM' | 'AES-256-CBC' | 'ChaCha20-Poly1305';
@@ -117,7 +122,8 @@ const PII_PATTERNS = {
   passport: /[A-Z]{1,2}\d{7,9}/g,
   driverLicense: /[A-Z]{1,2}\d{6,8}/g,
   dateOfBirth: /\b(0?[1-9]|1[0-2])[\/\-](0?[1-9]|[12]\d|3[01])[\/\-](\d{4}|\d{2})\b/g,
-  address: /\d+\s+[\w\s]+(?:street|st|avenue|ave|road|rd|drive|dr|lane|ln|court|ct|circle|cir|boulevard|blvd)\.?\s*(?:#\d+)?/gi,
+  address:
+    /\d+\s+[\w\s]+(?:street|st|avenue|ave|road|rd|drive|dr|lane|ln|court|ct|circle|cir|boulevard|blvd)\.?\s*(?:#\d+)?/gi,
 };
 
 /**
@@ -147,7 +153,7 @@ class DataProtectionService {
     try {
       const config = DATA_PROTECTION_CONFIGS[classification];
       const serializedData = this.serializeData(data);
-      
+
       // For top secret data, use multiple encryption layers
       let encryptedData: string;
       if (classification === 'top_secret') {
@@ -236,7 +242,12 @@ class DataProtectionService {
       if (encryptedData.classification === 'top_secret') {
         decryptedData = await this.multiLayerDecrypt(encryptedData.data, config, key);
       } else {
-        decryptedData = await this.singleLayerDecrypt(encryptedData.data, config, key, encryptedData.iv);
+        decryptedData = await this.singleLayerDecrypt(
+          encryptedData.data,
+          config,
+          key,
+          encryptedData.iv
+        );
       }
 
       const result = this.deserializeData(decryptedData);
@@ -309,7 +320,7 @@ class DataProtectionService {
 
     // Check for structured data PII
     if (typeof data === 'object' && data !== null) {
-      this.detectStructuredPII(data, '', detectedTypes, locations);
+      this.detectStructuredPII(data as Record<string, unknown>, '', detectedTypes, locations);
     }
 
     return {
@@ -324,11 +335,14 @@ class DataProtectionService {
    */
   maskData(data: unknown, masks: DataMask[]): unknown {
     if (typeof data !== 'object' || data === null) {
-      return this.applyStringMask(String(data), masks[0] || { field: 'default', strategy: 'partial' });
+      return this.applyStringMask(
+        String(data),
+        masks[0] || { field: 'default', strategy: 'partial' }
+      );
     }
 
     const maskedData = JSON.parse(JSON.stringify(data));
-    
+
     masks.forEach(mask => {
       const value = this.getNestedValue(maskedData, mask.field);
       if (value !== undefined) {
@@ -344,12 +358,12 @@ class DataProtectionService {
    * Sanitize HTML content to prevent XSS attacks
    */
   sanitizeHTML(html: string): string {
-    return DOMPurify.sanitize(html, {
+    const sanitized = DOMPurify.sanitize(html, {
       ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'u', 'br', 'p', 'div', 'span'],
       ALLOWED_ATTR: ['class'],
-      FORBID_SCRIPTS: true,
       FORBID_TAGS: ['script', 'object', 'embed', 'form', 'input'],
-    });
+    } as any);
+    return String(sanitized);
   }
 
   /**
@@ -465,15 +479,13 @@ class DataProtectionService {
   /**
    * Get audit logs for compliance reporting
    */
-  getAuditLogs(
-    filters?: {
-      userId?: string;
-      operation?: string;
-      classification?: DataClassification;
-      startDate?: string;
-      endDate?: string;
-    }
-  ): AuditLog[] {
+  getAuditLogs(filters?: {
+    userId?: string;
+    operation?: string;
+    classification?: DataClassification;
+    startDate?: string;
+    endDate?: string;
+  }): AuditLog[] {
     let logs = [...this.auditLogs];
 
     if (filters) {
@@ -539,49 +551,62 @@ class DataProtectionService {
   private async singleLayerEncrypt(data: string, config: EncryptionConfig): Promise<string> {
     const key = crypto.randomBytes(config.keySize / 8);
     const iv = crypto.randomBytes(config.ivSize);
-    
-    const cipher = crypto.createCipher('aes-256-gcm', key);
+
+    const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
     cipher.setAutoPadding(true);
-    
+
     let encrypted = cipher.update(data, 'utf8', 'hex');
     encrypted += cipher.final('hex');
-    
+
     return encrypted;
   }
 
   private async multiLayerEncrypt(data: string, config: EncryptionConfig): Promise<string> {
     // Layer 1: AES-256-GCM
-    let encrypted = await this.singleLayerEncrypt(data, config);
-    
+    const encrypted = await this.singleLayerEncrypt(data, config);
+
     // Layer 2: Additional XOR encryption
     const xorKey = crypto.randomBytes(32);
     const buffer = Buffer.from(encrypted, 'hex');
     for (let i = 0; i < buffer.length; i++) {
       buffer[i] ^= xorKey[i % xorKey.length];
     }
-    
+
     return buffer.toString('hex');
   }
 
-  private async singleLayerDecrypt(data: string, config: EncryptionConfig, key: string, iv: string): Promise<string> {
-    const decipher = crypto.createDecipher('aes-256-gcm', Buffer.from(key, 'hex'));
-    
+  private async singleLayerDecrypt(
+    data: string,
+    config: EncryptionConfig,
+    key: string,
+    iv: string
+  ): Promise<string> {
+    const decipher = crypto.createDecipheriv(
+      'aes-256-gcm',
+      Buffer.from(key, 'hex'),
+      Buffer.from(iv, 'hex')
+    );
+
     let decrypted = decipher.update(data, 'hex', 'utf8');
     decrypted += decipher.final('utf8');
-    
+
     return decrypted;
   }
 
-  private async multiLayerDecrypt(data: string, config: EncryptionConfig, key: string): Promise<string> {
+  private async multiLayerDecrypt(
+    data: string,
+    config: EncryptionConfig,
+    key: string
+  ): Promise<string> {
     // Reverse Layer 2: XOR decryption
     const xorKey = crypto.randomBytes(32);
     const buffer = Buffer.from(data, 'hex');
     for (let i = 0; i < buffer.length; i++) {
       buffer[i] ^= xorKey[i % xorKey.length];
     }
-    
+
     const layer1Data = buffer.toString('hex');
-    
+
     // Reverse Layer 1: AES-256-GCM
     return this.singleLayerDecrypt(layer1Data, config, key, '');
   }
@@ -615,7 +640,7 @@ class DataProtectionService {
   ): void {
     Object.entries(obj).forEach(([key, value]) => {
       const fieldPath = prefix ? `${prefix}.${key}` : key;
-      
+
       if (typeof value === 'string') {
         // Check for PII in field names
         const lowerKey = key.toLowerCase();
@@ -637,7 +662,12 @@ class DataProtectionService {
           });
         }
       } else if (typeof value === 'object' && value !== null) {
-        this.detectStructuredPII(value as Record<string, unknown>, fieldPath, detectedTypes, locations);
+        this.detectStructuredPII(
+          value as Record<string, unknown>,
+          fieldPath,
+          detectedTypes,
+          locations
+        );
       }
     });
   }
@@ -646,7 +676,7 @@ class DataProtectionService {
     switch (mask.strategy) {
       case 'full':
         return '*'.repeat(mask.preserveLength ? value.length : 8);
-      
+
       case 'partial':
         const showFirst = mask.showFirst || 2;
         const showLast = mask.showLast || 2;
@@ -657,13 +687,13 @@ class DataProtectionService {
         const end = value.substring(value.length - showLast);
         const middle = '*'.repeat(value.length - showFirst - showLast);
         return start + middle + end;
-      
+
       case 'hash':
         return CryptoJS.SHA256(value).toString().substring(0, 8);
-      
+
       case 'tokenize':
         return `token_${CryptoJS.SHA256(value).toString().substring(0, 16)}`;
-      
+
       default:
         return value;
     }
@@ -671,7 +701,9 @@ class DataProtectionService {
 
   private getNestedValue(obj: unknown, path: string): unknown {
     return path.split('.').reduce((current, key) => {
-      return current && typeof current === 'object' ? (current as Record<string, unknown>)[key] : undefined;
+      return current && typeof current === 'object'
+        ? (current as Record<string, unknown>)[key]
+        : undefined;
     }, obj);
   }
 
@@ -699,11 +731,13 @@ class DataProtectionService {
     const headers = Object.keys(data[0] as Record<string, unknown>);
     const csvRows = [
       headers.join(','),
-      ...data.map(row => 
-        headers.map(header => {
-          const value = (row as Record<string, unknown>)[header];
-          return typeof value === 'string' ? `"${value}"` : String(value);
-        }).join(',')
+      ...data.map(row =>
+        headers
+          .map(header => {
+            const value = (row as Record<string, unknown>)[header];
+            return typeof value === 'string' ? `"${value}"` : String(value);
+          })
+          .join(',')
       ),
     ];
 
@@ -765,7 +799,7 @@ export const decryptSensitiveData = (
 
 export const detectPersonalData = (data: unknown) => dataProtection.detectPII(data);
 
-export const maskSensitiveData = (data: unknown, masks: DataMask[]) => 
+export const maskSensitiveData = (data: unknown, masks: DataMask[]) =>
   dataProtection.maskData(data, masks);
 
 export const sanitizeUserInput = (input: unknown) => dataProtection.sanitizeInput(input);
@@ -774,7 +808,7 @@ export const sanitizeHTMLContent = (html: string) => dataProtection.sanitizeHTML
 
 export const generateChecksum = (data: unknown) => dataProtection.generateDataChecksum(data);
 
-export const verifyIntegrity = (data: unknown, checksum: string) => 
+export const verifyIntegrity = (data: unknown, checksum: string) =>
   dataProtection.verifyDataIntegrity(data, checksum);
 
 export const exportSecureData = (

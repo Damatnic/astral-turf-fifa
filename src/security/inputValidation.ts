@@ -8,7 +8,19 @@ import validator from 'validator';
 import DOMPurify from 'dompurify';
 
 // Validation rule types
-export type ValidationRule = 'email' | 'password' | 'phone' | 'url' | 'alphanumeric' | 'numeric' | 'text' | 'html' | 'json' | 'uuid' | 'date' | 'custom';
+export type ValidationRule =
+  | 'email'
+  | 'password'
+  | 'phone'
+  | 'url'
+  | 'alphanumeric'
+  | 'numeric'
+  | 'text'
+  | 'html'
+  | 'json'
+  | 'uuid'
+  | 'date'
+  | 'custom';
 
 export interface ValidationConfig {
   rule: ValidationRule;
@@ -133,7 +145,7 @@ export const VALIDATION_SCHEMAS = {
     jerseyNumber: {
       rule: 'numeric' as const,
       required: true,
-      customValidator: (value) => {
+      customValidator: value => {
         const num = Number(value);
         return num >= 1 && num <= 99;
       },
@@ -147,7 +159,7 @@ export const VALIDATION_SCHEMAS = {
     height: {
       rule: 'numeric' as const,
       required: false,
-      customValidator: (value) => {
+      customValidator: value => {
         const num = Number(value);
         return num >= 100 && num <= 250; // cm
       },
@@ -156,7 +168,7 @@ export const VALIDATION_SCHEMAS = {
     weight: {
       rule: 'numeric' as const,
       required: false,
-      customValidator: (value) => {
+      customValidator: value => {
         const num = Number(value);
         return num >= 30 && num <= 200; // kg
       },
@@ -241,27 +253,10 @@ const THREAT_PATTERNS = {
     /<iframe[^>]*>[\s\S]*?<\/iframe>/gi,
     /<object[^>]*>[\s\S]*?<\/object>/gi,
   ],
-  commandInjection: [
-    /[;&|`$(){}[\]\\]/g,
-    /\b(cat|ls|pwd|rm|mv|cp|chmod|sudo|su)\b/gi,
-  ],
-  pathTraversal: [
-    /\.\.\//g,
-    /\.\.\\/g,
-    /%2e%2e%2f/gi,
-    /%2e%2e%5c/gi,
-  ],
-  ldapInjection: [
-    /[()&|!=<>]/g,
-    /\*|\x00/g,
-  ],
-  nosqlInjection: [
-    /\$where/gi,
-    /\$ne/gi,
-    /\$gt/gi,
-    /\$lt/gi,
-    /\$regex/gi,
-  ],
+  commandInjection: [/[;&|`$(){}[\]\\]/g, /\b(cat|ls|pwd|rm|mv|cp|chmod|sudo|su)\b/gi],
+  pathTraversal: [/\.\.\//g, /\.\.\\/g, /%2e%2e%2f/gi, /%2e%2e%5c/gi],
+  ldapInjection: [/[()&|!=<>]/g, /\*|\x00/g],
+  nosqlInjection: [/\$where/gi, /\$ne/gi, /\$gt/gi, /\$lt/gi, /\$regex/gi],
 };
 
 /**
@@ -276,11 +271,7 @@ class InputValidationService {
   /**
    * Validate single field with comprehensive security checks
    */
-  validateField(
-    value: unknown,
-    config: ValidationConfig,
-    fieldName?: string
-  ): ValidationResult {
+  validateField(value: unknown, config: ValidationConfig, fieldName?: string): ValidationResult {
     // Create cache key
     const cacheKey = this.createCacheKey(value, config, fieldName);
     const cached = this.validationCache.get(cacheKey);
@@ -323,7 +314,7 @@ class InputValidationService {
 
       // Cache result for performance
       this.validationCache.set(cacheKey, result);
-      
+
       return result;
     } catch (error) {
       result.valid = false;
@@ -336,10 +327,7 @@ class InputValidationService {
   /**
    * Validate entire form with cross-field validation
    */
-  validateForm(
-    data: Record<string, unknown>,
-    schema: FormValidationSchema
-  ): BulkValidationResult {
+  validateForm(data: Record<string, unknown>, schema: FormValidationSchema): BulkValidationResult {
     const result: BulkValidationResult = {
       valid: true,
       fieldErrors: {},
@@ -356,7 +344,7 @@ class InputValidationService {
     Object.entries(schema).forEach(([fieldName, fieldConfigs]) => {
       const fieldValue = data[fieldName];
       const configs = Array.isArray(fieldConfigs) ? fieldConfigs : [fieldConfigs];
-      
+
       const fieldErrors: string[] = [];
       const fieldThreats: string[] = [];
       let sanitizedValue = fieldValue;
@@ -365,7 +353,7 @@ class InputValidationService {
       // Validate against all configs for this field
       configs.forEach(config => {
         const fieldResult = this.validateField(fieldValue, config, fieldName);
-        
+
         if (!fieldResult.valid) {
           fieldErrors.push(...fieldResult.errors);
           result.valid = false;
@@ -392,7 +380,7 @@ class InputValidationService {
       if (fieldThreats.length > 0) {
         result.riskAssessment.threatsByField[fieldName] = fieldThreats;
       }
-      
+
       result.sanitizedData[fieldName] = sanitizedValue;
     });
 
@@ -412,7 +400,7 @@ class InputValidationService {
     data: Record<string, unknown>,
     schemaName: keyof typeof VALIDATION_SCHEMAS
   ): BulkValidationResult {
-    const schema = VALIDATION_SCHEMAS[schemaName];
+    const schema = VALIDATION_SCHEMAS[schemaName] as unknown as FormValidationSchema;
     return this.validateForm(data, schema);
   }
 
@@ -428,9 +416,7 @@ class InputValidationService {
         return DOMPurify.sanitize(input, {
           ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'u', 'br', 'p'],
           ALLOWED_ATTR: [],
-          FORBID_SCRIPTS: true,
-          FORBID_TAGS: ['script', 'object', 'embed', 'iframe'],
-        });
+        } as any) as unknown as string;
 
       case 'sql':
         return input
@@ -547,21 +533,27 @@ class InputValidationService {
   } {
     const totalValidations = this.validationCache.size;
     const results = Array.from(this.validationCache.values());
-    
+
     const failures = results.filter(r => !r.valid).length;
     const threatDetections = results.filter(r => r.detectedThreats.length > 0).length;
-    
-    const riskDistribution = results.reduce((acc, r) => {
-      acc[r.riskLevel] = (acc[r.riskLevel] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+
+    const riskDistribution = results.reduce(
+      (acc, r) => {
+        acc[r.riskLevel] = (acc[r.riskLevel] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
 
     const threatCounts = results
       .flatMap(r => r.detectedThreats)
-      .reduce((acc, threat) => {
-        acc[threat] = (acc[threat] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
+      .reduce(
+        (acc, threat) => {
+          acc[threat] = (acc[threat] || 0) + 1;
+          return acc;
+        },
+        {} as Record<string, number>
+      );
 
     const commonThreats = Object.entries(threatCounts)
       .map(([threat, count]) => ({ threat, count }))
@@ -607,16 +599,12 @@ class InputValidationService {
     // Length validation
     if (config.minLength && stringValue.length < config.minLength) {
       result.valid = false;
-      result.errors.push(
-        config.errorMessage || `Minimum length is ${config.minLength} characters`
-      );
+      result.errors.push(config.errorMessage || `Minimum length is ${config.minLength} characters`);
     }
 
     if (config.maxLength && stringValue.length > config.maxLength) {
       result.valid = false;
-      result.errors.push(
-        config.errorMessage || `Maximum length is ${config.maxLength} characters`
-      );
+      result.errors.push(config.errorMessage || `Maximum length is ${config.maxLength} characters`);
     }
 
     // Pattern validation
@@ -694,7 +682,7 @@ class InputValidationService {
       patterns.forEach(pattern => {
         if (pattern.test(stringValue)) {
           result.detectedThreats.push(threatType);
-          
+
           // Escalate risk level based on threat type
           switch (threatType) {
             case 'sqlInjection':
@@ -707,8 +695,10 @@ class InputValidationService {
               result.riskLevel = result.riskLevel === 'critical' ? 'critical' : 'high';
               break;
             case 'pathTraversal':
-              result.riskLevel = result.riskLevel === 'critical' || result.riskLevel === 'high' 
-                ? result.riskLevel : 'medium';
+              result.riskLevel =
+                result.riskLevel === 'critical' || result.riskLevel === 'high'
+                  ? result.riskLevel
+                  : 'medium';
               break;
           }
         }
@@ -726,8 +716,7 @@ class InputValidationService {
         return DOMPurify.sanitize(value, {
           ALLOWED_TAGS: config.allowedTags || ['b', 'i', 'em', 'strong'],
           ALLOWED_ATTR: config.allowedAttributes || [],
-          FORBID_SCRIPTS: true,
-        });
+        } as any) as unknown;
 
       case 'email':
         return validator.normalizeEmail(value) || value;
@@ -777,7 +766,7 @@ class InputValidationService {
     if ('startDate' in data && 'endDate' in data) {
       const startDate = new Date(String(data.startDate));
       const endDate = new Date(String(data.endDate));
-      
+
       if (startDate >= endDate) {
         result.valid = false;
         result.fieldErrors.endDate = result.fieldErrors.endDate || [];
@@ -796,11 +785,11 @@ class InputValidationService {
 
     // Threats already set risk level in detectThreats method
     // Additional assessment based on error patterns
-    if (result.errors.some(error => 
-      error.includes('length') || 
-      error.includes('format') || 
-      error.includes('required')
-    )) {
+    if (
+      result.errors.some(
+        error => error.includes('length') || error.includes('format') || error.includes('required')
+      )
+    ) {
       // Basic validation errors are low risk unless threats detected
       if (result.riskLevel === 'low' && result.detectedThreats.length > 0) {
         result.riskLevel = 'medium';
@@ -830,7 +819,7 @@ class InputValidationService {
   }
 
   private getThreatRiskLevel(threat: string): 'low' | 'medium' | 'high' | 'critical' {
-    const riskMap = {
+    const riskMap: Record<string, 'low' | 'medium' | 'high' | 'critical'> = {
       sqlInjection: 'critical',
       commandInjection: 'critical',
       xss: 'high',

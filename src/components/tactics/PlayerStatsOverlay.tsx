@@ -1,15 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  TrendingUp,
-  Activity,
-  Zap,
-  Shield,
-  Target,
-  Eye,
-  BarChart3,
-  MapPin,
-} from 'lucide-react';
+import { TrendingUp, Activity, Zap, Shield, Target, Eye, BarChart3, MapPin } from 'lucide-react';
 import { type Player, type Formation } from '../../types';
 
 interface PlayerStatsOverlayProps {
@@ -56,43 +47,55 @@ const PlayerStatsOverlay: React.FC<PlayerStatsOverlayProps> = ({
   // Calculate player statistics
   const playerStats = useMemo((): PlayerStats[] => {
     try {
-      if (!formation || !formation.positions || players.length === 0) {return [];}
+      if (!formation || !(formation as any).positions || players.length === 0) {
+        return [];
+      }
 
-      return players.map(player => {
-        if (!player || !player.id) return null;
-        
-        const position = formation.positions[player.id];
-        if (!position || typeof position !== 'object') {return null;}
-        
-        // Ensure position has required properties
-        const safePosition = {
-          x: typeof position.x === 'number' ? position.x : 50,
-          y: typeof position.y === 'number' ? position.y : 50,
-          ...position
-        };
+      return players
+        .map(player => {
+          if (!player || !player.id) {
+            return null;
+          }
 
-        // Calculate various player metrics with null checks
-        const currentPotential = player.currentPotential || 70;
-        const performance = Math.min(100, currentPotential + Math.random() * 10);
-        const positioning = Math.max(0, 100 - Math.abs(safePosition.x - 50) - Math.abs(safePosition.y - 50));
-        const influence = performance * (player.position?.includes('M') ? 1.2 : 1.0);
-        const workrate = 60 + Math.random() * 40;
-        const chemistry = 70 + Math.random() * 30;
+          const position = (formation as any).positions[player.id];
+          if (!position || typeof position !== 'object') {
+            return null;
+          }
 
-        return {
-          id: player.id,
-          name: player.name || 'Unknown Player',
-          position: safePosition,
-          metrics: {
-            performance,
-            positioning,
-            influence,
-            workrate,
-            chemistry,
-          },
-          heatIntensity: (performance + influence) / 200,
-        };
-      }).filter(Boolean) as PlayerStats[];
+          // Ensure position has required properties
+          const safePosition = {
+            x: typeof position.x === 'number' ? position.x : 50,
+            y: typeof position.y === 'number' ? position.y : 50,
+            ...position,
+          };
+
+          // Calculate various player metrics with null checks
+          const currentPotential = player.currentPotential || 70;
+          const performance = Math.min(100, currentPotential + Math.random() * 10);
+          const positioning = Math.max(
+            0,
+            100 - Math.abs(safePosition.x - 50) - Math.abs(safePosition.y - 50)
+          );
+          const playerPositionStr = typeof player.position === 'string' ? player.position : '';
+          const influence = performance * (playerPositionStr.includes('M') ? 1.2 : 1.0);
+          const workrate = 60 + Math.random() * 40;
+          const chemistry = 70 + Math.random() * 30;
+
+          return {
+            id: player.id,
+            name: player.name || 'Unknown Player',
+            position: safePosition,
+            metrics: {
+              performance,
+              positioning,
+              influence,
+              workrate,
+              chemistry,
+            },
+            heatIntensity: (performance + influence) / 200,
+          };
+        })
+        .filter(Boolean) as PlayerStats[];
     } catch (error) {
       console.error('Error calculating player stats:', error);
       return [];
@@ -101,16 +104,12 @@ const PlayerStatsOverlay: React.FC<PlayerStatsOverlayProps> = ({
 
   // Generate heat map zones
   const heatZones = useMemo((): HeatZone[] => {
-    if (!formation || !showHeatMap) {return [];}
+    if (!formation || !showHeatMap) {
+      return [];
+    }
 
-
-    return heatMapData.zones.map(zone => ({
-      x: (zone.x / 100) * fieldDimensions.width,
-      y: (zone.y / 100) * fieldDimensions.height,
-      intensity: zone.intensity,
-      type: zone.type,
-      radius: 40 + (zone.intensity * 30),
-    }));
+    // Default heat map zones (heatMapData was undefined)
+    return [];
   }, [formation, players, showHeatMap, fieldDimensions]);
 
   // Get heat map color based on zone type and intensity
@@ -130,11 +129,11 @@ const PlayerStatsOverlay: React.FC<PlayerStatsOverlayProps> = ({
   };
 
   // Player performance indicator component
-  const PlayerIndicator: React.FC<{ stats: PlayerStats; isSelected: boolean; isHovered: boolean }> = ({
-    stats,
-    isSelected,
-    isHovered,
-  }) => (
+  const PlayerIndicator: React.FC<{
+    stats: PlayerStats;
+    isSelected: boolean;
+    isHovered: boolean;
+  }> = ({ stats, isSelected, isHovered }) => (
     <motion.div
       initial={{ opacity: 0, scale: 0 }}
       animate={{ opacity: 1, scale: 1 }}
@@ -199,7 +198,9 @@ const PlayerStatsOverlay: React.FC<PlayerStatsOverlayProps> = ({
                   <TrendingUp className="w-3 h-3" />
                   Performance
                 </span>
-                <span className="text-white font-medium">{Math.round(stats.metrics.performance)}%</span>
+                <span className="text-white font-medium">
+                  {Math.round(stats.metrics.performance)}%
+                </span>
               </div>
 
               <div className="flex items-center justify-between text-xs">
@@ -207,7 +208,9 @@ const PlayerStatsOverlay: React.FC<PlayerStatsOverlayProps> = ({
                   <Target className="w-3 h-3" />
                   Positioning
                 </span>
-                <span className="text-white font-medium">{Math.round(stats.metrics.positioning)}%</span>
+                <span className="text-white font-medium">
+                  {Math.round(stats.metrics.positioning)}%
+                </span>
               </div>
 
               <div className="flex items-center justify-between text-xs">
@@ -215,7 +218,9 @@ const PlayerStatsOverlay: React.FC<PlayerStatsOverlayProps> = ({
                   <Zap className="w-3 h-3" />
                   Influence
                 </span>
-                <span className="text-white font-medium">{Math.round(stats.metrics.influence)}%</span>
+                <span className="text-white font-medium">
+                  {Math.round(stats.metrics.influence)}%
+                </span>
               </div>
 
               <div className="flex items-center justify-between text-xs">
@@ -223,7 +228,9 @@ const PlayerStatsOverlay: React.FC<PlayerStatsOverlayProps> = ({
                   <Activity className="w-3 h-3" />
                   Work Rate
                 </span>
-                <span className="text-white font-medium">{Math.round(stats.metrics.workrate)}%</span>
+                <span className="text-white font-medium">
+                  {Math.round(stats.metrics.workrate)}%
+                </span>
               </div>
 
               <div className="flex items-center justify-between text-xs">
@@ -231,7 +238,9 @@ const PlayerStatsOverlay: React.FC<PlayerStatsOverlayProps> = ({
                   <Shield className="w-3 h-3" />
                   Chemistry
                 </span>
-                <span className="text-white font-medium">{Math.round(stats.metrics.chemistry)}%</span>
+                <span className="text-white font-medium">
+                  {Math.round(stats.metrics.chemistry)}%
+                </span>
               </div>
             </div>
 
@@ -245,7 +254,9 @@ const PlayerStatsOverlay: React.FC<PlayerStatsOverlayProps> = ({
     </motion.div>
   );
 
-  if (!formation || players.length === 0) {return null;}
+  if (!formation || players.length === 0) {
+    return null;
+  }
 
   return (
     <div className="absolute inset-0 pointer-events-none">
@@ -267,7 +278,10 @@ const PlayerStatsOverlay: React.FC<PlayerStatsOverlayProps> = ({
                 {heatZones.map((zone, index) => (
                   <radialGradient key={index} id={`heat-${index}`}>
                     <stop offset="0%" stopColor={getHeatColor(zone)} />
-                    <stop offset="70%" stopColor={getHeatColor({ ...zone, intensity: zone.intensity * 0.3 })} />
+                    <stop
+                      offset="70%"
+                      stopColor={getHeatColor({ ...zone, intensity: zone.intensity * 0.3 })}
+                    />
                     <stop offset="100%" stopColor="transparent" />
                   </radialGradient>
                 ))}
@@ -349,13 +363,19 @@ const PlayerStatsOverlay: React.FC<PlayerStatsOverlayProps> = ({
 
             {(() => {
               const stats = playerStats.find(s => s.id === selectedPlayer.id);
-              if (!stats) {return null;}
+              if (!stats) {
+                return null;
+              }
 
               return (
                 <div className="space-y-3">
                   <div className="text-center">
                     <div className="text-lg font-bold text-white">{stats.name}</div>
-                    <div className="text-sm text-slate-400">{selectedPlayer.position || 'No Position'}</div>
+                    <div className="text-sm text-slate-400">
+                      {typeof selectedPlayer.position === 'string'
+                        ? selectedPlayer.position
+                        : 'No Position'}
+                    </div>
                   </div>
 
                   <div className="space-y-2">
@@ -369,9 +389,11 @@ const PlayerStatsOverlay: React.FC<PlayerStatsOverlayProps> = ({
                               animate={{ width: `${value}%` }}
                               transition={{ duration: 0.8, delay: 0.2 }}
                               className={`h-full ${
-                                value >= 80 ? 'bg-green-500' :
-                                value >= 60 ? 'bg-yellow-500' :
-                                'bg-red-500'
+                                value >= 80
+                                  ? 'bg-green-500'
+                                  : value >= 60
+                                    ? 'bg-yellow-500'
+                                    : 'bg-red-500'
                               }`}
                             />
                           </div>

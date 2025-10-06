@@ -1,9 +1,93 @@
+import * as React from 'react';
+
+/* global HTMLImageElement, IntersectionObserver, Image */
+
 /**
  * Performance Optimization Utilities for Astral Turf
- * 
+ *
  * Comprehensive performance monitoring, optimization, and debugging tools
  * for achieving perfect 60fps and sub-100ms interaction responses.
  */
+
+interface PerformanceMemory {
+  usedJSHeapSize: number;
+  totalJSHeapSize: number;
+  jsHeapSizeLimit: number;
+}
+
+type AnyFunction = (...args: unknown[]) => unknown;
+
+type ObserverEntry = globalThis.PerformanceEntry;
+
+interface EventTimingEntry extends ObserverEntry {
+  processingStart?: number;
+}
+
+interface LayoutShiftEntry extends ObserverEntry {
+  value?: number;
+  hadRecentInput?: boolean;
+}
+
+interface NavigationTimingEntry extends ObserverEntry {
+  firstContentfulPaint?: number;
+}
+
+type DebouncedFunction<T extends AnyFunction> = ((
+  this: ThisParameterType<T>,
+  ...args: Parameters<T>
+) => ReturnType<T> | undefined) & {
+  cancel: () => void;
+  flush: () => ReturnType<T> | undefined;
+  pending: () => boolean;
+};
+
+type ThrottledFunction<T extends AnyFunction> = ((
+  this: ThisParameterType<T>,
+  ...args: Parameters<T>
+) => ReturnType<T> | undefined) & {
+  cancel: () => void;
+  pending: () => boolean;
+};
+
+type MemoizedFunction<T extends AnyFunction> = ((...args: Parameters<T>) => ReturnType<T>) & {
+  cache: Map<string, ReturnType<T>>;
+  clear: () => void;
+};
+
+type WindowLike = typeof globalThis & {
+  requestAnimationFrame?: (callback: FrameCallback) => number;
+  cancelAnimationFrame?: (handle: number) => void;
+};
+
+type PerformanceGlobal = globalThis.Performance & { memory?: PerformanceMemory };
+
+const getWindow = (): WindowLike | undefined =>
+  typeof window === 'undefined' ? undefined : (window as WindowLike);
+
+const getPerformanceGlobal = (): PerformanceGlobal | undefined =>
+  (globalThis as { performance?: PerformanceGlobal }).performance;
+
+const now = (): number => {
+  const perf = getPerformanceGlobal();
+  return perf && typeof perf.now === 'function' ? perf.now() : Date.now();
+};
+
+type FrameCallback = (ms: number) => void;
+
+const scheduleFrame = (callback: FrameCallback): number | null => {
+  const win = getWindow();
+  if (!win || typeof win.requestAnimationFrame !== 'function') {
+    return null;
+  }
+  return win.requestAnimationFrame(callback);
+};
+
+const cancelFrame = (id: number | null): void => {
+  const win = getWindow();
+  if (id !== null && win && typeof win.cancelAnimationFrame === 'function') {
+    win.cancelAnimationFrame(id);
+  }
+};
 
 // Performance metrics collection
 export interface PerformanceMetrics {
@@ -12,7 +96,7 @@ export interface PerformanceMetrics {
   largestContentfulPaint?: number;
   firstInputDelay?: number;
   cumulativeLayoutShift?: number;
-  
+
   // Custom metrics
   timeToInteractive?: number;
   totalBlockingTime?: number;
@@ -22,12 +106,12 @@ export interface PerformanceMetrics {
     totalJSHeapSize: number;
     jsHeapSizeLimit: number;
   };
-  
+
   // User interaction metrics
   inputLatency?: number[];
   scrollLatency?: number[];
   renderTime?: number[];
-  
+
   // Resource metrics
   resourceCount?: number;
   resourceSize?: number;
@@ -35,14 +119,42 @@ export interface PerformanceMetrics {
   cacheHitRatio?: number;
 }
 
+interface PerformanceThresholds {
+  fcp: number;
+  lcp: number;
+  fid: number;
+  cls: number;
+  fps: number;
+  ttfb: number;
+}
+
 // Performance monitoring class
 class PerformanceMonitor {
   private static instance: PerformanceMonitor;
+
   private metrics: PerformanceMetrics = {};
   private observers: Set<(metrics: PerformanceMetrics) => void> = new Set();
   private frameId: number | null = null;
   private lastFrameTime = 0;
   private frameDurations: number[] = [];
+  private performanceObservers: Array<{ disconnect: () => void }> = [];
+  private memoryIntervalId: ReturnType<typeof setInterval> | null = null;
+  private thresholds: PerformanceThresholds = {
+    fcp: 2000,
+    lcp: 2500,
+    fid: 100,
+    cls: 0.1,
+    fps: 60,
+    ttfb: 600,
+  };
+  private optimizationsEnabled = true;
+
+  // Exposed for performance test harnesses
+  public startTime = 0;
+  public startMemory = 0;
+  public calculations = 0;
+  public cacheHits = 0;
+  public cacheMisses = 0;
 
   static getInstance(): PerformanceMonitor {
     if (!PerformanceMonitor.instance) {
@@ -51,442 +163,708 @@ class PerformanceMonitor {
     return PerformanceMonitor.instance;
   }
 
+  static startMonitoring(): void {
+    const monitor = PerformanceMonitor.getInstance();
+    monitor.optimizationsEnabled = true;
+    monitor.ensureMonitoring();
+  }
+
+  static setThresholds(thresholds: Partial<PerformanceThresholds>): void {
+    const monitor = PerformanceMonitor.getInstance();
+    monitor.thresholds = {
+      ...monitor.thresholds,
+      ...thresholds,
+    };
+  }
+
+  static getThresholds(): PerformanceThresholds {
+    const monitor = PerformanceMonitor.getInstance();
+    return { ...monitor.thresholds };
+  }
+
+  static getMetrics(): PerformanceMetrics {
+    return PerformanceMonitor.getInstance().getMetrics();
+  }
+
+  static cleanup(): void {
+    PerformanceMonitor.getInstance().cleanup();
+  }
+
+  static enableOptimizations(): void {
+    PerformanceMonitor.startMonitoring();
+  }
+
+  static disableOptimizations(): void {
+    const monitor = PerformanceMonitor.getInstance();
+    monitor.optimizationsEnabled = false;
+    monitor.cleanup();
+  }
+
+  static isOptimizationEnabled(): boolean {
+    return PerformanceMonitor.getInstance().optimizationsEnabled;
+  }
+
   private constructor() {
+    this.ensureMonitoring();
+  }
+
+  private ensureMonitoring(): void {
+    if (!this.optimizationsEnabled || typeof window === 'undefined') {
+      return;
+    }
+
     this.setupPerformanceObservers();
     this.startFrameMonitoring();
     this.setupMemoryMonitoring();
   }
 
-  private setupPerformanceObservers(): void {
-    if ('PerformanceObserver' in window) {
-      // Largest Contentful Paint
-      try {
-        const lcpObserver = new PerformanceObserver((list) => {
-          const entries = list.getEntries();
-          const lastEntry = entries[entries.length - 1];
-          this.updateMetric('largestContentfulPaint', lastEntry.startTime);
-        });
-        lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
-      } catch (_e) {
-        // // console.warn('LCP observer not supported');
-      }
-
-      // First Input Delay
-      try {
-        const fidObserver = new PerformanceObserver((list) => {
-          const entries = list.getEntries();
-          entries.forEach((entry: unknown) => {
-            this.updateMetric('firstInputDelay', entry.processingStart - entry.startTime);
-          });
-        });
-        fidObserver.observe({ entryTypes: ['first-input'] });
-      } catch (_e) {
-        // // console.warn('FID observer not supported');
-      }
-
-      // Cumulative Layout Shift
-      try {
-        const clsObserver = new PerformanceObserver((list) => {
-          let clsValue = 0;
-          list.getEntries().forEach((entry: unknown) => {
-            if (!entry.hadRecentInput) {
-              clsValue += entry.value;
-            }
-          });
-          this.updateMetric('cumulativeLayoutShift', clsValue);
-        });
-        clsObserver.observe({ entryTypes: ['layout-shift'] });
-      } catch (_e) {
-        // // console.warn('CLS observer not supported');
-      }
-
-      // Long Tasks (for TTI calculation)
-      try {
-        const longTaskObserver = new PerformanceObserver((list) => {
-          let totalBlockingTime = this.metrics.totalBlockingTime || 0;
-          list.getEntries().forEach((entry) => {
-            if (entry.duration > 50) {
-              totalBlockingTime += entry.duration - 50;
-            }
-          });
-          this.updateMetric('totalBlockingTime', totalBlockingTime);
-        });
-        longTaskObserver.observe({ entryTypes: ['longtask'] });
-      } catch (_e) {
-        // // console.warn('Long task observer not supported');
-      }
-
-      // Navigation timing
-      try {
-        const navigationObserver = new PerformanceObserver((list) => {
-          list.getEntries().forEach((entry: unknown) => {
-            this.updateMetric('firstContentfulPaint', entry.firstContentfulPaint);
-          });
-        });
-        navigationObserver.observe({ entryTypes: ['navigation'] });
-      } catch (_e) {
-        // // console.warn('Navigation observer not supported');
-      }
-    }
-  }
-
-  private startFrameMonitoring(): void {
-    const measureFrame = (timestamp: number) => {
-      if (this.lastFrameTime > 0) {
-        const frameDuration = timestamp - this.lastFrameTime;
-        this.frameDurations.push(frameDuration);
-        
-        // Keep only last 100 frames
-        if (this.frameDurations.length > 100) {
-          this.frameDurations.shift();
-        }
-        
-        this.updateMetric('frameDuration', [...this.frameDurations]);
-      }
-      
-      this.lastFrameTime = timestamp;
-      this.frameId = requestAnimationFrame(measureFrame);
+  subscribe(listener: (metrics: PerformanceMetrics) => void): () => void {
+    this.observers.add(listener);
+    listener(this.getMetrics());
+    return () => {
+      this.observers.delete(listener);
     };
-
-    this.frameId = requestAnimationFrame(measureFrame);
   }
 
-  private setupMemoryMonitoring(): void {
-    if ('memory' in performance) {
-      setInterval(() => {
-        const memory = (performance as any).memory;
-        this.updateMetric('memoryUsage', {
-          usedJSHeapSize: memory.usedJSHeapSize,
-          totalJSHeapSize: memory.totalJSHeapSize,
-          jsHeapSizeLimit: memory.jsHeapSizeLimit,
-        });
-      }, 5000); // Every 5 seconds
-    }
-  }
-
-  private updateMetric(key: keyof PerformanceMetrics, value: unknown): void {
-    this.metrics[key] = value;
-    this.notifyObservers();
-  }
-
-  private notifyObservers(): void {
-    this.observers.forEach(observer => observer(this.metrics));
-  }
-
-  // Public API
   getMetrics(): PerformanceMetrics {
-    return { ...this.metrics };
-  }
-
-  subscribe(observer: (metrics: PerformanceMetrics) => void): () => void {
-    this.observers.add(observer);
-    return () => this.observers.delete(observer);
-  }
-
-  measureInteraction(name: string, fn: () => void): void {
-    const start = performance.now();
-    fn();
-    requestAnimationFrame(() => {
-      const duration = performance.now() - start;
-      const currentLatency = this.metrics.inputLatency || [];
-      currentLatency.push(duration);
-      
-      // Keep only last 50 measurements
-      if (currentLatency.length > 50) {
-        currentLatency.shift();
-      }
-      
-      this.updateMetric('inputLatency', currentLatency);
-      
-      // Log slow interactions
-      if (duration > 100) {
-        // // console.warn(`Slow interaction "${name}": ${duration.toFixed(2)}ms`);
-      }
-    });
-  }
-
-  measureRender(name: string, fn: () => Promise<void> | void): Promise<void> {
-    const start = performance.now();
-    
-    const finish = () => {
-      const duration = performance.now() - start;
-      const currentRenderTime = this.metrics.renderTime || [];
-      currentRenderTime.push(duration);
-      
-      if (currentRenderTime.length > 50) {
-        currentRenderTime.shift();
-      }
-      
-      this.updateMetric('renderTime', currentRenderTime);
-      
-      if (duration > 16.67) { // More than one frame at 60fps
-        // // console.warn(`Slow render "${name}": ${duration.toFixed(2)}ms`);
-      }
-    };
-
-    const result = fn();
-    
-    if (result instanceof Promise) {
-      return result.finally(finish);
-    } else {
-      finish();
-      return Promise.resolve();
-    }
-  }
-
-  getFPS(): number {
-    if (this.frameDurations.length === 0) return 0;
-    
-    const avgFrameDuration = this.frameDurations.reduce((sum, duration) => sum + duration, 0) / this.frameDurations.length;
-    return Math.round(1000 / avgFrameDuration);
+    return this.createMetricsSnapshot();
   }
 
   getPerformanceScore(): number {
     const metrics = this.metrics;
+    const { lcp, fid, cls, fps: targetFps } = this.thresholds;
     let score = 100;
 
-    // LCP penalty (target: <2.5s)
     if (metrics.largestContentfulPaint) {
-      if (metrics.largestContentfulPaint > 4000) score -= 30;
-      else if (metrics.largestContentfulPaint > 2500) score -= 15;
+      if (metrics.largestContentfulPaint > lcp * 1.6) {
+        score -= 30;
+      } else if (metrics.largestContentfulPaint > lcp) {
+        score -= 15;
+      }
     }
 
-    // FID penalty (target: <100ms)
     if (metrics.firstInputDelay) {
-      if (metrics.firstInputDelay > 300) score -= 25;
-      else if (metrics.firstInputDelay > 100) score -= 10;
+      if (metrics.firstInputDelay > fid * 3) {
+        score -= 25;
+      } else if (metrics.firstInputDelay > fid) {
+        score -= 10;
+      }
     }
 
-    // CLS penalty (target: <0.1)
     if (metrics.cumulativeLayoutShift) {
-      if (metrics.cumulativeLayoutShift > 0.25) score -= 20;
-      else if (metrics.cumulativeLayoutShift > 0.1) score -= 10;
+      if (metrics.cumulativeLayoutShift > cls * 2.5) {
+        score -= 20;
+      } else if (metrics.cumulativeLayoutShift > cls) {
+        score -= 10;
+      }
     }
 
-    // FPS penalty (target: 60fps)
     const fps = this.getFPS();
-    if (fps < 30) score -= 25;
-    else if (fps < 50) score -= 15;
-    else if (fps < 60) score -= 5;
+    if (fps < targetFps * 0.5) {
+      score -= 25;
+    } else if (fps < targetFps * 0.84) {
+      score -= 15;
+    } else if (fps < targetFps) {
+      score -= 5;
+    }
 
     return Math.max(0, score);
   }
 
-  cleanup(): void {
-    if (this.frameId !== null) {
-      cancelAnimationFrame(this.frameId);
+  measureInteraction<T>(name: string, fn: () => T): T {
+    if (!this.optimizationsEnabled) {
+      return fn();
     }
+
+    const start = now();
+    const result = fn();
+
+    const frameId = scheduleFrame(() => {
+      const duration = now() - start;
+      this.pushMetricSample('inputLatency', duration, 50);
+    });
+
+    if (frameId === null) {
+      const duration = now() - start;
+      this.pushMetricSample('inputLatency', duration, 50);
+    }
+
+    return result;
+  }
+
+  measureRender(name: string, fn: () => Promise<void> | void): Promise<void> {
+    if (!this.optimizationsEnabled) {
+      const result = fn();
+      return result instanceof Promise ? result : Promise.resolve();
+    }
+
+    const start = now();
+    const finish = () => {
+      const duration = now() - start;
+      this.pushMetricSample('renderTime', duration, 50);
+    };
+
+    const result = fn();
+
+    if (result instanceof Promise) {
+      return result.finally(finish);
+    }
+
+    finish();
+    return Promise.resolve();
+  }
+
+  getFPS(): number {
+    if (this.frameDurations.length === 0) {
+      return 0;
+    }
+
+    const avgFrameDuration =
+      this.frameDurations.reduce((sum, duration) => sum + duration, 0) / this.frameDurations.length;
+    return Math.round(1000 / avgFrameDuration);
+  }
+
+  cleanup(): void {
+    cancelFrame(this.frameId);
+    this.frameId = null;
+    this.lastFrameTime = 0;
+    this.frameDurations = [];
+
+    if (this.memoryIntervalId !== null) {
+      clearInterval(this.memoryIntervalId);
+      this.memoryIntervalId = null;
+    }
+
+    this.performanceObservers.forEach(observer => observer.disconnect());
+    this.performanceObservers = [];
+  }
+
+  private createMetricsSnapshot(): PerformanceMetrics {
+    const snapshot: PerformanceMetrics = { ...this.metrics };
+
+    if (snapshot.frameDuration) {
+      snapshot.frameDuration = [...snapshot.frameDuration];
+    }
+    if (snapshot.inputLatency) {
+      snapshot.inputLatency = [...snapshot.inputLatency];
+    }
+    if (snapshot.renderTime) {
+      snapshot.renderTime = [...snapshot.renderTime];
+    }
+    if (snapshot.scrollLatency) {
+      snapshot.scrollLatency = [...snapshot.scrollLatency];
+    }
+    if (snapshot.memoryUsage) {
+      snapshot.memoryUsage = { ...snapshot.memoryUsage };
+    }
+
+    return snapshot;
+  }
+
+  private notifyObservers(): void {
+    if (this.observers.size === 0) {
+      return;
+    }
+
+    const snapshot = this.createMetricsSnapshot();
+    this.observers.forEach(observer => observer(snapshot));
+  }
+
+  private updateMetric<K extends keyof PerformanceMetrics>(
+    key: K,
+    value: PerformanceMetrics[K]
+  ): void {
+    if (!this.optimizationsEnabled) {
+      return;
+    }
+
+    this.metrics = {
+      ...this.metrics,
+      [key]: value,
+    };
+    this.notifyObservers();
+  }
+
+  private pushMetricSample(
+    key: 'inputLatency' | 'renderTime' | 'scrollLatency',
+    value: number,
+    maxSamples: number
+  ): void {
+    if (!this.optimizationsEnabled) {
+      return;
+    }
+
+    const existing = Array.isArray(this.metrics[key]) ? [...(this.metrics[key] as number[])] : [];
+    existing.push(value);
+    if (existing.length > maxSamples) {
+      existing.shift();
+    }
+    this.updateMetric(key, existing as PerformanceMetrics[typeof key]);
+  }
+
+  private setupPerformanceObservers(): void {
+    if (this.performanceObservers.length > 0) {
+      return;
+    }
+
+    if (typeof window === 'undefined' || typeof window.PerformanceObserver !== 'function') {
+      return;
+    }
+
+    const Observer = window.PerformanceObserver;
+
+    const observe = (entryTypes: string[], handler: (entries: ObserverEntry[]) => void) => {
+      try {
+        const observer = new Observer(list => handler(list.getEntries()));
+        observer.observe({ entryTypes });
+        this.performanceObservers.push(observer);
+      } catch {
+        // Silently ignore unsupported observer types
+      }
+    };
+
+    observe(['largest-contentful-paint'], entries => {
+      const lastEntry = entries[entries.length - 1];
+      if (lastEntry) {
+        this.updateMetric('largestContentfulPaint', lastEntry.startTime);
+      }
+    });
+
+    observe(['first-input'], entries => {
+      entries.forEach(entry => {
+        const event = entry as EventTimingEntry;
+        if (typeof event.processingStart === 'number') {
+          this.updateMetric('firstInputDelay', event.processingStart - entry.startTime);
+        }
+      });
+    });
+
+    observe(['layout-shift'], entries => {
+      let clsValue = 0;
+      entries.forEach(entry => {
+        const shift = entry as LayoutShiftEntry;
+        if (!shift.hadRecentInput && typeof shift.value === 'number') {
+          clsValue += shift.value;
+        }
+      });
+
+      if (clsValue > 0) {
+        this.updateMetric('cumulativeLayoutShift', parseFloat(clsValue.toFixed(3)));
+      }
+    });
+
+    observe(['longtask'], entries => {
+      const totalBlockingTime = entries.reduce((sum, entry) => {
+        const blocking = entry.duration - 50;
+        return blocking > 0 ? sum + blocking : sum;
+      }, 0);
+
+      if (totalBlockingTime > 0) {
+        const current = this.metrics.totalBlockingTime ?? 0;
+        this.updateMetric('totalBlockingTime', current + totalBlockingTime);
+      }
+    });
+
+    observe(['paint'], entries => {
+      entries.forEach(entry => {
+        if (entry.name === 'first-contentful-paint') {
+          this.updateMetric('firstContentfulPaint', entry.startTime);
+        }
+      });
+    });
+
+    observe(['navigation'], entries => {
+      const navEntry = entries[entries.length - 1] as
+        | (NavigationTimingEntry & { domInteractive?: number })
+        | undefined;
+      if (!navEntry) {
+        return;
+      }
+
+      if (typeof navEntry.firstContentfulPaint === 'number') {
+        this.updateMetric('firstContentfulPaint', navEntry.firstContentfulPaint);
+      }
+
+      const interactive = navEntry.domInteractive;
+      if (typeof interactive === 'number') {
+        this.updateMetric('timeToInteractive', interactive);
+      }
+    });
+
+    observe(['resource'], entries => {
+      const resourceEntries = entries as Array<ObserverEntry & { transferSize?: number }>;
+      const count = resourceEntries.length;
+      if (count > 0) {
+        this.updateMetric('resourceCount', count);
+        const totalSize = resourceEntries.reduce(
+          (sum, entry) => sum + (entry.transferSize ?? 0),
+          0
+        );
+        this.updateMetric('resourceSize', totalSize);
+      }
+    });
+  }
+
+  private startFrameMonitoring(): void {
+    if (this.frameId !== null || typeof window === 'undefined') {
+      return;
+    }
+
+    const trackFrame = (timestamp: number) => {
+      if (!this.optimizationsEnabled) {
+        this.lastFrameTime = timestamp;
+        this.frameId = scheduleFrame(trackFrame);
+        return;
+      }
+
+      if (this.lastFrameTime !== 0) {
+        const duration = timestamp - this.lastFrameTime;
+        this.frameDurations.push(duration);
+        if (this.frameDurations.length > 180) {
+          this.frameDurations.shift();
+        }
+        this.updateMetric('frameDuration', [...this.frameDurations]);
+      }
+
+      this.lastFrameTime = timestamp;
+      this.frameId = scheduleFrame(trackFrame);
+    };
+
+    this.frameId = scheduleFrame(trackFrame);
+  }
+
+  private setupMemoryMonitoring(): void {
+    if (this.memoryIntervalId !== null) {
+      return;
+    }
+
+    const perf = getPerformanceGlobal();
+    if (!perf || !perf.memory) {
+      return;
+    }
+
+    this.memoryIntervalId = setInterval(() => {
+      if (!this.optimizationsEnabled) {
+        return;
+      }
+
+      const memory = perf.memory!;
+      this.updateMetric('memoryUsage', {
+        usedJSHeapSize: memory.usedJSHeapSize,
+        totalJSHeapSize: memory.totalJSHeapSize,
+        jsHeapSizeLimit: memory.jsHeapSizeLimit,
+      });
+    }, 10000);
   }
 }
 
 export const performanceMonitor = PerformanceMonitor.getInstance();
+export { PerformanceMonitor };
+export type { PerformanceThresholds };
+
+interface DebounceOptions {
+  leading?: boolean;
+  trailing?: boolean;
+  maxWait?: number;
+}
+
+interface ThrottleOptions {
+  leading?: boolean;
+  trailing?: boolean;
+}
+
+interface PendingCall<Fn extends (...args: unknown[]) => unknown> {
+  context: ThisParameterType<Fn>;
+  args: Parameters<Fn>;
+}
+
+function getFunctionLabel(fn: (...args: unknown[]) => unknown): string {
+  return fn.name || 'anonymous';
+}
 
 // Debounce utility with performance tracking
-export function debounce<T extends (...args: unknown[]) => any>(
-  fn: T,
-  delay: number,
-  options: { leading?: boolean; trailing?: boolean; maxWait?: number } = {}
-): T {
+export function debounce<Fn extends (...args: unknown[]) => unknown>(
+  fn: Fn,
+  delay = 0,
+  options: DebounceOptions = {}
+): DebouncedFunction<Fn> {
   let timeoutId: ReturnType<typeof setTimeout> | null = null;
   let maxTimeoutId: ReturnType<typeof setTimeout> | null = null;
-  let lastCallTime = 0;
+  let lastCallTime: number | null = null;
   let lastInvokeTime = 0;
-  
+  let pendingCall: PendingCall<Fn> | null = null;
+  let result: ReturnType<Fn> | undefined;
+
   const { leading = false, trailing = true, maxWait } = options;
+  const label = `debounced-${getFunctionLabel(fn)}`;
 
-  function invokeFunc(time: number) {
-    const args = lastArgs;
-    const thisArg = lastThis;
-    
-    lastArgs = undefined;
-    lastThis = undefined;
+  const startTimer = (wait: number): void => {
+    timeoutId = setTimeout(timerExpired, wait);
+  };
+
+  const clearTimers = (): void => {
+    if (timeoutId !== null) {
+      clearTimeout(timeoutId);
+      timeoutId = null;
+    }
+    if (maxTimeoutId !== null) {
+      clearTimeout(maxTimeoutId);
+      maxTimeoutId = null;
+    }
+  };
+
+  const invoke = (time: number): ReturnType<Fn> | undefined => {
+    if (!pendingCall) {
+      return result;
+    }
+
+    const call = pendingCall;
+    pendingCall = null;
     lastInvokeTime = time;
-    
-    return performanceMonitor.measureInteraction(`debounced-${fn.name}`, () => {
-      return fn.apply(thisArg, args);
-    });
-  }
 
-  function leadingEdge(time: number) {
+    result = performanceMonitor.measureInteraction(
+      label,
+      () => fn.apply(call.context, call.args) as ReturnType<Fn>
+    );
+
+    return result;
+  };
+
+  const leadingEdge = (time: number): ReturnType<Fn> | undefined => {
     lastInvokeTime = time;
-    timeoutId = setTimeout(timerExpired, delay);
-    return leading ? invokeFunc(time) : result;
-  }
+    startTimer(delay);
+    return leading ? invoke(time) : result;
+  };
 
-  function remainingWait(time: number) {
+  const remainingWait = (time: number): number => {
+    if (lastCallTime === null) {
+      return delay;
+    }
+
     const timeSinceLastCall = time - lastCallTime;
     const timeSinceLastInvoke = time - lastInvokeTime;
     const timeWaiting = delay - timeSinceLastCall;
 
-    return maxWait !== undefined
-      ? Math.min(timeWaiting, maxWait - timeSinceLastInvoke)
-      : timeWaiting;
-  }
+    if (maxWait === undefined) {
+      return timeWaiting;
+    }
 
-  function shouldInvoke(time: number) {
+    return Math.min(timeWaiting, maxWait - timeSinceLastInvoke);
+  };
+
+  const shouldInvoke = (time: number): boolean => {
+    if (lastCallTime === null) {
+      return true;
+    }
+
     const timeSinceLastCall = time - lastCallTime;
     const timeSinceLastInvoke = time - lastInvokeTime;
 
     return (
-      lastCallTime === 0 ||
       timeSinceLastCall >= delay ||
       timeSinceLastCall < 0 ||
       (maxWait !== undefined && timeSinceLastInvoke >= maxWait)
     );
-  }
+  };
 
-  function timerExpired() {
-    const time = Date.now();
-    if (shouldInvoke(time)) {
-      return trailingEdge(time);
+  const timerExpired = (): void => {
+    const currentTime = now();
+    if (shouldInvoke(currentTime)) {
+      trailingEdge(currentTime);
+      return;
     }
-    timeoutId = setTimeout(timerExpired, remainingWait(time));
-  }
 
-  function trailingEdge(time: number) {
+    startTimer(remainingWait(currentTime));
+  };
+
+  const trailingEdge = (time: number): ReturnType<Fn> | undefined => {
     timeoutId = null;
 
-    if (trailing && lastArgs) {
-      return invokeFunc(time);
+    if (trailing && pendingCall) {
+      return invoke(time);
     }
-    lastArgs = undefined;
-    lastThis = undefined;
+
+    pendingCall = null;
     return result;
-  }
+  };
 
-  function cancel() {
-    if (timeoutId !== null) {
-      clearTimeout(timeoutId);
-    }
-    if (maxTimeoutId !== null) {
-      clearTimeout(maxTimeoutId);
-    }
+  const cancel = (): void => {
+    clearTimers();
+    lastCallTime = null;
     lastInvokeTime = 0;
-    lastArgs = undefined;
-    lastCallTime = 0;
-    lastThis = undefined;
-    timeoutId = null;
-    maxTimeoutId = null;
-  }
+    pendingCall = null;
+    result = undefined;
+  };
 
-  function flush() {
-    return timeoutId === null ? result : trailingEdge(Date.now());
-  }
+  const flush = (): ReturnType<Fn> | undefined => {
+    if (timeoutId === null) {
+      return result;
+    }
+    return trailingEdge(now());
+  };
 
-  function pending() {
-    return timeoutId !== null;
-  }
+  const pending = (): boolean => timeoutId !== null;
 
-  let lastArgs: unknown;
-  let lastThis: unknown;
-  let result: unknown;
+  const debounced = function (this: ThisParameterType<Fn>, ...args: Parameters<Fn>) {
+    const currentTime = now();
+    const isInvoking = shouldInvoke(currentTime);
 
-  function debounced(this: unknown, ...args: unknown[]) {
-    const time = Date.now();
-    const isInvoking = shouldInvoke(time);
-
-    lastArgs = args;
-    lastThis = this;
-    lastCallTime = time;
+    pendingCall = { context: this, args };
+    lastCallTime = currentTime;
 
     if (isInvoking) {
       if (timeoutId === null) {
-        return leadingEdge(lastCallTime);
+        return leadingEdge(currentTime);
       }
       if (maxWait !== undefined) {
-        maxTimeoutId = setTimeout(timerExpired, maxWait);
-        return invokeFunc(lastCallTime);
+        if (maxTimeoutId !== null) {
+          clearTimeout(maxTimeoutId);
+        }
+        const remainingMaxWait = Math.max(0, (maxWait ?? 0) - (currentTime - lastInvokeTime));
+        maxTimeoutId = setTimeout(() => {
+          if (pendingCall) {
+            trailingEdge(now());
+          }
+        }, remainingMaxWait);
+        return invoke(currentTime);
       }
     }
+
     if (timeoutId === null) {
-      timeoutId = setTimeout(timerExpired, delay);
+      startTimer(delay);
     }
+
+    if (maxWait !== undefined && maxTimeoutId === null) {
+      maxTimeoutId = setTimeout(() => {
+        if (pendingCall) {
+          trailingEdge(now());
+        }
+      }, maxWait);
+    }
+
     return result;
-  }
+  } as DebouncedFunction<Fn>;
 
   debounced.cancel = cancel;
   debounced.flush = flush;
   debounced.pending = pending;
 
-  return debounced as T;
+  return debounced;
 }
 
 // Throttle utility with performance tracking
-export function throttle<T extends (...args: unknown[]) => any>(
-  fn: T,
+export function throttle<Fn extends (...args: unknown[]) => unknown>(
+  fn: Fn,
   limit: number,
-  options: { leading?: boolean; trailing?: boolean } = {}
-): T {
-  let inThrottle = false;
-  let lastArgs: unknown;
-  let lastThis: unknown;
-  
+  options: ThrottleOptions = {}
+): ThrottledFunction<Fn> {
   const { leading = true, trailing = true } = options;
+  const label = `throttled-${getFunctionLabel(fn)}`;
 
-  function throttled(this: unknown, ...args: unknown[]) {
-    if (!inThrottle) {
-      if (leading) {
-        performanceMonitor.measureInteraction(`throttled-${fn.name}`, () => {
-          fn.apply(this, args);
-        });
-      }
-      inThrottle = true;
-      setTimeout(() => {
-        inThrottle = false;
-        if (trailing && lastArgs) {
-          performanceMonitor.measureInteraction(`throttled-${fn.name}`, () => {
-            fn.apply(lastThis, lastArgs);
-          });
-          lastArgs = null;
-          lastThis = null;
-        }
-      }, limit);
-    } else if (trailing) {
-      lastArgs = args;
-      lastThis = this;
+  let throttling = false;
+  let trailingCall: PendingCall<Fn> | null = null;
+  let timeoutId: ReturnType<typeof setTimeout> | null = null;
+  let result: ReturnType<Fn> | undefined;
+
+  const clearTimer = (): void => {
+    if (timeoutId !== null) {
+      clearTimeout(timeoutId);
+      timeoutId = null;
     }
-  }
+  };
 
-  return throttled as T;
+  const invoke = (call: PendingCall<Fn>): ReturnType<Fn> | undefined => {
+    result = performanceMonitor.measureInteraction(
+      label,
+      () => fn.apply(call.context, call.args) as ReturnType<Fn>
+    );
+    return result;
+  };
+
+  const trailingInvoke = (): void => {
+    throttling = false;
+    clearTimer();
+    if (trailing && trailingCall) {
+      const call = trailingCall;
+      trailingCall = null;
+      invoke(call);
+    } else {
+      trailingCall = null;
+    }
+  };
+
+  const throttled = function (this: ThisParameterType<Fn>, ...args: Parameters<Fn>) {
+    const call: PendingCall<Fn> = { context: this, args };
+
+    if (!throttling) {
+      throttling = true;
+      if (leading) {
+        invoke(call);
+      } else {
+        trailingCall = call;
+      }
+
+      clearTimer();
+      timeoutId = setTimeout(trailingInvoke, limit);
+    } else if (trailing) {
+      trailingCall = call;
+    }
+
+    return result;
+  } as ThrottledFunction<Fn>;
+
+  throttled.cancel = () => {
+    throttling = false;
+    trailingCall = null;
+    clearTimer();
+    result = undefined;
+  };
+
+  throttled.pending = () => throttling;
+
+  return throttled;
 }
 
 // Memoization with performance tracking
-export function memoize<T extends (...args: unknown[]) => any>(
-  fn: T,
-  getKey?: (...args: Parameters<T>) => string
-): T & { cache: Map<string, ReturnType<T>>; clear: () => void } {
-  const cache = new Map<string, ReturnType<T>>();
-  
-  function memoized(...args: Parameters<T>): ReturnType<T> {
+export function memoize<Fn extends (...args: unknown[]) => unknown>(
+  fn: Fn,
+  getKey?: (...args: Parameters<Fn>) => string
+): MemoizedFunction<Fn> {
+  const cache = new Map<string, ReturnType<Fn>>();
+
+  const memoized = (...args: Parameters<Fn>): ReturnType<Fn> => {
     const key = getKey ? getKey(...args) : JSON.stringify(args);
-    
+
     if (cache.has(key)) {
       return cache.get(key)!;
     }
 
-    const start = performance.now();
-    const result = fn(...args);
-    const duration = performance.now() - start;
+    const start = now();
+    const value = fn(...args) as ReturnType<Fn>;
+    const duration = now() - start;
 
     if (duration > 10) {
       // // console.warn(`Slow memoized function "${fn.name}": ${duration.toFixed(2)}ms`);
     }
 
-    cache.set(key, result);
-    
-    // Limit cache size to prevent memory leaks
+    cache.set(key, value);
+
     if (cache.size > 100) {
       const firstKey = cache.keys().next().value;
-      cache.delete(firstKey);
+      if (firstKey !== undefined) {
+        cache.delete(firstKey);
+      }
     }
 
-    return result;
-  }
+    return value;
+  };
 
-  memoized.cache = cache;
-  memoized.clear = () => cache.clear();
+  const memoizedWithMeta = memoized as MemoizedFunction<Fn>;
 
-  return memoized as T & { cache: Map<string, ReturnType<T>>; clear: () => void };
+  memoizedWithMeta.cache = cache;
+  memoizedWithMeta.clear = () => cache.clear();
+
+  return memoizedWithMeta;
 }
 
 // Virtual scrolling utility for large lists
@@ -527,15 +905,17 @@ export class VirtualScrollManager {
 // Resource loading optimization
 export class ResourceOptimizer {
   private static preloadedResources = new Set<string>();
-  private static loadedResources = new Map<string, Promise<unknown>>();
+  private static imagePromises = new Map<string, Promise<HTMLImageElement>>();
+  private static scriptPromises = new Map<string, Promise<void>>();
 
   static preloadImage(src: string): Promise<HTMLImageElement> {
     if (this.preloadedResources.has(src)) {
       return Promise.resolve(new Image());
     }
 
-    if (this.loadedResources.has(src)) {
-      return this.loadedResources.get(src)!;
+    const existing = this.imagePromises.get(src);
+    if (existing) {
+      return existing;
     }
 
     const promise = new Promise<HTMLImageElement>((resolve, reject) => {
@@ -548,7 +928,7 @@ export class ResourceOptimizer {
       img.src = src;
     });
 
-    this.loadedResources.set(src, promise);
+    this.imagePromises.set(src, promise);
     return promise;
   }
 
@@ -557,8 +937,9 @@ export class ResourceOptimizer {
       return Promise.resolve();
     }
 
-    if (this.loadedResources.has(src)) {
-      return this.loadedResources.get(src)!;
+    const existing = this.scriptPromises.get(src);
+    if (existing) {
+      return existing;
     }
 
     const promise = new Promise<void>((resolve, reject) => {
@@ -572,16 +953,16 @@ export class ResourceOptimizer {
       document.head.appendChild(script);
     });
 
-    this.loadedResources.set(src, promise);
+    this.scriptPromises.set(src, promise);
     return promise;
   }
 
   static optimizeImages(): void {
     const images = document.querySelectorAll('img[data-src]');
-    
+
     if ('IntersectionObserver' in window) {
-      const imageObserver = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
+      const imageObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
           if (entry.isIntersecting) {
             const img = entry.target as HTMLImageElement;
             const src = img.dataset.src;
@@ -594,10 +975,10 @@ export class ResourceOptimizer {
         });
       });
 
-      images.forEach((img) => imageObserver.observe(img));
+      images.forEach(img => imageObserver.observe(img));
     } else {
       // Fallback for browsers without IntersectionObserver
-      images.forEach((img) => {
+      images.forEach(img => {
         const htmlImg = img as HTMLImageElement;
         const src = htmlImg.dataset.src;
         if (src) {
@@ -643,7 +1024,6 @@ export function useVirtualScroll(
   items: unknown[],
   containerRef: React.RefObject<HTMLElement>
 ) {
-  const [scrollTop, setScrollTop] = React.useState(0);
   const [containerHeight, setContainerHeight] = React.useState(0);
 
   const virtualScrollManager = React.useMemo(
@@ -653,14 +1033,15 @@ export function useVirtualScroll(
 
   React.useEffect(() => {
     const container = containerRef.current;
-    if (!container) return;
+    if (!container) {
+      return;
+    }
 
     const updateHeight = () => {
       setContainerHeight(container.clientHeight);
     };
 
     const handleScroll = () => {
-      setScrollTop(container.scrollTop);
       virtualScrollManager.updateScroll(container.scrollTop);
     };
 
@@ -672,7 +1053,7 @@ export function useVirtualScroll(
       container.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', updateHeight);
     };
-  }, [virtualScrollManager]);
+  }, [containerRef, virtualScrollManager]);
 
   const visibleRange = virtualScrollManager.getVisibleRange();
   const visibleItems = items.slice(visibleRange.start, visibleRange.end + 1);

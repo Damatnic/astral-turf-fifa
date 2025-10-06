@@ -1,1 +1,1091 @@
-/**\n * Mobile Accessibility Framework\n * Comprehensive accessibility features for mobile devices and screen readers\n */\n\nimport { useCallback, useEffect, useRef, useState } from 'react';\nimport { useMobileCapabilities } from './mobileOptimizations';\n\n// Accessibility configuration\ninterface AccessibilityConfig {\n  enableScreenReader: boolean;\n  enableHighContrast: boolean;\n  enableLargeText: boolean;\n  enableReducedMotion: boolean;\n  enableVoiceAnnouncements: boolean;\n  enableKeyboardNavigation: boolean;\n  textSize: 'small' | 'medium' | 'large' | 'extra-large';\n  contrastRatio: 'normal' | 'high' | 'maximum';\n  announceFormationChanges: boolean;\n  announcePlayerActions: boolean;\n}\n\n// Screen reader announcement types\ntype AnnouncementType = 'polite' | 'assertive' | 'off';\n\ninterface Announcement {\n  message: string;\n  type: AnnouncementType;\n  priority: 'low' | 'medium' | 'high';\n  delay?: number;\n}\n\n// Touch target sizes for accessibility\nexport const TOUCH_TARGETS = {\n  MINIMUM: 44,    // WCAG minimum\n  COMFORTABLE: 48, // Comfortable size\n  LARGE: 56,      // Large for motor impairments\n  EXTRA_LARGE: 64, // Extra large for severe motor impairments\n} as const;\n\n// Color contrast ratios\nexport const CONTRAST_RATIOS = {\n  AA_NORMAL: 4.5,\n  AA_LARGE: 3,\n  AAA_NORMAL: 7,\n  AAA_LARGE: 4.5,\n} as const;\n\n/**\n * Screen Reader Announcement Manager\n */\nexport class ScreenReaderManager {\n  private static instance: ScreenReaderManager;\n  private announcer: HTMLElement;\n  private politeAnnouncer: HTMLElement;\n  private assertiveAnnouncer: HTMLElement;\n  private announcementQueue: Announcement[] = [];\n  private isProcessing: boolean = false;\n  \n  static getInstance(): ScreenReaderManager {\n    if (!ScreenReaderManager.instance) {\n      ScreenReaderManager.instance = new ScreenReaderManager();\n    }\n    return ScreenReaderManager.instance;\n  }\n  \n  private constructor() {\n    this.createAnnouncers();\n  }\n  \n  private createAnnouncers(): void {\n    // Main announcer container\n    this.announcer = document.createElement('div');\n    this.announcer.setAttribute('aria-live', 'polite');\n    this.announcer.setAttribute('aria-atomic', 'true');\n    this.announcer.setAttribute('aria-relevant', 'all');\n    this.announcer.className = 'sr-only';\n    this.announcer.id = 'tactical-board-announcer';\n    \n    // Polite announcer for less urgent messages\n    this.politeAnnouncer = document.createElement('div');\n    this.politeAnnouncer.setAttribute('aria-live', 'polite');\n    this.politeAnnouncer.setAttribute('aria-atomic', 'true');\n    this.politeAnnouncer.className = 'sr-only';\n    this.politeAnnouncer.id = 'tactical-board-polite-announcer';\n    \n    // Assertive announcer for urgent messages\n    this.assertiveAnnouncer = document.createElement('div');\n    this.assertiveAnnouncer.setAttribute('aria-live', 'assertive');\n    this.assertiveAnnouncer.setAttribute('aria-atomic', 'true');\n    this.assertiveAnnouncer.className = 'sr-only';\n    this.assertiveAnnouncer.id = 'tactical-board-assertive-announcer';\n    \n    // Add to document\n    document.body.appendChild(this.announcer);\n    document.body.appendChild(this.politeAnnouncer);\n    document.body.appendChild(this.assertiveAnnouncer);\n  }\n  \n  /**\n   * Announce a message to screen readers\n   */\n  announce(announcement: Announcement): void {\n    this.announcementQueue.push(announcement);\n    \n    if (!this.isProcessing) {\n      this.processQueue();\n    }\n  }\n  \n  /**\n   * Quick announcement with default settings\n   */\n  say(message: string, type: AnnouncementType = 'polite', priority: 'low' | 'medium' | 'high' = 'medium'): void {\n    this.announce({ message, type, priority });\n  }\n  \n  /**\n   * Announce tactical board actions\n   */\n  announceTacticalAction(action: string, details?: string): void {\n    const message = details ? `${action}. ${details}` : action;\n    this.announce({\n      message,\n      type: 'polite',\n      priority: 'medium',\n    });\n  }\n  \n  /**\n   * Announce formation changes\n   */\n  announceFormationChange(formationName: string, playerCount: number): void {\n    const message = `Formation changed to ${formationName} with ${playerCount} players`;\n    this.announce({\n      message,\n      type: 'polite',\n      priority: 'medium',\n    });\n  }\n  \n  /**\n   * Announce player actions\n   */\n  announcePlayerAction(playerName: string, action: string, position?: string): void {\n    let message = `${playerName} ${action}`;\n    if (position) {\n      message += ` to ${position}`;\n    }\n    \n    this.announce({\n      message,\n      type: 'polite',\n      priority: 'low',\n    });\n  }\n  \n  /**\n   * Process announcement queue\n   */\n  private async processQueue(): Promise<void> {\n    if (this.isProcessing || this.announcementQueue.length === 0) {\n      return;\n    }\n    \n    this.isProcessing = true;\n    \n    // Sort by priority\n    this.announcementQueue.sort((a, b) => {\n      const priorityOrder = { high: 3, medium: 2, low: 1 };\n      return priorityOrder[b.priority] - priorityOrder[a.priority];\n    });\n    \n    while (this.announcementQueue.length > 0) {\n      const announcement = this.announcementQueue.shift()!;\n      await this.processAnnouncement(announcement);\n    }\n    \n    this.isProcessing = false;\n  }\n  \n  /**\n   * Process a single announcement\n   */\n  private async processAnnouncement(announcement: Announcement): Promise<void> {\n    const announcer = announcement.type === 'assertive' \n      ? this.assertiveAnnouncer \n      : this.politeAnnouncer;\n    \n    // Clear previous content\n    announcer.textContent = '';\n    \n    // Wait for screen reader to register the clear\n    await new Promise(resolve => setTimeout(resolve, 100));\n    \n    // Set new content\n    announcer.textContent = announcement.message;\n    \n    // Wait for announcement to be read\n    const delay = announcement.delay || this.calculateReadingTime(announcement.message);\n    await new Promise(resolve => setTimeout(resolve, delay));\n  }\n  \n  /**\n   * Calculate estimated reading time for announcement\n   */\n  private calculateReadingTime(text: string): number {\n    // Average reading speed: 150-200 words per minute\n    const wordsPerMinute = 175;\n    const words = text.split(' ').length;\n    const minutes = words / wordsPerMinute;\n    const milliseconds = minutes * 60 * 1000;\n    \n    // Minimum 500ms, maximum 5000ms\n    return Math.max(500, Math.min(5000, milliseconds));\n  }\n  \n  /**\n   * Clear all announcements\n   */\n  clear(): void {\n    this.announcementQueue = [];\n    this.politeAnnouncer.textContent = '';\n    this.assertiveAnnouncer.textContent = '';\n  }\n}\n\n/**\n * Mobile Accessibility Manager\n */\nexport class MobileAccessibilityManager {\n  private static instance: MobileAccessibilityManager;\n  private config: AccessibilityConfig;\n  private screenReader: ScreenReaderManager;\n  private focusManagementStack: HTMLElement[] = [];\n  \n  static getInstance(): MobileAccessibilityManager {\n    if (!MobileAccessibilityManager.instance) {\n      MobileAccessibilityManager.instance = new MobileAccessibilityManager();\n    }\n    return MobileAccessibilityManager.instance;\n  }\n  \n  private constructor() {\n    this.config = this.detectAccessibilityPreferences();\n    this.screenReader = ScreenReaderManager.getInstance();\n    this.setupAccessibilityStyles();\n    this.setupKeyboardNavigation();\n  }\n  \n  /**\n   * Detect user accessibility preferences\n   */\n  private detectAccessibilityPreferences(): AccessibilityConfig {\n    return {\n      enableScreenReader: this.isScreenReaderActive(),\n      enableHighContrast: window.matchMedia('(prefers-contrast: high)').matches,\n      enableLargeText: window.matchMedia('(prefers-font-size: large)').matches,\n      enableReducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,\n      enableVoiceAnnouncements: this.isScreenReaderActive(),\n      enableKeyboardNavigation: !this.isTouchDevice(),\n      textSize: this.getPreferredTextSize(),\n      contrastRatio: window.matchMedia('(prefers-contrast: high)').matches ? 'high' : 'normal',\n      announceFormationChanges: true,\n      announcePlayerActions: true,\n    };\n  }\n  \n  /**\n   * Detect if screen reader is active\n   */\n  private isScreenReaderActive(): boolean {\n    // Check for screen reader indicators\n    return (\n      window.navigator.userAgent.includes('NVDA') ||\n      window.navigator.userAgent.includes('JAWS') ||\n      window.speechSynthesis?.getVoices().length > 0 ||\n      !!(window as any).speechSynthesis\n    );\n  }\n  \n  /**\n   * Detect if device is primarily touch-based\n   */\n  private isTouchDevice(): boolean {\n    return 'ontouchstart' in window || navigator.maxTouchPoints > 0;\n  }\n  \n  /**\n   * Get preferred text size\n   */\n  private getPreferredTextSize(): 'small' | 'medium' | 'large' | 'extra-large' {\n    if (window.matchMedia('(prefers-font-size: large)').matches) {\n      return 'large';\n    }\n    return 'medium';\n  }\n  \n  /**\n   * Setup accessibility styles\n   */\n  private setupAccessibilityStyles(): void {\n    const style = document.createElement('style');\n    style.id = 'mobile-accessibility-styles';\n    \n    let css = `\n      /* Screen reader only content */\n      .sr-only {\n        position: absolute !important;\n        width: 1px !important;\n        height: 1px !important;\n        padding: 0 !important;\n        margin: -1px !important;\n        overflow: hidden !important;\n        clip: rect(0, 0, 0, 0) !important;\n        white-space: nowrap !important;\n        border: 0 !important;\n      }\n      \n      /* Skip links for keyboard navigation */\n      .skip-link {\n        position: absolute;\n        top: -40px;\n        left: 6px;\n        background: #000;\n        color: #fff;\n        padding: 8px;\n        text-decoration: none;\n        z-index: 1000;\n        border-radius: 4px;\n      }\n      \n      .skip-link:focus {\n        top: 6px;\n      }\n      \n      /* Focus indicators */\n      .focus-visible {\n        outline: 3px solid #005fcc;\n        outline-offset: 2px;\n      }\n      \n      /* High contrast mode */\n      .high-contrast {\n        filter: contrast(150%);\n      }\n      \n      .high-contrast .tactical-field {\n        background: #000 !important;\n        color: #fff !important;\n      }\n      \n      .high-contrast .player-token {\n        border: 2px solid #fff !important;\n        background: #000 !important;\n        color: #fff !important;\n      }\n    `;\n    \n    // Add text size styles\n    const textSizes = {\n      small: '0.875rem',\n      medium: '1rem',\n      large: '1.25rem',\n      'extra-large': '1.5rem',\n    };\n    \n    css += `\n      .text-size-${this.config.textSize} {\n        font-size: ${textSizes[this.config.textSize]} !important;\n      }\n    `;\n    \n    // Add reduced motion styles\n    if (this.config.enableReducedMotion) {\n      css += `\n        *, *::before, *::after {\n          animation-duration: 0.01ms !important;\n          animation-iteration-count: 1 !important;\n          transition-duration: 0.01ms !important;\n        }\n      `;\n    }\n    \n    style.textContent = css;\n    document.head.appendChild(style);\n    \n    // Apply classes to body\n    if (this.config.enableHighContrast) {\n      document.body.classList.add('high-contrast');\n    }\n    \n    document.body.classList.add(`text-size-${this.config.textSize}`);\n  }\n  \n  /**\n   * Setup keyboard navigation\n   */\n  private setupKeyboardNavigation(): void {\n    if (!this.config.enableKeyboardNavigation) {\n      return;\n    }\n    \n    // Add skip links\n    const skipLink = document.createElement('a');\n    skipLink.href = '#main-content';\n    skipLink.textContent = 'Skip to main content';\n    skipLink.className = 'skip-link';\n    document.body.insertBefore(skipLink, document.body.firstChild);\n    \n    // Setup keyboard event handlers\n    document.addEventListener('keydown', this.handleKeyboardNavigation.bind(this));\n    \n    // Setup focus management\n    document.addEventListener('focusin', this.handleFocusIn.bind(this));\n    document.addEventListener('focusout', this.handleFocusOut.bind(this));\n  }\n  \n  /**\n   * Handle keyboard navigation\n   */\n  private handleKeyboardNavigation(event: KeyboardEvent): void {\n    const { key, target, ctrlKey, altKey, shiftKey } = event;\n    \n    // Escape key to close modals/menus\n    if (key === 'Escape') {\n      this.handleEscapeKey();\n    }\n    \n    // Arrow key navigation on tactical board\n    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(key)) {\n      this.handleArrowKeyNavigation(event);\n    }\n    \n    // Tab navigation enhancement\n    if (key === 'Tab') {\n      this.handleTabNavigation(event);\n    }\n    \n    // Accessibility shortcuts\n    if (ctrlKey && altKey) {\n      this.handleAccessibilityShortcuts(event);\n    }\n  }\n  \n  /**\n   * Handle escape key for modal/menu closure\n   */\n  private handleEscapeKey(): void {\n    // Close any open modals or menus\n    const modals = document.querySelectorAll('[role=\"dialog\"], [role=\"menu\"]');\n    modals.forEach(modal => {\n      if (modal.hasAttribute('open') || !modal.hasAttribute('hidden')) {\n        (modal as HTMLElement).click(); // Trigger close\n      }\n    });\n  }\n  \n  /**\n   * Handle arrow key navigation on tactical board\n   */\n  private handleArrowKeyNavigation(event: KeyboardEvent): void {\n    const target = event.target as HTMLElement;\n    \n    if (target.classList.contains('player-token') || target.closest('.player-token')) {\n      event.preventDefault();\n      \n      const direction = event.key.replace('Arrow', '').toLowerCase();\n      this.screenReader.say(`Moving ${direction}`);\n      \n      // Implement actual player movement logic here\n      this.movePlayerWithKeyboard(target, direction);\n    }\n  }\n  \n  /**\n   * Move player token with keyboard\n   */\n  private movePlayerWithKeyboard(element: HTMLElement, direction: string): void {\n    const moveDistance = 10; // pixels\n    const rect = element.getBoundingClientRect();\n    \n    let newX = rect.left;\n    let newY = rect.top;\n    \n    switch (direction) {\n      case 'up':\n        newY -= moveDistance;\n        break;\n      case 'down':\n        newY += moveDistance;\n        break;\n      case 'left':\n        newX -= moveDistance;\n        break;\n      case 'right':\n        newX += moveDistance;\n        break;\n    }\n    \n    // Apply new position (this would integrate with the actual movement system)\n    element.style.transform = `translate(${newX}px, ${newY}px)`;\n    \n    // Announce new position\n    this.screenReader.say(`Player moved ${direction} to position ${Math.round(newX)}, ${Math.round(newY)}`);\n  }\n  \n  /**\n   * Handle tab navigation\n   */\n  private handleTabNavigation(event: KeyboardEvent): void {\n    const focusableElements = this.getFocusableElements();\n    const currentIndex = focusableElements.indexOf(event.target as HTMLElement);\n    \n    if (currentIndex === -1) return;\n    \n    let nextIndex;\n    if (event.shiftKey) {\n      nextIndex = currentIndex === 0 ? focusableElements.length - 1 : currentIndex - 1;\n    } else {\n      nextIndex = currentIndex === focusableElements.length - 1 ? 0 : currentIndex + 1;\n    }\n    \n    event.preventDefault();\n    focusableElements[nextIndex].focus();\n  }\n  \n  /**\n   * Get all focusable elements\n   */\n  private getFocusableElements(): HTMLElement[] {\n    const selector = `\n      a[href],\n      button:not([disabled]),\n      input:not([disabled]),\n      select:not([disabled]),\n      textarea:not([disabled]),\n      [tabindex]:not([tabindex=\"-1\"]),\n      [role=\"button\"]:not([disabled])\n    `;\n    \n    return Array.from(document.querySelectorAll(selector)) as HTMLElement[];\n  }\n  \n  /**\n   * Handle accessibility shortcuts\n   */\n  private handleAccessibilityShortcuts(event: KeyboardEvent): void {\n    const { key } = event;\n    \n    switch (key) {\n      case 'h': // Toggle high contrast\n        this.toggleHighContrast();\n        break;\n      case 't': // Toggle text size\n        this.cycleTextSize();\n        break;\n      case 's': // Toggle screen reader announcements\n        this.toggleScreenReaderAnnouncements();\n        break;\n      case 'r': // Read current focus\n        this.readCurrentFocus();\n        break;\n    }\n  }\n  \n  /**\n   * Handle focus in events\n   */\n  private handleFocusIn(event: FocusEvent): void {\n    const target = event.target as HTMLElement;\n    \n    // Add focus visible class\n    target.classList.add('focus-visible');\n    \n    // Announce focused element to screen reader\n    if (this.config.enableVoiceAnnouncements) {\n      this.announceElement(target);\n    }\n    \n    // Track focus for management\n    this.focusManagementStack.push(target);\n  }\n  \n  /**\n   * Handle focus out events\n   */\n  private handleFocusOut(event: FocusEvent): void {\n    const target = event.target as HTMLElement;\n    \n    // Remove focus visible class\n    target.classList.remove('focus-visible');\n  }\n  \n  /**\n   * Announce element to screen reader\n   */\n  private announceElement(element: HTMLElement): void {\n    let announcement = '';\n    \n    // Get element type\n    const role = element.getAttribute('role') || element.tagName.toLowerCase();\n    const label = element.getAttribute('aria-label') || \n                  element.getAttribute('title') ||\n                  element.textContent?.trim() || \n                  'Unlabeled element';\n    \n    announcement = `${label}, ${role}`;\n    \n    // Add state information\n    if (element.getAttribute('aria-expanded')) {\n      const expanded = element.getAttribute('aria-expanded') === 'true';\n      announcement += `, ${expanded ? 'expanded' : 'collapsed'}`;\n    }\n    \n    if (element.getAttribute('aria-selected')) {\n      const selected = element.getAttribute('aria-selected') === 'true';\n      announcement += `, ${selected ? 'selected' : 'not selected'}`;\n    }\n    \n    this.screenReader.say(announcement, 'polite');\n  }\n  \n  /**\n   * Toggle high contrast mode\n   */\n  private toggleHighContrast(): void {\n    this.config.enableHighContrast = !this.config.enableHighContrast;\n    document.body.classList.toggle('high-contrast', this.config.enableHighContrast);\n    \n    this.screenReader.say(\n      `High contrast ${this.config.enableHighContrast ? 'enabled' : 'disabled'}`,\n      'assertive'\n    );\n  }\n  \n  /**\n   * Cycle through text sizes\n   */\n  private cycleTextSize(): void {\n    const sizes: Array<AccessibilityConfig['textSize']> = ['small', 'medium', 'large', 'extra-large'];\n    const currentIndex = sizes.indexOf(this.config.textSize);\n    const nextIndex = (currentIndex + 1) % sizes.length;\n    \n    document.body.classList.remove(`text-size-${this.config.textSize}`);\n    this.config.textSize = sizes[nextIndex];\n    document.body.classList.add(`text-size-${this.config.textSize}`);\n    \n    this.screenReader.say(`Text size set to ${this.config.textSize}`, 'assertive');\n  }\n  \n  /**\n   * Toggle screen reader announcements\n   */\n  private toggleScreenReaderAnnouncements(): void {\n    this.config.enableVoiceAnnouncements = !this.config.enableVoiceAnnouncements;\n    \n    this.screenReader.say(\n      `Voice announcements ${this.config.enableVoiceAnnouncements ? 'enabled' : 'disabled'}`,\n      'assertive'\n    );\n  }\n  \n  /**\n   * Read current focus\n   */\n  private readCurrentFocus(): void {\n    const focusedElement = document.activeElement as HTMLElement;\n    if (focusedElement) {\n      this.announceElement(focusedElement);\n    } else {\n      this.screenReader.say('No element is currently focused', 'polite');\n    }\n  }\n  \n  /**\n   * Get current configuration\n   */\n  getConfig(): AccessibilityConfig {\n    return { ...this.config };\n  }\n  \n  /**\n   * Update configuration\n   */\n  updateConfig(updates: Partial<AccessibilityConfig>): void {\n    this.config = { ...this.config, ...updates };\n    this.setupAccessibilityStyles(); // Reapply styles\n  }\n  \n  /**\n   * Get screen reader instance\n   */\n  getScreenReader(): ScreenReaderManager {\n    return this.screenReader;\n  }\n}\n\n/**\n * React Hooks for Mobile Accessibility\n */\n\n/**\n * Hook for screen reader announcements\n */\nexport const useScreenReader = () => {\n  const screenReader = useRef(ScreenReaderManager.getInstance());\n  \n  const announce = useCallback((message: string, type: AnnouncementType = 'polite', priority: 'low' | 'medium' | 'high' = 'medium') => {\n    screenReader.current.say(message, type, priority);\n  }, []);\n  \n  const announceTacticalAction = useCallback((action: string, details?: string) => {\n    screenReader.current.announceTacticalAction(action, details);\n  }, []);\n  \n  const announceFormationChange = useCallback((formationName: string, playerCount: number) => {\n    screenReader.current.announceFormationChange(formationName, playerCount);\n  }, []);\n  \n  const announcePlayerAction = useCallback((playerName: string, action: string, position?: string) => {\n    screenReader.current.announcePlayerAction(playerName, action, position);\n  }, []);\n  \n  return {\n    announce,\n    announceTacticalAction,\n    announceFormationChange,\n    announcePlayerAction,\n  };\n};\n\n/**\n * Hook for accessibility configuration\n */\nexport const useAccessibilityConfig = () => {\n  const accessibilityManager = useRef(MobileAccessibilityManager.getInstance());\n  const [config, setConfig] = useState<AccessibilityConfig>(accessibilityManager.current.getConfig());\n  \n  const updateConfig = useCallback((updates: Partial<AccessibilityConfig>) => {\n    accessibilityManager.current.updateConfig(updates);\n    setConfig(accessibilityManager.current.getConfig());\n  }, []);\n  \n  return {\n    config,\n    updateConfig,\n  };\n};\n\n/**\n * Hook for focus management\n */\nexport const useFocusManagement = () => {\n  const trapFocus = useCallback((container: HTMLElement) => {\n    const focusableElements = container.querySelectorAll(\n      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex=\"-1\"])'\n    ) as NodeListOf<HTMLElement>;\n    \n    if (focusableElements.length === 0) return;\n    \n    const firstElement = focusableElements[0];\n    const lastElement = focusableElements[focusableElements.length - 1];\n    \n    const handleKeyDown = (event: KeyboardEvent) => {\n      if (event.key === 'Tab') {\n        if (event.shiftKey) {\n          if (document.activeElement === firstElement) {\n            event.preventDefault();\n            lastElement.focus();\n          }\n        } else {\n          if (document.activeElement === lastElement) {\n            event.preventDefault();\n            firstElement.focus();\n          }\n        }\n      }\n    };\n    \n    container.addEventListener('keydown', handleKeyDown);\n    firstElement.focus();\n    \n    return () => {\n      container.removeEventListener('keydown', handleKeyDown);\n    };\n  }, []);\n  \n  return { trapFocus };\n};\n\n/**\n * Hook for touch accessibility\n */\nexport const useTouchAccessibility = () => {\n  const capabilities = useMobileCapabilities();\n  \n  const getTouchTargetProps = useCallback((size: keyof typeof TOUCH_TARGETS = 'COMFORTABLE') => {\n    const targetSize = TOUCH_TARGETS[size];\n    \n    return {\n      style: {\n        minWidth: `${targetSize}px`,\n        minHeight: `${targetSize}px`,\n        touchAction: 'manipulation',\n      },\n      role: 'button',\n      tabIndex: 0,\n    };\n  }, []);\n  \n  const getAccessibleLabel = useCallback((element: {\n    name?: string;\n    position?: string;\n    action?: string;\n    state?: string;\n  }) => {\n    let label = '';\n    \n    if (element.name) {\n      label += element.name;\n    }\n    \n    if (element.position) {\n      label += ` (${element.position})`;\n    }\n    \n    if (element.action) {\n      label += ` - ${element.action}`;\n    }\n    \n    if (element.state) {\n      label += `, ${element.state}`;\n    }\n    \n    return label;\n  }, []);\n  \n  return {\n    getTouchTargetProps,\n    getAccessibleLabel,\n    isTouch: capabilities.supportsTouchEvents,\n  };\n};\n\n// Global instances\nexport const screenReaderManager = ScreenReaderManager.getInstance();\nexport const accessibilityManager = MobileAccessibilityManager.getInstance();\n\n// Utility functions\nexport const initializeMobileAccessibility = (): void => {\n  // Initialize accessibility manager\n  accessibilityManager.getConfig();\n  \n  console.log('[Accessibility] Mobile accessibility initialized');\n};\n\nexport const getContrastRatio = (foreground: string, background: string): number => {\n  // Simplified contrast ratio calculation\n  // In a real implementation, you would parse RGB values and calculate luminance\n  return 4.5; // Placeholder\n};\n\nexport const ensureContrastCompliance = (foreground: string, background: string, level: 'AA' | 'AAA' = 'AA'): boolean => {\n  const ratio = getContrastRatio(foreground, background);\n  const requirement = level === 'AA' ? CONTRAST_RATIOS.AA_NORMAL : CONTRAST_RATIOS.AAA_NORMAL;\n  \n  return ratio >= requirement;\n};\n\nexport default {\n  ScreenReaderManager,\n  MobileAccessibilityManager,\n  useScreenReader,\n  useAccessibilityConfig,\n  useFocusManagement,\n  useTouchAccessibility,\n  TOUCH_TARGETS,\n  CONTRAST_RATIOS,\n  screenReaderManager,\n  accessibilityManager,\n  initializeMobileAccessibility,\n  getContrastRatio,\n  ensureContrastCompliance,\n};"
+/**
+ * Mobile Accessibility Framework
+ * Comprehensive accessibility features for mobile devices and screen readers
+ */
+
+import { useCallback, useRef, useState } from 'react';
+import { useMobileCapabilities } from './mobileOptimizations';
+
+// Accessibility configuration
+interface AccessibilityConfig {
+  enableScreenReader: boolean;
+  enableHighContrast: boolean;
+  enableLargeText: boolean;
+  enableReducedMotion: boolean;
+  enableVoiceAnnouncements: boolean;
+  enableKeyboardNavigation: boolean;
+  textSize: 'small' | 'medium' | 'large' | 'extra-large';
+  contrastRatio: 'normal' | 'high' | 'maximum';
+  announceFormationChanges: boolean;
+  announcePlayerActions: boolean;
+}
+
+// Screen reader announcement types
+type AnnouncementType = 'polite' | 'assertive' | 'off';
+
+interface Announcement {
+  message: string;
+  type: AnnouncementType;
+  priority: 'low' | 'medium' | 'high';
+  delay?: number;
+}
+
+// Touch target sizes for accessibility
+export const TOUCH_TARGETS = {
+  MINIMUM: 44, // WCAG minimum
+  COMFORTABLE: 48, // Comfortable size
+  LARGE: 56, // Large for motor impairments
+  EXTRA_LARGE: 64, // Extra large for severe motor impairments
+} as const;
+
+// Color contrast ratios
+export const CONTRAST_RATIOS = {
+  AA_NORMAL: 4.5,
+  AA_LARGE: 3,
+  AAA_NORMAL: 7,
+  AAA_LARGE: 4.5,
+} as const;
+
+type WindowInstance = typeof globalThis extends { window: infer T } ? T : typeof window;
+
+type DocumentInstance = typeof globalThis extends { document: infer T } ? T : never;
+
+type NavigatorInstance = typeof globalThis extends { navigator: infer T } ? T : never;
+
+const getWindow = (): WindowInstance | undefined =>
+  typeof window === 'undefined' ? undefined : (window as WindowInstance);
+
+const getDocument = (): DocumentInstance | undefined =>
+  typeof document === 'undefined' ? undefined : (document as DocumentInstance);
+
+const getNavigator = (): NavigatorInstance | undefined =>
+  getWindow()?.navigator as NavigatorInstance | undefined;
+
+const getBodyElement = (doc: DocumentInstance): HTMLElement | null =>
+  doc.body ?? doc.documentElement ?? null;
+
+/**
+ * Screen Reader Announcement Manager
+ */
+export class ScreenReaderManager {
+  private static instance: ScreenReaderManager;
+  private announcer: HTMLElement | null = null;
+  private politeAnnouncer: HTMLElement | null = null;
+  private assertiveAnnouncer: HTMLElement | null = null;
+  private announcementQueue: Announcement[] = [];
+  private isProcessing: boolean = false;
+
+  static getInstance(): ScreenReaderManager {
+    if (!ScreenReaderManager.instance) {
+      ScreenReaderManager.instance = new ScreenReaderManager();
+    }
+    return ScreenReaderManager.instance;
+  }
+
+  private constructor() {
+    this.createAnnouncers();
+  }
+
+  private createAnnouncers(): void {
+    const doc = getDocument();
+    if (!doc) {
+      return;
+    }
+
+    const root = getBodyElement(doc);
+    if (!root) {
+      return;
+    }
+
+    const ensureAnnouncer = (
+      id: string,
+      ariaLive: 'polite' | 'assertive',
+      extraAttributes: Record<string, string> = {}
+    ) => {
+      let element = doc.getElementById(id) as HTMLElement | null;
+      if (!element) {
+        element = doc.createElement('div');
+        element.id = id;
+        element.className = 'sr-only';
+        root.appendChild(element);
+      } else if (!element.classList.contains('sr-only')) {
+        element.classList.add('sr-only');
+      }
+
+      element.setAttribute('aria-live', ariaLive);
+      element.setAttribute('aria-atomic', 'true');
+      Object.entries(extraAttributes).forEach(([key, value]) => {
+        element.setAttribute(key, value);
+      });
+
+      return element;
+    };
+
+    this.announcer = ensureAnnouncer('tactical-board-announcer', 'polite', {
+      'aria-relevant': 'all',
+    });
+    this.politeAnnouncer = ensureAnnouncer('tactical-board-polite-announcer', 'polite');
+    this.assertiveAnnouncer = ensureAnnouncer('tactical-board-assertive-announcer', 'assertive');
+  }
+
+  /**
+   * Announce a message to screen readers
+   */
+  announce(announcement: Announcement): void {
+    if (!this.politeAnnouncer || !this.assertiveAnnouncer) {
+      this.createAnnouncers();
+    }
+
+    this.announcementQueue.push(announcement);
+
+    if (!this.isProcessing) {
+      this.processQueue();
+    }
+  }
+
+  /**
+   * Quick announcement with default settings
+   */
+  say(
+    message: string,
+    type: AnnouncementType = 'polite',
+    priority: 'low' | 'medium' | 'high' = 'medium'
+  ): void {
+    this.announce({ message, type, priority });
+  }
+
+  /**
+   * Announce tactical board actions
+   */
+  announceTacticalAction(action: string, details?: string): void {
+    const message = details ? `${action}. ${details}` : action;
+    this.announce({
+      message,
+      type: 'polite',
+      priority: 'medium',
+    });
+  }
+
+  /**
+   * Announce formation changes
+   */
+  announceFormationChange(formationName: string, playerCount: number): void {
+    const message = `Formation changed to ${formationName} with ${playerCount} players`;
+    this.announce({
+      message,
+      type: 'polite',
+      priority: 'medium',
+    });
+  }
+
+  /**
+   * Announce player actions
+   */
+  announcePlayerAction(playerName: string, action: string, position?: string): void {
+    let message = `${playerName} ${action}`;
+    if (position) {
+      message += ` to ${position}`;
+    }
+
+    this.announce({
+      message,
+      type: 'polite',
+      priority: 'low',
+    });
+  }
+
+  /**
+   * Process announcement queue
+   */
+  private async processQueue(): Promise<void> {
+    if (this.isProcessing || this.announcementQueue.length === 0) {
+      return;
+    }
+
+    this.isProcessing = true;
+
+    // Sort by priority
+    this.announcementQueue.sort((a, b) => {
+      const priorityOrder = { high: 3, medium: 2, low: 1 };
+      return priorityOrder[b.priority] - priorityOrder[a.priority];
+    });
+
+    while (this.announcementQueue.length > 0) {
+      const announcement = this.announcementQueue.shift()!;
+      await this.processAnnouncement(announcement);
+    }
+
+    this.isProcessing = false;
+  }
+
+  /**
+   * Process a single announcement
+   */
+  private async processAnnouncement(announcement: Announcement): Promise<void> {
+    const announcer =
+      announcement.type === 'assertive' ? this.assertiveAnnouncer : this.politeAnnouncer;
+
+    if (!announcer) {
+      return;
+    }
+
+    // Clear previous content
+    announcer.textContent = '';
+
+    // Wait for screen reader to register the clear
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    // Set new content
+    announcer.textContent = announcement.message;
+
+    // Wait for announcement to be read
+    const delay = announcement.delay || this.calculateReadingTime(announcement.message);
+    await new Promise(resolve => setTimeout(resolve, delay));
+  }
+
+  /**
+   * Calculate estimated reading time for announcement
+   */
+  private calculateReadingTime(text: string): number {
+    // Average reading speed: 150-200 words per minute
+    const wordsPerMinute = 175;
+    const words = text.split(' ').length;
+    const minutes = words / wordsPerMinute;
+    const milliseconds = minutes * 60 * 1000;
+
+    // Minimum 500ms, maximum 5000ms
+    return Math.max(500, Math.min(5000, milliseconds));
+  }
+
+  /**
+   * Clear all announcements
+   */
+  clear(): void {
+    this.announcementQueue = [];
+    if (this.politeAnnouncer) {
+      this.politeAnnouncer.textContent = '';
+    }
+    if (this.assertiveAnnouncer) {
+      this.assertiveAnnouncer.textContent = '';
+    }
+  }
+}
+
+/**
+ * Mobile Accessibility Manager
+ */
+export class MobileAccessibilityManager {
+  private static instance: MobileAccessibilityManager;
+  private config: AccessibilityConfig;
+  private screenReader: ScreenReaderManager;
+  private focusManagementStack: HTMLElement[] = [];
+
+  static getInstance(): MobileAccessibilityManager {
+    if (!MobileAccessibilityManager.instance) {
+      MobileAccessibilityManager.instance = new MobileAccessibilityManager();
+    }
+    return MobileAccessibilityManager.instance;
+  }
+
+  private constructor() {
+    this.config = this.detectAccessibilityPreferences();
+    this.screenReader = ScreenReaderManager.getInstance();
+    this.setupAccessibilityStyles();
+    this.setupKeyboardNavigation();
+  }
+
+  /**
+   * Detect user accessibility preferences
+   */
+  private detectAccessibilityPreferences(): AccessibilityConfig {
+    const win = getWindow();
+    const prefers = (query: string): boolean => win?.matchMedia?.(query)?.matches ?? false;
+
+    const screenReaderActive = this.isScreenReaderActive();
+
+    return {
+      enableScreenReader: screenReaderActive,
+      enableHighContrast: prefers('(prefers-contrast: high)'),
+      enableLargeText: prefers('(prefers-font-size: large)'),
+      enableReducedMotion: prefers('(prefers-reduced-motion: reduce)'),
+      enableVoiceAnnouncements: screenReaderActive,
+      enableKeyboardNavigation: !this.isTouchDevice(),
+      textSize: this.getPreferredTextSize(),
+      contrastRatio: prefers('(prefers-contrast: high)') ? 'high' : 'normal',
+      announceFormationChanges: true,
+      announcePlayerActions: true,
+    };
+  }
+
+  /**
+   * Detect if screen reader is active
+   */
+  private isScreenReaderActive(): boolean {
+    // Check for screen reader indicators
+    const win = getWindow();
+    const nav = getNavigator();
+
+    if (!win || !nav) {
+      return false;
+    }
+
+    const userAgent = nav.userAgent ?? '';
+    const synthesis = win.speechSynthesis;
+    const hasVoices =
+      typeof synthesis?.getVoices === 'function' && synthesis.getVoices().length > 0;
+
+    return (
+      userAgent.includes('NVDA') ||
+      userAgent.includes('JAWS') ||
+      hasVoices ||
+      'speechSynthesis' in win
+    );
+  }
+
+  /**
+   * Detect if device is primarily touch-based
+   */
+  private isTouchDevice(): boolean {
+    const win = getWindow();
+    const nav = getNavigator();
+
+    return Boolean((win && 'ontouchstart' in win) || (nav && nav.maxTouchPoints > 0));
+  }
+
+  /**
+   * Get preferred text size
+   */
+  private getPreferredTextSize(): 'small' | 'medium' | 'large' | 'extra-large' {
+    const win = getWindow();
+    if (win?.matchMedia?.('(prefers-font-size: large)').matches) {
+      return 'large';
+    }
+    return 'medium';
+  }
+
+  /**
+   * Setup accessibility styles
+   */
+  private setupAccessibilityStyles(): void {
+    const doc = getDocument();
+    if (!doc) {
+      return;
+    }
+
+    const host = doc.head ?? doc.documentElement ?? doc.body;
+    if (!host) {
+      return;
+    }
+
+    let style = doc.getElementById('mobile-accessibility-styles') as HTMLElement | null;
+    if (!style) {
+      style = doc.createElement('style');
+      style.id = 'mobile-accessibility-styles';
+      host.appendChild(style);
+    }
+
+    let css = `
+      /* Screen reader only content */
+      .sr-only {
+        position: absolute !important;
+        width: 1px !important;
+        height: 1px !important;
+        padding: 0 !important;
+        margin: -1px !important;
+        overflow: hidden !important;
+        clip: rect(0, 0, 0, 0) !important;
+        white-space: nowrap !important;
+        border: 0 !important;
+      }
+      
+      /* Skip links for keyboard navigation */
+      .skip-link {
+        position: absolute;
+        top: -40px;
+        left: 6px;
+        background: #000;
+        color: #fff;
+        padding: 8px;
+        text-decoration: none;
+        z-index: 1000;
+        border-radius: 4px;
+      }
+      
+      .skip-link:focus {
+        top: 6px;
+      }
+      
+      /* Focus indicators */
+      .focus-visible {
+        outline: 3px solid #005fcc;
+        outline-offset: 2px;
+      }
+      
+      /* High contrast mode */
+      .high-contrast {
+        filter: contrast(150%);
+      }
+      
+      .high-contrast .tactical-field {
+        background: #000 !important;
+        color: #fff !important;
+      }
+      
+      .high-contrast .player-token {
+        border: 2px solid #fff !important;
+        background: #000 !important;
+        color: #fff !important;
+      }
+    `;
+
+    // Add text size styles
+    const textSizes = {
+      small: '0.875rem',
+      medium: '1rem',
+      large: '1.25rem',
+      'extra-large': '1.5rem',
+    };
+
+    css += `
+      .text-size-${this.config.textSize} {
+        font-size: ${textSizes[this.config.textSize]} !important;
+      }
+    `;
+
+    // Add reduced motion styles
+    if (this.config.enableReducedMotion) {
+      css += `
+        *, *::before, *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      `;
+    }
+
+    style.textContent = css;
+
+    const body = doc.body ?? doc.documentElement;
+    if (!body) {
+      return;
+    }
+
+    body.classList.toggle('high-contrast', this.config.enableHighContrast);
+    body.classList.add(`text-size-${this.config.textSize}`);
+  }
+
+  /**
+   * Setup keyboard navigation
+   */
+  private setupKeyboardNavigation(): void {
+    if (!this.config.enableKeyboardNavigation) {
+      return;
+    }
+
+    const doc = getDocument();
+    const body = doc?.body ?? doc?.documentElement;
+    if (!doc || !body) {
+      return;
+    }
+
+    // Add skip links
+    const skipLink = doc.createElement('a');
+    skipLink.href = '#main-content';
+    skipLink.textContent = 'Skip to main content';
+    skipLink.className = 'skip-link';
+    body.insertBefore(skipLink, body.firstChild);
+
+    // Setup keyboard event handlers
+    doc.addEventListener('keydown', this.handleKeyboardNavigation.bind(this));
+
+    // Setup focus management
+    doc.addEventListener('focusin', this.handleFocusIn.bind(this));
+    doc.addEventListener('focusout', this.handleFocusOut.bind(this));
+  }
+
+  /**
+   * Handle keyboard navigation
+   */
+  private handleKeyboardNavigation(event: KeyboardEvent): void {
+    const { key, ctrlKey, altKey } = event;
+
+    // Escape key to close modals/menus
+    if (key === 'Escape') {
+      this.handleEscapeKey();
+    }
+
+    // Arrow key navigation on tactical board
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(key)) {
+      this.handleArrowKeyNavigation(event);
+    }
+
+    // Tab navigation enhancement
+    if (key === 'Tab') {
+      this.handleTabNavigation(event);
+    }
+
+    // Accessibility shortcuts
+    if (ctrlKey && altKey) {
+      this.handleAccessibilityShortcuts(event);
+    }
+  }
+
+  /**
+   * Handle escape key for modal/menu closure
+   */
+  private handleEscapeKey(): void {
+    // Close any open modals or menus
+    const doc = getDocument();
+    if (!doc) {
+      return;
+    }
+
+    const modals = doc.querySelectorAll('[role="dialog"], [role="menu"]');
+    modals.forEach(modal => {
+      if (modal.hasAttribute('open') || !modal.hasAttribute('hidden')) {
+        (modal as HTMLElement).click(); // Trigger close
+      }
+    });
+  }
+
+  /**
+   * Handle arrow key navigation on tactical board
+   */
+  private handleArrowKeyNavigation(event: KeyboardEvent): void {
+    const target = event.target as HTMLElement;
+
+    if (target.classList.contains('player-token') || target.closest('.player-token')) {
+      event.preventDefault();
+
+      const direction = event.key.replace('Arrow', '').toLowerCase();
+      this.screenReader.say(`Moving ${direction}`);
+
+      // Implement actual player movement logic here
+      this.movePlayerWithKeyboard(target, direction);
+    }
+  }
+
+  /**
+   * Move player token with keyboard
+   */
+  private movePlayerWithKeyboard(element: HTMLElement, direction: string): void {
+    const moveDistance = 10; // pixels
+    const rect = element.getBoundingClientRect();
+
+    let newX = rect.left;
+    let newY = rect.top;
+
+    switch (direction) {
+      case 'up':
+        newY -= moveDistance;
+        break;
+      case 'down':
+        newY += moveDistance;
+        break;
+      case 'left':
+        newX -= moveDistance;
+        break;
+      case 'right':
+        newX += moveDistance;
+        break;
+    }
+
+    // Apply new position (this would integrate with the actual movement system)
+    element.style.transform = `translate(${newX}px, ${newY}px)`;
+
+    // Announce new position
+    this.screenReader.say(
+      `Player moved ${direction} to position ${Math.round(newX)}, ${Math.round(newY)}`
+    );
+  }
+
+  /**
+   * Handle tab navigation
+   */
+  private handleTabNavigation(event: KeyboardEvent): void {
+    const focusableElements = this.getFocusableElements();
+    const currentIndex = focusableElements.indexOf(event.target as HTMLElement);
+
+    if (currentIndex === -1) {
+      return;
+    }
+
+    let nextIndex;
+    if (event.shiftKey) {
+      nextIndex = currentIndex === 0 ? focusableElements.length - 1 : currentIndex - 1;
+    } else {
+      nextIndex = currentIndex === focusableElements.length - 1 ? 0 : currentIndex + 1;
+    }
+
+    event.preventDefault();
+    focusableElements[nextIndex].focus();
+  }
+
+  /**
+   * Get all focusable elements
+   */
+  private getFocusableElements(): HTMLElement[] {
+    const selector = `
+      a[href],
+      button:not([disabled]),
+      input:not([disabled]),
+      select:not([disabled]),
+      textarea:not([disabled]),
+      [tabindex]:not([tabindex="-1"]),
+      [role="button"]:not([disabled])
+    `;
+
+    return Array.from(document.querySelectorAll(selector)) as HTMLElement[];
+  }
+
+  /**
+   * Handle accessibility shortcuts
+   */
+  private handleAccessibilityShortcuts(event: KeyboardEvent): void {
+    const { key } = event;
+
+    switch (key) {
+      case 'h': // Toggle high contrast
+        this.toggleHighContrast();
+        break;
+      case 't': // Toggle text size
+        this.cycleTextSize();
+        break;
+      case 's': // Toggle screen reader announcements
+        this.toggleScreenReaderAnnouncements();
+        break;
+      case 'r': // Read current focus
+        this.readCurrentFocus();
+        break;
+    }
+  }
+
+  /**
+   * Handle focus in events
+   */
+  private handleFocusIn(event: FocusEvent): void {
+    const target = event.target as HTMLElement;
+
+    // Add focus visible class
+    target.classList.add('focus-visible');
+
+    // Announce focused element to screen reader
+    if (this.config.enableVoiceAnnouncements) {
+      this.announceElement(target);
+    }
+
+    // Track focus for management
+    this.focusManagementStack.push(target);
+  }
+
+  /**
+   * Handle focus out events
+   */
+  private handleFocusOut(event: FocusEvent): void {
+    const target = event.target as HTMLElement;
+
+    // Remove focus visible class
+    target.classList.remove('focus-visible');
+  }
+
+  /**
+   * Announce element to screen reader
+   */
+  private announceElement(element: HTMLElement): void {
+    let announcement = '';
+
+    // Get element type
+    const role = element.getAttribute('role') || element.tagName.toLowerCase();
+    const label =
+      element.getAttribute('aria-label') ||
+      element.getAttribute('title') ||
+      element.textContent?.trim() ||
+      'Unlabeled element';
+
+    announcement = `${label}, ${role}`;
+
+    // Add state information
+    if (element.getAttribute('aria-expanded')) {
+      const expanded = element.getAttribute('aria-expanded') === 'true';
+      announcement += `, ${expanded ? 'expanded' : 'collapsed'}`;
+    }
+
+    if (element.getAttribute('aria-selected')) {
+      const selected = element.getAttribute('aria-selected') === 'true';
+      announcement += `, ${selected ? 'selected' : 'not selected'}`;
+    }
+
+    this.screenReader.say(announcement, 'polite');
+  }
+
+  /**
+   * Toggle high contrast mode
+   */
+  private toggleHighContrast(): void {
+    this.config.enableHighContrast = !this.config.enableHighContrast;
+    document.body.classList.toggle('high-contrast', this.config.enableHighContrast);
+
+    this.screenReader.say(
+      `High contrast ${this.config.enableHighContrast ? 'enabled' : 'disabled'}`,
+      'assertive'
+    );
+  }
+
+  /**
+   * Cycle through text sizes
+   */
+  private cycleTextSize(): void {
+    const sizes: Array<AccessibilityConfig['textSize']> = [
+      'small',
+      'medium',
+      'large',
+      'extra-large',
+    ];
+    const currentIndex = sizes.indexOf(this.config.textSize);
+    const nextIndex = (currentIndex + 1) % sizes.length;
+
+    document.body.classList.remove(`text-size-${this.config.textSize}`);
+    this.config.textSize = sizes[nextIndex];
+    document.body.classList.add(`text-size-${this.config.textSize}`);
+
+    this.screenReader.say(`Text size set to ${this.config.textSize}`, 'assertive');
+  }
+
+  /**
+   * Toggle screen reader announcements
+   */
+  private toggleScreenReaderAnnouncements(): void {
+    this.config.enableVoiceAnnouncements = !this.config.enableVoiceAnnouncements;
+
+    this.screenReader.say(
+      `Voice announcements ${this.config.enableVoiceAnnouncements ? 'enabled' : 'disabled'}`,
+      'assertive'
+    );
+  }
+
+  /**
+   * Read current focus
+   */
+  private readCurrentFocus(): void {
+    const focusedElement = document.activeElement as HTMLElement;
+    if (focusedElement) {
+      this.announceElement(focusedElement);
+    } else {
+      this.screenReader.say('No element is currently focused', 'polite');
+    }
+  }
+
+  /**
+   * Get current configuration
+   */
+  getConfig(): AccessibilityConfig {
+    return { ...this.config };
+  }
+
+  /**
+   * Update configuration
+   */
+  updateConfig(updates: Partial<AccessibilityConfig>): void {
+    this.config = { ...this.config, ...updates };
+    this.setupAccessibilityStyles(); // Reapply styles
+  }
+
+  /**
+   * Get screen reader instance
+   */
+  getScreenReader(): ScreenReaderManager {
+    return this.screenReader;
+  }
+}
+
+/**
+ * React Hooks for Mobile Accessibility
+ */
+
+/**
+ * Hook for screen reader announcements
+ */
+export const useScreenReader = () => {
+  const screenReader = useRef(ScreenReaderManager.getInstance());
+
+  const announce = useCallback(
+    (
+      message: string,
+      type: AnnouncementType = 'polite',
+      priority: 'low' | 'medium' | 'high' = 'medium'
+    ) => {
+      screenReader.current.say(message, type, priority);
+    },
+    []
+  );
+
+  const announceTacticalAction = useCallback((action: string, details?: string) => {
+    screenReader.current.announceTacticalAction(action, details);
+  }, []);
+
+  const announceFormationChange = useCallback((formationName: string, playerCount: number) => {
+    screenReader.current.announceFormationChange(formationName, playerCount);
+  }, []);
+
+  const announcePlayerAction = useCallback(
+    (playerName: string, action: string, position?: string) => {
+      screenReader.current.announcePlayerAction(playerName, action, position);
+    },
+    []
+  );
+
+  return {
+    announce,
+    announceTacticalAction,
+    announceFormationChange,
+    announcePlayerAction,
+  };
+};
+
+/**
+ * Hook for accessibility configuration
+ */
+export const useAccessibilityConfig = () => {
+  const accessibilityManager = useRef(MobileAccessibilityManager.getInstance());
+  const [config, setConfig] = useState<AccessibilityConfig>(
+    accessibilityManager.current.getConfig()
+  );
+
+  const updateConfig = useCallback((updates: Partial<AccessibilityConfig>) => {
+    accessibilityManager.current.updateConfig(updates);
+    setConfig(accessibilityManager.current.getConfig());
+  }, []);
+
+  return {
+    config,
+    updateConfig,
+  };
+};
+
+/**
+ * Hook for focus management
+ */
+export const useFocusManagement = () => {
+  const trapFocus = useCallback((container: HTMLElement) => {
+    const focusableElements = container.querySelectorAll(
+      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    ) as NodeListOf<HTMLElement>;
+
+    if (focusableElements.length === 0) {
+      return;
+    }
+
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Tab') {
+        if (event.shiftKey) {
+          if (document.activeElement === firstElement) {
+            event.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            event.preventDefault();
+            firstElement.focus();
+          }
+        }
+      }
+    };
+
+    container.addEventListener('keydown', handleKeyDown);
+    firstElement.focus();
+
+    return () => {
+      container.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
+  return { trapFocus };
+};
+
+/**
+ * Hook for touch accessibility
+ */
+export const useTouchAccessibility = () => {
+  const capabilities = useMobileCapabilities();
+
+  const getTouchTargetProps = useCallback((size: keyof typeof TOUCH_TARGETS = 'COMFORTABLE') => {
+    const targetSize = TOUCH_TARGETS[size];
+
+    return {
+      style: {
+        minWidth: `${targetSize}px`,
+        minHeight: `${targetSize}px`,
+        touchAction: 'manipulation',
+      },
+      role: 'button',
+      tabIndex: 0,
+    };
+  }, []);
+
+  const getAccessibleLabel = useCallback(
+    (element: { name?: string; position?: string; action?: string; state?: string }) => {
+      let label = '';
+
+      if (element.name) {
+        label += element.name;
+      }
+
+      if (element.position) {
+        label += ` (${element.position})`;
+      }
+
+      if (element.action) {
+        label += ` - ${element.action}`;
+      }
+
+      if (element.state) {
+        label += `, ${element.state}`;
+      }
+
+      return label;
+    },
+    []
+  );
+
+  return {
+    getTouchTargetProps,
+    getAccessibleLabel,
+    isTouch: capabilities.supportsTouchEvents,
+  };
+};
+
+// Global instances
+export const screenReaderManager = ScreenReaderManager.getInstance();
+export const accessibilityManager = MobileAccessibilityManager.getInstance();
+
+// Utility functions
+export const initializeMobileAccessibility = (): void => {
+  // Initialize accessibility manager
+  accessibilityManager.getConfig();
+
+  console.log('[Accessibility] Mobile accessibility initialized');
+};
+
+/**
+ * Calculate WCAG 2.1 contrast ratio between two colors
+ * Formula: (L1 + 0.05) / (L2 + 0.05) where L1 is lighter and L2 is darker
+ * @param foreground - CSS color string (hex, rgb, rgba, or named color)
+ * @param background - CSS color string (hex, rgb, rgba, or named color)
+ * @returns Contrast ratio (1-21)
+ */
+export const getContrastRatio = (foreground: string, background: string): number => {
+  const getLuminance = (color: string): number => {
+    // Parse color to RGB
+    const rgb = parseColor(color);
+    if (!rgb) {
+      return 0;
+    }
+
+    // Convert RGB to relative luminance using WCAG formula
+    const [r, g, b] = rgb.map(channel => {
+      const normalized = channel / 255;
+      return normalized <= 0.03928
+        ? normalized / 12.92
+        : Math.pow((normalized + 0.055) / 1.055, 2.4);
+    });
+
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+
+  const parseColor = (color: string): [number, number, number] | null => {
+    // Handle hex colors (#RGB, #RRGGBB, #RRGGBBAA)
+    if (color.startsWith('#')) {
+      const hex = color.slice(1);
+      if (hex.length === 3) {
+        return [
+          parseInt(hex[0] + hex[0], 16),
+          parseInt(hex[1] + hex[1], 16),
+          parseInt(hex[2] + hex[2], 16),
+        ];
+      }
+      if (hex.length === 6 || hex.length === 8) {
+        return [
+          parseInt(hex.slice(0, 2), 16),
+          parseInt(hex.slice(2, 4), 16),
+          parseInt(hex.slice(4, 6), 16),
+        ];
+      }
+    }
+
+    // Handle rgb/rgba format
+    const rgbMatch = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*[\d.]+)?\)/);
+    if (rgbMatch) {
+      return [parseInt(rgbMatch[1], 10), parseInt(rgbMatch[2], 10), parseInt(rgbMatch[3], 10)];
+    }
+
+    // Handle common named colors
+    const namedColors: Record<string, [number, number, number]> = {
+      white: [255, 255, 255],
+      black: [0, 0, 0],
+      red: [255, 0, 0],
+      green: [0, 128, 0],
+      blue: [0, 0, 255],
+      yellow: [255, 255, 0],
+      cyan: [0, 255, 255],
+      magenta: [255, 0, 255],
+      gray: [128, 128, 128],
+      grey: [128, 128, 128],
+      silver: [192, 192, 192],
+      maroon: [128, 0, 0],
+      olive: [128, 128, 0],
+      lime: [0, 255, 0],
+      aqua: [0, 255, 255],
+      teal: [0, 128, 128],
+      navy: [0, 0, 128],
+      fuchsia: [255, 0, 255],
+      purple: [128, 0, 128],
+    };
+
+    const normalized = color.toLowerCase().trim();
+    if (normalized in namedColors) {
+      return namedColors[normalized];
+    }
+
+    // Default to black if unable to parse
+    return [0, 0, 0];
+  };
+
+  const fgLuminance = getLuminance(foreground);
+  const bgLuminance = getLuminance(background);
+
+  // Calculate contrast ratio (lighter / darker)
+  const lighter = Math.max(fgLuminance, bgLuminance);
+  const darker = Math.min(fgLuminance, bgLuminance);
+
+  return (lighter + 0.05) / (darker + 0.05);
+};
+
+export const ensureContrastCompliance = (
+  foreground: string,
+  background: string,
+  level: 'AA' | 'AAA' = 'AA'
+): boolean => {
+  const ratio = getContrastRatio(foreground, background);
+  const requirement = level === 'AA' ? CONTRAST_RATIOS.AA_NORMAL : CONTRAST_RATIOS.AAA_NORMAL;
+
+  return ratio >= requirement;
+};
+
+export default {
+  ScreenReaderManager,
+  MobileAccessibilityManager,
+  useScreenReader,
+  useAccessibilityConfig,
+  useFocusManagement,
+  useTouchAccessibility,
+  TOUCH_TARGETS,
+  CONTRAST_RATIOS,
+  screenReaderManager,
+  accessibilityManager,
+  initializeMobileAccessibility,
+  getContrastRatio,
+  ensureContrastCompliance,
+};

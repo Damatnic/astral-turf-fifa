@@ -1,9 +1,12 @@
+/* eslint-env serviceworker */
+/* eslint-disable no-console */
+/// <reference lib="webworker" />
+
 /**
  * Service Worker for Astral Turf PWA
  * Provides offline capabilities, caching, and background sync
  */
 
-const CACHE_NAME = 'astral-turf-v8.0.0';
 const STATIC_CACHE = 'astral-turf-static-v8.0.0';
 const DYNAMIC_CACHE = 'astral-turf-dynamic-v8.0.0';
 const API_CACHE = 'astral-turf-api-v8.0.0';
@@ -20,39 +23,99 @@ const STATIC_ASSETS = [
 ];
 
 // API endpoints to cache
-const API_ENDPOINTS = [
-  '/api/formations',
-  '/api/players',
-  '/api/analytics',
-  '/api/auth/validate',
-];
+const API_ENDPOINTS = ['/api/formations', '/api/players', '/api/analytics', '/api/auth/validate'];
 
 // Network-first resources (always try network first)
-const NETWORK_FIRST = [
-  '/api/auth',
-  '/api/sync',
-  '/api/realtime',
-];
+const NETWORK_FIRST = ['/api/auth', '/api/sync', '/api/realtime'];
 
 // Cache-first resources (use cache if available)
-const CACHE_FIRST = [
-  '/icons/',
-  '/images/',
-  '/fonts/',
-  '.woff2',
-  '.woff',
-  '.ttf',
-];
+const CACHE_FIRST = ['/icons/', '/images/', '/fonts/', '.woff2', '.woff', '.ttf'];
+
+type SyncType = 'formation' | 'player' | 'analytics';
+type OfflineEntity = Record<string, unknown>;
 
 interface SyncData {
-  type: 'formation' | 'player' | 'analytics';
-  data: any;
+  type: SyncType;
+  data: OfflineEntity;
   timestamp: number;
   retries: number;
 }
 
+const isOfflineEntity = (value: unknown): value is OfflineEntity =>
+  typeof value === 'object' && value !== null;
+
+const sw = self as unknown as globalThis.ServiceWorkerGlobalScope;
+
+type WorkerRequest = globalThis.Request;
+type WorkerResponse = globalThis.Response;
+type ExtendableEvent = globalThis.ExtendableEvent;
+type FetchEvent = globalThis.FetchEvent;
+type PushEvent = globalThis.PushEvent;
+type ExtendableMessageEvent = globalThis.ExtendableMessageEvent;
+
+type BackgroundSyncEvent = ExtendableEvent & { readonly tag?: string };
+type PushNotificationEvent = PushEvent & {
+  readonly data?: {
+    text(): string;
+  };
+};
+type NotificationClickEvent = ExtendableEvent & {
+  readonly action?: string;
+  readonly notification: globalThis.Notification;
+};
+
+const isSyncType = (value: unknown): value is SyncType =>
+  value === 'formation' || value === 'player' || value === 'analytics';
+
+const determineSyncTypeFromRequest = (request: WorkerRequest): SyncType | null => {
+  const { url } = request;
+
+  if (url.includes('/api/formations')) {
+    return 'formation';
+  }
+
+  if (url.includes('/api/players')) {
+    return 'player';
+  }
+
+  if (url.includes('/api/analytics')) {
+    return 'analytics';
+  }
+
+  return null;
+};
+
+type ServiceWorkerMessage =
+  | { type: 'SKIP_WAITING' }
+  | { type: 'CACHE_INVALIDATE'; data: { cacheName: string } }
+  | { type: 'SYNC_DATA'; data: { type: SyncType; payload: OfflineEntity } };
+
+const isServiceWorkerMessage = (value: unknown): value is ServiceWorkerMessage => {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+
+  const message = value as { type?: unknown; data?: unknown };
+
+  if (message.type === 'SKIP_WAITING') {
+    return true;
+  }
+
+  if (message.type === 'CACHE_INVALIDATE') {
+    const data = message.data as { cacheName?: unknown } | undefined;
+    return typeof data?.cacheName === 'string';
+  }
+
+  if (message.type === 'SYNC_DATA') {
+    const data = message.data as { type?: unknown; payload?: unknown } | undefined;
+    return isSyncType(data?.type) && isOfflineEntity(data?.payload);
+  }
+
+  return false;
+};
+
 class ServiceWorkerManager {
-  private db: IDBDatabase | null = null;
+  private db: globalThis.IDBDatabase | null = null;
   private syncQueue: SyncData[] = [];
 
   constructor() {
@@ -62,7 +125,7 @@ class ServiceWorkerManager {
   // Initialize IndexedDB for offline data storage
   private async initIndexedDB(): Promise<void> {
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open('AstralTurfDB', 1);
+      const request = sw.indexedDB.open('AstralTurfDB', 1);
 
       request.onerror = () => reject(request.error);
       request.onsuccess = () => {
@@ -70,8 +133,8 @@ class ServiceWorkerManager {
         resolve();
       };
 
-      request.onupgradeneeded = (event) => {
-        const db = (event.target as IDBOpenDBRequest).result;
+      request.onupgradeneeded = event => {
+        const db = (event.target as globalThis.IDBOpenDBRequest).result;
 
         // Formations store
         if (!db.objectStoreNames.contains('formations')) {
@@ -95,7 +158,10 @@ class ServiceWorkerManager {
 
         // Sync queue store
         if (!db.objectStoreNames.contains('syncQueue')) {
-          const syncStore = db.createObjectStore('syncQueue', { keyPath: 'id', autoIncrement: true });
+          const syncStore = db.createObjectStore('syncQueue', {
+            keyPath: 'id',
+            autoIncrement: true,
+          });
           syncStore.createIndex('type', 'type');
           syncStore.createIndex('timestamp', 'timestamp');
         }
@@ -104,19 +170,26 @@ class ServiceWorkerManager {
   }
 
   // Store data in IndexedDB
-  async storeOfflineData(storeName: string, data: any): Promise<void> {
-    if (!this.db) await this.initIndexedDB();
-    
+  async storeOfflineData(storeName: string, data: OfflineEntity): Promise<void> {
+    if (!this.db) {
+      await this.initIndexedDB();
+    }
+
+    const db = this.db;
+    if (!db) {
+      throw new Error('IndexedDB unavailable');
+    }
+
     return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction([storeName], 'readwrite');
+      const transaction = db.transaction([storeName], 'readwrite');
       const store = transaction.objectStore(storeName);
-      
-      const dataWithMeta = {
+
+      const dataWithMeta: OfflineEntity = {
         ...data,
         timestamp: Date.now(),
         syncStatus: 'pending',
       };
-      
+
       const request = store.put(dataWithMeta);
       request.onsuccess = () => resolve();
       request.onerror = () => reject(request.error);
@@ -124,21 +197,32 @@ class ServiceWorkerManager {
   }
 
   // Retrieve data from IndexedDB
-  async getOfflineData(storeName: string, id?: string): Promise<any> {
-    if (!this.db) await this.initIndexedDB();
-    
+  async getOfflineData(
+    storeName: string,
+    id?: string
+  ): Promise<OfflineEntity | OfflineEntity[] | undefined> {
+    if (!this.db) {
+      await this.initIndexedDB();
+    }
+
+    const db = this.db;
+    if (!db) {
+      throw new Error('IndexedDB unavailable');
+    }
+
     return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction([storeName], 'readonly');
+      const transaction = db.transaction([storeName], 'readonly');
       const store = transaction.objectStore(storeName);
-      
+
       const request = id ? store.get(id) : store.getAll();
-      request.onsuccess = () => resolve(request.result);
+      request.onsuccess = () =>
+        resolve(request.result as OfflineEntity | OfflineEntity[] | undefined);
       request.onerror = () => reject(request.error);
     });
   }
 
   // Add item to sync queue
-  async addToSyncQueue(type: SyncData['type'], data: any): Promise<void> {
+  async addToSyncQueue(type: SyncType, data: OfflineEntity): Promise<void> {
     const syncItem: SyncData = {
       type,
       data,
@@ -157,7 +241,10 @@ class ServiceWorkerManager {
 
   // Process sync queue when online
   async processSyncQueue(): Promise<void> {
-    if (!navigator.onLine || this.syncQueue.length === 0) return;
+    const isOnline = sw.navigator?.onLine ?? true;
+    if (!isOnline || this.syncQueue.length === 0) {
+      return;
+    }
 
     const itemsToSync = [...this.syncQueue];
     this.syncQueue = [];
@@ -167,7 +254,7 @@ class ServiceWorkerManager {
         await this.syncItem(item);
       } catch (error) {
         console.error('Sync failed for item:', item, error);
-        
+
         // Retry logic
         if (item.retries < 3) {
           item.retries++;
@@ -180,7 +267,7 @@ class ServiceWorkerManager {
   // Sync individual item
   private async syncItem(item: SyncData): Promise<void> {
     const endpoint = this.getEndpointForType(item.type);
-    
+
     const response = await fetch(endpoint, {
       method: 'POST',
       headers: {
@@ -210,234 +297,232 @@ class ServiceWorkerManager {
 
 const swManager = new ServiceWorkerManager();
 
-// Service Worker Event Listeners
-self.addEventListener('install', (event: ExtendableEvent) => {
-  console.log('Service Worker installing...');
-  
-  event.waitUntil(
+sw.addEventListener('install', event => {
+  const installEvent = event as ExtendableEvent;
+
+  installEvent.waitUntil(
     Promise.all([
       caches.open(STATIC_CACHE).then(cache => cache.addAll(STATIC_ASSETS)),
-      self.skipWaiting(),
+      sw.skipWaiting(),
     ])
   );
 });
 
-self.addEventListener('activate', (event: ExtendableEvent) => {
-  console.log('Service Worker activating...');
-  
-  event.waitUntil(
+sw.addEventListener('activate', event => {
+  const activateEvent = event as ExtendableEvent;
+
+  activateEvent.waitUntil(
     Promise.all([
-      // Clean up old caches
       caches.keys().then(cacheNames => {
-        return Promise.all(
-          cacheNames.map(cacheName => {
-            if (cacheName !== STATIC_CACHE && 
-                cacheName !== DYNAMIC_CACHE && 
-                cacheName !== API_CACHE) {
-              console.log('Deleting old cache:', cacheName);
-              return caches.delete(cacheName);
-            }
-          })
+        const obsoleteCaches = cacheNames.filter(
+          cacheName =>
+            cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE && cacheName !== API_CACHE
         );
+
+        return Promise.all(obsoleteCaches.map(cacheName => caches.delete(cacheName)));
       }),
-      self.clients.claim(),
+      sw.clients.claim(),
     ])
   );
 });
 
-self.addEventListener('fetch', (event: FetchEvent) => {
-  const { request } = event;
+sw.addEventListener('fetch', event => {
+  const fetchEvent = event as FetchEvent;
+  const { request } = fetchEvent;
   const url = new URL(request.url);
 
-  // Skip non-GET requests and chrome-extension requests
   if (request.method !== 'GET' || url.protocol === 'chrome-extension:') {
     return;
   }
 
-  // Handle different caching strategies
   if (NETWORK_FIRST.some(pattern => url.pathname.includes(pattern))) {
-    event.respondWith(networkFirstStrategy(request));
+    fetchEvent.respondWith(networkFirstStrategy(request));
   } else if (CACHE_FIRST.some(pattern => url.pathname.includes(pattern))) {
-    event.respondWith(cacheFirstStrategy(request));
+    fetchEvent.respondWith(cacheFirstStrategy(request));
   } else if (API_ENDPOINTS.some(endpoint => url.pathname.includes(endpoint))) {
-    event.respondWith(staleWhileRevalidateStrategy(request));
+    fetchEvent.respondWith(staleWhileRevalidateStrategy(request));
   } else if (url.pathname === '/' || url.pathname.includes('.html')) {
-    event.respondWith(networkFirstWithOfflineFallback(request));
+    fetchEvent.respondWith(networkFirstWithOfflineFallback(request));
   } else {
-    event.respondWith(cacheFirstStrategy(request));
+    fetchEvent.respondWith(cacheFirstStrategy(request));
   }
 });
 
-// Network First Strategy (for critical API calls)
-async function networkFirstStrategy(request: Request): Promise<Response> {
+async function networkFirstStrategy(request: WorkerRequest): Promise<WorkerResponse> {
   try {
     const networkResponse = await fetch(request);
-    
+
     if (networkResponse.ok) {
       const cache = await caches.open(DYNAMIC_CACHE);
-      cache.put(request, networkResponse.clone());
+      await cache.put(request, networkResponse.clone());
     }
-    
+
     return networkResponse;
   } catch {
     const cachedResponse = await caches.match(request);
     if (cachedResponse) {
       return cachedResponse;
     }
-    
-    return new Response(
-      JSON.stringify({ error: 'Offline - data not available' }),
-      {
-        status: 503,
-        headers: { 'Content-Type': 'application/json' },
-      }
-    );
+
+    return new Response(JSON.stringify({ error: 'Offline - data not available' }), {
+      status: 503,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 }
 
-// Cache First Strategy (for static assets)
-async function cacheFirstStrategy(request: Request): Promise<Response> {
+async function cacheFirstStrategy(request: WorkerRequest): Promise<WorkerResponse> {
   const cachedResponse = await caches.match(request);
-  
+
   if (cachedResponse) {
     return cachedResponse;
   }
 
   try {
     const networkResponse = await fetch(request);
-    
+
     if (networkResponse.ok) {
       const cache = await caches.open(STATIC_CACHE);
-      cache.put(request, networkResponse.clone());
+      await cache.put(request, networkResponse.clone());
     }
-    
+
     return networkResponse;
   } catch {
     return new Response('Offline - Resource not available', { status: 503 });
   }
 }
 
-// Stale While Revalidate Strategy (for API data)
-async function staleWhileRevalidateStrategy(request: Request): Promise<Response> {
+async function staleWhileRevalidateStrategy(request: WorkerRequest): Promise<WorkerResponse> {
   const cache = await caches.open(API_CACHE);
   const cachedResponse = await cache.match(request);
+  const requestClone = request.clone();
 
-  const fetchPromise = fetch(request).then(networkResponse => {
-    if (networkResponse.ok) {
-      cache.put(request, networkResponse.clone());
-    }
-    return networkResponse;
-  }).catch(() => {
-    // Store failed request for background sync
-    if (request.method === 'POST') {
-      request.json().then(data => {
-        swManager.addToSyncQueue('formation', data); // Determine type dynamically
-      });
-    }
-    throw new Error('Network error');
-  });
-
-  return cachedResponse || fetchPromise;
-}
-
-// Network First with Offline Fallback (for HTML pages)
-async function networkFirstWithOfflineFallback(request: Request): Promise<Response> {
   try {
     const networkResponse = await fetch(request);
-    
+
+    if (networkResponse.ok) {
+      await cache.put(request, networkResponse.clone());
+    }
+
+    return networkResponse;
+  } catch {
+    if (request.method === 'POST') {
+      const syncType = determineSyncTypeFromRequest(requestClone);
+
+      if (syncType) {
+        try {
+          const payload = await requestClone.json();
+          if (isOfflineEntity(payload)) {
+            await swManager.addToSyncQueue(syncType, payload);
+          }
+        } catch (parseError) {
+          console.warn('Failed to parse request body for sync queue', parseError);
+        }
+      }
+    }
+
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+
+    return new Response(JSON.stringify({ error: 'Offline - data not available' }), {
+      status: 503,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+}
+
+async function networkFirstWithOfflineFallback(request: WorkerRequest): Promise<WorkerResponse> {
+  try {
+    const networkResponse = await fetch(request);
+
     if (networkResponse.ok) {
       const cache = await caches.open(DYNAMIC_CACHE);
-      cache.put(request, networkResponse.clone());
+      await cache.put(request, networkResponse.clone());
     }
-    
+
     return networkResponse;
   } catch {
     const cachedResponse = await caches.match(request);
     if (cachedResponse) {
       return cachedResponse;
     }
-    
-    // Return offline page
-    return caches.match('/offline.html') || new Response('Offline', { status: 503 });
+
+    const offlinePage = await caches.match('/offline.html');
+    if (offlinePage) {
+      return offlinePage;
+    }
+
+    return new Response('Offline', { status: 503 });
   }
 }
 
-// Background Sync
-self.addEventListener('sync', (event: any) => {
-  console.log('Background sync triggered:', event.tag);
-  
-  if (event.tag === 'background-sync') {
-    event.waitUntil(swManager.processSyncQueue());
+sw.addEventListener('sync', event => {
+  const syncEvent = event as BackgroundSyncEvent;
+
+  if (syncEvent.tag === 'background-sync') {
+    syncEvent.waitUntil(swManager.processSyncQueue());
   }
 });
 
-// Push Notifications
-self.addEventListener('push', (event: PushEvent) => {
-  console.log('Push notification received:', event);
-  
+sw.addEventListener('push', event => {
+  const pushEvent = event as PushNotificationEvent;
+
   const options = {
-    body: event.data?.text() || 'New update available',
+    body: pushEvent.data?.text() ?? 'New update available',
     icon: '/icons/icon-192x192.png',
     badge: '/icons/badge.png',
     vibrate: [100, 50, 100],
     data: {
       dateOfArrival: Date.now(),
-      primaryKey: 1
+      primaryKey: 1,
     },
     actions: [
       {
         action: 'explore',
         title: 'Open App',
-        icon: '/icons/checkmark.png'
+        icon: '/icons/checkmark.png',
       },
       {
         action: 'close',
         title: 'Close',
-        icon: '/icons/xmark.png'
-      }
-    ]
+        icon: '/icons/xmark.png',
+      },
+    ],
   };
 
-  event.waitUntil(
-    self.registration.showNotification('Astral Turf', options)
-  );
+  pushEvent.waitUntil(sw.registration.showNotification('Astral Turf', options));
 });
 
-// Notification Click
-self.addEventListener('notificationclick', (event: NotificationEvent) => {
-  console.log('Notification click received.');
+sw.addEventListener('notificationclick', event => {
+  const notificationEvent = event as NotificationClickEvent;
 
-  event.notification.close();
+  notificationEvent.notification.close();
 
-  if (event.action === 'explore') {
-    event.waitUntil(
-      self.clients.openWindow('/')
-    );
+  if (notificationEvent.action === 'explore') {
+    notificationEvent.waitUntil(sw.clients.openWindow('/'));
   }
 });
 
-// Online/Offline detection
-self.addEventListener('online', () => {
-  console.log('App is online - processing sync queue');
-  swManager.processSyncQueue();
-});
+sw.addEventListener('message', event => {
+  const messageEvent = event as ExtendableMessageEvent;
+  const message = messageEvent.data;
 
-// Message handling from main thread
-self.addEventListener('message', (event: MessageEvent) => {
-  const { type, data } = event.data;
+  if (!isServiceWorkerMessage(message)) {
+    console.warn('Unknown message received by service worker', message);
+    return;
+  }
 
-  switch (type) {
+  switch (message.type) {
     case 'SKIP_WAITING':
-      self.skipWaiting();
+      sw.skipWaiting();
       break;
     case 'CACHE_INVALIDATE':
-      caches.delete(data.cacheName);
+      void caches.delete(message.data.cacheName);
       break;
     case 'SYNC_DATA':
-      swManager.addToSyncQueue(data.type, data.payload);
+      void swManager.addToSyncQueue(message.data.type, message.data.payload);
       break;
-    default:
-      console.log('Unknown message type:', type);
   }
 });
 

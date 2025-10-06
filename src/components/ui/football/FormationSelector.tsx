@@ -136,7 +136,7 @@ export const FormationSelector = forwardRef<HTMLDivElement, FormationSelectorPro
       onCreateCustom,
       ...props
     },
-    ref,
+    ref
   ) => {
     const [hoveredFormation, setHoveredFormation] = useState<string | null>(null);
 
@@ -211,17 +211,26 @@ export const FormationSelector = forwardRef<HTMLDivElement, FormationSelectorPro
 
     if (mode === 'compact') {
       return (
-        <div ref={ref} className={cn('flex flex-wrap gap-2', className)} {...props}>
+        <div
+          ref={ref}
+          className={cn('flex flex-wrap gap-2', className)}
+          role="radiogroup"
+          aria-label="Formation selection"
+          {...props}
+        >
           {formations.map(formation => (
             <button
               key={formation.id}
               onClick={() => onFormationSelect(formation.id)}
+              role="radio"
+              aria-checked={selectedFormation === formation.id}
+              aria-label={`${formation.formation} formation: ${formation.description}`}
               className={cn(
                 'px-3 py-2 rounded-lg border text-sm font-medium transition-all duration-200',
                 'hover:scale-105 hover:shadow-md',
                 selectedFormation === formation.id
                   ? 'bg-primary-600 border-primary-500 text-white'
-                  : 'bg-secondary-700 border-secondary-600 text-secondary-300 hover:bg-secondary-600',
+                  : 'bg-secondary-700 border-secondary-600 text-secondary-300 hover:bg-secondary-600'
               )}
             >
               {formation.formation}
@@ -230,6 +239,7 @@ export const FormationSelector = forwardRef<HTMLDivElement, FormationSelectorPro
           {allowCustom && (
             <button
               onClick={onCreateCustom}
+              aria-label="Create custom formation"
               className="px-3 py-2 rounded-lg border border-dashed border-secondary-600 text-sm font-medium text-secondary-400 hover:text-white hover:border-secondary-500 transition-colors"
             >
               + Custom
@@ -241,16 +251,27 @@ export const FormationSelector = forwardRef<HTMLDivElement, FormationSelectorPro
 
     if (mode === 'list') {
       return (
-        <div ref={ref} className={cn('space-y-3', className)} {...props}>
+        <div
+          ref={ref}
+          className={cn('space-y-3', className)}
+          role="radiogroup"
+          aria-label="Formation selection"
+          {...props}
+        >
           {formations.map(formation => (
             <Card
               key={formation.id}
               variant={selectedFormation === formation.id ? 'elevated' : 'interactive'}
               className={cn(
                 'cursor-pointer transition-all duration-200',
-                selectedFormation === formation.id && 'ring-2 ring-primary-500/50',
+                selectedFormation === formation.id && 'ring-2 ring-primary-500/50'
               )}
               onClick={() => onFormationSelect(formation.id)}
+              role="radio"
+              aria-checked={selectedFormation === formation.id}
+              aria-label={`${formation.name} formation`}
+              aria-describedby={`formation-${formation.id}-details`}
+              tabIndex={0}
             >
               <div className="p-4">
                 <div className="flex items-center space-x-4">
@@ -264,6 +285,14 @@ export const FormationSelector = forwardRef<HTMLDivElement, FormationSelectorPro
                       {renderPopularityStars(formation.popularity)}
                     </div>
                     <p className="text-sm text-secondary-400 mb-2">{formation.description}</p>
+
+                    {/* Hidden details for screen readers */}
+                    <div id={`formation-${formation.id}-details`} className="sr-only">
+                      {formation.description}. Popularity: {formation.popularity} out of 5 stars.
+                      Strengths: {formation.strengths.join(', ')}. Weaknesses:{' '}
+                      {formation.weaknesses.join(', ')}. Suitable for:{' '}
+                      {formation.suitableFor.join(', ')}.
+                    </div>
 
                     {showDetails && (
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs">
@@ -335,6 +364,8 @@ export const FormationSelector = forwardRef<HTMLDivElement, FormationSelectorPro
       <div
         ref={ref}
         className={cn('grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4', className)}
+        role="radiogroup"
+        aria-label="Formation selection"
         {...props}
       >
         {formations.map(formation => (
@@ -344,11 +375,16 @@ export const FormationSelector = forwardRef<HTMLDivElement, FormationSelectorPro
             className={cn(
               'cursor-pointer transition-all duration-200 group',
               selectedFormation === formation.id && 'ring-2 ring-primary-500/50',
-              'hover:scale-105',
+              'hover:scale-105'
             )}
             onClick={() => onFormationSelect(formation.id)}
             onMouseEnter={() => setHoveredFormation(formation.id)}
             onMouseLeave={() => setHoveredFormation(null)}
+            role="radio"
+            aria-checked={selectedFormation === formation.id}
+            aria-label={`${formation.name} formation`}
+            aria-describedby={`formation-${formation.id}-grid-details`}
+            tabIndex={0}
           >
             <div className="p-4">
               {/* Formation header */}
@@ -364,6 +400,13 @@ export const FormationSelector = forwardRef<HTMLDivElement, FormationSelectorPro
 
               {/* Formation description */}
               <p className="text-sm text-secondary-400 mb-3 text-center">{formation.description}</p>
+
+              {/* Hidden details for screen readers */}
+              <div id={`formation-${formation.id}-grid-details`} className="sr-only">
+                {formation.description}. Popularity: {formation.popularity} out of 5 stars.
+                Strengths: {formation.strengths.join(', ')}. Weaknesses:{' '}
+                {formation.weaknesses.join(', ')}. Suitable for: {formation.suitableFor.join(', ')}.
+              </div>
 
               {/* Formation details */}
               {showDetails &&
@@ -423,7 +466,7 @@ export const FormationSelector = forwardRef<HTMLDivElement, FormationSelectorPro
         )}
       </div>
     );
-  },
+  }
 );
 
 FormationSelector.displayName = 'FormationSelector';

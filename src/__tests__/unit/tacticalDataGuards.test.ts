@@ -47,13 +47,12 @@ describe('ZENITH Tactical Data Guards', () => {
           slots: [
             {
               id: 'slot-1',
-              position: 'GK',
+              role: 'GK',
               defaultPosition: { x: 10, y: 50 },
               playerId: null,
             },
           ],
-          type: '11v11',
-          isDefault: false,
+          isCustom: false,
         };
 
         expect(isValidFormation(validFormation)).toBe(true);
@@ -100,7 +99,7 @@ describe('ZENITH Tactical Data Guards', () => {
       it('should validate correct formation slot objects', () => {
         const validSlot: FormationSlot = {
           id: 'slot-gk',
-          position: 'GK',
+          role: 'GK',
           defaultPosition: { x: 10, y: 50 },
           playerId: null,
         };
@@ -110,35 +109,45 @@ describe('ZENITH Tactical Data Guards', () => {
 
       it('should reject slots with invalid structure', () => {
         // Missing id
-        expect(isValidFormationSlot({ 
-          defaultPosition: { x: 10, y: 50 } 
-        })).toBe(false);
+        expect(
+          isValidFormationSlot({
+            defaultPosition: { x: 10, y: 50 },
+          })
+        ).toBe(false);
 
         // Invalid id type
-        expect(isValidFormationSlot({ 
-          id: 123, 
-          defaultPosition: { x: 10, y: 50 } 
-        })).toBe(false);
+        expect(
+          isValidFormationSlot({
+            id: 123,
+            defaultPosition: { x: 10, y: 50 },
+          })
+        ).toBe(false);
 
         // Missing defaultPosition
         expect(isValidFormationSlot({ id: 'slot-1' })).toBeFalsy();
 
         // Invalid position coordinates
-        expect(isValidFormationSlot({
-          id: 'slot-1',
-          defaultPosition: { x: 'invalid', y: 50 }
-        })).toBe(false);
+        expect(
+          isValidFormationSlot({
+            id: 'slot-1',
+            defaultPosition: { x: 'invalid', y: 50 },
+          })
+        ).toBe(false);
 
-        expect(isValidFormationSlot({
-          id: 'slot-1',
-          defaultPosition: { x: 50, y: null }
-        })).toBe(false);
+        expect(
+          isValidFormationSlot({
+            id: 'slot-1',
+            defaultPosition: { x: 50, y: null },
+          })
+        ).toBe(false);
 
         // NaN coordinates
-        expect(isValidFormationSlot({
-          id: 'slot-1',
-          defaultPosition: { x: NaN, y: 50 }
-        })).toBe(false);
+        expect(
+          isValidFormationSlot({
+            id: 'slot-1',
+            defaultPosition: { x: NaN, y: 50 },
+          })
+        ).toBe(false);
       });
     });
 
@@ -149,52 +158,64 @@ describe('ZENITH Tactical Data Guards', () => {
           name: 'Test Player',
           jerseyNumber: 10,
           position: { x: 50, y: 50 },
-          role: 'CM',
-          teamSide: 'home',
-        };
+          roleId: 'CM',
+          team: 'home',
+        } as Player;
 
         expect(isValidPlayer(validPlayer)).toBe(true);
       });
 
       it('should reject players with invalid structure', () => {
         // Missing id
-        expect(isValidPlayer({
-          name: 'Test',
-          position: { x: 50, y: 50 }
-        })).toBe(false);
+        expect(
+          isValidPlayer({
+            name: 'Test',
+            position: { x: 50, y: 50 },
+          })
+        ).toBe(false);
 
         // Invalid id type
-        expect(isValidPlayer({
-          id: 123,
-          name: 'Test',
-          position: { x: 50, y: 50 }
-        })).toBe(false);
+        expect(
+          isValidPlayer({
+            id: 123,
+            name: 'Test',
+            position: { x: 50, y: 50 },
+          })
+        ).toBe(false);
 
         // Missing name
-        expect(isValidPlayer({
-          id: 'player-1',
-          position: { x: 50, y: 50 }
-        })).toBe(false);
+        expect(
+          isValidPlayer({
+            id: 'player-1',
+            position: { x: 50, y: 50 },
+          })
+        ).toBe(false);
 
         // Invalid name type
-        expect(isValidPlayer({
-          id: 'player-1',
-          name: 123,
-          position: { x: 50, y: 50 }
-        })).toBe(false);
+        expect(
+          isValidPlayer({
+            id: 'player-1',
+            name: 123,
+            position: { x: 50, y: 50 },
+          })
+        ).toBe(false);
 
         // Invalid position
-        expect(isValidPlayer({
-          id: 'player-1',
-          name: 'Test',
-          position: null
-        })).toBeFalsy();
+        expect(
+          isValidPlayer({
+            id: 'player-1',
+            name: 'Test',
+            position: null,
+          })
+        ).toBeFalsy();
 
-        expect(isValidPlayer({
-          id: 'player-1',
-          name: 'Test',
-          position: { x: 'invalid', y: 50 }
-        })).toBe(false);
+        expect(
+          isValidPlayer({
+            id: 'player-1',
+            name: 'Test',
+            position: { x: 'invalid', y: 50 },
+          })
+        ).toBe(false);
       });
     });
 
@@ -226,31 +247,30 @@ describe('ZENITH Tactical Data Guards', () => {
       slots: [
         {
           id: 'slot-gk',
-          position: 'GK',
+          role: 'GK',
           defaultPosition: { x: 10, y: 50 },
           playerId: 'player-gk',
         },
         {
           id: 'slot-cb1',
-          position: 'CB',
+          role: 'CB',
           defaultPosition: { x: 25, y: 35 },
           playerId: 'player-cb1',
         },
         {
           id: 'slot-cb2',
-          position: 'CB',
+          role: 'CB',
           defaultPosition: { x: 25, y: 65 },
           playerId: null,
         },
         {
           id: 'invalid-slot',
-          position: 'CB',
+          role: 'CB',
           defaultPosition: { x: NaN, y: 'invalid' as any },
           playerId: 'player-invalid',
         },
       ],
-      type: '11v11',
-      isDefault: false,
+      isCustom: false,
     });
 
     const createValidPlayers = (): Player[] => [
@@ -259,37 +279,33 @@ describe('ZENITH Tactical Data Guards', () => {
         name: 'Goalkeeper',
         jerseyNumber: 1,
         position: { x: 10, y: 50 },
-        role: 'GK',
-        teamSide: 'home',
+        roleId: 'GK',
         team: 'home',
-      },
+      } as Player,
       {
         id: 'player-cb1',
         name: 'Center Back 1',
         jerseyNumber: 4,
         position: { x: 25, y: 35 },
-        role: 'CB',
-        teamSide: 'home',
+        roleId: 'CB',
         team: 'home',
-      },
+      } as Player,
       {
         id: 'player-cm',
         name: 'Central Midfielder',
         jerseyNumber: 8,
         position: { x: 50, y: 50 },
-        role: 'CM',
-        teamSide: 'home',
+        roleId: 'CM',
         team: 'home',
-      },
+      } as Player,
       {
         id: 'player-invalid',
         name: 'Invalid Player',
         jerseyNumber: 'invalid' as any,
         position: { x: NaN, y: 'invalid' as any },
-        role: 'ST',
-        teamSide: 'home',
+        roleId: 'ST',
         team: 'away', // Different team
-      },
+      } as Player,
     ];
 
     describe('getFormationSlots', () => {
@@ -305,7 +321,7 @@ describe('ZENITH Tactical Data Guards', () => {
         expect(getFormationSlots(null)).toEqual([]);
         expect(getFormationSlots(undefined)).toEqual([]);
         expect(consoleSpy).toHaveBeenCalledWith(
-          'Invalid formation provided to getFormationSlots:', 
+          'Invalid formation provided to getFormationSlots:',
           null
         );
       });
@@ -394,9 +410,7 @@ describe('ZENITH Tactical Data Guards', () => {
       });
 
       it('should return null for invalid player data', () => {
-        const players = [
-          { id: 'invalid-player', position: null } as any,
-        ];
+        const players = [{ id: 'invalid-player', position: null } as any];
         const foundPlayer = findPlayerById(players, 'invalid-player');
 
         expect(foundPlayer).toBeNull();
@@ -433,9 +447,9 @@ describe('ZENITH Tactical Data Guards', () => {
           name: 'Test',
           jerseyNumber: 1,
           position: { x: 75, y: 25 },
-          role: 'ST',
-          teamSide: 'home',
-        };
+          roleId: 'ST',
+          team: 'home',
+        } as Player;
 
         const position = getPlayerPosition(player);
         expect(position).toEqual({ x: 75, y: 25 });
@@ -451,7 +465,7 @@ describe('ZENITH Tactical Data Guards', () => {
         const playerWithInvalidPosition = {
           id: 'test',
           name: 'Test',
-          position: { x: NaN, y: 'invalid' }
+          position: { x: NaN, y: 'invalid' },
         } as any;
 
         const position = getPlayerPosition(playerWithInvalidPosition);
@@ -463,7 +477,7 @@ describe('ZENITH Tactical Data Guards', () => {
       it('should return valid slot position', () => {
         const slot: FormationSlot = {
           id: 'test-slot',
-          position: 'GK',
+          role: 'GK',
           defaultPosition: { x: 15, y: 50 },
           playerId: null,
         };
@@ -619,9 +633,9 @@ describe('ZENITH Tactical Data Guards', () => {
         teamSide: 'home' as const,
       }));
 
-      const start = performance.now();
+      const start = Date.now();
       const validPlayers = largePlayers.filter(isValidPlayer);
-      const end = performance.now();
+      const end = Date.now();
 
       expect(validPlayers).toHaveLength(10000);
       expect(end - start).toBeLessThan(100); // Should complete within 100ms
@@ -635,13 +649,13 @@ describe('ZENITH Tactical Data Guards', () => {
               object: {
                 with: {
                   many: {
-                    levels: null
-                  }
-                }
-              }
-            }
-          }
-        }
+                    levels: null,
+                  },
+                },
+              },
+            },
+          },
+        },
       };
 
       expect(isValidFormation(deeplyInvalid as any)).toBe(false);

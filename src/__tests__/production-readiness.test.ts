@@ -39,16 +39,16 @@ beforeAll(() => {
   global.window = {
     ...global.window,
     localStorage: mockLocalStorage,
-    PerformanceObserver: vi.fn(() => mockPerformanceObserver),
-    performance: mockPerformance,
+    PerformanceObserver: vi.fn(() => mockPerformanceObserver) as any,
+    performance: mockPerformance as any,
     addEventListener: vi.fn(),
     removeEventListener: vi.fn(),
     location: {
       href: 'https://test.example.com',
-    },
+    } as any,
     navigator: {
       userAgent: 'Test Browser',
-    },
+    } as any,
   };
 
   // @ts-ignore

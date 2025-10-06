@@ -3,7 +3,10 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { axe, toHaveNoViolations } from 'jest-axe';
-import { renderWithProviders, generateCompleteTacticalSetup } from '../utils/enhanced-mock-generators';
+import {
+  renderWithProviders,
+  generateCompleteTacticalSetup,
+} from '../utils/enhanced-mock-generators';
 import { UnifiedTacticsBoard } from '../../components/tactics/UnifiedTacticsBoard';
 
 // Extend expect with accessibility matchers
@@ -11,7 +14,7 @@ expect.extend(toHaveNoViolations);
 
 /**
  * ACCESSIBILITY TEST SUITE FOR TACTICAL BOARD
- * 
+ *
  * Comprehensive accessibility testing covering:
  * - WCAG 2.1 AA compliance
  * - Screen reader compatibility
@@ -30,8 +33,8 @@ describe('♿ Tactical Board Accessibility Tests', () => {
   let tacticalSetup: ReturnType<typeof generateCompleteTacticalSetup>;
 
   beforeEach(() => {
-    user = userEvent.setup();
-    tacticalSetup = generateCompleteTacticalSetup('4-4-2', 'medium');
+    user = (userEvent.setup as any)();
+    tacticalSetup = (generateCompleteTacticalSetup as any)('4-4-2', 'medium');
 
     // Mock accessibility APIs
     global.speechSynthesis = {
@@ -51,7 +54,7 @@ describe('♿ Tactical Board Accessibility Tests', () => {
     // Mock screen reader detection
     Object.defineProperty(navigator, 'userAgent', {
       value: 'Mozilla/5.0 (compatible; NVDA)',
-      writable: true
+      writable: true,
     });
 
     // Mock prefers-reduced-motion
@@ -88,7 +91,7 @@ describe('♿ Tactical Board Accessibility Tests', () => {
   describe('🎯 WCAG 2.1 AA Compliance', () => {
     it('should have no accessibility violations', async () => {
       const { container } = renderWithProviders(<UnifiedTacticsBoard />);
-      
+
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
       });
@@ -96,11 +99,11 @@ describe('♿ Tactical Board Accessibility Tests', () => {
       const results = await axe(container, {
         rules: {
           // Enable all WCAG 2.1 AA rules
-          'wcag2a': { enabled: true },
-          'wcag2aa': { enabled: true },
-          'wcag21a': { enabled: true },
-          'wcag21aa': { enabled: true },
-        }
+          wcag2a: { enabled: true },
+          wcag2aa: { enabled: true },
+          wcag21a: { enabled: true },
+          wcag21aa: { enabled: true },
+        },
       });
 
       expect(results).toHaveNoViolations();
@@ -108,7 +111,7 @@ describe('♿ Tactical Board Accessibility Tests', () => {
 
     it('should have proper semantic structure', async () => {
       renderWithProviders(<UnifiedTacticsBoard />);
-      
+
       // Main application should have application role
       const application = screen.getByRole('application');
       expect(application).toBeInTheDocument();
@@ -130,43 +133,44 @@ describe('♿ Tactical Board Accessibility Tests', () => {
         tactics: {
           players: tacticalSetup.players,
           formations: { [tacticalSetup.formation.id]: tacticalSetup.formation },
-          activeFormationIds: { home: tacticalSetup.formation.id, away: '' }
-        }
+          activeFormationIds: { home: tacticalSetup.formation.id, away: '' },
+        },
       };
 
       renderWithProviders(<UnifiedTacticsBoard />, { initialState });
 
       // Check heading structure (should start with h1 and be hierarchical)
       const headings = screen.getAllByRole('heading');
-      
+
       if (headings.length > 0) {
         const levels = headings.map(h => parseInt(h.tagName.charAt(1)));
-        
+
         // First heading should be h1 or h2 (depending on page structure)
         expect(levels[0]).toBeLessThanOrEqual(2);
-        
+
         // No heading should skip levels
         for (let i = 1; i < levels.length; i++) {
-          expect(levels[i] - levels[i-1]).toBeLessThanOrEqual(1);
+          expect(levels[i] - levels[i - 1]).toBeLessThanOrEqual(1);
         }
       }
     });
 
     it('should have sufficient color contrast', async () => {
       renderWithProviders(<UnifiedTacticsBoard />);
-      
+
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
       });
 
       // Test key interactive elements for color contrast
       const buttons = screen.getAllByRole('button');
-      
-      for (const button of buttons.slice(0, 5)) { // Test first 5 buttons
+
+      for (const button of buttons.slice(0, 5)) {
+        // Test first 5 buttons
         const styles = getComputedStyle(button);
         const backgroundColor = styles.backgroundColor;
         const color = styles.color;
-        
+
         // Basic check - should have contrasting colors
         expect(backgroundColor).not.toBe(color);
         expect(backgroundColor).not.toBe('');
@@ -176,25 +180,25 @@ describe('♿ Tactical Board Accessibility Tests', () => {
 
     it('should support keyboard-only navigation', async () => {
       renderWithProviders(<UnifiedTacticsBoard />);
-      
+
       // Should be able to tab through all interactive elements
       await user.tab();
-      
+
       let focusedElement = document.activeElement;
       expect(focusedElement).toBeVisible();
       expect(focusedElement?.tagName).toMatch(/BUTTON|INPUT|SELECT|A|DIV/);
-      
+
       // Continue tabbing through elements
       const tabbableElements = [];
       for (let i = 0; i < 10; i++) {
         await user.tab();
         focusedElement = document.activeElement;
-        
+
         if (focusedElement && focusedElement !== document.body) {
-          tabbableElements.push(focusedElement);
+          (tabbableElements as any).push(focusedElement);
         }
       }
-      
+
       // Should have found multiple tabbable elements
       expect(tabbableElements.length).toBeGreaterThan(0);
     });
@@ -209,9 +213,9 @@ describe('♿ Tactical Board Accessibility Tests', () => {
         tactics: {
           formations: {
             '442': tacticalSetup.formation,
-            '433': { ...tacticalSetup.formation, id: '433', name: '4-3-3 Formation' }
-          }
-        }
+            '433': { ...tacticalSetup.formation, id: '433', name: '4-3-3 Formation' },
+          },
+        },
       };
 
       renderWithProviders(<UnifiedTacticsBoard />, { initialState });
@@ -231,18 +235,19 @@ describe('♿ Tactical Board Accessibility Tests', () => {
         tactics: {
           players: tacticalSetup.players.slice(0, 11),
           formations: { [tacticalSetup.formation.id]: tacticalSetup.formation },
-          activeFormationIds: { home: tacticalSetup.formation.id, away: '' }
-        }
+          activeFormationIds: { home: tacticalSetup.formation.id, away: '' },
+        },
       };
 
       renderWithProviders(<UnifiedTacticsBoard />, { initialState });
 
       const playerElements = screen.getAllByTestId(/player-/);
-      
-      for (const player of playerElements.slice(0, 3)) { // Test first 3 players
+
+      for (const player of playerElements.slice(0, 3)) {
+        // Test first 3 players
         // Should have accessible name
         expect(player).toHaveAttribute('aria-label');
-        
+
         const ariaLabel = player.getAttribute('aria-label');
         expect(ariaLabel).toContain('player'); // Should identify as a player
         expect(ariaLabel).toMatch(/position|role/i); // Should mention position
@@ -271,21 +276,24 @@ describe('♿ Tactical Board Accessibility Tests', () => {
               id: 'arrow-1',
               tool: 'arrow' as const,
               color: '#ff0000',
-              points: [{ x: 100, y: 200 }, { x: 300, y: 400 }],
-              timestamp: Date.now()
-            }
-          ]
-        }
+              points: [
+                { x: 100, y: 200 },
+                { x: 300, y: 400 },
+              ],
+              timestamp: Date.now(),
+            },
+          ],
+        },
       };
 
       renderWithProviders(<UnifiedTacticsBoard />, { initialState });
 
       // Drawings should have text alternatives
       const drawingElements = screen.getAllByTestId(/drawing-/);
-      
+
       for (const drawing of drawingElements) {
         expect(drawing).toHaveAttribute('aria-label');
-        
+
         const description = drawing.getAttribute('aria-label');
         expect(description).toMatch(/arrow|line|zone|drawing/i);
       }
@@ -356,8 +364,8 @@ describe('♿ Tactical Board Accessibility Tests', () => {
         tactics: {
           players: tacticalSetup.players.slice(0, 11),
           formations: { [tacticalSetup.formation.id]: tacticalSetup.formation },
-          activeFormationIds: { home: tacticalSetup.formation.id, away: '' }
-        }
+          activeFormationIds: { home: tacticalSetup.formation.id, away: '' },
+        },
       };
 
       renderWithProviders(<UnifiedTacticsBoard />, { initialState });
@@ -367,7 +375,7 @@ describe('♿ Tactical Board Accessibility Tests', () => {
 
       // Arrow keys should navigate between players spatially
       fireEvent.keyDown(firstPlayer, { key: 'ArrowRight' });
-      
+
       const newFocusedElement = document.activeElement;
       expect(newFocusedElement).toHaveAttribute('data-testid', expect.stringMatching(/player-/));
       expect(newFocusedElement).not.toBe(firstPlayer);
@@ -391,10 +399,10 @@ describe('♿ Tactical Board Accessibility Tests', () => {
       renderWithProviders(<UnifiedTacticsBoard />);
 
       const application = screen.getByRole('application');
-      
+
       // Should apply high contrast styles
       expect(application).toBeInTheDocument();
-      
+
       // Test that borders and outlines are visible
       const buttons = screen.getAllByRole('button');
       for (const button of buttons.slice(0, 3)) {
@@ -437,17 +445,15 @@ describe('♿ Tactical Board Accessibility Tests', () => {
       renderWithProviders(<UnifiedTacticsBoard />);
 
       const buttons = screen.getAllByRole('button');
-      
+
       for (const button of buttons.slice(0, 3)) {
         button.focus();
-        
+
         const styles = getComputedStyle(button);
-        
+
         // Should have visible focus indicator
         expect(
-          styles.outline !== 'none' || 
-          styles.boxShadow !== 'none' ||
-          styles.border !== 'none'
+          styles.outline !== 'none' || styles.boxShadow !== 'none' || styles.border !== 'none'
         ).toBe(true);
       }
     });
@@ -456,18 +462,18 @@ describe('♿ Tactical Board Accessibility Tests', () => {
       // Mock zoom level
       Object.defineProperty(window, 'devicePixelRatio', {
         writable: true,
-        value: 2 // 200% zoom
+        value: 2, // 200% zoom
       });
 
       Object.defineProperty(window, 'innerWidth', {
         writable: true,
-        value: 960 // Half width due to zoom
+        value: 960, // Half width due to zoom
       });
 
       renderWithProviders(<UnifiedTacticsBoard />);
 
       const application = screen.getByRole('application');
-      
+
       // Should not cause horizontal scroll
       expect(application.scrollWidth).toBeLessThanOrEqual(application.clientWidth + 10);
     });
@@ -480,7 +486,7 @@ describe('♿ Tactical Board Accessibility Tests', () => {
       // Should have proper landmarks
       expect(screen.getByRole('application')).toBeInTheDocument();
       expect(screen.getByRole('main')).toBeInTheDocument();
-      
+
       const navigation = screen.queryByRole('navigation');
       if (navigation) {
         expect(navigation).toHaveAttribute('aria-label');
@@ -494,7 +500,7 @@ describe('♿ Tactical Board Accessibility Tests', () => {
       renderWithProviders(<UnifiedTacticsBoard />);
 
       const buttons = screen.getAllByRole('button');
-      
+
       for (const button of buttons.slice(0, 5)) {
         // Each button should have a clear, unique label
         const label = button.getAttribute('aria-label') || button.textContent;
@@ -508,15 +514,15 @@ describe('♿ Tactical Board Accessibility Tests', () => {
         tactics: {
           players: tacticalSetup.players.slice(0, 11),
           formations: { [tacticalSetup.formation.id]: tacticalSetup.formation },
-          activeFormationIds: { home: tacticalSetup.formation.id, away: '' }
-        }
+          activeFormationIds: { home: tacticalSetup.formation.id, away: '' },
+        },
       };
 
       renderWithProviders(<UnifiedTacticsBoard />, { initialState });
 
       // Players should be discoverable by voice commands
       const players = screen.getAllByTestId(/player-/);
-      
+
       for (const player of players.slice(0, 3)) {
         const label = player.getAttribute('aria-label');
         expect(label).toMatch(/player|goalkeeper|defender|midfielder|forward/i);
@@ -529,10 +535,10 @@ describe('♿ Tactical Board Accessibility Tests', () => {
       renderWithProviders(<UnifiedTacticsBoard />);
 
       const images = screen.getAllByRole('img');
-      
+
       for (const image of images) {
         expect(image).toHaveAttribute('alt');
-        
+
         const altText = image.getAttribute('alt');
         if (altText) {
           expect(altText.length).toBeGreaterThan(0);
@@ -545,17 +551,17 @@ describe('♿ Tactical Board Accessibility Tests', () => {
       Object.defineProperty(document.documentElement, 'style', {
         writable: true,
         value: {
-          fontSize: '24px' // 150% of default 16px
-        }
+          fontSize: '24px', // 150% of default 16px
+        },
       });
 
       renderWithProviders(<UnifiedTacticsBoard />);
 
       const application = screen.getByRole('application');
-      
+
       // Should handle larger text without breaking layout
       expect(application).toBeInTheDocument();
-      
+
       // Text should remain readable
       const textElements = screen.getAllByText(/formation|player|tactics/i);
       for (const element of textElements.slice(0, 3)) {
@@ -568,13 +574,13 @@ describe('♿ Tactical Board Accessibility Tests', () => {
 
       // Look for common abbreviations
       const abbreviations = screen.getAllByText(/GK|DF|MF|FW|CB|FB|CM|ST/);
-      
+
       for (const abbr of abbreviations.slice(0, 3)) {
         // Should have title or aria-label explaining abbreviation
         expect(
-          abbr.hasAttribute('title') || 
-          abbr.hasAttribute('aria-label') ||
-          abbr.closest('[aria-label]')
+          abbr.hasAttribute('title') ||
+            abbr.hasAttribute('aria-label') ||
+            abbr.closest('[aria-label]')
         ).toBe(true);
       }
     });
@@ -603,23 +609,23 @@ describe('♿ Tactical Board Accessibility Tests', () => {
       // Mock mobile device
       Object.defineProperty(navigator, 'userAgent', {
         value: 'Mobile Safari',
-        writable: true
+        writable: true,
       });
 
       Object.defineProperty(window, 'innerWidth', {
         value: 375,
-        writable: true
+        writable: true,
       });
 
       renderWithProviders(<UnifiedTacticsBoard />);
 
       const buttons = screen.getAllByRole('button');
-      
+
       for (const button of buttons.slice(0, 3)) {
         const styles = getComputedStyle(button);
         const minHeight = parseInt(styles.minHeight || '0');
         const minWidth = parseInt(styles.minWidth || '0');
-        
+
         // Should meet minimum touch target size (44px)
         expect(Math.max(minHeight, minWidth)).toBeGreaterThanOrEqual(44);
       }
@@ -629,11 +635,11 @@ describe('♿ Tactical Board Accessibility Tests', () => {
       renderWithProviders(<UnifiedTacticsBoard />);
 
       const field = screen.getByTestId('modern-field');
-      
+
       // Should support swipe gestures for navigation
       expect(field).toHaveAttribute('role', 'grid');
       expect(field).toHaveAttribute('aria-label');
-      
+
       // Grid cells should be navigable
       const gridCells = field.querySelectorAll('[role="gridcell"]');
       if (gridCells.length > 0) {
@@ -648,10 +654,10 @@ describe('♿ Tactical Board Accessibility Tests', () => {
 
       // Interactive elements should indicate their function
       const draggableElements = screen.getAllByTestId(/player-/);
-      
+
       for (const element of draggableElements.slice(0, 3)) {
         expect(element).toHaveAttribute('aria-label');
-        
+
         const label = element.getAttribute('aria-label');
         expect(label).toMatch(/draggable|moveable|interactive/i);
       }
@@ -661,15 +667,15 @@ describe('♿ Tactical Board Accessibility Tests', () => {
   describe('🧪 Accessibility Testing Tools Integration', () => {
     it('should pass automated accessibility scans', async () => {
       const { container } = renderWithProviders(<UnifiedTacticsBoard />);
-      
+
       // Run comprehensive accessibility scan
       const results = await axe(container, {
         rules: {
           'color-contrast': { enabled: true },
           'keyboard-navigation': { enabled: true },
           'aria-usage': { enabled: true },
-          'semantic-structure': { enabled: true }
-        }
+          'semantic-structure': { enabled: true },
+        },
       });
 
       expect(results.violations).toHaveLength(0);
@@ -688,24 +694,24 @@ describe('♿ Tactical Board Accessibility Tests', () => {
 
     it('should generate accessibility reports', async () => {
       const { container } = renderWithProviders(<UnifiedTacticsBoard />);
-      
+
       const results = await axe(container);
-      
+
       // Should provide detailed accessibility information
       expect(results.passes).toBeDefined();
       expect(results.violations).toBeDefined();
       expect(results.incomplete).toBeDefined();
       expect(results.inapplicable).toBeDefined();
-      
+
       // Generate summary report
       const report = {
         totalChecks: results.passes.length + results.violations.length,
         violations: results.violations.length,
         passes: results.passes.length,
         incomplete: results.incomplete.length,
-        score: results.passes.length / (results.passes.length + results.violations.length) * 100
+        score: (results.passes.length / (results.passes.length + results.violations.length)) * 100,
       };
-      
+
       expect(report.score).toBeGreaterThan(95); // 95% accessibility score
     });
   });

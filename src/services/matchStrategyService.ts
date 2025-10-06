@@ -157,7 +157,7 @@ async function generateJson(prompt: string, schema: unknown, systemInstruction: 
       },
     });
 
-    const jsonText = response.text.trim();
+    const jsonText = response.text?.trim();
     if (!jsonText) {
       throw new Error('AI returned an empty response.');
     }
@@ -181,7 +181,7 @@ export const generateMatchStrategy = async (
     weather?: string;
     playerFitness: Record<string, number>;
   },
-  personality: AIPersonality = 'balanced',
+  personality: AIPersonality = 'balanced'
 ): Promise<MatchStrategyPlan> => {
   if (!aiInstance) {
     throw new Error('AI is offline.');
@@ -193,7 +193,7 @@ OUR TEAM ANALYSIS:
 Squad: ${ourTeam.players
     .map(
       p =>
-        `${p.name} (${p.roleId}) - Rating: ${p.currentPotential}, Form: ${p.form}, Fitness: ${matchContext.playerFitness[p.id] || 100}%`,
+        `${p.name} (${p.roleId}) - Rating: ${p.currentPotential}, Form: ${p.form}, Fitness: ${matchContext.playerFitness[p.id] || 100}%`
     )
     .join('\n')}
 
@@ -297,7 +297,7 @@ export const analyzeLiveMatch = async (
   ourPlayers: Player[],
   benchPlayers: Player[],
   currentTactics: TeamTactics,
-  personality: AIPersonality = 'balanced',
+  personality: AIPersonality = 'balanced'
 ): Promise<LiveMatchAnalysis> => {
   if (!aiInstance) {
     throw new Error('AI is offline.');
@@ -320,7 +320,7 @@ OUR TEAM ON FIELD:
 ${ourPlayers
   .map(
     p =>
-      `${p.name} (${p.roleId}) - Form: ${p.form}, Stamina: ${p.stamina}%, Rating: ${p.currentPotential}`,
+      `${p.name} (${p.roleId}) - Form: ${p.form}, Stamina: ${p.stamina}%, Rating: ${p.currentPotential}`
   )
   .join('\n')}
 
@@ -411,7 +411,7 @@ export const generateOppositionReport = async (
     playingStyle?: string;
     formations?: string[];
   },
-  personality: AIPersonality = 'balanced',
+  personality: AIPersonality = 'balanced'
 ): Promise<OppositionAnalysisReport> => {
   if (!aiInstance) {
     throw new Error('AI is offline.');
@@ -518,7 +518,7 @@ export const predictMatchOutcome = async (
     importance: string;
     weather?: string;
   },
-  personality: AIPersonality = 'balanced',
+  personality: AIPersonality = 'balanced'
 ): Promise<{
   homeWinProbability: number;
   drawProbability: number;

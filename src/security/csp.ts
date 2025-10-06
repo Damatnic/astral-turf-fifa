@@ -34,7 +34,7 @@ export interface CSPViolationReport {
     'blocked-uri': string;
     'document-uri': string;
     'original-policy': string;
-    'referrer': string;
+    referrer: string;
     'status-code': number;
     'violated-directive': string;
     'line-number'?: number;
@@ -63,30 +63,30 @@ export function generateCSPHeader(): string {
     // Add each directive with its sources
     const addDirective = (directive: string, sources: string[]) => {
       if (sources.length > 0) {
-        directives.push(`${directive} ${sources.join(' ')}`);
+        directives.push(...`${directive} ${sources.join(' ')}`);
       }
     };
 
-    addDirective(CSPDirective.DEFAULT_SRC, CSP_CONFIG.DEFAULT_SRC);
-    addDirective(CSPDirective.SCRIPT_SRC, CSP_CONFIG.SCRIPT_SRC);
-    addDirective(CSPDirective.STYLE_SRC, CSP_CONFIG.STYLE_SRC);
-    addDirective(CSPDirective.FONT_SRC, CSP_CONFIG.FONT_SRC);
-    addDirective(CSPDirective.IMG_SRC, CSP_CONFIG.IMG_SRC);
-    addDirective(CSPDirective.CONNECT_SRC, CSP_CONFIG.CONNECT_SRC);
-    addDirective(CSPDirective.FRAME_SRC, CSP_CONFIG.FRAME_SRC);
-    addDirective(CSPDirective.OBJECT_SRC, CSP_CONFIG.OBJECT_SRC);
-    addDirective(CSPDirective.BASE_URI, CSP_CONFIG.BASE_URI);
-    addDirective(CSPDirective.FORM_ACTION, CSP_CONFIG.FORM_ACTION);
-    addDirective(CSPDirective.FRAME_ANCESTORS, CSP_CONFIG.FRAME_ANCESTORS);
+    addDirective(CSPDirective.DEFAULT_SRC, CSP_CONFIG.DEFAULT_SRC.slice());
+    addDirective(CSPDirective.SCRIPT_SRC, CSP_CONFIG.SCRIPT_SRC.slice());
+    addDirective(CSPDirective.STYLE_SRC, CSP_CONFIG.STYLE_SRC.slice());
+    addDirective(CSPDirective.FONT_SRC, CSP_CONFIG.FONT_SRC.slice());
+    addDirective(CSPDirective.IMG_SRC, CSP_CONFIG.IMG_SRC.slice());
+    addDirective(CSPDirective.CONNECT_SRC, CSP_CONFIG.CONNECT_SRC.slice());
+    addDirective(CSPDirective.FRAME_SRC, CSP_CONFIG.FRAME_SRC.slice());
+    addDirective(CSPDirective.OBJECT_SRC, CSP_CONFIG.OBJECT_SRC.slice());
+    addDirective(CSPDirective.BASE_URI, CSP_CONFIG.BASE_URI.slice());
+    addDirective(CSPDirective.FORM_ACTION, CSP_CONFIG.FORM_ACTION.slice());
+    addDirective(CSPDirective.FRAME_ANCESTORS, CSP_CONFIG.FRAME_ANCESTORS.slice());
 
     // Add upgrade-insecure-requests if enabled
     if (CSP_CONFIG.UPGRADE_INSECURE_REQUESTS && !ENVIRONMENT_CONFIG.isDevelopment) {
-      directives.push('upgrade-insecure-requests');
+      directives.push(...'upgrade-insecure-requests');
     }
 
     // Add report URI in production
     if (!ENVIRONMENT_CONFIG.isDevelopment) {
-      directives.push('report-uri /api/csp-violations');
+      directives.push(...'report-uri /api/csp-violations');
     }
 
     const cspHeader = directives.join('; ');
@@ -99,7 +99,7 @@ export function generateCSPHeader(): string {
     return cspHeader;
   } catch (_error) {
     securityLogger.error('Failed to generate CSP header', {
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: _error instanceof Error ? _error.message : 'Unknown error',
     });
 
     // Fallback to basic CSP
@@ -147,15 +147,23 @@ export function validateCSPDirective(directive: string, sources: string[]): bool
 
   return sources.every(source => {
     // Allow valid keywords
-    if (validSourceKeywords.includes(source)) {return true;}
+    if (validSourceKeywords.includes(source)) {
+      return true;
+    }
 
     // Allow data: and blob: schemes
-    if (source.startsWith('data:') || source.startsWith('blob:')) {return true;}
+    if (source.startsWith('data:') || source.startsWith('blob:')) {
+      return true;
+    }
 
     // Allow valid URLs and wildcards
     try {
-      if (source === '*') {return true;}
-      if (source.startsWith('*.')) {return true;}
+      if (source === '*') {
+        return true;
+      }
+      if (source.startsWith('*.')) {
+        return true;
+      }
       if (source.startsWith('https://') || source.startsWith('http://')) {
         new URL(source);
         return true;
@@ -204,7 +212,9 @@ export function getSecurityHeaders(): Record<string, string> {
 
 // Validate security header value
 export function validateSecurityHeader(name: string, value: string): boolean {
-  if (!name || !value) {return false;}
+  if (!name || !value) {
+    return false;
+  }
 
   // Check for header injection attempts
   if (name.includes('\n') || name.includes('\r') || value.includes('\n') || value.includes('\r')) {
@@ -217,8 +227,10 @@ export function validateSecurityHeader(name: string, value: string): boolean {
     case 'strict-transport-security':
       return /^max-age=\d+/.test(value);
     case 'x-frame-options':
-      return ['DENY', 'SAMEORIGIN'].includes(value.toUpperCase()) ||
-             value.toLowerCase().startsWith('allow-from ');
+      return (
+        ['DENY', 'SAMEORIGIN'].includes(value.toUpperCase()) ||
+        value.toLowerCase().startsWith('allow-from ')
+      );
     case 'x-content-type-options':
       return value.toLowerCase() === 'nosniff';
     case 'x-xss-protection':
@@ -236,20 +248,16 @@ export function validateSecurityHeader(name: string, value: string): boolean {
 export function processCSpViolation(report: CSPViolationReport): void {
   const violation = report['csp-report'];
 
-  securityLogger.logSecurityEvent(
-    'XSS_ATTEMPT' as any,
-    'CSP violation detected',
-    {
-      metadata: {
-        blockedUri: violation['blocked-uri'],
-        documentUri: violation['document-uri'],
-        violatedDirective: violation['violated-directive'],
-        sourceFile: violation['source-file'],
-        lineNumber: violation['line-number'],
-        columnNumber: violation['column-number'],
-      },
+  securityLogger.logSecurityEvent('XSS_ATTEMPT' as any, 'CSP violation detected', {
+    metadata: {
+      blockedUri: violation['blocked-uri'],
+      documentUri: violation['document-uri'],
+      violatedDirective: violation['violated-directive'],
+      sourceFile: violation['source-file'],
+      lineNumber: violation['line-number'],
+      columnNumber: violation['column-number'],
     },
-  );
+  });
 
   // Track violation patterns
   trackViolationPattern(violation);
@@ -325,10 +333,7 @@ export function injectCSPIntoHTML(html: string): string {
   const metaTagsString = metaTags.join('\n  ');
 
   // Insert meta tags after <head> tag
-  return html.replace(
-    /<head(\s[^>]*)?>/i,
-    (match) => `${match}\n  ${metaTagsString}`,
-  );
+  return html.replace(/<head(\s[^>]*)?>/i, match => `${match}\n  ${metaTagsString}`);
 }
 
 /**
@@ -346,13 +351,9 @@ export function generateCSPNonce(): string {
 
 // Add nonce to CSP directive
 export function addNonceToCSP(csp: string, nonce: string): string {
-  return csp.replace(
-    /(script-src[^;]+)/,
-    `$1 'nonce-${nonce}'`,
-  ).replace(
-    /(style-src[^;]+)/,
-    `$1 'nonce-${nonce}'`,
-  );
+  return csp
+    .replace(/(script-src[^;]+)/, `$1 'nonce-${nonce}'`)
+    .replace(/(style-src[^;]+)/, `$1 'nonce-${nonce}'`);
 }
 
 /**

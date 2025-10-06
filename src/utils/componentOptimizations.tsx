@@ -3,17 +3,17 @@
  * Ultra-aggressive React component optimizations for sub-millisecond response times
  */
 
-import React, { 
-  memo, 
-  useMemo, 
-  useCallback, 
-  useRef, 
-  useEffect, 
+import React, {
+  memo,
+  useMemo,
+  useCallback,
+  useRef,
+  useEffect,
   useState,
   ComponentType,
   PropsWithChildren,
   ReactElement,
-  RefObject
+  RefObject,
 } from 'react';
 import { shallowEqual } from './performanceOptimizations';
 
@@ -22,20 +22,28 @@ export function createOptimizedMemo<P extends object>(
   Component: ComponentType<P>,
   customCompare?: (prev: P, next: P) => boolean
 ): ComponentType<P> {
-  return memo(Component, customCompare || ((prev, next) => {
-    // Ultra-fast shallow comparison
-    const prevKeys = Object.keys(prev);
-    const nextKeys = Object.keys(next);
-    
-    if (prevKeys.length !== nextKeys.length) return false;
-    
-    for (let i = 0; i < prevKeys.length; i++) {
-      const key = prevKeys[i] as keyof P;
-      if (prev[key] !== next[key]) return false;
-    }
-    
-    return true;
-  }));
+  return memo(
+    Component,
+    customCompare ||
+      ((prev, next) => {
+        // Ultra-fast shallow comparison
+        const prevKeys = Object.keys(prev);
+        const nextKeys = Object.keys(next);
+
+        if (prevKeys.length !== nextKeys.length) {
+          return false;
+        }
+
+        for (let i = 0; i < prevKeys.length; i++) {
+          const key = prevKeys[i] as keyof P;
+          if (prev[key] !== next[key]) {
+            return false;
+          }
+        }
+
+        return true;
+      })
+  ) as unknown as ComponentType<P>;
 }
 
 // Optimized useMemo with dependency comparison optimization
@@ -45,32 +53,34 @@ export function useOptimizedMemo<T>(
   isEqual?: (a: T, b: T) => boolean
 ): T {
   const ref = useRef<{ deps: React.DependencyList; value: T } | undefined>();
-  
+
   // Fast dependency comparison
-  const depsChanged = !ref.current || 
+  const depsChanged =
+    !ref.current ||
     ref.current.deps.length !== deps.length ||
     ref.current.deps.some((dep, i) => !Object.is(dep, deps[i]));
-  
+
   if (depsChanged) {
     const newValue = factory();
     if (!ref.current || !isEqual || !isEqual(ref.current.value, newValue)) {
       ref.current = { deps: [...deps], value: newValue };
     }
   }
-  
+
   return ref.current!.value;
 }
 
 // Ultra-optimized callback with stable reference
-export function useStableCallback<T extends (...args: any[]) => any>(
-  callback: T
-): T {
+export function useStableCallback<T extends (...args: any[]) => any>(callback: T): T {
   const ref = useRef<T>(callback);
   ref.current = callback;
-  
-  return useCallback(((...args: Parameters<T>) => {
-    return ref.current(...args);
-  }) as T, []);
+
+  return useCallback(
+    ((...args: Parameters<T>) => {
+      return ref.current(...args);
+    }) as T,
+    []
+  );
 }
 
 // Batch state updates for better performance
@@ -78,14 +88,14 @@ export function useBatchedState<T>(initialState: T) {
   const [state, setState] = useState<T>(initialState);
   const batchedUpdates = useRef<Array<(prev: T) => T>>([]);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  
+
   const batchUpdate = useCallback((updater: (prev: T) => T) => {
     batchedUpdates.current.push(updater);
-    
+
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
-    
+
     timeoutRef.current = setTimeout(() => {
       setState(prev => {
         let result = prev;
@@ -97,7 +107,7 @@ export function useBatchedState<T>(initialState: T) {
       });
     }, 0);
   }, []);
-  
+
   const immediateBatch = useCallback(() => {
     if (batchedUpdates.current.length > 0) {
       setState(prev => {
@@ -108,14 +118,14 @@ export function useBatchedState<T>(initialState: T) {
         batchedUpdates.current = [];
         return result;
       });
-      
+
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
       }
     }
   }, []);
-  
+
   return [state, batchUpdate, immediateBatch] as const;
 }
 
@@ -124,48 +134,46 @@ export function useRenderPrevention() {
   const renderCountRef = useRef(0);
   const lastRenderTimeRef = useRef(Date.now());
   const preventionActiveRef = useRef(false);
-  
+
   useEffect(() => {
     renderCountRef.current++;
     const now = Date.now();
     const timeSinceLastRender = now - lastRenderTimeRef.current;
-    
+
     // If rendering too frequently, activate prevention
-    if (timeSinceLastRender < 16) { // 60fps threshold
+    if (timeSinceLastRender < 16) {
+      // 60fps threshold
       preventionActiveRef.current = true;
-      
+
       // Disable prevention after a short delay
       setTimeout(() => {
         preventionActiveRef.current = false;
       }, 100);
     }
-    
+
     lastRenderTimeRef.current = now;
   });
-  
+
   return {
     renderCount: renderCountRef.current,
     shouldPreventRender: preventionActiveRef.current,
     forceRender: () => {
       preventionActiveRef.current = false;
-    }
+    },
   };
 }
 
 // Optimized event handler factory
 class EventHandlerCache {
   private cache = new Map<string, (...args: any[]) => void>();
-  
-  getHandler<T extends (...args: any[]) => void>(
-    key: string,
-    factory: () => T
-  ): T {
+
+  getHandler<T extends (...args: any[]) => void>(key: string, factory: () => T): T {
     if (!this.cache.has(key)) {
       this.cache.set(key, factory());
     }
     return this.cache.get(key) as T;
   }
-  
+
   clear() {
     this.cache.clear();
   }
@@ -190,7 +198,7 @@ export function useVirtualList<T>({
   containerHeight,
   itemHeight,
   overscan = 5,
-  scrollTop = 0
+  scrollTop = 0,
 }: {
   items: T[];
   containerHeight: number;
@@ -203,27 +211,24 @@ export function useVirtualList<T>({
     const startIndex = Math.floor(scrollTop / itemHeight);
     const endIndex = Math.min(startIndex + visibleCount + overscan, items.length);
     const startIndexWithOverscan = Math.max(0, startIndex - overscan);
-    
+
     const visibleItems = items.slice(startIndexWithOverscan, endIndex).map((item, index) => ({
       item,
       index: startIndexWithOverscan + index,
-      top: (startIndexWithOverscan + index) * itemHeight
+      top: (startIndexWithOverscan + index) * itemHeight,
     }));
-    
+
     return {
       visibleItems,
       totalHeight: items.length * itemHeight,
       startIndex: startIndexWithOverscan,
-      endIndex
+      endIndex,
     };
   }, [items, containerHeight, itemHeight, overscan, scrollTop]);
 }
 
 // Optimized children rendering
-export function useOptimizedChildren(
-  children: React.ReactNode,
-  key?: string
-): ReactElement[] {
+export function useOptimizedChildren(children: React.ReactNode, key?: string): ReactElement[] {
   return useOptimizedMemo(() => {
     const childArray = React.Children.toArray(children) as ReactElement[];
     return key ? childArray.filter(child => child.key === key) : childArray;
@@ -244,23 +249,23 @@ export function withPerformanceOptimizations<P extends object>(
     memoize = true,
     customCompare,
     enableVirtualization = false,
-    batchUpdates = false
+    batchUpdates = false,
   } = options;
-  
+
   let OptimizedComponent = Component;
-  
+
   if (memoize) {
     OptimizedComponent = createOptimizedMemo(OptimizedComponent, customCompare);
   }
-  
+
   return React.forwardRef<any, P>((props, ref) => {
     const { shouldPreventRender } = useRenderPrevention();
-    
-    if (shouldPreventRender && !props.forceRender) {
+
+    if (shouldPreventRender && !(props as any).forceRender) {
       return null;
     }
-    
-    return React.createElement(OptimizedComponent, { ...props, ref });
+
+    return React.createElement(OptimizedComponent, { ...props, ref } as any);
   });
 }
 
@@ -271,11 +276,13 @@ export function useIntersectionOptimization(
 ) {
   const [isIntersecting, setIsIntersecting] = useState(false);
   const [hasIntersected, setHasIntersected] = useState(false);
-  
+
   useEffect(() => {
     const element = ref.current;
-    if (!element) return;
-    
+    if (!element) {
+      return;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         setIsIntersecting(entry.isIntersecting);
@@ -286,15 +293,15 @@ export function useIntersectionOptimization(
       {
         threshold: 0.1,
         rootMargin: '100px',
-        ...options
+        ...options,
       }
     );
-    
+
     observer.observe(element);
-    
+
     return () => observer.disconnect();
   }, [ref, hasIntersected, options.threshold, options.rootMargin]);
-  
+
   return { isIntersecting, hasIntersected };
 }
 
@@ -307,7 +314,7 @@ export function OptimizedList<T>({
   className = '',
   onScroll,
   enableVirtualization = true,
-  keyExtractor = (item, index) => `item-${index}`
+  keyExtractor = (item, index) => `item-${index}`,
 }: {
   items: T[];
   renderItem: (item: T, index: number) => ReactElement;
@@ -320,21 +327,21 @@ export function OptimizedList<T>({
 }) {
   const [scrollTop, setScrollTop] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
-  
+
   const handleScroll = useStableCallback((e: React.UIEvent<HTMLDivElement>) => {
     const newScrollTop = e.currentTarget.scrollTop;
     setScrollTop(newScrollTop);
     onScroll?.(newScrollTop);
   });
-  
+
   const virtualList = useVirtualList({
     items,
     containerHeight,
     itemHeight,
     scrollTop,
-    overscan: 3
+    overscan: 3,
   });
-  
+
   if (!enableVirtualization || items.length < 50) {
     // Render all items for small lists
     return (
@@ -345,14 +352,12 @@ export function OptimizedList<T>({
         onScroll={handleScroll}
       >
         {items.map((item, index) => (
-          <div key={keyExtractor(item, index)}>
-            {renderItem(item, index)}
-          </div>
+          <div key={keyExtractor(item, index)}>{renderItem(item, index)}</div>
         ))}
       </div>
     );
   }
-  
+
   return (
     <div
       ref={containerRef}
@@ -369,7 +374,7 @@ export function OptimizedList<T>({
               top,
               left: 0,
               right: 0,
-              height: itemHeight
+              height: itemHeight,
             }}
           >
             {renderItem(item, index)}
@@ -384,25 +389,25 @@ export function OptimizedList<T>({
 export function useOptimizedForm<T extends Record<string, any>>(initialValues: T) {
   const [values, updateValues, flushUpdates] = useBatchedState(initialValues);
   const errorsRef = useRef<Partial<Record<keyof T, string>>>({});
-  
+
   const setValue = useStableCallback(<K extends keyof T>(name: K, value: T[K]) => {
     updateValues(prev => ({ ...prev, [name]: value }));
   });
-  
+
   const setValues = useStableCallback((newValues: Partial<T>) => {
     updateValues(prev => ({ ...prev, ...newValues }));
   });
-  
+
   const setError = useStableCallback(<K extends keyof T>(name: K, error: string) => {
     errorsRef.current = { ...errorsRef.current, [name]: error };
   });
-  
+
   const clearError = useStableCallback(<K extends keyof T>(name: K) => {
     const newErrors = { ...errorsRef.current };
     delete newErrors[name];
     errorsRef.current = newErrors;
   });
-  
+
   return {
     values,
     errors: errorsRef.current,
@@ -411,7 +416,7 @@ export function useOptimizedForm<T extends Record<string, any>>(initialValues: T
     setError,
     clearError,
     flush: flushUpdates,
-    reset: () => updateValues(() => initialValues)
+    reset: () => updateValues(() => initialValues),
   };
 }
 
@@ -423,28 +428,29 @@ export function withPerformanceProfiler<P extends object>(
   return React.forwardRef<any, P>((props, ref) => {
     const renderStartTime = useRef<number>(0);
     const renderCount = useRef<number>(0);
-    
+
     useEffect(() => {
       renderStartTime.current = performance.now();
       renderCount.current++;
     });
-    
+
     useEffect(() => {
       const renderTime = performance.now() - renderStartTime.current;
-      
-      if (renderTime > 16) { // Longer than 1 frame
+
+      if (renderTime > 16) {
+        // Longer than 1 frame
         console.warn(
           `🐌 Slow render detected in ${componentName}: ${renderTime.toFixed(2)}ms (render #${renderCount.current})`
         );
       }
-      
+
       // Log to performance API if available
       if ('mark' in performance) {
         performance.mark(`${componentName}-render-${renderCount.current}`);
       }
     });
-    
-    return React.createElement(Component, { ...props, ref });
+
+    return React.createElement(Component, { ...props, ref } as any);
   });
 }
 
@@ -461,5 +467,5 @@ export default {
   useIntersectionOptimization,
   OptimizedList,
   useOptimizedForm,
-  withPerformanceProfiler
+  withPerformanceProfiler,
 };

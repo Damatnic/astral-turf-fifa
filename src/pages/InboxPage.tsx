@@ -39,7 +39,10 @@ const InboxPage: React.FC = () => {
   };
 
   const handleAcceptTransferOffer = (inboxId: string, playerId: string, price: number) => {
-    dispatch({ type: 'ACCEPT_TRANSFER_OFFER', payload: { inboxId, playerId, price } });
+    (dispatch as (action: { type: string; payload: unknown }) => void)({
+      type: 'ACCEPT_TRANSFER_OFFER',
+      payload: { inboxId, playerId, price },
+    });
     uiDispatch({
       type: 'ADD_NOTIFICATION',
       payload: {
@@ -53,9 +56,12 @@ const InboxPage: React.FC = () => {
     inboxId: string,
     playerId: string,
     fee: number,
-    wageContribution: number,
+    wageContribution: number
   ) => {
-    dispatch({ type: 'ACCEPT_LOAN_OFFER', payload: { inboxId, playerId, fee, wageContribution } });
+    (dispatch as (action: { type: string; payload: unknown }) => void)({
+      type: 'ACCEPT_LOAN_OFFER',
+      payload: { inboxId, playerId, fee, wageContribution },
+    });
     uiDispatch({
       type: 'ADD_NOTIFICATION',
       payload: {
@@ -291,27 +297,27 @@ const InboxPage: React.FC = () => {
                 </div>
 
                 {/* Action Buttons for Transfer Offers */}
-                {selectedItem.payload && selectedItem.payload.offer && (
+                {selectedItem.payload && (selectedItem.payload as any).offer && (
                   <div className="bg-gray-700 rounded-lg p-4">
                     <h3 className="text-lg font-semibold text-teal-400 mb-3">Offer Details</h3>
                     <div className="space-y-3">
                       <div className="flex justify-between">
                         <span className="text-gray-300">From Club:</span>
                         <span className="text-white font-medium">
-                          {selectedItem.payload.offer.fromClub}
+                          {(selectedItem.payload as any).offer.fromClub}
                         </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-300">Offer Value:</span>
                         <span className="text-green-400 font-bold">
-                          ${selectedItem.payload.offer.value.toLocaleString()}
+                          ${(selectedItem.payload as any).offer.value.toLocaleString()}
                         </span>
                       </div>
-                      {selectedItem.payload.offer.wageContribution && (
+                      {(selectedItem.payload as any).offer.wageContribution && (
                         <div className="flex justify-between">
                           <span className="text-gray-300">Wage Contribution:</span>
                           <span className="text-yellow-400 font-medium">
-                            {selectedItem.payload.offer.wageContribution}%
+                            {(selectedItem.payload as any).offer.wageContribution}%
                           </span>
                         </div>
                       )}
@@ -319,18 +325,26 @@ const InboxPage: React.FC = () => {
                     <div className="flex space-x-3 mt-4">
                       <button
                         onClick={() => {
-                          if (selectedItem.payload!.offer!.type === 'transfer_offer') {
+                          const payload = selectedItem.payload as {
+                            offer?: {
+                              type?: string;
+                              playerId?: string;
+                              value?: number;
+                              wageContribution?: number;
+                            };
+                          };
+                          if (payload.offer?.type === 'transfer_offer') {
                             handleAcceptTransferOffer(
                               selectedItem.id,
-                              selectedItem.payload!.offer!.playerId,
-                              selectedItem.payload!.offer!.value,
+                              payload.offer.playerId!,
+                              payload.offer.value!
                             );
                           } else {
                             handleAcceptLoanOffer(
                               selectedItem.id,
-                              selectedItem.payload!.offer!.playerId,
-                              selectedItem.payload!.offer!.value,
-                              selectedItem.payload!.offer!.wageContribution || 0,
+                              payload.offer!.playerId!,
+                              payload.offer!.value!,
+                              payload.offer!.wageContribution || 0
                             );
                           }
                         }}
@@ -349,20 +363,23 @@ const InboxPage: React.FC = () => {
                 )}
 
                 {/* Action for Conversation Requests */}
-                {selectedItem.payload && selectedItem.payload.conversationRequest && (
+                {selectedItem.payload && (selectedItem.payload as any).conversationRequest && (
                   <div className="bg-gray-700 rounded-lg p-4">
                     <h3 className="text-lg font-semibold text-teal-400 mb-3">
                       Conversation Request
                     </h3>
                     <p className="text-gray-300 mb-3">
-                      Reason: {selectedItem.payload.conversationRequest.reason}
+                      Reason: {(selectedItem.payload as any).conversationRequest.reason}
                     </p>
                     <button
                       onClick={() => {
+                        const payload = selectedItem.payload as {
+                          conversationRequest?: { playerId?: string };
+                        };
                         uiDispatch({
                           type: 'START_PLAYER_CONVERSATION',
                           payload: {
-                            playerId: selectedItem.payload!.conversationRequest!.playerId,
+                            playerId: payload.conversationRequest!.playerId!,
                           },
                         });
                       }}

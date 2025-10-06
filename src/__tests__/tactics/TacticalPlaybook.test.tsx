@@ -2,17 +2,18 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '../test-utils';
 import TacticalPlaybook from '../../components/tactics/TacticalPlaybook';
 import { type Formation, type Player } from '../../types';
+import { createMockPlayer } from '../../test-utils/mock-factories/player.factory';
 
 // Mock localStorage
 const mockLocalStorage = {
   getItem: vi.fn(),
   setItem: vi.fn(),
   removeItem: vi.fn(),
-  clear: vi.fn()
+  clear: vi.fn(),
 };
 
 Object.defineProperty(window, 'localStorage', {
-  value: mockLocalStorage
+  value: mockLocalStorage,
 });
 
 // Mock tactical integration service
@@ -23,7 +24,7 @@ vi.mock('../../services/tacticalIntegrationService', () => ({
       weaknesses: ['Could improve width'],
       recommendations: ['Adjust wing positions'],
       effectiveness: 85,
-      riskLevel: 'medium'
+      riskLevel: 'medium',
     }),
     exportFormation: vi.fn().mockReturnValue({
       id: 'export-123',
@@ -31,37 +32,37 @@ vi.mock('../../services/tacticalIntegrationService', () => ({
       formation: {},
       players: [],
       analysis: {},
-      timestamp: Date.now()
-    })
-  }
+      timestamp: Date.now(),
+    }),
+  },
 }));
 
 describe('TacticalPlaybook Component', () => {
   const mockFormation: Formation = {
     id: 'test-formation',
     name: '4-3-3',
-    positions: {
-      '1': { x: 50, y: 80 },
-      '2': { x: 30, y: 60 },
-      '3': { x: 70, y: 60 }
-    }
+    slots: [
+      { id: '1', role: 'GK', defaultPosition: { x: 50, y: 80 }, playerId: null },
+      { id: '2', role: 'DF', defaultPosition: { x: 30, y: 60 }, playerId: null },
+      { id: '3', role: 'DF', defaultPosition: { x: 70, y: 60 }, playerId: null },
+    ],
   };
 
   const mockPlayers: Player[] = [
-    {
+    createMockPlayer({
       id: '1',
       name: 'Test Player 1',
-      position: 'CF',
+      roleId: 'striker',
       currentPotential: 85,
-      age: 25
-    },
-    {
+      age: 25,
+    }),
+    createMockPlayer({
       id: '2',
       name: 'Test Player 2',
-      position: 'CM',
+      roleId: 'midfielder',
       currentPotential: 78,
-      age: 23
-    }
+      age: 23,
+    }),
   ];
 
   const mockOnLoadFormation = vi.fn();
@@ -219,10 +220,10 @@ describe('TacticalPlaybook Component', () => {
             strengths: ['Good'],
             weaknesses: ['Bad'],
             recommendations: ['Fix'],
-            riskLevel: 'low'
+            riskLevel: 'low',
           },
-          timestamp: Date.now()
-        }
+          timestamp: Date.now(),
+        },
       ];
 
       mockLocalStorage.getItem.mockReturnValue(JSON.stringify(savedFormations));
@@ -252,12 +253,12 @@ describe('TacticalPlaybook Component', () => {
           analysis: {
             effectiveness: 85,
             strengths: ['Good'],
-            weaknesses: ['Bad'], 
+            weaknesses: ['Bad'],
             recommendations: ['Fix'],
-            riskLevel: 'low'
+            riskLevel: 'low',
           },
-          timestamp: Date.now()
-        }
+          timestamp: Date.now(),
+        },
       ];
 
       mockLocalStorage.getItem.mockReturnValue(JSON.stringify(savedFormations));
@@ -292,10 +293,10 @@ describe('TacticalPlaybook Component', () => {
             strengths: [],
             weaknesses: [],
             recommendations: [],
-            riskLevel: 'low' as const
+            riskLevel: 'low' as const,
           },
-          timestamp: Date.now()
-        }
+          timestamp: Date.now(),
+        },
       ];
 
       mockLocalStorage.getItem.mockReturnValue(JSON.stringify(savedFormations));
@@ -309,11 +310,11 @@ describe('TacticalPlaybook Component', () => {
       const mockClick = vi.fn();
       const mockAppendChild = vi.fn();
       const mockRemoveChild = vi.fn();
-      
+
       const mockLink = {
         href: '',
         download: '',
-        click: mockClick
+        click: mockClick,
       };
 
       document.createElement = vi.fn().mockReturnValue(mockLink);
@@ -334,9 +335,11 @@ describe('TacticalPlaybook Component', () => {
       const exportButtons = screen.getAllByRole('button');
       const exportButton = exportButtons.find(button => {
         const icon = button.querySelector('svg');
-        return icon?.classList.contains('lucide-download') || 
-               button.getAttribute('title')?.includes('Export') ||
-               button.textContent?.includes('Export');
+        return (
+          icon?.classList.contains('lucide-download') ||
+          button.getAttribute('title')?.includes('Export') ||
+          button.textContent?.includes('Export')
+        );
       });
 
       if (exportButton) {
@@ -364,7 +367,7 @@ describe('TacticalPlaybook Component', () => {
         type: 'file',
         accept: '.json',
         onchange: null,
-        click: vi.fn()
+        click: vi.fn(),
       };
 
       document.createElement = vi.fn().mockReturnValue(mockFileInput);
@@ -386,17 +389,29 @@ describe('TacticalPlaybook Component', () => {
           name: 'Attack Formation',
           formation: mockFormation,
           players: mockPlayers,
-          analysis: { effectiveness: 85, strengths: [], weaknesses: [], recommendations: [], riskLevel: 'low' as const },
-          timestamp: Date.now() - 1000
+          analysis: {
+            effectiveness: 85,
+            strengths: [],
+            weaknesses: [],
+            recommendations: [],
+            riskLevel: 'low' as const,
+          },
+          timestamp: Date.now() - 1000,
         },
         {
           id: 'saved-2',
           name: 'Defense Formation',
           formation: mockFormation,
           players: mockPlayers,
-          analysis: { effectiveness: 75, strengths: [], weaknesses: [], recommendations: [], riskLevel: 'medium' as const },
-          timestamp: Date.now()
-        }
+          analysis: {
+            effectiveness: 75,
+            strengths: [],
+            weaknesses: [],
+            recommendations: [],
+            riskLevel: 'medium' as const,
+          },
+          timestamp: Date.now(),
+        },
       ];
 
       mockLocalStorage.getItem.mockReturnValue(JSON.stringify(savedFormations));
@@ -424,7 +439,7 @@ describe('TacticalPlaybook Component', () => {
 
     it('should filter by category', async () => {
       // Mock favorites
-      mockLocalStorage.getItem.mockImplementation((key) => {
+      mockLocalStorage.getItem.mockImplementation(key => {
         if (key === 'favoriteFormations') {
           return JSON.stringify(['saved-1']);
         }
@@ -435,17 +450,29 @@ describe('TacticalPlaybook Component', () => {
               name: 'Favorite Formation',
               formation: mockFormation,
               players: mockPlayers,
-              analysis: { effectiveness: 85, strengths: [], weaknesses: [], recommendations: [], riskLevel: 'low' as const },
-              timestamp: Date.now()
+              analysis: {
+                effectiveness: 85,
+                strengths: [],
+                weaknesses: [],
+                recommendations: [],
+                riskLevel: 'low' as const,
+              },
+              timestamp: Date.now(),
             },
             {
               id: 'saved-2',
               name: 'Regular Formation',
               formation: mockFormation,
               players: mockPlayers,
-              analysis: { effectiveness: 75, strengths: [], weaknesses: [], recommendations: [], riskLevel: 'medium' as const },
-              timestamp: Date.now()
-            }
+              analysis: {
+                effectiveness: 75,
+                strengths: [],
+                weaknesses: [],
+                recommendations: [],
+                riskLevel: 'medium' as const,
+              },
+              timestamp: Date.now(),
+            },
           ]);
         }
         return '[]';
@@ -479,12 +506,18 @@ describe('TacticalPlaybook Component', () => {
           name: 'Test Formation',
           formation: mockFormation,
           players: mockPlayers,
-          analysis: { effectiveness: 85, strengths: [], weaknesses: [], recommendations: [], riskLevel: 'low' as const },
-          timestamp: Date.now()
-        }
+          analysis: {
+            effectiveness: 85,
+            strengths: [],
+            weaknesses: [],
+            recommendations: [],
+            riskLevel: 'low' as const,
+          },
+          timestamp: Date.now(),
+        },
       ];
 
-      mockLocalStorage.getItem.mockImplementation((key) => {
+      mockLocalStorage.getItem.mockImplementation(key => {
         if (key === 'savedFormations') {
           return JSON.stringify(savedFormations);
         }
@@ -527,9 +560,15 @@ describe('TacticalPlaybook Component', () => {
           name: 'Delete Test Formation',
           formation: mockFormation,
           players: mockPlayers,
-          analysis: { effectiveness: 85, strengths: [], weaknesses: [], recommendations: [], riskLevel: 'low' as const },
-          timestamp: Date.now()
-        }
+          analysis: {
+            effectiveness: 85,
+            strengths: [],
+            weaknesses: [],
+            recommendations: [],
+            riskLevel: 'low' as const,
+          },
+          timestamp: Date.now(),
+        },
       ];
 
       mockLocalStorage.getItem.mockReturnValue(JSON.stringify(savedFormations));
@@ -554,10 +593,7 @@ describe('TacticalPlaybook Component', () => {
       if (deleteButton) {
         fireEvent.click(deleteButton);
 
-        expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
-          'savedFormations',
-          '[]'
-        );
+        expect(mockLocalStorage.setItem).toHaveBeenCalledWith('savedFormations', '[]');
       }
     });
   });

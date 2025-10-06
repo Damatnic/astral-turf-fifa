@@ -1,6 +1,7 @@
 import React, { lazy, Suspense } from 'react';
-import { useAuthContext, useFranchiseContext, useUIContext } from '../hooks';
+import { useAuthContext } from '../hooks';
 import { LoadingSpinner } from '../components/ui/icons';
+import { ResponsivePage } from '../components/Layout/ResponsivePage';
 
 // Lazy load role-specific dashboard components
 const CoachDashboard = lazy(() => import('../components/dashboards/CoachDashboard'));
@@ -9,8 +10,6 @@ const FamilyDashboard = lazy(() => import('../components/dashboards/FamilyDashbo
 
 const DashboardPage: React.FC = () => {
   const { authState } = useAuthContext();
-  const { franchiseState } = useFranchiseContext();
-  const { uiState } = useUIContext();
 
   if (!authState.user) {
     return (
@@ -44,15 +43,17 @@ const DashboardPage: React.FC = () => {
   };
 
   return (
-    <Suspense
-      fallback={
-        <div className="w-full h-full flex items-center justify-center bg-[var(--bg-primary)]">
-          <LoadingSpinner className="w-12 h-12 text-teal-400" />
-        </div>
-      }
-    >
-      {renderDashboard()}
-    </Suspense>
+    <ResponsivePage maxWidth="full" noPadding>
+      <Suspense
+        fallback={
+          <div className="w-full h-full flex items-center justify-center bg-[var(--bg-primary)]">
+            <LoadingSpinner className="w-12 h-12 text-teal-400" />
+          </div>
+        }
+      >
+        {renderDashboard()}
+      </Suspense>
+    </ResponsivePage>
   );
 };
 

@@ -32,12 +32,12 @@ interface TabsContentProps {
   children: React.ReactNode;
 }
 
-export const Tabs: React.FC<TabsProps> = ({ 
-  value: controlledValue, 
-  defaultValue = '', 
-  onValueChange, 
-  className = '', 
-  children 
+export const Tabs: React.FC<TabsProps> = ({
+  value: controlledValue,
+  defaultValue = '',
+  onValueChange,
+  className = '',
+  children,
 }) => {
   const [internalValue, setInternalValue] = useState(defaultValue);
   const value = controlledValue !== undefined ? controlledValue : internalValue;
@@ -51,9 +51,7 @@ export const Tabs: React.FC<TabsProps> = ({
 
   return (
     <TabsContext.Provider value={{ value, onValueChange: handleValueChange }}>
-      <div className={className}>
-        {children}
-      </div>
+      <div className={className}>{children}</div>
     </TabsContext.Provider>
   );
 };
@@ -81,8 +79,8 @@ export const TabsTrigger: React.FC<TabsTriggerProps> = ({ value, className = '',
   return (
     <button
       className={`inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${
-        isActive 
-          ? 'bg-background text-foreground shadow-sm' 
+        isActive
+          ? 'bg-background text-foreground shadow-sm'
           : 'hover:bg-background/50 hover:text-foreground'
       } ${className}`}
       role="tab"

@@ -7,6 +7,8 @@ import type {
   AdvancedRosterFilters,
   ChatMessage,
 } from './player';
+import type { AIInsight, AIComparison, AISuggestedFormation } from './ai';
+import type { TeamKit } from './match';
 
 // Theme and general UI
 export type AppTheme = 'light' | 'dark';
@@ -62,6 +64,19 @@ export interface DrawingShape {
   color: string;
   points: readonly { x: number; y: number }[];
   text?: string;
+  timestamp?: number;
+  layer?: number;
+}
+
+// Tactical lines for player connections
+export interface TacticalLine {
+  id: string;
+  startPlayerId: string | null;
+  endPlayerId: string | null;
+  type?: 'pass' | 'run' | 'press' | 'support' | 'movement';
+  color?: string;
+  style?: 'solid' | 'dashed' | 'dotted';
+  label?: string;
 }
 
 // Playbook and animations
@@ -137,7 +152,7 @@ export interface UIState {
   saveSlots: Record<string, SaveSlot>;
   activeSaveSlotId: string | null;
   isExportingLineup: boolean;
-  teamKits: { home: unknown; away: unknown }; // TeamKit when imported
+  teamKits: { home: TeamKit; away: TeamKit };
   notifications: Notification[];
   activeTeamContext: TeamView;
 
@@ -176,11 +191,11 @@ export interface UIState {
   // AI State
   settings: AISettings;
   isLoadingAI: boolean;
-  aiInsight: unknown | null; // AIInsight when AI types are imported
+  aiInsight: AIInsight | null;
   isComparingAI: boolean;
-  aiComparisonResult: unknown | null; // AIComparison when imported
+  aiComparisonResult: AIComparison | null;
   isSuggestingFormation: boolean;
-  aiSuggestedFormation: unknown | null; // AISuggestedFormation when imported
+  aiSuggestedFormation: AISuggestedFormation | null;
   chatHistory: ChatMessage[];
   isChatProcessing: boolean;
   highlightedByAIPlayerIds: string[];
@@ -205,4 +220,105 @@ export interface UIState {
   isLoadingTeamTalk: boolean;
   teamTalkData: unknown | null; // AITeamTalkResponse when imported
   pendingPromiseRequest: unknown | null; // PromiseRequest when imported
+}
+
+// Extended tactical board types
+export interface TacticalInstruction {
+  id?: string;
+  type: 'defensive' | 'offensive' | 'positional' | 'set-piece' | 'set_piece' | 'transition';
+  phase?: 'build_up' | 'attack' | 'defense' | 'set_piece';
+  title?: string;
+  description: string;
+  instruction?: string;
+  targetPlayers?: string[]; // Player IDs to apply to
+  playerIds?: string[]; // Alternative property name
+  duration?: number; // Minutes active
+  priority: 'low' | 'medium' | 'high';
+}
+
+// Animation system
+export interface AnimationStep {
+  id: string;
+  timestamp: number; // Time in animation (ms)
+  playerId?: string; // Player being animated
+  action: 'move' | 'pass' | 'shoot' | 'tackle' | 'dribble';
+  startPosition: { x: number; y: number };
+  endPosition: { x: number; y: number };
+  duration: number; // Animation duration (ms)
+  easing?: 'linear' | 'ease-in' | 'ease-out' | 'ease-in-out';
+}
+
+// Heat map data
+export interface HeatMapData {
+  playerId: string;
+  positions: Array<{ x: number; y: number; intensity: number }>;
+  timeRange: { start: number; end: number };
+  totalTouches: number;
+  averagePosition: { x: number; y: number };
+}
+
+// Collaboration system
+export interface CollaborationSession {
+  id: string;
+  hostUserId?: string;
+  formationId: string;
+  participants: Array<{
+    userId: string;
+    userName?: string;
+    role: 'viewer' | 'editor' | 'commentator' | 'owner';
+    joinedAt: string | Date;
+    lastSeen?: Date;
+    cursor?: { x: number; y: number };
+    selectedElement?: string;
+  }>;
+  startedAt?: string;
+  isActive?: boolean;
+  createdAt?: Date;
+  lastActivity?: Date;
+  status: 'active' | 'paused' | 'ended';
+  changes: Array<{
+    userId: string;
+    timestamp: string;
+    action: string;
+    data: any;
+  }>;
+  permissions?: {
+    allowEditing: boolean;
+    allowPlayerMovement: boolean;
+    allowTacticalChanges: boolean;
+    allowExport: boolean;
+  };
+}
+
+// Export formats
+export type ExportFormat = 'pdf' | 'png' | 'jpeg' | 'svg' | 'json' | 'csv';
+
+export interface ExportOptions {
+  format: ExportFormat;
+  quality?: number; // For image exports (0-100)
+  includeMetadata?: boolean;
+  includeDrawings?: boolean;
+  includePlayerStats?: boolean;
+}
+
+// Analytics data
+export interface AnalyticsData {
+  formationId: string;
+  dateRange: { start: string; end: string };
+  matches: number;
+  wins: number;
+  draws: number;
+  losses: number;
+  goalsScored: number;
+  goalsConceded: number;
+  cleanSheets: number;
+  averagePossession: number;
+  playerPerformance: Array<{
+    playerId: string;
+    gamesPlayed: number;
+    minutesPlayed: number;
+    goals: number;
+    assists: number;
+    rating: number;
+  }>;
 }

@@ -85,7 +85,10 @@ export interface PenetrationTest {
 export interface TestResult {
   success: boolean;
   vulnerabilityFound: boolean;
-  vulnerability?: Omit<VulnerabilityReport, 'id' | 'scanId' | 'timestamp' | 'discoveredAt' | 'lastTested' | 'status'>;
+  vulnerability?: Omit<
+    VulnerabilityReport,
+    'id' | 'scanId' | 'timestamp' | 'discoveredAt' | 'lastTested' | 'status'
+  >;
   evidence: string[];
   duration: number;
   error?: string;
@@ -160,7 +163,7 @@ class PenetrationTestingEngine {
   async runSecurityScan(config: ScanConfiguration): Promise<ScanResult> {
     const scanId = this.generateScanId();
     this.currentScan = scanId;
-    
+
     const startTime = new Date().toISOString();
     const vulnerabilities: VulnerabilityReport[] = [];
     let testsRun = 0;
@@ -169,18 +172,21 @@ class PenetrationTestingEngine {
 
     try {
       // Get all enabled test suites
-      const enabledSuites = Array.from(this.testSuites.values())
-        .filter(suite => suite.enabled);
+      const enabledSuites = Array.from(this.testSuites.values()).filter(suite => suite.enabled);
 
       for (const suite of enabledSuites) {
         console.info(`[PENTEST] Running test suite: ${suite.name}`);
-        
+
         for (const test of suite.tests) {
-          if (!test.enabled) continue;
-          
+          if (!test.enabled) {
+            continue;
+          }
+
           // Check if test category is included
-          if (config.scope.includeCategories.length > 0 && 
-              !config.scope.includeCategories.includes(test.category)) {
+          if (
+            config.scope.includeCategories.length > 0 &&
+            !config.scope.includeCategories.includes(test.category)
+          ) {
             continue;
           }
 
@@ -191,7 +197,7 @@ class PenetrationTestingEngine {
           try {
             console.info(`[PENTEST] Running test: ${test.name}`);
             const testStart = Date.now();
-            
+
             const result = await test.testFunction();
             testsRun++;
 
@@ -208,13 +214,12 @@ class PenetrationTestingEngine {
 
               vulnerabilities.push(vulnerability);
               this.vulnerabilities.set(vulnerability.id, vulnerability);
-              
+
               console.warn(`[PENTEST] Vulnerability found: ${vulnerability.title}`);
             }
 
             const testDuration = Date.now() - testStart;
             console.info(`[PENTEST] Test completed in ${testDuration}ms`);
-
           } catch (error) {
             console.error(`[PENTEST] Test failed: ${test.name}`, error);
           }
@@ -246,7 +251,10 @@ class PenetrationTestingEngine {
 
       // Generate reports if requested
       if (config.reporting.generateReport) {
-        scanResult.exportUrls = await this.generateReports(scanResult, config.reporting.exportFormats);
+        scanResult.exportUrls = await this.generateReports(
+          scanResult,
+          config.reporting.exportFormats
+        );
       }
 
       // Send critical vulnerability notifications
@@ -255,9 +263,8 @@ class PenetrationTestingEngine {
       }
 
       console.info(`[PENTEST] Scan completed: ${summary.total} vulnerabilities found`);
-      
-      return scanResult;
 
+      return scanResult;
     } finally {
       this.currentScan = null;
     }
@@ -694,7 +701,6 @@ class PenetrationTestingEngine {
         evidence,
         duration: Date.now() - startTime,
       };
-
     } catch (error) {
       return {
         success: false,
@@ -720,18 +726,13 @@ class PenetrationTestingEngine {
         "' OR 1=1 LIMIT 1 --",
       ];
 
-      const testEndpoints = [
-        '/api/login',
-        '/api/search',
-        '/api/players',
-        '/api/formations',
-      ];
+      const testEndpoints = ['/api/login', '/api/search', '/api/players', '/api/formations'];
 
       for (const endpoint of testEndpoints) {
         for (const payload of payloads) {
           const testUrl = `${endpoint}?id=${encodeURIComponent(payload)}`;
           const response = await this.makeRequest(testUrl, { method: 'GET' });
-          
+
           evidence.push(`${testUrl}: ${response.status}`);
 
           // Check for SQL error messages
@@ -799,7 +800,6 @@ class PenetrationTestingEngine {
         evidence,
         duration: Date.now() - startTime,
       };
-
     } catch (error) {
       return {
         success: false,
@@ -825,21 +825,17 @@ class PenetrationTestingEngine {
         "'><script>alert('XSS')</script>",
       ];
 
-      const testEndpoints = [
-        '/api/search',
-        '/api/error',
-        '/dashboard',
-      ];
+      const testEndpoints = ['/api/search', '/api/error', '/dashboard'];
 
       for (const endpoint of testEndpoints) {
         for (const payload of xssPayloads) {
           const testUrl = `${endpoint}?q=${encodeURIComponent(payload)}`;
           const response = await this.makeRequest(testUrl, { method: 'GET' });
-          
+
           evidence.push(`${testUrl}: ${response.status}`);
 
           const responseText = await response.text();
-          
+
           // Check if payload is reflected unescaped
           if (responseText.includes(payload)) {
             return {
@@ -850,7 +846,7 @@ class PenetrationTestingEngine {
                 category: VulnerabilityCategory.XSS,
                 title: 'Reflected Cross-Site Scripting (XSS)',
                 description: `Reflected XSS vulnerability found in ${endpoint}`,
-                impact: 'Attacker can execute arbitrary JavaScript in victim\'s browser',
+                impact: "Attacker can execute arbitrary JavaScript in victim's browser",
                 likelihood: 0.7,
                 cvssScore: 6.1,
                 location: { endpoint, parameter: 'q' },
@@ -893,7 +889,6 @@ class PenetrationTestingEngine {
         evidence,
         duration: Date.now() - startTime,
       };
-
     } catch (error) {
       return {
         success: false,
@@ -950,7 +945,9 @@ class PenetrationTestingEngine {
                 'Note missing security headers',
               ],
               request: 'GET /',
-              response: Array.from(headers.entries()).map(([k, v]) => `${k}: ${v}`).join('\n'),
+              response: Array.from(headers.entries())
+                .map(([k, v]) => `${k}: ${v}`)
+                .join('\n'),
             },
             remediation: {
               summary: 'Implement comprehensive security headers',
@@ -979,7 +976,6 @@ class PenetrationTestingEngine {
         evidence,
         duration: Date.now() - startTime,
       };
-
     } catch (error) {
       return {
         success: false,
@@ -993,7 +989,10 @@ class PenetrationTestingEngine {
 
   // Placeholder implementations for other tests
   private async testPrivilegeEscalation(): Promise<TestResult> {
-    return this.createPlaceholderResult('Privilege Escalation Test', VulnerabilityCategory.BROKEN_ACCESS_CONTROL);
+    return this.createPlaceholderResult(
+      'Privilege Escalation Test',
+      VulnerabilityCategory.BROKEN_ACCESS_CONTROL
+    );
   }
 
   private async testIDOR(): Promise<TestResult> {
@@ -1001,11 +1000,17 @@ class PenetrationTestingEngine {
   }
 
   private async testWeakEncryption(): Promise<TestResult> {
-    return this.createPlaceholderResult('Weak Encryption Test', VulnerabilityCategory.SENSITIVE_DATA_EXPOSURE);
+    return this.createPlaceholderResult(
+      'Weak Encryption Test',
+      VulnerabilityCategory.SENSITIVE_DATA_EXPOSURE
+    );
   }
 
   private async testUnencryptedData(): Promise<TestResult> {
-    return this.createPlaceholderResult('Unencrypted Data Test', VulnerabilityCategory.SENSITIVE_DATA_EXPOSURE);
+    return this.createPlaceholderResult(
+      'Unencrypted Data Test',
+      VulnerabilityCategory.SENSITIVE_DATA_EXPOSURE
+    );
   }
 
   private async testNoSQLInjection(): Promise<TestResult> {
@@ -1017,39 +1022,66 @@ class PenetrationTestingEngine {
   }
 
   private async testBusinessLogicFlaws(): Promise<TestResult> {
-    return this.createPlaceholderResult('Business Logic Test', VulnerabilityCategory.BUSINESS_LOGIC);
+    return this.createPlaceholderResult(
+      'Business Logic Test',
+      VulnerabilityCategory.BUSINESS_LOGIC
+    );
   }
 
   private async testDefaultCredentials(): Promise<TestResult> {
-    return this.createPlaceholderResult('Default Credentials Test', VulnerabilityCategory.SECURITY_MISCONFIGURATION);
+    return this.createPlaceholderResult(
+      'Default Credentials Test',
+      VulnerabilityCategory.SECURITY_MISCONFIGURATION
+    );
   }
 
   private async testInformationDisclosure(): Promise<TestResult> {
-    return this.createPlaceholderResult('Information Disclosure Test', VulnerabilityCategory.INFORMATION_DISCLOSURE);
+    return this.createPlaceholderResult(
+      'Information Disclosure Test',
+      VulnerabilityCategory.INFORMATION_DISCLOSURE
+    );
   }
 
   private async testOutdatedDependencies(): Promise<TestResult> {
-    return this.createPlaceholderResult('Outdated Dependencies Test', VulnerabilityCategory.COMPONENTS_WITH_VULNERABILITIES);
+    return this.createPlaceholderResult(
+      'Outdated Dependencies Test',
+      VulnerabilityCategory.COMPONENTS_WITH_VULNERABILITIES
+    );
   }
 
   private async testWeakPasswordPolicy(): Promise<TestResult> {
-    return this.createPlaceholderResult('Weak Password Policy Test', VulnerabilityCategory.BROKEN_AUTHENTICATION);
+    return this.createPlaceholderResult(
+      'Weak Password Policy Test',
+      VulnerabilityCategory.BROKEN_AUTHENTICATION
+    );
   }
 
   private async testSessionFixation(): Promise<TestResult> {
-    return this.createPlaceholderResult('Session Fixation Test', VulnerabilityCategory.BROKEN_AUTHENTICATION);
+    return this.createPlaceholderResult(
+      'Session Fixation Test',
+      VulnerabilityCategory.BROKEN_AUTHENTICATION
+    );
   }
 
   private async testBruteForceProtection(): Promise<TestResult> {
-    return this.createPlaceholderResult('Brute Force Protection Test', VulnerabilityCategory.BROKEN_AUTHENTICATION);
+    return this.createPlaceholderResult(
+      'Brute Force Protection Test',
+      VulnerabilityCategory.BROKEN_AUTHENTICATION
+    );
   }
 
   private async testInsecureDeserialization(): Promise<TestResult> {
-    return this.createPlaceholderResult('Insecure Deserialization Test', VulnerabilityCategory.INSECURE_DESERIALIZATION);
+    return this.createPlaceholderResult(
+      'Insecure Deserialization Test',
+      VulnerabilityCategory.INSECURE_DESERIALIZATION
+    );
   }
 
   private async testInsufficientLogging(): Promise<TestResult> {
-    return this.createPlaceholderResult('Insufficient Logging Test', VulnerabilityCategory.INSUFFICIENT_LOGGING);
+    return this.createPlaceholderResult(
+      'Insufficient Logging Test',
+      VulnerabilityCategory.INSUFFICIENT_LOGGING
+    );
   }
 
   private async testSSRF(): Promise<TestResult> {
@@ -1115,12 +1147,15 @@ class PenetrationTestingEngine {
 
   private calculateCoverage(config: ScanConfiguration, testsRun: number) {
     const totalSuites = this.testSuites.size;
-    const totalTests = Array.from(this.testSuites.values())
-      .reduce((sum, suite) => sum + suite.tests.filter(t => t.enabled).length, 0);
+    const totalTests = Array.from(this.testSuites.values()).reduce(
+      (sum, suite) => sum + suite.tests.filter(t => t.enabled).length,
+      0
+    );
 
     return {
       endpointsTested: config.target.endpoints.length,
-      categoriesTested: config.scope.includeCategories.length || Object.keys(VulnerabilityCategory).length,
+      categoriesTested:
+        config.scope.includeCategories.length || Object.keys(VulnerabilityCategory).length,
       completionPercentage: Math.round((testsRun / totalTests) * 100),
     };
   }
@@ -1130,20 +1165,26 @@ class PenetrationTestingEngine {
     const severityCounts = this.generateScanSummary(vulnerabilities);
 
     if (severityCounts.critical > 0) {
-      recommendations.push(`Address ${severityCounts.critical} critical vulnerabilities immediately`);
+      recommendations.push(
+        `Address ${severityCounts.critical} critical vulnerabilities immediately`
+      );
     }
 
     if (severityCounts.high > 0) {
-      recommendations.push(`Fix ${severityCounts.high} high-severity vulnerabilities within 1 week`);
+      recommendations.push(
+        `Fix ${severityCounts.high} high-severity vulnerabilities within 1 week`
+      );
     }
 
     if (severityCounts.medium > 0) {
-      recommendations.push(`Plan fixes for ${severityCounts.medium} medium-severity vulnerabilities`);
+      recommendations.push(
+        `Plan fixes for ${severityCounts.medium} medium-severity vulnerabilities`
+      );
     }
 
     // Category-specific recommendations
     const categories = new Set(vulnerabilities.map(v => v.category));
-    
+
     if (categories.has(VulnerabilityCategory.INJECTION)) {
       recommendations.push('Implement comprehensive input validation and parameterized queries');
     }
@@ -1157,13 +1198,18 @@ class PenetrationTestingEngine {
     }
 
     if (recommendations.length === 0) {
-      recommendations.push('No immediate security issues found. Continue regular security testing.');
+      recommendations.push(
+        'No immediate security issues found. Continue regular security testing.'
+      );
     }
 
     return recommendations;
   }
 
-  private async generateReports(scanResult: ScanResult, formats: string[]): Promise<Record<string, string>> {
+  private async generateReports(
+    scanResult: ScanResult,
+    formats: string[]
+  ): Promise<Record<string, string>> {
     const exportUrls: Record<string, string> = {};
 
     for (const format of formats) {
@@ -1188,9 +1234,11 @@ class PenetrationTestingEngine {
 
   private async sendCriticalVulnerabilityAlert(scanResult: ScanResult): Promise<void> {
     const criticalVulns = scanResult.vulnerabilities.filter(v => v.severity === 'critical');
-    
-    console.error(`[PENTEST ALERT] ${criticalVulns.length} critical vulnerabilities found in scan ${scanResult.scanId}`);
-    
+
+    console.error(
+      `[PENTEST ALERT] ${criticalVulns.length} critical vulnerabilities found in scan ${scanResult.scanId}`
+    );
+
     // In a real implementation, send email/Slack/webhook notifications
   }
 
@@ -1215,7 +1263,10 @@ class PenetrationTestingEngine {
     return Array.from(this.vulnerabilities.values());
   }
 
-  public updateVulnerabilityStatus(vulnerabilityId: string, status: VulnerabilityReport['status']): void {
+  public updateVulnerabilityStatus(
+    vulnerabilityId: string,
+    status: VulnerabilityReport['status']
+  ): void {
     const vulnerability = this.vulnerabilities.get(vulnerabilityId);
     if (vulnerability) {
       vulnerability.status = status;
@@ -1230,7 +1281,7 @@ class PenetrationTestingEngine {
 export const penetrationTesting = new PenetrationTestingEngine();
 
 // Export convenience functions
-export const runSecurityScan = (config: ScanConfiguration) => 
+export const runSecurityScan = (config: ScanConfiguration) =>
   penetrationTesting.runSecurityScan(config);
 
 export const getTestSuites = () => penetrationTesting.getTestSuites();

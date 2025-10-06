@@ -81,40 +81,44 @@ const ScoutingPopup: React.FC = () => {
               <LoadingSpinner className="w-8 h-8" />
             </div>
           )}
-          {scoutReport && (
-            <div className="space-y-4 text-sm">
-              <div>
-                <h4 className="font-bold text-green-400 mb-1">Strengths</h4>
-                <ul className="list-disc list-inside text-gray-300">
-                  {scoutReport.strengths.map((s, i) => (
-                    <li key={i}>{s}</li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-bold text-yellow-400 mb-1">Weaknesses</h4>
-                <ul className="list-disc list-inside text-gray-300">
-                  {scoutReport.weaknesses.map((s, i) => (
-                    <li key={i}>{s}</li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-bold text-gray-300 mb-1">Summary</h4>
-                <p className="text-gray-400 italic">"{scoutReport.summary}"</p>
-              </div>
-              <div>
-                <h4 className="font-bold text-blue-400 mb-1">Potential Tactical Fit</h4>
-                <p className="text-gray-300">{scoutReport.potentialFit}</p>
-              </div>
-              <div className="pt-2 text-center">
-                <p className="text-gray-400">Estimated Value</p>
-                <p className="text-2xl font-bold text-teal-300">
-                  ${scoutReport.estimatedValue.toLocaleString()}
-                </p>
-              </div>
-            </div>
-          )}
+          {
+            (scoutReport && (
+              <>
+                <div className="space-y-4 text-sm">
+                  <div>
+                    <h4 className="font-bold text-green-400 mb-1">Strengths</h4>
+                    <ul className="list-disc list-inside text-gray-300">
+                      {(scoutReport as any).strengths.map((s: string, i: number) => (
+                        <li key={i}>{s as React.ReactNode}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-yellow-400 mb-1">Weaknesses</h4>
+                    <ul className="list-disc list-inside text-gray-300">
+                      {(scoutReport as any).weaknesses.map((s: string, i: number) => (
+                        <li key={i}>{s as React.ReactNode}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-gray-300 mb-1">Summary</h4>
+                    <p className="text-gray-400 italic">"{(scoutReport as any).summary}"</p>
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-blue-400 mb-1">Potential Tactical Fit</h4>
+                    <p className="text-gray-300">{(scoutReport as any).potentialFit}</p>
+                  </div>
+                  <div className="pt-2 text-center">
+                    <p className="text-gray-400">Estimated Value</p>
+                    <p className="text-2xl font-bold text-teal-300">
+                      ${(scoutReport as any).estimatedValue.toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+              </>
+            )) as React.ReactNode
+          }
         </div>
         <div className="p-4 border-t border-gray-700 text-right">
           <button

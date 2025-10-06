@@ -17,6 +17,7 @@ const securityLogger = {
 const SecurityEventType = {
   DATABASE_ERROR: 'DATABASE_ERROR',
   QUERY_ERROR: 'QUERY_ERROR',
+  DATA_MODIFICATION: 'DATA_MODIFICATION',
 };
 
 // Database configuration
@@ -65,10 +66,10 @@ class DatabaseService {
       });
     } catch (_error) {
       securityLogger.error('Database service initialization failed', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
         attempts: this.connectionAttempts,
       });
-      throw error;
+      throw _error;
     }
   }
 
@@ -95,7 +96,7 @@ class DatabaseService {
         securityLogger.warn('Database connection attempt failed', {
           attempt: this.connectionAttempts,
           maxRetries: this.maxRetries,
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: _error instanceof Error ? _error.message : 'Unknown error',
         });
 
         if (this.connectionAttempts >= this.maxRetries) {
@@ -113,7 +114,7 @@ class DatabaseService {
    */
   private setupEventListeners(): void {
     // Query logging
-    this.prisma.$on('query', (e) => {
+    (this.prisma.$on as any)('query', (e: any) => {
       if (process.env.NODE_ENV === 'development') {
         // // // // console.log('Query: ' + e.query);
         // // // // console.log('Params: ' + e.params);
@@ -122,7 +123,7 @@ class DatabaseService {
     });
 
     // Error logging
-    this.prisma.$on('error', (e) => {
+    (this.prisma.$on as any)('error', (e: any) => {
       securityLogger.error('Database error occurred', {
         target: e.target,
         message: e.message,
@@ -131,7 +132,7 @@ class DatabaseService {
     });
 
     // Info logging
-    this.prisma.$on('info', (e) => {
+    (this.prisma.$on as any)('info', (e: any) => {
       securityLogger.info('Database info', {
         target: e.target,
         message: e.message,
@@ -140,7 +141,7 @@ class DatabaseService {
     });
 
     // Warning logging
-    this.prisma.$on('warn', (e) => {
+    (this.prisma.$on as any)('warn', (e: any) => {
       securityLogger.warn('Database warning', {
         target: e.target,
         message: e.message,
@@ -168,7 +169,7 @@ class DatabaseService {
       maxWait?: number;
       timeout?: number;
       isolationLevel?: Prisma.TransactionIsolationLevel;
-    },
+    }
   ): Promise<T> {
     try {
       const result = await this.prisma.$transaction(operations, {
@@ -185,16 +186,16 @@ class DatabaseService {
             transactionType: 'bulk_operation',
             isolationLevel: options?.isolationLevel || 'default',
           },
-        },
+        }
       );
 
       return result;
     } catch (_error) {
       securityLogger.error('Database transaction failed', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
         isolationLevel: options?.isolationLevel || 'default',
       });
-      throw error;
+      throw _error;
     }
   }
 
@@ -236,7 +237,7 @@ class DatabaseService {
       const latency = Date.now() - startTime;
 
       securityLogger.error('Database health check failed', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
         latency,
       });
 
@@ -262,11 +263,15 @@ class DatabaseService {
     uptime: number;
   }> {
     try {
-      const stats = await this.prisma.$queryRaw<[{
-        total_connections: number;
-        active_connections: number;
-        uptime: number;
-      }]>`
+      const stats = await this.prisma.$queryRaw<
+        [
+          {
+            total_connections: number;
+            active_connections: number;
+            uptime: number;
+          },
+        ]
+      >`
         SELECT 
           (SELECT count(*) FROM pg_stat_activity) as total_connections,
           (SELECT count(*) FROM pg_stat_activity WHERE state = 'active') as active_connections,
@@ -284,7 +289,7 @@ class DatabaseService {
       };
     } catch (_error) {
       securityLogger.error('Failed to get database statistics', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
       });
 
       return {
@@ -307,7 +312,7 @@ class DatabaseService {
       securityLogger.info('Database connection closed gracefully');
     } catch (_error) {
       securityLogger.error('Error during database disconnection', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
       });
     }
   }

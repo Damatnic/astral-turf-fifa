@@ -4,6 +4,8 @@ import type {
   NewsItem,
   InboxItem,
   TrainingPlanTemplate,
+  SponsorshipDeal,
+  SkillChallenge,
 } from '../../types';
 
 // Helper function to add an inbox item
@@ -12,7 +14,7 @@ const addInboxItem = (
   type: InboxItem['type'],
   title: string,
   content: string,
-  payload?: unknown,
+  payload?: InboxItem['payload']
 ) => {
   draft.inbox.unshift({
     id: `inbox_${Date.now()}_${Math.random()}`,
@@ -50,18 +52,26 @@ export const franchiseReducer = (draft: FranchiseState, action: Action): Franchi
         draft,
         'objective',
         `New Season: ${draft.season.year}`,
-        'A new season has begun. Check your board objectives and prepare your squad!',
+        'A new season has begun. Check your board objectives and prepare your squad!'
       );
       break;
     }
     case 'ADD_INBOX_ITEM':
-      addInboxItem(
-        draft,
-        action.payload.type,
-        action.payload.title,
-        action.payload.content,
-        action.payload.payload,
-      );
+      if (
+        action.payload &&
+        typeof action.payload === 'object' &&
+        'type' in action.payload &&
+        'title' in action.payload &&
+        'content' in action.payload
+      ) {
+        addInboxItem(
+          draft,
+          action.payload.type as InboxItem['type'],
+          action.payload.title as string,
+          action.payload.content as string,
+          'payload' in action.payload ? (action.payload.payload as InboxItem['payload']) : undefined
+        );
+      }
       break;
 
     case 'MARK_INBOX_ITEM_READ': {
@@ -78,22 +88,24 @@ export const franchiseReducer = (draft: FranchiseState, action: Action): Franchi
     }
 
     case 'HIRE_STAFF': {
-      const cost = action.payload.staff.cost;
+      const staff = action.payload.staff as { name: string; cost: number };
+      const cost = staff.cost;
       if (draft.finances[action.payload.team].transferBudget >= cost) {
         draft.finances[action.payload.team].transferBudget -= cost;
-        draft.staff[action.payload.team][action.payload.type] = action.payload.staff as any;
+        const staffObj = draft.staff[action.payload.team] as unknown as Record<string, unknown>;
+        staffObj[action.payload.type] = staff;
         addInboxItem(
           draft,
           'finance',
           `New Staff Hired`,
-          `${action.payload.staff.name} has been hired as the new ${action.payload.type}.`,
+          `${staff.name} has been hired as the new ${action.payload.type}.`
         );
       } else {
         addInboxItem(
           draft,
           'finance',
           `Hiring Failed`,
-          `Insufficient funds to hire ${action.payload.staff.name}.`,
+          `Insufficient funds to hire ${staff.name}.`
         );
       }
       break;
@@ -101,17 +113,17 @@ export const franchiseReducer = (draft: FranchiseState, action: Action): Franchi
 
     case 'UPGRADE_STADIUM_FACILITY': {
       const { facility, team } = action.payload;
+      const stadium = draft.stadium[team] as unknown as Record<string, number>;
       const upgradeCost =
-        draft.stadium[team][facility] *
-        (facility === 'trainingFacilitiesLevel' ? 5000000 : 3000000);
+        stadium[facility] * (facility === 'trainingFacilitiesLevel' ? 5000000 : 3000000);
       if (draft.finances[team].transferBudget >= upgradeCost) {
         draft.finances[team].transferBudget -= upgradeCost;
-        draft.stadium[team][facility]++;
+        stadium[facility]++;
         addInboxItem(
           draft,
           'finance',
           `${facility} Upgraded`,
-          `The ${facility} has been upgraded to level ${draft.stadium[team][facility]}.`,
+          `The ${facility} has been upgraded to level ${stadium[facility]}.`
         );
       }
       break;
@@ -119,35 +131,60 @@ export const franchiseReducer = (draft: FranchiseState, action: Action): Franchi
 
     case 'SET_SPONSORSHIP_DEAL': {
       const { deal, team } = action.payload;
-      draft.sponsorships[team] = deal;
-      draft.finances[team].income.sponsorship = deal.weeklyIncome;
+      const sponsorDeal = deal as { name: string; weeklyIncome: number };
+      draft.sponsorships[team] = sponsorDeal as SponsorshipDeal;
+      draft.finances[team].income.sponsorship = sponsorDeal.weeklyIncome;
       addInboxItem(
         draft,
         'finance',
         `New Sponsorship Deal`,
-        `A new deal has been signed with ${deal.name}.`,
+        `A new deal has been signed with ${sponsorDeal.name}.`
       );
       break;
     }
 
     case 'SET_SESSION_DRILL': {
       const { team, day, session, sessionPart, drillId } = action.payload;
-      draft.trainingSchedule[team][day][session][sessionPart] = drillId;
+      const schedule = draft.trainingSchedule[team] as unknown as Record<
+        string,
+        {
+          isRestDay: boolean;
+          morning: Record<string, string | null>;
+          afternoon: Record<string, string | null>;
+        }
+      >;
+      const daySchedule = schedule[day];
+      const sessionSchedule = (
+        session === 'morning' ? daySchedule.morning : daySchedule.afternoon
+      ) as Record<string, string | null>;
+      sessionSchedule[sessionPart] = drillId;
       if (drillId) {
-        draft.trainingSchedule[team][day].isRestDay = false;
+        daySchedule.isRestDay = false;
       }
       break;
     }
     case 'SET_DAY_AS_REST': {
       const { team, day } = action.payload;
-      draft.trainingSchedule[team][day].isRestDay = true;
-      draft.trainingSchedule[team][day].morning = { warmup: null, main: null, cooldown: null };
-      draft.trainingSchedule[team][day].afternoon = { warmup: null, main: null, cooldown: null };
+      const schedule = draft.trainingSchedule[team] as unknown as Record<
+        string,
+        {
+          isRestDay: boolean;
+          morning: { warmup: string | null; main: string | null; cooldown: string | null };
+          afternoon: { warmup: string | null; main: string | null; cooldown: string | null };
+        }
+      >;
+      schedule[day].isRestDay = true;
+      schedule[day].morning = { warmup: null, main: null, cooldown: null };
+      schedule[day].afternoon = { warmup: null, main: null, cooldown: null };
       break;
     }
     case 'SET_DAY_AS_TRAINING': {
       const { team, day } = action.payload;
-      draft.trainingSchedule[team][day].isRestDay = false;
+      const schedule = draft.trainingSchedule[team] as unknown as Record<
+        string,
+        { isRestDay: boolean }
+      >;
+      schedule[day].isRestDay = false;
       break;
     }
 
@@ -182,11 +219,13 @@ export const franchiseReducer = (draft: FranchiseState, action: Action): Franchi
     }
 
     case 'ADD_SKILL_CHALLENGE': {
-      const newChallenge = {
-        id: `challenge_${Date.now()}`,
-        ...action.payload,
-      };
-      draft.skillChallenges.push(newChallenge);
+      if (action.payload && typeof action.payload === 'object') {
+        const newChallenge = {
+          id: `challenge_${Date.now()}`,
+          ...(action.payload as object),
+        } as SkillChallenge;
+        draft.skillChallenges.push(newChallenge);
+      }
       break;
     }
 
@@ -196,11 +235,13 @@ export const franchiseReducer = (draft: FranchiseState, action: Action): Franchi
     }
 
     case 'ADD_NEWS_ITEM': {
-      draft.newsFeed.unshift({
-        id: `news_${Date.now()}_${Math.random()}`,
-        date: new Date().toISOString(),
-        ...action.payload,
-      });
+      if (action.payload && typeof action.payload === 'object') {
+        draft.newsFeed.unshift({
+          id: `news_${Date.now()}_${Math.random()}`,
+          date: new Date().toISOString(),
+          ...(action.payload as object),
+        } as NewsItem);
+      }
       break;
     }
 
@@ -249,7 +290,7 @@ export const franchiseReducer = (draft: FranchiseState, action: Action): Franchi
         draft,
         'mentoring',
         'New Mentoring Group',
-        'A new mentoring group has been established.',
+        'A new mentoring group has been established.'
       );
       break;
     }
@@ -268,13 +309,13 @@ export const franchiseReducer = (draft: FranchiseState, action: Action): Franchi
         });
       }
       draft.mentoringGroups[team] = draft.mentoringGroups[team].filter(
-        g => g.mentorId !== mentorId,
+        g => g.mentorId !== mentorId
       );
       addInboxItem(
         draft,
         'mentoring',
         'Mentoring Group Dissolved',
-        'A mentoring group has been dissolved.',
+        'A mentoring group has been dissolved.'
       );
       break;
     }

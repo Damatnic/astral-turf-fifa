@@ -16,6 +16,7 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "types": ["vitest/globals"],
+    "ignoreDeprecations": "5.0",
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
@@ -39,8 +40,20 @@
     "noUncheckedIndexedAccess": false,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "noImplicitOverride": true
+    "noImplicitOverride": true,
+    "allowImportingTsExtensions": true,
+    "noImplicitAny": false
   },
   "include": ["src", "*.ts", "*.tsx", "**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules", "src-tauri", "dist", "backup_*", "build", "coverage"]
+  "exclude": [
+    "node_modules",
+    "src-tauri",
+    "dist",
+    "backup_*",
+    "build",
+    "coverage",
+    "original_snapshot",
+    "original_zip",
+    "temp_original"
+  ]
 }

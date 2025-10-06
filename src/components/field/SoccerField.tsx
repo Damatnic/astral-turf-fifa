@@ -192,7 +192,7 @@ const SetPieceContext: React.FC<{ category: PlayCategory }> = ({ category }) => 
 };
 
 const FieldGrid: React.FC = () => {
-  const gridLines = [];
+  const gridLines: JSX.Element[] = [];
   // Vertical lines
   for (let i = 1; i < 10; i++) {
     gridLines.push(
@@ -204,7 +204,7 @@ const FieldGrid: React.FC = () => {
         y2="100"
         stroke="rgba(255, 255, 255, 0.05)"
         strokeWidth={0.2}
-      />,
+      />
     );
   }
   // Horizontal lines
@@ -218,7 +218,7 @@ const FieldGrid: React.FC = () => {
         y2={i * 10}
         stroke="rgba(255, 255, 255, 0.05)"
         strokeWidth={0.2}
-      />,
+      />
     );
   }
   return (
@@ -266,7 +266,7 @@ const FormationStrengthOverlay: React.FC = () => {
     .filter(p => p && typeof p.x === 'number' && typeof p.y === 'number')
     .map(
       p =>
-        `radial-gradient(circle at ${p.x}% ${p.y}%, rgba(45, 212, 191, 0.25) 0%, transparent 20%)`,
+        `radial-gradient(circle at ${p.x}% ${p.y}%, rgba(45, 212, 191, 0.25) 0%, transparent 20%)`
     )
     .join(', ');
 
@@ -329,13 +329,17 @@ const SoccerField: React.FC = () => {
       opacity: number;
       score: number;
     }[] = [];
-    const slotsWithPlayers = (formation?.slots ?? []).filter(s => s && s.playerId && s.defaultPosition);
+    const slotsWithPlayers = (formation?.slots ?? []).filter(
+      s => s && s.playerId && s.defaultPosition
+    );
     const checkedPairs = new Set<string>();
     const shouldMirror = team === 'away';
 
     for (const slotA of slotsWithPlayers) {
-      if (!slotA || !slotA.playerId || !slotA.defaultPosition) continue;
-      
+      if (!slotA || !slotA.playerId || !slotA.defaultPosition) {
+        continue;
+      }
+
       const playerA = players?.find(p => p?.id === slotA.playerId);
       if (!playerA || !playerA.position) {
         continue;
@@ -376,7 +380,7 @@ const SoccerField: React.FC = () => {
             playerB,
             chemistry ?? {},
             relationships ?? {},
-            mentoringGroups?.[team] ?? {},
+            mentoringGroups?.[team] ?? {}
           );
 
           if (chemistryScore > 40) {
@@ -455,7 +459,7 @@ const SoccerField: React.FC = () => {
 
       dispatch({ type: 'UPDATE_PLAYER_POSITION', payload: { playerId, position: { x, y } } });
     },
-    [dispatch, drawingTool, positioningMode],
+    [dispatch, drawingTool, positioningMode]
   );
 
   const handleSlotDrop = (e: React.DragEvent<HTMLDivElement>, slot: FormationSlot, team: Team) => {
@@ -545,9 +549,7 @@ const SoccerField: React.FC = () => {
       .filter(slot => slot && slot.defaultPosition)
       .map(slot => ({
         ...slot,
-        defaultPosition: shouldMirror
-          ? mirrorPosition(slot.defaultPosition)
-          : slot.defaultPosition,
+        defaultPosition: shouldMirror ? mirrorPosition(slot.defaultPosition) : slot.defaultPosition,
       }));
 
     return (
@@ -687,8 +689,8 @@ const SoccerField: React.FC = () => {
                 <polyline
                   key={trail.playerId}
                   points={trail.points
-                    .filter(p => p && typeof p.x === 'number' && typeof p.y === 'number')
-                    .map(p => `${p.x},${p.y}`)
+                    .filter((p: any) => p && typeof p.x === 'number' && typeof p.y === 'number')
+                    .map((p: any) => `${p.x},${p.y}`)
                     .join(' ')}
                   fill="none"
                   stroke={trail.color}

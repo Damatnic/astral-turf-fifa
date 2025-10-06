@@ -6,6 +6,9 @@ import { ThemeProvider } from './src/context/ThemeContext';
 import { AccessibilityProvider, SkipLink } from './src/components/ui/AccessibilityComponents';
 import ProtectedRoute from './src/components/ProtectedRoute';
 import { useAuthContext } from './src/hooks/useAuthContext';
+import PWAInstallPrompt from './src/components/pwa/PWAInstallPrompt';
+import PWAUpdatePrompt from './src/components/pwa/PWAUpdatePrompt';
+import OfflineIndicator from './src/components/pwa/OfflineIndicator';
 
 // Lazy load page components
 const LandingPage = lazy(() => import('./src/pages/LandingPage'));
@@ -50,6 +53,11 @@ const AppContent: React.FC = () => {
       {/* Skip Links for Accessibility */}
       <SkipLink targetId="main-content">Skip to main content</SkipLink>
       <SkipLink targetId="navigation">Skip to navigation</SkipLink>
+
+      {/* PWA Components */}
+      <PWAInstallPrompt autoShow delay={5000} />
+      <PWAUpdatePrompt />
+      <OfflineIndicator />
 
       <div className="h-screen w-screen overflow-hidden font-sans">
         <Suspense

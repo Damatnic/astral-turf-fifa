@@ -96,7 +96,7 @@ const PlayerRankingCard: React.FC<PlayerRankingCardProps> = ({
             <div>
               <h3 className="text-xl font-bold text-white">{player.name}</h3>
               <p className="text-sm text-gray-400">
-                {player.position} • {player.nationality}
+                {(player as any).positionRole || 'Player'} • {player.nationality}
               </p>
               <div className="flex items-center mt-1">
                 <span className="text-sm font-medium text-blue-400">

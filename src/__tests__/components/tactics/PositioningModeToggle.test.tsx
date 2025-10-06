@@ -7,7 +7,7 @@ import PositioningModeToggle from '../../../components/tactics/PositioningModeTo
 
 /**
  * Comprehensive Test Suite for PositioningModeToggle Component
- * 
+ *
  * Tests cover:
  * - Rendering with different modes
  * - User interactions and mode switching
@@ -21,11 +21,13 @@ import PositioningModeToggle from '../../../components/tactics/PositioningModeTo
 // Mock framer-motion to avoid animation complexities in tests
 vi.mock('framer-motion', () => ({
   motion: {
-    div: React.forwardRef<HTMLDivElement, any>(({ children, layoutId, className, ...props }, ref) => (
-      <div ref={ref} className={className} data-layout-id={layoutId} {...props}>
-        {children}
-      </div>
-    ))
+    div: React.forwardRef<HTMLDivElement, any>(
+      ({ children, layoutId, className, ...props }, ref) => (
+        <div ref={ref} className={className} data-layout-id={layoutId} {...props}>
+          {children}
+        </div>
+      )
+    ),
   },
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
@@ -41,12 +43,7 @@ describe('PositioningModeToggle', () => {
 
   describe('Rendering', () => {
     it('should render with snap mode selected by default', () => {
-      render(
-        <PositioningModeToggle
-          mode="snap"
-          onModeChange={mockOnModeChange}
-        />
-      );
+      render(<PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />);
 
       expect(screen.getByText('Positioning Mode:')).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /snap to position/i })).toBeInTheDocument();
@@ -55,12 +52,7 @@ describe('PositioningModeToggle', () => {
     });
 
     it('should render with free mode selected', () => {
-      render(
-        <PositioningModeToggle
-          mode="free"
-          onModeChange={mockOnModeChange}
-        />
-      );
+      render(<PositioningModeToggle mode="free" onModeChange={mockOnModeChange} />);
 
       expect(screen.getByText('Players can be placed anywhere on field')).toBeInTheDocument();
     });
@@ -80,10 +72,7 @@ describe('PositioningModeToggle', () => {
 
     it('should render correct icons for each mode', () => {
       const { rerender } = render(
-        <PositioningModeToggle
-          mode="snap"
-          onModeChange={mockOnModeChange}
-        />
+        <PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />
       );
 
       // Check snap mode icon
@@ -91,12 +80,7 @@ describe('PositioningModeToggle', () => {
       expect(icon).toBeInTheDocument();
 
       // Switch to free mode
-      rerender(
-        <PositioningModeToggle
-          mode="free"
-          onModeChange={mockOnModeChange}
-        />
-      );
+      rerender(<PositioningModeToggle mode="free" onModeChange={mockOnModeChange} />);
 
       // Check free mode icon (different SVG path)
       icon = screen.getByRole('img', { hidden: true });
@@ -106,12 +90,7 @@ describe('PositioningModeToggle', () => {
 
   describe('Mode Selection', () => {
     it('should call onModeChange with "snap" when snap button is clicked', async () => {
-      render(
-        <PositioningModeToggle
-          mode="free"
-          onModeChange={mockOnModeChange}
-        />
-      );
+      render(<PositioningModeToggle mode="free" onModeChange={mockOnModeChange} />);
 
       const snapButton = screen.getByRole('button', { name: /snap to position/i });
       await user.click(snapButton);
@@ -121,12 +100,7 @@ describe('PositioningModeToggle', () => {
     });
 
     it('should call onModeChange with "free" when free button is clicked', async () => {
-      render(
-        <PositioningModeToggle
-          mode="snap"
-          onModeChange={mockOnModeChange}
-        />
-      );
+      render(<PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />);
 
       const freeButton = screen.getByRole('button', { name: /free movement/i });
       await user.click(freeButton);
@@ -136,12 +110,7 @@ describe('PositioningModeToggle', () => {
     });
 
     it('should not call onModeChange when already selected mode is clicked', async () => {
-      render(
-        <PositioningModeToggle
-          mode="snap"
-          onModeChange={mockOnModeChange}
-        />
-      );
+      render(<PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />);
 
       const snapButton = screen.getByRole('button', { name: /snap to position/i });
       await user.click(snapButton);
@@ -151,12 +120,7 @@ describe('PositioningModeToggle', () => {
     });
 
     it('should handle rapid clicking without issues', async () => {
-      render(
-        <PositioningModeToggle
-          mode="snap"
-          onModeChange={mockOnModeChange}
-        />
-      );
+      render(<PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />);
 
       const freeButton = screen.getByRole('button', { name: /free movement/i });
       const snapButton = screen.getByRole('button', { name: /snap to position/i });
@@ -173,59 +137,45 @@ describe('PositioningModeToggle', () => {
 
   describe('Visual States', () => {
     it('should apply correct styles for active snap mode', () => {
-      render(
-        <PositioningModeToggle
-          mode="snap"
-          onModeChange={mockOnModeChange}
-        />
-      );
+      render(<PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />);
 
       const snapButton = screen.getByRole('button', { name: /snap to position/i });
       const freeButton = screen.getByRole('button', { name: /free movement/i });
 
       // Active button should have white text
       expect(snapButton).toHaveClass('text-white');
-      
+
       // Inactive button should have gray text
       expect(freeButton).toHaveClass('text-slate-400');
     });
 
     it('should apply correct styles for active free mode', () => {
-      render(
-        <PositioningModeToggle
-          mode="free"
-          onModeChange={mockOnModeChange}
-        />
-      );
+      render(<PositioningModeToggle mode="free" onModeChange={mockOnModeChange} />);
 
       const snapButton = screen.getByRole('button', { name: /snap to position/i });
       const freeButton = screen.getByRole('button', { name: /free movement/i });
 
       // Active button should have white text
       expect(freeButton).toHaveClass('text-white');
-      
+
       // Inactive button should have gray text
       expect(snapButton).toHaveClass('text-slate-400');
     });
 
     it('should render motion indicators with correct layout IDs', () => {
       const { container } = render(
-        <PositioningModeToggle
-          mode="snap"
-          onModeChange={mockOnModeChange}
-        />
+        <PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />
       );
 
-      const motionIndicator = container.querySelector('[data-layout-id="positioningModeIndicator"]');
+      const motionIndicator = container.querySelector(
+        '[data-layout-id="positioningModeIndicator"]'
+      );
       expect(motionIndicator).toBeInTheDocument();
     });
 
     it('should show correct background colors for mode indicators', () => {
       const { container, rerender } = render(
-        <PositioningModeToggle
-          mode="snap"
-          onModeChange={mockOnModeChange}
-        />
+        <PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />
       );
 
       // Snap mode should have blue background
@@ -233,12 +183,7 @@ describe('PositioningModeToggle', () => {
       expect(indicator).toHaveClass('bg-blue-600');
 
       // Free mode should have green background
-      rerender(
-        <PositioningModeToggle
-          mode="free"
-          onModeChange={mockOnModeChange}
-        />
-      );
+      rerender(<PositioningModeToggle mode="free" onModeChange={mockOnModeChange} />);
 
       indicator = container.querySelector('[data-layout-id="positioningModeIndicator"]');
       expect(indicator).toHaveClass('bg-green-600');
@@ -247,39 +192,24 @@ describe('PositioningModeToggle', () => {
 
   describe('Accessibility', () => {
     it('should have proper button roles', () => {
-      render(
-        <PositioningModeToggle
-          mode="snap"
-          onModeChange={mockOnModeChange}
-        />
-      );
+      render(<PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />);
 
       const buttons = screen.getAllByRole('button');
       expect(buttons).toHaveLength(2);
     });
 
     it('should have descriptive button text', () => {
-      render(
-        <PositioningModeToggle
-          mode="snap"
-          onModeChange={mockOnModeChange}
-        />
-      );
+      render(<PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />);
 
       expect(screen.getByRole('button', { name: /snap to position/i })).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /free movement/i })).toBeInTheDocument();
     });
 
     it('should support keyboard navigation', async () => {
-      render(
-        <PositioningModeToggle
-          mode="snap"
-          onModeChange={mockOnModeChange}
-        />
-      );
+      render(<PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />);
 
       const freeButton = screen.getByRole('button', { name: /free movement/i });
-      
+
       // Focus and activate with keyboard
       freeButton.focus();
       expect(freeButton).toHaveFocus();
@@ -289,12 +219,7 @@ describe('PositioningModeToggle', () => {
     });
 
     it('should support space key activation', async () => {
-      render(
-        <PositioningModeToggle
-          mode="snap"
-          onModeChange={mockOnModeChange}
-        />
-      );
+      render(<PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />);
 
       const freeButton = screen.getByRole('button', { name: /free movement/i });
       freeButton.focus();
@@ -305,20 +230,12 @@ describe('PositioningModeToggle', () => {
 
     it('should provide informative descriptions for each mode', () => {
       const { rerender } = render(
-        <PositioningModeToggle
-          mode="snap"
-          onModeChange={mockOnModeChange}
-        />
+        <PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />
       );
 
       expect(screen.getByText('Players snap to formation positions')).toBeInTheDocument();
 
-      rerender(
-        <PositioningModeToggle
-          mode="free"
-          onModeChange={mockOnModeChange}
-        />
-      );
+      rerender(<PositioningModeToggle mode="free" onModeChange={mockOnModeChange} />);
 
       expect(screen.getByText('Players can be placed anywhere on field')).toBeInTheDocument();
     });
@@ -326,24 +243,14 @@ describe('PositioningModeToggle', () => {
 
   describe('Icon Rendering', () => {
     it('should render snap mode icon with correct attributes', () => {
-      render(
-        <PositioningModeToggle
-          mode="snap"
-          onModeChange={mockOnModeChange}
-        />
-      );
+      render(<PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />);
 
       const icon = screen.getByRole('img', { hidden: true });
       expect(icon).toHaveClass('w-4', 'h-4', 'text-blue-400');
     });
 
     it('should render free mode icon with correct attributes', () => {
-      render(
-        <PositioningModeToggle
-          mode="free"
-          onModeChange={mockOnModeChange}
-        />
-      );
+      render(<PositioningModeToggle mode="free" onModeChange={mockOnModeChange} />);
 
       const icon = screen.getByRole('img', { hidden: true });
       expect(icon).toHaveClass('w-4', 'h-4', 'text-green-400');
@@ -351,15 +258,12 @@ describe('PositioningModeToggle', () => {
 
     it('should render SVG paths correctly', () => {
       const { container } = render(
-        <PositioningModeToggle
-          mode="snap"
-          onModeChange={mockOnModeChange}
-        />
+        <PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />
       );
 
       const svg = container.querySelector('svg');
       const path = container.querySelector('path');
-      
+
       expect(svg).toBeInTheDocument();
       expect(path).toBeInTheDocument();
       expect(path).toHaveAttribute('strokeLinecap', 'round');
@@ -371,10 +275,7 @@ describe('PositioningModeToggle', () => {
   describe('Component Structure', () => {
     it('should maintain proper DOM structure', () => {
       const { container } = render(
-        <PositioningModeToggle
-          mode="snap"
-          onModeChange={mockOnModeChange}
-        />
+        <PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />
       );
 
       const wrapper = container.firstChild as HTMLElement;
@@ -387,10 +288,7 @@ describe('PositioningModeToggle', () => {
 
     it('should have correct button container styling', () => {
       const { container } = render(
-        <PositioningModeToggle
-          mode="snap"
-          onModeChange={mockOnModeChange}
-        />
+        <PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />
       );
 
       const buttonContainer = container.querySelector('.bg-slate-800');
@@ -400,10 +298,7 @@ describe('PositioningModeToggle', () => {
 
     it('should render description section correctly', () => {
       const { container } = render(
-        <PositioningModeToggle
-          mode="snap"
-          onModeChange={mockOnModeChange}
-        />
+        <PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />
       );
 
       const descriptionSection = container.querySelector('.space-x-2');
@@ -418,10 +313,7 @@ describe('PositioningModeToggle', () => {
     it('should handle missing onModeChange prop gracefully', () => {
       // This would normally cause TypeScript errors, but test runtime behavior
       const { container } = render(
-        <PositioningModeToggle
-          mode="snap"
-          onModeChange={undefined as any}
-        />
+        <PositioningModeToggle mode="snap" onModeChange={undefined as any} />
       );
 
       expect(container.firstChild).toBeInTheDocument();
@@ -430,10 +322,7 @@ describe('PositioningModeToggle', () => {
     it('should handle invalid mode prop', () => {
       // Test with invalid mode
       const { container } = render(
-        <PositioningModeToggle
-          mode={'invalid' as any}
-          onModeChange={mockOnModeChange}
-        />
+        <PositioningModeToggle mode={'invalid' as any} onModeChange={mockOnModeChange} />
       );
 
       expect(container.firstChild).toBeInTheDocument();
@@ -443,15 +332,10 @@ describe('PositioningModeToggle', () => {
   describe('Performance', () => {
     it('should not re-render unnecessarily', () => {
       const renderSpy = vi.fn();
-      
+
       function TestWrapper(props: { mode: 'snap' | 'free' }) {
         renderSpy();
-        return (
-          <PositioningModeToggle
-            mode={props.mode}
-            onModeChange={mockOnModeChange}
-          />
-        );
+        return <PositioningModeToggle mode={props.mode} onModeChange={mockOnModeChange} />;
       }
 
       const { rerender } = render(<TestWrapper mode="snap" />);
@@ -463,12 +347,7 @@ describe('PositioningModeToggle', () => {
     });
 
     it('should handle high-frequency mode changes', async () => {
-      render(
-        <PositioningModeToggle
-          mode="snap"
-          onModeChange={mockOnModeChange}
-        />
-      );
+      render(<PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />);
 
       const freeButton = screen.getByRole('button', { name: /free movement/i });
       const snapButton = screen.getByRole('button', { name: /snap to position/i });
@@ -489,26 +368,26 @@ describe('PositioningModeToggle', () => {
   describe('Visual Regression Prevention', () => {
     it('should maintain consistent styling classes', () => {
       const { container } = render(
-        <PositioningModeToggle
-          mode="snap"
-          onModeChange={mockOnModeChange}
-        />
+        <PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />
       );
 
       const buttons = container.querySelectorAll('button');
-      
+
       buttons.forEach(button => {
-        expect(button).toHaveClass('relative', 'px-3', 'py-1.5', 'text-sm', 'font-medium', 'transition-colors', 'rounded-md');
+        expect(button).toHaveClass(
+          'relative',
+          'px-3',
+          'py-1.5',
+          'text-sm',
+          'font-medium',
+          'transition-colors',
+          'rounded-md'
+        );
       });
     });
 
     it('should maintain correct color scheme', () => {
-      render(
-        <PositioningModeToggle
-          mode="snap"
-          onModeChange={mockOnModeChange}
-        />
-      );
+      render(<PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />);
 
       const activeButton = screen.getByRole('button', { name: /snap to position/i });
       const inactiveButton = screen.getByRole('button', { name: /free movement/i });
@@ -521,38 +400,27 @@ describe('PositioningModeToggle', () => {
   describe('Integration with Parent Components', () => {
     it('should work correctly when mode is changed externally', () => {
       const { rerender } = render(
-        <PositioningModeToggle
-          mode="snap"
-          onModeChange={mockOnModeChange}
-        />
+        <PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />
       );
 
       expect(screen.getByText('Players snap to formation positions')).toBeInTheDocument();
 
       // Simulate external mode change
-      rerender(
-        <PositioningModeToggle
-          mode="free"
-          onModeChange={mockOnModeChange}
-        />
-      );
+      rerender(<PositioningModeToggle mode="free" onModeChange={mockOnModeChange} />);
 
       expect(screen.getByText('Players can be placed anywhere on field')).toBeInTheDocument();
     });
 
     it('should handle mode changes during component lifecycle', () => {
       let currentMode: 'snap' | 'free' = 'snap';
-      
+
       const handleModeChange = (mode: 'snap' | 'free') => {
         currentMode = mode;
         mockOnModeChange(mode);
       };
 
       const { rerender } = render(
-        <PositioningModeToggle
-          mode={currentMode}
-          onModeChange={handleModeChange}
-        />
+        <PositioningModeToggle mode={currentMode} onModeChange={handleModeChange} />
       );
 
       const freeButton = screen.getByRole('button', { name: /free movement/i });
@@ -560,12 +428,7 @@ describe('PositioningModeToggle', () => {
 
       // Update mode and re-render
       currentMode = 'free';
-      rerender(
-        <PositioningModeToggle
-          mode={currentMode}
-          onModeChange={handleModeChange}
-        />
-      );
+      rerender(<PositioningModeToggle mode={currentMode} onModeChange={handleModeChange} />);
 
       expect(screen.getByText('Players can be placed anywhere on field')).toBeInTheDocument();
     });

@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
 import { useFranchiseContext, useTacticsContext, useUIContext } from '../hooks';
 import type { Team } from '../types';
+import { ResponsivePage } from '../components/Layout/ResponsivePage';
+import {
+  ResponsiveGrid,
+  TouchButton,
+  ResponsiveCard,
+} from '../components/Layout/AdaptiveLayout.tsx';
 
 const AnalyticsPage: React.FC = () => {
   const { franchiseState } = useFranchiseContext();
@@ -18,21 +24,21 @@ const AnalyticsPage: React.FC = () => {
   // Calculate performance metrics
   const calculatePerformanceMetrics = () => {
     const totalMatches = matchHistory.length;
-    const wins = matchHistory.filter(match => {
+    const wins = matchHistory.filter((match: any) => {
       const isHome = true; // Simplified assumption
       return isHome ? match.homeScore > match.awayScore : match.awayScore > match.homeScore;
     }).length;
-    const draws = matchHistory.filter(match => match.homeScore === match.awayScore).length;
+    const draws = matchHistory.filter((match: any) => match.homeScore === match.awayScore).length;
     const losses = totalMatches - wins - draws;
 
     const goalStats = matchHistory.reduce(
-      (acc, match) => {
+      (acc: any, match: any) => {
         acc.scored += match.homeScore; // Simplified
         acc.conceded += match.awayScore;
         return acc;
       },
-      { scored: 0, conceded: 0 },
-    );
+      { scored: 0, conceded: 0 }
+    ) as { scored: number; conceded: number };
 
     return {
       totalMatches,
@@ -79,71 +85,58 @@ const AnalyticsPage: React.FC = () => {
   };
 
   return (
-    <div className="w-full h-full p-6 bg-gray-900 overflow-y-auto">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-teal-400 mb-2">Analytics Dashboard</h1>
-          <p className="text-gray-400">Analyze your team's performance and trends</p>
-        </div>
+    <ResponsivePage title="Analytics Dashboard" maxWidth="full">
+      <div className="space-y-6">
+        {/* Description */}
+        <p className="text-sm sm:text-base text-gray-400">
+          Analyze your team's performance and trends
+        </p>
 
         {/* Team Selector */}
-        <div className="mb-6">
-          <div className="bg-gray-800 rounded-lg p-1 inline-flex">
-            <button
-              onClick={() => setSelectedTeam('home')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                selectedTeam === 'home'
-                  ? 'bg-teal-600 text-white'
-                  : 'text-gray-400 hover:text-white hover:bg-gray-700'
-              }`}
-            >
-              Home Team
-            </button>
-            <button
-              onClick={() => setSelectedTeam('away')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                selectedTeam === 'away'
-                  ? 'bg-teal-600 text-white'
-                  : 'text-gray-400 hover:text-white hover:bg-gray-700'
-              }`}
-            >
-              Away Team
-            </button>
-          </div>
+        <div className="bg-gray-800 rounded-lg p-1 inline-flex gap-1">
+          <TouchButton
+            onClick={() => setSelectedTeam('home')}
+            variant={selectedTeam === 'home' ? 'primary' : 'secondary'}
+            size="md"
+          >
+            Home Team
+          </TouchButton>
+          <TouchButton
+            onClick={() => setSelectedTeam('away')}
+            variant={selectedTeam === 'away' ? 'primary' : 'secondary'}
+            size="md"
+          >
+            Away Team
+          </TouchButton>
         </div>
 
         {/* Metric Selector */}
-        <div className="mb-6">
-          <div className="border-b border-gray-700">
-            <nav className="-mb-px flex space-x-8">
-              {[
-                { key: 'performance' as const, label: 'Performance' },
-                { key: 'financials' as const, label: 'Financials' },
-                { key: 'transfers' as const, label: 'Transfers' },
-                { key: 'development' as const, label: 'Development' },
-              ].map(({ key, label }) => (
-                <button
-                  key={key}
-                  onClick={() => setSelectedMetric(key)}
-                  className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
-                    selectedMetric === key
-                      ? 'border-teal-500 text-teal-400'
-                      : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
-            </nav>
-          </div>
+        <div className="border-b border-gray-700 pb-2">
+          <ResponsiveGrid cols={{ mobile: 2, tablet: 4, desktop: 4 }} gap="sm">
+            {[
+              { key: 'performance' as const, label: 'Performance' },
+              { key: 'financials' as const, label: 'Financials' },
+              { key: 'transfers' as const, label: 'Transfers' },
+              { key: 'development' as const, label: 'Development' },
+            ].map(({ key, label }) => (
+              <TouchButton
+                key={key}
+                onClick={() => setSelectedMetric(key)}
+                variant={selectedMetric === key ? 'primary' : 'secondary'}
+                size="md"
+                fullWidth
+              >
+                {label}
+              </TouchButton>
+            ))}
+          </ResponsiveGrid>
         </div>
 
         {/* Performance Analytics */}
         {selectedMetric === 'performance' && (
           <div className="space-y-6">
             {/* Match Statistics */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <ResponsiveGrid cols={{ mobile: 1, tablet: 2, desktop: 4 }} gap="lg">
               <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
                 <div className="flex items-center justify-between">
                   <div>
@@ -256,10 +249,10 @@ const AnalyticsPage: React.FC = () => {
                   </div>
                 </div>
               </div>
-            </div>
+            </ResponsiveGrid>
 
             {/* Top Performers */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <ResponsiveGrid cols={{ mobile: 1, tablet: 2, desktop: 2 }} gap="lg">
               {/* Top Scorers */}
               <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
                 <h3 className="text-lg font-semibold text-teal-400 mb-4">Top Scorers</h3>
@@ -297,7 +290,7 @@ const AnalyticsPage: React.FC = () => {
                   ))}
                 </div>
               </div>
-            </div>
+            </ResponsiveGrid>
           </div>
         )}
 
@@ -452,7 +445,7 @@ const AnalyticsPage: React.FC = () => {
           </div>
         )}
       </div>
-    </div>
+    </ResponsivePage>
   );
 };
 

@@ -163,9 +163,15 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({ fieldRef }) => {
 
     switch (tool) {
       case 'arrow': {
-        if (points.length < 2 || !points[0] || !points[1] || 
-            typeof points[0].x !== 'number' || typeof points[0].y !== 'number' ||
-            typeof points[1].x !== 'number' || typeof points[1].y !== 'number') {
+        if (
+          points.length < 2 ||
+          !points[0] ||
+          !points[1] ||
+          typeof points[0].x !== 'number' ||
+          typeof points[0].y !== 'number' ||
+          typeof points[1].x !== 'number' ||
+          typeof points[1].y !== 'number'
+        ) {
           return null;
         }
         const p0 = points[0];
@@ -184,9 +190,15 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({ fieldRef }) => {
         );
       }
       case 'line': {
-        if (points.length < 2 || !points[0] || !points[1] || 
-            typeof points[0].x !== 'number' || typeof points[0].y !== 'number' ||
-            typeof points[1].x !== 'number' || typeof points[1].y !== 'number') {
+        if (
+          points.length < 2 ||
+          !points[0] ||
+          !points[1] ||
+          typeof points[0].x !== 'number' ||
+          typeof points[0].y !== 'number' ||
+          typeof points[1].x !== 'number' ||
+          typeof points[1].y !== 'number'
+        ) {
           return null;
         }
         const p0 = points[0];
@@ -204,9 +216,15 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({ fieldRef }) => {
         );
       }
       case 'zone': {
-        if (points.length < 2 || !points[0] || !points[1] || 
-            typeof points[0].x !== 'number' || typeof points[0].y !== 'number' ||
-            typeof points[1].x !== 'number' || typeof points[1].y !== 'number') {
+        if (
+          points.length < 2 ||
+          !points[0] ||
+          !points[1] ||
+          typeof points[0].x !== 'number' ||
+          typeof points[0].y !== 'number' ||
+          typeof points[1].x !== 'number' ||
+          typeof points[1].y !== 'number'
+        ) {
           return null;
         }
         const p0 = points[0];
@@ -251,8 +269,13 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({ fieldRef }) => {
         );
       }
       case 'text':
-        if (!text || points.length < 1 || !points[0] || 
-            typeof points[0].x !== 'number' || typeof points[0].y !== 'number') {
+        if (
+          !text ||
+          points.length < 1 ||
+          !points[0] ||
+          typeof points[0].x !== 'number' ||
+          typeof points[0].y !== 'number'
+        ) {
           return null;
         }
         return (
@@ -280,7 +303,7 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({ fieldRef }) => {
       (drawings ?? [])
         .map(d => d?.color)
         .filter(Boolean)
-        .concat(drawingColor ?? '#ffffff'),
+        .concat(drawingColor ?? '#ffffff')
     ),
   ];
   const eventsToHandle =

@@ -6,8 +6,9 @@
  */
 
 import CryptoJS from 'crypto-js';
-import { securityLogger } from './logging';
-import { generateSecureRandom, generateUUID } from './encryption';
+import { securityLogger, SecurityEventType } from './logging';
+import { generateUUID } from './encryption';
+import { bytesToHex, getSecureRandomBytes } from './runtime';
 
 // MFA Method types
 export enum MFAMethod {
@@ -16,6 +17,8 @@ export enum MFAMethod {
   EMAIL = 'email',
   BACKUP_CODE = 'backup_code',
 }
+
+const MFAMethodSet = new Set<string>(Object.values(MFAMethod));
 
 // MFA Challenge types
 export enum MFAChallengeType {
@@ -83,40 +86,132 @@ export interface MFAStatus {
 const mfaChallenges = new Map<string, MFAChallenge>();
 const trustedDevices = new Map<string, Set<string>>(); // userId -> Set of device fingerprints
 
-/**
- * TOTP (Time-based One-Time Password) Functions
- */
+const BASE32_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+const BACKUP_CODE_CHARSET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
-// Generate TOTP secret
-export function generateTOTPSecret(): string {
-  return generateSecureRandom(20); // 160-bit secret
+function normalizeBase32(value: string): string {
+  return value.replace(/\s+/g, '').toUpperCase();
 }
 
-// Generate TOTP token
-export function generateTOTP(secret: string, timestamp?: number): string {
+function bytesToBase32String(bytes: Uint8Array): string {
+  if (bytes.length === 0) {
+    return '';
+  }
+
+  let bits = '';
+  bytes.forEach(byte => {
+    bits += byte.toString(2).padStart(8, '0');
+  });
+
+  let output = '';
+  for (let index = 0; index < bits.length; index += 5) {
+    const chunk = bits.slice(index, index + 5);
+    const paddedChunk = chunk.padEnd(5, '0');
+    const alphabetIndex = parseInt(paddedChunk, 2);
+    output += BASE32_ALPHABET[alphabetIndex] ?? 'A';
+  }
+
+  while (output.length % 8 !== 0) {
+    output += '=';
+  }
+
+  return output;
+}
+
+function base32ToBytes(value: string): Uint8Array {
+  const normalized = normalizeBase32(value).replace(/=+$/, '');
+  if (!normalized) {
+    return new Uint8Array();
+  }
+
+  let bits = '';
+  for (const char of normalized) {
+    const index = BASE32_ALPHABET.indexOf(char);
+    if (index === -1) {
+      throw new Error(`Invalid base32 character: ${char}`);
+    }
+    bits += index.toString(2).padStart(5, '0');
+  }
+
+  const byteCount = Math.floor(bits.length / 8);
+  const bytes = new Uint8Array(byteCount);
+
+  for (let i = 0; i < byteCount; i += 1) {
+    bytes[i] = parseInt(bits.slice(i * 8, i * 8 + 8), 2);
+  }
+
+  return bytes;
+}
+
+function parseTotpSecret(secret: string): CryptoJS.lib.WordArray {
+  const normalized = normalizeBase32(secret);
+
+  try {
+    const secretBytes = base32ToBytes(normalized);
+    if (secretBytes.length > 0) {
+      return CryptoJS.enc.Hex.parse(bytesToHex(secretBytes));
+    }
+  } catch {
+    // Fall back to other encodings below
+  }
+
+  if (/^[0-9a-f]+$/i.test(secret) && secret.length % 2 === 0) {
+    return CryptoJS.enc.Hex.parse(secret);
+  }
+
+  return CryptoJS.enc.Utf8.parse(secret);
+}
+
+function generateNumericCode(length: number): string {
+  const bytes = getSecureRandomBytes(length);
+  return Array.from(bytes, byte => (byte % 10).toString()).join('');
+}
+
+function generateBackupCode(length = 8): string {
+  const charsetLength = BACKUP_CODE_CHARSET.length;
+  const bytes = getSecureRandomBytes(length);
+  return Array.from(bytes, byte => BACKUP_CODE_CHARSET[byte % charsetLength]).join('');
+}
+
+function generateTOTPInternal(secretWordArray: CryptoJS.lib.WordArray, timestamp?: number): string {
   const time = Math.floor((timestamp || Date.now()) / 1000 / 30); // 30-second window
   const timeHex = time.toString(16).padStart(16, '0');
   const timeBytes = CryptoJS.enc.Hex.parse(timeHex);
 
-  // HMAC-SHA1 with secret
-  const hmac = CryptoJS.HmacSHA1(timeBytes, secret);
+  const hmac = CryptoJS.HmacSHA1(timeBytes, secretWordArray);
   const hmacHex = hmac.toString();
 
-  // Dynamic truncation
   const offset = parseInt(hmacHex.slice(-1), 16);
   const code = parseInt(hmacHex.slice(offset * 2, offset * 2 + 8), 16) & 0x7fffffff;
 
   return (code % 1000000).toString().padStart(6, '0');
 }
 
+/**
+ * TOTP (Time-based One-Time Password) Functions
+ */
+
+// Generate TOTP secret
+export function generateTOTPSecret(): string {
+  const secretBytes = getSecureRandomBytes(20); // 160-bit secret
+  return bytesToBase32String(secretBytes).replace(/=+$/, '');
+}
+
+// Generate TOTP token
+export function generateTOTP(secret: string, timestamp?: number): string {
+  const secretWordArray = parseTotpSecret(secret);
+  return generateTOTPInternal(secretWordArray, timestamp);
+}
+
 // Verify TOTP token
 export function verifyTOTP(token: string, secret: string, windowSize: number = 1): boolean {
-  const currentTime = Math.floor(Date.now() / 1000);
+  const secretWordArray = parseTotpSecret(secret);
+  const baseTimestamp = Date.now();
 
   // Check current window and adjacent windows for clock skew
-  for (let i = -windowSize; i <= windowSize; i++) {
-    const testTime = currentTime + i * 30;
-    const expectedToken = generateTOTP(secret, testTime * 1000);
+  for (let windowOffset = -windowSize; windowOffset <= windowSize; windowOffset += 1) {
+    const windowTimestamp = baseTimestamp + windowOffset * 30_000;
+    const expectedToken = generateTOTPInternal(secretWordArray, windowTimestamp);
 
     if (token === expectedToken) {
       return true;
@@ -130,11 +225,12 @@ export function verifyTOTP(token: string, secret: string, windowSize: number = 1
 export function generateTOTPQRCode(
   secret: string,
   accountName: string,
-  issuer: string = 'Astral Turf',
+  issuer: string = 'Astral Turf'
 ): string {
+  const normalizedSecret = normalizeBase32(secret).replace(/=+$/, '');
   const label = encodeURIComponent(`${issuer}:${accountName}`);
   const params = new URLSearchParams({
-    secret,
+    secret: normalizedSecret,
     issuer,
     algorithm: 'SHA1',
     digits: '6',
@@ -150,18 +246,13 @@ export function generateTOTPQRCode(
 
 // Generate backup codes
 export function generateBackupCodes(count: number = 10): string[] {
-  const codes: string[] = [];
+  const codes = new Set<string>();
 
-  for (let i = 0; i < count; i++) {
-    // Generate 8-character alphanumeric code
-    const code = generateSecureRandom(4)
-      .replace(/[0o1il]/gi, '') // Remove confusing characters
-      .substring(0, 8)
-      .toUpperCase();
-    codes.push(code);
+  while (codes.size < count) {
+    codes.add(generateBackupCode());
   }
 
-  return codes;
+  return Array.from(codes);
 }
 
 // Hash backup code for storage
@@ -185,7 +276,7 @@ export function createMFAChallenge(
   method: MFAMethod,
   type: MFAChallengeType,
   ipAddress: string,
-  userAgent: string,
+  userAgent: string
 ): MFAChallenge {
   const challenge: MFAChallenge = {
     id: generateUUID(),
@@ -203,18 +294,26 @@ export function createMFAChallenge(
 
   // Generate verification code for SMS/Email
   if (method === MFAMethod.SMS || method === MFAMethod.EMAIL) {
-    challenge.code = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit code
+    challenge.code = generateNumericCode(6);
   }
 
   mfaChallenges.set(challenge.id, challenge);
 
-  securityLogger.info('MFA challenge created', {
-    challengeId: challenge.id,
-    userId,
-    method,
-    type,
-    ipAddress,
-  });
+  securityLogger.logSecurityEvent(
+    SecurityEventType.MFA_CHALLENGE_CREATED,
+    'MFA challenge created',
+    {
+      userId,
+      ipAddress,
+      userAgent,
+      metadata: {
+        challengeId: challenge.id,
+        method,
+        type,
+        expiresAt: challenge.expiresAt,
+      },
+    }
+  );
 
   return challenge;
 }
@@ -242,12 +341,21 @@ export function verifyMFAChallenge(
   challengeId: string,
   code: string,
   userSecret?: string,
-  userBackupCodes?: string[],
+  userBackupCodes?: string[]
 ): MFAVerificationResult {
   const challenge = getMFAChallenge(challengeId);
 
   if (!challenge) {
-    securityLogger.warn('MFA verification attempted with invalid challenge', { challengeId });
+    securityLogger.logSecurityEvent(
+      SecurityEventType.MFA_CHALLENGE_FAILED,
+      'MFA verification attempted with invalid challenge',
+      {
+        metadata: {
+          challengeId,
+          reason: 'invalid_challenge',
+        },
+      }
+    );
     return {
       success: false,
       method: MFAMethod.TOTP,
@@ -257,11 +365,19 @@ export function verifyMFAChallenge(
 
   // Check attempt limits
   if (challenge.attempts >= challenge.maxAttempts) {
-    securityLogger.warn('MFA verification blocked - max attempts exceeded', {
-      challengeId,
-      userId: challenge.userId,
-      attempts: challenge.attempts,
-    });
+    securityLogger.logSecurityEvent(
+      SecurityEventType.MFA_CHALLENGE_FAILED,
+      'MFA verification blocked - max attempts exceeded',
+      {
+        userId: challenge.userId,
+        metadata: {
+          challengeId,
+          reason: 'max_attempts_exceeded',
+          attempts: challenge.attempts,
+          maxAttempts: challenge.maxAttempts,
+        },
+      }
+    );
 
     return {
       success: false,
@@ -299,6 +415,18 @@ export function verifyMFAChallenge(
             userBackupCodes.splice(index, 1);
             backupCodesRemaining = userBackupCodes.length;
           }
+
+          securityLogger.logSecurityEvent(
+            SecurityEventType.MFA_BACKUP_CODE_USED,
+            'MFA backup code used',
+            {
+              userId: challenge.userId,
+              metadata: {
+                challengeId,
+                backupCodesRemaining,
+              },
+            }
+          );
         }
       }
       break;
@@ -308,12 +436,19 @@ export function verifyMFAChallenge(
     challenge.verified = true;
     mfaChallenges.delete(challengeId);
 
-    securityLogger.info('MFA verification successful', {
-      challengeId,
-      userId: challenge.userId,
-      method: challenge.method,
-      attempts: challenge.attempts,
-    });
+    securityLogger.logSecurityEvent(
+      SecurityEventType.MFA_CHALLENGE_VERIFIED,
+      'MFA verification successful',
+      {
+        userId: challenge.userId,
+        metadata: {
+          challengeId,
+          method: challenge.method,
+          attempts: challenge.attempts,
+          backupCodesRemaining,
+        },
+      }
+    );
 
     return {
       success: true,
@@ -322,13 +457,19 @@ export function verifyMFAChallenge(
       backupCodesRemaining,
     };
   } else {
-    securityLogger.warn('MFA verification failed', {
-      challengeId,
-      userId: challenge.userId,
-      method: challenge.method,
-      attempts: challenge.attempts,
-      remainingAttempts: challenge.maxAttempts - challenge.attempts,
-    });
+    securityLogger.logSecurityEvent(
+      SecurityEventType.MFA_CHALLENGE_FAILED,
+      'MFA verification failed',
+      {
+        userId: challenge.userId,
+        metadata: {
+          challengeId,
+          method: challenge.method,
+          attempts: challenge.attempts,
+          remainingAttempts: challenge.maxAttempts - challenge.attempts,
+        },
+      }
+    );
 
     return {
       success: false,
@@ -393,7 +534,17 @@ export function setupTOTPMFA(userId: string, accountName: string): MFASetupResul
     const qrCodeUrl = generateTOTPQRCode(secret, accountName);
     const backupCodes = generateBackupCodes();
 
-    securityLogger.info('TOTP MFA setup initiated', { userId, accountName });
+    securityLogger.logSecurityEvent(
+      SecurityEventType.MFA_CHALLENGE_CREATED,
+      'TOTP MFA setup initiated',
+      {
+        userId,
+        metadata: {
+          accountName,
+          backupCodesIssued: backupCodes.length,
+        },
+      }
+    );
 
     return {
       success: true,
@@ -402,11 +553,18 @@ export function setupTOTPMFA(userId: string, accountName: string): MFASetupResul
       backupCodes,
       setupKey: secret, // Manual entry key
     };
-  } catch (_error) {
-    securityLogger.error('TOTP MFA setup failed', {
-      userId,
-      error: error instanceof Error ? error.message : 'Unknown error',
-    });
+  } catch (error: unknown) {
+    securityLogger.logSecurityEvent(
+      SecurityEventType.MFA_CHALLENGE_FAILED,
+      'TOTP MFA setup failed',
+      {
+        userId,
+        metadata: {
+          accountName,
+          error: error instanceof Error ? error.message : 'Unknown error',
+        },
+      }
+    );
 
     return { success: false };
   }
@@ -416,21 +574,80 @@ export function setupTOTPMFA(userId: string, accountName: string): MFASetupResul
 export function verifyTOTPSetup(secret: string, token: string): boolean {
   const isValid = verifyTOTP(token, secret);
 
-  securityLogger.info('TOTP setup verification', {
-    success: isValid,
-    token: token.substring(0, 2) + '****',
-  });
+  securityLogger.logSecurityEvent(
+    isValid ? SecurityEventType.MFA_CHALLENGE_VERIFIED : SecurityEventType.MFA_CHALLENGE_FAILED,
+    'TOTP setup verification',
+    {
+      metadata: {
+        success: isValid,
+        tokenPreview: token.substring(0, 2) + '****',
+      },
+    }
+  );
 
   return isValid;
 }
 
 // Get MFA status for user
+function isMFAMethod(value: unknown): value is MFAMethod {
+  return typeof value === 'string' && MFAMethodSet.has(value);
+}
+
+function normalizeMFAConfig(config: unknown): {
+  enabled?: boolean;
+  methods?: MFAMethod[];
+  backupCodes?: string[];
+  lastUsed?: string;
+} {
+  if (!config || typeof config !== 'object') {
+    return {};
+  }
+
+  const data = config as Record<string, unknown>;
+  const normalized: {
+    enabled?: boolean;
+    methods?: MFAMethod[];
+    backupCodes?: string[];
+    lastUsed?: string;
+  } = {};
+
+  if (typeof data.enabled === 'boolean') {
+    normalized.enabled = data.enabled;
+  }
+
+  if (Array.isArray(data.methods)) {
+    normalized.methods = data.methods.filter(isMFAMethod);
+  }
+
+  if (typeof data.method === 'string' && isMFAMethod(data.method)) {
+    normalized.methods = [...(normalized.methods ?? []), data.method];
+  }
+
+  if (Array.isArray(data.backupCodes)) {
+    normalized.backupCodes = data.backupCodes.filter(
+      (value): value is string => typeof value === 'string'
+    );
+  }
+
+  if (typeof data.lastUsed === 'string') {
+    normalized.lastUsed = data.lastUsed;
+  }
+
+  if (normalized.methods) {
+    normalized.methods = Array.from(new Set(normalized.methods));
+  }
+
+  return normalized;
+}
+
 export function getMFAStatus(mfaConfig: unknown): MFAStatus {
+  const normalized = normalizeMFAConfig(mfaConfig);
+
   return {
-    enabled: mfaConfig?.enabled || false,
-    methods: mfaConfig?.methods || [],
-    backupCodesRemaining: mfaConfig?.backupCodes?.length || 0,
-    lastUsed: mfaConfig?.lastUsed,
+    enabled: normalized.enabled ?? false,
+    methods: normalized.methods ?? [],
+    backupCodesRemaining: normalized.backupCodes?.length ?? 0,
+    lastUsed: normalized.lastUsed,
     trusted: false, // Would check device trust in real implementation
   };
 }
@@ -473,7 +690,9 @@ export function calculateLoginRisk(context: {
 // Determine if MFA is required based on risk
 export function requiresMFA(riskScore: number, userMFAConfig: unknown): boolean {
   // Always require MFA if enabled and risk score is above threshold
-  if (userMFAConfig?.enabled) {
+  const normalized = normalizeMFAConfig(userMFAConfig);
+
+  if (normalized.enabled) {
     return riskScore > 0.1; // Low threshold for MFA users
   }
 

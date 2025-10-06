@@ -229,10 +229,10 @@ jobs:
         run: |
           # Update deployment image
           kubectl set image deployment/astral-turf-blue astral-turf=${{ needs.build-and-scan.outputs.image }} -n astral-turf-staging
-          
+
           # Wait for rollout to complete
           kubectl rollout status deployment/astral-turf-blue -n astral-turf-staging --timeout=600s
-          
+
           # Run health checks
           kubectl run atlas-health-check --image=curlimages/curl:latest --rm -i --restart=Never -- \
             curl -f http://astral-turf-service.astral-turf-staging.svc.cluster.local/health
@@ -266,13 +266,13 @@ jobs:
         run: |
           #!/bin/bash
           set -e
-          
+
           NAMESPACE="astral-turf"
           NEW_IMAGE="${{ needs.build-and-scan.outputs.image }}"
           DEPLOYMENT_ID="${{ env.ATLAS_DEPLOYMENT_ID }}"
-          
+
           echo "🚀 Atlas: Starting blue-green deployment ${DEPLOYMENT_ID}"
-          
+
           # Determine current active slot
           CURRENT_SLOT=$(kubectl get service astral-turf-service -n $NAMESPACE -o jsonpath='{.spec.selector.version}')
           if [ "$CURRENT_SLOT" = "blue" ]; then
@@ -280,21 +280,21 @@ jobs:
           else
             NEW_SLOT="blue"
           fi
-          
+
           echo "🔄 Atlas: Current active slot: $CURRENT_SLOT, deploying to: $NEW_SLOT"
-          
+
           # Scale up the new slot
           echo "⬆️ Atlas: Scaling up $NEW_SLOT slot"
           kubectl scale deployment astral-turf-$NEW_SLOT --replicas=3 -n $NAMESPACE
-          
+
           # Update the new slot with new image
           echo "🔄 Atlas: Updating $NEW_SLOT with new image"
           kubectl set image deployment/astral-turf-$NEW_SLOT astral-turf=$NEW_IMAGE -n $NAMESPACE
-          
+
           # Wait for new slot to be ready
           echo "⏳ Atlas: Waiting for $NEW_SLOT deployment to be ready"
           kubectl rollout status deployment/astral-turf-$NEW_SLOT -n $NAMESPACE --timeout=600s
-          
+
           # Health check on new slot
           echo "🏥 Atlas: Running health checks on $NEW_SLOT"
           for i in {1..30}; do
@@ -306,15 +306,15 @@ jobs:
             echo "⏳ Atlas: Health check attempt $i/30 failed, retrying..."
             sleep 10
           done
-          
+
           # Canary traffic test (5% for 2 minutes)
           echo "🐤 Atlas: Starting canary traffic test (5% traffic to $NEW_SLOT)"
           kubectl patch service astral-turf-service -n $NAMESPACE --type='json' \
             -p='[{"op": "replace", "path": "/metadata/annotations/atlas.traffic.split", "value": "'$CURRENT_SLOT':95,'$NEW_SLOT':5"}]'
-          
+
           # Monitor canary metrics
           sleep 120
-          
+
           # Gradual traffic shift
           echo "🔄 Atlas: Gradually shifting traffic to $NEW_SLOT"
           for TRAFFIC in 25 50 75 100; do
@@ -337,15 +337,15 @@ jobs:
             kubectl run atlas-health-check-$TRAFFIC --image=curlimages/curl:latest --rm -i --restart=Never -- \
               curl -f http://astral-turf-service.$NAMESPACE.svc.cluster.local/health
           done
-          
+
           # Scale down old slot
           echo "⬇️ Atlas: Scaling down old slot $CURRENT_SLOT"
           kubectl scale deployment astral-turf-$CURRENT_SLOT --replicas=0 -n $NAMESPACE
-          
+
           # Update HPA target to new slot
           kubectl patch hpa astral-turf-hpa -n $NAMESPACE --type='json' \
             -p='[{"op": "replace", "path": "/spec/scaleTargetRef/name", "value": "astral-turf-'$NEW_SLOT'"}]'
-          
+
           echo "✅ Atlas: Blue-green deployment completed successfully!"
           echo "🎯 Atlas: Active slot is now: $NEW_SLOT"
 
@@ -354,7 +354,7 @@ jobs:
           # Comprehensive post-deployment tests
           kubectl run atlas-validation --image=curlimages/curl:latest --rm -i --restart=Never -- \
             curl -f http://astral-turf-service.astral-turf.svc.cluster.local/health
-          
+
           # Performance baseline check
           kubectl run atlas-perf-check --image=curlimages/curl:latest --rm -i --restart=Never -- \
             sh -c 'for i in $(seq 1 100); do curl -s -w "%{time_total}\n" -o /dev/null http://astral-turf-service.astral-turf.svc.cluster.local/ && sleep 0.1; done | awk "{sum+=\$1; count++} END {print \"Average response time:\", sum/count \"s\"}"'
@@ -396,11 +396,11 @@ jobs:
         run: |
           #!/bin/bash
           set -e
-          
+
           NAMESPACE="astral-turf"
-          
+
           echo "🚨 Atlas: EMERGENCY ROLLBACK INITIATED"
-          
+
           # Get current service selector
           CURRENT_SLOT=$(kubectl get service astral-turf-service -n $NAMESPACE -o jsonpath='{.spec.selector.version}')
           if [ "$CURRENT_SLOT" = "blue" ]; then
@@ -408,23 +408,23 @@ jobs:
           else
             ROLLBACK_SLOT="blue"
           fi
-          
+
           echo "🔄 Atlas: Rolling back from $CURRENT_SLOT to $ROLLBACK_SLOT"
-          
+
           # Immediate traffic switch
           kubectl patch service astral-turf-service -n $NAMESPACE --type='json' \
             -p='[{"op": "replace", "path": "/spec/selector/version", "value": "'$ROLLBACK_SLOT'"}]'
-          
+
           # Scale up rollback slot if needed
           kubectl scale deployment astral-turf-$ROLLBACK_SLOT --replicas=3 -n $NAMESPACE
-          
+
           # Scale down failed slot
           kubectl scale deployment astral-turf-$CURRENT_SLOT --replicas=0 -n $NAMESPACE
-          
+
           # Update HPA target
           kubectl patch hpa astral-turf-hpa -n $NAMESPACE --type='json' \
             -p='[{"op": "replace", "path": "/spec/scaleTargetRef/name", "value": "astral-turf-'$ROLLBACK_SLOT'"}]'
-          
+
           echo "✅ Atlas: Emergency rollback completed"
 
       - name: Notify rollback

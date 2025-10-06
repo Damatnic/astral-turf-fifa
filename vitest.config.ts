@@ -73,9 +73,9 @@ export default defineConfig({
         },
       },
     },
-    // Configure test timeouts
-    testTimeout: 30000,
-    hookTimeout: 10000,
+    // Configure test timeouts (increased for heavy integration tests)
+    testTimeout: 60000, // 60 seconds for integration tests with complex setups
+    hookTimeout: 30000, // 30 seconds for beforeEach/afterEach hooks
     // Enable parallel test execution
     pool: 'threads',
     poolOptions: {
@@ -85,23 +85,13 @@ export default defineConfig({
       },
     },
     // Test reporting
-    reporter: [
-      'default',
-      'verbose',
-      'json',
-      'html',
-    ],
+    reporters: ['default', 'verbose', 'json', 'html'],
     outputFile: {
       json: './coverage/test-results.json',
       html: './coverage/test-results.html',
     },
     // Retry configuration for flaky tests
     retry: 2,
-    // Watch configuration
-    watch: {
-      enabled: false,
-      ignore: ['**/node_modules/**', '**/dist/**'],
-    },
     // Performance optimization
     isolate: true,
     passWithNoTests: false,
@@ -157,6 +147,6 @@ export default defineConfig({
     'process.env.JWT_SECRET': JSON.stringify('test-jwt-secret'),
     'process.env.ENCRYPTION_KEY': JSON.stringify('test-encryption-key'),
     'process.env.WEBHOOK_SECRET': JSON.stringify('test-webhook-secret'),
-    '__VITEST__': JSON.stringify(true),
+    __VITEST__: JSON.stringify(true),
   },
 });

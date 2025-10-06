@@ -89,7 +89,7 @@ class DeviceContinuityService {
     page: string,
     formationId?: string,
     playerId?: string,
-    features: string[] = [],
+    features: string[] = []
   ): Promise<void> {
     if (!this.currentSession) {
       return;
@@ -185,7 +185,7 @@ class DeviceContinuityService {
     // Send handoff request through sync service
     await syncService.syncState(
       { type: 'HANDOFF_REQUEST', payload: handoffRequest } as any,
-      {} as RootState,
+      {} as RootState
     );
 
     // // // // console.log(`📲 Handoff requested to device: ${targetDeviceId}`);
@@ -208,7 +208,7 @@ class DeviceContinuityService {
     // Notify other device of acceptance
     await syncService.syncState(
       { type: 'HANDOFF_ACCEPTED', payload: { requestId } } as any,
-      {} as RootState,
+      {} as RootState
     );
 
     // Clean up
@@ -320,7 +320,7 @@ class DeviceContinuityService {
     try {
       await syncService.syncState(
         { type: 'SESSION_UPDATE', payload: this.currentSession } as any,
-        {} as RootState,
+        {} as RootState
       );
     } catch (_error) {
       console.error('❌ Failed to broadcast session update:', _error);
@@ -389,7 +389,7 @@ class DeviceContinuityService {
     // // // // console.log('🔧 View state restoration:', viewState);
   }
 
-  private handleRemoteStateUpdate(action: unknown): void {
+  private handleRemoteStateUpdate(action: any): void {
     if (action.type === 'SESSION_UPDATE') {
       const session = action.payload as DeviceSession;
       this.activeSessions.set(session.deviceId, session);
@@ -414,10 +414,11 @@ class DeviceContinuityService {
   private handleDeviceUpdates(devices: unknown[]): void {
     // Update active sessions based on device connectivity
     devices.forEach(device => {
-      if (this.activeSessions.has(device.id)) {
-        const session = this.activeSessions.get(device.id)!;
-        session.isActive = device.isOnline;
-        session.lastActivity = device.lastSeen;
+      const dev = device as any;
+      if (this.activeSessions.has(dev.id)) {
+        const session = this.activeSessions.get(dev.id)!;
+        session.isActive = dev.isOnline;
+        session.lastActivity = dev.lastSeen;
       }
     });
 
@@ -456,7 +457,7 @@ class DeviceContinuityService {
           JSON.stringify({
             sessionId: this.currentSession.id,
             timestamp: Date.now(),
-          }),
+          })
         );
       }
     });
@@ -477,7 +478,7 @@ class DeviceContinuityService {
       deviceName = 'Tablet';
     } else if (
       /mobile|iphone|ipod|android|blackberry|opera|mini|windows\sce|palm|smartphone|iemobile/i.test(
-        userAgent,
+        userAgent
       )
     ) {
       deviceType = 'mobile';

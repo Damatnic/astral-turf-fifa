@@ -1,6 +1,6 @@
 /**
  * Phoenix Authentication & Authorization Middleware
- * 
+ *
  * Enterprise-grade security middleware with:
  * - JWT token validation with rotation
  * - Role-based access control (RBAC)
@@ -13,7 +13,7 @@
 
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import rateLimit from 'express-rate-limit';
+// @ts-ignore - express-slow-down doesn't have type declarations
 import slowDown from 'express-slow-down';
 import { createHash, createHmac } from 'crypto';
 import { phoenixPool } from '../database/PhoenixDatabasePool';
@@ -26,6 +26,8 @@ export interface AuthenticatedRequest extends Request {
     permissions: string[];
     sessionId: string;
     deviceId?: string;
+    firstName?: string;
+    lastName?: string;
   };
   session?: {
     id: string;
@@ -81,15 +83,16 @@ export class PhoenixAuthMiddleware {
   private apiKeys: Map<string, any> = new Map();
   private activeSessions: Map<string, any> = new Map();
   private securityEvents: any[] = [];
-  
+
   // Rate limiting stores
   private rateLimitStore: Map<string, { count: number; resetTime: number }> = new Map();
   private bruteForceStore: Map<string, { attempts: number; lockedUntil?: number }> = new Map();
 
   constructor() {
     this.jwtSecret = process.env.JWT_SECRET || 'phoenix-jwt-secret-change-in-production';
-    this.jwtRefreshSecret = process.env.JWT_REFRESH_SECRET || 'phoenix-refresh-secret-change-in-production';
-    
+    this.jwtRefreshSecret =
+      process.env.JWT_REFRESH_SECRET || 'phoenix-refresh-secret-change-in-production';
+
     this.initializeMiddleware();
     this.startCleanupTasks();
   }
@@ -97,17 +100,15 @@ export class PhoenixAuthMiddleware {
   private initializeMiddleware(): void {
     // Load API keys from database on startup
     this.loadAPIKeys();
-    
+
     // Load active sessions
     this.loadActiveSessions();
   }
 
   private async loadAPIKeys(): Promise<void> {
     try {
-      const result = await phoenixPool.query(
-        'SELECT * FROM api_keys WHERE is_active = true'
-      );
-      
+      const result = await phoenixPool.query('SELECT * FROM api_keys WHERE is_active = true');
+
       result.rows.forEach(key => {
         this.apiKeys.set(key.key_hash, {
           id: key.id,
@@ -116,10 +117,10 @@ export class PhoenixAuthMiddleware {
           permissions: key.permissions,
           rateLimitPerHour: key.rate_limit_per_hour,
           lastUsed: key.last_used,
-          usageCount: key.usage_count
+          usageCount: key.usage_count,
         });
       });
-      
+
       console.log(`Loaded ${this.apiKeys.size} API keys`);
     } catch (error) {
       console.error('Failed to load API keys:', error);
@@ -134,7 +135,7 @@ export class PhoenixAuthMiddleware {
         JOIN users u ON s.user_id = u.id 
         WHERE s.is_active = true AND s.expires_at > NOW()
       `);
-      
+
       result.rows.forEach(session => {
         this.activeSessions.set(session.session_token, {
           id: session.id,
@@ -145,10 +146,10 @@ export class PhoenixAuthMiddleware {
           expiresAt: session.expires_at,
           lastActivity: session.last_activity_at,
           userRole: session.role,
-          userEmail: session.email
+          userEmail: session.email,
         });
       });
-      
+
       console.log(`Loaded ${this.activeSessions.size} active sessions`);
     } catch (error) {
       console.error('Failed to load active sessions:', error);
@@ -157,25 +158,38 @@ export class PhoenixAuthMiddleware {
 
   private startCleanupTasks(): void {
     // Clean up expired sessions every 5 minutes
-    setInterval(() => {
-      this.cleanupExpiredSessions();
-    }, 5 * 60 * 1000);
+    setInterval(
+      () => {
+        this.cleanupExpiredSessions();
+      },
+      5 * 60 * 1000
+    );
 
     // Clean up rate limit data every hour
-    setInterval(() => {
-      this.cleanupRateLimitData();
-    }, 60 * 60 * 1000);
+    setInterval(
+      () => {
+        this.cleanupRateLimitData();
+      },
+      60 * 60 * 1000
+    );
 
     // Clean up security events older than 24 hours
-    setInterval(() => {
-      this.cleanupSecurityEvents();
-    }, 60 * 60 * 1000);
+    setInterval(
+      () => {
+        this.cleanupSecurityEvents();
+      },
+      60 * 60 * 1000
+    );
   }
 
   /**
    * JWT Authentication Middleware
    */
-  authenticateJWT = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  authenticateJWT = async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       const authHeader = req.headers.authorization;
       const token = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null;
@@ -185,7 +199,7 @@ export class PhoenixAuthMiddleware {
         res.status(401).json({
           success: false,
           error: 'Authentication required',
-          code: 'MISSING_TOKEN'
+          code: 'MISSING_TOKEN',
         });
         return;
       }
@@ -197,7 +211,7 @@ export class PhoenixAuthMiddleware {
         res.status(401).json({
           success: false,
           error: 'Invalid or expired token',
-          code: 'INVALID_TOKEN'
+          code: 'INVALID_TOKEN',
         });
         return;
       }
@@ -209,13 +223,15 @@ export class PhoenixAuthMiddleware {
         res.status(401).json({
           success: false,
           error: 'Session expired',
-          code: 'SESSION_EXPIRED'
+          code: 'SESSION_EXPIRED',
         });
         return;
       }
 
       // Update session activity
-      await this.updateSessionActivity(decoded.sessionId, req.ip);
+      if (decoded.sessionId) {
+        await this.updateSessionActivity(decoded.sessionId as string, req.ip ?? 'unknown');
+      }
 
       // Set user context
       req.user = {
@@ -224,7 +240,7 @@ export class PhoenixAuthMiddleware {
         role: decoded.role,
         permissions: decoded.permissions,
         sessionId: decoded.sessionId,
-        deviceId: decoded.deviceId
+        deviceId: decoded.deviceId,
       };
 
       req.session = session;
@@ -234,11 +250,12 @@ export class PhoenixAuthMiddleware {
 
       next();
     } catch (error) {
-      this.logSecurityEvent('AUTH_ERROR', req, { error: error.message });
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      this.logSecurityEvent('AUTH_ERROR', req, { error: errorMessage });
       res.status(401).json({
         success: false,
         error: 'Authentication failed',
-        code: 'AUTH_ERROR'
+        code: 'AUTH_ERROR',
       });
     }
   };
@@ -246,7 +263,11 @@ export class PhoenixAuthMiddleware {
   /**
    * API Key Authentication Middleware
    */
-  authenticateAPIKey = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  authenticateAPIKey = async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       const apiKey = req.headers['x-api-key'] as string;
 
@@ -254,7 +275,7 @@ export class PhoenixAuthMiddleware {
         res.status(401).json({
           success: false,
           error: 'API key required',
-          code: 'MISSING_API_KEY'
+          code: 'MISSING_API_KEY',
         });
         return;
       }
@@ -268,7 +289,7 @@ export class PhoenixAuthMiddleware {
         res.status(401).json({
           success: false,
           error: 'Invalid API key',
-          code: 'INVALID_API_KEY'
+          code: 'INVALID_API_KEY',
         });
         return;
       }
@@ -278,7 +299,7 @@ export class PhoenixAuthMiddleware {
         res.status(429).json({
           success: false,
           error: 'API key rate limit exceeded',
-          code: 'RATE_LIMIT_EXCEEDED'
+          code: 'RATE_LIMIT_EXCEEDED',
         });
         return;
       }
@@ -293,11 +314,12 @@ export class PhoenixAuthMiddleware {
 
       next();
     } catch (error) {
-      this.logSecurityEvent('API_KEY_ERROR', req, { error: error.message });
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      this.logSecurityEvent('API_KEY_ERROR', req, { error: errorMessage });
       res.status(401).json({
         success: false,
         error: 'API key authentication failed',
-        code: 'API_KEY_ERROR'
+        code: 'API_KEY_ERROR',
       });
     }
   };
@@ -307,26 +329,26 @@ export class PhoenixAuthMiddleware {
    */
   requireRole = (allowedRoles: string | string[]) => {
     const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
-    
+
     return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
       if (!req.user) {
         res.status(401).json({
           success: false,
           error: 'Authentication required',
-          code: 'NOT_AUTHENTICATED'
+          code: 'NOT_AUTHENTICATED',
         });
         return;
       }
 
       if (!roles.includes(req.user.role)) {
-        this.logSecurityEvent('INSUFFICIENT_ROLE', req, { 
-          userRole: req.user.role, 
-          requiredRoles: roles 
+        this.logSecurityEvent('INSUFFICIENT_ROLE', req, {
+          userRole: req.user.role,
+          requiredRoles: roles,
         });
         res.status(403).json({
           success: false,
           error: 'Insufficient role permissions',
-          code: 'INSUFFICIENT_ROLE'
+          code: 'INSUFFICIENT_ROLE',
         });
         return;
       }
@@ -344,24 +366,25 @@ export class PhoenixAuthMiddleware {
         res.status(401).json({
           success: false,
           error: 'Authentication required',
-          code: 'NOT_AUTHENTICATED'
+          code: 'NOT_AUTHENTICATED',
         });
         return;
       }
 
-      const hasPermission = req.user.permissions.includes(permission) ||
-                          req.user.permissions.includes('*') ||
-                          req.user.role === 'admin';
+      const hasPermission =
+        req.user.permissions.includes(permission) ||
+        req.user.permissions.includes('*') ||
+        req.user.role === 'admin';
 
       if (!hasPermission) {
-        this.logSecurityEvent('INSUFFICIENT_PERMISSION', req, { 
+        this.logSecurityEvent('INSUFFICIENT_PERMISSION', req, {
           permission,
-          userPermissions: req.user.permissions 
+          userPermissions: req.user.permissions,
         });
         res.status(403).json({
           success: false,
           error: 'Insufficient permissions',
-          code: 'INSUFFICIENT_PERMISSION'
+          code: 'INSUFFICIENT_PERMISSION',
         });
         return;
       }
@@ -379,7 +402,7 @@ export class PhoenixAuthMiddleware {
         res.status(401).json({
           success: false,
           error: 'Authentication required',
-          code: 'NOT_AUTHENTICATED'
+          code: 'NOT_AUTHENTICATED',
         });
         return;
       }
@@ -389,28 +412,24 @@ export class PhoenixAuthMiddleware {
         res.status(400).json({
           success: false,
           error: 'Resource ID required',
-          code: 'MISSING_RESOURCE_ID'
+          code: 'MISSING_RESOURCE_ID',
         });
         return;
       }
 
       try {
-        const hasAccess = await this.checkResourceAccess(
-          req.user,
-          resourceType,
-          resourceId
-        );
+        const hasAccess = await this.checkResourceAccess(req.user, resourceType, resourceId);
 
         if (!hasAccess) {
           this.logSecurityEvent('UNAUTHORIZED_RESOURCE_ACCESS', req, {
             resourceType,
             resourceId,
-            userId: req.user.id
+            userId: req.user.id,
           });
           res.status(403).json({
             success: false,
             error: 'Access to resource denied',
-            code: 'RESOURCE_ACCESS_DENIED'
+            code: 'RESOURCE_ACCESS_DENIED',
           });
           return;
         }
@@ -420,7 +439,7 @@ export class PhoenixAuthMiddleware {
         res.status(500).json({
           success: false,
           error: 'Failed to verify resource access',
-          code: 'RESOURCE_ACCESS_ERROR'
+          code: 'RESOURCE_ACCESS_ERROR',
         });
       }
     };
@@ -436,9 +455,7 @@ export class PhoenixAuthMiddleware {
     keyGenerator?: (req: Request) => string;
   }) => {
     return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
-      const key = config.keyGenerator ? 
-        config.keyGenerator(req) : 
-        req.ip || 'unknown';
+      const key = config.keyGenerator ? config.keyGenerator(req) : req.ip || 'unknown';
 
       const now = Date.now();
       const windowStart = now - config.windowMs;
@@ -447,25 +464,25 @@ export class PhoenixAuthMiddleware {
       if (!rateLimitData || rateLimitData.resetTime < windowStart) {
         rateLimitData = {
           count: 0,
-          resetTime: now + config.windowMs
+          resetTime: now + config.windowMs,
         };
         this.rateLimitStore.set(key, rateLimitData);
       }
 
       if (rateLimitData.count >= config.max) {
         this.logSecurityEvent('RATE_LIMIT_EXCEEDED', req, { key, limit: config.max });
-        
+
         res.set({
           'X-RateLimit-Limit': config.max.toString(),
           'X-RateLimit-Remaining': '0',
-          'X-RateLimit-Reset': new Date(rateLimitData.resetTime).toISOString()
+          'X-RateLimit-Reset': new Date(rateLimitData.resetTime).toISOString(),
         });
 
         res.status(429).json({
           success: false,
           error: 'Rate limit exceeded',
           code: 'RATE_LIMIT_EXCEEDED',
-          retryAfter: Math.ceil((rateLimitData.resetTime - now) / 1000)
+          retryAfter: Math.ceil((rateLimitData.resetTime - now) / 1000),
         });
         return;
       }
@@ -480,13 +497,13 @@ export class PhoenixAuthMiddleware {
       req.rateLimitInfo = {
         limit: config.max,
         remaining: config.max - rateLimitData.count - 1,
-        resetTime: new Date(rateLimitData.resetTime)
+        resetTime: new Date(rateLimitData.resetTime),
       };
 
       res.set({
         'X-RateLimit-Limit': config.max.toString(),
         'X-RateLimit-Remaining': req.rateLimitInfo.remaining.toString(),
-        'X-RateLimit-Reset': req.rateLimitInfo.resetTime.toISOString()
+        'X-RateLimit-Reset': req.rateLimitInfo.resetTime.toISOString(),
       });
 
       next();
@@ -502,24 +519,22 @@ export class PhoenixAuthMiddleware {
     keyGenerator?: (req: Request) => string;
   }) => {
     return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
-      const key = config.keyGenerator ? 
-        config.keyGenerator(req) : 
-        req.ip || 'unknown';
+      const key = config.keyGenerator ? config.keyGenerator(req) : req.ip || 'unknown';
 
       const now = Date.now();
       let bruteData = this.bruteForceStore.get(key);
 
       if (bruteData?.lockedUntil && bruteData.lockedUntil > now) {
-        this.logSecurityEvent('BRUTE_FORCE_BLOCKED', req, { 
-          key, 
-          lockedUntil: new Date(bruteData.lockedUntil) 
+        this.logSecurityEvent('BRUTE_FORCE_BLOCKED', req, {
+          key,
+          lockedUntil: new Date(bruteData.lockedUntil),
         });
-        
+
         res.status(429).json({
           success: false,
           error: 'Account temporarily locked due to too many failed attempts',
           code: 'ACCOUNT_LOCKED',
-          retryAfter: Math.ceil((bruteData.lockedUntil - now) / 1000)
+          retryAfter: Math.ceil((bruteData.lockedUntil - now) / 1000),
         });
         return;
       }
@@ -536,17 +551,17 @@ export class PhoenixAuthMiddleware {
           if (!bruteData) {
             bruteData = { attempts: 0 };
           }
-          
+
           bruteData.attempts++;
-          
+
           if (bruteData.attempts >= config.maxAttempts) {
             bruteData.lockedUntil = now + config.lockoutDuration;
-            this.logSecurityEvent('BRUTE_FORCE_LOCKOUT', req, { 
-              key, 
-              attempts: bruteData.attempts 
+            this.logSecurityEvent('BRUTE_FORCE_LOCKOUT', req, {
+              key,
+              attempts: bruteData.attempts,
             });
           }
-          
+
           this.bruteForceStore.set(key, bruteData);
         } else if (res.statusCode < 400) {
           // Reset on successful authentication
@@ -563,7 +578,7 @@ export class PhoenixAuthMiddleware {
    */
   deviceFingerprinting = (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
     const deviceFingerprint = this.generateDeviceFingerprint(req);
-    
+
     // Store device fingerprint for security analysis
     if (req.user) {
       this.analyzeDeviceFingerprint(req.user.id, deviceFingerprint, req);
@@ -583,8 +598,9 @@ export class PhoenixAuthMiddleware {
       'X-XSS-Protection': '1; mode=block',
       'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
       'Referrer-Policy': 'strict-origin-when-cross-origin',
-      'Content-Security-Policy': "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'",
-      'Permissions-Policy': 'geolocation=(), microphone=(), camera=()'
+      'Content-Security-Policy':
+        "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'",
+      'Permissions-Policy': 'geolocation=(), microphone=(), camera=()',
     });
 
     next();
@@ -595,7 +611,7 @@ export class PhoenixAuthMiddleware {
   private verifyJWTToken(token: string): JWTPayload | null {
     try {
       const decoded = jwt.verify(token, this.jwtSecret) as JWTPayload;
-      
+
       // Validate token structure
       if (!decoded.userId || !decoded.sessionId || !decoded.role) {
         return null;
@@ -614,13 +630,13 @@ export class PhoenixAuthMiddleware {
   private checkAPIKeyRateLimit(keyData: any, req: Request): boolean {
     const key = `api_key:${keyData.id}`;
     const now = Date.now();
-    const hourAgo = now - (60 * 60 * 1000);
+    const hourAgo = now - 60 * 60 * 1000;
 
     let rateLimitData = this.rateLimitStore.get(key);
     if (!rateLimitData || rateLimitData.resetTime < hourAgo) {
       rateLimitData = {
         count: 0,
-        resetTime: now + (60 * 60 * 1000)
+        resetTime: now + 60 * 60 * 1000,
       };
       this.rateLimitStore.set(key, rateLimitData);
     }
@@ -635,11 +651,14 @@ export class PhoenixAuthMiddleware {
 
   private async updateSessionActivity(sessionId: string, ipAddress: string): Promise<void> {
     try {
-      await phoenixPool.query(`
+      await phoenixPool.query(
+        `
         UPDATE user_sessions 
         SET last_activity_at = NOW(), ip_address = $1 
         WHERE id = $2
-      `, [ipAddress, sessionId]);
+      `,
+        [ipAddress, sessionId]
+      );
 
       // Update in-memory session
       const session = this.activeSessions.get(sessionId);
@@ -654,11 +673,14 @@ export class PhoenixAuthMiddleware {
 
   private async updateAPIKeyUsage(apiKeyId: string): Promise<void> {
     try {
-      await phoenixPool.query(`
+      await phoenixPool.query(
+        `
         UPDATE api_keys 
         SET last_used = NOW(), usage_count = usage_count + 1 
         WHERE id = $1
-      `, [apiKeyId]);
+      `,
+        [apiKeyId]
+      );
     } catch (error) {
       console.error('Failed to update API key usage:', error);
     }
@@ -705,11 +727,14 @@ export class PhoenixAuthMiddleware {
 
     // Family members can access associated players
     if (user.role === 'family') {
-      const result = await phoenixPool.query(`
+      const result = await phoenixPool.query(
+        `
         SELECT 1 FROM family_member_associations 
         WHERE family_member_id = $1 AND player_id = $2 AND approved_by_coach = true
-      `, [user.id, playerId]);
-      
+      `,
+        [user.id, playerId]
+      );
+
       return result.rows.length > 0;
     }
 
@@ -723,19 +748,22 @@ export class PhoenixAuthMiddleware {
     }
 
     // Check if formation is public or user has specific access
-    const result = await phoenixPool.query(`
+    const result = await phoenixPool.query(
+      `
       SELECT f.*, t.coach_id 
       FROM formations f 
       LEFT JOIN teams t ON f.team_id = t.id 
       WHERE f.id = $1
-    `, [formationId]);
+    `,
+      [formationId]
+    );
 
     if (result.rows.length === 0) {
       return false;
     }
 
     const formation = result.rows[0];
-    
+
     // If formation has no team (public formation)
     if (!formation.team_id) {
       return true;
@@ -747,11 +775,14 @@ export class PhoenixAuthMiddleware {
 
   private async checkTeamAccess(user: any, teamId: string): Promise<boolean> {
     // Check if user is coach or member of the team
-    const result = await phoenixPool.query(`
+    const result = await phoenixPool.query(
+      `
       SELECT 1 FROM teams t
       LEFT JOIN players p ON p.team_id = t.id
       WHERE t.id = $1 AND (t.coach_id = $2 OR p.id = $2)
-    `, [teamId, user.id]);
+    `,
+      [teamId, user.id]
+    );
 
     return result.rows.length > 0;
   }
@@ -763,21 +794,19 @@ export class PhoenixAuthMiddleware {
       req.headers['accept-encoding'] || '',
       req.headers['x-forwarded-for'] || req.ip || '',
       req.headers['sec-ch-ua'] || '',
-      req.headers['sec-ch-ua-platform'] || ''
+      req.headers['sec-ch-ua-platform'] || '',
     ];
 
-    return createHash('sha256')
-      .update(components.join('|'))
-      .digest('hex');
+    return createHash('sha256').update(components.join('|')).digest('hex');
   }
 
   private analyzeDeviceFingerprint(userId: string, fingerprint: string, req: Request): void {
     // Check if this is a new device for the user
     // Implementation would check against known devices and alert on new ones
-    this.logSecurityEvent('DEVICE_FINGERPRINT', req, { 
-      userId, 
+    this.logSecurityEvent('DEVICE_FINGERPRINT', req, {
+      userId,
       fingerprint,
-      isNewDevice: false // Would be determined by database lookup
+      isNewDevice: false, // Would be determined by database lookup
     });
   }
 
@@ -790,7 +819,7 @@ export class PhoenixAuthMiddleware {
       endpoint: req.originalUrl,
       method: req.method,
       correlationId: req.headers['x-correlation-id'] || 'unknown',
-      metadata: metadata || {}
+      metadata: metadata || {},
     };
 
     this.securityEvents.push(event);
@@ -801,24 +830,29 @@ export class PhoenixAuthMiddleware {
     });
 
     // Log critical events immediately
-    if (['BRUTE_FORCE_LOCKOUT', 'INVALID_TOKEN', 'UNAUTHORIZED_RESOURCE_ACCESS'].includes(eventType)) {
+    if (
+      ['BRUTE_FORCE_LOCKOUT', 'INVALID_TOKEN', 'UNAUTHORIZED_RESOURCE_ACCESS'].includes(eventType)
+    ) {
       console.warn('Security Event:', event);
     }
   }
 
   private async persistSecurityEvent(event: any): Promise<void> {
     try {
-      await phoenixPool.query(`
+      await phoenixPool.query(
+        `
         INSERT INTO system_logs (level, message, timestamp, service, ip_address, user_agent, metadata, security_event_type)
         VALUES ('warn', $1, $2, 'auth-middleware', $3, $4, $5, $6)
-      `, [
-        `Security event: ${event.type}`,
-        event.timestamp,
-        event.ipAddress,
-        event.userAgent,
-        JSON.stringify(event.metadata),
-        event.type
-      ]);
+      `,
+        [
+          `Security event: ${event.type}`,
+          event.timestamp,
+          event.ipAddress,
+          event.userAgent,
+          JSON.stringify(event.metadata),
+          event.type,
+        ]
+      );
     } catch (error) {
       console.error('Failed to persist security event to database:', error);
     }
@@ -843,10 +877,8 @@ export class PhoenixAuthMiddleware {
   }
 
   private cleanupSecurityEvents(): void {
-    const dayAgo = Date.now() - (24 * 60 * 60 * 1000);
-    this.securityEvents = this.securityEvents.filter(
-      event => event.timestamp.getTime() > dayAgo
-    );
+    const dayAgo = Date.now() - 24 * 60 * 60 * 1000;
+    this.securityEvents = this.securityEvents.filter(event => event.timestamp.getTime() > dayAgo);
   }
 
   /**
@@ -854,13 +886,13 @@ export class PhoenixAuthMiddleware {
    */
   createJWTToken(payload: Omit<JWTPayload, 'iat' | 'exp' | 'iss' | 'aud'>): string {
     const now = Math.floor(Date.now() / 1000);
-    
+
     const fullPayload: JWTPayload = {
       ...payload,
       iat: now,
-      exp: now + (15 * 60), // 15 minutes
+      exp: now + 15 * 60, // 15 minutes
       iss: 'astral-turf',
-      aud: 'astral-turf-client'
+      aud: 'astral-turf-client',
     };
 
     return jwt.sign(fullPayload, this.jwtSecret);
@@ -871,13 +903,13 @@ export class PhoenixAuthMiddleware {
    */
   createRefreshToken(payload: Omit<JWTPayload, 'iat' | 'exp' | 'iss' | 'aud'>): string {
     const now = Math.floor(Date.now() / 1000);
-    
+
     const fullPayload: JWTPayload = {
       ...payload,
       iat: now,
-      exp: now + (7 * 24 * 60 * 60), // 7 days
+      exp: now + 7 * 24 * 60 * 60, // 7 days
       iss: 'astral-turf',
-      aud: 'astral-turf-client'
+      aud: 'astral-turf-client',
     };
 
     return jwt.sign(fullPayload, this.jwtRefreshSecret);
@@ -888,13 +920,16 @@ export class PhoenixAuthMiddleware {
    */
   getSecurityMetrics(): any {
     const recentEvents = this.securityEvents.filter(
-      event => event.timestamp.getTime() > Date.now() - (60 * 60 * 1000) // Last hour
+      event => event.timestamp.getTime() > Date.now() - 60 * 60 * 1000 // Last hour
     );
 
-    const eventCounts = recentEvents.reduce((counts, event) => {
-      counts[event.type] = (counts[event.type] || 0) + 1;
-      return counts;
-    }, {} as Record<string, number>);
+    const eventCounts = recentEvents.reduce(
+      (counts, event) => {
+        counts[event.type] = (counts[event.type] || 0) + 1;
+        return counts;
+      },
+      {} as Record<string, number>
+    );
 
     return {
       activeSessions: this.activeSessions.size,
@@ -902,7 +937,7 @@ export class PhoenixAuthMiddleware {
       rateLimitEntries: this.rateLimitStore.size,
       bruteForceEntries: this.bruteForceStore.size,
       recentSecurityEvents: eventCounts,
-      totalSecurityEvents: this.securityEvents.length
+      totalSecurityEvents: this.securityEvents.length,
     };
   }
 }
@@ -920,41 +955,34 @@ export const {
   rateLimit,
   bruteForceProtection,
   deviceFingerprinting,
-  securityHeaders
+  securityHeaders,
 } = phoenixAuthMiddleware;
 
 // Export convenience middleware combinations
-export const authRequired = [
-  phoenixAuthMiddleware.authenticateJWT
-];
+export const authRequired = [phoenixAuthMiddleware.authenticateJWT];
 
 export const adminRequired = [
   phoenixAuthMiddleware.authenticateJWT,
-  phoenixAuthMiddleware.requireRole('admin')
+  phoenixAuthMiddleware.requireRole('admin'),
 ];
 
 export const coachRequired = [
   phoenixAuthMiddleware.authenticateJWT,
-  phoenixAuthMiddleware.requireRole(['coach', 'admin'])
+  phoenixAuthMiddleware.requireRole(['coach', 'admin']),
 ];
 
-export const apiKeyAuth = [
-  phoenixAuthMiddleware.authenticateAPIKey
-];
+export const apiKeyAuth = [phoenixAuthMiddleware.authenticateAPIKey];
 
 export const strictSecurity = [
   phoenixAuthMiddleware.securityHeaders,
   phoenixAuthMiddleware.bruteForceProtection({
     maxAttempts: 5,
-    lockoutDuration: 15 * 60 * 1000 // 15 minutes
+    lockoutDuration: 15 * 60 * 1000, // 15 minutes
   }),
   phoenixAuthMiddleware.rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 1000 // 1000 requests per window
+    max: 1000, // 1000 requests per window
   }),
   phoenixAuthMiddleware.deviceFingerprinting,
-  phoenixAuthMiddleware.authenticateJWT
+  phoenixAuthMiddleware.authenticateJWT,
 ];
-
-// Export types
-export type { AuthenticatedRequest, JWTPayload, SecurityContext };

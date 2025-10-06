@@ -13,9 +13,8 @@ export default defineConfig({
     open: true,
     cors: true,
     hmr: {
-      port: 6021
+      port: 6021,
     },
-    force: true
   },
   resolve: {
     alias: {
@@ -30,7 +29,7 @@ export default defineConfig({
     outDir: 'dist-test',
     sourcemap: true,
     rollupOptions: {
-      input: './test-index.html'
-    }
+      input: './test-index.html',
+    },
   },
 });

@@ -61,7 +61,7 @@ export class SecurityErrorBoundary extends Component<Props, State> {
   static getDerivedStateFromError(error: Error): Partial<State> {
     const errorId = `error_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     const isSecurityRelated = SECURITY_ERROR_PATTERNS.some(
-      pattern => pattern.test(error.message) || pattern.test(error.name),
+      pattern => pattern.test(error.message) || pattern.test(error.name)
     );
 
     return {
@@ -71,7 +71,7 @@ export class SecurityErrorBoundary extends Component<Props, State> {
     };
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
+  override componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     try {
       // Sanitize error information to prevent information leakage
       const sanitizedError = this.sanitizeError(error);
@@ -101,7 +101,7 @@ export class SecurityErrorBoundary extends Component<Props, State> {
               stackTrace: sanitizedError.stack,
             }),
           },
-        },
+        }
       );
 
       // Call custom error handler if provided
@@ -111,7 +111,7 @@ export class SecurityErrorBoundary extends Component<Props, State> {
 
       // Track error patterns for security analysis
       this.trackErrorPattern(sanitizedError);
-    } catch (__loggingError) {
+    } catch (loggingError) {
       // Fallback error logging to console if security logger fails
       console.error('Security error boundary logging failed:', loggingError);
       console.error('Original error:', error);
@@ -131,7 +131,7 @@ export class SecurityErrorBoundary extends Component<Props, State> {
 
   private sanitizeErrorInfo(errorInfo: ErrorInfo): ErrorInfo {
     return {
-      componentStack: this.sanitizeSensitiveInfo(errorInfo.componentStack),
+      componentStack: this.sanitizeSensitiveInfo(errorInfo.componentStack || ''),
     };
   }
 
@@ -201,7 +201,7 @@ export class SecurityErrorBoundary extends Component<Props, State> {
     }
   };
 
-  render(): ReactNode {
+  override render(): ReactNode {
     if (this.state.hasError) {
       // Use custom fallback if provided
       if (this.props.fallback) {

@@ -13,12 +13,21 @@ const PressConferencePopup: React.FC = () => {
 
   useEffect(() => {
     if (!pressConferenceData && !isLoadingPressConference && !result) {
-      dispatch({ type: 'GET_PRESS_CONFERENCE_QUESTIONS_START' });
+      (dispatch as (action: { type: string }) => void)({
+        type: 'GET_PRESS_CONFERENCE_QUESTIONS_START',
+      });
       getPressConferenceQuestions(settings.aiPersonality, pressNarratives)
-        .then(data => dispatch({ type: 'GET_PRESS_CONFERENCE_QUESTIONS_SUCCESS', payload: data }))
+        .then(data =>
+          (dispatch as (action: { type: string; payload?: unknown }) => void)({
+            type: 'GET_PRESS_CONFERENCE_QUESTIONS_SUCCESS',
+            payload: data,
+          })
+        )
         .catch(err => {
           console.error(err);
-          dispatch({ type: 'GET_PRESS_CONFERENCE_QUESTIONS_FAILURE' });
+          (dispatch as (action: { type: string }) => void)({
+            type: 'GET_PRESS_CONFERENCE_QUESTIONS_FAILURE',
+          });
         });
     }
   }, [
@@ -31,11 +40,14 @@ const PressConferencePopup: React.FC = () => {
   ]);
 
   const handleCloseAndReset = () => {
-    dispatch({ type: 'GET_PRESS_CONFERENCE_QUESTIONS_FAILURE' }); // Resets data
+    (dispatch as (action: { type: string }) => void)({
+      type: 'GET_PRESS_CONFERENCE_QUESTIONS_FAILURE',
+    }); // Resets data
     dispatch({ type: 'CLOSE_MODAL' });
   };
 
   const handleSelectOption = (option: AIPressConferenceResponse['options'][0]) => {
+    const conferenceData = pressConferenceData as { narrativeId?: string } | null;
     const payload: {
       fanConfidenceEffect: number;
       teamMoraleEffect: number;
@@ -45,11 +57,11 @@ const PressConferencePopup: React.FC = () => {
       teamMoraleEffect: option.teamMoraleEffect,
     };
 
-    if (pressConferenceData?.narrativeId) {
-      payload.narrativeId = pressConferenceData.narrativeId;
+    if (conferenceData?.narrativeId) {
+      payload.narrativeId = conferenceData.narrativeId;
     }
 
-    dispatch({
+    (dispatch as (action: { type: string; payload?: unknown }) => void)({
       type: 'RESOLVE_PRESS_CONFERENCE_OPTION',
       payload,
     });
@@ -88,22 +100,33 @@ const PressConferencePopup: React.FC = () => {
             </div>
           )}
 
-          {!isLoadingPressConference && pressConferenceData && !result && (
-            <div className="text-center space-y-4 animate-fade-in-scale">
-              <p className="text-lg text-gray-300 italic">"{pressConferenceData.question}"</p>
-              <div className="space-y-2 pt-4">
-                {pressConferenceData.options.map((opt, i) => (
-                  <button
-                    key={i}
-                    onClick={() => handleSelectOption(opt)}
-                    className="w-full p-3 bg-gray-700 hover:bg-teal-600/50 rounded-md text-sm text-left transition-colors"
-                  >
-                    {i + 1}. {opt.text}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+          {
+            (!isLoadingPressConference &&
+              pressConferenceData &&
+              !result &&
+              (() => {
+                const data = pressConferenceData as {
+                  question?: string;
+                  options?: Array<AIPressConferenceResponse['options'][0]>;
+                };
+                return (
+                  <div className="text-center space-y-4 animate-fade-in-scale">
+                    <p className="text-lg text-gray-300 italic">"{data.question}"</p>
+                    <div className="space-y-2 pt-4">
+                      {data.options?.map((opt, i) => (
+                        <button
+                          key={i}
+                          onClick={() => handleSelectOption(opt)}
+                          className="w-full p-3 bg-gray-700 hover:bg-teal-600/50 rounded-md text-sm text-left transition-colors"
+                        >
+                          {i + 1}. {opt.text}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()) as React.ReactNode
+          }
 
           {result && (
             <div className="text-center space-y-4 animate-fade-in-scale">

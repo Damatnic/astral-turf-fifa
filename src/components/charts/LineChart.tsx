@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { generateLineChartDescription } from '@/utils/chartAccessibility';
 
 interface LineChartProps {
   data: { x: number; y: number }[];
@@ -7,6 +8,7 @@ interface LineChartProps {
   color?: string;
   yAxisLabel?: string;
   xAxisLabel?: string;
+  title?: string;
 }
 
 const LineChart: React.FC<LineChartProps> = ({
@@ -16,6 +18,7 @@ const LineChart: React.FC<LineChartProps> = ({
   color = '#2dd4bf',
   yAxisLabel = 'Value',
   xAxisLabel = 'Week',
+  title,
 }) => {
   const padding = useMemo(() => ({ top: 20, right: 20, bottom: 40, left: 40 }), []);
 
@@ -25,8 +28,10 @@ const LineChart: React.FC<LineChartProps> = ({
     }
 
     // Filter out invalid data points and ensure valid coordinates
-    const validData = data.filter(d => d && typeof d.x === 'number' && typeof d.y === 'number' && !isNaN(d.x) && !isNaN(d.y));
-    
+    const validData = data.filter(
+      d => d && typeof d.x === 'number' && typeof d.y === 'number' && !isNaN(d.x) && !isNaN(d.y)
+    );
+
     if (validData.length === 0) {
       return { xScale: () => 0, yScale: () => 0, path: '', points: [] };
     }
@@ -63,18 +68,20 @@ const LineChart: React.FC<LineChartProps> = ({
     if (!data || data.length === 0) {
       return [];
     }
-    
+
     // Filter out invalid data points and ensure valid coordinates
-    const validData = data.filter(d => d && typeof d.x === 'number' && typeof d.y === 'number' && !isNaN(d.x) && !isNaN(d.y));
-    
+    const validData = data.filter(
+      d => d && typeof d.x === 'number' && typeof d.y === 'number' && !isNaN(d.x) && !isNaN(d.y)
+    );
+
     if (validData.length === 0) {
       return [];
     }
-    
+
     const yCoordinates = validData.map(d => d.y);
     const yMin = Math.min(...yCoordinates);
     const yMax = Math.max(...yCoordinates);
-    const ticks = [];
+    const ticks: Array<{ value: number; y: number }> = [];
     for (let i = 0; i <= 4; i++) {
       const value = Math.round(yMin + (i / 4) * (yMax - yMin));
       ticks.push({ value, y: yScale(value) });
@@ -86,24 +93,34 @@ const LineChart: React.FC<LineChartProps> = ({
     if (!data || data.length === 0) {
       return [];
     }
-    
+
     // Filter out invalid data points and ensure valid coordinates
-    const validData = data.filter(d => d && typeof d.x === 'number' && typeof d.y === 'number' && !isNaN(d.x) && !isNaN(d.y));
-    
+    const validData = data.filter(
+      d => d && typeof d.x === 'number' && typeof d.y === 'number' && !isNaN(d.x) && !isNaN(d.y)
+    );
+
     if (validData.length === 0) {
       return [];
     }
-    
+
     const xValues = validData.map(d => d.x);
     const uniqueX = [...new Set(xValues)];
     return uniqueX.map(val => ({ value: val, x: xScale(val) }));
   }, [data, xScale]);
+
+  // Generate accessible description
+  const ariaDescription = useMemo(
+    () => generateLineChartDescription(data, xAxisLabel, yAxisLabel, title),
+    [data, xAxisLabel, yAxisLabel, title]
+  );
 
   if (!data || data.length < 2) {
     return (
       <div
         style={{ width, height }}
         className="flex items-center justify-center text-sm text-gray-500 bg-gray-700/30 rounded-md"
+        role="img"
+        aria-label="Empty line chart"
       >
         Not enough data to display chart. Needs at least 2 weeks of history.
       </div>
@@ -111,7 +128,15 @@ const LineChart: React.FC<LineChartProps> = ({
   }
 
   return (
-    <svg width="100%" height="100%" viewBox={`0 0 ${width} ${height}`}>
+    <svg
+      width="100%"
+      height="100%"
+      viewBox={`0 0 ${width} ${height}`}
+      role="img"
+      aria-label={title || `Line chart showing ${yAxisLabel} over ${xAxisLabel}`}
+      aria-describedby="line-chart-desc"
+    >
+      <desc id="line-chart-desc">{ariaDescription}</desc>
       {/* Axes and Grid */}
       <g className="text-gray-500">
         {yAxisTicks.map(tick => (

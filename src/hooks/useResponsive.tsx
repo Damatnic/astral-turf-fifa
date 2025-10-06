@@ -71,13 +71,25 @@ export const useResponsive = (): ResponsiveState => {
 
     const width = window.innerWidth;
     const height = window.innerHeight;
-    
+
     // Get safe area insets
     const computedStyle = getComputedStyle(document.documentElement);
-    const safeAreaTop = parseInt(computedStyle.getPropertyValue('env(safe-area-inset-top)') || '0', 10);
-    const safeAreaBottom = parseInt(computedStyle.getPropertyValue('env(safe-area-inset-bottom)') || '0', 10);
-    const safeAreaLeft = parseInt(computedStyle.getPropertyValue('env(safe-area-inset-left)') || '0', 10);
-    const safeAreaRight = parseInt(computedStyle.getPropertyValue('env(safe-area-inset-right)') || '0', 10);
+    const safeAreaTop = parseInt(
+      computedStyle.getPropertyValue('env(safe-area-inset-top)') || '0',
+      10
+    );
+    const safeAreaBottom = parseInt(
+      computedStyle.getPropertyValue('env(safe-area-inset-bottom)') || '0',
+      10
+    );
+    const safeAreaLeft = parseInt(
+      computedStyle.getPropertyValue('env(safe-area-inset-left)') || '0',
+      10
+    );
+    const safeAreaRight = parseInt(
+      computedStyle.getPropertyValue('env(safe-area-inset-right)') || '0',
+      10
+    );
 
     return {
       width,
@@ -110,13 +122,25 @@ export const useResponsive = (): ResponsiveState => {
     const handleResize = () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
-      
+
       // Get safe area insets
       const computedStyle = getComputedStyle(document.documentElement);
-      const safeAreaTop = parseInt(computedStyle.getPropertyValue('env(safe-area-inset-top)') || '0', 10);
-      const safeAreaBottom = parseInt(computedStyle.getPropertyValue('env(safe-area-inset-bottom)') || '0', 10);
-      const safeAreaLeft = parseInt(computedStyle.getPropertyValue('env(safe-area-inset-left)') || '0', 10);
-      const safeAreaRight = parseInt(computedStyle.getPropertyValue('env(safe-area-inset-right)') || '0', 10);
+      const safeAreaTop = parseInt(
+        computedStyle.getPropertyValue('env(safe-area-inset-top)') || '0',
+        10
+      );
+      const safeAreaBottom = parseInt(
+        computedStyle.getPropertyValue('env(safe-area-inset-bottom)') || '0',
+        10
+      );
+      const safeAreaLeft = parseInt(
+        computedStyle.getPropertyValue('env(safe-area-inset-left)') || '0',
+        10
+      );
+      const safeAreaRight = parseInt(
+        computedStyle.getPropertyValue('env(safe-area-inset-right)') || '0',
+        10
+      );
 
       setResponsiveState({
         width,
@@ -165,7 +189,7 @@ export const useResponsive = (): ResponsiveState => {
     const hoverQuery = window.matchMedia('(hover: hover)');
 
     const handleMediaChange = () => handleResize();
-    
+
     motionQuery.addEventListener('change', handleMediaChange);
     colorQuery.addEventListener('change', handleMediaChange);
     hoverQuery.addEventListener('change', handleMediaChange);
@@ -187,9 +211,15 @@ export const useResponsive = (): ResponsiveState => {
  * Get current breakpoint based on width
  */
 function getCurrentBreakpoint(width: number): BreakpointKey {
-  if (width >= BREAKPOINTS.xl) {return 'xl';}
-  if (width >= BREAKPOINTS.desktop) {return 'desktop';}
-  if (width >= BREAKPOINTS.tablet) {return 'tablet';}
+  if (width >= BREAKPOINTS.xl) {
+    return 'xl';
+  }
+  if (width >= BREAKPOINTS.desktop) {
+    return 'desktop';
+  }
+  if (width >= BREAKPOINTS.tablet) {
+    return 'tablet';
+  }
   return 'mobile';
 }
 
@@ -241,33 +271,36 @@ export const useResponsiveNavigation = () => {
  */
 export const useMobileOptimizations = () => {
   const { isMobile, isTablet, isTouchDevice, prefersReducedMotion, isHighDPI } = useResponsive();
-  
-  return useMemo(() => ({
-    // Touch target optimization
-    minTouchTarget: isMobile ? '44px' : '32px',
-    
-    // Animation preferences
-    shouldReduceAnimations: prefersReducedMotion || (isMobile && !isTablet),
-    animationDuration: prefersReducedMotion ? 0 : isMobile ? 200 : 300,
-    
-    // Layout optimizations
-    compactLayout: isMobile,
-    showTooltips: !isTouchDevice,
-    enableHover: !isTouchDevice,
-    
-    // Performance optimizations
-    enableLazyLoading: isMobile,
-    useLowQualityImages: isMobile && !isHighDPI,
-    reducedEffects: isMobile || prefersReducedMotion,
-    enableVirtualization: isMobile,
-    
-    // Spacing adjustments
-    spacing: {
-      xs: isMobile ? '0.25rem' : '0.5rem',
-      sm: isMobile ? '0.5rem' : '0.75rem',
-      md: isMobile ? '0.75rem' : '1rem',
-      lg: isMobile ? '1rem' : '1.5rem',
-      xl: isMobile ? '1.5rem' : '2rem',
-    },
-  }), [isMobile, isTablet, isTouchDevice, prefersReducedMotion, isHighDPI]);
+
+  return useMemo(
+    () => ({
+      // Touch target optimization
+      minTouchTarget: isMobile ? '44px' : '32px',
+
+      // Animation preferences
+      shouldReduceAnimations: prefersReducedMotion || (isMobile && !isTablet),
+      animationDuration: prefersReducedMotion ? 0 : isMobile ? 200 : 300,
+
+      // Layout optimizations
+      compactLayout: isMobile,
+      showTooltips: !isTouchDevice,
+      enableHover: !isTouchDevice,
+
+      // Performance optimizations
+      enableLazyLoading: isMobile,
+      useLowQualityImages: isMobile && !isHighDPI,
+      reducedEffects: isMobile || prefersReducedMotion,
+      enableVirtualization: isMobile,
+
+      // Spacing adjustments
+      spacing: {
+        xs: isMobile ? '0.25rem' : '0.5rem',
+        sm: isMobile ? '0.5rem' : '0.75rem',
+        md: isMobile ? '0.75rem' : '1rem',
+        lg: isMobile ? '1rem' : '1.5rem',
+        xl: isMobile ? '1.5rem' : '2rem',
+      },
+    }),
+    [isMobile, isTablet, isTouchDevice, prefersReducedMotion, isHighDPI]
+  );
 };

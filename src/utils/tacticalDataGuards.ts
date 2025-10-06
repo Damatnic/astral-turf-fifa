@@ -80,63 +80,66 @@ export function getFormationSlots(formation: Formation | null | undefined): Form
     console.warn('Invalid formation provided to getFormationSlots:', formation);
     return [];
   }
-  
+
   return formation.slots.filter(isValidFormationSlot);
 }
 
 /**
  * Safely get players assigned to formation slots
  */
-export function getAssignedPlayers(formation: Formation | null | undefined, players: Player[] | null | undefined): Player[] {
+export function getAssignedPlayers(
+  formation: Formation | null | undefined,
+  players: Player[] | null | undefined
+): Player[] {
   if (!isValidFormation(formation) || !Array.isArray(players)) {
     return [];
   }
-  
+
   const validSlots = getFormationSlots(formation);
   const assignedPlayerIds = new Set(validSlots.map(slot => slot.playerId).filter(Boolean));
-  
-  return players.filter(player => 
-    isValidPlayer(player) && 
-    assignedPlayerIds.has(player.id)
-  );
+
+  return players.filter(player => isValidPlayer(player) && assignedPlayerIds.has(player.id));
 }
 
 /**
  * Safely get unassigned players
  */
 export function getUnassignedPlayers(
-  formation: Formation | null | undefined, 
+  formation: Formation | null | undefined,
   players: Player[] | null | undefined,
   team?: string
 ): Player[] {
   if (!Array.isArray(players)) {
     return [];
   }
-  
+
   let filteredPlayers = players.filter(isValidPlayer);
-  
+
   if (team) {
     filteredPlayers = filteredPlayers.filter(p => p.team === team);
   }
-  
+
   if (!isValidFormation(formation)) {
     return filteredPlayers;
   }
-  
+
   const validSlots = getFormationSlots(formation);
   const assignedPlayerIds = new Set(validSlots.map(slot => slot.playerId).filter(Boolean));
-  
+
   return filteredPlayers.filter(player => !assignedPlayerIds.has(player.id));
 }
 
 /**
  * Safely find a player by ID with validation
  */
-export function findPlayerById(players: Player[] | null | undefined, playerId: string | null | undefined): Player | null {
+export function findPlayerById(
+  players: Player[] | null | undefined,
+  playerId: string | null | undefined
+): Player | null {
   if (!Array.isArray(players) || !playerId) {
     return null;
   }
-  
+
   const player = players.find(p => p?.id === playerId);
   return isValidPlayer(player) ? player : null;
 }
@@ -144,11 +147,14 @@ export function findPlayerById(players: Player[] | null | undefined, playerId: s
 /**
  * Safely find a formation slot by ID with validation
  */
-export function findSlotById(formation: Formation | null | undefined, slotId: string | null | undefined): FormationSlot | null {
+export function findSlotById(
+  formation: Formation | null | undefined,
+  slotId: string | null | undefined
+): FormationSlot | null {
   if (!isValidFormation(formation) || !slotId) {
     return null;
   }
-  
+
   const slot = formation.slots.find(s => s?.id === slotId);
   return isValidFormationSlot(slot) ? slot : null;
 }
@@ -156,22 +162,28 @@ export function findSlotById(formation: Formation | null | undefined, slotId: st
 /**
  * Safely get player position with fallback
  */
-export function getPlayerPosition(player: Player | null | undefined, fallback: Position = { x: 50, y: 50 }): Position {
+export function getPlayerPosition(
+  player: Player | null | undefined,
+  fallback: Position = { x: 50, y: 50 }
+): Position {
   if (!isValidPlayer(player)) {
     return fallback;
   }
-  
+
   return isValidPosition(player.position) ? player.position : fallback;
 }
 
 /**
  * Safely get slot default position with fallback
  */
-export function getSlotPosition(slot: FormationSlot | null | undefined, fallback: Position = { x: 50, y: 50 }): Position {
+export function getSlotPosition(
+  slot: FormationSlot | null | undefined,
+  fallback: Position = { x: 50, y: 50 }
+): Position {
   if (!isValidFormationSlot(slot)) {
     return fallback;
   }
-  
+
   return isValidPosition(slot.defaultPosition) ? slot.defaultPosition : fallback;
 }
 
@@ -181,13 +193,13 @@ export function getSlotPosition(slot: FormationSlot | null | undefined, fallback
 export function getFormationStats(formation: Formation | null | undefined) {
   const validSlots = getFormationSlots(formation);
   const assignedSlots = validSlots.filter(slot => slot.playerId);
-  
+
   return {
     totalSlots: validSlots.length,
     assignedSlots: assignedSlots.length,
     emptySlots: validSlots.length - assignedSlots.length,
     isComplete: assignedSlots.length === validSlots.length,
-    isValid: validSlots.length > 0
+    isValid: validSlots.length > 0,
   };
 }
 
@@ -196,17 +208,19 @@ export function getFormationStats(formation: Formation | null | undefined) {
  */
 export function getFormationPlayerIds(formation: Formation | null | undefined): Set<string> {
   const validSlots = getFormationSlots(formation);
-  const playerIds = validSlots
-    .map(slot => slot.playerId)
-    .filter((id): id is string => Boolean(id));
-    
+  const playerIds = validSlots.map(slot => slot.playerId).filter((id): id is string => Boolean(id));
+
   return new Set(playerIds);
 }
 
 /**
  * Error boundary helper for tactical calculations
  */
-export function safeCalculation<T>(calculation: () => T, fallback: T, context: string = 'calculation'): T {
+export function safeCalculation<T>(
+  calculation: () => T,
+  fallback: T,
+  context: string = 'calculation'
+): T {
   try {
     const result = calculation();
     if (result === null || result === undefined) {
@@ -227,7 +241,7 @@ export function validateTrailPoints(points: any[]): Position[] {
   if (!Array.isArray(points)) {
     return [];
   }
-  
+
   return points.filter(isValidPosition);
 }
 

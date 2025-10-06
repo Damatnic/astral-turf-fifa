@@ -26,7 +26,7 @@ test.describe('Basic Application Navigation', () => {
       error =>
         !error.includes('CJS build of Vite') &&
         !error.includes('deprecated') &&
-        !error.includes('Warning'),
+        !error.includes('Warning')
     );
 
     expect(criticalErrors).toHaveLength(0);

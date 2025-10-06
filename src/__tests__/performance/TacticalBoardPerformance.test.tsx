@@ -1,9 +1,13 @@
 import React from 'react';
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { render, fireEvent, act } from '@testing-library/react';
-import { TacticalBoard } from '../../components/ui/football/TacticalBoard';
+import {
+  TacticalBoard,
+  type Player as TacticalBoardPlayer,
+  type TacticalLine as TacticalBoardLine,
+} from '../../components/ui/football/TacticalBoard';
 import { UnifiedTacticsBoard } from '../../components/tactics/UnifiedTacticsBoard';
-import type { Player, Formation, TacticalLine } from '../../types';
+import type { Player, Formation } from '../../types';
 
 /**
  * ZENITH PERFORMANCE & STRESS TESTING SUITE
@@ -72,7 +76,7 @@ vi.mock('../../hooks', () => ({
 }));
 
 // Test data generators
-const generatePlayers = (count: number): Player[] => {
+const generatePlayers = (count: number): TacticalBoardPlayer[] => {
   return Array.from({ length: count }, (_, i) => ({
     id: `player-${i}`,
     name: `Player ${i}`,
@@ -89,7 +93,7 @@ const generatePlayers = (count: number): Player[] => {
   }));
 };
 
-const generateTacticalLines = (playerCount: number, lineCount: number): TacticalLine[] => {
+const generateTacticalLines = (playerCount: number, lineCount: number): TacticalBoardLine[] => {
   return Array.from({ length: lineCount }, (_, i) => ({
     id: `line-${i}`,
     startPlayerId: `player-${i % playerCount}`,
@@ -105,15 +109,14 @@ const generateFormation = (slotCount: number): Formation => ({
   description: `Formation with ${slotCount} slots`,
   slots: Array.from({ length: slotCount }, (_, i) => ({
     id: `slot-${i}`,
-    position: (['GK', 'CB', 'LB', 'RB', 'CM'] as const)[i % 5],
+    role: (['GK', 'CB', 'LB', 'RB', 'CM'] as const)[i % 5],
     defaultPosition: {
       x: (i % 5) * 20 + 10,
       y: Math.floor(i / 5) * 20 + 10,
     },
     playerId: i < slotCount / 2 ? `player-${i}` : null,
   })),
-  type: '11v11',
-  isDefault: false,
+  isCustom: false,
 });
 
 describe('ZENITH Tactical Board Performance Tests', () => {
@@ -141,8 +144,8 @@ describe('ZENITH Tactical Board Performance Tests', () => {
 
       const { unmount } = render(
         <TacticalBoard
-          players={players}
-          lines={lines}
+          players={players as any}
+          lines={lines as any}
           onPlayerMove={mockOnPlayerMove}
           onPlayerSelect={mockOnPlayerSelect}
         />
@@ -162,8 +165,8 @@ describe('ZENITH Tactical Board Performance Tests', () => {
 
       const { unmount } = render(
         <TacticalBoard
-          players={players.slice(0, 22)} // Only show field players
-          lines={lines.slice(0, 15)} // Reasonable number of lines
+          players={players.slice(0, 22) as any} // Only show field players
+          lines={lines.slice(0, 15) as any} // Reasonable number of lines
           onPlayerMove={mockOnPlayerMove}
           onPlayerSelect={mockOnPlayerSelect}
         />
@@ -181,7 +184,7 @@ describe('ZENITH Tactical Board Performance Tests', () => {
 
       const { rerender } = render(
         <TacticalBoard
-          players={players}
+          players={players as any}
           onPlayerMove={mockOnPlayerMove}
           onPlayerSelect={mockOnPlayerSelect}
         />
@@ -190,7 +193,7 @@ describe('ZENITH Tactical Board Performance Tests', () => {
       // Perform 100 re-renders with slight position changes
       for (let i = 0; i < 100; i++) {
         const endMeasurement = profiler.startMeasurement('frequent-rerenders');
-        
+
         const updatedPlayers = players.map(player => ({
           ...player,
           position: {
@@ -201,7 +204,7 @@ describe('ZENITH Tactical Board Performance Tests', () => {
 
         rerender(
           <TacticalBoard
-            players={updatedPlayers}
+            players={updatedPlayers as any}
             onPlayerMove={mockOnPlayerMove}
             onPlayerSelect={mockOnPlayerSelect}
           />
@@ -213,7 +216,7 @@ describe('ZENITH Tactical Board Performance Tests', () => {
 
       const stats = profiler.getStats('frequent-rerenders');
       expect(stats.avg).toBeLessThan(20); // Average under 20ms
-      expect(stats.p95).toBeLessThan(50); // 95th percentile under 50ms
+      expect(stats.p95 as any).toBeLessThan(50); // 95th percentile under 50ms
       expect(renderCount).toBe(100);
     });
   });
@@ -221,10 +224,10 @@ describe('ZENITH Tactical Board Performance Tests', () => {
   describe('Interaction Performance', () => {
     it('should handle rapid player movements efficiently', async () => {
       const players = generatePlayers(22);
-      
+
       const { container } = render(
         <TacticalBoard
-          players={players}
+          players={players as any}
           onPlayerMove={mockOnPlayerMove}
           onPlayerSelect={mockOnPlayerSelect}
           mode="edit"
@@ -233,26 +236,29 @@ describe('ZENITH Tactical Board Performance Tests', () => {
 
       // Simulate rapid drag operations
       const playerElements = container.querySelectorAll('[data-testid]');
-      
+
       for (let i = 0; i < 50; i++) {
         const endMeasurement = profiler.startMeasurement('rapid-movements');
-        
+
         if (playerElements[i % playerElements.length]) {
           await act(async () => {
             fireEvent.mouseDown(playerElements[i % playerElements.length], {
               clientX: 100 + i,
               clientY: 100 + i,
             });
-            
-            fireEvent(document, new MouseEvent('mousemove', {
-              clientX: 150 + i,
-              clientY: 150 + i,
-            }));
-            
+
+            fireEvent(
+              document,
+              new MouseEvent('mousemove', {
+                clientX: 150 + i,
+                clientY: 150 + i,
+              })
+            );
+
             fireEvent(document, new MouseEvent('mouseup'));
           });
         }
-        
+
         endMeasurement();
       }
 
@@ -262,10 +268,10 @@ describe('ZENITH Tactical Board Performance Tests', () => {
 
     it('should handle concurrent line creation efficiently', async () => {
       const players = generatePlayers(22);
-      
+
       render(
         <TacticalBoard
-          players={players}
+          players={players as any}
           onPlayerMove={mockOnPlayerMove}
           onPlayerSelect={mockOnPlayerSelect}
           mode="tactics"
@@ -275,14 +281,14 @@ describe('ZENITH Tactical Board Performance Tests', () => {
       // Simulate rapid line creation
       for (let i = 0; i < 20; i++) {
         const endMeasurement = profiler.startMeasurement('line-creation');
-        
+
         await act(async () => {
           // Simulate clicking two different players rapidly
           const mockClick = new MouseEvent('click', { bubbles: true });
           fireEvent(document.body, mockClick);
           fireEvent(document.body, mockClick);
         });
-        
+
         endMeasurement();
       }
 
@@ -294,13 +300,13 @@ describe('ZENITH Tactical Board Performance Tests', () => {
   describe('Memory Management', () => {
     it('should not leak memory during component lifecycle', () => {
       const initialMemory = (performance as any).memory?.usedJSHeapSize || 0;
-      
+
       // Create and destroy components multiple times
       for (let i = 0; i < 50; i++) {
         const players = generatePlayers(22);
         const { unmount } = render(
           <TacticalBoard
-            players={players}
+            players={players as any}
             onPlayerMove={mockOnPlayerMove}
             onPlayerSelect={mockOnPlayerSelect}
           />
@@ -315,7 +321,7 @@ describe('ZENITH Tactical Board Performance Tests', () => {
 
       const finalMemory = (performance as any).memory?.usedJSHeapSize || 0;
       const memoryIncrease = finalMemory - initialMemory;
-      
+
       // Memory increase should be reasonable (less than 50MB)
       expect(memoryIncrease).toBeLessThan(50 * 1024 * 1024);
     });
@@ -327,7 +333,7 @@ describe('ZENITH Tactical Board Performance Tests', () => {
       const players = generatePlayers(11);
       const { unmount } = render(
         <TacticalBoard
-          players={players}
+          players={players as any}
           onPlayerMove={mockOnPlayerMove}
           onPlayerSelect={mockOnPlayerSelect}
           mode="edit"
@@ -335,14 +341,14 @@ describe('ZENITH Tactical Board Performance Tests', () => {
       );
 
       const addCallCount = addEventListenerSpy.mock.calls.length;
-      
+
       unmount();
-      
+
       const removeCallCount = removeEventListenerSpy.mock.calls.length;
-      
+
       // Should remove at least as many listeners as added
       expect(removeCallCount).toBeGreaterThanOrEqual(addCallCount);
-      
+
       addEventListenerSpy.mockRestore();
       removeEventListenerSpy.mockRestore();
     });
@@ -357,7 +363,7 @@ describe('ZENITH Tactical Board Performance Tests', () => {
 
       const { unmount } = render(
         <TacticalBoard
-          players={visiblePlayers}
+          players={visiblePlayers as any}
           onPlayerMove={mockOnPlayerMove}
           onPlayerSelect={mockOnPlayerSelect}
         />
@@ -378,8 +384,8 @@ describe('ZENITH Tactical Board Performance Tests', () => {
 
       const { unmount } = render(
         <TacticalBoard
-          players={players}
-          lines={visibleLines}
+          players={players as any}
+          lines={visibleLines as any}
           onPlayerMove={mockOnPlayerMove}
           onPlayerSelect={mockOnPlayerSelect}
         />
@@ -395,10 +401,10 @@ describe('ZENITH Tactical Board Performance Tests', () => {
   describe('Animation Performance', () => {
     it('should maintain smooth animations during interactions', async () => {
       const players = generatePlayers(11);
-      
+
       render(
         <TacticalBoard
-          players={players}
+          players={players as any}
           onPlayerMove={mockOnPlayerMove}
           onPlayerSelect={mockOnPlayerSelect}
           mode="edit"
@@ -408,12 +414,13 @@ describe('ZENITH Tactical Board Performance Tests', () => {
       // Test animation frame rate during interactions
       const animationFrames: number[] = [];
       let frameCount = 0;
-      
+
       const measureFrame = () => {
         const start = performance.now();
         frameCount++;
-        
-        if (frameCount < 60) { // Measure 60 frames
+
+        if (frameCount < 60) {
+          // Measure 60 frames
           requestAnimationFrame(() => {
             const frameDuration = performance.now() - start;
             animationFrames.push(frameDuration);
@@ -427,8 +434,9 @@ describe('ZENITH Tactical Board Performance Tests', () => {
       // Wait for animation measurements
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      const avgFrameTime = animationFrames.reduce((sum, time) => sum + time, 0) / animationFrames.length;
-      
+      const avgFrameTime =
+        animationFrames.reduce((sum, time) => sum + time, 0) / animationFrames.length;
+
       // Should maintain ~60fps (16.67ms per frame)
       expect(avgFrameTime).toBeLessThan(20);
     });
@@ -438,8 +446,8 @@ describe('ZENITH Tactical Board Performance Tests', () => {
     it('should perform well with different viewport sizes', () => {
       const players = generatePlayers(22);
       const viewportSizes = [
-        { width: 320, height: 568 },   // Mobile
-        { width: 768, height: 1024 },  // Tablet
+        { width: 320, height: 568 }, // Mobile
+        { width: 768, height: 1024 }, // Tablet
         { width: 1920, height: 1080 }, // Desktop
         { width: 3840, height: 2160 }, // 4K
       ];
@@ -461,7 +469,7 @@ describe('ZENITH Tactical Board Performance Tests', () => {
 
         const { unmount } = render(
           <TacticalBoard
-            players={players}
+            players={players as any}
             onPlayerMove={mockOnPlayerMove}
             onPlayerSelect={mockOnPlayerSelect}
           />
@@ -478,10 +486,10 @@ describe('ZENITH Tactical Board Performance Tests', () => {
   describe('Stress Testing', () => {
     it('should survive extreme user interactions', async () => {
       const players = generatePlayers(22);
-      
+
       const { container } = render(
         <TacticalBoard
-          players={players}
+          players={players as any}
           onPlayerMove={mockOnPlayerMove}
           onPlayerSelect={mockOnPlayerSelect}
           mode="edit"
@@ -493,17 +501,26 @@ describe('ZENITH Tactical Board Performance Tests', () => {
         await act(async () => {
           // Random interaction types
           const interactionType = i % 4;
-          
+
           switch (interactionType) {
             case 0: // Mouse down/up
-              fireEvent.mouseDown(container, { clientX: Math.random() * 800, clientY: Math.random() * 600 });
+              fireEvent.mouseDown(container, {
+                clientX: Math.random() * 800,
+                clientY: Math.random() * 600,
+              });
               fireEvent.mouseUp(container);
               break;
             case 1: // Mouse move
-              fireEvent.mouseMove(container, { clientX: Math.random() * 800, clientY: Math.random() * 600 });
+              fireEvent.mouseMove(container, {
+                clientX: Math.random() * 800,
+                clientY: Math.random() * 600,
+              });
               break;
             case 2: // Click
-              fireEvent.click(container, { clientX: Math.random() * 800, clientY: Math.random() * 600 });
+              fireEvent.click(container, {
+                clientX: Math.random() * 800,
+                clientY: Math.random() * 600,
+              });
               break;
             case 3: // Key press
               fireEvent.keyDown(container, { key: 'Escape' });
@@ -518,19 +535,19 @@ describe('ZENITH Tactical Board Performance Tests', () => {
 
     it('should handle rapid component mount/unmount cycles', () => {
       const players = generatePlayers(11);
-      
+
       // Rapid mount/unmount cycles
       for (let i = 0; i < 100; i++) {
         const endMeasurement = profiler.startMeasurement('mount-unmount-cycle');
-        
+
         const { unmount } = render(
           <TacticalBoard
-            players={players}
+            players={players as any}
             onPlayerMove={mockOnPlayerMove}
             onPlayerSelect={mockOnPlayerSelect}
           />
         );
-        
+
         unmount();
         endMeasurement();
       }
@@ -544,7 +561,7 @@ describe('ZENITH Tactical Board Performance Tests', () => {
     it('should meet production performance benchmarks', () => {
       const players = generatePlayers(22);
       const lines = generateTacticalLines(22, 15);
-      
+
       // Test multiple scenarios
       const scenarios = [
         { name: 'standard-game', players: players.slice(0, 22), lines: lines.slice(0, 10) },
@@ -555,62 +572,62 @@ describe('ZENITH Tactical Board Performance Tests', () => {
       scenarios.forEach(scenario => {
         for (let i = 0; i < 10; i++) {
           const endMeasurement = profiler.startMeasurement(scenario.name);
-          
+
           const { unmount } = render(
             <TacticalBoard
-              players={scenario.players}
-              lines={scenario.lines}
+              players={scenario.players as any}
+              lines={scenario.lines as any}
               onPlayerMove={mockOnPlayerMove}
               onPlayerSelect={mockOnPlayerSelect}
             />
           );
-          
+
           unmount();
           endMeasurement();
         }
 
         const stats = profiler.getStats(scenario.name);
-        
+
         // Production readiness criteria
         expect(stats.avg).toBeLessThan(100); // Average render under 100ms
-        expect(stats.p95).toBeLessThan(200); // 95th percentile under 200ms
+        expect(stats.p95 as any).toBeLessThan(200); // 95th percentile under 200ms
         expect(stats.max).toBeLessThan(500); // No render over 500ms
       });
     });
 
     it('should generate performance report', () => {
       const players = generatePlayers(22);
-      
+
       // Run comprehensive performance test
       for (let i = 0; i < 50; i++) {
         const endMeasurement = profiler.startMeasurement('performance-report');
-        
+
         const { unmount } = render(
           <TacticalBoard
-            players={players}
+            players={players as any}
             onPlayerMove={mockOnPlayerMove}
             onPlayerSelect={mockOnPlayerSelect}
           />
         );
-        
+
         unmount();
         endMeasurement();
       }
 
       const stats = profiler.getStats('performance-report');
-      
+
       // Generate performance report
       const performanceReport = {
         testName: 'Tactical Board Performance',
         timestamp: new Date().toISOString(),
         metrics: {
           averageRenderTime: `${stats.avg.toFixed(2)}ms`,
-          medianRenderTime: `${stats.p50.toFixed(2)}ms`,
-          p95RenderTime: `${stats.p95.toFixed(2)}ms`,
+          medianRenderTime: `${(stats.p50 as any).toFixed(2)}ms`,
+          p95RenderTime: `${(stats.p95 as any).toFixed(2)}ms`,
           maxRenderTime: `${stats.max.toFixed(2)}ms`,
           totalTests: stats.count,
         },
-        status: stats.avg < 100 && stats.p95 < 200 ? 'PASS' : 'FAIL',
+        status: stats.avg < 100 && (stats.p95 as any) < 200 ? 'PASS' : 'FAIL',
       };
 
       console.log('🎯 ZENITH Performance Report:', performanceReport);

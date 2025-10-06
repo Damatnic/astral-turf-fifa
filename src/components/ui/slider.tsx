@@ -15,7 +15,7 @@ export const Slider: React.FC<SliderProps> = ({
   min = 0,
   max = 100,
   step = 1,
-  className = ''
+  className = '',
 }) => {
   const [isDragging, setIsDragging] = useState(false);
 
@@ -24,23 +24,29 @@ export const Slider: React.FC<SliderProps> = ({
     updateValue(e);
   }, []);
 
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (isDragging) {
-      updateValue(e);
-    }
-  }, [isDragging]);
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if (isDragging) {
+        updateValue(e);
+      }
+    },
+    [isDragging]
+  );
 
   const handleMouseUp = useCallback(() => {
     setIsDragging(false);
   }, []);
 
-  const updateValue = useCallback((e: MouseEvent | React.MouseEvent<HTMLDivElement>) => {
-    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    const percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-    const newValue = min + percent * (max - min);
-    const steppedValue = Math.round(newValue / step) * step;
-    onValueChange([Math.max(min, Math.min(max, steppedValue))]);
-  }, [min, max, step, onValueChange]);
+  const updateValue = useCallback(
+    (e: MouseEvent | React.MouseEvent<HTMLDivElement>) => {
+      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+      const percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      const newValue = min + percent * (max - min);
+      const steppedValue = Math.round(newValue / step) * step;
+      onValueChange([Math.max(min, Math.min(max, steppedValue))]);
+    },
+    [min, max, step, onValueChange]
+  );
 
   React.useEffect(() => {
     if (isDragging) {
@@ -51,6 +57,7 @@ export const Slider: React.FC<SliderProps> = ({
         document.removeEventListener('mouseup', handleMouseUp);
       };
     }
+    return undefined;
   }, [isDragging, handleMouseMove, handleMouseUp]);
 
   const percentage = ((value[0] - min) / (max - min)) * 100;
@@ -61,10 +68,7 @@ export const Slider: React.FC<SliderProps> = ({
         className="relative h-2 w-full grow overflow-hidden rounded-full bg-secondary cursor-pointer"
         onMouseDown={handleMouseDown}
       >
-        <div
-          className="absolute h-full bg-primary"
-          style={{ width: `${percentage}%` }}
-        />
+        <div className="absolute h-full bg-primary" style={{ width: `${percentage}%` }} />
       </div>
       <div
         className="absolute block h-5 w-5 rounded-full border-2 border-primary bg-background ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 cursor-pointer"

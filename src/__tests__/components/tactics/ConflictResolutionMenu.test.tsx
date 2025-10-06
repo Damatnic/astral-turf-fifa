@@ -8,7 +8,7 @@ import type { Player } from '../../../types';
 
 /**
  * Comprehensive Integration Test Suite for ConflictResolutionMenu Component
- * 
+ *
  * Tests cover:
  * - Complete workflow from conflict detection to resolution
  * - Menu positioning and viewport handling
@@ -23,16 +23,20 @@ import type { Player } from '../../../types';
 // Mock framer-motion for consistent testing
 vi.mock('framer-motion', () => ({
   motion: {
-    div: React.forwardRef<HTMLDivElement, any>(({ children, onClick, className, style, ...props }, ref) => (
-      <div ref={ref} onClick={onClick} className={className} style={style} {...props}>
-        {children}
-      </div>
-    )),
-    button: React.forwardRef<HTMLButtonElement, any>(({ children, onClick, className, ...props }, ref) => (
-      <button ref={ref} onClick={onClick} className={className} {...props}>
-        {children}
-      </button>
-    ))
+    div: React.forwardRef<HTMLDivElement, any>(
+      ({ children, onClick, className, style, ...props }, ref) => (
+        <div ref={ref} onClick={onClick} className={className} style={style} {...props}>
+          {children}
+        </div>
+      )
+    ),
+    button: React.forwardRef<HTMLButtonElement, any>(
+      ({ children, onClick, className, ...props }, ref) => (
+        <button ref={ref} onClick={onClick} className={className} {...props}>
+          {children}
+        </button>
+      )
+    ),
   },
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
@@ -62,7 +66,7 @@ describe('ConflictResolutionMenu Integration Tests', () => {
       shooting: 88,
       dribbling: 91,
       positioning: 85,
-      stamina: 80
+      stamina: 80,
     },
     position: { x: 80, y: 30 },
     availability: { status: 'Available' },
@@ -80,7 +84,7 @@ describe('ConflictResolutionMenu Integration Tests', () => {
       saves: 0,
       passesCompleted: 1200,
       passesAttempted: 1400,
-      careerHistory: []
+      careerHistory: [],
     },
     loan: { isLoaned: false },
     traits: ['Ambitious'],
@@ -93,7 +97,7 @@ describe('ConflictResolutionMenu Integration Tests', () => {
     injuryRisk: 15,
     lastConversationInitiatedWeek: 0,
     moraleBoost: null,
-    completedChallenges: []
+    completedChallenges: [],
   };
 
   const mockTargetPlayer: Player = {
@@ -115,7 +119,7 @@ describe('ConflictResolutionMenu Integration Tests', () => {
       shooting: 85,
       dribbling: 88,
       positioning: 82,
-      stamina: 85
+      stamina: 85,
     },
     position: { x: 80, y: 70 },
     availability: { status: 'Available' },
@@ -133,7 +137,7 @@ describe('ConflictResolutionMenu Integration Tests', () => {
       saves: 0,
       passesCompleted: 1000,
       passesAttempted: 1200,
-      careerHistory: []
+      careerHistory: [],
     },
     loan: { isLoaned: false },
     traits: ['Loyal'],
@@ -146,20 +150,20 @@ describe('ConflictResolutionMenu Integration Tests', () => {
     injuryRisk: 10,
     lastConversationInitiatedWeek: 0,
     moraleBoost: null,
-    completedChallenges: []
+    completedChallenges: [],
   };
 
   const mockAlternativeSlots = [
     {
       id: 'alt-slot-1',
       role: 'LW',
-      position: { x: 60, y: 20 }
+      position: { x: 60, y: 20 },
     },
     {
       id: 'alt-slot-2',
       role: 'CAM',
-      position: { x: 70, y: 50 }
-    }
+      position: { x: 70, y: 50 },
+    },
   ];
 
   const defaultProps = {
@@ -169,13 +173,13 @@ describe('ConflictResolutionMenu Integration Tests', () => {
     targetPlayer: mockTargetPlayer,
     onResolve: mockOnResolve,
     onClose: mockOnClose,
-    alternativeSlots: mockAlternativeSlots
+    alternativeSlots: mockAlternativeSlots,
   };
 
   beforeEach(() => {
     cleanup();
     vi.clearAllMocks();
-    
+
     // Mock window dimensions for positioning tests
     Object.defineProperty(window, 'innerWidth', {
       writable: true,
@@ -198,7 +202,9 @@ describe('ConflictResolutionMenu Integration Tests', () => {
       render(<ConflictResolutionMenu {...defaultProps} />);
 
       expect(screen.getByText('Position Conflict')).toBeInTheDocument();
-      expect(screen.getByText(/Mohamed Salah wants to move to Sadio Mané's position/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Mohamed Salah wants to move to Sadio Mané's position/)
+      ).toBeInTheDocument();
     });
 
     it('should not render when not visible', () => {
@@ -229,7 +235,9 @@ describe('ConflictResolutionMenu Integration Tests', () => {
     it('should apply team colors to player avatars', () => {
       const { container } = render(<ConflictResolutionMenu {...defaultProps} />);
 
-      const playerAvatars = container.querySelectorAll('div[style*="background-color: rgb(255, 0, 0)"]');
+      const playerAvatars = container.querySelectorAll(
+        'div[style*="background-color: rgb(255, 0, 0)"]'
+      );
       expect(playerAvatars).toHaveLength(2); // Both players should have red background
     });
   });
@@ -249,19 +257,14 @@ describe('ConflictResolutionMenu Integration Tests', () => {
 
       const recommendedBadge = screen.getByText('Recommended');
       expect(recommendedBadge).toBeInTheDocument();
-      
+
       // Should be next to swap option
       const swapOption = screen.getByText('Swap Positions').closest('button');
       expect(swapOption).toContainElement(recommendedBadge);
     });
 
     it('should not show alternative option when no alternative slots provided', () => {
-      render(
-        <ConflictResolutionMenu 
-          {...defaultProps} 
-          alternativeSlots={[]} 
-        />
-      );
+      render(<ConflictResolutionMenu {...defaultProps} alternativeSlots={[]} />);
 
       expect(screen.queryByText('Find Alternative')).not.toBeInTheDocument();
     });
@@ -338,7 +341,7 @@ describe('ConflictResolutionMenu Integration Tests', () => {
       render(<ConflictResolutionMenu {...defaultProps} />);
 
       const swapButton = screen.getByText('Swap Positions').closest('button');
-      
+
       // Rapid clicks
       await user.click(swapButton!);
       await user.click(swapButton!);
@@ -357,10 +360,7 @@ describe('ConflictResolutionMenu Integration Tests', () => {
 
       // Position near edge
       const { container } = render(
-        <ConflictResolutionMenu 
-          {...defaultProps} 
-          position={{ x: 700, y: 500 }} 
-        />
+        <ConflictResolutionMenu {...defaultProps} position={{ x: 700, y: 500 }} />
       );
 
       await waitFor(() => {
@@ -375,10 +375,7 @@ describe('ConflictResolutionMenu Integration Tests', () => {
 
     it('should handle negative position values', async () => {
       const { container } = render(
-        <ConflictResolutionMenu 
-          {...defaultProps} 
-          position={{ x: -50, y: -50 }} 
-        />
+        <ConflictResolutionMenu {...defaultProps} position={{ x: -50, y: -50 }} />
       );
 
       await waitFor(() => {
@@ -389,19 +386,11 @@ describe('ConflictResolutionMenu Integration Tests', () => {
 
     it('should reposition when position prop changes', async () => {
       const { rerender } = render(
-        <ConflictResolutionMenu 
-          {...defaultProps} 
-          position={{ x: 100, y: 100 }} 
-        />
+        <ConflictResolutionMenu {...defaultProps} position={{ x: 100, y: 100 }} />
       );
 
       // Change position
-      rerender(
-        <ConflictResolutionMenu 
-          {...defaultProps} 
-          position={{ x: 200, y: 200 }} 
-        />
-      );
+      rerender(<ConflictResolutionMenu {...defaultProps} position={{ x: 200, y: 200 }} />);
 
       // Should trigger repositioning logic
       await waitFor(() => {
@@ -418,10 +407,7 @@ describe('ConflictResolutionMenu Integration Tests', () => {
 
       // Trigger resize handling by changing position
       const { rerender } = render(
-        <ConflictResolutionMenu 
-          {...defaultProps} 
-          position={{ x: 350, y: 250 }} 
-        />
+        <ConflictResolutionMenu {...defaultProps} position={{ x: 350, y: 250 }} />
       );
 
       await waitFor(() => {
@@ -477,10 +463,7 @@ describe('ConflictResolutionMenu Integration Tests', () => {
   describe('Alternative Slots Handling', () => {
     it('should dynamically show alternative option based on available slots', () => {
       const { rerender } = render(
-        <ConflictResolutionMenu 
-          {...defaultProps} 
-          alternativeSlots={[]} 
-        />
+        <ConflictResolutionMenu {...defaultProps} alternativeSlots={[]} />
       );
 
       expect(screen.queryByText('Find Alternative')).not.toBeInTheDocument();
@@ -492,23 +475,13 @@ describe('ConflictResolutionMenu Integration Tests', () => {
 
     it('should handle empty alternative slots array', () => {
       expect(() => {
-        render(
-          <ConflictResolutionMenu 
-            {...defaultProps} 
-            alternativeSlots={[]} 
-          />
-        );
+        render(<ConflictResolutionMenu {...defaultProps} alternativeSlots={[]} />);
       }).not.toThrow();
     });
 
     it('should handle undefined alternative slots', () => {
       expect(() => {
-        render(
-          <ConflictResolutionMenu 
-            {...defaultProps} 
-            alternativeSlots={undefined} 
-          />
-        );
+        render(<ConflictResolutionMenu {...defaultProps} alternativeSlots={undefined} />);
       }).not.toThrow();
     });
   });
@@ -516,38 +489,25 @@ describe('ConflictResolutionMenu Integration Tests', () => {
   describe('Error Handling and Edge Cases', () => {
     it('should handle missing player names gracefully', () => {
       const playerWithoutName = { ...mockSourcePlayer, name: '' };
-      
-      render(
-        <ConflictResolutionMenu 
-          {...defaultProps} 
-          sourcePlayer={playerWithoutName} 
-        />
-      );
+
+      render(<ConflictResolutionMenu {...defaultProps} sourcePlayer={playerWithoutName} />);
 
       expect(screen.getByText('Position Conflict')).toBeInTheDocument();
     });
 
     it('should handle missing jersey numbers', () => {
       const playerWithoutNumber = { ...mockSourcePlayer, jerseyNumber: 0 };
-      
-      render(
-        <ConflictResolutionMenu 
-          {...defaultProps} 
-          sourcePlayer={playerWithoutNumber} 
-        />
-      );
+
+      render(<ConflictResolutionMenu {...defaultProps} sourcePlayer={playerWithoutNumber} />);
 
       expect(screen.getByText('0')).toBeInTheDocument();
     });
 
     it('should handle invalid team colors', () => {
       const playerWithInvalidColor = { ...mockSourcePlayer, teamColor: '' };
-      
+
       const { container } = render(
-        <ConflictResolutionMenu 
-          {...defaultProps} 
-          sourcePlayer={playerWithInvalidColor} 
-        />
+        <ConflictResolutionMenu {...defaultProps} sourcePlayer={playerWithInvalidColor} />
       );
 
       const avatar = container.querySelector('div[style*="background-color: "]');
@@ -556,28 +516,19 @@ describe('ConflictResolutionMenu Integration Tests', () => {
 
     it('should handle extreme position values', () => {
       expect(() => {
-        render(
-          <ConflictResolutionMenu 
-            {...defaultProps} 
-            position={{ x: 999999, y: -999999 }} 
-          />
-        );
+        render(<ConflictResolutionMenu {...defaultProps} position={{ x: 999999, y: -999999 }} />);
       }).not.toThrow();
     });
 
     it('should handle null callbacks gracefully', () => {
       const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
-      
+
       render(
-        <ConflictResolutionMenu 
-          {...defaultProps} 
-          onResolve={null as any} 
-          onClose={null as any} 
-        />
+        <ConflictResolutionMenu {...defaultProps} onResolve={null as any} onClose={null as any} />
       );
 
       expect(screen.getByText('Position Conflict')).toBeInTheDocument();
-      
+
       consoleError.mockRestore();
     });
   });
@@ -585,7 +536,7 @@ describe('ConflictResolutionMenu Integration Tests', () => {
   describe('Performance and Optimization', () => {
     it('should not re-render unnecessarily', () => {
       const renderSpy = vi.fn();
-      
+
       function TestWrapper(props: any) {
         renderSpy();
         return <ConflictResolutionMenu {...props} />;
@@ -603,31 +554,22 @@ describe('ConflictResolutionMenu Integration Tests', () => {
       const largeAlternativeSlots = Array.from({ length: 100 }, (_, i) => ({
         id: `slot-${i}`,
         role: `Role ${i}`,
-        position: { x: i, y: i }
+        position: { x: i, y: i },
       }));
 
       const startTime = performance.now();
-      render(
-        <ConflictResolutionMenu 
-          {...defaultProps} 
-          alternativeSlots={largeAlternativeSlots} 
-        />
-      );
+      render(<ConflictResolutionMenu {...defaultProps} alternativeSlots={largeAlternativeSlots} />);
       const endTime = performance.now();
 
       expect(endTime - startTime).toBeLessThan(100); // Should render quickly
     });
 
     it('should handle rapid visibility changes', async () => {
-      const { rerender } = render(
-        <ConflictResolutionMenu {...defaultProps} isVisible={false} />
-      );
+      const { rerender } = render(<ConflictResolutionMenu {...defaultProps} isVisible={false} />);
 
       // Rapid visibility changes
       for (let i = 0; i < 10; i++) {
-        rerender(
-          <ConflictResolutionMenu {...defaultProps} isVisible={i % 2 === 0} />
-        );
+        rerender(<ConflictResolutionMenu {...defaultProps} isVisible={i % 2 === 0} />);
       }
 
       expect(screen.queryByText('Position Conflict')).not.toBeInTheDocument();
@@ -637,17 +579,14 @@ describe('ConflictResolutionMenu Integration Tests', () => {
   describe('Complete Workflow Integration', () => {
     it('should complete full swap workflow', async () => {
       const onResolveHandler = vi.fn();
-      
-      render(
-        <ConflictResolutionMenu 
-          {...defaultProps} 
-          onResolve={onResolveHandler} 
-        />
-      );
+
+      render(<ConflictResolutionMenu {...defaultProps} onResolve={onResolveHandler} />);
 
       // User sees conflict
       expect(screen.getByText('Position Conflict')).toBeInTheDocument();
-      expect(screen.getByText(/Mohamed Salah wants to move to Sadio Mané's position/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Mohamed Salah wants to move to Sadio Mané's position/)
+      ).toBeInTheDocument();
 
       // User selects swap option
       const swapButton = screen.getByText('Swap Positions').closest('button');
@@ -659,13 +598,8 @@ describe('ConflictResolutionMenu Integration Tests', () => {
 
     it('should complete full replacement workflow', async () => {
       const onResolveHandler = vi.fn();
-      
-      render(
-        <ConflictResolutionMenu 
-          {...defaultProps} 
-          onResolve={onResolveHandler} 
-        />
-      );
+
+      render(<ConflictResolutionMenu {...defaultProps} onResolve={onResolveHandler} />);
 
       // User decides to replace
       const replaceButton = screen.getByText('Replace Player').closest('button');
@@ -676,13 +610,8 @@ describe('ConflictResolutionMenu Integration Tests', () => {
 
     it('should complete cancellation workflow', async () => {
       const onResolveHandler = vi.fn();
-      
-      render(
-        <ConflictResolutionMenu 
-          {...defaultProps} 
-          onResolve={onResolveHandler} 
-        />
-      );
+
+      render(<ConflictResolutionMenu {...defaultProps} onResolve={onResolveHandler} />);
 
       // User cancels
       const cancelButton = screen.getByText('Cancel Move');
@@ -693,12 +622,9 @@ describe('ConflictResolutionMenu Integration Tests', () => {
 
     it('should handle menu dismissal through backdrop', async () => {
       const onCloseHandler = vi.fn();
-      
+
       const { container } = render(
-        <ConflictResolutionMenu 
-          {...defaultProps} 
-          onClose={onCloseHandler} 
-        />
+        <ConflictResolutionMenu {...defaultProps} onClose={onCloseHandler} />
       );
 
       // User clicks outside menu

@@ -3,6 +3,8 @@
  * Tests mobile-optimized components for touch interactions and responsive behavior
  */
 
+/* eslint-disable no-undef */
+import React from 'react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -10,6 +12,7 @@ import { ThemeProvider } from '../../context/ThemeContext';
 import MobilePlayerToken from '../../components/mobile/MobilePlayerToken';
 import MobileTacticalField from '../../components/mobile/MobileTacticalField';
 import MobileNavigation, { defaultNavigationItems } from '../../components/mobile/MobileNavigation';
+import { createMockPlayer } from '../../test-utils/mock-factories/player.factory';
 
 // Mock utilities
 vi.mock('../../utils/mobileOptimizations', () => ({
@@ -45,33 +48,32 @@ vi.mock('framer-motion', () => ({
   PanInfo: {},
 }));
 
-const mockPlayer = {
+const mockPlayer = createMockPlayer({
   id: 'player-1',
   name: 'John Doe',
-  position: 'ST' as const,
+  roleId: 'striker',
   jerseyNumber: 9,
-  rating: 85,
   nationality: 'England',
   age: 25,
-  isInjured: false,
-  morale: 90,
-  fitness: 85,
+  morale: 'Good',
+  position: { x: 50, y: 50 },
   attributes: {
-    pace: 80,
+    speed: 80,
     shooting: 85,
     passing: 70,
-    defending: 40,
-    physicality: 75,
-    mentality: 80,
+    tackling: 40,
+    positioning: 75,
+    stamina: 80,
+    dribbling: 85,
   },
-};
+});
 
 const mockFormation = {
   id: 'formation-1',
   name: '4-3-3',
-  playerPositions: {
-    'player-1': { x: 100, y: 100 },
-  },
+  slots: [
+    { id: 'player-1', role: 'FW', defaultPosition: { x: 100, y: 100 }, playerId: 'player-1' },
+  ],
   description: 'Test formation',
   createdAt: Date.now(),
   updatedAt: Date.now(),
@@ -90,11 +92,7 @@ const mockFieldBounds = {
 } as DOMRect;
 
 const renderWithTheme = (component: React.ReactElement) => {
-  return render(
-    <ThemeProvider>
-      {component}
-    </ThemeProvider>
-  );
+  return render(<ThemeProvider>{component}</ThemeProvider>);
 };
 
 describe('MobilePlayerToken Component', () => {
@@ -128,12 +126,16 @@ describe('MobilePlayerToken Component', () => {
 
   it('should apply correct position colors based on player role', () => {
     const { rerender } = renderWithTheme(<MobilePlayerToken {...defaultProps} />);
-    
+
     // Striker should have red background
     expect(screen.getByRole('button')).toHaveClass('bg-red-500');
 
     // Defender should have blue background
-    const defender = { ...mockPlayer, position: 'CB' as const };
+    const defender = createMockPlayer({
+      ...mockPlayer,
+      roleId: 'defender',
+      position: { x: 30, y: 70 },
+    });
     rerender(
       <ThemeProvider>
         <MobilePlayerToken {...defaultProps} player={defender} />
@@ -144,13 +146,13 @@ describe('MobilePlayerToken Component', () => {
 
   it('should show selection indicator when selected', () => {
     renderWithTheme(<MobilePlayerToken {...defaultProps} isSelected={true} />);
-    
+
     expect(screen.getByRole('button')).toHaveAttribute('aria-pressed', 'true');
   });
 
   it('should show conflict indicator when conflicted', () => {
     renderWithTheme(<MobilePlayerToken {...defaultProps} isConflicted={true} />);
-    
+
     // Should have conflict indicator (red dot)
     const conflictIndicator = document.querySelector('.bg-red-500.rounded-full');
     expect(conflictIndicator).toBeInTheDocument();
@@ -173,8 +175,10 @@ describe('MobilePlayerToken Component', () => {
       onDrag: vi.fn(),
     };
 
-    const mockUseTouchGestures = vi.mocked(require('../../utils/mobileOptimizations').useTouchGestures);
-    mockUseTouchGestures.mockImplementation((ref, callbacks) => {
+    const mockUseTouchGestures = vi.mocked(
+      require('../../utils/mobileOptimizations').useTouchGestures
+    );
+    mockUseTouchGestures.mockImplementation((_ref: unknown, callbacks: any) => {
       Object.assign(touchCallbacks, callbacks);
     });
 
@@ -189,19 +193,17 @@ describe('MobilePlayerToken Component', () => {
   });
 
   it('should show stats overlay on mobile when enabled', () => {
-    renderWithTheme(
-      <MobilePlayerToken {...defaultProps} isSelected={true} showStats={true} />
-    );
+    renderWithTheme(<MobilePlayerToken {...defaultProps} isSelected={true} showStats={true} />);
 
     expect(screen.getByText(/John Doe • 85/)).toBeInTheDocument();
   });
 
   it('should apply minimum touch target size on mobile', () => {
     renderWithTheme(<MobilePlayerToken {...defaultProps} />);
-    
+
     const tokenElement = screen.getByRole('button').firstChild as HTMLElement;
     const computedStyle = window.getComputedStyle(tokenElement);
-    
+
     // Should have minimum 44px touch target
     expect(parseInt(computedStyle.minWidth)).toBeGreaterThanOrEqual(44);
     expect(parseInt(computedStyle.minHeight)).toBeGreaterThanOrEqual(44);
@@ -232,26 +234,20 @@ describe('MobileTacticalField Component', () => {
   });
 
   it('should render players on the field', () => {
-    renderWithTheme(
-      <MobileTacticalField {...defaultProps} formation={mockFormation} />
-    );
+    renderWithTheme(<MobileTacticalField {...defaultProps} formation={mockFormation} />);
 
     expect(screen.getByLabelText(/John Doe.*ST.*85 rating/)).toBeInTheDocument();
   });
 
   it('should show grid overlay when enabled', () => {
-    renderWithTheme(
-      <MobileTacticalField {...defaultProps} showGrid={true} />
-    );
+    renderWithTheme(<MobileTacticalField {...defaultProps} showGrid={true} />);
 
     const gridSvg = document.querySelector('svg');
     expect(gridSvg).toBeInTheDocument();
   });
 
   it('should show tactical zones when enabled', () => {
-    renderWithTheme(
-      <MobileTacticalField {...defaultProps} showZones={true} />
-    );
+    renderWithTheme(<MobileTacticalField {...defaultProps} showZones={true} />);
 
     // Should have zone rectangles
     const zones = document.querySelectorAll('rect[fill*="rgba"]');
@@ -264,8 +260,10 @@ describe('MobileTacticalField Component', () => {
       onSwipe: vi.fn(),
     };
 
-    const mockUseTouchGestures = vi.mocked(require('../../utils/mobileOptimizations').useTouchGestures);
-    mockUseTouchGestures.mockImplementation((ref, callbacks) => {
+    const mockUseTouchGestures = vi.mocked(
+      require('../../utils/mobileOptimizations').useTouchGestures
+    );
+    mockUseTouchGestures.mockImplementation((_ref: unknown, callbacks: any) => {
       Object.assign(touchCallbacks, callbacks);
     });
 
@@ -273,7 +271,7 @@ describe('MobileTacticalField Component', () => {
 
     // Simulate pinch gesture
     touchCallbacks.onPinch(new TouchEvent('touchmove'), 1.5);
-    
+
     // Simulate swipe gesture
     touchCallbacks.onSwipe(new TouchEvent('touchend'), 'left', 2.0);
   });
@@ -377,11 +375,7 @@ describe('MobileNavigation Component', () => {
 
   it('should show notification and user profile buttons', () => {
     renderWithTheme(
-      <MobileNavigation 
-        {...defaultProps} 
-        showNotifications={true} 
-        showUserProfile={true} 
-      />
+      <MobileNavigation {...defaultProps} showNotifications={true} showUserProfile={true} />
     );
 
     expect(screen.getByLabelText('Notifications')).toBeInTheDocument();
@@ -412,8 +406,10 @@ describe('MobileNavigation Component', () => {
       onSwipe: vi.fn(),
     };
 
-    const mockUseTouchGestures = vi.mocked(require('../../utils/mobileOptimizations').useTouchGestures);
-    mockUseTouchGestures.mockImplementation((ref, callbacks) => {
+    const mockUseTouchGestures = vi.mocked(
+      require('../../utils/mobileOptimizations').useTouchGestures
+    );
+    mockUseTouchGestures.mockImplementation((_ref: unknown, callbacks: any) => {
       Object.assign(touchCallbacks, callbacks);
     });
 
@@ -430,7 +426,7 @@ describe('MobileNavigation Component', () => {
     await userEvent.click(menuButton);
 
     const navItems = screen.getAllByRole('menuitem');
-    
+
     navItems.forEach(item => {
       const computedStyle = window.getComputedStyle(item);
       expect(parseInt(computedStyle.minHeight)).toBeGreaterThanOrEqual(48);
@@ -443,10 +439,7 @@ describe('Mobile Component Integration', () => {
     const IntegratedComponent = () => (
       <ThemeProvider>
         <div>
-          <MobileNavigation 
-            items={defaultNavigationItems}
-            onNavigate={vi.fn()}
-          />
+          <MobileNavigation items={defaultNavigationItems} onNavigate={vi.fn()} />
           <MobileTacticalField
             players={[mockPlayer]}
             formation={mockFormation}
@@ -467,7 +460,7 @@ describe('Mobile Component Integration', () => {
     // Should handle interactions without conflicts
     const menuButton = screen.getByLabelText('Open menu');
     await userEvent.click(menuButton);
-    
+
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
   });
 

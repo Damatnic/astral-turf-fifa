@@ -82,9 +82,9 @@ class JWTRotationService {
       });
     } catch (_error) {
       log.error('Failed to initialize JWT rotation service', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
       });
-      throw error;
+      throw _error;
     }
   }
 
@@ -170,10 +170,10 @@ class JWTRotationService {
       });
     } catch (_error) {
       log.error('JWT key rotation failed', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
         metadata: { reason },
       });
-      throw error;
+      throw _error;
     }
   }
 
@@ -188,7 +188,7 @@ class JWTRotationService {
         {
           severity: 'critical',
           metadata: { reason },
-        },
+        }
       );
 
       // Clear all existing keys
@@ -215,14 +215,14 @@ class JWTRotationService {
             newKeyId: this.currentKey.id,
             reason,
           },
-        },
+        }
       );
     } catch (_error) {
       log.error('Emergency JWT key revocation failed', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
         metadata: { reason },
       });
-      throw error;
+      throw _error;
     }
   }
 
@@ -285,7 +285,7 @@ class JWTRotationService {
    */
   private scheduleRotation(): void {
     if (this.rotationTimer) {
-      clearTimeout(this.rotationTimer);
+      clearTimeout(this.rotationTimer as any);
     }
 
     const intervalMs = this.config.rotationIntervalHours * 60 * 60 * 1000;
@@ -296,7 +296,7 @@ class JWTRotationService {
         this.scheduleRotation(); // Schedule next rotation
       } catch (_error) {
         log.error('Scheduled JWT rotation failed', {
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: _error instanceof Error ? _error.message : 'Unknown error',
         });
 
         // Retry in 1 hour
@@ -359,7 +359,7 @@ class JWTRotationService {
 
       // Fallback to database
       const db = databaseService.getClient();
-      const systemConfig = await db.systemConfig.findMany({
+      const systemConfig = await (db as any).systemConfig.findMany({
         where: {
           key: {
             startsWith: 'jwt_key_',
@@ -385,7 +385,7 @@ class JWTRotationService {
       }
     } catch (_error) {
       log.error('Failed to load JWT keys from storage', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
       });
     }
   }
@@ -399,7 +399,7 @@ class JWTRotationService {
 
       // Save current key
       if (this.currentKey) {
-        await db.systemConfig.upsert({
+        await (db as any).systemConfig.upsert({
           where: { key: `jwt_key_${this.currentKey.id}` },
           create: {
             key: `jwt_key_${this.currentKey.id}`,
@@ -416,7 +416,7 @@ class JWTRotationService {
 
       // Save previous keys
       for (const key of this.previousKeys) {
-        await db.systemConfig.upsert({
+        await (db as any).systemConfig.upsert({
           where: { key: `jwt_key_${key.id}` },
           create: {
             key: `jwt_key_${key.id}`,
@@ -434,7 +434,7 @@ class JWTRotationService {
       log.info('Saved JWT keys to database');
     } catch (_error) {
       log.error('Failed to save JWT keys to database', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
       });
     }
   }
@@ -451,14 +451,14 @@ class JWTRotationService {
             current: this.currentKey,
             previous: this.previousKeys,
           },
-          { ttl: 3600 },
+          { ttl: 3600 }
         ); // Cache for 1 hour
 
         log.debug('Cached JWT keys in Redis');
       }
     } catch (_error) {
       log.error('Failed to cache JWT keys', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
       });
     }
   }
@@ -474,7 +474,7 @@ class JWTRotationService {
       }
     } catch (_error) {
       log.error('Failed to clear JWT key cache', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
       });
     }
   }
@@ -568,7 +568,7 @@ class JWTRotationService {
       log.info('Shutting down JWT rotation service');
 
       if (this.rotationTimer) {
-        clearTimeout(this.rotationTimer);
+        clearTimeout(this.rotationTimer as any);
         this.rotationTimer = null;
       }
 
@@ -580,7 +580,7 @@ class JWTRotationService {
       log.info('JWT rotation service shut down successfully');
     } catch (_error) {
       log.error('Error during JWT rotation service shutdown', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
       });
     }
   }

@@ -20,9 +20,12 @@ export interface LeagueTableEntry {
 }
 
 export interface Fixture {
+  id?: string;
   week: number;
   homeTeam: string;
   awayTeam: string;
+  competition?: string;
+  date?: string;
 }
 
 export interface Season {

@@ -21,7 +21,7 @@ const ChallengeProgressBar: React.FC<ChallengeProgressBarProps> = ({ challenge, 
   useEffect(() => {
     const playerProgress = challengeService.getPlayerProgress(playerId);
     const challengeProgress = playerProgress.find(
-      p => p.challengeId === challenge.id && p.status === 'active',
+      p => p.challengeId === challenge.id && p.status === 'active'
     );
     setProgress(challengeProgress || null);
   }, [challenge.id, playerId]);
@@ -51,7 +51,7 @@ const ChallengeProgressBar: React.FC<ChallengeProgressBarProps> = ({ challenge, 
     // Refresh local progress
     const updatedProgress = challengeService.getPlayerProgress(playerId);
     const challengeProgress = updatedProgress.find(
-      p => p.challengeId === challenge.id && p.status === 'active',
+      p => p.challengeId === challenge.id && p.status === 'active'
     );
     setProgress(challengeProgress || null);
   };

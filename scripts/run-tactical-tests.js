@@ -50,29 +50,29 @@ console.log('\n🚀 Starting Test Execution...\n');
 for (const test of testCommands) {
   console.log(`📋 Running: ${test.name}`);
   console.log('─'.repeat(40));
-  
+
   try {
     const startTime = Date.now();
-    
+
     // Execute test command
-    const result = execSync(test.command, { 
+    const result = execSync(test.command, {
       encoding: 'utf8',
       stdio: 'pipe',
       timeout: 120000, // 2 minute timeout
     });
-    
+
     const duration = Date.now() - startTime;
-    
+
     // Parse test results (simplified parsing)
     const passedMatch = result.match(/(\d+) passed/);
     const failedMatch = result.match(/(\d+) failed/);
-    
+
     const passed = passedMatch ? parseInt(passedMatch[1]) : 0;
     const failed = failedMatch ? parseInt(failedMatch[1]) : 0;
-    
+
     totalPassed += passed;
     totalFailed += failed;
-    
+
     if (failed > 0) {
       allTestsPassed = false;
       if (test.critical) {
@@ -82,11 +82,11 @@ for (const test of testCommands) {
         break; // Stop on critical test failure
       }
     }
-    
+
     console.log(`✅ ${test.name} completed successfully`);
     console.log(`   Passed: ${passed}, Failed: ${failed}`);
     console.log(`   Duration: ${duration}ms\n`);
-    
+
     testResults.push({
       name: test.name,
       passed,
@@ -94,11 +94,10 @@ for (const test of testCommands) {
       duration,
       status: failed === 0 ? 'PASS' : 'FAIL',
     });
-    
   } catch (error) {
     console.log(`❌ ${test.name} execution failed`);
     console.log(`   Error: ${error.message}\n`);
-    
+
     testResults.push({
       name: test.name,
       passed: 0,
@@ -106,7 +105,7 @@ for (const test of testCommands) {
       duration: 0,
       status: 'ERROR',
     });
-    
+
     if (test.critical) {
       allTestsPassed = false;
       console.log('🚨 Critical test failed - stopping execution');
@@ -123,7 +122,9 @@ console.log('='.repeat(60));
 console.log(`\n📈 Overall Results:`);
 console.log(`   Total Passed: ${totalPassed}`);
 console.log(`   Total Failed: ${totalFailed}`);
-console.log(`   Success Rate: ${totalFailed === 0 ? '100%' : ((totalPassed / (totalPassed + totalFailed)) * 100).toFixed(1) + '%'}`);
+console.log(
+  `   Success Rate: ${totalFailed === 0 ? '100%' : ((totalPassed / (totalPassed + totalFailed)) * 100).toFixed(1) + '%'}`
+);
 
 console.log(`\n📋 Individual Test Results:`);
 testResults.forEach((result, index) => {
@@ -143,7 +144,9 @@ if (totalFailed > 0) {
   criticalIssues.push(`${totalFailed} test(s) failed`);
 }
 
-const criticalTestsFailed = testResults.filter(r => r.status !== 'PASS' && testCommands.find(t => t.name === r.name)?.critical);
+const criticalTestsFailed = testResults.filter(
+  r => r.status !== 'PASS' && testCommands.find(t => t.name === r.name)?.critical
+);
 if (criticalTestsFailed.length > 0) {
   criticalIssues.push('Critical tests failed');
 }
@@ -164,7 +167,7 @@ if (criticalIssues.length === 0 && allTestsPassed) {
   productionStatus = '🔴 NOT READY';
   console.log(`   Status: ${productionStatus}`);
   console.log(`   ❌ Critical issues detected`);
-  
+
   console.log(`\n🚨 Critical Issues:`);
   criticalIssues.forEach((issue, index) => {
     console.log(`   ${index + 1}. ${issue}`);
@@ -193,7 +196,7 @@ const reportData = {
   executionSummary: {
     totalPassed,
     totalFailed,
-    successRate: totalFailed === 0 ? 100 : ((totalPassed / (totalPassed + totalFailed)) * 100),
+    successRate: totalFailed === 0 ? 100 : (totalPassed / (totalPassed + totalFailed)) * 100,
     productionStatus: productionStatus.replace(/🟢|🟡|🔴/, '').trim(),
   },
   testResults,

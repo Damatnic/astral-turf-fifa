@@ -44,7 +44,7 @@ const promptCache = new Map<string, string>();
 
 async function loadAndFormatPrompt(
   promptFile: string,
-  replacements: Record<string, string>,
+  replacements: Record<string, string>
 ): Promise<string> {
   let template = promptCache.get(promptFile);
   if (!template) {
@@ -53,7 +53,7 @@ async function loadAndFormatPrompt(
       if (!response.ok) {
         throw new Error(`Failed to fetch prompt: ${response.statusText}`);
       }
-      template = await response.text();
+      template = await (response.text?.() ?? '');
       promptCache.set(promptFile, template);
     } catch (_error) {
       console.error(`Error loading prompt file ${promptFile}:`, _error);
@@ -121,7 +121,7 @@ async function getSystemInstruction(personality: AIPersonality): Promise<string>
   let template = promptCache.get(promptFile);
   if (!template) {
     const response = await fetch(`/prompts/${promptFile}`);
-    template = await response.text();
+    template = await (response.text?.() ?? '');
     promptCache.set(promptFile, template);
   }
   return template;
@@ -199,7 +199,7 @@ const generateJson = async (prompt: string, schema: unknown, systemInstruction: 
         temperature: 0.8,
       },
     });
-    const jsonText = response.text.trim();
+    const jsonText = response.text?.trim();
     if (!jsonText) {
       throw new Error('AI returned an empty response.');
     }
@@ -215,7 +215,7 @@ export const getTeamTalkOptions = async (
   opponentName: string,
   isHalftime: boolean,
   currentScore: string,
-  personality: AIPersonality,
+  personality: AIPersonality
 ): Promise<AITeamTalkResponse> => {
   if (!aiInstance) {
     throw new Error('AI is offline.');
@@ -309,7 +309,7 @@ export const generatePlayerBio = async (player: Player): Promise<string> => {
         temperature: 0.9,
       },
     });
-    const text = response.text.trim();
+    const text = response.text?.trim();
     if (!text) {
       throw new Error('AI returned an empty response.');
     }
@@ -328,7 +328,7 @@ export const getTacticalAdvice = async (
   homeTactics: TeamTactics,
   awayTactics: TeamTactics,
   personality: AIPersonality,
-  coach: HeadCoach | null,
+  coach: HeadCoach | null
 ): Promise<AIInsight> => {
   if (!aiInstance) {
     return getOfflineResponse('Tactical Analysis') as AIInsight;
@@ -359,10 +359,10 @@ export const getAIPlayerComparison = async (
   player1: Player,
   player2: Player,
   formation: Formation,
-  personality: AIPersonality,
+  personality: AIPersonality
 ): Promise<AIComparison> => {
   if (!aiInstance) {
-    return getOfflineResponse('Player Comparison') as AIComparison;
+    return getOfflineResponse('Player Comparison') as unknown as AIComparison;
   }
   const prompt = await loadAndFormatPrompt('player_comparison.md', {
     '{{FORMATION_NAME}}': formation.name,
@@ -385,10 +385,10 @@ export const getAIPlayerComparison = async (
 
 export const getAIFormationSuggestion = async (
   allPlayers: Player[],
-  personality: AIPersonality,
+  personality: AIPersonality
 ): Promise<AISuggestedFormation> => {
   if (!aiInstance) {
-    return getOfflineResponse('Formation Suggestion') as AISuggestedFormation;
+    return getOfflineResponse('Formation Suggestion') as unknown as AISuggestedFormation;
   }
   const prompt = await loadAndFormatPrompt('formation_suggestion.md', {
     '{{PLAYER_ROSTER}}': allPlayers.map(formatPlayerForPrompt).join('\n'),
@@ -406,7 +406,7 @@ export const getAIFormationSuggestion = async (
   const parsedData = (await generateJson(
     prompt,
     schema,
-    systemInstruction,
+    systemInstruction
   )) as AISuggestedFormation;
   if (
     !['4-4-2', '4-3-3', '3-5-2'].includes(parsedData.formationName) ||
@@ -421,7 +421,7 @@ export const getAIChatResponse = async (
   chatHistory: ChatMessage[],
   playersInFormation: Player[],
   formation: Formation,
-  personality: AIPersonality,
+  personality: AIPersonality
 ): Promise<{ text: string; playerIdsToHighlight: string[] }> => {
   if (!aiInstance) {
     return getOfflineResponse('AI Chat') as { text: string; playerIdsToHighlight: string[] };
@@ -449,7 +449,7 @@ export const getAIChatResponse = async (
 export const getAIPlayerConversationResponse = async (
   player: Player,
   userMessage: string,
-  personality: AIPersonality, // manager personality
+  personality: AIPersonality // manager personality
 ): Promise<{ response: string; moraleEffect: number; promiseRequest?: PromiseRequest }> => {
   if (!aiInstance) {
     return { response: 'AI is offline. Player is unavailable to talk.', moraleEffect: 0 };
@@ -490,7 +490,7 @@ export const getOppositionAnalysis = async (
   formation: string,
   keyPlayers: string,
   personality: AIPersonality,
-  scoutRating: number,
+  scoutRating: number
 ): Promise<AIOppositionReport> => {
   if (!aiInstance) {
     return getOfflineResponse('Opposition Scouting') as AIOppositionReport;
@@ -517,7 +517,7 @@ export const getOppositionAnalysis = async (
 export const getAISubstitutionSuggestion = async (
   onFieldPlayers: Player[],
   benchedPlayers: Player[],
-  personality: AIPersonality,
+  personality: AIPersonality
 ): Promise<AISubstitutionSuggestion> => {
   if (!aiInstance) {
     return { playerInId: '', playerOutId: '', reasoning: 'AI is offline.' };
@@ -543,10 +543,10 @@ export const getPostMatchAnalysis = async (
   result: MatchResult,
   homeTeamName: string,
   awayTeamName: string,
-  personality: AIPersonality,
+  personality: AIPersonality
 ): Promise<AIPostMatchAnalysis> => {
   if (!aiInstance) {
-    return getOfflineResponse('Post-Match Analysis') as AIPostMatchAnalysis;
+    return getOfflineResponse('Post-Match Analysis') as unknown as AIPostMatchAnalysis;
   }
   const prompt = await loadAndFormatPrompt('post_match_analysis.md', {
     '{{HOME_TEAM_NAME}}': homeTeamName,
@@ -574,7 +574,7 @@ export const getAgentNegotiationResponse = async (
   playerValue: number,
   agentPersonality: string,
   userOffer: string,
-  conversationHistory: string,
+  conversationHistory: string
 ): Promise<AIAgentResponse> => {
   if (!aiInstance) {
     return getOfflineResponse('Agent Negotiation') as AIAgentResponse;
@@ -600,7 +600,7 @@ export const getAgentNegotiationResponse = async (
 
 export const getPressConferenceQuestions = async (
   personality: AIPersonality,
-  narratives: PressNarrative[],
+  narratives: PressNarrative[]
 ): Promise<AIPressConferenceResponse> => {
   if (!aiInstance) {
     return getOfflineResponse('Press Conference') as AIPressConferenceResponse;
@@ -648,7 +648,7 @@ export const getPlayerScoutingReport = async (
   player: TransferPlayer,
   formation: Formation,
   tactics: TeamTactics,
-  personality: AIPersonality,
+  personality: AIPersonality
 ): Promise<AIScoutReport> => {
   if (!aiInstance) {
     throw new Error('AI is offline.');
@@ -683,7 +683,7 @@ export const generatePressNarratives = async (
   upcomingOpponent: string,
   leaguePosition: number,
   topScorer: { name: string; goals: number } | null,
-  playerInPoorForm: Player | null,
+  playerInPoorForm: Player | null
 ): Promise<PressNarrative[]> => {
   if (!aiInstance) {
     return [];
@@ -722,8 +722,8 @@ export const generatePressNarratives = async (
   const generatedNarratives = await generateJson(prompt, schema, systemInstruction);
 
   // Add unique IDs to the narratives
-  return generatedNarratives.map((narrative: unknown) => ({
-    ...narrative,
+  return generatedNarratives.map((narrative: any) => ({
+    ...(narrative as object),
     id: `narrative_${Date.now()}_${Math.random()}`,
   }));
 };
@@ -732,7 +732,7 @@ export const generateSocialMediaReactions = async (
   matchResult: MatchResult,
   homeTeam: string,
   awayTeam: string,
-  keyPlayers: Player[],
+  keyPlayers: Player[]
 ): Promise<string[]> => {
   if (!aiInstance) {
     return ['AI is offline - cannot generate social media reactions'];
@@ -761,7 +761,7 @@ export const generateSocialMediaReactions = async (
 
 export const generateInjuryReport = async (
   player: Player,
-  injuryType: 'Minor Injury' | 'Major Injury',
+  injuryType: 'Minor Injury' | 'Major Injury'
 ): Promise<{
   description: string;
   estimatedRecovery: string;
@@ -799,7 +799,7 @@ export const generateSeasonReview = async (
   totalTeams: number,
   topScorer: { name: string; goals: number },
   seasonHighlights: string[],
-  personality: AIPersonality,
+  personality: AIPersonality
 ): Promise<{
   overallAssessment: string;
   keyAchievements: string[];
@@ -841,7 +841,7 @@ export const analyzePlayerCompatibility = async (
   player1: Player,
   player2: Player,
   relationshipType: 'potential_signing' | 'formation_pairing' | 'mentorship',
-  personality: AIPersonality,
+  personality: AIPersonality
 ): Promise<{
   compatibilityScore: number;
   reasoning: string;

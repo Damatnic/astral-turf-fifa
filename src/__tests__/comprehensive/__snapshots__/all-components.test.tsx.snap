@@ -1,0 +1,890 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Route Protection Components - ZENITH Test Suite > ProtectedRoute > ProtectedRoute - ZENITH Comprehensive Test Suite > Rendering Tests > should render consistent snapshots 1`] = `
+<div
+  class="min-h-screen bg-slate-900 flex items-center justify-center"
+>
+  <div
+    class="text-white"
+  >
+    Loading...
+  </div>
+</div>
+`;
+
+exports[`Tactics Board Components - ZENITH Test Suite > ModernField > ModernField - ZENITH Comprehensive Test Suite > Rendering Tests > should render consistent snapshots 1`] = `
+<div
+  class="relative w-full h-full overflow-hidden"
+>
+  <div
+    class="relative w-full h-full cursor-pointer select-none"
+    style="border-radius: 12px; box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.3),
+             inset 0 0 50px rgba(34, 197, 94, 0.1),
+             0 20px 40px rgba(0, 0, 0, 0.2); will-change: auto; transform: translateZ(0);"
+  >
+    <div
+      class="absolute inset-0 pointer-events-none"
+    />
+    <svg
+      class="absolute inset-0 w-full h-full pointer-events-none"
+      preserveAspectRatio="none"
+      viewBox="0 0 100 100"
+    >
+      <defs>
+        <lineargradient
+          id="fieldLineGradient"
+          x1="0%"
+          x2="0%"
+          y1="0%"
+          y2="100%"
+        >
+          <stop
+            offset="0%"
+            stop-color="rgba(255,255,255,0.9)"
+          />
+          <stop
+            offset="50%"
+            stop-color="rgba(255,255,255,1)"
+          />
+          <stop
+            offset="100%"
+            stop-color="rgba(255,255,255,0.7)"
+          />
+        </lineargradient>
+        <filter
+          height="200%"
+          id="fieldLineShadow"
+          width="200%"
+          x="-50%"
+          y="-50%"
+        >
+          <fedropshadow
+            dx="0"
+            dy="1"
+            flood-color="rgba(0,0,0,0.4)"
+            stdDeviation="0.5"
+          />
+        </filter>
+        <filter
+          height="200%"
+          id="fieldLineGlow"
+          width="200%"
+          x="-50%"
+          y="-50%"
+        >
+          <fegaussianblur
+            result="coloredBlur"
+            stdDeviation="0.8"
+          />
+          <femerge>
+            <femergenode
+              in="coloredBlur"
+            />
+            <femergenode
+              in="SourceGraphic"
+            />
+          </femerge>
+        </filter>
+        <filter
+          height="300%"
+          id="centerSpotGlow"
+          width="300%"
+          x="-100%"
+          y="-100%"
+        >
+          <fegaussianblur
+            result="coloredBlur"
+            stdDeviation="1.5"
+          />
+          <femerge>
+            <femergenode
+              in="coloredBlur"
+            />
+            <femergenode
+              in="SourceGraphic"
+            />
+          </femerge>
+        </filter>
+      </defs>
+      <rect
+        fill="none"
+        filter="url(#fieldLineShadow)"
+        height="100"
+        opacity="0.9"
+        stroke="url(#fieldLineGradient)"
+        stroke-width="0.3"
+        width="100"
+        x="0"
+        y="0"
+      />
+      <circle
+        cx="50"
+        cy="50"
+        fill="none"
+        filter="url(#fieldLineShadow)"
+        opacity="0.9"
+        r="9.15"
+        stroke="url(#fieldLineGradient)"
+        stroke-width="0.25"
+      />
+      <circle
+        cx="50"
+        cy="50"
+        fill="url(#fieldLineGradient)"
+        filter="url(#centerSpotGlow)"
+        opacity="0.95"
+        r="0.6"
+      />
+      <line
+        filter="url(#fieldLineShadow)"
+        opacity="0.8"
+        stroke="url(#fieldLineGradient)"
+        stroke-width="0.2"
+        x1="50"
+        x2="50"
+        y1="0"
+        y2="100"
+      />
+      <rect
+        fill="none"
+        filter="url(#fieldLineShadow)"
+        height="57.8"
+        opacity="0.8"
+        stroke="url(#fieldLineGradient)"
+        stroke-width="0.2"
+        width="16.5"
+        x="0"
+        y="21.1"
+      />
+      <rect
+        fill="none"
+        filter="url(#fieldLineShadow)"
+        height="57.8"
+        opacity="0.8"
+        stroke="url(#fieldLineGradient)"
+        stroke-width="0.2"
+        width="16.5"
+        x="83.5"
+        y="21.1"
+      />
+      <rect
+        fill="none"
+        filter="url(#fieldLineShadow)"
+        height="26.4"
+        opacity="0.8"
+        stroke="url(#fieldLineGradient)"
+        stroke-width="0.2"
+        width="5.5"
+        x="0"
+        y="36.8"
+      />
+      <rect
+        fill="none"
+        filter="url(#fieldLineShadow)"
+        height="26.4"
+        opacity="0.8"
+        stroke="url(#fieldLineGradient)"
+        stroke-width="0.2"
+        width="5.5"
+        x="94.5"
+        y="36.8"
+      />
+      <circle
+        cx="11"
+        cy="50"
+        fill="url(#fieldLineGradient)"
+        filter="url(#fieldLineGlow)"
+        opacity="0.9"
+        r="0.4"
+      />
+      <circle
+        cx="89"
+        cy="50"
+        fill="url(#fieldLineGradient)"
+        filter="url(#fieldLineGlow)"
+        opacity="0.9"
+        r="0.4"
+      />
+      <path
+        d="M 6.85 41.9 A 9.15 9.15 0 0 1 6.85 58.1"
+        fill="none"
+        filter="url(#fieldLineShadow)"
+        opacity="0.8"
+        stroke="url(#fieldLineGradient)"
+        stroke-width="0.2"
+      />
+      <path
+        d="M 93.15 41.9 A 9.15 9.15 0 0 0 93.15 58.1"
+        fill="none"
+        filter="url(#fieldLineShadow)"
+        opacity="0.8"
+        stroke="url(#fieldLineGradient)"
+        stroke-width="0.2"
+      />
+      <path
+        d="M 0 0 A 1 1 0 0 1 1 1"
+        fill="none"
+        filter="url(#fieldLineShadow)"
+        opacity="0.7"
+        stroke="url(#fieldLineGradient)"
+        stroke-width="0.15"
+      />
+      <path
+        d="M 100 0 A 1 1 0 0 0 99 1"
+        fill="none"
+        filter="url(#fieldLineShadow)"
+        opacity="0.7"
+        stroke="url(#fieldLineGradient)"
+        stroke-width="0.15"
+      />
+      <path
+        d="M 0 100 A 1 1 0 0 0 1 99"
+        fill="none"
+        filter="url(#fieldLineShadow)"
+        opacity="0.7"
+        stroke="url(#fieldLineGradient)"
+        stroke-width="0.15"
+      />
+      <path
+        d="M 100 100 A 1 1 0 0 1 99 99"
+        fill="none"
+        filter="url(#fieldLineShadow)"
+        opacity="0.7"
+        stroke="url(#fieldLineGradient)"
+        stroke-width="0.15"
+      />
+      <rect
+        fill="none"
+        filter="url(#fieldLineShadow)"
+        height="12"
+        opacity="0.9"
+        stroke="url(#fieldLineGradient)"
+        stroke-width="0.3"
+        width="2"
+        x="-2"
+        y="44"
+      />
+      <rect
+        fill="none"
+        filter="url(#fieldLineShadow)"
+        height="12"
+        opacity="0.9"
+        stroke="url(#fieldLineGradient)"
+        stroke-width="0.3"
+        width="2"
+        x="100"
+        y="44"
+      />
+      <g
+        opacity="0.03"
+      >
+        <rect
+          fill="rgba(239, 68, 68, 0.5)"
+          height="33.33"
+          width="100"
+          x="0"
+          y="66.67"
+        />
+        <rect
+          fill="rgba(245, 158, 11, 0.5)"
+          height="33.34"
+          width="100"
+          x="0"
+          y="33.33"
+        />
+        <rect
+          fill="rgba(34, 197, 94, 0.5)"
+          height="33.33"
+          width="100"
+          x="0"
+          y="0"
+        />
+      </g>
+    </svg>
+    <div
+      class="absolute inset-0 pointer-events-none"
+      style="opacity: 0;"
+    />
+    <div
+      class="absolute inset-0 pointer-events-none"
+    />
+    <div
+      class="absolute inset-0"
+      style="will-change: auto; contain: layout style paint;"
+    />
+  </div>
+</div>
+`;
+
+exports[`Tactics Board Components - ZENITH Test Suite > QuickActionsPanel > QuickActionsPanel - ZENITH Comprehensive Test Suite > Rendering Tests > should render consistent snapshots 1`] = `
+<div
+  style="opacity: 0; transform: translateY(16px);"
+>
+  <div
+    aria-label="Quick actions toolbar"
+    class="focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 bg-slate-900/90 border border-slate-700/50 rounded-2xl p-4 shadow-2xl flex flex-col gap-3"
+    data-testid="quick-actions-panel"
+    role="toolbar"
+    tabindex="0"
+  >
+    <div
+      class="flex flex-wrap items-center gap-3 "
+    >
+      <button
+        aria-label="Save formation"
+        class="focus-visible flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-blue-400 bg-slate-800/80 text-slate-200 hover:bg-slate-700/80 hover:text-white"
+        title="Save Formation"
+        type="button"
+      >
+        <span
+          aria-hidden="true"
+          class="flex items-center"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-save w-4 h-4"
+            data-testid="save-icon"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"
+            />
+            <path
+              d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"
+            />
+            <path
+              d="M7 3v4a1 1 0 0 0 1 1h7"
+            />
+          </svg>
+        </span>
+        <span>
+          Save Formation
+        </span>
+      </button>
+      <button
+        aria-label="Export formation"
+        class="focus-visible flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-blue-400 bg-slate-800/80 text-slate-200 hover:bg-slate-700/80 hover:text-white"
+        title="Export Formation"
+        type="button"
+      >
+        <span
+          aria-hidden="true"
+          class="flex items-center"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-download w-4 h-4"
+            data-testid="download-icon"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M12 15V3"
+            />
+            <path
+              d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
+            />
+            <path
+              d="m7 10 5 5 5-5"
+            />
+          </svg>
+        </span>
+        <span>
+          Export Formation
+        </span>
+      </button>
+      <button
+        aria-label="Import formation"
+        class="focus-visible flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-blue-400 bg-slate-800/80 text-slate-200 hover:bg-slate-700/80 hover:text-white"
+        title="Import Formation"
+        type="button"
+      >
+        <span
+          aria-hidden="true"
+          class="flex items-center"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-upload w-4 h-4"
+            data-testid="upload-icon"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M12 3v12"
+            />
+            <path
+              d="m17 8-5-5-5 5"
+            />
+            <path
+              d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
+            />
+          </svg>
+        </span>
+        <span>
+          Import Formation
+        </span>
+      </button>
+      <button
+        aria-label="Share formation"
+        class="focus-visible flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-blue-400 bg-slate-800/80 text-slate-200 hover:bg-slate-700/80 hover:text-white"
+        title="Share Formation"
+        type="button"
+      >
+        <span
+          aria-hidden="true"
+          class="flex items-center"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-share2 lucide-share-2 w-4 h-4"
+            data-testid="share-icon"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle
+              cx="18"
+              cy="5"
+              r="3"
+            />
+            <circle
+              cx="6"
+              cy="12"
+              r="3"
+            />
+            <circle
+              cx="18"
+              cy="19"
+              r="3"
+            />
+            <line
+              x1="8.59"
+              x2="15.42"
+              y1="13.51"
+              y2="17.49"
+            />
+            <line
+              x1="15.41"
+              x2="8.59"
+              y1="6.51"
+              y2="10.49"
+            />
+          </svg>
+        </span>
+        <span>
+          Share Formation
+        </span>
+      </button>
+      <button
+        aria-label="Copy formation"
+        class="focus-visible flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-blue-400 bg-slate-800/80 text-slate-200 hover:bg-slate-700/80 hover:text-white"
+        title="Copy Formation"
+        type="button"
+      >
+        <span
+          aria-hidden="true"
+          class="flex items-center"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-copy w-4 h-4"
+            data-testid="copy-icon"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <rect
+              height="14"
+              rx="2"
+              ry="2"
+              width="14"
+              x="8"
+              y="8"
+            />
+            <path
+              d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"
+            />
+          </svg>
+        </span>
+        <span>
+          Copy Formation
+        </span>
+      </button>
+      <button
+        aria-label="Undo"
+        class="focus-visible flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-blue-400 bg-slate-800/40 text-slate-500 cursor-not-allowed"
+        disabled=""
+        title="Undo"
+        type="button"
+      >
+        <span
+          aria-hidden="true"
+          class="flex items-center"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-undo w-4 h-4"
+            data-testid="undo-icon"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M3 7v6h6"
+            />
+            <path
+              d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"
+            />
+          </svg>
+        </span>
+        <span>
+          Undo
+        </span>
+      </button>
+      <button
+        aria-label="Redo"
+        class="focus-visible flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-blue-400 bg-slate-800/40 text-slate-500 cursor-not-allowed"
+        disabled=""
+        title="Redo"
+        type="button"
+      >
+        <span
+          aria-hidden="true"
+          class="flex items-center"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-redo w-4 h-4"
+            data-testid="redo-icon"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M21 7v6h-6"
+            />
+            <path
+              d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"
+            />
+          </svg>
+        </span>
+        <span>
+          Redo
+        </span>
+      </button>
+      <button
+        aria-label="Reset formation"
+        class="focus-visible flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-blue-400 bg-slate-800/80 text-slate-200 hover:bg-slate-700/80 hover:text-white"
+        title="Reset Formation"
+        type="button"
+      >
+        <span
+          aria-hidden="true"
+          class="flex items-center"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-rotate-ccw w-4 h-4"
+            data-testid="reset-icon"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"
+            />
+            <path
+              d="M3 3v5h5"
+            />
+          </svg>
+        </span>
+        <span>
+          Reset Formation
+        </span>
+      </button>
+      <button
+        aria-label="Simulate match"
+        class="focus-visible flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-blue-400 bg-slate-800/80 text-slate-200 hover:bg-slate-700/80 hover:text-white"
+        title="Simulate Match"
+        type="button"
+      >
+        <span
+          aria-hidden="true"
+          class="flex items-center"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-play w-4 h-4"
+            data-testid="play-icon"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"
+            />
+          </svg>
+        </span>
+        <span>
+          Simulate Match
+        </span>
+      </button>
+      <button
+        aria-label="AI assistant"
+        aria-pressed="false"
+        class="focus-visible flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-blue-400 bg-slate-800/80 text-slate-200 hover:bg-slate-700/80 hover:text-white"
+        title="AI Assistant"
+        type="button"
+      >
+        <span
+          aria-hidden="true"
+          class="flex items-center"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-zap w-4 h-4"
+            data-testid="ai-icon"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"
+            />
+          </svg>
+        </span>
+        <span>
+          AI Assistant
+        </span>
+      </button>
+      <button
+        aria-label="Settings"
+        class="focus-visible flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-blue-400 bg-slate-800/80 text-slate-200 hover:bg-slate-700/80 hover:text-white"
+        title="Settings"
+        type="button"
+      >
+        <span
+          aria-hidden="true"
+          class="flex items-center"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-settings w-4 h-4"
+            data-testid="settings-icon"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"
+            />
+            <circle
+              cx="12"
+              cy="12"
+              r="3"
+            />
+          </svg>
+        </span>
+        <span>
+          Settings
+        </span>
+      </button>
+      <button
+        aria-label="Help"
+        class="focus-visible flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-blue-400 bg-slate-800/80 text-slate-200 hover:bg-slate-700/80 hover:text-white"
+        title="Help"
+        type="button"
+      >
+        <span
+          aria-hidden="true"
+          class="flex items-center"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-circle-question-mark w-4 h-4"
+            data-testid="help-icon"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r="10"
+            />
+            <path
+              d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"
+            />
+            <path
+              d="M12 17h.01"
+            />
+          </svg>
+        </span>
+        <span>
+          Help
+        </span>
+      </button>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`UI Components - ZENITH Test Suite > Button Component > Button - ZENITH Comprehensive Test Suite > Rendering Tests > should render consistent snapshots 1`] = `
+<button
+  class="relative inline-flex items-center justify-center font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:ring-offset-2 focus:ring-offset-secondary-900 rounded-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 bg-primary-500 hover:bg-primary-600 text-white shadow-sm hover:shadow-md border border-primary-500 px-4 py-2 text-sm"
+>
+  <div
+    class="flex items-center justify-center gap-2"
+  >
+    <span>
+      Test Button
+    </span>
+  </div>
+</button>
+`;
+
+exports[`UI Components - ZENITH Test Suite > Card Component > Card - ZENITH Comprehensive Test Suite > Rendering Tests > should render consistent snapshots 1`] = `
+<div
+  class="bg-secondary-800/50 backdrop-blur-sm border border-secondary-700/50 shadow-soft p-4 rounded-xl"
+>
+  Card content
+</div>
+`;
+
+exports[`UI Components - ZENITH Test Suite > Dialog Component > Dialog - ZENITH Comprehensive Test Suite > Rendering Tests > should render consistent snapshots 1`] = `Dialog content`;
+
+exports[`UI Components - ZENITH Test Suite > Input Component > Input - ZENITH Comprehensive Test Suite > Rendering Tests > should render consistent snapshots 1`] = `
+<div
+  class="space-y-1"
+>
+  <div
+    class="relative"
+  >
+    <input
+      class="w-full rounded-lg backdrop-blur-sm transition-all duration-200 text-white placeholder-secondary-400 focus:outline-none focus:ring-2 focus:ring-primary-500/50 disabled:opacity-50 disabled:cursor-not-allowed bg-secondary-800/50 border border-secondary-700/50 focus:border-primary-500 focus:bg-secondary-800/70 px-4 py-2.5 text-sm"
+      id="input-nt12op4qs"
+      placeholder="Enter text"
+    />
+  </div>
+</div>
+`;
+
+exports[`UI Components - ZENITH Test Suite > Progress Component > Progress - ZENITH Comprehensive Test Suite > Rendering Tests > should render consistent snapshots 1`] = `
+<div
+  class="w-full"
+>
+  <div
+    aria-valuemax="100"
+    aria-valuemin="0"
+    aria-valuenow="50"
+    class="w-full bg-secondary-700/50 rounded-full overflow-hidden h-2"
+    role="progressbar"
+  >
+    <div
+      class="h-full transition-all duration-300 ease-out rounded-full bg-primary-600"
+      style="width: 50%; transform: none;"
+    />
+  </div>
+</div>
+`;
+
+exports[`UI Components - ZENITH Test Suite > Switch Component > Switch - ZENITH Comprehensive Test Suite > Rendering Tests > should render consistent snapshots 1`] = `
+<div
+  class="relative inline-flex items-center"
+>
+  <input
+    class="sr-only peer"
+    id="switch-sb9vsp303"
+    type="checkbox"
+  />
+  <label
+    class="relative inline-flex cursor-pointer items-center"
+    for="switch-sb9vsp303"
+  >
+    <div
+      class="relative rounded-full transition-colors duration-200 peer-focus:ring-4 peer-focus:ring-offset-2 peer-focus:ring-offset-secondary-900 w-11 h-6 bg-secondary-700 peer-checked:bg-primary-600 peer-focus:ring-primary-600/25"
+    >
+      <div
+        class="absolute left-0.5 top-0.5 rounded-full shadow-md transition-transform duration-200 peer-checked:translate-x-full rtl:peer-checked:-translate-x-full w-5 h-5 bg-white"
+      />
+    </div>
+  </label>
+</div>
+`;

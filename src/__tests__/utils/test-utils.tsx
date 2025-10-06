@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { vi } from 'vitest';
 import type { User, Player, Formation, AuthState, TacticsState, UIState } from '../../types';
 import { AppProvider } from '../../context/AppProvider';
+import { ThemeProvider } from '../../context/ThemeContext';
 import {
   createMockUser,
   createMockPlayer,
@@ -23,6 +24,7 @@ export const createMockAuthState = (overrides: Partial<AuthState> = {}): AuthSta
   user: null,
   error: null,
   isAuthenticated: false,
+  isLoading: false,
   familyAssociations: [],
   ...overrides,
 });
@@ -47,7 +49,6 @@ export const createMockTacticsState = (overrides: Partial<TacticsState> = {}): T
     },
   },
   drawings: [],
-  selectedPlayers: [],
   tacticalFamiliarity: { '4-4-2': 50 },
   chemistry: {},
   captainIds: { home: null, away: null },
@@ -57,17 +58,70 @@ export const createMockTacticsState = (overrides: Partial<TacticsState> = {}): T
 
 export const createMockUIState = (overrides: Partial<UIState> = {}): UIState => ({
   theme: 'dark',
+  saveSlots: {},
+  activeSaveSlotId: null,
   activeModal: null,
-  sidebarExpanded: true,
+  teamKits: { home: {} as any, away: {} as any },
   notifications: [],
+  activeTeamContext: 'home',
+  editingPlayerId: null,
+  playerToCompareId: null,
+  slotActionMenuData: null,
   isExportingLineup: false,
   isPresentationMode: false,
   drawingTool: 'select',
+  drawingColor: '#000000',
+  isGridVisible: true,
+  isFormationStrengthVisible: false,
+  positioningMode: 'snap',
+  activePlaybookItemId: null,
+  activeStepIndex: null,
+  isAnimating: false,
+  isPaused: false,
+  playerInitialPositions: null,
+  animationTrails: null,
+  setPieceEditor: { isEditing: false, activeTool: null, selectedPlayerId: null },
+  rosterSearchQuery: '',
+  rosterRoleFilters: [],
+  advancedRosterFilters: {} as any,
+  transferMarketFilters: {} as any,
+  playbookCategories: {},
+  settings: {} as any,
+  isLoadingAI: false,
+  aiInsight: null,
+  isComparingAI: false,
+  aiComparisonResult: null,
+  isSuggestingFormation: false,
+  aiSuggestedFormation: null,
+  chatHistory: [],
+  isChatProcessing: false,
+  highlightedByAIPlayerIds: [],
+  isLoadingOppositionReport: false,
+  oppositionReport: null,
+  isSimulatingMatch: false,
+  simulationTimeline: [],
+  isLoadingPostMatchReport: false,
+  postMatchReport: null,
+  isLoadingPressConference: false,
+  pressConferenceData: null,
+  isLoadingNegotiation: false,
+  isLoadingAISubSuggestion: false,
+  aiSubSuggestionData: null,
+  isScoutingPlayer: false,
+  scoutedPlayerId: null,
+  scoutReport: null,
+  isLoadingConversation: false,
+  selectedPlayerId: null,
+  isLoadingDevelopmentSummary: false,
+  developmentSummary: null,
+  isLoadingTeamTalk: false,
+  teamTalkData: null,
   tutorial: {
     isActive: false,
-    currentStep: 0,
-    completedSteps: [],
+    step: 0,
   },
+  playerConversationData: null,
+  pendingPromiseRequest: null,
   ...overrides,
 });
 
@@ -86,7 +140,11 @@ export const renderWithProviders = (ui: React.ReactElement, options: CustomRende
 
   // Create wrapper component with providers
   const Wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const content = <AppProvider>{children}</AppProvider>;
+    const content = (
+      <ThemeProvider>
+        <AppProvider>{children}</AppProvider>
+      </ThemeProvider>
+    );
 
     if (withRouter) {
       return <BrowserRouter>{content}</BrowserRouter>;

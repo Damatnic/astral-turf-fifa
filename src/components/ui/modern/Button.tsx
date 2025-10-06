@@ -71,7 +71,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       as: Component = 'button',
       ...props
     },
-    ref,
+    ref
   ) => {
     const isDisabled = disabled || isLoading;
 
@@ -96,7 +96,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           // Loading state
           isLoading && 'cursor-wait',
 
-          className,
+          className
         )}
         disabled={isDisabled}
         ref={ref}
@@ -117,7 +117,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         </div>
       </Component>
     );
-  },
+  }
 );
 
 Button.displayName = 'Button';
@@ -148,7 +148,7 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
         {icon}
       </Button>
     );
-  },
+  }
 );
 
 IconButton.displayName = 'IconButton';
@@ -174,7 +174,7 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({
         orientation === 'horizontal'
           ? '[&>button:first-child]:rounded-r-none [&>button:last-child]:rounded-l-none [&>button:not(:first-child):not(:last-child)]:rounded-none'
           : '[&>button:first-child]:rounded-b-none [&>button:last-child]:rounded-t-none [&>button:not(:first-child):not(:last-child)]:rounded-none',
-        className,
+        className
       )}
     >
       {children}

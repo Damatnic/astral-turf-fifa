@@ -5,7 +5,11 @@
 
 import React, { useRef, useCallback, useState, useEffect, memo } from 'react';
 import { motion, useMotionValue, useTransform, PanInfo } from 'framer-motion';
-import { useMobileCapabilities, useTouchGestures, useMobileViewport } from '../../utils/mobileOptimizations';
+import {
+  useMobileCapabilities,
+  useTouchGestures,
+  useMobileViewport,
+} from '../../utils/mobileOptimizations';
 import MobilePlayerToken from './MobilePlayerToken';
 import { Player, Formation } from '../../types';
 
@@ -40,16 +44,16 @@ const MobileTacticalField: React.FC<MobileTacticalFieldProps> = ({
   const viewport = useMobileViewport();
 
   // Field state
-  const [fieldBounds, setFieldBounds] = useState<DOMRect>({ 
-    width: 800, 
-    height: 520, 
-    x: 0, 
-    y: 0, 
-    top: 0, 
-    left: 0, 
-    bottom: 520, 
+  const [fieldBounds, setFieldBounds] = useState<DOMRect>({
+    width: 800,
+    height: 520,
+    x: 0,
+    y: 0,
+    top: 0,
+    left: 0,
+    bottom: 520,
     right: 800,
-    toJSON: () => ({})
+    toJSON: () => ({}),
   });
   const [isDragging, setIsDragging] = useState(false);
   const [draggedPlayerId, setDraggedPlayerId] = useState<string | null>(null);
@@ -70,21 +74,21 @@ const MobileTacticalField: React.FC<MobileTacticalFieldProps> = ({
     const aspectRatio = 800 / 520; // Standard football field ratio
     const containerWidth = viewport.width - (capabilities.isMobile ? 20 : 40);
     const containerHeight = viewport.height - (capabilities.isMobile ? 120 : 160);
-    
+
     let width = containerWidth;
     let height = width / aspectRatio;
-    
+
     if (height > containerHeight) {
       height = containerHeight;
       width = height * aspectRatio;
     }
-    
+
     // Minimum field size for mobile usability
     if (capabilities.isMobile) {
       width = Math.max(width, 320);
       height = Math.max(height, 208);
     }
-    
+
     return { width, height };
   }, [viewport, capabilities.isMobile]);
 
@@ -109,55 +113,66 @@ const MobileTacticalField: React.FC<MobileTacticalFieldProps> = ({
 
   // Advanced touch gestures for field
   useTouchGestures(containerRef, {
-    onPinch: useCallback((event: TouchEvent, scale: number) => {
-      const currentScale = fieldScale.get();
-      const newScale = Math.max(0.5, Math.min(3, currentScale * scale));
-      fieldScale.set(newScale);
-      
-      // Haptic feedback for zoom
-      if (capabilities.hasHapticFeedback && Math.abs(scale - 1) > 0.1) {
-        navigator.vibrate(5);
-      }
-    }, [fieldScale, capabilities.hasHapticFeedback]),
+    onPinch: useCallback(
+      (event: TouchEvent, scale: number) => {
+        const currentScale = fieldScale.get();
+        const newScale = Math.max(0.5, Math.min(3, currentScale * scale));
+        fieldScale.set(newScale);
 
-    onSwipe: useCallback((event: TouchEvent, direction: string, velocity: number) => {
-      // Quick navigation gestures
-      const moveDistance = 100 * velocity;
-      const currentX = fieldX.get();
-      const currentY = fieldY.get();
-      
-      switch (direction) {
-        case 'left':
-          fieldX.set(currentX - moveDistance);
-          break;
-        case 'right':
-          fieldX.set(currentX + moveDistance);
-          break;
-        case 'up':
-          fieldY.set(currentY - moveDistance);
-          break;
-        case 'down':
-          fieldY.set(currentY + moveDistance);
-          break;
-      }
-      
-      // Haptic feedback for swipe
-      if (capabilities.hasHapticFeedback) {
-        navigator.vibrate(10);
-      }
-    }, [fieldX, fieldY, capabilities.hasHapticFeedback]),
+        // Haptic feedback for zoom
+        if (capabilities.hasHapticFeedback && Math.abs(scale - 1) > 0.1) {
+          navigator.vibrate(5);
+        }
+      },
+      [fieldScale, capabilities.hasHapticFeedback]
+    ),
+
+    onSwipe: useCallback(
+      (event: TouchEvent, direction: string, velocity: number) => {
+        // Quick navigation gestures
+        const moveDistance = 100 * velocity;
+        const currentX = fieldX.get();
+        const currentY = fieldY.get();
+
+        switch (direction) {
+          case 'left':
+            fieldX.set(currentX - moveDistance);
+            break;
+          case 'right':
+            fieldX.set(currentX + moveDistance);
+            break;
+          case 'up':
+            fieldY.set(currentY - moveDistance);
+            break;
+          case 'down':
+            fieldY.set(currentY + moveDistance);
+            break;
+        }
+
+        // Haptic feedback for swipe
+        if (capabilities.hasHapticFeedback) {
+          navigator.vibrate(10);
+        }
+      },
+      [fieldX, fieldY, capabilities.hasHapticFeedback]
+    ),
   });
 
   // Handle field pan
-  const handleFieldPan = useCallback((event: any, info: PanInfo) => {
-    if (isDragging) return; // Don't pan while dragging players
-    
-    const currentX = fieldX.get();
-    const currentY = fieldY.get();
-    
-    fieldX.set(currentX + info.delta.x);
-    fieldY.set(currentY + info.delta.y);
-  }, [fieldX, fieldY, isDragging]);
+  const handleFieldPan = useCallback(
+    (event: any, info: PanInfo) => {
+      if (isDragging) {
+        return;
+      } // Don't pan while dragging players
+
+      const currentX = fieldX.get();
+      const currentY = fieldY.get();
+
+      fieldX.set(currentX + info.delta.x);
+      fieldY.set(currentY + info.delta.y);
+    },
+    [fieldX, fieldY, isDragging]
+  );
 
   // Player interaction handlers
   const handlePlayerDragStart = useCallback((playerId: string) => {
@@ -175,11 +190,13 @@ const MobileTacticalField: React.FC<MobileTacticalFieldProps> = ({
 
   // Grid lines for positioning assistance
   const renderGrid = () => {
-    if (!showGrid) return null;
-    
-    const gridLines = [];
+    if (!showGrid) {
+      return null;
+    }
+
+    const gridLines: JSX.Element[] = [];
     const gridSize = 20;
-    
+
     // Vertical lines
     for (let x = 0; x <= fieldWidth; x += gridSize) {
       gridLines.push(
@@ -194,7 +211,7 @@ const MobileTacticalField: React.FC<MobileTacticalFieldProps> = ({
         />
       );
     }
-    
+
     // Horizontal lines
     for (let y = 0; y <= fieldHeight; y += gridSize) {
       gridLines.push(
@@ -209,13 +226,9 @@ const MobileTacticalField: React.FC<MobileTacticalFieldProps> = ({
         />
       );
     }
-    
+
     return (
-      <svg
-        className="absolute inset-0 pointer-events-none"
-        width={fieldWidth}
-        height={fieldHeight}
-      >
+      <svg className="absolute inset-0 pointer-events-none" width={fieldWidth} height={fieldHeight}>
         {gridLines}
       </svg>
     );
@@ -223,17 +236,15 @@ const MobileTacticalField: React.FC<MobileTacticalFieldProps> = ({
 
   // Field zones for tactical visualization
   const renderZones = () => {
-    if (!showZones) return null;
-    
+    if (!showZones) {
+      return null;
+    }
+
     const zoneWidth = fieldWidth / 3;
     const zoneHeight = fieldHeight / 3;
-    
+
     return (
-      <svg
-        className="absolute inset-0 pointer-events-none"
-        width={fieldWidth}
-        height={fieldHeight}
-      >
+      <svg className="absolute inset-0 pointer-events-none" width={fieldWidth} height={fieldHeight}>
         {/* Defense zone */}
         <rect
           x={0}
@@ -245,7 +256,7 @@ const MobileTacticalField: React.FC<MobileTacticalFieldProps> = ({
           strokeWidth="2"
           strokeDasharray="10,5"
         />
-        
+
         {/* Midfield zone */}
         <rect
           x={zoneWidth}
@@ -257,7 +268,7 @@ const MobileTacticalField: React.FC<MobileTacticalFieldProps> = ({
           strokeWidth="2"
           strokeDasharray="10,5"
         />
-        
+
         {/* Attack zone */}
         <rect
           x={zoneWidth * 2}
@@ -311,15 +322,13 @@ const MobileTacticalField: React.FC<MobileTacticalFieldProps> = ({
             transform: fieldTransform,
           }}
           animate={{
-            boxShadow: isDragging 
-              ? '0 20px 40px rgba(0,0,0,0.3)' 
-              : '0 10px 20px rgba(0,0,0,0.2)',
+            boxShadow: isDragging ? '0 20px 40px rgba(0,0,0,0.3)' : '0 10px 20px rgba(0,0,0,0.2)',
           }}
         >
           {/* Field markings */}
           <div className="absolute inset-0">
             {/* Center circle */}
-            <div 
+            <div
               className="absolute border-2 border-white rounded-full"
               style={{
                 width: fieldWidth * 0.15,
@@ -329,18 +338,18 @@ const MobileTacticalField: React.FC<MobileTacticalFieldProps> = ({
                 transform: 'translate(-50%, -50%)',
               }}
             />
-            
+
             {/* Center line */}
-            <div 
+            <div
               className="absolute border-l-2 border-white"
               style={{
                 left: '50%',
                 height: '100%',
               }}
             />
-            
+
             {/* Penalty areas */}
-            <div 
+            <div
               className="absolute border-2 border-white"
               style={{
                 width: fieldWidth * 0.22,
@@ -350,8 +359,8 @@ const MobileTacticalField: React.FC<MobileTacticalFieldProps> = ({
                 transform: 'translateY(-50%)',
               }}
             />
-            
-            <div 
+
+            <div
               className="absolute border-2 border-white"
               style={{
                 width: fieldWidth * 0.22,
@@ -361,9 +370,9 @@ const MobileTacticalField: React.FC<MobileTacticalFieldProps> = ({
                 transform: 'translateY(-50%)',
               }}
             />
-            
+
             {/* Goal areas */}
-            <div 
+            <div
               className="absolute border-2 border-white"
               style={{
                 width: fieldWidth * 0.1,
@@ -373,8 +382,8 @@ const MobileTacticalField: React.FC<MobileTacticalFieldProps> = ({
                 transform: 'translateY(-50%)',
               }}
             />
-            
-            <div 
+
+            <div
               className="absolute border-2 border-white"
               style={{
                 width: fieldWidth * 0.1,
@@ -393,9 +402,13 @@ const MobileTacticalField: React.FC<MobileTacticalFieldProps> = ({
           {renderZones()}
 
           {/* Players */}
-          {players.map((player) => {
-            const playerPosition = formation?.playerPositions?.[player.id] || { x: 100, y: 100 };
-            
+          {players.map(player => {
+            const extendedFormation = formation as any;
+            const playerPosition = extendedFormation?.playerPositions?.[player.id] || {
+              x: 100,
+              y: 100,
+            };
+
             return (
               <MobilePlayerToken
                 key={player.id}
@@ -441,27 +454,42 @@ const MobileTacticalField: React.FC<MobileTacticalFieldProps> = ({
             }}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+              />
             </svg>
           </motion.button>
-          
+
           <motion.button
             className="bg-black/50 text-white p-2 rounded-full"
             whileTap={{ scale: 0.9 }}
             onClick={() => fieldScale.set(Math.min(3, fieldScale.get() * 1.2))}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"
+              />
             </svg>
           </motion.button>
-          
+
           <motion.button
             className="bg-black/50 text-white p-2 rounded-full"
             whileTap={{ scale: 0.9 }}
             onClick={() => fieldScale.set(Math.max(0.5, fieldScale.get() * 0.8))}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"
+              />
             </svg>
           </motion.button>
         </div>

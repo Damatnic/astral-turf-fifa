@@ -19,7 +19,7 @@ interface ZenithTestConfig {
   maxWorkers: number;
   timeout: number;
   retries: number;
-  
+
   // Coverage requirements
   coverage: {
     statements: number;
@@ -27,7 +27,7 @@ interface ZenithTestConfig {
     functions: number;
     lines: number;
   };
-  
+
   // Test categories to run
   categories: {
     unit: boolean;
@@ -37,7 +37,7 @@ interface ZenithTestConfig {
     accessibility: boolean;
     visual: boolean;
   };
-  
+
   // Reporting configuration
   reporting: {
     formats: Array<'console' | 'html' | 'json' | 'junit' | 'lcov'>;
@@ -45,14 +45,14 @@ interface ZenithTestConfig {
     includeScreenshots: boolean;
     includeVideos: boolean;
   };
-  
+
   // Performance thresholds
   performance: {
     renderTime: number;
     memoryUsage: number;
     bundleSize: number;
   };
-  
+
   // Quality gates
   qualityGates: {
     mustPass: boolean;
@@ -70,14 +70,14 @@ const DEFAULT_ZENITH_CONFIG: ZenithTestConfig = {
   maxWorkers: 4,
   timeout: 30000,
   retries: 2,
-  
+
   coverage: {
     statements: 100,
     branches: 100,
     functions: 100,
     lines: 100,
   },
-  
+
   categories: {
     unit: true,
     integration: true,
@@ -86,20 +86,20 @@ const DEFAULT_ZENITH_CONFIG: ZenithTestConfig = {
     accessibility: true,
     visual: true,
   },
-  
+
   reporting: {
     formats: ['console', 'html', 'json', 'junit', 'lcov'],
     outputDir: './test-results',
     includeScreenshots: true,
     includeVideos: true,
   },
-  
+
   performance: {
-    renderTime: 50,    // 50ms max render time
-    memoryUsage: 100,  // 100MB max memory usage
-    bundleSize: 2048,  // 2MB max bundle size
+    renderTime: 50, // 50ms max render time
+    memoryUsage: 100, // 100MB max memory usage
+    bundleSize: 2048, // 2MB max bundle size
   },
-  
+
   qualityGates: {
     mustPass: true,
     failOnCoverageThreshold: true,
@@ -119,25 +119,25 @@ interface ZenithTestResults {
     skipped: number;
     duration: number;
   };
-  
+
   coverage: {
     statements: { pct: number; covered: number; total: number };
     branches: { pct: number; covered: number; total: number };
     functions: { pct: number; covered: number; total: number };
     lines: { pct: number; covered: number; total: number };
   };
-  
+
   performance: {
     avgRenderTime: number;
     maxMemoryUsage: number;
     bundleSize: number;
   };
-  
+
   accessibility: {
     violations: number;
     level: 'A' | 'AA' | 'AAA';
   };
-  
+
   categories: {
     [key: string]: {
       passed: number;
@@ -145,7 +145,7 @@ interface ZenithTestResults {
       duration: number;
     };
   };
-  
+
   files: Array<{
     name: string;
     status: 'passed' | 'failed' | 'skipped';
@@ -212,7 +212,6 @@ class ZenithTestRunner {
 
       console.log('✅ ZENITH Test Suite completed successfully!\n');
       return this.results;
-
     } catch (error) {
       console.error('❌ ZENITH Test Suite failed:', error);
       throw error;
@@ -250,7 +249,6 @@ class ZenithTestRunner {
 
       const duration = Date.now() - startTime;
       console.log(`✅ ${category} tests completed in ${duration}ms\n`);
-
     } catch (error) {
       console.error(`❌ ${category} tests failed:`, error);
       throw error;
@@ -308,7 +306,7 @@ class ZenithTestRunner {
     try {
       const { stdout, stderr } = await execAsync(command);
       console.log(stdout);
-      
+
       if (stderr) {
         console.warn('Unit test warnings:', stderr);
       }
@@ -316,7 +314,7 @@ class ZenithTestRunner {
       // Parse results
       const resultFile = path.join(this.config.reporting.outputDir, 'unit-results.json');
       const results = JSON.parse(await fs.readFile(resultFile, 'utf-8'));
-      
+
       this.results.categories.unit = {
         passed: results.numPassedTests,
         failed: results.numFailedTests,
@@ -326,7 +324,6 @@ class ZenithTestRunner {
       this.results.summary.passed += results.numPassedTests;
       this.results.summary.failed += results.numFailedTests;
       this.results.summary.total += results.numTotalTests;
-
     } catch (error) {
       console.error('Unit tests failed:', error);
       throw error;
@@ -350,7 +347,7 @@ class ZenithTestRunner {
     try {
       const { stdout, stderr } = await execAsync(command);
       console.log(stdout);
-      
+
       if (stderr) {
         console.warn('Integration test warnings:', stderr);
       }
@@ -361,7 +358,6 @@ class ZenithTestRunner {
         failed: 0,
         duration: 30000,
       };
-
     } catch (error) {
       console.error('Integration tests failed:', error);
       throw error;
@@ -385,7 +381,7 @@ class ZenithTestRunner {
     try {
       const { stdout, stderr } = await execAsync(command);
       console.log(stdout);
-      
+
       if (stderr) {
         console.warn('E2E test warnings:', stderr);
       }
@@ -396,7 +392,6 @@ class ZenithTestRunner {
         failed: 0,
         duration: 120000,
       };
-
     } catch (error) {
       console.error('E2E tests failed:', error);
       throw error;
@@ -409,11 +404,7 @@ class ZenithTestRunner {
   private async runPerformanceTests(): Promise<void> {
     console.log('⚡ Running performance tests...');
 
-    const command = [
-      'vitest run',
-      '--reporter=verbose',
-      'src/__tests__/performance',
-    ].join(' ');
+    const command = ['vitest run', '--reporter=verbose', 'src/__tests__/performance'].join(' ');
 
     try {
       const { stdout, stderr } = await execAsync(command);
@@ -431,7 +422,6 @@ class ZenithTestRunner {
         failed: 0,
         duration: 15000,
       };
-
     } catch (error) {
       console.error('Performance tests failed:', error);
       throw error;
@@ -444,11 +434,7 @@ class ZenithTestRunner {
   private async runAccessibilityTests(): Promise<void> {
     console.log('♿ Running accessibility tests...');
 
-    const command = [
-      'vitest run',
-      '--reporter=verbose',
-      'src/__tests__/accessibility',
-    ].join(' ');
+    const command = ['vitest run', '--reporter=verbose', 'src/__tests__/accessibility'].join(' ');
 
     try {
       const { stdout, stderr } = await execAsync(command);
@@ -465,7 +451,6 @@ class ZenithTestRunner {
         failed: 0,
         duration: 8000,
       };
-
     } catch (error) {
       console.error('Accessibility tests failed:', error);
       throw error;
@@ -478,11 +463,7 @@ class ZenithTestRunner {
   private async runVisualTests(): Promise<void> {
     console.log('👁️ Running visual regression tests...');
 
-    const command = [
-      'vitest run',
-      '--reporter=verbose',
-      'src/__tests__/visual',
-    ].join(' ');
+    const command = ['vitest run', '--reporter=verbose', 'src/__tests__/visual'].join(' ');
 
     try {
       const { stdout, stderr } = await execAsync(command);
@@ -493,7 +474,6 @@ class ZenithTestRunner {
         failed: 0,
         duration: 12000,
       };
-
     } catch (error) {
       console.error('Visual tests failed:', error);
       throw error;
@@ -538,17 +518,23 @@ class ZenithTestRunner {
     // Check coverage thresholds
     if (this.config.qualityGates.failOnCoverageThreshold) {
       if (this.results.coverage.statements.pct < this.config.coverage.statements) {
-        failures.push(`Statement coverage ${this.results.coverage.statements.pct}% < ${this.config.coverage.statements}%`);
+        failures.push(
+          `Statement coverage ${this.results.coverage.statements.pct}% < ${this.config.coverage.statements}%`
+        );
       }
       if (this.results.coverage.branches.pct < this.config.coverage.branches) {
-        failures.push(`Branch coverage ${this.results.coverage.branches.pct}% < ${this.config.coverage.branches}%`);
+        failures.push(
+          `Branch coverage ${this.results.coverage.branches.pct}% < ${this.config.coverage.branches}%`
+        );
       }
     }
 
     // Check performance thresholds
     if (this.config.qualityGates.failOnPerformanceThreshold) {
       if (this.results.performance.avgRenderTime > this.config.performance.renderTime) {
-        failures.push(`Render time ${this.results.performance.avgRenderTime}ms > ${this.config.performance.renderTime}ms`);
+        failures.push(
+          `Render time ${this.results.performance.avgRenderTime}ms > ${this.config.performance.renderTime}ms`
+        );
       }
     }
 
@@ -671,14 +657,18 @@ class ZenithTestRunner {
     <div class="section">
         <h2>📊 Test Categories</h2>
         <div class="category-grid">
-            ${Object.entries(this.results.categories).map(([name, stats]) => `
+            ${Object.entries(this.results.categories)
+              .map(
+                ([name, stats]) => `
                 <div class="category">
                     <h4>${name.charAt(0).toUpperCase() + name.slice(1)} Tests</h4>
                     <div>Passed: <span class="success">${stats.passed}</span></div>
                     <div>Failed: <span class="${stats.failed > 0 ? 'error' : 'success'}">${stats.failed}</span></div>
                     <div>Duration: ${(stats.duration / 1000).toFixed(2)}s</div>
                 </div>
-            `).join('')}
+            `
+              )
+              .join('')}
         </div>
     </div>
 
@@ -753,10 +743,16 @@ class ZenithTestRunner {
     console.log('\n' + '='.repeat(80));
     console.log('🏆 ZENITH TEST SUITE SUMMARY');
     console.log('='.repeat(80));
-    console.log(`📊 Tests: ${this.results.summary.total} total, ${this.results.summary.passed} passed, ${this.results.summary.failed} failed`);
-    console.log(`📈 Coverage: ${this.results.coverage.statements.pct}% statements, ${this.results.coverage.branches.pct}% branches`);
+    console.log(
+      `📊 Tests: ${this.results.summary.total} total, ${this.results.summary.passed} passed, ${this.results.summary.failed} failed`
+    );
+    console.log(
+      `📈 Coverage: ${this.results.coverage.statements.pct}% statements, ${this.results.coverage.branches.pct}% branches`
+    );
     console.log(`⚡ Performance: ${this.results.performance.avgRenderTime}ms avg render time`);
-    console.log(`♿ Accessibility: ${this.results.accessibility.level} compliance, ${this.results.accessibility.violations} violations`);
+    console.log(
+      `♿ Accessibility: ${this.results.accessibility.level} compliance, ${this.results.accessibility.violations} violations`
+    );
     console.log(`⏱️ Duration: ${(this.results.summary.duration / 1000).toFixed(2)}s`);
     console.log('='.repeat(80) + '\n');
   }
@@ -765,5 +761,6 @@ class ZenithTestRunner {
 /**
  * Export the ZENITH Test Runner
  */
-export { ZenithTestRunner, ZenithTestConfig, ZenithTestResults };
+export { ZenithTestRunner };
+export type { ZenithTestConfig, ZenithTestResults };
 export default ZenithTestRunner;

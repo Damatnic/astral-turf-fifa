@@ -79,7 +79,7 @@ const HeatMapAnalytics: React.FC<HeatMapAnalyticsProps> = ({
           // Check if player operates in this zone based on their position and role
           const playerX = player.position?.x || 50;
           const playerY = player.position?.y || 50;
-          
+
           // Calculate distance from zone center
           const zoneCenter = { x: x + width / 2, y: y + height / 2 };
           const distance = Math.sqrt(
@@ -87,14 +87,15 @@ const HeatMapAnalytics: React.FC<HeatMapAnalyticsProps> = ({
           );
 
           // Players have influence based on their role and proximity
-          if (distance < 25) { // Within 25% of field
-            const influence = Math.max(0, 1 - (distance / 25));
+          if (distance < 25) {
+            // Within 25% of field
+            const influence = Math.max(0, 1 - distance / 25);
             const roleMultiplier = getRoleZoneMultiplier(player.roleId, zoneCenter);
             const playerInfluence = influence * roleMultiplier;
 
             if (playerInfluence > 0.1) {
               zoneIntensity += playerInfluence;
-              
+
               // Generate synthetic activity data
               const touches = Math.floor(playerInfluence * 50 + Math.random() * 20);
               const timeSpent = Math.floor(playerInfluence * 300 + Math.random() * 100);
@@ -142,7 +143,7 @@ const HeatMapAnalytics: React.FC<HeatMapAnalyticsProps> = ({
 
           const zoneCenter = { x: x + width / 2, y: y + height / 2 };
           const playerPos = player.position || { x: 50, y: 50 };
-          
+
           // Calculate heat based on player's natural position and movement patterns
           const distance = Math.sqrt(
             Math.pow(playerPos.x - zoneCenter.x, 2) + Math.pow(playerPos.y - zoneCenter.y, 2)
@@ -158,12 +159,14 @@ const HeatMapAnalytics: React.FC<HeatMapAnalyticsProps> = ({
               width,
               height,
               intensity,
-              playerActivity: [{
-                playerId: player.id,
-                touches: Math.floor(intensity * 30),
-                timeSpent: Math.floor(intensity * 200),
-                events: generatePlayerEvents(player.roleId, intensity),
-              }],
+              playerActivity: [
+                {
+                  playerId: player.id,
+                  touches: Math.floor(intensity * 30),
+                  timeSpent: Math.floor(intensity * 200),
+                  events: generatePlayerEvents(player.roleId, intensity),
+                },
+              ],
             });
           }
         }
@@ -175,24 +178,27 @@ const HeatMapAnalytics: React.FC<HeatMapAnalyticsProps> = ({
     return maps;
   }, [players, heatMapFilter, timeRange]);
 
-  const getHeatMapColor = useCallback((intensity: number) => {
-    const alpha = Math.max(0.1, Math.min(0.8, intensity * intensity));
-    
-    if (heatMapFilter === 'attacking') {
-      return `rgba(239, 68, 68, ${alpha})`; // Red for attacking
-    } else if (heatMapFilter === 'defending') {
-      return `rgba(59, 130, 246, ${alpha})`; // Blue for defending
-    } else if (heatMapFilter === 'movement') {
-      return `rgba(34, 197, 94, ${alpha})`; // Green for movement
-    } else if (heatMapFilter === 'possession') {
-      return `rgba(168, 85, 247, ${alpha})`; // Purple for possession
-    }
-    
-    // Default gradient from blue to red
-    const red = Math.floor(255 * intensity);
-    const blue = Math.floor(255 * (1 - intensity));
-    return `rgba(${red}, 50, ${blue}, ${alpha})`;
-  }, [heatMapFilter]);
+  const getHeatMapColor = useCallback(
+    (intensity: number) => {
+      const alpha = Math.max(0.1, Math.min(0.8, intensity * intensity));
+
+      if (heatMapFilter === 'attacking') {
+        return `rgba(239, 68, 68, ${alpha})`; // Red for attacking
+      } else if (heatMapFilter === 'defending') {
+        return `rgba(59, 130, 246, ${alpha})`; // Blue for defending
+      } else if (heatMapFilter === 'movement') {
+        return `rgba(34, 197, 94, ${alpha})`; // Green for movement
+      } else if (heatMapFilter === 'possession') {
+        return `rgba(168, 85, 247, ${alpha})`; // Purple for possession
+      }
+
+      // Default gradient from blue to red
+      const red = Math.floor(255 * intensity);
+      const blue = Math.floor(255 * (1 - intensity));
+      return `rgba(${red}, 50, ${blue}, ${alpha})`;
+    },
+    [heatMapFilter]
+  );
 
   const getZonesToRender = useCallback(() => {
     if (viewMode === 'individual' && selectedPlayerId) {
@@ -203,7 +209,9 @@ const HeatMapAnalytics: React.FC<HeatMapAnalyticsProps> = ({
     return heatMapZones;
   }, [viewMode, selectedPlayerId, playerHeatMaps, heatMapZones]);
 
-  if (!isVisible) return null;
+  if (!isVisible) {
+    return null;
+  }
 
   return (
     <div className={`absolute inset-0 pointer-events-none ${className}`}>
@@ -238,9 +246,7 @@ const HeatMapAnalytics: React.FC<HeatMapAnalyticsProps> = ({
               <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 hover:opacity-100 transition-opacity pointer-events-auto z-10">
                 <div>Activity: {Math.floor(zone.intensity * 100)}%</div>
                 <div>Players: {zone.playerActivity.length}</div>
-                <div>
-                  Touches: {zone.playerActivity.reduce((sum, p) => sum + p.touches, 0)}
-                </div>
+                <div>Touches: {zone.playerActivity.reduce((sum, p) => sum + p.touches, 0)}</div>
               </div>
             )}
           </motion.div>
@@ -283,9 +289,10 @@ const HeatMapAnalytics: React.FC<HeatMapAnalyticsProps> = ({
                     onClick={() => setViewMode(mode.id as any)}
                     className={`
                       flex items-center justify-center gap-1 px-2 py-1.5 rounded text-xs font-medium transition-all
-                      ${viewMode === mode.id
-                        ? 'bg-blue-600/80 text-white'
-                        : 'text-slate-400 hover:text-white'
+                      ${
+                        viewMode === mode.id
+                          ? 'bg-blue-600/80 text-white'
+                          : 'text-slate-400 hover:text-white'
                       }
                     `}
                   >
@@ -302,7 +309,7 @@ const HeatMapAnalytics: React.FC<HeatMapAnalyticsProps> = ({
             <label className="text-xs text-slate-400 mb-2 block">Activity Filter</label>
             <select
               value={heatMapFilter}
-              onChange={(e) => setHeatMapFilter(e.target.value as HeatMapFilter)}
+              onChange={e => setHeatMapFilter(e.target.value as HeatMapFilter)}
               className="w-full bg-slate-800/50 border border-slate-600/50 rounded-lg text-white text-xs px-3 py-2 focus:outline-none focus:border-blue-500/50"
             >
               <option value="all">All Activities</option>
@@ -319,7 +326,7 @@ const HeatMapAnalytics: React.FC<HeatMapAnalyticsProps> = ({
               <label className="text-xs text-slate-400 mb-2 block">Select Player</label>
               <select
                 value={selectedPlayerId || ''}
-                onChange={(e) => onPlayerSelect?.(e.target.value)}
+                onChange={e => onPlayerSelect?.(e.target.value)}
                 className="w-full bg-slate-800/50 border border-slate-600/50 rounded-lg text-white text-xs px-3 py-2 focus:outline-none focus:border-blue-500/50"
               >
                 <option value="">Choose a player...</option>
@@ -352,7 +359,7 @@ const HeatMapAnalytics: React.FC<HeatMapAnalyticsProps> = ({
                     max="1"
                     step="0.1"
                     value={intensity}
-                    onChange={(e) => setIntensity(parseFloat(e.target.value))}
+                    onChange={e => setIntensity(parseFloat(e.target.value))}
                     className="w-full accent-blue-500"
                   />
                 </div>
@@ -371,9 +378,10 @@ const HeatMapAnalytics: React.FC<HeatMapAnalyticsProps> = ({
                         onClick={() => setTimeRange(range.id as any)}
                         className={`
                           px-2 py-1 rounded text-xs font-medium transition-all
-                          ${timeRange === range.id
-                            ? 'bg-blue-600/80 text-white'
-                            : 'text-slate-400 hover:text-white'
+                          ${
+                            timeRange === range.id
+                              ? 'bg-blue-600/80 text-white'
+                              : 'text-slate-400 hover:text-white'
                           }
                         `}
                       >
@@ -410,63 +418,95 @@ const HeatMapAnalytics: React.FC<HeatMapAnalyticsProps> = ({
 // Helper functions
 function getRoleZoneMultiplier(roleId: string, zoneCenter: { x: number; y: number }): number {
   const { x, y } = zoneCenter;
-  
+
   // Handle undefined/null roleId
-  if (!roleId) return 1.0;
-  
+  if (!roleId) {
+    return 1.0;
+  }
+
   // Defensive positions have higher activity in defensive zones
   if (roleId.includes('back') || roleId === 'goalkeeper') {
-    if (y > 70) return 1.5; // Defensive third
-    if (y > 40) return 1.0; // Middle third
+    if (y > 70) {
+      return 1.5;
+    } // Defensive third
+    if (y > 40) {
+      return 1.0;
+    } // Middle third
     return 0.3; // Attacking third
   }
-  
+
   // Midfield positions are active across the field
   if (roleId.includes('midfielder')) {
-    if (y > 30 && y < 70) return 1.3; // Central areas
+    if (y > 30 && y < 70) {
+      return 1.3;
+    } // Central areas
     return 0.8;
   }
-  
+
   // Attacking positions have higher activity in attacking zones
   if (roleId.includes('striker') || roleId.includes('winger')) {
-    if (y < 30) return 1.5; // Attacking third
-    if (y < 60) return 1.0; // Middle third
+    if (y < 30) {
+      return 1.5;
+    } // Attacking third
+    if (y < 60) {
+      return 1.0;
+    } // Middle third
     return 0.4; // Defensive third
   }
-  
+
   return 0.8;
 }
 
-function getPlayerZoneIntensity(player: Player, zoneCenter: { x: number; y: number }, distance: number): number {
-  const baseIntensity = Math.max(0, 1 - (distance / 30));
+function getPlayerZoneIntensity(
+  player: Player,
+  zoneCenter: { x: number; y: number },
+  distance: number
+): number {
+  const baseIntensity = Math.max(0, 1 - distance / 30);
   const roleMultiplier = getRoleZoneMultiplier(player.roleId, zoneCenter);
   const staminaFactor = (player.stamina || 100) / 100;
   const formFactor = getFormMultiplier(player.form);
-  
+
   return baseIntensity * roleMultiplier * staminaFactor * formFactor;
 }
 
 function getFormMultiplier(form: string): number {
   switch (form) {
-    case 'Excellent': return 1.3;
-    case 'Good': return 1.1;
-    case 'Average': return 1.0;
-    case 'Poor': return 0.8;
-    case 'Very Poor': return 0.6;
-    default: return 1.0;
+    case 'Excellent':
+      return 1.3;
+    case 'Good':
+      return 1.1;
+    case 'Average':
+      return 1.0;
+    case 'Poor':
+      return 0.8;
+    case 'Very Poor':
+      return 0.6;
+    default:
+      return 1.0;
   }
 }
 
 function generatePlayerEvents(roleId: string, intensity: number): string[] {
   const events: string[] = [];
   const eventChance = intensity * 5; // Higher intensity = more events
-  
-  if (Math.random() < eventChance * 0.3) events.push('pass');
-  if (Math.random() < eventChance * 0.15) events.push('tackle');
-  if (Math.random() < eventChance * 0.1) events.push('shot');
-  if (Math.random() < eventChance * 0.05) events.push('goal');
-  if (Math.random() < eventChance * 0.08) events.push('assist');
-  
+
+  if (Math.random() < eventChance * 0.3) {
+    events.push('pass');
+  }
+  if (Math.random() < eventChance * 0.15) {
+    events.push('tackle');
+  }
+  if (Math.random() < eventChance * 0.1) {
+    events.push('shot');
+  }
+  if (Math.random() < eventChance * 0.05) {
+    events.push('goal');
+  }
+  if (Math.random() < eventChance * 0.08) {
+    events.push('assist');
+  }
+
   return events;
 }
 

@@ -1,6 +1,12 @@
 import React, { useState, useMemo } from 'react';
 import { useFranchiseContext, useUIContext } from '../hooks';
-import type { Team, FinancialReport, BudgetCategory } from '../types';
+import type { BudgetCategory, FinancialReport } from '../types';
+import { ResponsivePage } from '../components/Layout/ResponsivePage';
+import {
+  ResponsiveGrid,
+  TouchButton,
+  ResponsiveCard,
+} from '../components/Layout/AdaptiveLayout.tsx';
 
 const FinancesPage: React.FC = () => {
   const { franchiseState, dispatch } = useFranchiseContext();
@@ -49,16 +55,16 @@ const FinancesPage: React.FC = () => {
       income.ticketSales +
       income.sponsorship +
       income.prizeMoney +
-      income.merchandising +
-      income.broadcasting;
+      (income.merchandising || 0) +
+      (income.broadcasting || 0);
     const totalExpenses =
       expenses.playerWages +
       expenses.staffWages +
       expenses.stadiumMaintenance +
       expenses.travel +
-      expenses.marketing +
-      expenses.utilities +
-      expenses.insurance;
+      (expenses.marketing || 0) +
+      (expenses.utilities || 0) +
+      (expenses.insurance || 0);
     const netIncome = totalIncome - totalExpenses;
 
     // Financial health metrics
@@ -67,16 +73,15 @@ const FinancesPage: React.FC = () => {
     const profitMargin = (netIncome / totalIncome) * 100;
 
     // Budget utilization
-    const transferBudgetUsed =
-      ((finances.initialTransferBudget - finances.transferBudget) /
-        finances.initialTransferBudget) *
-      100;
+    const initialBudget = finances.initialTransferBudget || finances.transferBudget;
+    const transferBudgetUsed = ((initialBudget - finances.transferBudget) / initialBudget) * 100;
     const wageBudgetUsed =
       ((expenses.playerWages + expenses.staffWages) / finances.wageBudget) * 100;
 
     // Financial projections
     const monthlyBurn = totalExpenses / 12;
-    const monthsOfRunway = finances.balance / monthlyBurn;
+    const balance = finances.balance || 0;
+    const monthsOfRunway = balance / monthlyBurn;
 
     return {
       totalIncome,
@@ -126,8 +131,8 @@ const FinancesPage: React.FC = () => {
     });
   };
 
-  const generateFinancialRecommendations = () => {
-    const recommendations = [];
+  const generateFinancialRecommendations = (): string[] => {
+    const recommendations: string[] = [];
 
     if (financialAnalytics.wageRatio > 0.7) {
       recommendations.push('Wage costs are high - consider optimizing player contracts');
@@ -149,112 +154,101 @@ const FinancesPage: React.FC = () => {
   };
 
   return (
-    <div className="w-full h-full p-6 bg-gray-900 overflow-y-auto">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-teal-400 mb-2">Financial Management</h1>
-          <p className="text-gray-400">Manage your club's finances and budget</p>
+    <ResponsivePage title="Financial Management" maxWidth="full">
+      <div className="space-y-6">
+        {/* Description */}
+        <p className="text-sm sm:text-base text-gray-400">Manage your club's finances and budget</p>
 
-          {/* Financial Health Overview */}
-          <div className="mt-4 grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-2xl font-bold text-green-400">
-                    ${financialAnalytics.netIncome.toLocaleString()}
-                  </div>
-                  <div className="text-sm text-gray-400">Net Income</div>
-                  <div
-                    className={`text-xs ${
-                      financialAnalytics.profitMargin > 0 ? 'text-green-400' : 'text-red-400'
-                    }`}
-                  >
-                    {financialAnalytics.profitMargin.toFixed(1)}% margin
-                  </div>
+        {/* Financial Health Overview */}
+        <ResponsiveGrid cols={{ mobile: 1, tablet: 2, desktop: 4 }} gap="md">
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-2xl font-bold text-green-400">
+                  ${financialAnalytics.netIncome.toLocaleString()}
                 </div>
+                <div className="text-sm text-gray-400">Net Income</div>
                 <div
-                  className={`text-2xl ${
+                  className={`text-xs ${
                     financialAnalytics.profitMargin > 0 ? 'text-green-400' : 'text-red-400'
                   }`}
                 >
-                  {financialAnalytics.profitMargin > 0 ? '📈' : '📉'}
+                  {financialAnalytics.profitMargin.toFixed(1)}% margin
                 </div>
               </div>
-            </div>
-
-            <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
-              <div className="text-2xl font-bold text-blue-400">
-                ${finances.balance.toLocaleString()}
-              </div>
-              <div className="text-sm text-gray-400">Available Balance</div>
-              <div className="text-xs text-gray-500">
-                {financialAnalytics.monthsOfRunway.toFixed(1)} months runway
-              </div>
-            </div>
-
-            <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
-              <div className="text-2xl font-bold text-yellow-400">
-                {financialAnalytics.wageRatio.toFixed(1)}%
-              </div>
-              <div className="text-sm text-gray-400">Wage Ratio</div>
               <div
-                className={`text-xs ${
-                  financialAnalytics.wageRatio > 70 ? 'text-red-400' : 'text-green-400'
+                className={`text-2xl ${
+                  financialAnalytics.profitMargin > 0 ? 'text-green-400' : 'text-red-400'
                 }`}
               >
-                {financialAnalytics.wageRatio > 70 ? 'High risk' : 'Healthy'}
+                {financialAnalytics.profitMargin > 0 ? '📈' : '📉'}
               </div>
-            </div>
-
-            <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
-              <div
-                className={`text-2xl font-bold ${
-                  financialAnalytics.financialHealth === 'Excellent'
-                    ? 'text-green-400'
-                    : financialAnalytics.financialHealth === 'Good'
-                      ? 'text-blue-400'
-                      : financialAnalytics.financialHealth === 'Concerning'
-                        ? 'text-yellow-400'
-                        : 'text-red-400'
-                }`}
-              >
-                {financialAnalytics.financialHealth}
-              </div>
-              <div className="text-sm text-gray-400">Financial Health</div>
-              <div className="text-xs text-gray-500">Overall rating</div>
             </div>
           </div>
-        </div>
+
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+            <div className="text-2xl font-bold text-blue-400">
+              ${(finances.balance || 0).toLocaleString()}
+            </div>
+            <div className="text-sm text-gray-400">Available Balance</div>
+            <div className="text-xs text-gray-500">
+              {financialAnalytics.monthsOfRunway.toFixed(1)} months runway
+            </div>
+          </div>
+
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+            <div className="text-2xl font-bold text-yellow-400">
+              {financialAnalytics.wageRatio.toFixed(1)}%
+            </div>
+            <div className="text-sm text-gray-400">Wage Ratio</div>
+            <div
+              className={`text-xs ${
+                financialAnalytics.wageRatio > 70 ? 'text-red-400' : 'text-green-400'
+              }`}
+            >
+              {financialAnalytics.wageRatio > 70 ? 'High risk' : 'Healthy'}
+            </div>
+          </div>
+
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+            <div
+              className={`text-2xl font-bold ${
+                financialAnalytics.financialHealth === 'Excellent'
+                  ? 'text-green-400'
+                  : financialAnalytics.financialHealth === 'Good'
+                    ? 'text-blue-400'
+                    : financialAnalytics.financialHealth === 'Concerning'
+                      ? 'text-yellow-400'
+                      : 'text-red-400'
+              }`}
+            >
+              {financialAnalytics.financialHealth}
+            </div>
+            <div className="text-sm text-gray-400">Financial Health</div>
+            <div className="text-xs text-gray-500">Overall rating</div>
+          </div>
+        </ResponsiveGrid>
 
         {/* Team Selector */}
-        <div className="mb-6">
-          <div className="bg-gray-800 rounded-lg p-1 inline-flex">
-            <button
-              onClick={() => setSelectedTeam('home')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                selectedTeam === 'home'
-                  ? 'bg-teal-600 text-white'
-                  : 'text-gray-400 hover:text-white hover:bg-gray-700'
-              }`}
-            >
-              Home Team
-            </button>
-            <button
-              onClick={() => setSelectedTeam('away')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                selectedTeam === 'away'
-                  ? 'bg-teal-600 text-white'
-                  : 'text-gray-400 hover:text-white hover:bg-gray-700'
-              }`}
-            >
-              Away Team
-            </button>
-          </div>
+        <div className="bg-gray-800 rounded-lg p-1 inline-flex gap-1">
+          <TouchButton
+            onClick={() => setSelectedTeam('home')}
+            variant={selectedTeam === 'home' ? 'primary' : 'secondary'}
+            size="md"
+          >
+            Home Team
+          </TouchButton>
+          <TouchButton
+            onClick={() => setSelectedTeam('away')}
+            variant={selectedTeam === 'away' ? 'primary' : 'secondary'}
+            size="md"
+          >
+            Away Team
+          </TouchButton>
         </div>
 
         {/* Budget Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <ResponsiveGrid cols={{ mobile: 1, tablet: 2, desktop: 3 }} gap="lg">
           <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
             <div className="flex items-center justify-between">
               <div>
@@ -302,19 +296,21 @@ const FinancesPage: React.FC = () => {
               <div>
                 <p className="text-gray-400 text-sm">Net Income</p>
                 <p
-                  className={`text-2xl font-bold ${netIncome >= 0 ? 'text-green-400' : 'text-red-400'}`}
+                  className={`text-2xl font-bold ${financialAnalytics.netIncome >= 0 ? 'text-green-400' : 'text-red-400'}`}
                 >
-                  ${netIncome.toLocaleString()}
+                  ${financialAnalytics.netIncome.toLocaleString()}
                 </p>
               </div>
-              <div className={netIncome >= 0 ? 'text-green-400' : 'text-red-400'}>
+              <div
+                className={financialAnalytics.netIncome >= 0 ? 'text-green-400' : 'text-red-400'}
+              >
                 <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
                     d={
-                      netIncome >= 0
+                      financialAnalytics.netIncome >= 0
                         ? 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6'
                         : 'M13 17h8m0 0V9m0 8l-8-8-4 4-6-6'
                     }
@@ -323,7 +319,7 @@ const FinancesPage: React.FC = () => {
               </div>
             </div>
           </div>
-        </div>
+        </ResponsiveGrid>
 
         {/* Income and Expenses */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
@@ -353,7 +349,7 @@ const FinancesPage: React.FC = () => {
                 <div className="flex justify-between items-center p-3 bg-green-600/20 rounded">
                   <span className="text-white font-semibold">Total Income</span>
                   <span className="text-green-400 font-bold text-lg">
-                    ${totalIncome.toLocaleString()}
+                    ${financialAnalytics.totalIncome.toLocaleString()}
                   </span>
                 </div>
               </div>
@@ -392,7 +388,7 @@ const FinancesPage: React.FC = () => {
                 <div className="flex justify-between items-center p-3 bg-red-600/20 rounded">
                   <span className="text-white font-semibold">Total Expenses</span>
                   <span className="text-red-400 font-bold text-lg">
-                    ${totalExpenses.toLocaleString()}
+                    ${financialAnalytics.totalExpenses.toLocaleString()}
                   </span>
                 </div>
               </div>
@@ -475,7 +471,7 @@ const FinancesPage: React.FC = () => {
           </div>
         </div>
       </div>
-    </div>
+    </ResponsivePage>
   );
 };
 

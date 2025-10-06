@@ -27,7 +27,7 @@ interface FormationAutoSaveOptions {
 
 /**
  * Enhanced Formation Management Service
- * 
+ *
  * Features:
  * - Auto-save formations with configurable intervals
  * - Version history and rollback capability
@@ -53,7 +53,7 @@ class FormationManagementService {
    */
   public initializeAutoSave(options?: Partial<FormationAutoSaveOptions>): void {
     this.autoSaveOptions = { ...this.autoSaveOptions, ...options };
-    
+
     if (this.autoSaveOptions.enabled) {
       this.startAutoSave();
     }
@@ -64,7 +64,7 @@ class FormationManagementService {
    */
   private startAutoSave(): void {
     this.stopAutoSave();
-    
+
     this.autoSaveTimer = setInterval(() => {
       this.performAutoSave();
     }, this.autoSaveOptions.interval);
@@ -86,7 +86,7 @@ class FormationManagementService {
   private performAutoSave(): void {
     const currentData = this.getCurrentFormationData();
     const dataString = JSON.stringify(currentData);
-    
+
     if (dataString !== this.lastSaveData) {
       this.saveFormationVersion(currentData, true);
       this.lastSaveData = dataString;
@@ -117,7 +117,9 @@ class FormationManagementService {
   ): FormationSaveData {
     const saveData: FormationSaveData = {
       id: `formation_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      name: customName || `${isAutoSaved ? 'Auto-save' : 'Manual save'} ${new Date().toLocaleTimeString()}`,
+      name:
+        customName ||
+        `${isAutoSaved ? 'Auto-save' : 'Manual save'} ${new Date().toLocaleTimeString()}`,
       formation: formationData?.formation || {},
       savedAt: new Date().toISOString(),
       version: this.saveHistory.length + 1,
@@ -139,7 +141,10 @@ class FormationManagementService {
     this.saveHistory.push(saveData);
 
     // Limit history size for auto-saves
-    if (isAutoSaved && this.saveHistory.filter(s => s.isAutoSaved).length > this.autoSaveOptions.maxAutoSaves) {
+    if (
+      isAutoSaved &&
+      this.saveHistory.filter(s => s.isAutoSaved).length > this.autoSaveOptions.maxAutoSaves
+    ) {
       this.cleanupOldAutoSaves();
     }
 
@@ -154,18 +159,20 @@ class FormationManagementService {
    */
   private extractStrengths(analysis: any): string[] {
     const strengths: string[] = [];
-    
+
     if (analysis.averageScore >= 80) {
       strengths.push('Well-balanced team selection');
     }
-    
-    const excellentPositions = analysis.positionScores.filter((p: any) => p.fitness === 'excellent');
+
+    const excellentPositions = analysis.positionScores.filter(
+      (p: any) => p.fitness === 'excellent'
+    );
     if (excellentPositions.length >= 6) {
       strengths.push('Strong positional coverage');
     }
-    
-    const defensePositions = analysis.positionScores.filter((p: any) => 
-      p.role.includes('DF') || p.role.includes('GK')
+
+    const defensePositions = analysis.positionScores.filter(
+      (p: any) => p.role.includes('DF') || p.role.includes('GK')
     );
     if (defensePositions.every((p: any) => p.fitness !== 'poor')) {
       strengths.push('Solid defensive foundation');
@@ -179,16 +186,16 @@ class FormationManagementService {
    */
   private extractWeaknesses(analysis: any): string[] {
     const weaknesses: string[] = [];
-    
+
     if (analysis.averageScore < 60) {
       weaknesses.push('Multiple players out of position');
     }
-    
+
     const poorPositions = analysis.positionScores.filter((p: any) => p.fitness === 'poor');
     if (poorPositions.length > 2) {
       weaknesses.push('Several weak positional fits');
     }
-    
+
     if (analysis.recommendations.length > 5) {
       weaknesses.push('Multiple tactical adjustments needed');
     }
@@ -202,7 +209,7 @@ class FormationManagementService {
   private cleanupOldAutoSaves(): void {
     const autoSaves = this.saveHistory.filter(s => s.isAutoSaved);
     const toRemove = autoSaves.slice(0, autoSaves.length - this.autoSaveOptions.maxAutoSaves);
-    
+
     toRemove.forEach(save => {
       const index = this.saveHistory.findIndex(s => s.id === save.id);
       if (index !== -1) {
@@ -242,8 +249,8 @@ class FormationManagementService {
    * Get formation save history
    */
   public getSaveHistory(): FormationSaveData[] {
-    return [...this.saveHistory].sort((a, b) => 
-      new Date(b.savedAt).getTime() - new Date(a.savedAt).getTime()
+    return [...this.saveHistory].sort(
+      (a, b) => new Date(b.savedAt).getTime() - new Date(a.savedAt).getTime()
     );
   }
 
@@ -277,7 +284,7 @@ class FormationManagementService {
     description?: string
   ): FormationSaveData {
     const analysis = getFormationAnalysis(formation, players);
-    
+
     const template: FormationSaveData = {
       id: `template_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       name: templateName,
@@ -328,21 +335,23 @@ class FormationManagementService {
   } {
     // Auto-assign players for optimal positions
     const optimizedFormation = autoAssignPlayersToFormation(players, formation, team);
-    
+
     // Get analysis of optimized formation
     const analysis = getFormationAnalysis(optimizedFormation, players);
-    
+
     // Generate improvement suggestions
     const improvements: string[] = [];
-    
+
     if (analysis.averageScore > 75) {
       improvements.push('Formation is well-optimized with strong player-position matches');
     }
-    
+
     if (analysis.recommendations.length === 0) {
       improvements.push('All positions have suitable players assigned');
     } else {
-      improvements.push(`${analysis.recommendations.length} positions could benefit from player adjustments`);
+      improvements.push(
+        `${analysis.recommendations.length} positions could benefit from player adjustments`
+      );
     }
 
     const excellentFits = analysis.positionScores.filter(p => p.fitness === 'excellent').length;
@@ -362,13 +371,19 @@ class FormationManagementService {
    */
   public exportFormation(saveId: string): string | null {
     const save = this.loadFormationFromSave(saveId);
-    if (!save) return null;
+    if (!save) {
+      return null;
+    }
 
-    return JSON.stringify({
-      ...save,
-      exportedAt: new Date().toISOString(),
-      exportVersion: '1.0',
-    }, null, 2);
+    return JSON.stringify(
+      {
+        ...save,
+        exportedAt: new Date().toISOString(),
+        exportVersion: '1.0',
+      },
+      null,
+      2
+    );
   }
 
   /**
@@ -377,7 +392,7 @@ class FormationManagementService {
   public importFormation(importData: string): FormationSaveData | null {
     try {
       const data = JSON.parse(importData);
-      
+
       // Validate imported data structure
       if (!data.formation || !data.name) {
         throw new Error('Invalid formation data');
@@ -407,7 +422,7 @@ class FormationManagementService {
    */
   public updateAutoSaveOptions(options: Partial<FormationAutoSaveOptions>): void {
     this.autoSaveOptions = { ...this.autoSaveOptions, ...options };
-    
+
     if (this.autoSaveOptions.enabled) {
       this.startAutoSave();
     } else {
@@ -427,7 +442,9 @@ class FormationManagementService {
    */
   public manualSave(customName?: string): FormationSaveData | null {
     const currentData = this.getCurrentFormationData();
-    if (!currentData) return null;
+    if (!currentData) {
+      return null;
+    }
 
     return this.saveFormationVersion(currentData, false, customName);
   }

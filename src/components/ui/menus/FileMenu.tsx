@@ -219,22 +219,22 @@ export const FileMenu: React.FC = () => {
               uiDispatch({
                 type: 'ADD_NOTIFICATION',
                 payload: {
-                  message: `Error parsing CSV. ${parseErr instanceof Error ? parseErr.message : ''}`,
+                  message: `Error parsing CSV. ${__parseErr instanceof Error ? __parseErr.message : ''}`,
                   type: 'error',
                 },
               });
             }
           },
-          error: err => {
+          error: __err => {
             uiDispatch({
               type: 'ADD_NOTIFICATION',
-              payload: { message: `CSV parsing error: ${err.message}`, type: 'error' },
+              payload: { message: `CSV parsing error: ${__err.message}`, type: 'error' },
             });
           },
         });
       }
     } catch (__err) {
-      console.error('Error importing roster:', err);
+      console.error('Error importing roster:', __err);
       uiDispatch({
         type: 'ADD_NOTIFICATION',
         payload: { message: `Error importing roster.`, type: 'error' },
@@ -262,7 +262,7 @@ export const FileMenu: React.FC = () => {
           form: p.form,
           notes: p.notes,
           traits: p.traits.join(','),
-        })),
+        }))
       );
 
       const filePath = await save({
@@ -281,7 +281,7 @@ export const FileMenu: React.FC = () => {
       uiDispatch({
         type: 'ADD_NOTIFICATION',
         payload: {
-          message: `Error exporting roster. ${err instanceof Error ? err.message : ''}`,
+          message: `Error exporting roster. ${__err instanceof Error ? __err.message : ''}`,
           type: 'error',
         },
       });
@@ -304,7 +304,7 @@ export const FileMenu: React.FC = () => {
         });
       }
     } catch (__err) {
-      console.error('Error exporting playbook:', err);
+      console.error('Error exporting playbook:', __err);
       uiDispatch({
         type: 'ADD_NOTIFICATION',
         payload: { message: `Error exporting playbook.`, type: 'error' },
@@ -333,11 +333,11 @@ export const FileMenu: React.FC = () => {
         });
       }
     } catch (__err) {
-      console.error('Error loading playbook:', err);
+      console.error('Error loading playbook:', __err);
       uiDispatch({
         type: 'ADD_NOTIFICATION',
         payload: {
-          message: `Error loading playbook. ${err instanceof Error ? err.message : ''}`,
+          message: `Error loading playbook. ${__err instanceof Error ? __err.message : ''}`,
           type: 'error',
         },
       });

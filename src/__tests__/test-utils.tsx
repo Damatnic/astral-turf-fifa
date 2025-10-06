@@ -17,15 +17,15 @@ export const mockTacticsContext = {
         name: 'Test Player 1',
         position: 'CF',
         currentPotential: 85,
-        age: 25
+        age: 25,
       },
       {
-        id: '2', 
+        id: '2',
         name: 'Test Player 2',
         position: 'CM',
         currentPotential: 78,
-        age: 23
-      }
+        age: 23,
+      },
     ],
     formations: {
       'test-formation': {
@@ -33,38 +33,35 @@ export const mockTacticsContext = {
         name: '4-3-3',
         positions: {
           '1': { x: 50, y: 80 },
-          '2': { x: 50, y: 50 }
-        }
-      }
+          '2': { x: 50, y: 50 },
+        },
+      },
     },
     activeFormationIds: {
-      home: 'test-formation'
-    }
+      home: 'test-formation',
+    },
   },
-  dispatch: vi.fn()
+  dispatch: vi.fn(),
 };
 
 // Mock UIContext
 export const mockUIContext = {
   uiState: {
     isPresentationMode: false,
-    theme: 'dark'
+    theme: 'dark',
   },
-  dispatch: vi.fn()
+  dispatch: vi.fn(),
 };
 
 // Mock useResponsive hook
 export const mockUseResponsive = {
   isMobile: false,
   isTablet: false,
-  isDesktop: true
+  isDesktop: true,
 };
 
 // Custom render function
-const customRender = (
-  ui: React.ReactElement,
-  options?: Omit<RenderOptions, 'wrapper'>
-) => {
+const customRender = (ui: React.ReactElement, options?: Omit<RenderOptions, 'wrapper'>) => {
   const Wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return <MockRouter>{children}</MockRouter>;
   };

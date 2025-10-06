@@ -10,7 +10,7 @@ import { AuthContext } from './AuthContext';
 import { authService } from '../services/authService';
 import { ChallengeProvider } from './ChallengeContext';
 
-export const cleanStateForSaving = (state: RootState): object => {
+export const cleanStateForSaving = (state: RootState): object | undefined => {
   const stateToSave = produce(state, draft => {
     // Update playbook step with current positions before saving
     if (draft.ui.activePlaybookItemId && draft.ui.activeStepIndex !== null) {
@@ -22,7 +22,7 @@ export const cleanStateForSaving = (state: RootState): object => {
             acc[p.id] = p.position;
             return acc;
           },
-          {} as Record<string, { x: number; y: number }>,
+          {} as Record<string, { x: number; y: number }>
         );
         activeStep.drawings = draft.tactics.drawings;
       }
@@ -90,7 +90,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     // Set loading to false first to ensure app doesn't get stuck
     dispatch({ type: 'SET_AUTH_LOADING', payload: false });
-    
+
     // Check for existing authentication
     const currentUser = authService.getCurrentUserSync();
     if (currentUser) {
@@ -123,13 +123,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         const timer = setTimeout(() => {
           dispatch({ type: 'SET_ACTIVE_STEP', payload: currentStepIndex + 1 });
         }, 2000); // 2 seconds per step
-
         return () => clearTimeout(timer);
-      } else if (currentStepIndex >= activeItem.steps.length - 1) {
+      } else if (activeItem && currentStepIndex >= activeItem.steps.length - 1) {
         // Animation finished
         dispatch({ type: 'RESET_ANIMATION' });
       }
     }
+    return undefined;
   }, [
     state.ui.isAnimating,
     state.ui.isPaused,
@@ -143,7 +143,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         const stateToSave = cleanStateForSaving(state);
         localStorage.setItem(
           `astralTurfSave_${state.ui.activeSaveSlotId}`,
-          JSON.stringify(stateToSave),
+          JSON.stringify(stateToSave)
         );
 
         const slots = JSON.parse(localStorage.getItem('astralTurfSaveSlots') || '{}');

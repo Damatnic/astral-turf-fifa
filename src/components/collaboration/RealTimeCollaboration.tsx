@@ -4,13 +4,13 @@ import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Input } from '../ui/input';
-import { 
-  Users, 
-  Wifi, 
-  WifiOff, 
-  MessageCircle, 
-  Share2, 
-  Lock, 
+import {
+  Users,
+  Wifi,
+  WifiOff,
+  MessageCircle,
+  Share2,
+  Lock,
   Unlock,
   MousePointer,
   Eye,
@@ -19,7 +19,7 @@ import {
   VolumeX,
   Copy,
   Crown,
-  UserX
+  UserX,
 } from 'lucide-react';
 import type { Player, Formation } from '../../types';
 
@@ -75,7 +75,7 @@ export const RealTimeCollaboration: React.FC<RealTimeCollaborationProps> = ({
   formation,
   onFormationChange,
   onUserJoin,
-  onUserLeave
+  onUserLeave,
 }) => {
   const [isConnected, setIsConnected] = useState(true);
   const [session, setSession] = useState<CollaborationSession>({
@@ -92,7 +92,7 @@ export const RealTimeCollaboration: React.FC<RealTimeCollaborationProps> = ({
         isOnline: true,
         color: '#4ade80',
         cursor: { x: 300, y: 200 },
-        permissions: { canEdit: true, canMove: true, canDraw: true, canChat: true }
+        permissions: { canEdit: true, canMove: true, canDraw: true, canChat: true },
       },
       {
         id: 'user-3',
@@ -101,7 +101,7 @@ export const RealTimeCollaboration: React.FC<RealTimeCollaborationProps> = ({
         isOnline: true,
         color: '#f59e0b',
         cursor: { x: 450, y: 350 },
-        permissions: { canEdit: false, canMove: false, canDraw: true, canChat: true }
+        permissions: { canEdit: false, canMove: false, canDraw: true, canChat: true },
       },
       {
         id: 'user-4',
@@ -109,15 +109,15 @@ export const RealTimeCollaboration: React.FC<RealTimeCollaborationProps> = ({
         role: 'viewer',
         isOnline: false,
         color: '#8b5cf6',
-        permissions: { canEdit: false, canMove: false, canDraw: false, canChat: true }
-      }
+        permissions: { canEdit: false, canMove: false, canDraw: false, canChat: true },
+      },
     ],
     settings: {
       allowGuests: true,
       requireApproval: false,
       maxUsers: 8,
-      lockFormation: false
-    }
+      lockFormation: false,
+    },
   });
 
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
@@ -127,7 +127,7 @@ export const RealTimeCollaboration: React.FC<RealTimeCollaborationProps> = ({
       userName: 'John Martinez',
       message: 'What do you think about switching to 4-3-3?',
       timestamp: new Date(Date.now() - 5 * 60000),
-      type: 'text'
+      type: 'text',
     },
     {
       id: '2',
@@ -135,7 +135,7 @@ export const RealTimeCollaboration: React.FC<RealTimeCollaborationProps> = ({
       userName: currentUser.name,
       message: 'Good idea, let me adjust the formation',
       timestamp: new Date(Date.now() - 3 * 60000),
-      type: 'text'
+      type: 'text',
     },
     {
       id: '3',
@@ -143,8 +143,8 @@ export const RealTimeCollaboration: React.FC<RealTimeCollaborationProps> = ({
       userName: 'System',
       message: 'Sarah Chen added a tactical note',
       timestamp: new Date(Date.now() - 1 * 60000),
-      type: 'system'
-    }
+      type: 'system',
+    },
   ]);
 
   const [newMessage, setNewMessage] = useState('');
@@ -164,12 +164,12 @@ export const RealTimeCollaboration: React.FC<RealTimeCollaborationProps> = ({
               ...user,
               cursor: {
                 x: user.cursor.x + (Math.random() - 0.5) * 20,
-                y: user.cursor.y + (Math.random() - 0.5) * 20
-              }
+                y: user.cursor.y + (Math.random() - 0.5) * 20,
+              },
             };
           }
           return user;
-        })
+        }),
       }));
     }, 2000);
 
@@ -182,7 +182,9 @@ export const RealTimeCollaboration: React.FC<RealTimeCollaborationProps> = ({
   }, [chatMessages]);
 
   const sendMessage = () => {
-    if (!newMessage.trim()) return;
+    if (!newMessage.trim()) {
+      return;
+    }
 
     const message: ChatMessage = {
       id: Date.now().toString(),
@@ -190,7 +192,7 @@ export const RealTimeCollaboration: React.FC<RealTimeCollaborationProps> = ({
       userName: currentUser.name,
       message: newMessage,
       timestamp: new Date(),
-      type: 'text'
+      type: 'text',
     };
 
     setChatMessages(prev => [...prev, message]);
@@ -212,8 +214,13 @@ export const RealTimeCollaboration: React.FC<RealTimeCollaborationProps> = ({
     }
   };
 
-  const toggleUserPermission = (userId: string, permission: keyof CollaborationUser['permissions']) => {
-    if (session.owner !== currentUser.id) return;
+  const toggleUserPermission = (
+    userId: string,
+    permission: keyof CollaborationUser['permissions']
+  ) => {
+    if (session.owner !== currentUser.id) {
+      return;
+    }
 
     setSession(prev => ({
       ...prev,
@@ -223,20 +230,22 @@ export const RealTimeCollaboration: React.FC<RealTimeCollaborationProps> = ({
               ...user,
               permissions: {
                 ...user.permissions,
-                [permission]: !user.permissions[permission]
-              }
+                [permission]: !user.permissions[permission],
+              },
             }
           : user
-      )
+      ),
     }));
   };
 
   const removeUser = (userId: string) => {
-    if (session.owner !== currentUser.id || userId === currentUser.id) return;
+    if (session.owner !== currentUser.id || userId === currentUser.id) {
+      return;
+    }
 
     setSession(prev => ({
       ...prev,
-      users: prev.users.filter(user => user.id !== userId)
+      users: prev.users.filter(user => user.id !== userId),
     }));
 
     onUserLeave?.(userId);
@@ -244,21 +253,31 @@ export const RealTimeCollaboration: React.FC<RealTimeCollaborationProps> = ({
 
   const getRoleIcon = (role: string) => {
     switch (role) {
-      case 'coach': return <Crown className="w-4 h-4 text-yellow-400" />;
-      case 'assistant': return <Users className="w-4 h-4 text-blue-400" />;
-      case 'analyst': return <Eye className="w-4 h-4 text-purple-400" />;
-      case 'viewer': return <Eye className="w-4 h-4 text-gray-400" />;
-      default: return null;
+      case 'coach':
+        return <Crown className="w-4 h-4 text-yellow-400" />;
+      case 'assistant':
+        return <Users className="w-4 h-4 text-blue-400" />;
+      case 'analyst':
+        return <Eye className="w-4 h-4 text-purple-400" />;
+      case 'viewer':
+        return <Eye className="w-4 h-4 text-gray-400" />;
+      default:
+        return null;
     }
   };
 
   const getRoleColor = (role: string) => {
     switch (role) {
-      case 'coach': return 'bg-yellow-500/20 text-yellow-400';
-      case 'assistant': return 'bg-blue-500/20 text-blue-400';
-      case 'analyst': return 'bg-purple-500/20 text-purple-400';
-      case 'viewer': return 'bg-gray-500/20 text-gray-400';
-      default: return 'bg-gray-500/20 text-gray-400';
+      case 'coach':
+        return 'bg-yellow-500/20 text-yellow-400';
+      case 'assistant':
+        return 'bg-blue-500/20 text-blue-400';
+      case 'analyst':
+        return 'bg-purple-500/20 text-purple-400';
+      case 'viewer':
+        return 'bg-gray-500/20 text-gray-400';
+      default:
+        return 'bg-gray-500/20 text-gray-400';
     }
   };
 
@@ -284,7 +303,7 @@ export const RealTimeCollaboration: React.FC<RealTimeCollaborationProps> = ({
                   {isConnected ? 'Connected' : 'Disconnected'}
                 </Badge>
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <Button
                   size="sm"
@@ -294,15 +313,19 @@ export const RealTimeCollaboration: React.FC<RealTimeCollaborationProps> = ({
                   <Share2 className="w-4 h-4 mr-2" />
                   Share
                 </Button>
-                
+
                 <Button
                   size="sm"
                   onClick={() => setShowCursors(!showCursors)}
                   className="bg-white/10 hover:bg-white/20 border-white/20"
                 >
-                  {showCursors ? <MousePointer className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                  {showCursors ? (
+                    <MousePointer className="w-4 h-4" />
+                  ) : (
+                    <EyeOff className="w-4 h-4" />
+                  )}
                 </Button>
-                
+
                 <Button
                   size="sm"
                   onClick={() => setSoundEnabled(!soundEnabled)}
@@ -321,7 +344,7 @@ export const RealTimeCollaboration: React.FC<RealTimeCollaborationProps> = ({
                   {session.users.filter(u => u.isOnline).length} online
                 </Badge>
               </div>
-              
+
               <div className="flex items-center gap-2">
                 {session.settings.lockFormation ? (
                   <Lock className="w-4 h-4 text-red-400" />
@@ -351,8 +374,8 @@ export const RealTimeCollaboration: React.FC<RealTimeCollaborationProps> = ({
               <div
                 key={user.id}
                 className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
-                  user.isOnline 
-                    ? 'bg-white/10 border-white/20' 
+                  user.isOnline
+                    ? 'bg-white/10 border-white/20'
                     : 'bg-white/5 border-white/10 opacity-60'
                 }`}
               >
@@ -364,13 +387,13 @@ export const RealTimeCollaboration: React.FC<RealTimeCollaborationProps> = ({
                         {user.name.charAt(0)}
                       </AvatarFallback>
                     </Avatar>
-                    <div 
+                    <div
                       className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white ${
                         user.isOnline ? 'bg-green-400' : 'bg-gray-400'
                       }`}
                     />
                   </div>
-                  
+
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="text-white text-sm font-medium">{user.name}</span>
@@ -424,15 +447,18 @@ export const RealTimeCollaboration: React.FC<RealTimeCollaborationProps> = ({
               </Button>
             </CardTitle>
           </CardHeader>
-          
+
           {showChat && (
             <CardContent className="flex flex-col h-80">
               {/* Chat Messages */}
               <div className="flex-1 overflow-y-auto space-y-3 mb-4 pr-2">
                 {chatMessages.map(message => (
-                  <div key={message.id} className={`flex gap-3 ${
-                    message.userId === currentUser.id ? 'justify-end' : 'justify-start'
-                  }`}>
+                  <div
+                    key={message.id}
+                    className={`flex gap-3 ${
+                      message.userId === currentUser.id ? 'justify-end' : 'justify-start'
+                    }`}
+                  >
                     {message.userId !== currentUser.id && message.type !== 'system' && (
                       <Avatar className="w-6 h-6 mt-1">
                         <AvatarFallback className="text-xs">
@@ -440,23 +466,25 @@ export const RealTimeCollaboration: React.FC<RealTimeCollaborationProps> = ({
                         </AvatarFallback>
                       </Avatar>
                     )}
-                    
-                    <div className={`max-w-xs lg:max-w-md ${
-                      message.userId === currentUser.id ? 'order-first' : ''
-                    }`}>
+
+                    <div
+                      className={`max-w-xs lg:max-w-md ${
+                        message.userId === currentUser.id ? 'order-first' : ''
+                      }`}
+                    >
                       {message.type === 'system' ? (
                         <div className="text-center">
-                          <Badge className="bg-blue-500/20 text-blue-400">
-                            {message.message}
-                          </Badge>
+                          <Badge className="bg-blue-500/20 text-blue-400">{message.message}</Badge>
                         </div>
                       ) : (
                         <>
-                          <div className={`p-3 rounded-lg ${
-                            message.userId === currentUser.id
-                              ? 'bg-blue-500/20 text-blue-100'
-                              : 'bg-white/10 text-white'
-                          }`}>
+                          <div
+                            className={`p-3 rounded-lg ${
+                              message.userId === currentUser.id
+                                ? 'bg-blue-500/20 text-blue-100'
+                                : 'bg-white/10 text-white'
+                            }`}
+                          >
                             <p className="text-sm">{message.message}</p>
                           </div>
                           <div className="flex items-center gap-2 mt-1 px-1">
@@ -477,8 +505,8 @@ export const RealTimeCollaboration: React.FC<RealTimeCollaborationProps> = ({
               <div className="flex gap-2">
                 <Input
                   value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                  onChange={e => setNewMessage(e.target.value)}
+                  onKeyPress={e => e.key === 'Enter' && sendMessage()}
                   placeholder="Type a message..."
                   className="flex-1 bg-white/10 border-white/20 text-white placeholder-gray-400"
                 />
@@ -507,19 +535,16 @@ export const RealTimeCollaboration: React.FC<RealTimeCollaborationProps> = ({
                 style={{
                   left: user.cursor!.x,
                   top: user.cursor!.y,
-                  transform: 'translate(-2px, -2px)'
+                  transform: 'translate(-2px, -2px)',
                 }}
               >
                 <div className="relative">
-                  <MousePointer 
-                    className="w-5 h-5" 
-                    style={{ color: user.color }}
-                  />
-                  <div 
+                  <MousePointer className="w-5 h-5" style={{ color: user.color }} />
+                  <div
                     className="absolute top-5 left-2 px-2 py-1 rounded text-xs font-medium pointer-events-none whitespace-nowrap"
-                    style={{ 
+                    style={{
                       backgroundColor: user.color,
-                      color: 'white'
+                      color: 'white',
                     }}
                   >
                     {user.name}

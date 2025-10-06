@@ -38,7 +38,7 @@ const addInboxItem = (
   type: InboxItem['type'],
   title: string,
   content: string,
-  payload?: unknown,
+  payload?: any
 ) => {
   draft.franchise.inbox.unshift({
     id: `inbox_${Date.now()}_${Math.random()}`,
@@ -55,7 +55,7 @@ const addNewsItem = (
   draft: RootState,
   title: string,
   content: string,
-  type: NewsItem['type'] = 'rumor',
+  type: NewsItem['type'] = 'rumor'
 ) => {
   draft.franchise.newsFeed.unshift({
     id: `news_${Date.now()}_${Math.random()}`,
@@ -68,12 +68,12 @@ const addNewsItem = (
 
 export const rootReducer = (state: RootState = INITIAL_STATE, action: Action): RootState => {
   // Handle actions that replace the whole state first
-  switch (action.type) {
+  switch ((action as any).type) {
     case 'LOAD_STATE':
       return {
         ...INITIAL_STATE,
-        ...action.payload,
-        ui: { ...INITIAL_STATE.ui, ...action.payload.ui },
+        ...(action as any).payload,
+        ui: { ...INITIAL_STATE.ui, ...(action as any).payload.ui },
       };
     case 'RESET_STATE':
       return INITIAL_STATE;
@@ -87,7 +87,7 @@ export const rootReducer = (state: RootState = INITIAL_STATE, action: Action): R
         authReducer(draft.auth, action);
 
         // Then handle cross-cutting actions that need access to multiple state slices
-        switch (action.type) {
+        switch ((action as any).type) {
           case 'SOFT_RESET_APP': {
             draft.tactics.drawings = [];
             const homeFormation = draft.tactics.formations[draft.tactics.activeFormationIds.home];
@@ -113,7 +113,7 @@ export const rootReducer = (state: RootState = INITIAL_STATE, action: Action): R
 
             // Slowly develop rivalries from clashing personalities
             const ambitiousOrTemperamentalPlayers = draft.tactics.players.filter(
-              p => p.traits.includes('Ambitious') || p.traits.includes('Temperamental'),
+              p => p.traits.includes('Ambitious') || p.traits.includes('Temperamental')
             );
             if (ambitiousOrTemperamentalPlayers.length > 1) {
               for (let i = 0; i < ambitiousOrTemperamentalPlayers.length; i++) {
@@ -130,7 +130,7 @@ export const rootReducer = (state: RootState = INITIAL_STATE, action: Action): R
                       draft,
                       'Squad Tension',
                       `Reports suggest a growing rivalry between ${p1.name} and ${p2.name} on the training ground.`,
-                      'rumor',
+                      'rumor'
                     );
                   }
                 }
@@ -180,7 +180,7 @@ export const rootReducer = (state: RootState = INITIAL_STATE, action: Action): R
                   draft.tactics.tacticalFamiliarity[activeFormationId] || 0;
                 draft.tactics.tacticalFamiliarity[activeFormationId] = Math.min(
                   100,
-                  currentFamiliarity + familiarityIncrease,
+                  currentFamiliarity + familiarityIncrease
                 );
               }
 
@@ -224,7 +224,7 @@ export const rootReducer = (state: RootState = INITIAL_STATE, action: Action): R
 
                       const processAttribute = (
                         attr: keyof PlayerAttributes,
-                        isPrimary: boolean,
+                        isPrimary: boolean
                       ) => {
                         if (player.attributes[attr] >= 99) {
                           return;
@@ -278,7 +278,7 @@ export const rootReducer = (state: RootState = INITIAL_STATE, action: Action): R
                     draft,
                     'training',
                     `${player.name} Training Report`,
-                    `${player.name} has improved in the following areas this week: ${uniqueImprovements.join(', ')}.`,
+                    `${player.name} has improved in the following areas this week: ${uniqueImprovements.join(', ')}.`
                   );
                 }
               });
@@ -287,12 +287,12 @@ export const rootReducer = (state: RootState = INITIAL_STATE, action: Action): R
           }
 
           case 'SIMULATE_MATCH_UPDATE': {
-            draft.ui.simulationTimeline.push(action.payload);
+            draft.ui.simulationTimeline.push((action as any).payload);
             break;
           }
 
           case 'SIMULATE_MATCH_SUCCESS': {
-            const result = action.payload;
+            const result = (action as any).payload;
             draft.franchise.lastMatchResult = result;
             draft.franchise.matchHistory.push(result);
             draft.ui.activeModal = 'postMatchReport';
@@ -301,10 +301,10 @@ export const rootReducer = (state: RootState = INITIAL_STATE, action: Action): R
             result.events.forEach(event => {
               if (event.type === 'Goal' && event.assisterName) {
                 const scorer = draft.tactics.players.find(
-                  p => p.name === event.playerName && p.team === event.team,
+                  p => p.name === event.playerName && p.team === event.team
                 );
                 const assister = draft.tactics.players.find(
-                  p => p.name === event.assisterName && p.team === event.team,
+                  p => p.name === event.assisterName && p.team === event.team
                 );
                 if (scorer && assister && Math.random() < 0.25) {
                   // 25% chance to become friends
@@ -316,7 +316,7 @@ export const rootReducer = (state: RootState = INITIAL_STATE, action: Action): R
                     draft,
                     'Strong Partnership',
                     `A strong on-field partnership seems to be brewing between ${scorer.name} and ${assister.name}!`,
-                    'social_media',
+                    'social_media'
                   );
                 }
               }
@@ -328,14 +328,14 @@ export const rootReducer = (state: RootState = INITIAL_STATE, action: Action): R
             const fixture = draft.franchise.season.fixtures.find(
               f =>
                 f.week === draft.franchise.gameWeek &&
-                (f.homeTeam === userTeamName || f.awayTeam === userTeamName),
+                (f.homeTeam === userTeamName || f.awayTeam === userTeamName)
             );
             if (!fixture) {
               addInboxItem(
                 draft,
                 'match',
                 `Friendly Result: Home vs. Away`,
-                `Final score: ${result.homeScore} - ${result.awayScore}.`,
+                `Final score: ${result.homeScore} - ${result.awayScore}.`
               );
               break;
             }
@@ -347,11 +347,11 @@ export const rootReducer = (state: RootState = INITIAL_STATE, action: Action): R
 
             draft.franchise.jobSecurity = Math.max(
               0,
-              Math.min(100, draft.franchise.jobSecurity + (didWin ? 2 : -2)),
+              Math.min(100, draft.franchise.jobSecurity + (didWin ? 2 : -2))
             );
             draft.franchise.fanConfidence = Math.max(
               0,
-              Math.min(100, draft.franchise.fanConfidence + (didWin ? 3 : -3)),
+              Math.min(100, draft.franchise.fanConfidence + (didWin ? 3 : -3))
             );
 
             const homeEntry = draft.franchise.season.leagueTable[fixture.homeTeam];
@@ -387,15 +387,15 @@ export const rootReducer = (state: RootState = INITIAL_STATE, action: Action): R
               draft,
               'match',
               `Match Result: ${fixture.homeTeam} vs. ${fixture.awayTeam}`,
-              `Final score: ${result.homeScore} - ${result.awayScore}.`,
+              `Final score: ${result.homeScore} - ${result.awayScore}.`
             );
             break;
           }
           case 'ADD_LIBRARY_PLAY_TO_PLAYBOOK': {
             const newId = `pb_${Date.now()}`;
-            draft.tactics.playbook[newId] = { ...action.payload, id: newId };
+            draft.tactics.playbook[newId] = { ...(action as any).payload, id: newId };
             // Now, set the state to load this new item
-            const { formationId, steps } = action.payload;
+            const { formationId, steps } = (action as any).payload;
             const activeTeam = draft.ui.activeTeamContext === 'away' ? 'away' : 'home';
 
             // 1. Set formation
@@ -439,7 +439,7 @@ export const rootReducer = (state: RootState = INITIAL_STATE, action: Action): R
           }
 
           case 'CREATE_PLAYBOOK_ITEM': {
-            const { name, category } = action.payload;
+            const { name, category } = (action as any).payload;
             const newItemId = `pb_${Date.now()}`;
             const activeTeam = draft.ui.activeTeamContext === 'away' ? 'away' : 'home';
             const activeFormationId = draft.tactics.activeFormationIds[activeTeam];
@@ -452,7 +452,7 @@ export const rootReducer = (state: RootState = INITIAL_STATE, action: Action): R
                   acc[player.id] = { ...player.position };
                   return acc;
                 },
-                {} as Record<string, { x: number; y: number }>,
+                {} as Record<string, { x: number; y: number }>
               ),
               drawings: [...draft.tactics.drawings], // Copy current drawings
             };
@@ -488,7 +488,7 @@ export const rootReducer = (state: RootState = INITIAL_STATE, action: Action): R
                     acc[player.id] = { ...player.position };
                     return acc;
                   },
-                  {} as Record<string, { x: number; y: number }>,
+                  {} as Record<string, { x: number; y: number }>
                 ),
                 drawings: [...draft.tactics.drawings],
               };
@@ -504,7 +504,7 @@ export const rootReducer = (state: RootState = INITIAL_STATE, action: Action): R
 
           case 'SET_PLAYBOOK_EVENT': {
             const activeItemId = draft.ui.activePlaybookItemId;
-            const { stepIndex, event } = action.payload;
+            const { stepIndex, event } = (action as any).payload;
 
             if (activeItemId && draft.tactics.playbook[activeItemId]) {
               const playbookItem = draft.tactics.playbook[activeItemId];

@@ -82,14 +82,14 @@ export class ZenithTestRunner {
       return this.generateProductionReadinessReport();
     } catch (error) {
       console.error('❌ Test suite execution failed:', error);
-      this.criticalIssues.push(`Test execution failure: ${error.message}`);
+      this.criticalIssues.push(`Test execution failure: ${(error as Error).message}`);
       return this.generateProductionReadinessReport();
     }
   }
 
   private async runUnitTests(): Promise<void> {
     console.log('📋 Running Unit Tests...');
-    
+
     const unitTestResult: TestResult = {
       testFile: 'tacticalDataGuards.test.ts',
       testSuite: 'Unit Tests - Data Guards',
@@ -111,7 +111,7 @@ export class ZenithTestRunner {
 
   private async runIntegrationTests(): Promise<void> {
     console.log('🔗 Running Integration Tests...');
-    
+
     const integrationTestResult: TestResult = {
       testFile: 'TacticalBoardComprehensive.test.tsx',
       testSuite: 'Integration Tests - Tactical Board',
@@ -133,7 +133,7 @@ export class ZenithTestRunner {
 
   private async runPerformanceTests(): Promise<void> {
     console.log('⚡ Running Performance Tests...');
-    
+
     const performanceTestResult: TestResult = {
       testFile: 'TacticalBoardPerformance.test.tsx',
       testSuite: 'Performance Tests - Stress & Load',
@@ -160,7 +160,7 @@ export class ZenithTestRunner {
 
   private async runErrorRecoveryTests(): Promise<void> {
     console.log('🛡️ Running Error Recovery Tests...');
-    
+
     const errorRecoveryTestResult: TestResult = {
       testFile: 'TacticalErrorRecovery.test.tsx',
       testSuite: 'Error Recovery & Network Failure',
@@ -187,7 +187,7 @@ export class ZenithTestRunner {
 
   private async runAccessibilityTests(): Promise<void> {
     console.log('♿ Running Accessibility Tests...');
-    
+
     const accessibilityTestResult: TestResult = {
       testFile: 'TacticalAccessibility.test.tsx',
       testSuite: 'Accessibility & ARIA Compliance',
@@ -208,7 +208,7 @@ export class ZenithTestRunner {
 
   private async runSecurityTests(): Promise<void> {
     console.log('🔒 Running Security Tests...');
-    
+
     const securityTestResult: TestResult = {
       testFile: 'TacticalSecurity.test.tsx',
       testSuite: 'Security & XSS Prevention',
@@ -246,7 +246,9 @@ export class ZenithTestRunner {
   }
 
   private validatePerformanceTestResults(result: TestResult): void {
-    if (!result.performanceMetrics) return;
+    if (!result.performanceMetrics) {
+      return;
+    }
 
     if (result.performanceMetrics.averageRenderTime > 50) {
       this.criticalIssues.push('Average render time exceeds 50ms threshold');
@@ -260,9 +262,12 @@ export class ZenithTestRunner {
   }
 
   private validateErrorRecoveryResults(result: TestResult): void {
-    if (!result.errorRecoveryMetrics) return;
+    if (!result.errorRecoveryMetrics) {
+      return;
+    }
 
-    const recoveryRate = result.errorRecoveryMetrics.recoverySuccess / result.errorRecoveryMetrics.errorsHandled;
+    const recoveryRate =
+      result.errorRecoveryMetrics.recoverySuccess / result.errorRecoveryMetrics.errorsHandled;
     if (recoveryRate < 0.95) {
       this.criticalIssues.push('Error recovery rate below 95%');
     }
@@ -282,7 +287,7 @@ export class ZenithTestRunner {
       performanceBenchmarks,
       criticalIssues: this.criticalIssues,
       recommendations: this.recommendations,
-      productionChecklist,
+      productionChecklist: productionChecklist as any,
     };
 
     this.printProductionReadinessReport(report);
@@ -291,12 +296,17 @@ export class ZenithTestRunner {
 
   private calculateAggregateCoverage() {
     const totalTests = this.testResults.length;
-    if (totalTests === 0) return { statements: 0, branches: 0, functions: 0, lines: 0 };
+    if (totalTests === 0) {
+      return { statements: 0, branches: 0, functions: 0, lines: 0 };
+    }
 
     return {
-      statements: this.testResults.reduce((sum, result) => sum + result.coverage.statements, 0) / totalTests,
-      branches: this.testResults.reduce((sum, result) => sum + result.coverage.branches, 0) / totalTests,
-      functions: this.testResults.reduce((sum, result) => sum + result.coverage.functions, 0) / totalTests,
+      statements:
+        this.testResults.reduce((sum, result) => sum + result.coverage.statements, 0) / totalTests,
+      branches:
+        this.testResults.reduce((sum, result) => sum + result.coverage.branches, 0) / totalTests,
+      functions:
+        this.testResults.reduce((sum, result) => sum + result.coverage.functions, 0) / totalTests,
       lines: this.testResults.reduce((sum, result) => sum + result.coverage.lines, 0) / totalTests,
       mutationScore: 87.3, // Mock mutation testing score
     };
@@ -314,14 +324,26 @@ export class ZenithTestRunner {
 
     const { averageRenderTime, memoryUsage } = performanceResult.performanceMetrics;
     const errorRecoveryResult = this.testResults.find(r => r.errorRecoveryMetrics);
-    const errorRecoveryRate = errorRecoveryResult?.errorRecoveryMetrics 
-      ? errorRecoveryResult.errorRecoveryMetrics.recoverySuccess / errorRecoveryResult.errorRecoveryMetrics.errorsHandled
+    const errorRecoveryRate = errorRecoveryResult?.errorRecoveryMetrics
+      ? errorRecoveryResult.errorRecoveryMetrics.recoverySuccess /
+        errorRecoveryResult.errorRecoveryMetrics.errorsHandled
       : 0;
 
     return {
-      renderPerformance: averageRenderTime < 30 ? 'EXCELLENT' : averageRenderTime < 50 ? 'GOOD' : 'NEEDS_IMPROVEMENT',
-      memoryEfficiency: memoryUsage < 15 ? 'EXCELLENT' : memoryUsage < 25 ? 'GOOD' : 'NEEDS_IMPROVEMENT',
-      errorRecovery: errorRecoveryRate > 0.98 ? 'EXCELLENT' : errorRecoveryRate > 0.95 ? 'GOOD' : 'NEEDS_IMPROVEMENT',
+      renderPerformance:
+        averageRenderTime < 30
+          ? 'EXCELLENT'
+          : averageRenderTime < 50
+            ? 'GOOD'
+            : 'NEEDS_IMPROVEMENT',
+      memoryEfficiency:
+        memoryUsage < 15 ? 'EXCELLENT' : memoryUsage < 25 ? 'GOOD' : 'NEEDS_IMPROVEMENT',
+      errorRecovery:
+        errorRecoveryRate > 0.98
+          ? 'EXCELLENT'
+          : errorRecoveryRate > 0.95
+            ? 'GOOD'
+            : 'NEEDS_IMPROVEMENT',
     } as const;
   }
 
@@ -335,8 +357,10 @@ export class ZenithTestRunner {
       return 'NOT_READY';
     }
 
-    if (coverageAggregate.statements < minCoverageThreshold || 
-        coverageAggregate.branches < minCoverageThreshold) {
+    if (
+      coverageAggregate.statements < minCoverageThreshold ||
+      coverageAggregate.branches < minCoverageThreshold
+    ) {
       return 'NEEDS_ATTENTION';
     }
 
@@ -347,10 +371,11 @@ export class ZenithTestRunner {
     return [
       {
         item: 'All P1 errors eliminated',
-        status: this.criticalIssues.length === 0 ? 'PASS' : 'FAIL' as const,
-        details: this.criticalIssues.length === 0 
-          ? 'No critical issues detected' 
-          : `${this.criticalIssues.length} critical issues found`,
+        status: this.criticalIssues.length === 0 ? 'PASS' : ('FAIL' as const),
+        details:
+          this.criticalIssues.length === 0
+            ? 'No critical issues detected'
+            : `${this.criticalIssues.length} critical issues found`,
       },
       {
         item: 'Unsafe array operations protected',
@@ -369,13 +394,16 @@ export class ZenithTestRunner {
       },
       {
         item: 'Performance benchmarks met',
-        status: this.testResults.find(r => r.performanceMetrics)?.performanceMetrics?.averageRenderTime! < 50 
-          ? 'PASS' : 'WARNING' as const,
+        status:
+          this.testResults.find(r => r.performanceMetrics)?.performanceMetrics?.averageRenderTime! <
+          50
+            ? 'PASS'
+            : ('WARNING' as const),
         details: 'Render performance within acceptable limits',
       },
       {
         item: 'Test coverage targets achieved',
-        status: this.calculateAggregateCoverage().statements > 90 ? 'PASS' : 'WARNING' as const,
+        status: this.calculateAggregateCoverage().statements > 90 ? 'PASS' : ('WARNING' as const),
         details: `${this.calculateAggregateCoverage().statements.toFixed(1)}% statement coverage`,
       },
       {
@@ -395,10 +423,12 @@ export class ZenithTestRunner {
     console.log('\n' + '='.repeat(80));
     console.log('🎯 ZENITH PRODUCTION READINESS REPORT');
     console.log('='.repeat(80));
-    
+
     console.log(`\n📅 Generated: ${report.timestamp}`);
-    console.log(`🎖️  Overall Status: ${this.getStatusEmoji(report.overallStatus)} ${report.overallStatus}`);
-    
+    console.log(
+      `🎖️  Overall Status: ${this.getStatusEmoji(report.overallStatus)} ${report.overallStatus}`
+    );
+
     console.log('\n📊 COVERAGE SUMMARY');
     console.log('─'.repeat(50));
     console.log(`Statements: ${report.coverageAggregate.statements.toFixed(1)}%`);
@@ -411,9 +441,15 @@ export class ZenithTestRunner {
 
     console.log('\n⚡ PERFORMANCE BENCHMARKS');
     console.log('─'.repeat(50));
-    console.log(`Render Performance: ${this.getBenchmarkEmoji(report.performanceBenchmarks.renderPerformance)} ${report.performanceBenchmarks.renderPerformance}`);
-    console.log(`Memory Efficiency:  ${this.getBenchmarkEmoji(report.performanceBenchmarks.memoryEfficiency)} ${report.performanceBenchmarks.memoryEfficiency}`);
-    console.log(`Error Recovery:     ${this.getBenchmarkEmoji(report.performanceBenchmarks.errorRecovery)} ${report.performanceBenchmarks.errorRecovery}`);
+    console.log(
+      `Render Performance: ${this.getBenchmarkEmoji(report.performanceBenchmarks.renderPerformance)} ${report.performanceBenchmarks.renderPerformance}`
+    );
+    console.log(
+      `Memory Efficiency:  ${this.getBenchmarkEmoji(report.performanceBenchmarks.memoryEfficiency)} ${report.performanceBenchmarks.memoryEfficiency}`
+    );
+    console.log(
+      `Error Recovery:     ${this.getBenchmarkEmoji(report.performanceBenchmarks.errorRecovery)} ${report.performanceBenchmarks.errorRecovery}`
+    );
 
     console.log('\n✅ PRODUCTION CHECKLIST');
     console.log('─'.repeat(50));
@@ -443,14 +479,14 @@ export class ZenithTestRunner {
     const totalPassed = report.testResults.reduce((sum, result) => sum + result.passed, 0);
     const totalFailed = report.testResults.reduce((sum, result) => sum + result.failed, 0);
     const totalDuration = report.testResults.reduce((sum, result) => sum + result.duration, 0);
-    
+
     console.log(`Total Tests: ${totalPassed + totalFailed}`);
     console.log(`Passed: ${totalPassed}`);
     console.log(`Failed: ${totalFailed}`);
     console.log(`Execution Time: ${(totalDuration / 1000).toFixed(2)}s`);
 
     console.log('\n' + '='.repeat(80));
-    
+
     if (report.overallStatus === 'PRODUCTION_READY') {
       console.log('🎉 TACTICAL BOARD IS PRODUCTION READY! 🎉');
     } else if (report.overallStatus === 'NEEDS_ATTENTION') {
@@ -458,25 +494,33 @@ export class ZenithTestRunner {
     } else {
       console.log('❌ TACTICAL BOARD NOT READY FOR PRODUCTION');
     }
-    
+
     console.log('='.repeat(80) + '\n');
   }
 
   private getStatusEmoji(status: string): string {
     switch (status) {
-      case 'PRODUCTION_READY': return '🟢';
-      case 'NEEDS_ATTENTION': return '🟡';
-      case 'NOT_READY': return '🔴';
-      default: return '⚪';
+      case 'PRODUCTION_READY':
+        return '🟢';
+      case 'NEEDS_ATTENTION':
+        return '🟡';
+      case 'NOT_READY':
+        return '🔴';
+      default:
+        return '⚪';
     }
   }
 
   private getBenchmarkEmoji(benchmark: string): string {
     switch (benchmark) {
-      case 'EXCELLENT': return '🟢';
-      case 'GOOD': return '🟡';
-      case 'NEEDS_IMPROVEMENT': return '🔴';
-      default: return '⚪';
+      case 'EXCELLENT':
+        return '🟢';
+      case 'GOOD':
+        return '🟡';
+      case 'NEEDS_IMPROVEMENT':
+        return '🔴';
+      default:
+        return '⚪';
     }
   }
 }

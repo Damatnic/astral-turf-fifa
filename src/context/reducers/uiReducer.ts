@@ -1,9 +1,9 @@
 import type { UIState, Action } from '../../types';
 
 export const uiReducer = (draft: UIState, action: Action): UIState | void => {
-  switch (action.type) {
+  switch ((action as any).type) {
     case 'OPEN_MODAL':
-      draft.activeModal = action.payload;
+      draft.activeModal = (action as any).payload;
       break;
     case 'CLOSE_MODAL':
       draft.activeModal = null;
@@ -19,10 +19,10 @@ export const uiReducer = (draft: UIState, action: Action): UIState | void => {
       draft.developmentSummary = null;
       break;
     case 'SET_EDITING_PLAYER_ID':
-      draft.editingPlayerId = action.payload;
+      draft.editingPlayerId = (action as any).payload;
       break;
     case 'SET_COMPARE_PLAYER_ID':
-      draft.playerToCompareId = action.payload;
+      draft.playerToCompareId = (action as any).payload;
       break;
     case 'SELECT_PLAYER':
       if (draft.isPresentationMode) {
@@ -34,7 +34,7 @@ export const uiReducer = (draft: UIState, action: Action): UIState | void => {
       if (draft.isAnimating) {
         return;
       }
-      draft.selectedPlayerId = action.payload;
+      draft.selectedPlayerId = (action as any).payload;
       draft.highlightedByAIPlayerIds = [];
       break;
     case 'OPEN_SLOT_ACTION_MENU':
@@ -42,7 +42,7 @@ export const uiReducer = (draft: UIState, action: Action): UIState | void => {
         return;
       }
       draft.activeModal = 'slotActionMenu';
-      draft.slotActionMenuData = action.payload;
+      draft.slotActionMenuData = (action as any).payload;
       break;
     case 'CLOSE_SLOT_ACTION_MENU':
       if (draft.activeModal === 'slotActionMenu') {
@@ -54,20 +54,20 @@ export const uiReducer = (draft: UIState, action: Action): UIState | void => {
       draft.theme = draft.theme === 'dark' ? 'light' : 'dark';
       break;
     case 'ADD_NOTIFICATION':
-      draft.notifications.push({ ...action.payload, id: `notif_${Date.now()}` });
+      draft.notifications.push({ ...(action as any).payload, id: `notif_${Date.now()}` });
       break;
     case 'REMOVE_NOTIFICATION':
-      draft.notifications = draft.notifications.filter(n => n.id !== action.payload);
+      draft.notifications = draft.notifications.filter(n => n.id !== (action as any).payload);
       break;
     case 'SET_DRAWING_TOOL':
-      draft.drawingTool = action.payload;
+      draft.drawingTool = (action as any).payload;
       draft.selectedPlayerId = null;
       break;
     case 'SET_DRAWING_COLOR':
-      draft.drawingColor = action.payload;
+      draft.drawingColor = (action as any).payload;
       break;
     case 'SET_POSITIONING_MODE':
-      draft.positioningMode = action.payload;
+      draft.positioningMode = (action as any).payload;
       break;
     case 'TOGGLE_GRID_VISIBILITY':
       draft.isGridVisible = !draft.isGridVisible;
@@ -76,13 +76,13 @@ export const uiReducer = (draft: UIState, action: Action): UIState | void => {
       draft.isFormationStrengthVisible = !draft.isFormationStrengthVisible;
       break;
     case 'SET_ACTIVE_STEP': {
-      if (action.payload === draft.activeStepIndex) {
+      if ((action as any).payload === draft.activeStepIndex) {
         return;
       }
       draft.isAnimating = false;
       draft.animationTrails = null;
       draft.playerInitialPositions = null;
-      draft.activeStepIndex = action.payload;
+      draft.activeStepIndex = (action as any).payload;
       break;
     }
     case 'START_ANIMATION': {
@@ -111,7 +111,7 @@ export const uiReducer = (draft: UIState, action: Action): UIState | void => {
       break;
     case 'GENERATE_AI_INSIGHT_SUCCESS':
       draft.isLoadingAI = false;
-      draft.aiInsight = action.payload;
+      draft.aiInsight = (action as any).payload;
       break;
     case 'GENERATE_AI_INSIGHT_FAILURE':
       draft.isLoadingAI = false;
@@ -123,7 +123,7 @@ export const uiReducer = (draft: UIState, action: Action): UIState | void => {
       break;
     case 'GENERATE_AI_COMPARISON_SUCCESS':
       draft.isComparingAI = false;
-      draft.aiComparisonResult = action.payload;
+      draft.aiComparisonResult = (action as any).payload;
       break;
     case 'GENERATE_AI_COMPARISON_FAILURE':
       draft.isComparingAI = false;
@@ -135,7 +135,7 @@ export const uiReducer = (draft: UIState, action: Action): UIState | void => {
       break;
     case 'SUGGEST_FORMATION_SUCCESS':
       draft.isSuggestingFormation = false;
-      draft.aiSuggestedFormation = action.payload;
+      draft.aiSuggestedFormation = (action as any).payload;
       break;
     case 'SUGGEST_FORMATION_FAILURE':
       draft.isSuggestingFormation = false;
@@ -143,13 +143,13 @@ export const uiReducer = (draft: UIState, action: Action): UIState | void => {
 
     case 'SEND_CHAT_MESSAGE_START':
       draft.isChatProcessing = true;
-      draft.chatHistory.push(action.payload);
+      draft.chatHistory.push((action as any).payload);
       draft.highlightedByAIPlayerIds = [];
       break;
     case 'SEND_CHAT_MESSAGE_SUCCESS':
       draft.isChatProcessing = false;
-      draft.chatHistory.push(action.payload.response);
-      draft.highlightedByAIPlayerIds = [...action.payload.playerIdsToHighlight];
+      draft.chatHistory.push((action as any).payload.response);
+      draft.highlightedByAIPlayerIds = [...(action as any).payload.playerIdsToHighlight];
       break;
     case 'SEND_CHAT_MESSAGE_FAILURE':
       draft.isChatProcessing = false;
@@ -166,7 +166,7 @@ export const uiReducer = (draft: UIState, action: Action): UIState | void => {
       break;
     case 'GENERATE_OPPOSITION_REPORT_SUCCESS':
       draft.isLoadingOppositionReport = false;
-      draft.oppositionReport = action.payload;
+      draft.oppositionReport = (action as any).payload;
       break;
     case 'GENERATE_OPPOSITION_REPORT_FAILURE':
       draft.isLoadingOppositionReport = false;
@@ -174,7 +174,7 @@ export const uiReducer = (draft: UIState, action: Action): UIState | void => {
       break;
 
     case 'LOAD_PLAYBOOK_ITEM': {
-      draft.activePlaybookItemId = action.payload;
+      draft.activePlaybookItemId = (action as any).payload;
       draft.activeStepIndex = 0;
       draft.isAnimating = false;
       draft.animationTrails = null;
@@ -182,20 +182,21 @@ export const uiReducer = (draft: UIState, action: Action): UIState | void => {
       break;
     }
     case 'SET_ACTIVE_TEAM_CONTEXT':
-      draft.activeTeamContext = action.payload;
+      draft.activeTeamContext = (action as any).payload;
       break;
 
     case 'TOGGLE_PLAYBOOK_CATEGORY':
-      draft.playbookCategories[action.payload] = !draft.playbookCategories[action.payload];
+      draft.playbookCategories[(action as any).payload] =
+        !draft.playbookCategories[(action as any).payload];
       break;
 
     case 'SET_AI_PERSONALITY':
-      draft.settings.aiPersonality = action.payload;
+      draft.settings.aiPersonality = (action as any).payload;
       break;
 
     case 'START_PLAYER_CONVERSATION':
       draft.activeModal = 'playerConversation';
-      draft.playerConversationData = { playerId: action.payload.playerId };
+      draft.playerConversationData = { playerId: (action as any).payload.playerId };
       break;
 
     case 'START_TUTORIAL':
@@ -206,7 +207,7 @@ export const uiReducer = (draft: UIState, action: Action): UIState | void => {
       draft.tutorial.isActive = false;
       break;
     case 'SET_TUTORIAL_STEP':
-      draft.tutorial.step = action.payload;
+      draft.tutorial.step = (action as any).payload;
       break;
 
     case 'GET_AI_DEVELOPMENT_SUMMARY_START':
@@ -215,14 +216,14 @@ export const uiReducer = (draft: UIState, action: Action): UIState | void => {
       break;
     case 'GET_AI_DEVELOPMENT_SUMMARY_SUCCESS':
       draft.isLoadingDevelopmentSummary = false;
-      draft.developmentSummary = action.payload;
+      draft.developmentSummary = (action as any).payload;
       break;
     case 'GET_AI_DEVELOPMENT_SUMMARY_FAILURE':
       draft.isLoadingDevelopmentSummary = false;
       break;
 
     case 'SIMULATE_MATCH_UPDATE':
-      draft.simulationTimeline.push(action.payload);
+      draft.simulationTimeline.push((action as any).payload);
       break;
 
     case 'GET_TEAM_TALK_OPTIONS_START':
@@ -231,7 +232,7 @@ export const uiReducer = (draft: UIState, action: Action): UIState | void => {
       break;
     case 'GET_TEAM_TALK_OPTIONS_SUCCESS':
       draft.isLoadingTeamTalk = false;
-      draft.teamTalkData = action.payload;
+      draft.teamTalkData = (action as any).payload;
       break;
     case 'GET_TEAM_TALK_OPTIONS_FAILURE':
       draft.isLoadingTeamTalk = false;

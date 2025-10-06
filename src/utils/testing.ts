@@ -6,7 +6,6 @@
 
 import { UIUXValidator, type ValidationReport } from './validation';
 import { PerformanceMonitor } from './performance';
-import { AccessibilityManager } from './accessibility';
 
 // ===================================================================
 // AUTOMATED TESTING FRAMEWORK
@@ -143,7 +142,7 @@ export class InteractionTester {
         passed: responseTime <= (test.timeout || DEFAULT_TEST_CONFIG.interaction.maxResponseTime),
         responseTime,
       };
-    } catch (_error) {
+    } catch (error) {
       return {
         passed: false,
         responseTime: performance.now() - startTime,
@@ -351,7 +350,7 @@ export class QualityMonitor {
 
     this.monitoringInterval = window.setInterval(
       () => this.runMonitoringCycle(),
-      this.config.monitoring.interval * 1000,
+      this.config.monitoring.interval * 1000
     );
 
     // Initial run
@@ -438,7 +437,7 @@ export class QualityMonitor {
         // // console.warn(`⚠️ Quality score dropped to ${report.overall.score}%`);
         this.generateMonitoringAlert(report);
       }
-    } catch (_error) {
+    } catch (error) {
       console.error('Monitoring cycle failed:', error);
     }
   }
@@ -472,10 +471,10 @@ export class QualityMonitor {
     // Quick checks only
     const imagesWithoutAlt = document.querySelectorAll('img:not([alt])').length;
     const buttonsWithoutLabels = document.querySelectorAll(
-      'button:not([aria-label]):not([aria-labelledby])',
+      'button:not([aria-label]):not([aria-labelledby])'
     ).length;
     const inputsWithoutLabels = document.querySelectorAll(
-      'input:not([aria-label]):not([aria-labelledby])',
+      'input:not([aria-label]):not([aria-labelledby])'
     ).length;
 
     const totalViolations = imagesWithoutAlt + buttonsWithoutLabels + inputsWithoutLabels;
@@ -496,7 +495,7 @@ export class QualityMonitor {
   private static calculateOverallScore(
     interactions: { total: number; passed: number },
     accessibility: { score: number },
-    frameRate: number,
+    frameRate: number
   ): number {
     const interactionScore =
       interactions.total > 0 ? (interactions.passed / interactions.total) * 100 : 100;
@@ -570,10 +569,13 @@ export class TestRunner {
             name: 'Frame Rate > 55fps',
             fn: async () => {
               const metrics = PerformanceMonitor.getMetrics();
+              const frameDurations = Array.isArray(metrics.frameDuration)
+                ? metrics.frameDuration
+                : [];
+              const totalDuration = frameDurations.reduce((sum, value) => sum + value, 0);
               const avgDuration =
-                metrics.frameDuration?.reduce((a, b) => a + b, 0) /
-                (metrics.frameDuration?.length || 1);
-              return !avgDuration || 1000 / avgDuration > 55;
+                frameDurations.length > 0 ? totalDuration / frameDurations.length : null;
+              return avgDuration === null || 1000 / avgDuration > 55;
             },
             critical: true,
           },
@@ -596,7 +598,7 @@ export class TestRunner {
             name: 'All Buttons Have Labels',
             fn: async () => {
               const unlabeled = document.querySelectorAll(
-                'button:not([aria-label]):not([aria-labelledby])',
+                'button:not([aria-label]):not([aria-labelledby])'
               );
               return Array.from(unlabeled).every(btn => btn.textContent?.trim());
             },
@@ -611,7 +613,7 @@ export class TestRunner {
             name: 'Keyboard Navigation Works',
             fn: async () => {
               const focusable = document.querySelectorAll(
-                'a, button, input, textarea, select, [tabindex]:not([tabindex="-1"])',
+                'a, button, input, textarea, select, [tabindex]:not([tabindex="-1"])'
               );
               return focusable.length > 0;
             },
@@ -635,7 +637,7 @@ export class TestRunner {
             passed,
             duration,
           });
-        } catch (_error) {
+        } catch (error) {
           const duration = performance.now() - startTime;
           results.push({
             name: `${suite.name}: ${test.name}`,

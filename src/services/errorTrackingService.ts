@@ -113,11 +113,11 @@ class ErrorTrackingService {
           alertRulesCount: this.alertRules.size,
         },
       });
-    } catch (_error) {
+    } catch (_error: any) {
       log.error('Failed to initialize error tracking service', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
       });
-      throw error;
+      throw _error;
     }
   }
 
@@ -127,7 +127,7 @@ class ErrorTrackingService {
   async trackError(
     error: Error | string,
     context: ErrorContext = {},
-    severity: 'low' | 'medium' | 'high' | 'critical' = 'medium',
+    severity: 'low' | 'medium' | 'high' | 'critical' = 'medium'
   ): Promise<string> {
     try {
       const errorMessage = typeof error === 'string' ? error : error.message;
@@ -189,10 +189,9 @@ class ErrorTrackingService {
       await this.cacheRecentError(trackedError);
 
       return trackedError.id;
-    } catch (_trackingError) {
+    } catch (_trackingError: any) {
       log.error('Failed to track error', {
-        error: trackingError instanceof Error ? trackingError.message : 'Unknown error',
-        originalError: typeof error === 'string' ? error : error.message,
+        error: _trackingError instanceof Error ? _trackingError.message : 'Unknown error',
       });
 
       // Return a fallback ID
@@ -206,12 +205,12 @@ class ErrorTrackingService {
   async trackSecurityIncident(
     incident: string,
     context: ErrorContext,
-    severity: 'low' | 'medium' | 'high' | 'critical' = 'high',
+    severity: 'low' | 'medium' | 'high' | 'critical' = 'high'
   ): Promise<string> {
     const errorId = await this.trackError(
       new Error(`Security Incident: ${incident}`),
       { ...context, component: 'security' },
-      severity,
+      severity
     );
 
     // Log as security event
@@ -235,13 +234,13 @@ class ErrorTrackingService {
   /**
    * Get error by ID or fingerprint
    */
-  getError(idOrFingerprint: string): TrackedError | null {
+  getError(idOrFingerprint: string): TrackedError | undefined {
     // Try by fingerprint first
     let error = this.errors.get(idOrFingerprint);
 
     if (!error) {
       // Try by ID
-      error = Array.from(this.errors.values()).find(e => e.id === idOrFingerprint) || null;
+      error = Array.from(this.errors.values()).find(e => e.id === idOrFingerprint);
     }
 
     return error;
@@ -253,7 +252,7 @@ class ErrorTrackingService {
   getStatistics(timeRangeHours = 24): ErrorStatistics {
     const cutoffTime = new Date(Date.now() - timeRangeHours * 60 * 60 * 1000);
     const recentErrors = Array.from(this.errors.values()).filter(
-      error => error.lastOccurrence > cutoffTime,
+      error => error.lastOccurrence > cutoffTime
     );
 
     const errorsByType: Record<string, number> = {};
@@ -488,7 +487,7 @@ class ErrorTrackingService {
         await this.executeAlertAction(action, rule, error);
       } catch (_actionError) {
         log.error('Alert action failed', {
-          error: actionError instanceof Error ? actionError.message : 'Unknown error',
+          error: _actionError instanceof Error ? _actionError.message : 'Unknown error',
           metadata: {
             ruleId: rule.id,
             actionType: action.type,
@@ -505,7 +504,7 @@ class ErrorTrackingService {
   private async executeAlertAction(
     action: AlertAction,
     rule: AlertRule,
-    error: TrackedError,
+    error: TrackedError
   ): Promise<void> {
     switch (action.type) {
       case 'log':
@@ -553,7 +552,7 @@ class ErrorTrackingService {
   private async saveAlertToDatabase(
     rule: AlertRule,
     error: TrackedError,
-    action: AlertAction,
+    action: AlertAction
   ): Promise<void> {
     try {
       const db = databaseService.getClient();
@@ -570,14 +569,14 @@ class ErrorTrackingService {
             errorMessage: error.message,
             occurrenceCount: error.occurrenceCount,
             severity: error.severity,
-            context: error.context,
+            context: error.context as any,
             priority: action.config.priority || 'medium',
-          },
+          } as any,
         },
       });
     } catch (_dbError) {
       log.error('Failed to save alert to database', {
-        error: dbError instanceof Error ? dbError.message : 'Unknown error',
+        error: _dbError instanceof Error ? _dbError.message : 'Unknown error',
       });
     }
   }
@@ -681,14 +680,14 @@ class ErrorTrackingService {
             severity: error.severity,
             occurrenceCount: error.occurrenceCount,
             stack: error.stack,
-            context: error.context,
+            context: error.context as any,
             tags: error.tags,
           },
         },
       });
     } catch (_dbError) {
       log.error('Failed to save error to database', {
-        error: dbError instanceof Error ? dbError.message : 'Unknown error',
+        error: _dbError instanceof Error ? _dbError.message : 'Unknown error',
       });
     }
   }
@@ -704,7 +703,7 @@ class ErrorTrackingService {
       }
     } catch (_cacheError) {
       log.error('Failed to cache error', {
-        error: cacheError instanceof Error ? cacheError.message : 'Unknown error',
+        error: _cacheError instanceof Error ? _cacheError.message : 'Unknown error',
       });
     }
   }
@@ -717,7 +716,7 @@ class ErrorTrackingService {
       () => {
         this.cleanupOldErrors();
       },
-      60 * 60 * 1000,
+      60 * 60 * 1000
     ); // Run every hour
   }
 
@@ -785,9 +784,9 @@ class ErrorTrackingService {
       this.initialized = false;
 
       log.info('Error tracking service shut down successfully');
-    } catch (_error) {
+    } catch (_error: any) {
       log.error('Error during error tracking service shutdown', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
       });
     }
   }
@@ -803,7 +802,7 @@ export function setupGlobalErrorHandler(): void {
     errorTrackingService.trackError(
       new Error(`Unhandled Promise Rejection: ${reason}`),
       { component: 'global', metadata: { promise: promise.toString() } },
-      'critical',
+      'critical'
     );
   });
 

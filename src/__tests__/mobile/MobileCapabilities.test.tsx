@@ -5,8 +5,24 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
-import { useMobileCapabilities, useTouchGestures, useMobileViewport } from '../../utils/mobileOptimizations';
+import {
+  useMobileCapabilities,
+  useTouchGestures,
+  useMobileViewport,
+} from '../../utils/mobileOptimizations';
 import { renderHook, act } from '@testing-library/react';
+
+// Type augmentations for mobile-specific properties
+declare global {
+  interface Navigator {
+    connection?: {
+      effectiveType?: string;
+    };
+  }
+  interface CSSStyleDeclaration {
+    webkitOverflowScrolling?: string;
+  }
+}
 
 // Mock window object for different mobile scenarios
 const createMockWindow = (overrides: Partial<Window> = {}) => {
@@ -26,14 +42,31 @@ const createMockWindow = (overrides: Partial<Window> = {}) => {
     })),
     ...overrides,
   };
-  
+
   Object.defineProperty(global, 'window', {
     value: mockWindow,
     writable: true,
   });
-  
+
   return mockWindow;
 };
+
+// Helper functions for touch events (shared across tests)
+const createTouchEvent = (type: string, touches: any[], changedTouches?: any[]) => {
+  const event = new TouchEvent(type, {
+    touches,
+    changedTouches: changedTouches || touches,
+    bubbles: true,
+  });
+  return event;
+};
+
+const createTouch = (x: number, y: number, identifier = 0) => ({
+  identifier,
+  clientX: x,
+  clientY: y,
+  target: null as any,
+});
 
 describe('Mobile Capabilities Detection', () => {
   beforeEach(() => {
@@ -170,8 +203,12 @@ describe('Mobile Capabilities Detection', () => {
       // Mock CSS env() function
       const mockComputedStyle = {
         getPropertyValue: (prop: string) => {
-          if (prop === 'env(safe-area-inset-top)') return '44px';
-          if (prop === 'env(safe-area-inset-bottom)') return '34px';
+          if (prop === 'env(safe-area-inset-top)') {
+            return '44px';
+          }
+          if (prop === 'env(safe-area-inset-bottom)') {
+            return '34px';
+          }
           return '0px';
         },
       };
@@ -211,7 +248,7 @@ describe('Touch Gesture Recognition', () => {
   beforeEach(() => {
     mockElement = document.createElement('div');
     document.body.appendChild(mockElement);
-    
+
     touchCallbacks = {
       onTap: vi.fn(),
       onLongPress: vi.fn(),
@@ -226,22 +263,6 @@ describe('Touch Gesture Recognition', () => {
     cleanup();
   });
 
-  const createTouchEvent = (type: string, touches: any[], changedTouches?: any[]) => {
-    const event = new TouchEvent(type, {
-      touches,
-      changedTouches: changedTouches || touches,
-      bubbles: true,
-    });
-    return event;
-  };
-
-  const createTouch = (x: number, y: number, identifier = 0) => ({
-    identifier,
-    clientX: x,
-    clientY: y,
-    target: mockElement,
-  });
-
   it('should detect tap gestures', () => {
     const TestComponent = () => {
       const elementRef = { current: mockElement };
@@ -252,42 +273,41 @@ describe('Touch Gesture Recognition', () => {
     render(<TestComponent />);
 
     const touch = createTouch(100, 100);
-    
+
     // Touch start
     fireEvent(mockElement, createTouchEvent('touchstart', [touch]));
-    
+
     // Touch end (quick tap)
     setTimeout(() => {
       fireEvent(mockElement, createTouchEvent('touchend', [], [touch]));
-      expect(touchCallbacks.onTap).toHaveBeenCalledWith(
-        expect.any(TouchEvent),
-        { x: 100, y: 100 }
-      );
+      expect(touchCallbacks.onTap).toHaveBeenCalledWith(expect.any(TouchEvent), { x: 100, y: 100 });
     }, 100);
   });
 
-  it('should detect long press gestures', (done) => {
-    const TestComponent = () => {
-      const elementRef = { current: mockElement };
-      useTouchGestures(elementRef, touchCallbacks);
-      return <div />;
-    };
+  it('should detect long press gestures', () => {
+    return new Promise<void>(resolve => {
+      const TestComponent = () => {
+        const elementRef = { current: mockElement };
+        useTouchGestures(elementRef, touchCallbacks);
+        return <div />;
+      };
 
-    render(<TestComponent />);
+      render(<TestComponent />);
 
-    const touch = createTouch(100, 100);
-    
-    // Touch start
-    fireEvent(mockElement, createTouchEvent('touchstart', [touch]));
-    
-    // Wait for long press timeout
-    setTimeout(() => {
-      expect(touchCallbacks.onLongPress).toHaveBeenCalledWith(
-        expect.any(TouchEvent),
-        { x: 100, y: 100 }
-      );
-      done();
-    }, 600);
+      const touch = createTouch(100, 100);
+
+      // Touch start
+      fireEvent(mockElement, createTouchEvent('touchstart', [touch]));
+
+      // Wait for long press timeout
+      setTimeout(() => {
+        expect(touchCallbacks.onLongPress).toHaveBeenCalledWith(expect.any(TouchEvent), {
+          x: 100,
+          y: 100,
+        });
+        resolve();
+      }, 600);
+    });
   });
 
   it('should detect swipe gestures', () => {
@@ -301,13 +321,13 @@ describe('Touch Gesture Recognition', () => {
 
     const startTouch = createTouch(100, 100);
     const endTouch = createTouch(200, 100); // Swipe right
-    
+
     // Touch start
     fireEvent(mockElement, createTouchEvent('touchstart', [startTouch]));
-    
+
     // Touch move
     fireEvent(mockElement, createTouchEvent('touchmove', [endTouch]));
-    
+
     // Touch end (quick swipe)
     setTimeout(() => {
       fireEvent(mockElement, createTouchEvent('touchend', [], [endTouch]));
@@ -332,13 +352,13 @@ describe('Touch Gesture Recognition', () => {
     const touch2 = createTouch(200, 100, 1);
     const touch1Moved = createTouch(80, 100, 0);
     const touch2Moved = createTouch(220, 100, 1);
-    
+
     // Two finger touch start
     fireEvent(mockElement, createTouchEvent('touchstart', [touch1, touch2]));
-    
+
     // Pinch gesture (fingers moving apart)
     fireEvent(mockElement, createTouchEvent('touchmove', [touch1Moved, touch2Moved]));
-    
+
     expect(touchCallbacks.onPinch).toHaveBeenCalledWith(
       expect.any(TouchEvent),
       expect.any(Number) // Scale factor
@@ -356,17 +376,14 @@ describe('Touch Gesture Recognition', () => {
 
     const startTouch = createTouch(100, 100);
     const dragTouch = createTouch(110, 105);
-    
+
     // Touch start
     fireEvent(mockElement, createTouchEvent('touchstart', [startTouch]));
-    
+
     // Small drag movement
     fireEvent(mockElement, createTouchEvent('touchmove', [dragTouch]));
-    
-    expect(touchCallbacks.onDrag).toHaveBeenCalledWith(
-      expect.any(TouchEvent),
-      { x: 10, y: 5 }
-    );
+
+    expect(touchCallbacks.onDrag).toHaveBeenCalledWith(expect.any(TouchEvent), { x: 10, y: 5 });
   });
 });
 
@@ -412,7 +429,7 @@ describe('Mobile Performance Metrics', () => {
       act(() => {
         result.current.markInteractionEnd('tap');
       });
-      
+
       expect(result.current.metrics.interactionLatency).toBeGreaterThan(0);
     }, 50);
   });
@@ -425,7 +442,9 @@ describe('Mobile Error Handling', () => {
       return useMobileErrorHandling();
     });
 
-    const longError = new Error('This is a very long error message that should be truncated for mobile devices to provide better user experience');
+    const longError = new Error(
+      'This is a very long error message that should be truncated for mobile devices to provide better user experience'
+    );
     const shortMessage = result.current.showMobileError(longError, 'test');
 
     expect(shortMessage.length).toBeLessThanOrEqual(100);

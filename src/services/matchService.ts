@@ -78,7 +78,7 @@ export const updateLeagueTable = (
   leagueTable: Record<string, LeagueTableEntry>,
   result: MatchResult,
   homeTeam: string,
-  awayTeam: string,
+  awayTeam: string
 ): Record<string, LeagueTableEntry> => {
   const updatedTable = { ...leagueTable };
 
@@ -123,7 +123,7 @@ export const updateLeagueTable = (
 export const generateMatchCommentary = (
   events: MatchEvent[],
   homeTeam: string = 'Home',
-  awayTeam: string = 'Away',
+  awayTeam: string = 'Away'
 ): MatchCommentary[] => {
   const commentary: MatchCommentary[] = [];
 
@@ -179,12 +179,12 @@ export const generateMatchCommentary = (
 export const calculateMatchRating = (
   player: Player,
   events: MatchEvent[],
-  result: MatchResult,
+  result: MatchResult
 ): number => {
   let rating = 6.0; // Base rating
 
   const playerEvents = events.filter(e => e.playerName === player.name);
-  const playerStats = result.playerStats[player.id];
+  const playerStats = result.playerStats?.[player.id];
 
   // Goals and assists
   if (playerStats?.goals) {
@@ -236,7 +236,9 @@ export const calculateMatchRating = (
   };
   const moraleMultipliers = { Excellent: 1.1, Good: 1.05, Okay: 1.0, Poor: 0.95, 'Very Poor': 0.9 };
 
-  rating *= formMultipliers[player.form] * moraleMultipliers[player.morale];
+  rating *=
+    formMultipliers[player.form as keyof typeof formMultipliers] *
+    moraleMultipliers[player.morale as keyof typeof moraleMultipliers];
 
   // Cap rating between 1.0 and 10.0
   return Math.max(1.0, Math.min(10.0, Math.round(rating * 10) / 10));
@@ -247,7 +249,7 @@ export const generateMatchReport = (
   homeTeam: string,
   awayTeam: string,
   homePlayers: Player[],
-  awayPlayers: Player[],
+  awayPlayers: Player[]
 ): {
   summary: string;
   keyMoments: string[];
@@ -272,7 +274,7 @@ export const generateMatchReport = (
     const teamName = goal.team === 'home' ? homeTeam : awayTeam;
     if (goal.assisterName) {
       keyMoments.push(
-        `${goal.minute}' - ${goal.playerName} scores for ${teamName}, assisted by ${goal.assisterName}`,
+        `${goal.minute}' - ${goal.playerName} scores for ${teamName}, assisted by ${goal.assisterName}`
       );
     } else {
       keyMoments.push(`${goal.minute}' - ${goal.playerName} scores for ${teamName}`);
@@ -316,7 +318,7 @@ export const simulateAIMatch = (
   homeTeam: string,
   awayTeam: string,
   homeStrength: number,
-  awayStrength: number,
+  awayStrength: number
 ): MatchResult => {
   const strengthDiff = homeStrength - awayStrength;
   const homeAdvantage = 5; // Small home advantage
@@ -371,13 +373,13 @@ export const getUpcomingFixtures = (
   fixtures: Fixture[],
   currentWeek: number,
   teamName?: string,
-  count: number = 5,
+  count: number = 5
 ): Fixture[] => {
   let upcomingFixtures = fixtures.filter(fixture => fixture.week >= currentWeek);
 
   if (teamName) {
     upcomingFixtures = upcomingFixtures.filter(
-      fixture => fixture.homeTeam === teamName || fixture.awayTeam === teamName,
+      fixture => fixture.homeTeam === teamName || fixture.awayTeam === teamName
     );
   }
 
@@ -389,13 +391,13 @@ export const getRecentResults = (
   matchHistory: MatchResult[],
   currentWeek: number,
   teamName?: string,
-  count: number = 5,
+  count: number = 5
 ): Array<Fixture & { result?: MatchResult }> => {
   let recentFixtures = fixtures.filter(fixture => fixture.week < currentWeek);
 
   if (teamName) {
     recentFixtures = recentFixtures.filter(
-      fixture => fixture.homeTeam === teamName || fixture.awayTeam === teamName,
+      fixture => fixture.homeTeam === teamName || fixture.awayTeam === teamName
     );
   }
 
@@ -405,7 +407,7 @@ export const getRecentResults = (
         match &&
         // You might need to add additional matching logic here
         // This is a simplified version
-        true,
+        true
     );
     return { ...fixture, result };
   });

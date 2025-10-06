@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "include": ["src/__tests__/utils/comprehensive-test-providers.tsx"],
+  "exclude": [
+    "node_modules",
+    "src-tauri",
+    "dist",
+    "backup_*",
+    "build",
+    "coverage",
+    "temp_original",
+    "FinalAstralTurf*"
+  ]
+}

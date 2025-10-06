@@ -3,10 +3,10 @@ import { screen, fireEvent, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { renderWithProviders } from '../../utils/test-helpers';
-import { 
+import {
   generateTacticalFormation,
   generatePlayerForConflict,
-  generateDrawingShape
+  generateDrawingShape,
 } from '../../utils/enhanced-mock-generators';
 import UnifiedFloatingToolbar from '../../../components/tactics/UnifiedFloatingToolbar';
 import type { Formation, Player, DrawingShape, DrawingTool } from '../../../types';
@@ -21,13 +21,13 @@ vi.mock('framer-motion', () => ({
 // Mock FormationAutoSave component
 vi.mock('../../../components/tactics/FormationAutoSave', () => ({
   FormationAutoSave: ({ onNotification }: { onNotification: Function }) => (
-    <button 
+    <button
       data-testid="formation-auto-save"
       onClick={() => onNotification('Formation saved', 'success')}
     >
       Auto Save
     </button>
-  )
+  ),
 }));
 
 // Mock PlayerDisplaySettings component
@@ -35,14 +35,14 @@ vi.mock('../../../components/tactics/PlayerDisplaySettings', () => ({
   __esModule: true,
   default: ({ config, onConfigChange }: any) => (
     <div data-testid="player-display-settings">
-      <button 
+      <button
         onClick={() => onConfigChange({ ...config, showNames: !config.showNames })}
         data-testid="toggle-display"
       >
         Toggle Display
       </button>
     </div>
-  )
+  ),
 }));
 
 describe('UnifiedFloatingToolbar Component', () => {
@@ -61,7 +61,7 @@ describe('UnifiedFloatingToolbar Component', () => {
     showAvailability: true,
     iconType: 'circle' as const,
     namePosition: 'below' as const,
-    size: 'medium' as const
+    size: 'medium' as const,
   };
 
   beforeEach(() => {
@@ -100,7 +100,7 @@ describe('UnifiedFloatingToolbar Component', () => {
       onToggleFullscreen: vi.fn(),
       playerDisplayConfig,
       onPlayerDisplayConfigChange: vi.fn(),
-      className: ''
+      className: '',
     };
 
     user = userEvent.setup();
@@ -122,9 +122,7 @@ describe('UnifiedFloatingToolbar Component', () => {
     });
 
     it('applies custom className when provided', () => {
-      renderWithProviders(
-        <UnifiedFloatingToolbar {...mockProps} className="custom-toolbar" />
-      );
+      renderWithProviders(<UnifiedFloatingToolbar {...mockProps} className="custom-toolbar" />);
 
       const toolbar = screen.getByTestId('unified-floating-toolbar');
       expect(toolbar).toHaveClass('custom-toolbar');
@@ -134,7 +132,14 @@ describe('UnifiedFloatingToolbar Component', () => {
       renderWithProviders(<UnifiedFloatingToolbar {...mockProps} />);
 
       const toolbar = screen.getByTestId('unified-floating-toolbar');
-      expect(toolbar).toHaveClass('fixed', 'top-20', 'left-1/2', 'transform', '-translate-x-1/2', 'z-50');
+      expect(toolbar).toHaveClass(
+        'fixed',
+        'top-20',
+        'left-1/2',
+        'transform',
+        '-translate-x-1/2',
+        'z-50'
+      );
       expect(toolbar).toHaveClass('bg-slate-800/95', 'backdrop-blur-md');
     });
   });
@@ -159,11 +164,7 @@ describe('UnifiedFloatingToolbar Component', () => {
 
     it('shows inactive state for hidden sidebars', () => {
       renderWithProviders(
-        <UnifiedFloatingToolbar 
-          {...mockProps} 
-          showLeftSidebar={false}
-          showRightSidebar={false}
-        />
+        <UnifiedFloatingToolbar {...mockProps} showLeftSidebar={false} showRightSidebar={false} />
       );
 
       const leftToggle = screen.getByRole('button', { name: /toggle left sidebar/i });
@@ -197,7 +198,9 @@ describe('UnifiedFloatingToolbar Component', () => {
       const assignedSlots = mockFormation.slots.filter(slot => slot.playerId).length;
       renderWithProviders(<UnifiedFloatingToolbar {...mockProps} />);
 
-      expect(screen.getByText(`${assignedSlots}/${mockFormation.slots.length}`)).toBeInTheDocument();
+      expect(
+        screen.getByText(`${assignedSlots}/${mockFormation.slots.length}`)
+      ).toBeInTheDocument();
     });
   });
 
@@ -214,9 +217,7 @@ describe('UnifiedFloatingToolbar Component', () => {
     });
 
     it('shows active state for currently selected tool', () => {
-      renderWithProviders(
-        <UnifiedFloatingToolbar {...mockProps} drawingTool="arrow" />
-      );
+      renderWithProviders(<UnifiedFloatingToolbar {...mockProps} drawingTool="arrow" />);
 
       const arrowButton = screen.getByRole('button', { name: /arrow/i });
       expect(arrowButton).toHaveClass('bg-blue-500');
@@ -278,8 +279,8 @@ describe('UnifiedFloatingToolbar Component', () => {
 
     it('shows active states for enabled view options', () => {
       renderWithProviders(
-        <UnifiedFloatingToolbar 
-          {...mockProps} 
+        <UnifiedFloatingToolbar
+          {...mockProps}
           isGridVisible={true}
           isFormationStrengthVisible={true}
         />
@@ -309,9 +310,7 @@ describe('UnifiedFloatingToolbar Component', () => {
     });
 
     it('shows correct positioning mode label', () => {
-      renderWithProviders(
-        <UnifiedFloatingToolbar {...mockProps} positioningMode="free" />
-      );
+      renderWithProviders(<UnifiedFloatingToolbar {...mockProps} positioningMode="free" />);
 
       const positioningButton = screen.getByRole('button', { name: /free movement/i });
       expect(positioningButton).toBeInTheDocument();
@@ -326,17 +325,13 @@ describe('UnifiedFloatingToolbar Component', () => {
     });
 
     it('shows reset button when animating', () => {
-      renderWithProviders(
-        <UnifiedFloatingToolbar {...mockProps} isAnimating={true} />
-      );
+      renderWithProviders(<UnifiedFloatingToolbar {...mockProps} isAnimating={true} />);
 
       expect(screen.getByRole('button', { name: /reset animation/i })).toBeInTheDocument();
     });
 
     it('disables play button when animation cannot be played', () => {
-      renderWithProviders(
-        <UnifiedFloatingToolbar {...mockProps} canPlayAnimation={false} />
-      );
+      renderWithProviders(<UnifiedFloatingToolbar {...mockProps} canPlayAnimation={false} />);
 
       const playButton = screen.getByRole('button', { name: /play animation/i });
       expect(playButton).toBeDisabled();
@@ -360,9 +355,7 @@ describe('UnifiedFloatingToolbar Component', () => {
     });
 
     it('disables drawing action buttons when no drawings exist', () => {
-      renderWithProviders(
-        <UnifiedFloatingToolbar {...mockProps} drawings={[]} />
-      );
+      renderWithProviders(<UnifiedFloatingToolbar {...mockProps} drawings={[]} />);
 
       const undoButton = screen.getByRole('button', { name: /undo last drawing/i });
       const clearButton = screen.getByRole('button', { name: /clear all drawings/i });
@@ -402,9 +395,7 @@ describe('UnifiedFloatingToolbar Component', () => {
     });
 
     it('shows correct fullscreen button text based on view mode', () => {
-      renderWithProviders(
-        <UnifiedFloatingToolbar {...mockProps} viewMode="fullscreen" />
-      );
+      renderWithProviders(<UnifiedFloatingToolbar {...mockProps} viewMode="fullscreen" />);
 
       expect(screen.getByRole('button', { name: /exit fullscreen/i })).toBeInTheDocument();
     });
@@ -429,8 +420,8 @@ describe('UnifiedFloatingToolbar Component', () => {
 
     it('hides player display settings when props are not provided', () => {
       renderWithProviders(
-        <UnifiedFloatingToolbar 
-          {...mockProps} 
+        <UnifiedFloatingToolbar
+          {...mockProps}
           playerDisplayConfig={undefined}
           onPlayerDisplayConfigChange={undefined}
         />
@@ -475,17 +466,13 @@ describe('UnifiedFloatingToolbar Component', () => {
     });
 
     it('shows singular form for single drawing', () => {
-      renderWithProviders(
-        <UnifiedFloatingToolbar {...mockProps} drawings={[mockDrawings[0]]} />
-      );
+      renderWithProviders(<UnifiedFloatingToolbar {...mockProps} drawings={[mockDrawings[0]]} />);
 
       expect(screen.getByText('1 shape')).toBeInTheDocument();
     });
 
     it('hides drawing stats when no drawings exist', () => {
-      renderWithProviders(
-        <UnifiedFloatingToolbar {...mockProps} drawings={[]} />
-      );
+      renderWithProviders(<UnifiedFloatingToolbar {...mockProps} drawings={[]} />);
 
       expect(screen.queryByText(/shape/)).not.toBeInTheDocument();
     });
@@ -527,11 +514,11 @@ describe('UnifiedFloatingToolbar Component', () => {
 
       const keyHandler = (document.addEventListener as any).mock.calls[0][1];
 
-      keyHandler({ 
-        key: 'z', 
-        ctrlKey: true, 
+      keyHandler({
+        key: 'z',
+        ctrlKey: true,
         target: document.body,
-        preventDefault: vi.fn()
+        preventDefault: vi.fn(),
       });
       expect(mockProps.onUndoDrawing).toHaveBeenCalled();
     });
@@ -582,7 +569,7 @@ describe('UnifiedFloatingToolbar Component', () => {
 
       expect(mockProps.onPlayerDisplayConfigChange).toHaveBeenCalledWith({
         ...playerDisplayConfig,
-        showNames: false
+        showNames: false,
       });
     });
 
@@ -620,17 +607,13 @@ describe('UnifiedFloatingToolbar Component', () => {
     });
 
     it('announces tool changes to screen readers', () => {
-      renderWithProviders(
-        <UnifiedFloatingToolbar {...mockProps} drawingTool="arrow" />
-      );
+      renderWithProviders(<UnifiedFloatingToolbar {...mockProps} drawingTool="arrow" />);
 
       expect(screen.getByTestId('sr-announcer')).toHaveTextContent(/arrow tool selected/i);
     });
 
     it('provides focus management for disabled buttons', () => {
-      renderWithProviders(
-        <UnifiedFloatingToolbar {...mockProps} drawings={[]} />
-      );
+      renderWithProviders(<UnifiedFloatingToolbar {...mockProps} drawings={[]} />);
 
       const undoButton = screen.getByRole('button', { name: /undo last drawing/i });
       expect(undoButton).toHaveAttribute('aria-disabled', 'true');
@@ -666,9 +649,7 @@ describe('UnifiedFloatingToolbar Component', () => {
   describe('Error Handling', () => {
     it('handles missing formation gracefully', () => {
       expect(() => {
-        renderWithProviders(
-          <UnifiedFloatingToolbar {...mockProps} currentFormation={undefined} />
-        );
+        renderWithProviders(<UnifiedFloatingToolbar {...mockProps} currentFormation={undefined} />);
       }).not.toThrow();
 
       expect(screen.getByTestId('unified-floating-toolbar')).toBeInTheDocument();
@@ -676,7 +657,7 @@ describe('UnifiedFloatingToolbar Component', () => {
 
     it('handles missing callback functions gracefully', async () => {
       renderWithProviders(
-        <UnifiedFloatingToolbar 
+        <UnifiedFloatingToolbar
           {...mockProps}
           onToolChange={undefined as any}
           onGridToggle={undefined as any}
@@ -684,20 +665,18 @@ describe('UnifiedFloatingToolbar Component', () => {
       );
 
       const selectButton = screen.getByRole('button', { name: /select/i });
-      
+
       expect(() => user.click(selectButton)).not.toThrow();
     });
 
     it('handles malformed drawing data', () => {
       const malformedDrawings = [
         { ...mockDrawings[0], points: null },
-        { ...mockDrawings[1], tool: undefined }
+        { ...mockDrawings[1], tool: undefined },
       ] as any;
 
       expect(() => {
-        renderWithProviders(
-          <UnifiedFloatingToolbar {...mockProps} drawings={malformedDrawings} />
-        );
+        renderWithProviders(<UnifiedFloatingToolbar {...mockProps} drawings={malformedDrawings} />);
       }).not.toThrow();
     });
   });

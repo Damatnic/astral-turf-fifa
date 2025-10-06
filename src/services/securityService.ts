@@ -111,9 +111,9 @@ class SecurityService {
     }
 
     if (typeof data === 'object' && data !== null) {
-      const sanitized: unknown = {};
+      const sanitized: Record<string, any> = {};
       for (const key in data) {
-        sanitized[key] = this.sanitizeData(data[key]);
+        sanitized[key] = this.sanitizeData((data as any)[key]);
       }
       return sanitized;
     }

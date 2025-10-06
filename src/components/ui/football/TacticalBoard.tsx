@@ -71,7 +71,7 @@ export const TacticalBoard = forwardRef<HTMLDivElement, TacticalBoardProps>(
       readonly = false,
       ...props
     },
-    ref,
+    ref
   ) => {
     const boardRef = useRef<HTMLDivElement>(null);
     const [draggedPlayer, setDraggedPlayer] = useState<string | null>(null);
@@ -102,7 +102,7 @@ export const TacticalBoard = forwardRef<HTMLDivElement, TacticalBoardProps>(
           y: e.clientY - playerRect.top - playerRect.height / 2,
         });
       },
-      [readonly, mode],
+      [readonly, mode]
     );
 
     // Handle mouse move during drag
@@ -122,7 +122,7 @@ export const TacticalBoard = forwardRef<HTMLDivElement, TacticalBoardProps>(
 
         setMousePosition({ x: constrainedX, y: constrainedY });
       },
-      [draggedPlayer, dragOffset],
+      [draggedPlayer, dragOffset]
     );
 
     // Handle drag end
@@ -160,7 +160,7 @@ export const TacticalBoard = forwardRef<HTMLDivElement, TacticalBoardProps>(
           onPlayerSelect?.(playerId);
         }
       },
-      [mode, readonly, isCreatingLine, lineStart, onLineCreate, onPlayerSelect],
+      [mode, readonly, isCreatingLine, lineStart, onLineCreate, onPlayerSelect]
     );
 
     // Setup mouse event listeners
@@ -173,6 +173,7 @@ export const TacticalBoard = forwardRef<HTMLDivElement, TacticalBoardProps>(
           document.removeEventListener('mouseup', handleMouseUp);
         };
       }
+      return undefined;
     }, [draggedPlayer, handleMouseMove, handleMouseUp]);
 
     // Get player position (either current or dragged position)
@@ -289,7 +290,7 @@ export const TacticalBoard = forwardRef<HTMLDivElement, TacticalBoardProps>(
         return null;
       }
 
-      const gridLines = [];
+      const gridLines: JSX.Element[] = [];
       const gridSize = 50;
 
       for (let i = 0; i <= FIELD_WIDTH; i += gridSize) {
@@ -302,7 +303,7 @@ export const TacticalBoard = forwardRef<HTMLDivElement, TacticalBoardProps>(
             y2={FIELD_HEIGHT}
             stroke="rgba(255, 255, 255, 0.1)"
             strokeWidth="1"
-          />,
+          />
         );
       }
 
@@ -316,7 +317,7 @@ export const TacticalBoard = forwardRef<HTMLDivElement, TacticalBoardProps>(
             y2={i}
             stroke="rgba(255, 255, 255, 0.1)"
             strokeWidth="1"
-          />,
+          />
         );
       }
 
@@ -415,18 +416,24 @@ export const TacticalBoard = forwardRef<HTMLDivElement, TacticalBoardProps>(
     return (
       <div
         ref={node => {
-          boardRef.current = node;
+          if (boardRef) {
+            (boardRef as any).current = node;
+          }
           if (typeof ref === 'function') {
             ref(node);
           } else if (ref) {
-            ref.current = node;
+            (ref as any).current = node;
           }
         }}
+        role="application"
+        aria-label={`Tactical board in ${mode} mode with ${players?.length ?? 0} players`}
+        aria-roledescription="Football tactical board"
+        aria-describedby="tactical-board-description"
         className={cn(
           'relative bg-gradient-to-b from-green-600 to-green-700 rounded-lg overflow-hidden',
           'border-2 border-white/20 shadow-2xl',
           !readonly && 'cursor-crosshair',
-          className,
+          className
         )}
         style={{
           aspectRatio: FIELD_RATIO,
@@ -438,6 +445,14 @@ export const TacticalBoard = forwardRef<HTMLDivElement, TacticalBoardProps>(
         {/* Field pattern/texture */}
         <div className="absolute inset-0 opacity-10">
           <div className="w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3Jhc3MiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjMDA4MDAwIi8+PHBhdGggZD0iTTAgMGg0MHY0MEgweiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDA2MDAwIiBzdHJva2Utd2lkdGg9IjAuNSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSJ1cmwoI2dyYXNzKSIvPjwvc3ZnPg==')] repeat" />
+        </div>
+
+        {/* Hidden description for screen readers */}
+        <div id="tactical-board-description" className="sr-only">
+          Football tactical board showing player positions.
+          {!readonly && mode !== 'view' && ' Drag players to reposition them.'}
+          {mode === 'tactics' && ' Click on two players to create a tactical line between them.'}
+          {` Currently showing ${(players || []).filter(p => p?.teamSide === 'home').length} home team players and ${(players || []).filter(p => p?.teamSide === 'away').length} away team players.`}
         </div>
 
         {/* Zone overlays */}
@@ -453,7 +468,7 @@ export const TacticalBoard = forwardRef<HTMLDivElement, TacticalBoardProps>(
         {renderTacticalLines()}
 
         {/* Players */}
-        {players.map(player => {
+        {(players || []).filter(p => p !== null && p !== undefined).map(player => {
           const position = getPlayerPosition(player);
           const isDragging = draggedPlayer === player.id;
 
@@ -470,7 +485,7 @@ export const TacticalBoard = forwardRef<HTMLDivElement, TacticalBoardProps>(
               className={cn(
                 'absolute transform -translate-x-1/2 -translate-y-1/2',
                 isDragging && 'z-50 scale-110 shadow-2xl',
-                player.isSelected && 'ring-2 ring-primary-400 ring-offset-2 ring-offset-transparent',
+                player.isSelected && 'ring-2 ring-primary-400 ring-offset-2 ring-offset-transparent'
               )}
               style={{
                 left: `${position.x}%`,
@@ -482,13 +497,21 @@ export const TacticalBoard = forwardRef<HTMLDivElement, TacticalBoardProps>(
         })}
 
         {/* Mode indicator */}
-        <div className="absolute top-4 right-4 bg-black/20 backdrop-blur-sm rounded-lg px-3 py-1">
+        <div
+          className="absolute top-4 right-4 bg-black/20 backdrop-blur-sm rounded-lg px-3 py-1"
+          role="status"
+          aria-label={`Current mode: ${mode}`}
+        >
           <span className="text-xs font-medium text-white/80 uppercase tracking-wider">{mode}</span>
         </div>
 
         {/* Line creation indicator */}
         {isCreatingLine && lineStart && (
-          <div className="absolute bottom-4 left-4 bg-primary-600/90 backdrop-blur-sm rounded-lg px-3 py-2">
+          <div
+            className="absolute bottom-4 left-4 bg-primary-600/90 backdrop-blur-sm rounded-lg px-3 py-2"
+            role="status"
+            aria-live="polite"
+          >
             <span className="text-xs font-medium text-white">
               Click on another player to create a tactical line
             </span>
@@ -496,7 +519,7 @@ export const TacticalBoard = forwardRef<HTMLDivElement, TacticalBoardProps>(
         )}
       </div>
     );
-  },
+  }
 );
 
 TacticalBoard.displayName = 'TacticalBoard';
@@ -512,7 +535,7 @@ interface PlayerTokenProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const PlayerToken: React.FC<PlayerTokenProps> = ({
   player,
-  position,
+  position: _position,
   isDragging = false,
   showName = true,
   readonly = false,
@@ -540,13 +563,33 @@ const PlayerToken: React.FC<PlayerTokenProps> = ({
 
   const colors = teamColors[player.teamSide];
 
+  // Generate comprehensive ARIA label
+  const ariaLabel = [
+    player.name,
+    `number ${player.jerseyNumber}`,
+    player.role,
+    player.teamSide === 'home' ? 'home team' : 'away team',
+    player.isCaptain && 'team captain',
+    player.availability === 'injured' && 'injured',
+    player.availability === 'suspended' && 'suspended',
+    player.isSelected && 'selected',
+  ]
+    .filter(Boolean)
+    .join(', ');
+
   return (
     <div
+      role="button"
+      tabIndex={readonly ? -1 : 0}
+      aria-label={ariaLabel}
+      aria-pressed={player.isSelected}
+      aria-grabbed={isDragging}
+      aria-describedby={`player-${player.id}-details`}
       className={cn(
         'relative group animate-fade-in-scale',
         !readonly && 'cursor-grab active:cursor-grabbing',
         isDragging && 'cursor-grabbing',
-        className,
+        className
       )}
       {...props}
     >
@@ -560,7 +603,7 @@ const PlayerToken: React.FC<PlayerTokenProps> = ({
           colors.border,
           colors.text,
           player.isSelected && 'scale-110',
-          isDragging && 'scale-125 shadow-2xl',
+          isDragging && 'scale-125 shadow-2xl'
         )}
       >
         {/* Captain indicator */}
@@ -578,7 +621,7 @@ const PlayerToken: React.FC<PlayerTokenProps> = ({
           <div
             className={cn(
               'absolute -bottom-1 -right-1 w-3 h-3 rounded-full border border-white',
-              availabilityIndicator[player.availability],
+              availabilityIndicator[player.availability]
             )}
           />
         )}
@@ -592,13 +635,24 @@ const PlayerToken: React.FC<PlayerTokenProps> = ({
             'bg-black/60 backdrop-blur-sm rounded px-2 py-1',
             'opacity-0 group-hover:opacity-100 transition-opacity duration-200',
             'whitespace-nowrap text-xs font-medium text-white',
-            'pointer-events-none z-10',
+            'pointer-events-none z-10'
           )}
         >
           {player.name}
           <div className="text-xs text-gray-300">{player.role}</div>
         </div>
       )}
+
+      {/* Hidden player details for screen readers */}
+      <div id={`player-${player.id}-details`} className="sr-only">
+        {player.name}, jersey number {player.jerseyNumber}, playing as {player.role} for the{' '}
+        {player.teamSide} team
+        {player.isCaptain && ', team captain'}
+        {player.availability === 'injured' && ', currently injured'}
+        {player.availability === 'suspended' && ', currently suspended'}. Click to{' '}
+        {player.isSelected ? 'deselect' : 'select'} player
+        {!readonly && ', drag to reposition'}.
+      </div>
     </div>
   );
 };

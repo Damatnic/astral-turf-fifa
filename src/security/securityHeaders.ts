@@ -27,7 +27,15 @@ export interface SecurityHeadersConfig {
   };
   referrerPolicy?: {
     enabled: boolean;
-    policy: 'no-referrer' | 'no-referrer-when-downgrade' | 'origin' | 'origin-when-cross-origin' | 'same-origin' | 'strict-origin' | 'strict-origin-when-cross-origin' | 'unsafe-url';
+    policy:
+      | 'no-referrer'
+      | 'no-referrer-when-downgrade'
+      | 'origin'
+      | 'origin-when-cross-origin'
+      | 'same-origin'
+      | 'strict-origin'
+      | 'strict-origin-when-cross-origin'
+      | 'unsafe-url';
   };
   permissionsPolicy?: {
     enabled: boolean;
@@ -144,12 +152,7 @@ const DEFAULT_SECURITY_CONFIG: SecurityHeadersConfig = {
         'https://images.unsplash.com',
         'https://ui-avatars.com',
       ],
-      'font-src': [
-        "'self'",
-        'data:',
-        'https://fonts.gstatic.com',
-        'https://cdn.jsdelivr.net',
-      ],
+      'font-src': ["'self'", 'data:', 'https://fonts.gstatic.com', 'https://cdn.jsdelivr.net'],
       'connect-src': [
         "'self'",
         'https://api.openai.com',
@@ -164,11 +167,7 @@ const DEFAULT_SECURITY_CONFIG: SecurityHeadersConfig = {
       'media-src': ["'self'", 'data:', 'blob:'],
       'object-src': ["'none'"],
       'child-src': ["'self'"],
-      'frame-src': [
-        "'self'",
-        'https://www.google.com',
-        'https://accounts.google.com',
-      ],
+      'frame-src': ["'self'", 'https://www.google.com', 'https://accounts.google.com'],
       'worker-src': ["'self'", 'blob:'],
       'manifest-src': ["'self'"],
       'base-uri': ["'self'"],
@@ -284,9 +283,8 @@ class SecurityHeadersService {
 
   constructor(environment: 'development' | 'production' | 'test' = 'production') {
     this.environment = environment;
-    this.config = environment === 'development' 
-      ? DEVELOPMENT_SECURITY_CONFIG 
-      : DEFAULT_SECURITY_CONFIG;
+    this.config =
+      environment === 'development' ? DEVELOPMENT_SECURITY_CONFIG : DEFAULT_SECURITY_CONFIG;
   }
 
   /**
@@ -317,9 +315,7 @@ class SecurityHeadersService {
 
     // X-Content-Type-Options
     if (this.config.xContentTypeOptions?.enabled) {
-      headers['X-Content-Type-Options'] = this.config.xContentTypeOptions.nosniff 
-        ? 'nosniff' 
-        : '';
+      headers['X-Content-Type-Options'] = this.config.xContentTypeOptions.nosniff ? 'nosniff' : '';
     }
 
     // Referrer Policy
@@ -363,7 +359,10 @@ class SecurityHeadersService {
     const metaTags: string[] = [];
 
     // CSP meta tag (for HTML documents)
-    if (this.config.contentSecurityPolicy?.enabled && !this.config.contentSecurityPolicy.reportOnly) {
+    if (
+      this.config.contentSecurityPolicy?.enabled &&
+      !this.config.contentSecurityPolicy.reportOnly
+    ) {
       const cspHeader = this.generateCSPHeader();
       metaTags.push(`<meta http-equiv="Content-Security-Policy" content="${cspHeader}">`);
     }
@@ -417,31 +416,42 @@ class SecurityHeadersService {
     violationsByUri: Record<string, number>;
     violationsByUserAgent: Record<string, number>;
     trends: Array<{ date: string; count: number }>;
-    topViolations: Array<{ directive: string; count: number; riskLevel: 'low' | 'medium' | 'high' | 'critical' }>;
+    topViolations: Array<{
+      directive: string;
+      count: number;
+      riskLevel: 'low' | 'medium' | 'high' | 'critical';
+    }>;
   } {
     const now = new Date();
     const timeframeMs = this.getTimeframeInMs(timeframe);
     const cutoff = new Date(now.getTime() - timeframeMs);
 
-    const recentViolations = this.violations.filter(
-      v => new Date(v.timestamp) >= cutoff
+    const recentViolations = this.violations.filter(v => new Date(v.timestamp) >= cutoff);
+
+    const violationsByDirective = recentViolations.reduce(
+      (acc, v) => {
+        acc[v.violatedDirective] = (acc[v.violatedDirective] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
     );
 
-    const violationsByDirective = recentViolations.reduce((acc, v) => {
-      acc[v.violatedDirective] = (acc[v.violatedDirective] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const violationsByUri = recentViolations.reduce(
+      (acc, v) => {
+        acc[v.blockedUri] = (acc[v.blockedUri] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
 
-    const violationsByUri = recentViolations.reduce((acc, v) => {
-      acc[v.blockedUri] = (acc[v.blockedUri] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-
-    const violationsByUserAgent = recentViolations.reduce((acc, v) => {
-      const browser = this.extractBrowser(v.userAgent);
-      acc[browser] = (acc[browser] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const violationsByUserAgent = recentViolations.reduce(
+      (acc, v) => {
+        const browser = this.extractBrowser(v.userAgent);
+        acc[browser] = (acc[browser] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
 
     // Generate trend data
     const trends = this.generateTrendData(recentViolations, timeframe);
@@ -495,7 +505,7 @@ class SecurityHeadersService {
 
         // Check for overly permissive directives
         if (directives['default-src']?.includes('*')) {
-          errors.push("Wildcard (*) in default-src is too permissive");
+          errors.push('Wildcard (*) in default-src is too permissive');
         }
       }
     }
@@ -503,7 +513,8 @@ class SecurityHeadersService {
     // Validate HSTS configuration
     if (this.config.strictTransportSecurity?.enabled) {
       const maxAge = this.config.strictTransportSecurity.maxAge || 0;
-      if (maxAge < 86400) { // 1 day
+      if (maxAge < 86400) {
+        // 1 day
         errors.push('HSTS max-age should be at least 1 day (86400 seconds)');
       }
     }
@@ -526,11 +537,11 @@ class SecurityHeadersService {
   addNonceToCSP(nonce: string): void {
     if (this.config.contentSecurityPolicy?.directives) {
       const directives = this.config.contentSecurityPolicy.directives;
-      
+
       if (directives['script-src']) {
         directives['script-src'].push(`'nonce-${nonce}'`);
       }
-      
+
       if (directives['style-src']) {
         directives['style-src'].push(`'nonce-${nonce}'`);
       }
@@ -540,7 +551,9 @@ class SecurityHeadersService {
   // Private helper methods
   private generateCSPHeader(): string {
     const directives = this.config.contentSecurityPolicy?.directives;
-    if (!directives) return '';
+    if (!directives) {
+      return '';
+    }
 
     const parts: string[] = [];
 
@@ -565,31 +578,33 @@ class SecurityHeadersService {
   private generateHSTSHeader(): string {
     const config = this.config.strictTransportSecurity!;
     let header = `max-age=${config.maxAge || 31536000}`;
-    
+
     if (config.includeSubDomains) {
       header += '; includeSubDomains';
     }
-    
+
     if (config.preload) {
       header += '; preload';
     }
-    
+
     return header;
   }
 
   private generateXFrameOptionsHeader(): string {
     const config = this.config.xFrameOptions!;
-    
+
     if (config.policy === 'ALLOW-FROM' && config.allowFrom) {
       return `ALLOW-FROM ${config.allowFrom}`;
     }
-    
+
     return config.policy;
   }
 
   private generatePermissionsPolicyHeader(): string {
     const directives = this.config.permissionsPolicy?.directives;
-    if (!directives) return '';
+    if (!directives) {
+      return '';
+    }
 
     const parts: string[] = [];
 
@@ -629,18 +644,27 @@ class SecurityHeadersService {
       /eval\(/i,
     ];
 
-    return suspiciousPatterns.some(pattern => 
-      pattern.test(violation.blockedUri) || 
-      pattern.test(violation.sourceFile || '')
+    return suspiciousPatterns.some(
+      pattern => pattern.test(violation.blockedUri) || pattern.test(violation.sourceFile || '')
     );
   }
 
   private extractBrowser(userAgent: string): string {
-    if (userAgent.includes('Chrome')) return 'Chrome';
-    if (userAgent.includes('Firefox')) return 'Firefox';
-    if (userAgent.includes('Safari') && !userAgent.includes('Chrome')) return 'Safari';
-    if (userAgent.includes('Edge')) return 'Edge';
-    if (userAgent.includes('Opera')) return 'Opera';
+    if (userAgent.includes('Chrome')) {
+      return 'Chrome';
+    }
+    if (userAgent.includes('Firefox')) {
+      return 'Firefox';
+    }
+    if (userAgent.includes('Safari') && !userAgent.includes('Chrome')) {
+      return 'Safari';
+    }
+    if (userAgent.includes('Edge')) {
+      return 'Edge';
+    }
+    if (userAgent.includes('Opera')) {
+      return 'Opera';
+    }
     return 'Other';
   }
 
@@ -664,31 +688,31 @@ class SecurityHeadersService {
   ): Array<{ date: string; count: number }> {
     const trends: Array<{ date: string; count: number }> = [];
     const now = new Date();
-    
+
     let interval: number;
     let format: (date: Date) => string;
-    
+
     switch (timeframe) {
       case '1h':
         interval = 5 * 60 * 1000; // 5 minutes
-        format = (date) => date.toISOString().substring(0, 16);
+        format = date => date.toISOString().substring(0, 16);
         break;
       case '24h':
         interval = 60 * 60 * 1000; // 1 hour
-        format = (date) => date.toISOString().substring(0, 13);
+        format = date => date.toISOString().substring(0, 13);
         break;
       case '7d':
         interval = 24 * 60 * 60 * 1000; // 1 day
-        format = (date) => date.toISOString().substring(0, 10);
+        format = date => date.toISOString().substring(0, 10);
         break;
       case '30d':
         interval = 24 * 60 * 60 * 1000; // 1 day
-        format = (date) => date.toISOString().substring(0, 10);
+        format = date => date.toISOString().substring(0, 10);
         break;
     }
 
     const buckets = new Map<string, number>();
-    
+
     violations.forEach(violation => {
       const violationTime = new Date(violation.timestamp);
       const bucketTime = new Date(Math.floor(violationTime.getTime() / interval) * interval);
@@ -720,13 +744,18 @@ class SecurityHeadersService {
   }
 
   private generateViolationId(): string {
-    return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    return (
+      Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+    );
   }
 }
 
 // Export singleton instance
 export const securityHeaders = new SecurityHeadersService(
-  (typeof process !== 'undefined' && process.env.NODE_ENV) || 'production'
+  ((typeof process !== 'undefined' && process.env.NODE_ENV) || 'production') as
+    | 'development'
+    | 'production'
+    | 'test'
 );
 
 // Export convenience functions
@@ -736,14 +765,14 @@ export const getSecurityMetaTags = () => securityHeaders.generateMetaTags();
 
 export const reportViolation = (report: any) => securityHeaders.processViolationReport(report);
 
-export const getSecurityStats = (timeframe?: '1h' | '24h' | '7d' | '30d') => 
+export const getSecurityStats = (timeframe?: '1h' | '24h' | '7d' | '30d') =>
   securityHeaders.getViolationStats(timeframe);
 
 export const validateSecurityConfig = () => securityHeaders.validateConfig();
 
 export const generateSecureNonce = () => securityHeaders.generateNonce();
 
-export const updateSecurityConfig = (config: Partial<SecurityHeadersConfig>) => 
+export const updateSecurityConfig = (config: Partial<SecurityHeadersConfig>) =>
   securityHeaders.updateConfig(config);
 
 // Export for Vite configuration

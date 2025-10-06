@@ -19,15 +19,13 @@ const getVariantClasses = (variant: string) => {
   }
 };
 
-export const Badge: React.FC<BadgeProps> = ({ 
-  variant = 'default', 
-  className = '', 
-  children 
-}) => {
+export const Badge: React.FC<BadgeProps> = ({ variant = 'default', className = '', children }) => {
   const variantClasses = getVariantClasses(variant);
-  
+
   return (
-    <div className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${variantClasses} ${className}`}>
+    <div
+      className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${variantClasses} ${className}`}
+    >
       {children}
     </div>
   );

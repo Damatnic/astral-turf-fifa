@@ -138,7 +138,7 @@ export function createSecret(
     expiresAt?: string;
     classification?: DataClassification;
   } = {},
-  context: SecretAccessContext,
+  context: SecretAccessContext
 ): string {
   try {
     const secretId = generateUUID();
@@ -213,7 +213,7 @@ export function createSecret(
 
     return secretId;
   } catch (_error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorMessage = _error instanceof Error ? _error.message : 'Unknown error';
 
     securityLogger.error('Secret creation failed', {
       userId: context.userId,
@@ -341,7 +341,7 @@ export function getSecret(secretId: string, context: SecretAccessContext): strin
 
     return decryptedValue;
   } catch (_error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorMessage = _error instanceof Error ? _error.message : 'Unknown error';
 
     auditSecretAccess({
       secretId,
@@ -415,8 +415,8 @@ function scheduleSecretRotation(secretId: string): void {
 // Rotate a secret
 export function rotateSecret(
   secretId: string,
-  newValue?: string,
   context: SecretAccessContext,
+  newValue?: string
 ): RotationResult {
   try {
     const secret = secretStore.get(secretId);
@@ -498,7 +498,7 @@ export function rotateSecret(
       rotatedAt: now,
     };
   } catch (_error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorMessage = _error instanceof Error ? _error.message : 'Unknown error';
 
     securityLogger.error('Secret rotation failed', {
       secretId,
@@ -641,7 +641,7 @@ export function deleteSecret(secretId: string, context: SecretAccessContext): bo
     securityLogger.error('Secret deletion failed', {
       secretId,
       userId: context.userId,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: _error instanceof Error ? _error.message : 'Unknown error',
     });
 
     return false;

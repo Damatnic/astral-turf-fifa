@@ -9,13 +9,20 @@ export * from './tacticsValidation';
 
 // Performance & Optimization
 export * from './performance';
-export * from './accessibility';
 export * from './themeManager';
 
 // Testing & Validation
-export * from './validation';
 export * from './testing';
 export * from './qualityAssurance';
+
+// Accessibility - explicit re-export to avoid conflict
+export type { AccessibilityIssue } from './accessibility';
+export * from './accessibility';
+
+// Validation - export everything except AccessibilityIssue
+export type { LighthouseMetrics, LighthouseThresholds, ValidationReport } from './validation';
+export { LighthouseValidator, AccessibilityValidator, SEOValidator } from './validation';
+export { UIUXValidator as UIUXValidatorFromValidation } from './validation';
 
 // Convenience exports for common use cases
 export {
@@ -30,24 +37,7 @@ export {
   UIUXValidator,
   QualityMonitor,
   TestRunner,
-
-  // Performance monitoring
-  PerformanceMonitor,
-
-  // Accessibility management
-  AccessibilityManager,
-  FocusManager,
-
-  // Theme management
-  ThemeManager,
 } from './qualityAssurance';
 
 // Types for easy importing
-export type {
-  QualityDashboard,
-  ValidationReport,
-  MonitoringReport,
-  PerformanceMetrics,
-  AccessibilityIssue,
-  ThemePreferences,
-} from './qualityAssurance';
+export type { QualityDashboard } from './qualityAssurance';

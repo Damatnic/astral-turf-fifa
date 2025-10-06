@@ -112,10 +112,10 @@ export const PersonalizationProvider: React.FC<{ children: ReactNode }> = ({ chi
 
   const updatePreferences = (updates: Partial<UserPreferences>) => {
     setPreferences(prev => {
-      const updated = { ...prev };
+      const updated = { ...prev } as UserPreferences;
       Object.keys(updates).forEach(key => {
         const category = key as keyof UserPreferences;
-        updated[category] = { ...updated[category], ...updates[category] };
+        updated[category] = { ...updated[category], ...updates[category] } as any;
       });
       return updated;
     });
@@ -141,7 +141,7 @@ export const PersonalizationProvider: React.FC<{ children: ReactNode }> = ({ chi
 
   const getPreferenceValue = <T extends keyof UserPreferences>(
     category: T,
-    key: keyof UserPreferences[T],
+    key: keyof UserPreferences[T]
   ) => {
     return preferences[category][key];
   };
@@ -256,7 +256,6 @@ export const ThemeCustomizer: React.FC<ThemeCustomizerProps> = ({ isOpen, onClos
                     customColors.primary === color.value
                       ? theme.colors.text.primary
                       : 'transparent',
-                  focusRingColor: theme.colors.accent.primary,
                 }}
                 onClick={() => handleColorChange('primary', color.value)}
                 aria-label={`Set primary color to ${color.name}`}
@@ -298,7 +297,6 @@ export const ThemeCustomizer: React.FC<ThemeCustomizerProps> = ({ isOpen, onClos
                   backgroundColor: color.value,
                   borderColor:
                     customColors.accent === color.value ? theme.colors.text.primary : 'transparent',
-                  focusRingColor: theme.colors.accent.primary,
                 }}
                 onClick={() => handleColorChange('accent', color.value)}
                 aria-label={`Set accent color to ${color.name}`}
@@ -491,7 +489,7 @@ export const AccessibilityPreferences: React.FC<AccessibilityPreferencesProps> =
 
   const handleAccessibilityChange = (
     key: keyof UserPreferences['accessibility'],
-    value: unknown,
+    value: unknown
   ) => {
     updatePreferences({
       accessibility: { ...preferences.accessibility, [key]: value },
@@ -533,7 +531,6 @@ export const AccessibilityPreferences: React.FC<AccessibilityPreferencesProps> =
                     preferences.accessibility.fontSize === option.value
                       ? `${theme.colors.accent.primary}10`
                       : theme.colors.background.secondary,
-                  focusRingColor: theme.colors.accent.primary,
                 }}
                 onClick={() => handleAccessibilityChange('fontSize', option.value)}
               >

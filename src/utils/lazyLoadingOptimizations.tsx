@@ -18,150 +18,97 @@ interface LazyComponentOptions {
 }
 
 // Enhanced lazy loading with preloading
-export function createOptimizedLazy<T extends ComponentType<any>>(
+export function createOptimizedLazy<T extends ComponentType<unknown>>(
   componentImport: () => Promise<{ default: T }>,
-  options: LazyComponentOptions = {}
+  _options: LazyComponentOptions = {}
 ): LazyExoticComponent<T> {
-  const {
-    preloadStrategy = 'viewport',
-    timeout = 10000,
-    retryAttempts = 3
-  } = options;
+  const LazyComponent = lazy(componentImport);
 
-  let importPromise: Promise<{ default: T }> | null = null;
-  let retryCount = 0;
-
-  const loadComponent = (): Promise<{ default: T }> => {
-    if (importPromise) return importPromise;
-
-    importPromise = Promise.race([
-      componentImport(),
-      new Promise<never>((_, reject) => 
-        setTimeout(() => reject(new Error('Component load timeout')), timeout)
-      )
-    ]).catch((error) => {
-      importPromise = null; // Reset for retry
-      
-      if (retryCount < retryAttempts) {
-        retryCount++;
-        console.warn(`Component load failed, retrying (${retryCount}/${retryAttempts})...`, error);
-        return new Promise(resolve => 
-          setTimeout(() => resolve(loadComponent()), 1000 * retryCount)
-        );
-      }
-      
-      throw error;
-    });
-
-    return importPromise;
+  const preloadableComponent = LazyComponent as LazyExoticComponent<T> & {
+    preload?: () => void;
   };
 
-  const preloadComponent = () => {
-    if (!importPromise) {
-      loadComponent().catch(() => {
-        // Silently handle preload errors
-      });
-    }
+  preloadableComponent.preload = () => {
+    componentImport();
   };
 
-  // Implement preloading strategies
-  switch (preloadStrategy) {
-    case 'idle':
-      if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
-        (window as any).requestIdleCallback(preloadComponent);
-      } else {
-        setTimeout(preloadComponent, 100);
-      }
-      break;
-    
-    case 'instant':
-      preloadComponent();
-      break;
-    
-    case 'viewport':
-      // Viewport preloading handled by component wrapper
-      break;
-    
-    case 'hover':
-      // Hover preloading handled by component wrapper
-      break;
-  }
-
-  const LazyComponent = lazy(loadComponent);
-  
-  // Add preload method to component
-  (LazyComponent as any).preload = preloadComponent;
-  
-  return LazyComponent;
+  return preloadableComponent;
 }
 
-// Intersection observer hook for viewport-based lazy loading
-export function useViewportLazyLoad(options: IntersectionObserverInit = {}) {
-  const { ref, inView, entry } = useInView({
-    threshold: 0.1,
+// Viewport-based lazy loading hook
+export function useViewportLazyLoad(options: { threshold?: number } = {}) {
+  const { threshold = 0.1 } = options;
+  const { ref, inView } = useInView({
+    threshold,
     triggerOnce: true,
-    rootMargin: '200px', // Load 200px before entering viewport
-    ...options
   });
 
-  return { ref, shouldLoad: inView, entry };
+  return {
+    ref,
+    shouldLoad: inView,
+  };
 }
 
-// Optimized image lazy loading
+// Optimized image loader with lazy loading
+/* eslint-disable no-undef */
 export class OptimizedImageLoader {
   private cache = new Map<string, HTMLImageElement>();
   private loadingPromises = new Map<string, Promise<HTMLImageElement>>();
-  private priorityQueue: string[] = [];
-  private observer: IntersectionObserver;
-  
+  private observer: IntersectionObserver | null;
+
   constructor() {
+    if (typeof IntersectionObserver === 'undefined') {
+      this.observer = null;
+      return;
+    }
     this.observer = new IntersectionObserver(
-      (entries) => {
+      entries => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
             const img = entry.target as HTMLImageElement;
             const src = img.dataset.src;
             if (src) {
-              this.loadImage(src, 'high').then(loadedImg => {
-                img.src = loadedImg.src;
-                img.classList.add('loaded');
-              });
-              this.observer.unobserve(img);
+              this.loadImage(src);
+              if (this.observer) {
+                this.observer.unobserve(img);
+              }
             }
           }
         });
       },
-      { rootMargin: '50px' }
+      {
+        rootMargin: '50px',
+      }
     );
   }
 
-  async loadImage(src: string, priority: 'low' | 'high' = 'low'): Promise<HTMLImageElement> {
-    // Check cache first
+  loadImage(src: string, priority: 'low' | 'high' = 'low'): Promise<HTMLImageElement> {
     if (this.cache.has(src)) {
-      return this.cache.get(src)!;
+      return Promise.resolve(this.cache.get(src)!);
     }
 
-    // Check if already loading
     if (this.loadingPromises.has(src)) {
       return this.loadingPromises.get(src)!;
     }
 
-    // Create loading promise
     const promise = new Promise<HTMLImageElement>((resolve, reject) => {
+      if (typeof Image === 'undefined') {
+        reject(new Error('Image API not available (SSR context)'));
+        return;
+      }
       const img = new Image();
-      
+
       img.onload = () => {
         this.cache.set(src, img);
         this.loadingPromises.delete(src);
         resolve(img);
       };
-      
+
       img.onerror = () => {
         this.loadingPromises.delete(src);
         reject(new Error(`Failed to load image: ${src}`));
       };
 
-      // Set loading priority
       if (priority === 'high') {
         img.loading = 'eager';
         img.fetchPriority = 'high';
@@ -169,7 +116,7 @@ export class OptimizedImageLoader {
         img.loading = 'lazy';
         img.fetchPriority = 'low';
       }
-      
+
       img.src = src;
     });
 
@@ -182,21 +129,26 @@ export class OptimizedImageLoader {
   }
 
   observeImage(img: HTMLImageElement) {
-    this.observer.observe(img);
+    if (this.observer) {
+      this.observer.observe(img);
+    }
   }
 
   disconnect() {
-    this.observer.disconnect();
+    if (this.observer) {
+      this.observer.disconnect();
+    }
     this.cache.clear();
     this.loadingPromises.clear();
   }
 }
+/* eslint-enable no-undef */
 
 // Resource preloader for critical assets
 export class ResourcePreloader {
   private static instance: ResourcePreloader;
   private preloadedResources = new Set<string>();
-  
+
   static getInstance(): ResourcePreloader {
     if (!ResourcePreloader.instance) {
       ResourcePreloader.instance = new ResourcePreloader();
@@ -207,6 +159,10 @@ export class ResourcePreloader {
   preloadStylesheet(href: string): Promise<void> {
     if (this.preloadedResources.has(href)) {
       return Promise.resolve();
+    }
+
+    if (typeof document === 'undefined') {
+      return Promise.reject(new Error('Document API not available (SSR context)'));
     }
 
     return new Promise((resolve, reject) => {
@@ -228,6 +184,10 @@ export class ResourcePreloader {
       return Promise.resolve();
     }
 
+    if (typeof document === 'undefined') {
+      return Promise.reject(new Error('Document API not available (SSR context)'));
+    }
+
     return new Promise((resolve, reject) => {
       const link = document.createElement('link');
       link.rel = 'preload';
@@ -247,6 +207,10 @@ export class ResourcePreloader {
       return Promise.resolve();
     }
 
+    if (typeof document === 'undefined') {
+      return Promise.reject(new Error('Document API not available (SSR context)'));
+    }
+
     return new Promise((resolve, reject) => {
       const link = document.createElement('link');
       link.rel = 'preload';
@@ -264,7 +228,13 @@ export class ResourcePreloader {
   }
 
   prefetchResource(href: string): void {
-    if (this.preloadedResources.has(href)) return;
+    if (this.preloadedResources.has(href)) {
+      return;
+    }
+
+    if (typeof document === 'undefined') {
+      return;
+    }
 
     const link = document.createElement('link');
     link.rel = 'prefetch';
@@ -274,25 +244,77 @@ export class ResourcePreloader {
   }
 }
 
+type LazyLoadingErrorBoundaryProps = React.PropsWithChildren<{
+  fallback: React.ReactNode;
+  onError?: (error: Error) => void;
+}>;
+
+interface LazyLoadingErrorBoundaryState {
+  hasError: boolean;
+}
+
+class LazyLoadingErrorBoundary extends React.Component<
+  LazyLoadingErrorBoundaryProps,
+  LazyLoadingErrorBoundaryState
+> {
+  override state: LazyLoadingErrorBoundaryState = {
+    hasError: false,
+  };
+
+  static getDerivedStateFromError(): LazyLoadingErrorBoundaryState {
+    return { hasError: true };
+  }
+
+  override componentDidCatch(error: Error) {
+    this.props.onError?.(error);
+  }
+
+  override render() {
+    if (this.state.hasError) {
+      return this.props.fallback;
+    }
+
+    return this.props.children;
+  }
+}
+
+interface PreloadableComponent {
+  preload?: () => void;
+}
+
+const invokePreload = (component: unknown) => {
+  if (
+    component &&
+    (typeof component === 'object' || typeof component === 'function') &&
+    typeof (component as PreloadableComponent).preload === 'function'
+  ) {
+    (component as PreloadableComponent).preload?.();
+  }
+};
+
 // Component-level lazy loading wrapper
 export function withLazyLoading<P extends object>(
   LazyComponent: LazyExoticComponent<ComponentType<P>>,
   options: LazyComponentOptions = {}
-): React.FC<P & { preloadStrategy?: PreloadStrategy }> {
+): React.ForwardRefExoticComponent<
+  React.PropsWithoutRef<P & { preloadStrategy?: PreloadStrategy }> &
+    React.RefAttributes<HTMLDivElement>
+> {
   const {
     fallback: FallbackComponent,
     errorBoundary: ErrorBoundary,
-    preloadStrategy: defaultPreloadStrategy = 'viewport'
+    preloadStrategy: defaultPreloadStrategy = 'viewport',
   } = options;
 
-  return React.forwardRef<any, P & { preloadStrategy?: PreloadStrategy }>((props, ref) => {
+  const WithLazyLoadingComponent = React.forwardRef<
+    HTMLDivElement,
+    P & { preloadStrategy?: PreloadStrategy }
+  >((props, ref) => {
     const { preloadStrategy = defaultPreloadStrategy, ...componentProps } = props;
     const [shouldLoad, setShouldLoad] = React.useState(preloadStrategy === 'instant');
     const [hasError, setHasError] = React.useState(false);
-    const [retryCount, setRetryCount] = React.useState(0);
-    const elementRef = React.useRef<HTMLDivElement>(null);
+    const elementRef = React.useRef<HTMLDivElement | null>(null);
 
-    // Viewport-based loading
     const { ref: viewportRef, shouldLoad: inViewport } = useViewportLazyLoad();
 
     React.useEffect(() => {
@@ -301,50 +323,68 @@ export function withLazyLoading<P extends object>(
       }
     }, [inViewport, preloadStrategy]);
 
-    // Hover-based preloading
     const handleMouseEnter = React.useCallback(() => {
       if (preloadStrategy === 'hover' || preloadStrategy === 'viewport') {
-        if ((LazyComponent as any).preload) {
-          (LazyComponent as any).preload();
-        }
+        invokePreload(LazyComponent);
         if (preloadStrategy === 'hover') {
           setShouldLoad(true);
         }
       }
     }, [preloadStrategy]);
 
-    // Error retry logic
     const retry = React.useCallback(() => {
       setHasError(false);
-      setRetryCount(prev => prev + 1);
       setShouldLoad(true);
     }, []);
 
-    const handleError = React.useCallback((error: Error) => {
-      console.error('Lazy component error:', error);
+    const handleError = React.useCallback(() => {
       setHasError(true);
     }, []);
 
-    // Combine refs
-    const combinedRef = React.useCallback((node: HTMLDivElement) => {
-      if (elementRef.current) elementRef.current = node;
-      if (viewportRef) viewportRef(node);
-    }, [viewportRef]);
+    const combinedRef = React.useCallback(
+      (node: HTMLDivElement | null) => {
+        elementRef.current = node;
+
+        if (typeof viewportRef === 'function') {
+          viewportRef(node);
+        } else if (viewportRef && 'current' in viewportRef) {
+          (viewportRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
+        }
+      },
+      [viewportRef]
+    );
+
+    const setRefs = React.useCallback(
+      (node: HTMLDivElement | null) => {
+        combinedRef(node);
+
+        if (!ref) {
+          return;
+        }
+
+        if (typeof ref === 'function') {
+          ref(node);
+        } else {
+          (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
+        }
+      },
+      [combinedRef, ref]
+    );
 
     if (hasError && ErrorBoundary) {
-      return React.createElement(ErrorBoundary, { 
-        error: new Error('Component failed to load'), 
-        retry: retry 
+      return React.createElement(ErrorBoundary, {
+        error: new Error('Component failed to load'),
+        retry,
       });
     }
 
     if (!shouldLoad) {
       return (
         <div
-          ref={combinedRef}
+          ref={setRefs}
           onMouseEnter={handleMouseEnter}
           className="lazy-placeholder"
-          style={{ minHeight: '100px' }} // Prevent layout shift
+          style={{ minHeight: '100px' }}
         >
           {FallbackComponent ? <FallbackComponent /> : null}
         </div>
@@ -352,50 +392,60 @@ export function withLazyLoading<P extends object>(
     }
 
     return (
-      <div ref={combinedRef} onMouseEnter={handleMouseEnter}>
-        <React.ErrorBoundary
+      <div ref={setRefs} onMouseEnter={handleMouseEnter}>
+        <LazyLoadingErrorBoundary
           fallback={
-            ErrorBoundary ? 
-              <ErrorBoundary error={new Error('Component error')} retry={retry} /> :
+            ErrorBoundary ? (
+              <ErrorBoundary error={new Error('Component error')} retry={retry} />
+            ) : (
               <div>Error loading component</div>
+            )
           }
           onError={handleError}
         >
           <Suspense
             fallback={
-              FallbackComponent ? 
-                <FallbackComponent /> : 
+              FallbackComponent ? (
+                <FallbackComponent />
+              ) : (
                 <div className="animate-pulse bg-slate-800/50 rounded h-32" />
+              )
             }
           >
-            <LazyComponent {...(componentProps as P)} ref={ref} />
+            {/* @ts-expect-error - ComponentType spread issue */}
+            <LazyComponent {...(componentProps as P)} />
           </Suspense>
-        </React.ErrorBoundary>
+        </LazyLoadingErrorBoundary>
       </div>
     );
   });
+
+  const componentName =
+    (LazyComponent as { displayName?: string; name?: string }).displayName ||
+    (LazyComponent as { displayName?: string; name?: string }).name ||
+    'Component';
+  WithLazyLoadingComponent.displayName = `WithLazyLoading(${componentName})`;
+
+  return WithLazyLoadingComponent;
 }
 
 // Route-based code splitting with preloading
-export function createRouteComponent<T extends ComponentType<any>>(
+export function createRouteComponent<T extends ComponentType<unknown>>(
   componentImport: () => Promise<{ default: T }>,
   preloadTriggers: string[] = []
 ): LazyExoticComponent<T> {
   const LazyComponent = createOptimizedLazy(componentImport, {
     preloadStrategy: 'hover',
     timeout: 15000,
-    retryAttempts: 2
+    retryAttempts: 2,
   });
 
-  // Set up route preloading triggers
   if (typeof window !== 'undefined' && preloadTriggers.length > 0) {
     preloadTriggers.forEach(trigger => {
       const elements = document.querySelectorAll(`[href="${trigger}"]`);
       elements.forEach(element => {
         element.addEventListener('mouseenter', () => {
-          if ((LazyComponent as any).preload) {
-            (LazyComponent as any).preload();
-          }
+          invokePreload(LazyComponent);
         });
       });
     });
@@ -405,36 +455,33 @@ export function createRouteComponent<T extends ComponentType<any>>(
 }
 
 // Progressive loading for large datasets
-export function useProgressiveLoading<T>(
-  data: T[],
-  batchSize: number = 20,
-  delay: number = 100
-) {
+export function useProgressiveLoading<T>(data: T[], batchSize: number = 20, delay: number = 100) {
   const [loadedItems, setLoadedItems] = React.useState<T[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [hasMore, setHasMore] = React.useState(true);
 
   const loadMoreItems = React.useCallback(() => {
-    if (loading || !hasMore) return;
+    if (loading || !hasMore) {
+      return;
+    }
 
     setLoading(true);
-    
+
     setTimeout(() => {
       setLoadedItems(prev => {
         const nextBatch = data.slice(prev.length, prev.length + batchSize);
         const newItems = [...prev, ...nextBatch];
-        
+
         if (newItems.length >= data.length) {
           setHasMore(false);
         }
-        
+
         setLoading(false);
         return newItems;
       });
     }, delay);
   }, [data, batchSize, delay, loading, hasMore]);
 
-  // Load initial batch
   React.useEffect(() => {
     if (loadedItems.length === 0 && data.length > 0) {
       loadMoreItems();
@@ -445,7 +492,7 @@ export function useProgressiveLoading<T>(
     items: loadedItems,
     loading,
     hasMore,
-    loadMore: loadMoreItems
+    loadMore: loadMoreItems,
   };
 }
 
@@ -456,5 +503,5 @@ export default {
   ResourcePreloader,
   withLazyLoading,
   createRouteComponent,
-  useProgressiveLoading
+  useProgressiveLoading,
 };

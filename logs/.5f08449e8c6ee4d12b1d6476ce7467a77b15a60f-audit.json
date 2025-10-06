@@ -19,6 +19,11 @@
             "date": 1759001166210,
             "name": "logs\\security-2025-09-27.log",
             "hash": "405a7cbc493f88a8282c85c774c484ef9cc39f4f038a69576b4dc3f02f687fab"
+        },
+        {
+            "date": 1759682458540,
+            "name": "logs\\security-2025-10-05.log",
+            "hash": "bec4d745852936d9b62cf289ae7b8ce349bb56b1ee9bf84a35ccf41c284684f2"
         }
     ],
     "hashType": "sha256"

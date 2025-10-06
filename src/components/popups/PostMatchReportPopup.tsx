@@ -12,7 +12,7 @@ const PostMatchReportPopup: React.FC = () => {
   useEffect(() => {
     if (!postMatchReport && !isLoadingPostMatchReport && lastMatchResult) {
       dispatch({ type: 'GET_POST_MATCH_REPORT_START' });
-      getPostMatchAnalysis(lastMatchResult, 'Home Team', 'Away Team', settings.aiPersonality)
+      getPostMatchAnalysis(lastMatchResult as any, 'Home Team', 'Away Team', settings.aiPersonality)
         .then(report => dispatch({ type: 'GET_POST_MATCH_REPORT_SUCCESS', payload: report }))
         .catch(err => {
           console.error(err);
@@ -58,8 +58,8 @@ const PostMatchReportPopup: React.FC = () => {
           <div className="text-center mb-4">
             <p className="text-sm text-gray-400">Final Score</p>
             <p className="text-4xl font-bold">
-              <span className="text-blue-400">{lastMatchResult.homeScore}</span> -{' '}
-              <span className="text-red-400">{lastMatchResult.awayScore}</span>
+              <span className="text-blue-400">{(lastMatchResult as any).homeScore}</span> -{' '}
+              <span className="text-red-400">{(lastMatchResult as any).awayScore}</span>
             </p>
           </div>
 
@@ -69,22 +69,32 @@ const PostMatchReportPopup: React.FC = () => {
             </div>
           )}
 
-          {postMatchReport && (
-            <div className="space-y-4 text-sm">
-              <div>
-                <h4 className="font-bold text-green-400 mb-1">Match Summary</h4>
-                <p className="text-gray-300">{postMatchReport.summary}</p>
-              </div>
-              <div>
-                <h4 className="font-bold text-yellow-400 mb-1">Key Moment</h4>
-                <p className="text-gray-300">{postMatchReport.keyMoment}</p>
-              </div>
-              <div>
-                <h4 className="font-bold text-blue-400 mb-1">Strategic Advice</h4>
-                <p className="text-gray-300">{postMatchReport.advice}</p>
-              </div>
-            </div>
-          )}
+          {
+            (postMatchReport && (
+              <>
+                <div className="space-y-4 text-sm">
+                  <div>
+                    <h4 className="font-bold text-green-400 mb-1">Match Summary</h4>
+                    <p className="text-gray-300">
+                      {(postMatchReport as any).summary as React.ReactNode}
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-yellow-400 mb-1">Key Moment</h4>
+                    <p className="text-gray-300">
+                      {(postMatchReport as any).keyMoment as React.ReactNode}
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-blue-400 mb-1">Strategic Advice</h4>
+                    <p className="text-gray-300">
+                      {(postMatchReport as any).advice as React.ReactNode}
+                    </p>
+                  </div>
+                </div>
+              </>
+            )) as React.ReactNode
+          }
         </div>
         <div className="p-4 border-t border-gray-700 text-right">
           <button

@@ -37,7 +37,7 @@ const PlayerConversationPopup: React.FC = () => {
     dispatch({
       type: 'SEND_PLAYER_MESSAGE_START',
       payload: { playerId: player.id, message: userMessage },
-    });
+    } as any);
     setMessage('');
 
     try {
@@ -50,10 +50,10 @@ const PlayerConversationPopup: React.FC = () => {
       dispatch({
         type: 'SEND_PLAYER_MESSAGE_SUCCESS',
         payload: { playerId: player.id, response: aiResponse, moraleEffect: result.moraleEffect },
-      });
+      } as any);
     } catch (_error) {
       console.error('Failed to get AI player response:', _error);
-      dispatch({ type: 'SEND_PLAYER_MESSAGE_FAILURE', payload: { playerId: player.id } });
+      dispatch({ type: 'SEND_PLAYER_MESSAGE_FAILURE', payload: { playerId: player.id } } as any);
     }
   };
 

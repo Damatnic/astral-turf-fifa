@@ -8,6 +8,11 @@
 import { databaseService } from './databaseService';
 import { redisService } from './redisService';
 import { securityLogger } from '../security/logging';
+import { statfs } from 'node:fs';
+import { promisify } from 'node:util';
+import { platform } from 'node:os';
+
+const statfsAsync = promisify(statfs);
 
 export interface HealthStatus {
   status: 'healthy' | 'degraded' | 'unhealthy';
@@ -96,7 +101,7 @@ class HealthService {
       return healthStatus;
     } catch (_error) {
       securityLogger.error('Health check failed', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
       });
 
       return {
@@ -108,7 +113,7 @@ class HealthService {
         checks: {
           system: {
             status: 'unhealthy',
-            error: error instanceof Error ? error.message : 'Health check failed',
+            error: _error instanceof Error ? _error.message : 'Health check failed',
             lastChecked: timestamp,
           },
         },
@@ -138,7 +143,7 @@ class HealthService {
       };
     } catch (_error) {
       securityLogger.error('Readiness check failed', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
       });
 
       return {
@@ -207,7 +212,7 @@ class HealthService {
       return {
         status: 'unhealthy',
         latency: Date.now() - startTime,
-        error: error instanceof Error ? error.message : 'Database check failed',
+        error: _error instanceof Error ? _error.message : 'Database check failed',
         lastChecked: new Date().toISOString(),
       };
     }
@@ -278,7 +283,7 @@ class HealthService {
     } catch (_error) {
       return {
         status: 'unhealthy',
-        error: error instanceof Error ? error.message : 'Memory check failed',
+        error: _error instanceof Error ? _error.message : 'Memory check failed',
         lastChecked: new Date().toISOString(),
       };
     }
@@ -287,21 +292,65 @@ class HealthService {
   /**
    * Check disk space (simplified for cross-platform compatibility)
    */
+  /**
+   * Check disk space across platforms
+   */
   private async checkDiskSpace(): Promise<ComponentHealth> {
     try {
-      // This is a simplified check - in production, you'd want to check actual disk usage
+      const currentPlatform = platform();
+
+      // Determine the path to check based on platform
+      const pathToCheck = currentPlatform === 'win32' ? 'C:\\' : '/';
+
+      // Get filesystem statistics
+      const stats = await statfsAsync(pathToCheck);
+
+      // Calculate disk space metrics
+      const blockSize = stats.bsize;
+      const totalBlocks = stats.blocks;
+      const availableBlocks = stats.bavail;
+
+      const totalBytes = totalBlocks * blockSize;
+      const availableBytes = availableBlocks * blockSize;
+      const usedBytes = totalBytes - availableBytes;
+      const percentUsed = (usedBytes / totalBytes) * 100;
+
+      // Convert to GB for readability
+      const totalGB = (totalBytes / 1024 ** 3).toFixed(2);
+      const availableGB = (availableBytes / 1024 ** 3).toFixed(2);
+      const usedGB = (usedBytes / 1024 ** 3).toFixed(2);
+
+      // Determine health status based on disk usage
+      let status: 'healthy' | 'degraded' | 'unhealthy';
+      if (percentUsed < 80) {
+        status = 'healthy';
+      } else if (percentUsed < 90) {
+        status = 'degraded';
+      } else {
+        status = 'unhealthy';
+      }
+
       return {
-        status: 'healthy',
+        status,
         details: {
-          available: 'N/A - Platform specific implementation needed',
-          usage: 'N/A - Platform specific implementation needed',
+          path: pathToCheck,
+          platform: currentPlatform,
+          totalGB,
+          availableGB,
+          usedGB,
+          percentUsed: percentUsed.toFixed(2) + '%',
+          warning: percentUsed >= 80 ? 'Disk space running low' : undefined,
         },
         lastChecked: new Date().toISOString(),
       };
-    } catch (_error) {
+    } catch (error) {
       return {
         status: 'degraded',
-        error: 'Disk space check not implemented for this platform',
+        error: `Disk space check failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        details: {
+          platform: platform(),
+          note: 'statfs not available on this platform or insufficient permissions',
+        },
         lastChecked: new Date().toISOString(),
       };
     }
@@ -369,7 +418,7 @@ class HealthService {
     } catch (_error) {
       return {
         status: 'unhealthy',
-        error: error instanceof Error ? error.message : 'Security check failed',
+        error: _error instanceof Error ? _error.message : 'Security check failed',
         lastChecked: new Date().toISOString(),
       };
     }
@@ -407,7 +456,7 @@ class HealthService {
    */
   private processCheckResult(
     result: PromiseSettledResult<ComponentHealth>,
-    checkName: string,
+    checkName: string
   ): ComponentHealth {
     if (result.status === 'fulfilled') {
       return result.value;
@@ -424,7 +473,7 @@ class HealthService {
    * Determine overall status from individual check statuses
    */
   private determineOverallStatus(
-    statuses: Array<'healthy' | 'degraded' | 'unhealthy'>,
+    statuses: Array<'healthy' | 'degraded' | 'unhealthy'>
   ): 'healthy' | 'degraded' | 'unhealthy' {
     if (statuses.includes('unhealthy')) {
       return 'unhealthy';
@@ -454,7 +503,7 @@ class HealthService {
    */
   shutdown(): void {
     if (this.healthCheckInterval) {
-      clearInterval(this.healthCheckInterval);
+      clearInterval(this.healthCheckInterval as any);
       this.healthCheckInterval = null;
     }
 

@@ -101,7 +101,7 @@ const TacticalHeatMapCanvas: React.FC<TacticalHeatMapCanvasProps> = ({
     ctx: CanvasRenderingContext2D,
     positions: TacticalHeatMap['positions'],
     w: number,
-    h: number,
+    h: number
   ) => {
     positions.forEach(pos => {
       const x = (pos.x / 100) * (w - 20) + 10;
@@ -136,7 +136,7 @@ const TacticalHeatMapCanvas: React.FC<TacticalHeatMapCanvasProps> = ({
     ctx: CanvasRenderingContext2D,
     patterns: TacticalHeatMap['movementPatterns'],
     w: number,
-    h: number,
+    h: number
   ) => {
     patterns.forEach(pattern => {
       const fromX = (pattern.from.x / 100) * (w - 20) + 10;
@@ -165,7 +165,7 @@ const TacticalHeatMapCanvas: React.FC<TacticalHeatMapCanvasProps> = ({
     ctx: CanvasRenderingContext2D,
     zones: TacticalHeatMap['influenceZones'],
     w: number,
-    h: number,
+    h: number
   ) => {
     zones.forEach(zone => {
       const x = (zone.centerX / 100) * (w - 20) + 10;
@@ -199,7 +199,7 @@ const TacticalHeatMapCanvas: React.FC<TacticalHeatMapCanvasProps> = ({
     fromX: number,
     fromY: number,
     toX: number,
-    toY: number,
+    toY: number
   ) => {
     const headlen = 10; // Length of head in pixels
     const dx = toX - fromX;
@@ -217,12 +217,12 @@ const TacticalHeatMapCanvas: React.FC<TacticalHeatMapCanvasProps> = ({
     ctx.moveTo(toX, toY);
     ctx.lineTo(
       toX - headlen * Math.cos(angle - Math.PI / 6),
-      toY - headlen * Math.sin(angle - Math.PI / 6),
+      toY - headlen * Math.sin(angle - Math.PI / 6)
     );
     ctx.moveTo(toX, toY);
     ctx.lineTo(
       toX - headlen * Math.cos(angle + Math.PI / 6),
-      toY - headlen * Math.sin(angle + Math.PI / 6),
+      toY - headlen * Math.sin(angle + Math.PI / 6)
     );
     ctx.stroke();
   };

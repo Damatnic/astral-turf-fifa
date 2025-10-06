@@ -41,7 +41,7 @@ export const AccessibilityProvider: React.FC<{ children: ReactNode }> = ({ child
 
   const trapFocus = (container: HTMLElement) => {
     const focusableElements = container.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
     );
     const firstElement = focusableElements[0] as HTMLElement;
     const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
@@ -321,7 +321,6 @@ export const AccessibleModal: React.FC<AccessibleModalProps> = ({
                     className="p-2 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2"
                     style={{
                       color: theme.colors.text.secondary,
-                      focusRingColor: theme.colors.accent.primary,
                     }}
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -385,7 +384,7 @@ export const AccessibleButton: React.FC<AccessibleButtonProps> = ({
     }
 
     announceToScreenReader(
-      `Button activated: ${typeof children === 'string' ? children : 'Button'}`,
+      `Button activated: ${typeof children === 'string' ? children : 'Button'}`
     );
     props.onClick?.(e);
   };
@@ -438,26 +437,26 @@ export const AccessibleButton: React.FC<AccessibleButtonProps> = ({
 
   return (
     <motion.button
-      {...props}
+      {...(props as any)}
       disabled={disabled || loading}
       aria-disabled={disabled || loading}
       aria-busy={loading}
       className={`relative overflow-hidden focus:outline-none focus:ring-2 focus:ring-offset-2 ${className}`}
-      style={{
-        ...sizeStyles[size],
-        ...variantStyles[variant],
-        borderRadius: tokens.borderRadius.lg,
-        fontWeight: tokens.typography.fontWeights.medium,
-        cursor: disabled || loading ? 'not-allowed' : 'pointer',
-        opacity: disabled ? 0.6 : 1,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: tokens.spacing[2],
-        transition: `all ${tokens.transitions.normal} ease-in-out`,
-        focusRingColor: theme.colors.accent.primary,
-        focusRingOffsetColor: theme.colors.background.primary,
-      }}
+      style={
+        {
+          ...sizeStyles[size],
+          ...variantStyles[variant],
+          borderRadius: tokens.borderRadius.lg,
+          fontWeight: tokens.typography.fontWeights.medium,
+          cursor: disabled || loading ? 'not-allowed' : 'pointer',
+          opacity: disabled ? 0.6 : 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: tokens.spacing[2],
+          transition: `all ${tokens.transitions.normal} ease-in-out`,
+        } as any
+      }
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       onFocus={() => setIsFocused(true)}

@@ -9,3 +9,8 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
+
+// Extend Window interface for test utilities
+interface Window {
+  __lastAnnouncement?: string;
+}

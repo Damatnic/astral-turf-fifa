@@ -30,7 +30,7 @@ describe('Site-Wide Navigation Validation - ZENITH Tests', () => {
   describe('Complete Navigation Flow', () => {
     it('should navigate through all major pages without errors', async () => {
       const user = userEvent.setup();
-      
+
       render(
         <MemoryRouter initialEntries={['/dashboard']}>
           <AppProvider>
@@ -52,11 +52,11 @@ describe('Site-Wide Navigation Validation - ZENITH Tests', () => {
       for (const { link, expectedText } of navigationTests) {
         const navLink = screen.getByRole('link', { name: new RegExp(link, 'i') });
         await user.click(navLink);
-        
+
         await waitFor(() => {
           expect(screen.getByText(expectedText)).toBeInTheDocument();
         });
-        
+
         // Verify page loaded properly
         expect(screen.getByRole('main')).toBeInTheDocument();
       }
@@ -64,7 +64,7 @@ describe('Site-Wide Navigation Validation - ZENITH Tests', () => {
 
     it('should maintain navigation state during browser back/forward', async () => {
       const user = userEvent.setup();
-      
+
       render(
         <BrowserRouter>
           <AppProvider>
@@ -76,7 +76,7 @@ describe('Site-Wide Navigation Validation - ZENITH Tests', () => {
       // Navigate to tactics
       const tacticsLink = screen.getByRole('link', { name: /tactics/i });
       await user.click(tacticsLink);
-      
+
       await waitFor(() => {
         expect(screen.getByText(/tactics/i)).toBeInTheDocument();
       });
@@ -84,21 +84,21 @@ describe('Site-Wide Navigation Validation - ZENITH Tests', () => {
       // Navigate to analytics
       const analyticsLink = screen.getByRole('link', { name: /analytics/i });
       await user.click(analyticsLink);
-      
+
       await waitFor(() => {
         expect(screen.getByText(/analytics/i)).toBeInTheDocument();
       });
 
       // Test browser back button
       window.history.back();
-      
+
       await waitFor(() => {
         expect(screen.getByText(/tactics/i)).toBeInTheDocument();
       });
 
       // Test browser forward button
       window.history.forward();
-      
+
       await waitFor(() => {
         expect(screen.getByText(/analytics/i)).toBeInTheDocument();
       });
@@ -119,7 +119,7 @@ describe('Site-Wide Navigation Validation - ZENITH Tests', () => {
 
     it('should preserve state across navigation', async () => {
       const user = userEvent.setup();
-      
+
       render(
         <MemoryRouter initialEntries={['/tactics']}>
           <AppProvider>
@@ -150,7 +150,7 @@ describe('Site-Wide Navigation Validation - ZENITH Tests', () => {
   describe('Menu System Validation', () => {
     it('should open and close all menus correctly', async () => {
       const user = userEvent.setup();
-      
+
       render(
         <ZenithTestWrapper>
           <App />
@@ -160,30 +160,30 @@ describe('Site-Wide Navigation Validation - ZENITH Tests', () => {
       // Test main navigation menu
       const menuButton = screen.getByRole('button', { name: /menu/i });
       await user.click(menuButton);
-      
+
       expect(screen.getByRole('navigation')).toBeVisible();
 
       // Test user menu
       const userMenuButton = screen.getByRole('button', { name: /user/i });
       await user.click(userMenuButton);
-      
+
       expect(screen.getByRole('menu')).toBeVisible();
 
       // Test closing menus with escape
       await user.keyboard('{Escape}');
-      
+
       expect(screen.queryByRole('menu')).not.toBeVisible();
 
       // Test closing menus by clicking outside
       await user.click(menuButton);
       await user.click(document.body);
-      
+
       expect(screen.queryByRole('navigation')).not.toBeVisible();
     });
 
     it('should support keyboard navigation in menus', async () => {
       const user = userEvent.setup();
-      
+
       render(
         <ZenithTestWrapper>
           <App />
@@ -194,7 +194,7 @@ describe('Site-Wide Navigation Validation - ZENITH Tests', () => {
       const menuButton = screen.getByRole('button', { name: /menu/i });
       menuButton.focus();
       await user.keyboard('{Enter}');
-      
+
       expect(screen.getByRole('navigation')).toBeVisible();
 
       // Navigate through menu items
@@ -206,7 +206,7 @@ describe('Site-Wide Navigation Validation - ZENITH Tests', () => {
 
       // Activate menu item with Enter
       await user.keyboard('{Enter}');
-      
+
       // Should navigate to selected page
       expect(screen.getByRole('main')).toBeInTheDocument();
     });
@@ -228,7 +228,7 @@ describe('Cross-Component Interaction Validation - ZENITH Tests', () => {
   describe('Data Flow Between Components', () => {
     it('should synchronize data between tactics board and analytics', async () => {
       const user = userEvent.setup();
-      
+
       render(
         <MemoryRouter initialEntries={['/tactics']}>
           <AppProvider>
@@ -257,7 +257,7 @@ describe('Cross-Component Interaction Validation - ZENITH Tests', () => {
 
     it('should update player data across all components', async () => {
       const user = userEvent.setup();
-      
+
       render(
         <MemoryRouter initialEntries={['/transfers']}>
           <AppProvider>
@@ -297,7 +297,7 @@ describe('Cross-Component Interaction Validation - ZENITH Tests', () => {
 
     it('should maintain real-time updates across components', async () => {
       const user = userEvent.setup();
-      
+
       // Simulate multiple tabs/components
       const { rerender } = render(
         <MemoryRouter initialEntries={['/dashboard']}>
@@ -330,7 +330,7 @@ describe('Cross-Component Interaction Validation - ZENITH Tests', () => {
   describe('Modal and Dialog Interactions', () => {
     it('should handle overlapping modals correctly', async () => {
       const user = userEvent.setup();
-      
+
       render(
         <ZenithTestWrapper>
           <App />
@@ -340,31 +340,31 @@ describe('Cross-Component Interaction Validation - ZENITH Tests', () => {
       // Open first modal
       const settingsButton = screen.getByRole('button', { name: /settings/i });
       await user.click(settingsButton);
-      
+
       expect(screen.getByRole('dialog')).toBeVisible();
 
       // Open second modal from within first modal
       const advancedButton = screen.getByRole('button', { name: /advanced/i });
       await user.click(advancedButton);
-      
+
       // Should have two modals open
       const dialogs = screen.getAllByRole('dialog');
       expect(dialogs).toHaveLength(2);
 
       // Close modals with escape (should close top-most first)
       await user.keyboard('{Escape}');
-      
+
       const remainingDialogs = screen.getAllByRole('dialog');
       expect(remainingDialogs).toHaveLength(1);
 
       await user.keyboard('{Escape}');
-      
+
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
 
     it('should handle modal focus trapping correctly', async () => {
       const user = userEvent.setup();
-      
+
       render(
         <ZenithTestWrapper>
           <App />
@@ -381,14 +381,14 @@ describe('Cross-Component Interaction Validation - ZENITH Tests', () => {
       // Tab should cycle through modal elements only
       await user.tab();
       expect(document.activeElement).toBeVisible();
-      expect(modal).toContainElement(document.activeElement);
+      expect(modal).toContainElement(document.activeElement as HTMLElement);
 
       // Continue tabbing
       await user.tab();
       await user.tab();
-      
+
       // Should still be within modal
-      expect(modal).toContainElement(document.activeElement);
+      expect(modal).toContainElement(document.activeElement as HTMLElement);
     });
   });
 });
@@ -408,7 +408,7 @@ describe('Feature Integration Validation - ZENITH Tests', () => {
   describe('Tactical Planning Integration', () => {
     it('should integrate formation creation with match simulation', async () => {
       const user = userEvent.setup();
-      
+
       render(
         <MemoryRouter initialEntries={['/tactics']}>
           <AppProvider>
@@ -424,7 +424,7 @@ describe('Feature Integration Validation - ZENITH Tests', () => {
       // Position players
       const players = screen.getAllByRole('button', { name: /player/i });
       const firstPlayer = players[0];
-      
+
       fireEvent.mouseDown(firstPlayer);
       fireEvent.mouseMove(firstPlayer, { clientX: 100, clientY: 100 });
       fireEvent.mouseUp(firstPlayer);
@@ -444,7 +444,7 @@ describe('Feature Integration Validation - ZENITH Tests', () => {
 
     it('should integrate tactical analysis with player performance', async () => {
       const user = userEvent.setup();
-      
+
       render(
         <MemoryRouter initialEntries={['/tactics']}>
           <AppProvider>
@@ -479,7 +479,7 @@ describe('Feature Integration Validation - ZENITH Tests', () => {
   describe('Analytics Integration', () => {
     it('should integrate real-time match data with analytics dashboard', async () => {
       const user = userEvent.setup();
-      
+
       // Start with live match
       render(
         <MemoryRouter initialEntries={['/tactics']}>
@@ -511,7 +511,7 @@ describe('Feature Integration Validation - ZENITH Tests', () => {
 
     it('should integrate historical data with trend analysis', async () => {
       const user = userEvent.setup();
-      
+
       render(
         <MemoryRouter initialEntries={['/analytics']}>
           <AppProvider>
@@ -542,7 +542,7 @@ describe('Feature Integration Validation - ZENITH Tests', () => {
   describe('Financial Integration', () => {
     it('should integrate transfer spending with budget management', async () => {
       const user = userEvent.setup();
-      
+
       render(
         <MemoryRouter initialEntries={['/transfers']}>
           <AppProvider>
@@ -604,7 +604,7 @@ describe('Error Boundary and Recovery Validation - ZENITH Tests', () => {
 
       // Should show error boundary
       expect(screen.getByText(/something went wrong/i)).toBeInTheDocument();
-      
+
       // Should provide recovery options
       expect(screen.getByRole('button', { name: /retry/i })).toBeInTheDocument();
 
@@ -631,7 +631,7 @@ describe('Error Boundary and Recovery Validation - ZENITH Tests', () => {
 
       // Good component should still work
       expect(screen.getByText('Working component')).toBeInTheDocument();
-      
+
       // Error boundary should contain the error
       expect(screen.getByText(/something went wrong/i)).toBeInTheDocument();
 
@@ -642,7 +642,7 @@ describe('Error Boundary and Recovery Validation - ZENITH Tests', () => {
   describe('Network Error Recovery', () => {
     it('should handle API failures gracefully', async () => {
       const user = userEvent.setup();
-      
+
       // Mock network failure
       global.fetch = vi.fn().mockRejectedValue(new Error('Network error'));
 
@@ -703,7 +703,7 @@ describe('Site-Wide Performance Validation - ZENITH Tests', () => {
 
       for (const { route, name } of pages) {
         const startTime = performance.now();
-        
+
         render(
           <MemoryRouter initialEntries={[route]}>
             <AppProvider>
@@ -725,7 +725,7 @@ describe('Site-Wide Performance Validation - ZENITH Tests', () => {
 
     it('should handle concurrent user interactions efficiently', async () => {
       const user = userEvent.setup();
-      
+
       render(
         <MemoryRouter initialEntries={['/tactics']}>
           <AppProvider>
@@ -736,7 +736,7 @@ describe('Site-Wide Performance Validation - ZENITH Tests', () => {
 
       // Perform multiple actions simultaneously
       const startTime = performance.now();
-      
+
       const actions = [
         user.selectOptions(screen.getByRole('combobox', { name: /formation/i }), '4-4-2'),
         user.click(screen.getByRole('button', { name: /save/i })),
@@ -799,7 +799,7 @@ describe('Site-Wide Accessibility Validation - ZENITH Tests', () => {
   describe('Keyboard Navigation', () => {
     it('should support full keyboard navigation across all pages', async () => {
       const user = userEvent.setup();
-      
+
       const pages = ['/dashboard', '/tactics', '/analytics', '/finances'];
 
       for (const page of pages) {
@@ -817,13 +817,13 @@ describe('Site-Wide Accessibility Validation - ZENITH Tests', () => {
 
         while (tabCount < maxTabs) {
           await user.tab();
-          
+
           const activeElement = document.activeElement;
           if (activeElement && activeElement !== document.body) {
             expect(activeElement).toBeVisible();
             expect(activeElement).toHaveAttribute('tabindex');
           }
-          
+
           tabCount++;
         }
 
@@ -833,7 +833,7 @@ describe('Site-Wide Accessibility Validation - ZENITH Tests', () => {
 
     it('should maintain focus management across navigation', async () => {
       const user = userEvent.setup();
-      
+
       render(
         <MemoryRouter initialEntries={['/dashboard']}>
           <AppProvider>
@@ -845,7 +845,7 @@ describe('Site-Wide Accessibility Validation - ZENITH Tests', () => {
       // Focus on a navigation link
       const tacticsLink = screen.getByRole('link', { name: /tactics/i });
       tacticsLink.focus();
-      
+
       // Navigate with Enter
       await user.keyboard('{Enter}');
 
@@ -872,18 +872,20 @@ describe('Site-Wide Accessibility Validation - ZENITH Tests', () => {
         // Check interactive elements have proper labels
         const buttons = screen.getAllByRole('button');
         buttons.forEach(button => {
-          const hasLabel = button.getAttribute('aria-label') ||
-                          button.getAttribute('aria-labelledby') ||
-                          button.textContent?.trim();
+          const hasLabel =
+            button.getAttribute('aria-label') ||
+            button.getAttribute('aria-labelledby') ||
+            button.textContent?.trim();
           expect(hasLabel).toBeTruthy();
         });
 
         // Check form inputs have proper labels
         const inputs = screen.getAllByRole('textbox');
         inputs.forEach(input => {
-          const hasLabel = input.getAttribute('aria-label') ||
-                          input.getAttribute('aria-labelledby') ||
-                          screen.queryByLabelText(input.getAttribute('name') || '');
+          const hasLabel =
+            input.getAttribute('aria-label') ||
+            input.getAttribute('aria-labelledby') ||
+            screen.queryByLabelText(input.getAttribute('name') || '');
           expect(hasLabel).toBeTruthy();
         });
 
@@ -912,8 +914,8 @@ describe('Site-Wide Accessibility Validation - ZENITH Tests', () => {
         // Check heading levels are logical
         for (let i = 1; i < headings.length; i++) {
           const currentLevel = parseInt(headings[i].getAttribute('aria-level') || '1');
-          const previousLevel = parseInt(headings[i-1].getAttribute('aria-level') || '1');
-          
+          const previousLevel = parseInt(headings[i - 1].getAttribute('aria-level') || '1');
+
           // Heading level should not jump more than 1
           expect(currentLevel - previousLevel).toBeLessThanOrEqual(1);
         }

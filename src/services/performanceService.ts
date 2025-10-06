@@ -152,7 +152,7 @@ class PerformanceService {
         const observer = new PerformanceObserver(list => {
           const entries = list.getEntries() as PerformanceEntry[];
 
-          entries.forEach((entry: unknown) => {
+          entries.forEach((entry: any) => {
             if (!entry.hadRecentInput) {
               clsValue += entry.value;
             }
@@ -204,7 +204,7 @@ class PerformanceService {
     // Time to First Byte
     if (this.isClient && 'performance' in window && 'getEntriesByType' in performance) {
       const navigationEntries = performance.getEntriesByType(
-        'navigation',
+        'navigation'
       ) as PerformanceNavigationTiming[];
 
       if (navigationEntries.length > 0) {
@@ -230,7 +230,7 @@ class PerformanceService {
     window.addEventListener('load', () => {
       setTimeout(() => {
         const navigation = performance.getEntriesByType(
-          'navigation',
+          'navigation'
         )[0] as PerformanceNavigationTiming;
 
         if (navigation) {

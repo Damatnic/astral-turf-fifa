@@ -1,3 +1,5 @@
+import * as React from 'react';
+
 /**
  * Advanced Theme Management System for Astral Turf
  *
@@ -296,7 +298,7 @@ const DARK_THEME_BASE: ThemeColors = {
   },
 };
 
-class ThemeManager {
+export class ThemeManager {
   private static instance: ThemeManager;
   private currentTheme: ThemeConfig;
   private preferences: ThemePreferences;
@@ -614,13 +616,14 @@ class ThemeManager {
     let value: unknown = this.currentTheme.colors;
 
     for (const key of keys) {
-      value = value?.[key];
-      if (value === undefined) {
+      if (value && typeof value === 'object' && key in (value as Record<string, unknown>)) {
+        value = (value as Record<string, unknown>)[key];
+      } else {
         return '';
       }
     }
 
-    return value || '';
+    return typeof value === 'string' ? value : '';
   }
 }
 

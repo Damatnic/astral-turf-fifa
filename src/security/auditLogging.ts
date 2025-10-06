@@ -246,7 +246,7 @@ const DEFAULT_AUDIT_CONFIG: AuditConfiguration = {
  */
 class AuditLoggingService {
   private config: AuditConfiguration;
-  private logger: winston.Logger;
+  private logger!: winston.Logger;
   private eventBuffer: AuditEvent[] = [];
   private siemBuffer: AuditEvent[] = [];
   private correlationMap: Map<string, string[]> = new Map();
@@ -288,10 +288,7 @@ class AuditLoggingService {
           datePattern: this.config.storage.local.datePattern,
           maxSize: this.config.storage.local.maxFileSize,
           maxFiles: this.config.storage.local.maxFiles,
-          format: winston.format.combine(
-            winston.format.timestamp(),
-            winston.format.json()
-          ),
+          format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
         })
       );
 
@@ -303,10 +300,7 @@ class AuditLoggingService {
           maxSize: this.config.storage.local.maxFileSize,
           maxFiles: this.config.storage.local.maxFiles,
           level: 'warn',
-          format: winston.format.combine(
-            winston.format.timestamp(),
-            winston.format.json()
-          ),
+          format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
         })
       );
 
@@ -320,10 +314,16 @@ class AuditLoggingService {
           format: winston.format.combine(
             winston.format.timestamp(),
             winston.format.json(),
-            winston.format.printf((info) => {
+            winston.format.printf(info => {
               // Only log compliance-related events
               const event = info.meta as AuditEvent;
-              if (event && (event.compliance.gdpr || event.compliance.hipaa || event.compliance.soc2 || event.compliance.iso27001)) {
+              if (
+                event &&
+                (event.compliance.gdpr ||
+                  event.compliance.hipaa ||
+                  event.compliance.soc2 ||
+                  event.compliance.iso27001)
+              ) {
                 return JSON.stringify(info);
               }
               return '';
@@ -380,7 +380,7 @@ class AuditLoggingService {
 
     // Add to buffers
     this.eventBuffer.push(auditEvent);
-    
+
     if (this.shouldSendToSIEM(auditEvent)) {
       this.siemBuffer.push(auditEvent);
     }
@@ -448,7 +448,8 @@ class AuditLoggingService {
   ): string {
     return this.logEvent({
       eventType: AuditEventType.DATA_ACCESS,
-      severity: action === 'delete' || action === 'export' ? AuditSeverity.MEDIUM : AuditSeverity.INFO,
+      severity:
+        action === 'delete' || action === 'export' ? AuditSeverity.MEDIUM : AuditSeverity.INFO,
       source: AuditSource.WEB_APPLICATION,
       userId: details.userId,
       ipAddress: details.ipAddress,
@@ -471,7 +472,11 @@ class AuditLoggingService {
    * Log security event
    */
   logSecurityEvent(
-    eventType: 'attack_detected' | 'vulnerability_found' | 'policy_violation' | 'suspicious_activity',
+    eventType:
+      | 'attack_detected'
+      | 'vulnerability_found'
+      | 'policy_violation'
+      | 'suspicious_activity',
     description: string,
     details: {
       threatLevel?: 'low' | 'medium' | 'high' | 'critical';
@@ -483,7 +488,7 @@ class AuditLoggingService {
     }
   ): string {
     const severity = this.mapThreatLevelToSeverity(details.threatLevel || 'medium');
-    
+
     return this.logEvent({
       eventType: AuditEventType.SECURITY_EVENT,
       severity,
@@ -584,15 +589,13 @@ class AuditLoggingService {
     }
 
     if (query.tags) {
-      filteredEvents = filteredEvents.filter(e => 
-        query.tags!.some(tag => e.tags.includes(tag))
-      );
+      filteredEvents = filteredEvents.filter(e => query.tags!.some(tag => e.tags.includes(tag)));
     }
 
     // Sort events
     const sortBy = query.sortBy || 'timestamp';
     const sortOrder = query.sortOrder || 'desc';
-    
+
     filteredEvents.sort((a, b) => {
       let valueA: any = a[sortBy as keyof AuditEvent];
       let valueB: any = b[sortBy as keyof AuditEvent];
@@ -655,19 +658,19 @@ class AuditLoggingService {
         iso27001Compliant: events.filter(e => e.compliance.iso27001).length,
       },
       securityInsights: {
-        suspiciousActivity: events.filter(e => 
-          e.eventType === AuditEventType.SECURITY_EVENT ||
-          e.severity === AuditSeverity.HIGH ||
-          e.severity === AuditSeverity.CRITICAL
+        suspiciousActivity: events.filter(
+          e =>
+            e.eventType === AuditEventType.SECURITY_EVENT ||
+            e.severity === AuditSeverity.HIGH ||
+            e.severity === AuditSeverity.CRITICAL
         ),
-        failedLogins: events.filter(e => 
-          e.action === 'auth_login' && e.outcome === 'failure'
+        failedLogins: events.filter(e => e.action === 'auth_login' && e.outcome === 'failure')
+          .length,
+        privilegeEscalations: events.filter(
+          e => e.action.includes('privilege') || e.action.includes('admin')
         ).length,
-        privilegeEscalations: events.filter(e => 
-          e.action.includes('privilege') || e.action.includes('admin')
-        ).length,
-        dataBreachIndicators: events.filter(e => 
-          e.tags.includes('data_breach') || e.severity === AuditSeverity.CRITICAL
+        dataBreachIndicators: events.filter(
+          e => e.tags.includes('data_breach') || e.severity === AuditSeverity.CRITICAL
         ).length,
         anomalousPatterns: this.detectAnomalousPatterns(events),
       },
@@ -701,25 +704,22 @@ class AuditLoggingService {
   /**
    * Export audit logs in various formats
    */
-  async exportLogs(
-    query: AuditQuery,
-    format: 'json' | 'csv' | 'xml' | 'syslog'
-  ): Promise<string> {
+  async exportLogs(query: AuditQuery, format: 'json' | 'csv' | 'xml' | 'syslog'): Promise<string> {
     const { events } = await this.queryEvents(query);
 
     switch (format) {
       case 'json':
         return JSON.stringify(events, null, 2);
-      
+
       case 'csv':
         return this.convertToCSV(events);
-      
+
       case 'xml':
         return this.convertToXML(events);
-      
+
       case 'syslog':
         return this.convertToSyslog(events);
-      
+
       default:
         throw new Error(`Unsupported export format: ${format}`);
     }
@@ -741,9 +741,7 @@ class AuditLoggingService {
     const timeframeMs = this.getTimeframeMs(timeframe);
     const cutoff = new Date(now.getTime() - timeframeMs);
 
-    const recentEvents = this.eventBuffer.filter(
-      e => new Date(e.timestamp) >= cutoff
-    );
+    const recentEvents = this.eventBuffer.filter(e => new Date(e.timestamp) >= cutoff);
 
     return {
       eventCount: recentEvents.length,
@@ -754,8 +752,8 @@ class AuditLoggingService {
       recentSecurityEvents: recentEvents
         .filter(e => e.eventType === AuditEventType.SECURITY_EVENT)
         .slice(0, 20),
-      alertsTriggered: recentEvents.filter(e => 
-        e.severity === AuditSeverity.CRITICAL || e.severity === AuditSeverity.HIGH
+      alertsTriggered: recentEvents.filter(
+        e => e.severity === AuditSeverity.CRITICAL || e.severity === AuditSeverity.HIGH
       ).length,
     };
   }
@@ -808,13 +806,16 @@ class AuditLoggingService {
     ];
     const eventSeverityIndex = severityLevels.indexOf(event.severity);
     const minSeverityIndex = severityLevels.indexOf(config.filters.minSeverity);
-    
+
     if (eventSeverityIndex < minSeverityIndex) {
       return false;
     }
 
     // Check event type filter
-    if (config.filters.eventTypes.length > 0 && !config.filters.eventTypes.includes(event.eventType)) {
+    if (
+      config.filters.eventTypes.length > 0 &&
+      !config.filters.eventTypes.includes(event.eventType)
+    ) {
       return false;
     }
 
@@ -834,9 +835,7 @@ class AuditLoggingService {
 
     const now = Date.now();
     const hour = 60 * 60 * 1000;
-    const recentEvents = this.eventBuffer.filter(
-      e => now - new Date(e.timestamp).getTime() < hour
-    );
+    const recentEvents = this.eventBuffer.filter(e => now - new Date(e.timestamp).getTime() < hour);
 
     // Check critical events threshold
     const criticalEvents = recentEvents.filter(e => e.severity === AuditSeverity.CRITICAL);
@@ -849,13 +848,13 @@ class AuditLoggingService {
     }
 
     // Check failure rate threshold
-    const totalRequests = recentEvents.filter(e => 
-      e.eventType === AuditEventType.AUTHENTICATION || 
-      e.eventType === AuditEventType.DATA_ACCESS
+    const totalRequests = recentEvents.filter(
+      e =>
+        e.eventType === AuditEventType.AUTHENTICATION || e.eventType === AuditEventType.DATA_ACCESS
     );
     const failures = totalRequests.filter(e => e.outcome === 'failure');
     const failureRate = failures.length / totalRequests.length;
-    
+
     if (failureRate >= this.config.alerting.thresholds.failureRate) {
       this.sendAlert('High failure rate detected', {
         failureRate: (failureRate * 100).toFixed(2) + '%',
@@ -866,10 +865,11 @@ class AuditLoggingService {
     }
 
     // Check suspicious activity threshold
-    const suspiciousEvents = recentEvents.filter(e => 
-      e.eventType === AuditEventType.SECURITY_EVENT ||
-      e.severity === AuditSeverity.HIGH ||
-      e.severity === AuditSeverity.CRITICAL
+    const suspiciousEvents = recentEvents.filter(
+      e =>
+        e.eventType === AuditEventType.SECURITY_EVENT ||
+        e.severity === AuditSeverity.HIGH ||
+        e.severity === AuditSeverity.CRITICAL
     );
     if (suspiciousEvents.length >= this.config.alerting.thresholds.suspiciousActivity) {
       this.sendAlert('Suspicious activity threshold exceeded', {
@@ -901,20 +901,26 @@ class AuditLoggingService {
     items: T[],
     field: keyof T
   ): Record<string, number> {
-    return items.reduce((acc, item) => {
-      const value = String(item[field]);
-      acc[value] = (acc[value] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    return items.reduce(
+      (acc, item) => {
+        const value = String(item[field]);
+        acc[value] = (acc[value] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
   }
 
   private getTopResources(events: AuditEvent[]): Array<{ resource: string; count: number }> {
     const resourceCounts = events
       .filter(e => e.resource)
-      .reduce((acc, e) => {
-        acc[e.resource!] = (acc[e.resource!] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
+      .reduce(
+        (acc, e) => {
+          acc[e.resource!] = (acc[e.resource!] || 0) + 1;
+          return acc;
+        },
+        {} as Record<string, number>
+      );
 
     return Object.entries(resourceCounts)
       .map(([resource, count]) => ({ resource, count }))
@@ -925,10 +931,13 @@ class AuditLoggingService {
   private getTopUsers(events: AuditEvent[]): Array<{ userId: string; count: number }> {
     const userCounts = events
       .filter(e => e.userId)
-      .reduce((acc, e) => {
-        acc[e.userId!] = (acc[e.userId!] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
+      .reduce(
+        (acc, e) => {
+          acc[e.userId!] = (acc[e.userId!] || 0) + 1;
+          return acc;
+        },
+        {} as Record<string, number>
+      );
 
     return Object.entries(userCounts)
       .map(([userId, count]) => ({ userId, count }))
@@ -939,11 +948,14 @@ class AuditLoggingService {
   private getGeographicDistribution(events: AuditEvent[]): Record<string, number> {
     return events
       .filter(e => e.geolocation?.country)
-      .reduce((acc, e) => {
-        const country = e.geolocation!.country!;
-        acc[country] = (acc[country] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
+      .reduce(
+        (acc, e) => {
+          const country = e.geolocation!.country!;
+          acc[country] = (acc[country] || 0) + 1;
+          return acc;
+        },
+        {} as Record<string, number>
+      );
   }
 
   private detectAnomalousPatterns(events: AuditEvent[]): string[] {
@@ -963,9 +975,12 @@ class AuditLoggingService {
     const failures = events.filter(e => e.outcome === 'failure');
     if (failures.length > 0) {
       const rapidFailures = failures.filter((failure, index) => {
-        if (index === 0) return false;
+        if (index === 0) {
+          return false;
+        }
         const prevFailure = failures[index - 1];
-        const timeDiff = new Date(failure.timestamp).getTime() - new Date(prevFailure.timestamp).getTime();
+        const timeDiff =
+          new Date(failure.timestamp).getTime() - new Date(prevFailure.timestamp).getTime();
         return timeDiff < 60000; // Less than 1 minute
       });
       if (rapidFailures.length > 5) {
@@ -974,10 +989,11 @@ class AuditLoggingService {
     }
 
     // Detect privilege escalation attempts
-    const privilegeEvents = events.filter(e => 
-      e.action.includes('admin') || 
-      e.action.includes('privilege') ||
-      e.tags.includes('privilege_escalation')
+    const privilegeEvents = events.filter(
+      e =>
+        e.action.includes('admin') ||
+        e.action.includes('privilege') ||
+        e.tags.includes('privilege_escalation')
     );
     if (privilegeEvents.length > 0) {
       patterns.push('Privilege escalation attempts detected');
@@ -992,11 +1008,15 @@ class AuditLoggingService {
     const securityEvents = events.filter(e => e.eventType === AuditEventType.SECURITY_EVENT);
 
     if (failures.length / events.length > 0.1) {
-      recommendations.push('High failure rate detected - review authentication and authorization policies');
+      recommendations.push(
+        'High failure rate detected - review authentication and authorization policies'
+      );
     }
 
     if (securityEvents.length > 0) {
-      recommendations.push('Security events detected - review security monitoring and incident response procedures');
+      recommendations.push(
+        'Security events detected - review security monitoring and incident response procedures'
+      );
     }
 
     const uniqueUsers = new Set(events.map(e => e.userId).filter(Boolean)).size;
@@ -1009,7 +1029,9 @@ class AuditLoggingService {
       return hour >= 22 || hour <= 6;
     });
     if (nightTimeEvents.length > events.length * 0.3) {
-      recommendations.push('High after-hours activity - review access controls and monitoring policies');
+      recommendations.push(
+        'High after-hours activity - review access controls and monitoring policies'
+      );
     }
 
     return recommendations;
@@ -1017,60 +1039,77 @@ class AuditLoggingService {
 
   private convertToCSV(events: AuditEvent[]): string {
     const headers = [
-      'id', 'timestamp', 'eventType', 'severity', 'source', 'userId', 
-      'ipAddress', 'action', 'outcome', 'description', 'resource'
+      'id',
+      'timestamp',
+      'eventType',
+      'severity',
+      'source',
+      'userId',
+      'ipAddress',
+      'action',
+      'outcome',
+      'description',
+      'resource',
     ];
-    
+
     const csvRows = [
       headers.join(','),
-      ...events.map(event => 
-        headers.map(header => {
-          const value = event[header as keyof AuditEvent];
-          return typeof value === 'string' ? `"${value.replace(/"/g, '""')}"` : String(value || '');
-        }).join(',')
-      )
+      ...events.map(event =>
+        headers
+          .map(header => {
+            const value = event[header as keyof AuditEvent];
+            return typeof value === 'string'
+              ? `"${value.replace(/"/g, '""')}"`
+              : String(value || '');
+          })
+          .join(',')
+      ),
     ];
 
     return csvRows.join('\n');
   }
 
   private convertToXML(events: AuditEvent[]): string {
-    const xmlEvents = events.map(event => {
-      const eventXml = Object.entries(event)
-        .map(([key, value]) => {
-          if (typeof value === 'object' && value !== null) {
-            return `<${key}><![CDATA[${JSON.stringify(value)}]]></${key}>`;
-          }
-          return `<${key}><![CDATA[${String(value)}]]></${key}>`;
-        })
-        .join('\n    ');
-      
-      return `  <event>\n    ${eventXml}\n  </event>`;
-    }).join('\n');
+    const xmlEvents = events
+      .map(event => {
+        const eventXml = Object.entries(event)
+          .map(([key, value]) => {
+            if (typeof value === 'object' && value !== null) {
+              return `<${key}><![CDATA[${JSON.stringify(value)}]]></${key}>`;
+            }
+            return `<${key}><![CDATA[${String(value)}]]></${key}>`;
+          })
+          .join('\n    ');
+
+        return `  <event>\n    ${eventXml}\n  </event>`;
+      })
+      .join('\n');
 
     return `<?xml version="1.0" encoding="UTF-8"?>\n<auditLog>\n${xmlEvents}\n</auditLog>`;
   }
 
   private convertToSyslog(events: AuditEvent[]): string {
-    return events.map(event => {
-      const priority = this.getSyslogPriority(event.severity);
-      const timestamp = new Date(event.timestamp).toISOString();
-      const hostname = 'astral-turf';
-      const appName = 'audit';
-      const message = `${event.action} ${event.outcome} - ${event.description}`;
-      
-      return `<${priority}>${timestamp} ${hostname} ${appName}: ${message}`;
-    }).join('\n');
+    return events
+      .map(event => {
+        const priority = this.getSyslogPriority(event.severity);
+        const timestamp = new Date(event.timestamp).toISOString();
+        const hostname = 'astral-turf';
+        const appName = 'audit';
+        const message = `${event.action} ${event.outcome} - ${event.description}`;
+
+        return `<${priority}>${timestamp} ${hostname} ${appName}: ${message}`;
+      })
+      .join('\n');
   }
 
   private getSyslogPriority(severity: AuditSeverity): number {
     // RFC 5424 priorities (facility=16 for local use, severity 0-7)
     const severityMap = {
       [AuditSeverity.CRITICAL]: 130, // 16*8 + 2 (critical)
-      [AuditSeverity.HIGH]: 131,     // 16*8 + 3 (error)
-      [AuditSeverity.MEDIUM]: 132,   // 16*8 + 4 (warning)
-      [AuditSeverity.LOW]: 134,      // 16*8 + 6 (info)
-      [AuditSeverity.INFO]: 134,     // 16*8 + 6 (info)
+      [AuditSeverity.HIGH]: 131, // 16*8 + 3 (error)
+      [AuditSeverity.MEDIUM]: 132, // 16*8 + 4 (warning)
+      [AuditSeverity.LOW]: 134, // 16*8 + 6 (info)
+      [AuditSeverity.INFO]: 134, // 16*8 + 6 (info)
     };
     return severityMap[severity] || 134;
   }
@@ -1094,24 +1133,25 @@ class AuditLoggingService {
     }, this.config.siemIntegration.flushInterval);
 
     // Cleanup old events from memory buffer
-    setInterval(() => {
-      const retentionMs = this.config.compliance.dataRetentionDays * 24 * 60 * 60 * 1000;
-      const cutoff = Date.now() - retentionMs;
-      
-      this.eventBuffer = this.eventBuffer.filter(
-        e => new Date(e.timestamp).getTime() > cutoff
-      );
-    }, 24 * 60 * 60 * 1000); // Daily cleanup
+    setInterval(
+      () => {
+        const retentionMs = this.config.compliance.dataRetentionDays * 24 * 60 * 60 * 1000;
+        const cutoff = Date.now() - retentionMs;
+
+        this.eventBuffer = this.eventBuffer.filter(e => new Date(e.timestamp).getTime() > cutoff);
+      },
+      24 * 60 * 60 * 1000
+    ); // Daily cleanup
   }
 
-  private async flushToSIEM(): void {
+  private async flushToSIEM(): Promise<void> {
     if (!this.config.siemIntegration.enabled || this.siemBuffer.length === 0) {
       return;
     }
 
     try {
       const batch = this.siemBuffer.splice(0, this.config.siemIntegration.batchSize);
-      
+
       // Format events for SIEM
       let payload: string;
       switch (this.config.siemIntegration.format) {
@@ -1133,7 +1173,6 @@ class AuditLoggingService {
 
       // Send to SIEM endpoint (implementation would depend on SIEM type)
       console.info(`[AUDIT] Sending ${batch.length} events to SIEM`);
-      
     } catch (error) {
       console.error('[AUDIT] Failed to send events to SIEM:', error);
       // Re-add events to buffer for retry
@@ -1143,47 +1182,51 @@ class AuditLoggingService {
 
   private convertToCEF(events: AuditEvent[]): string {
     // Common Event Format (CEF) for SIEM integration
-    return events.map(event => {
-      const version = '0';
-      const deviceVendor = 'Astral Turf';
-      const deviceProduct = 'Football Tactics App';
-      const deviceVersion = '1.0';
-      const signatureId = event.eventType;
-      const name = event.description;
-      const severity = this.getCEFSeverity(event.severity);
-      
-      const extensions = [
-        `rt=${new Date(event.timestamp).getTime()}`,
-        `src=${event.ipAddress || 'unknown'}`,
-        `suser=${event.userId || 'unknown'}`,
-        `act=${event.action}`,
-        `outcome=${event.outcome}`,
-      ].join(' ');
+    return events
+      .map(event => {
+        const version = '0';
+        const deviceVendor = 'Astral Turf';
+        const deviceProduct = 'Football Tactics App';
+        const deviceVersion = '1.0';
+        const signatureId = event.eventType;
+        const name = event.description;
+        const severity = this.getCEFSeverity(event.severity);
 
-      return `CEF:${version}|${deviceVendor}|${deviceProduct}|${deviceVersion}|${signatureId}|${name}|${severity}|${extensions}`;
-    }).join('\n');
+        const extensions = [
+          `rt=${new Date(event.timestamp).getTime()}`,
+          `src=${event.ipAddress || 'unknown'}`,
+          `suser=${event.userId || 'unknown'}`,
+          `act=${event.action}`,
+          `outcome=${event.outcome}`,
+        ].join(' ');
+
+        return `CEF:${version}|${deviceVendor}|${deviceProduct}|${deviceVersion}|${signatureId}|${name}|${severity}|${extensions}`;
+      })
+      .join('\n');
   }
 
   private convertToLEEF(events: AuditEvent[]): string {
     // Log Event Extended Format (LEEF) for IBM QRadar
-    return events.map(event => {
-      const version = '2.0';
-      const vendor = 'Astral Turf';
-      const product = 'Football Tactics App';
-      const version2 = '1.0';
-      const eventId = event.eventType;
-      
-      const attributes = [
-        `devTime=${new Date(event.timestamp).toISOString()}`,
-        `src=${event.ipAddress || 'unknown'}`,
-        `usrName=${event.userId || 'unknown'}`,
-        `cat=${event.action}`,
-        `severity=${this.getLEEFSeverity(event.severity)}`,
-        `msg=${event.description}`,
-      ].join('\t');
+    return events
+      .map(event => {
+        const version = '2.0';
+        const vendor = 'Astral Turf';
+        const product = 'Football Tactics App';
+        const version2 = '1.0';
+        const eventId = event.eventType;
 
-      return `LEEF:${version}|${vendor}|${product}|${version2}|${eventId}|${attributes}`;
-    }).join('\n');
+        const attributes = [
+          `devTime=${new Date(event.timestamp).toISOString()}`,
+          `src=${event.ipAddress || 'unknown'}`,
+          `usrName=${event.userId || 'unknown'}`,
+          `cat=${event.action}`,
+          `severity=${this.getLEEFSeverity(event.severity)}`,
+          `msg=${event.description}`,
+        ].join('\t');
+
+        return `LEEF:${version}|${vendor}|${product}|${version2}|${eventId}|${attributes}`;
+      })
+      .join('\n');
   }
 
   private getCEFSeverity(severity: AuditSeverity): number {

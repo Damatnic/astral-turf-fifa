@@ -39,6 +39,7 @@ export interface User {
   firstName: string;
   lastName: string;
   profileImage?: string;
+  phoneNumber?: string;
 
   // Role-specific associations
   playerId?: string; // For players and family members

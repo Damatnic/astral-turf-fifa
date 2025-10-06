@@ -17,7 +17,7 @@ const FamilyDashboard: React.FC = () => {
 
   // Get the family member's associated players
   const associatedPlayers = tacticsState.players.filter(player =>
-    authState.user?.playerIds?.includes(player.id),
+    authState.user?.playerIds?.includes(player.id)
   );
 
   // For demo purposes, get the first associated player

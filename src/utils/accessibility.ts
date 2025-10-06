@@ -1,3 +1,4 @@
+import React from 'react';
 /**
  * Accessibility Utilities for Astral Turf
  *
@@ -97,7 +98,7 @@ export class FocusManager {
   }
 
   static pushFocus(element: HTMLElement): void {
-    const currentFocus = document.activeElement as HTMLElement;
+    const currentFocus = document.activeElement as any;
     if (currentFocus) {
       this.focusStack.push(currentFocus);
     }
@@ -123,7 +124,7 @@ export class FocusManager {
       'summary',
     ].join(', ');
 
-    return Array.from(container.querySelectorAll(focusableSelectors)) as HTMLElement[];
+    return Array.from(container.querySelectorAll(focusableSelectors)) as any[];
   }
 
   static setFocusVisible(element: HTMLElement): void {
@@ -140,7 +141,7 @@ export class FocusManager {
 // Keyboard Navigation Helper
 export class KeyboardNavigation {
   static handleMenuNavigation(event: KeyboardEvent, items: HTMLElement[]): void {
-    const currentIndex = items.indexOf(event.target as HTMLElement);
+    const currentIndex = items.indexOf(event.target as any);
     let targetIndex = currentIndex;
 
     switch (event.key) {
@@ -162,7 +163,7 @@ export class KeyboardNavigation {
         break;
       case 'Escape':
         event.preventDefault();
-        (event.target as HTMLElement).blur();
+        (event.target as any).blur();
         return;
     }
 
@@ -170,7 +171,7 @@ export class KeyboardNavigation {
   }
 
   static handleGridNavigation(event: KeyboardEvent, items: HTMLElement[], columns: number): void {
-    const currentIndex = items.indexOf(event.target as HTMLElement);
+    const currentIndex = items.indexOf(event.target as any);
     let targetIndex = currentIndex;
     const rows = Math.ceil(items.length / columns);
 
@@ -318,7 +319,7 @@ export class ScreenReader {
 // Accessibility Testing Utilities
 export class AccessibilityTester {
   static async runBasicTests(
-    container: HTMLElement = document.body,
+    container: HTMLElement = document.body
   ): Promise<AccessibilityIssue[]> {
     const issues: AccessibilityIssue[] = [];
 
@@ -364,7 +365,7 @@ export class AccessibilityTester {
       if (!hasLabel && !hasAriaLabel && !hasAriaLabelledBy && input.id) {
         issues.push({
           type: 'missing-form-label',
-          element: input,
+          element: input as HTMLElement,
           message: 'Form control missing label',
           severity: 'error',
           wcagCriterion: '1.3.1',
@@ -382,7 +383,7 @@ export class AccessibilityTester {
       if (previousLevel > 0 && currentLevel > previousLevel + 1) {
         issues.push({
           type: 'heading-skip',
-          element: heading,
+          element: heading as HTMLElement,
           message: `Heading level skipped from h${previousLevel} to h${currentLevel}`,
           severity: 'warning',
           wcagCriterion: '1.3.1',
@@ -418,7 +419,7 @@ export class AccessibilityTester {
           // For now, just flag for manual review
           issues.push({
             type: 'contrast-check',
-            element: element as HTMLElement,
+            element: element as any,
             message: 'Check color contrast manually',
             severity: 'info',
             wcagCriterion: '1.4.3',
@@ -456,6 +457,7 @@ export function useFocusTrap(active: boolean) {
       const cleanup = FocusManager.trapFocus(ref.current);
       return cleanup;
     }
+    return undefined;
   }, [active]);
 
   return ref;
@@ -464,7 +466,7 @@ export function useFocusTrap(active: boolean) {
 export function useKeyboardNavigation(type: 'menu' | 'grid', options?: { columns?: number }) {
   const handleKeyDown = React.useCallback(
     (event: React.KeyboardEvent) => {
-      const container = event.currentTarget as HTMLElement;
+      const container = event.currentTarget as any;
       const items = FocusManager.getFocusableElements(container);
 
       if (type === 'menu') {
@@ -473,7 +475,7 @@ export function useKeyboardNavigation(type: 'menu' | 'grid', options?: { columns
         KeyboardNavigation.handleGridNavigation(event.nativeEvent, items, options.columns);
       }
     },
-    [type, options?.columns],
+    [type, options?.columns]
   );
 
   return { onKeyDown: handleKeyDown };
@@ -488,3 +490,57 @@ export const a11y = {
   screenReader: ScreenReader,
   test: AccessibilityTester,
 };
+
+class AccessibilityManagerImpl {
+  private static complianceLevel: 'A' | 'AA' | 'AAA' = 'AA';
+  private static autoFocusEnabled = false;
+  private static keyboardHandler: ((event: KeyboardEvent) => void) | null = null;
+
+  static setComplianceLevel(level: 'A' | 'AA' | 'AAA'): void {
+    this.complianceLevel = level;
+  }
+
+  static getComplianceLevel(): 'A' | 'AA' | 'AAA' {
+    return this.complianceLevel;
+  }
+
+  static enableAutoFocus(): void {
+    if (typeof document === 'undefined' || this.autoFocusEnabled) {
+      return;
+    }
+
+    document.body?.setAttribute('data-a11y-auto-focus', 'true');
+    this.autoFocusEnabled = true;
+  }
+
+  static setupGlobalKeyboardNavigation(): void {
+    if (typeof document === 'undefined') {
+      return;
+    }
+
+    if (this.keyboardHandler) {
+      return;
+    }
+
+    const handler = (event: KeyboardEvent) => {
+      if (event.key === 'Tab') {
+        const activeElement = document.activeElement as any | null;
+        if (activeElement) {
+          FocusManager.setFocusVisible(activeElement);
+        }
+      }
+
+      if (event.key === 'Escape') {
+        const activeElement = document.activeElement as any | null;
+        if (activeElement && activeElement.closest('[data-focus-trap]')) {
+          FocusManager.popFocus();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handler);
+    this.keyboardHandler = handler;
+  }
+}
+
+export const AccessibilityManager = AccessibilityManagerImpl;

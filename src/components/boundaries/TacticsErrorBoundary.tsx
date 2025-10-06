@@ -44,7 +44,7 @@ export class TacticsErrorBoundary extends Component<Props, State> {
     };
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     const { componentName = 'TacticsComponent', onError } = this.props;
 
     // Log error details
@@ -57,8 +57,8 @@ export class TacticsErrorBoundary extends Component<Props, State> {
     // Track error for analytics (if service is available)
     try {
       // Only track if we have the error tracking service
-      if (window.gtag) {
-        window.gtag('event', 'exception', {
+      if ((window as any).gtag) {
+        (window as any).gtag('event', 'exception', {
           description: `${componentName}: ${error.message}`,
           fatal: false,
           error_id: this.state.errorId,
@@ -86,7 +86,7 @@ export class TacticsErrorBoundary extends Component<Props, State> {
     }
   };
 
-  render() {
+  override render() {
     if (this.state.hasError) {
       const { fallback, componentName = 'Tactics Component', showDetails = false } = this.props;
 
@@ -193,10 +193,10 @@ export class TacticsErrorBoundary extends Component<Props, State> {
       // Default fallback for other errors
       return (
         <LightErrorFallback
-          error={this.state.error}
+          error={this.state.error ?? undefined}
           resetError={this.resetError}
           componentName={componentName}
-          errorId={this.state.errorId}
+          errorId={this.state.errorId ?? undefined}
         />
       );
     }
@@ -209,7 +209,7 @@ export class TacticsErrorBoundary extends Component<Props, State> {
 export const withTacticsErrorBoundary = <P extends object>(
   WrappedComponent: React.ComponentType<P>,
   componentName?: string,
-  showDetails = false,
+  showDetails = false
 ) => {
   const WithErrorBoundaryComponent = (props: P) => (
     <TacticsErrorBoundary

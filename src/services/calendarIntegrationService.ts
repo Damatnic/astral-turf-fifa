@@ -1,7 +1,11 @@
 /**
  * Calendar Integration Service
  *
- * Provides comprehensive calendar integration with Google Calendar, Outlook, and Apple Calendar
+ * Provides comprehensive calendar integration with Google Cal    } catch (_error) {
+      console.error('❌ Failed to disconnect calendar:', _error);
+      throw _error;
+    }
+  }, Outlook, and Apple Calendar
  * for training schedules, matches, meetings, and automated event management
  */
 
@@ -83,7 +87,7 @@ class CalendarIntegrationService {
       const oauth2Client = new google.auth.OAuth2(
         clientId,
         clientSecret,
-        'http://localhost:3000/auth/google/callback',
+        'http://localhost:3000/auth/google/callback'
       );
 
       // Generate auth URL
@@ -104,7 +108,7 @@ class CalendarIntegrationService {
       this.simulateOAuthFlow('google', oauth2Client);
     } catch (_error) {
       console.error('❌ Failed to connect Google Calendar:', _error);
-      throw error;
+      throw _error;
     }
   }
 
@@ -124,7 +128,7 @@ class CalendarIntegrationService {
       this.simulateOutlookConnection(clientId, clientSecret);
     } catch (_error) {
       console.error('❌ Failed to connect Outlook Calendar:', _error);
-      throw error;
+      throw _error;
     }
   }
 
@@ -168,7 +172,7 @@ class CalendarIntegrationService {
       // // // // console.log(`📅 Event created across providers: ${createdEvents.join(', ')}`);
     } catch (_error) {
       console.error('❌ Failed to create calendar event:', _error);
-      throw error;
+      throw _error;
     }
   }
 
@@ -185,7 +189,7 @@ class CalendarIntegrationService {
       attendees: string[];
       recurrence?: 'daily' | 'weekly' | 'monthly';
       endDate?: string;
-    },
+    }
   ): Promise<void> {
     const event: CalendarEvent = {
       id: uuidv4(),
@@ -217,7 +221,7 @@ class CalendarIntegrationService {
     opponent: string,
     dateTime: string,
     venue: string,
-    isHome: boolean,
+    isHome: boolean
   ): Promise<void> {
     const event: CalendarEvent = {
       id: uuidv4(),
@@ -308,7 +312,7 @@ class CalendarIntegrationService {
     duration: number,
     attendees: string[],
     preferredTimes: string[],
-    dateRange: { start: string; end: string },
+    dateRange: { start: string; end: string }
   ): Promise<{ time: string; score: number; reasoning: string }[]> {
     const suggestions: { time: string; score: number; reasoning: string }[] = [];
 
@@ -351,7 +355,7 @@ class CalendarIntegrationService {
   async getEvents(
     startDate: string,
     endDate: string,
-    eventType?: CalendarEvent['type'],
+    eventType?: CalendarEvent['type']
   ): Promise<CalendarEvent[]> {
     const allEvents: CalendarEvent[] = [];
 
@@ -371,7 +375,7 @@ class CalendarIntegrationService {
     }
 
     return allEvents.sort(
-      (a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime(),
+      (a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
     );
   }
 
@@ -431,7 +435,7 @@ class CalendarIntegrationService {
       return;
     }
 
-    const calendar = google.calendar({ version: 'v3', auth: this.googleAuth });
+    const calendar = google.calendar({ version: 'v3', auth: this.googleAuth } as any);
 
     const googleEvent = {
       summary: event.title,
@@ -439,7 +443,7 @@ class CalendarIntegrationService {
       start: {
         dateTime: event.startTime,
         timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      },
+      } as any,
       end: {
         dateTime: event.endTime,
         timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -459,7 +463,7 @@ class CalendarIntegrationService {
     await calendar.events.insert({
       calendarId: 'primary',
       requestBody: googleEvent,
-    });
+    } as any);
   }
 
   private async createOutlookEvent(event: CalendarEvent): Promise<void> {
@@ -510,14 +514,14 @@ class CalendarIntegrationService {
     switch (provider.type) {
       case 'google':
         if (this.googleAuth) {
-          const calendar = google.calendar({ version: 'v3', auth: this.googleAuth });
+          const calendar = google.calendar({ version: 'v3', auth: this.googleAuth } as any);
           const response = await calendar.events.list({
             calendarId: 'primary',
             timeMin: new Date().toISOString(),
             maxResults: 100,
             singleEvents: true,
             orderBy: 'startTime',
-          });
+          } as any);
 
           response.data.items?.forEach(item => {
             if (item.start && item.end) {
@@ -527,11 +531,11 @@ class CalendarIntegrationService {
                 description: item.description,
                 startTime: item.start.dateTime || item.start.date || '',
                 endTime: item.end.dateTime || item.end.date || '',
-                location: item.location,
+                location: item.location !== null ? item.location : undefined,
                 isAllDay: !item.start.dateTime,
                 type: this.determineEventType(item.summary || ''),
                 attendees: item.attendees?.map(a => a.email || '') || [],
-              });
+              } as any);
             }
           });
         }
@@ -545,7 +549,7 @@ class CalendarIntegrationService {
             },
           });
 
-          response.data.value?.forEach((item: unknown) => {
+          response.data.value?.forEach((item: any) => {
             events.push({
               id: item.id,
               title: item.subject,
@@ -555,7 +559,7 @@ class CalendarIntegrationService {
               location: item.location?.displayName,
               isAllDay: item.isAllDay,
               type: this.determineEventType(item.subject),
-              attendees: item.attendees?.map((a: unknown) => a.emailAddress.address) || [],
+              attendees: item.attendees?.map((a: any) => a.emailAddress.address) || [],
             });
           });
         }
@@ -586,7 +590,7 @@ class CalendarIntegrationService {
 
   private generateAlternativeTimes(
     newEvent: CalendarEvent,
-    conflictingEvent: CalendarEvent,
+    conflictingEvent: CalendarEvent
   ): { time: string; reason: string }[] {
     const alternatives: { time: string; reason: string }[] = [];
     const newStart = new Date(newEvent.startTime);
@@ -603,7 +607,7 @@ class CalendarIntegrationService {
     const beforeConflict = new Date(
       new Date(conflictingEvent.startTime).getTime() -
         (new Date(newEvent.endTime).getTime() - newStart.getTime()) -
-        30 * 60 * 1000,
+        30 * 60 * 1000
     );
     alternatives.push({
       time: beforeConflict.toISOString(),
@@ -620,7 +624,7 @@ class CalendarIntegrationService {
 
   private async analyzeAvailabilityPatterns(
     attendees: string[],
-    dateRange: { start: string; end: string },
+    dateRange: { start: string; end: string }
   ): Promise<unknown> {
     // Analyze historical availability patterns
     return { patterns: 'analyzed' };
@@ -648,7 +652,7 @@ class CalendarIntegrationService {
   private async createRecurringEvents(
     event: CalendarEvent,
     recurrence: 'daily' | 'weekly' | 'monthly',
-    endDate: string,
+    endDate: string
   ): Promise<void> {
     // // // // console.log(`🔄 Creating recurring ${recurrence} events until ${endDate}`);
   }

@@ -1,1 +1,100 @@
-import React from 'react';\nimport {\n  renderWithProviders,\n  createTestData,\n  createMockProps,\n  vi,\n  expect,\n  describe,\n  it,\n  screen,\n  waitFor\n} from '../../utils/comprehensive-test-providers';\nimport { UnifiedTacticsBoard } from '../../../components/tactics/UnifiedTacticsBoard';\n\n/**\n * Smoke tests for the comprehensive testing framework\n * These tests verify that our testing infrastructure works correctly\n */\n\ndescribe('Tactical Board - Smoke Tests', () => {\n  it('should render UnifiedTacticsBoard without crashing', async () => {\n    const testData = createTestData.minimal();\n    const mockProps = createMockProps.unifiedTacticsBoard();\n\n    try {\n      const { container } = renderWithProviders(\n        <UnifiedTacticsBoard {...mockProps} />,\n        {\n          initialTacticsState: {\n            players: testData.players,\n            formations: { [testData.formation.id]: testData.formation },\n            activeFormationIds: { home: testData.formation.id },\n            drawings: [],\n            playbook: {},\n            matchState: null,\n            notifications: []\n          }\n        }\n      );\n\n      // Just verify it renders without crashing\n      expect(container).toBeInTheDocument();\n      \n      // Look for any element that might be rendered\n      await waitFor(() => {\n        const elements = container.querySelectorAll('*');\n        expect(elements.length).toBeGreaterThan(0);\n      }, { timeout: 5000 });\n\n    } catch (error) {\n      // Log the error for debugging but don't fail the test\n      console.warn('UnifiedTacticsBoard render issue:', error);\n      \n      // Still expect the test to complete\n      expect(true).toBe(true);\n    }\n  });\n\n  it('should create test data without errors', () => {\n    const testData = createTestData.complete();\n    \n    expect(testData.players).toBeDefined();\n    expect(testData.formation).toBeDefined();\n    expect(testData.tacticsState).toBeDefined();\n    expect(testData.uiState).toBeDefined();\n    \n    expect(testData.players.length).toBeGreaterThan(0);\n    expect(testData.formation.id).toBeDefined();\n  });\n\n  it('should create mock props without errors', () => {\n    const mockProps = createMockProps.unifiedTacticsBoard();\n    \n    expect(mockProps.onSimulateMatch).toBeDefined();\n    expect(mockProps.onSaveFormation).toBeDefined();\n    expect(mockProps.onAnalyticsView).toBeDefined();\n    expect(mockProps.onExportFormation).toBeDefined();\n    \n    expect(typeof mockProps.onSimulateMatch).toBe('function');\n    expect(typeof mockProps.onSaveFormation).toBe('function');\n  });\n\n  it('should render with test providers', () => {\n    const { container } = renderWithProviders(\n      <div data-testid=\"test-element\">Test Content</div>\n    );\n    \n    expect(container).toBeInTheDocument();\n    expect(screen.getByTestId('test-element')).toBeInTheDocument();\n    expect(screen.getByText('Test Content')).toBeInTheDocument();\n  });\n\n  it('should handle performance test data generation', () => {\n    const performanceData = createTestData.performance(10);\n    \n    expect(performanceData.players).toBeDefined();\n    expect(performanceData.formation).toBeDefined();\n    expect(performanceData.players.length).toBe(10);\n    \n    const largeDataset = createTestData.performance(100);\n    expect(largeDataset.players.length).toBe(100);\n  });\n});"
+import React from 'react';
+import {
+  renderWithProviders,
+  createTestData,
+  createMockProps,
+  vi,
+  expect,
+  describe,
+  it,
+  screen,
+  waitFor,
+} from '../../utils/comprehensive-test-providers';
+import { UnifiedTacticsBoard } from '../../../components/tactics/UnifiedTacticsBoard';
+
+/**
+ * Smoke tests for the comprehensive testing framework
+ * These tests verify that our testing infrastructure works correctly
+ */
+
+describe('Tactical Board - Smoke Tests', () => {
+  it('should render UnifiedTacticsBoard without crashing', async () => {
+    const testData = createTestData.minimal();
+    const mockProps = createMockProps.unifiedTacticsBoard();
+
+    try {
+      const { container } = renderWithProviders(<UnifiedTacticsBoard {...mockProps} />, {
+        initialTacticsState: {
+          players: testData.players,
+          formations: { [testData.formation.id]: testData.formation },
+          activeFormationIds: { home: testData.formation.id, away: '' } as any,
+          drawings: [],
+          playbook: {},
+          matchState: null,
+          notifications: [],
+        } as any,
+      });
+
+      // Just verify it renders without crashing
+      expect(container).toBeInTheDocument();
+
+      // Look for any element that might be rendered
+      await waitFor(
+        () => {
+          const elements = container.querySelectorAll('*');
+          expect(elements.length).toBeGreaterThan(0);
+        },
+        { timeout: 5000 }
+      );
+    } catch (error) {
+      // Log the error for debugging but don't fail the test
+      console.warn('UnifiedTacticsBoard render issue:', error);
+
+      // Still expect the test to complete
+      expect(true).toBe(true);
+    }
+  });
+
+  it('should create test data without errors', () => {
+    const testData = createTestData.complete();
+
+    expect(testData.players).toBeDefined();
+    expect(testData.formation).toBeDefined();
+    expect(testData.tacticsState).toBeDefined();
+    expect(testData.uiState).toBeDefined();
+
+    expect(testData.players.length).toBeGreaterThan(0);
+    expect(testData.formation.id).toBeDefined();
+  });
+
+  it('should create mock props without errors', () => {
+    const mockProps = createMockProps.unifiedTacticsBoard();
+
+    expect(mockProps.onSimulateMatch).toBeDefined();
+    expect(mockProps.onSaveFormation).toBeDefined();
+    expect(mockProps.onAnalyticsView).toBeDefined();
+    expect(mockProps.onExportFormation).toBeDefined();
+
+    expect(typeof mockProps.onSimulateMatch).toBe('function');
+    expect(typeof mockProps.onSaveFormation).toBe('function');
+  });
+
+  it('should render with test providers', () => {
+    const { container } = renderWithProviders(<div data-testid="test-element">Test Content</div>);
+
+    expect(container).toBeInTheDocument();
+    expect(screen.getByTestId('test-element')).toBeInTheDocument();
+    expect(screen.getByText('Test Content')).toBeInTheDocument();
+  });
+
+  it('should handle performance test data generation', () => {
+    const performanceData = createTestData.performance(10);
+
+    expect(performanceData.players).toBeDefined();
+    expect(performanceData.formation).toBeDefined();
+    expect(performanceData.players.length).toBe(10);
+
+    const largeDataset = createTestData.performance(100);
+    expect(largeDataset.players.length).toBe(100);
+  });
+});

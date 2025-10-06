@@ -1,8 +1,13 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { useTacticsContext } from '../hooks/useTacticsContext';
 import { useFranchiseContext } from '../hooks/useFranchiseContext';
 import { useUIContext } from '../hooks/useUIContext';
-import AdvancedAnalyticsDashboard from '../components/dashboards/AdvancedAnalyticsDashboard';
+import { LoadingFallback } from '../components/ErrorFallback';
+import type { MatchResult } from '../types';
+
+const AdvancedAnalyticsDashboard = lazy(
+  () => import('../components/dashboards/AdvancedAnalyticsDashboard'),
+);
 
 const AdvancedAnalyticsPage: React.FC = () => {
   const { tacticsState } = useTacticsContext();
@@ -12,6 +17,7 @@ const AdvancedAnalyticsPage: React.FC = () => {
   const { players, formations, teamTactics, activeFormationIds } = tacticsState;
   const { matchHistory } = franchiseState;
   const { settings } = uiState;
+  const matchResults = matchHistory as MatchResult[];
 
   return (
     <div className="h-full flex flex-col bg-gray-900">
@@ -37,15 +43,17 @@ const AdvancedAnalyticsPage: React.FC = () => {
       </div>
 
       <div className="flex-1 overflow-y-auto p-6">
-        <AdvancedAnalyticsDashboard
-          players={players}
-          formations={formations}
-          teamTactics={teamTactics}
-          matchHistory={matchHistory}
-          activeFormationIds={activeFormationIds}
-          aiPersonality={settings.aiPersonality}
-          className="mb-6"
-        />
+        <Suspense fallback={<LoadingFallback message="Loading advanced analytics..." />}>
+          <AdvancedAnalyticsDashboard
+            players={players}
+            formations={formations}
+            teamTactics={teamTactics}
+            matchHistory={matchResults}
+            activeFormationIds={activeFormationIds}
+            aiPersonality={settings.aiPersonality}
+            className="mb-6"
+          />
+        </Suspense>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
           <div className="bg-gray-800 rounded-lg p-6">
@@ -108,7 +116,7 @@ const AdvancedAnalyticsPage: React.FC = () => {
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-400">Matches Analyzed</span>
-                <span className="text-blue-400 font-semibold">{matchHistory.length}</span>
+                <span className="text-blue-400 font-semibold">{matchResults.length}</span>
               </div>
             </div>
           </div>
@@ -145,17 +153,35 @@ const AdvancedAnalyticsPage: React.FC = () => {
           </div>
 
           <div className="mt-6 p-4 bg-black/20 rounded border border-gray-600">
-            <h4 className="font-semibold text-blue-400 mb-2">🔬 Coming Soon: Advanced Features</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-300">
-              <div>
-                <p>• Real-time player performance tracking</p>
-                <p>• 3D tactical visualization</p>
-                <p>• Automated scouting reports</p>
+            <h4 className="font-semibold text-blue-400 mb-2">🔬 Advanced Analytics Features</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span className="text-gray-300">Real-time player performance tracking</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span className="text-gray-300">Interactive tactical visualization</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span className="text-gray-300">Automated analytics reports</span>
+                </div>
               </div>
-              <div>
-                <p>• Market value predictions</p>
-                <p>• Injury risk assessment</p>
-                <p>• Transfer recommendation engine</p>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span className="text-gray-300">Performance predictions</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span className="text-gray-300">Injury risk assessment</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span className="text-gray-300">AI-powered recommendations</span>
+                </div>
               </div>
             </div>
           </div>

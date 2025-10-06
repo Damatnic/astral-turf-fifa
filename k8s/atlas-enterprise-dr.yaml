@@ -12,20 +12,19 @@ metadata:
   labels:
     name: atlas-enterprise-dr
     tier: disaster-recovery
-    atlas.dr: "enterprise"
-    atlas.backup: "enterprise"
-    atlas.compliance: "sox-gdpr-pci"
-    atlas.rto: "5-minutes"
-    atlas.rpo: "1-minute"
+    atlas.dr: 'enterprise'
+    atlas.backup: 'enterprise'
+    atlas.compliance: 'sox-gdpr-pci'
+    atlas.rto: '5-minutes'
+    atlas.rpo: '1-minute'
   annotations:
-    atlas.dr/strategy: "multi-region-active-passive"
-    atlas.backup/retention: "7-years"
-    atlas.recovery/automation: "enabled"
-    atlas.compliance/audit: "continuous"
-    atlas.business-continuity/plan: "comprehensive"
+    atlas.dr/strategy: 'multi-region-active-passive'
+    atlas.backup/retention: '7-years'
+    atlas.recovery/automation: 'enabled'
+    atlas.compliance/audit: 'continuous'
+    atlas.business-continuity/plan: 'comprehensive'
 
 ---
-
 # Enterprise Disaster Recovery Configuration
 apiVersion: v1
 kind: ConfigMap
@@ -33,7 +32,7 @@ metadata:
   name: atlas-enterprise-dr-config
   namespace: atlas-enterprise-dr
   labels:
-    atlas.config/type: "disaster-recovery-enterprise"
+    atlas.config/type: 'disaster-recovery-enterprise'
 data:
   enterprise-dr-strategy.yaml: |
     disaster_recovery:
@@ -250,7 +249,6 @@ data:
           compliance_audits: "quarterly"
 
 ---
-
 # Enterprise Backup Orchestration CronJob
 apiVersion: batch/v1
 kind: CronJob
@@ -258,12 +256,12 @@ metadata:
   name: atlas-enterprise-backup-orchestrator
   namespace: atlas-enterprise-dr
   labels:
-    atlas.backup/type: "enterprise-orchestrator"
-    atlas.backup/criticality: "critical"
-    atlas.compliance/required: "true"
+    atlas.backup/type: 'enterprise-orchestrator'
+    atlas.backup/criticality: 'critical'
+    atlas.compliance/required: 'true'
 spec:
-  schedule: "0 2 * * *"  # Daily at 2 AM UTC
-  timeZone: "UTC"
+  schedule: '0 2 * * *' # Daily at 2 AM UTC
+  timeZone: 'UTC'
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 30
   failedJobsHistoryLimit: 7
@@ -272,8 +270,8 @@ spec:
       template:
         metadata:
           labels:
-            atlas.backup/type: "enterprise-orchestrator"
-            atlas.compliance/audit: "true"
+            atlas.backup/type: 'enterprise-orchestrator'
+            atlas.compliance/audit: 'true'
         spec:
           restartPolicy: OnFailure
           serviceAccountName: atlas-enterprise-backup-sa
@@ -282,364 +280,363 @@ spec:
             runAsUser: 65534
             runAsGroup: 65534
             fsGroup: 65534
-          
+
           initContainers:
-          - name: pre-backup-compliance-check
-            image: atlas/compliance-validator:v2.0.0
-            command:
-            - /bin/sh
-            - -c
-            - |
-              echo "🔍 Atlas Enterprise DR: Pre-backup compliance validation..."
-              
-              # SOX Compliance Check
-              if [ "$SOX_COMPLIANCE_ENABLED" = "true" ]; then
-                echo "📋 Validating SOX compliance requirements..."
-                # Check financial data classification
-                kubectl get secrets -n astral-turf-production -o json | \
-                  jq '.items[] | select(.metadata.labels["data-classification"]=="financial")' | \
-                  jq -r '.metadata.name' > /tmp/financial-secrets.txt
-                
-                if [ -s /tmp/financial-secrets.txt ]; then
-                  echo "✅ Financial data secrets identified for SOX backup"
-                else
-                  echo "⚠️  No financial data secrets found"
-                fi
-              fi
-              
-              # GDPR Compliance Check
-              if [ "$GDPR_COMPLIANCE_ENABLED" = "true" ]; then
-                echo "🔐 Validating GDPR compliance requirements..."
-                # Check for user data retention policies
-                psql $DATABASE_URL -c "
-                  SELECT COUNT(*) as user_data_records 
-                  FROM user_profiles 
-                  WHERE created_at < NOW() - INTERVAL '$GDPR_RETENTION_PERIOD'
-                "
-              fi
-              
-              # PCI DSS Compliance Check
-              if [ "$PCI_COMPLIANCE_ENABLED" = "true" ]; then
-                echo "💳 Validating PCI DSS compliance requirements..."
-                # Verify no cardholder data in logs
-                if grep -r "4[0-9]{12}(?:[0-9]{3})?" /var/log/ >/dev/null 2>&1; then
-                  echo "❌ Potential credit card data found in logs - compliance violation"
-                  exit 1
-                fi
-              fi
-              
-              # Encryption Key Validation
-              echo "🔑 Validating encryption keys..."
-              for key_file in /etc/backup-keys/*.key; do
-                if [ -f "$key_file" ]; then
-                  openssl rand -base64 32 | openssl dgst -sha256 -hmac "$(cat $key_file)" >/dev/null
-                  if [ $? -eq 0 ]; then
-                    echo "✅ Encryption key valid: $(basename $key_file)"
-                  else
-                    echo "❌ Encryption key invalid: $(basename $key_file)"
-                    exit 1
+            - name: pre-backup-compliance-check
+              image: atlas/compliance-validator:v2.0.0
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  echo "🔍 Atlas Enterprise DR: Pre-backup compliance validation..."
+
+                  # SOX Compliance Check
+                  if [ "$SOX_COMPLIANCE_ENABLED" = "true" ]; then
+                    echo "📋 Validating SOX compliance requirements..."
+                    # Check financial data classification
+                    kubectl get secrets -n astral-turf-production -o json | \
+                      jq '.items[] | select(.metadata.labels["data-classification"]=="financial")' | \
+                      jq -r '.metadata.name' > /tmp/financial-secrets.txt
+                    
+                    if [ -s /tmp/financial-secrets.txt ]; then
+                      echo "✅ Financial data secrets identified for SOX backup"
+                    else
+                      echo "⚠️  No financial data secrets found"
+                    fi
                   fi
-                fi
-              done
-              
-              echo "✅ Pre-backup compliance validation completed"
-            
-            env:
-            - name: SOX_COMPLIANCE_ENABLED
-              value: "true"
-            - name: GDPR_COMPLIANCE_ENABLED
-              value: "true"
-            - name: PCI_COMPLIANCE_ENABLED
-              value: "true"
-            - name: GDPR_RETENTION_PERIOD
-              value: "7 years"
-            - name: DATABASE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: atlas-enterprise-db-secrets
-                  key: compliance-audit-url
-            
-            volumeMounts:
-            - name: backup-encryption-keys
-              mountPath: /etc/backup-keys
-              readOnly: true
-            - name: compliance-logs
-              mountPath: /var/log
-            
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities:
-                drop: ["ALL"]
-          
+
+                  # GDPR Compliance Check
+                  if [ "$GDPR_COMPLIANCE_ENABLED" = "true" ]; then
+                    echo "🔐 Validating GDPR compliance requirements..."
+                    # Check for user data retention policies
+                    psql $DATABASE_URL -c "
+                      SELECT COUNT(*) as user_data_records 
+                      FROM user_profiles 
+                      WHERE created_at < NOW() - INTERVAL '$GDPR_RETENTION_PERIOD'
+                    "
+                  fi
+
+                  # PCI DSS Compliance Check
+                  if [ "$PCI_COMPLIANCE_ENABLED" = "true" ]; then
+                    echo "💳 Validating PCI DSS compliance requirements..."
+                    # Verify no cardholder data in logs
+                    if grep -r "4[0-9]{12}(?:[0-9]{3})?" /var/log/ >/dev/null 2>&1; then
+                      echo "❌ Potential credit card data found in logs - compliance violation"
+                      exit 1
+                    fi
+                  fi
+
+                  # Encryption Key Validation
+                  echo "🔑 Validating encryption keys..."
+                  for key_file in /etc/backup-keys/*.key; do
+                    if [ -f "$key_file" ]; then
+                      openssl rand -base64 32 | openssl dgst -sha256 -hmac "$(cat $key_file)" >/dev/null
+                      if [ $? -eq 0 ]; then
+                        echo "✅ Encryption key valid: $(basename $key_file)"
+                      else
+                        echo "❌ Encryption key invalid: $(basename $key_file)"
+                        exit 1
+                      fi
+                    fi
+                  done
+
+                  echo "✅ Pre-backup compliance validation completed"
+
+              env:
+                - name: SOX_COMPLIANCE_ENABLED
+                  value: 'true'
+                - name: GDPR_COMPLIANCE_ENABLED
+                  value: 'true'
+                - name: PCI_COMPLIANCE_ENABLED
+                  value: 'true'
+                - name: GDPR_RETENTION_PERIOD
+                  value: '7 years'
+                - name: DATABASE_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: atlas-enterprise-db-secrets
+                      key: compliance-audit-url
+
+              volumeMounts:
+                - name: backup-encryption-keys
+                  mountPath: /etc/backup-keys
+                  readOnly: true
+                - name: compliance-logs
+                  mountPath: /var/log
+
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: ['ALL']
+
           containers:
-          - name: enterprise-backup-orchestrator
-            image: atlas/enterprise-backup-orchestrator:v2.0.0
-            command:
-            - /bin/sh
-            - -c
-            - |
-              set -e
-              
-              BACKUP_ID="atlas-enterprise-$(date +%Y%m%d-%H%M%S)"
-              BACKUP_DIR="/backup/${BACKUP_ID}"
-              START_TIME=$(date +%s)
-              
-              echo "🚀 Atlas Enterprise DR: Starting comprehensive backup - ${BACKUP_ID}"
-              echo "📊 Backup Classification: SOX/GDPR/PCI Compliant"
-              
-              mkdir -p ${BACKUP_DIR}/{database,application,kubernetes,compliance,audit}
-              
-              # Create enterprise backup manifest
-              cat > ${BACKUP_DIR}/enterprise-manifest.json << EOF
-              {
-                "backup_id": "${BACKUP_ID}",
-                "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-                "type": "enterprise_full",
-                "version": "2.0",
-                "classification": "confidential",
-                "compliance": {
-                  "sox": true,
-                  "gdpr": true,
-                  "pci_dss": true,
-                  "hipaa": false,
-                  "iso27001": true
-                },
-                "encryption": {
-                  "algorithm": "AES-256-GCM",
-                  "key_derivation": "PBKDF2-SHA256",
-                  "key_rotation": "quarterly",
-                  "compliance_level": "FIPS-140-2-Level-3"
-                },
-                "retention": {
-                  "operational": "30 days",
-                  "compliance": "7 years",
-                  "legal_hold": "indefinite"
-                },
-                "components": []
-              }
-              EOF
-              
-              # Database Backup with Point-in-Time Recovery
-              echo "💾 Atlas Enterprise DR: Creating database backup with PITR..."
-              
-              # Full database backup
-              pg_dump $DATABASE_URL \
-                --verbose \
-                --create \
-                --clean \
-                --if-exists \
-                --format=custom \
-                --compress=9 \
-                --file=${BACKUP_DIR}/database/full-backup.dump
-              
-              # WAL archive backup for PITR
-              psql $DATABASE_URL -c "SELECT pg_start_backup('${BACKUP_ID}', false, false);" 
-              rsync -av $POSTGRES_WAL_PATH/ ${BACKUP_DIR}/database/wal-archive/
-              psql $DATABASE_URL -c "SELECT pg_stop_backup(false, true);"
-              
-              # Encrypt database backup
-              openssl enc -aes-256-gcm -salt \
-                -in ${BACKUP_DIR}/database/full-backup.dump \
-                -out ${BACKUP_DIR}/database/full-backup.dump.enc \
-                -pass file:/etc/backup-keys/database-encryption.key
-              
-              # Create database backup verification
-              sha256sum ${BACKUP_DIR}/database/full-backup.dump.enc > ${BACKUP_DIR}/database/checksums.sha256
-              
-              # Application Data Backup
-              echo "📱 Atlas Enterprise DR: Creating application data backup..."
-              
-              # User uploads and formations
-              kubectl create secret generic app-data-backup-${BACKUP_ID} \
-                --from-literal=formations="$(kubectl get configmap tactical-formations -n astral-turf-production -o json | base64 -w 0)" \
-                --from-literal=user-preferences="$(kubectl get configmap user-preferences -n astral-turf-production -o json | base64 -w 0)" \
-                --dry-run=client -o yaml > ${BACKUP_DIR}/application/app-data.yaml
-              
-              # Encrypt application data
-              openssl enc -aes-256-gcm -salt \
-                -in ${BACKUP_DIR}/application/app-data.yaml \
-                -out ${BACKUP_DIR}/application/app-data.yaml.enc \
-                -pass file:/etc/backup-keys/application-encryption.key
-              
-              # Kubernetes Configuration Backup
-              echo "⚙️  Atlas Enterprise DR: Creating Kubernetes configuration backup..."
-              
-              # Export all production namespace resources
-              kubectl get all,configmaps,secrets,pv,pvc,ingresses,networkpolicies \
-                -n astral-turf-production -o yaml > ${BACKUP_DIR}/kubernetes/production-resources.yaml
-              
-              # Export monitoring configuration
-              kubectl get all,configmaps,secrets \
-                -n atlas-enterprise-monitoring -o yaml > ${BACKUP_DIR}/kubernetes/monitoring-resources.yaml
-              
-              # Export DR configuration
-              kubectl get all,configmaps,secrets \
-                -n atlas-enterprise-dr -o yaml > ${BACKUP_DIR}/kubernetes/dr-resources.yaml
-              
-              # Encrypt Kubernetes configs
-              openssl enc -aes-256-gcm -salt \
-                -in ${BACKUP_DIR}/kubernetes/production-resources.yaml \
-                -out ${BACKUP_DIR}/kubernetes/production-resources.yaml.enc \
-                -pass file:/etc/backup-keys/k8s-encryption.key
-              
-              # Compliance and Audit Data Backup
-              echo "📋 Atlas Enterprise DR: Creating compliance audit backup..."
-              
-              # Export audit logs
-              kubectl logs -n atlas-enterprise-monitoring \
-                -l atlas.audit/enabled=true \
-                --since=24h > ${BACKUP_DIR}/compliance/audit-logs-24h.log
-              
-              # Export security events
-              kubectl get events -n astral-turf-production \
-                --field-selector type=Warning \
-                -o json > ${BACKUP_DIR}/compliance/security-events.json
-              
-              # Compliance metadata
-              cat > ${BACKUP_DIR}/compliance/compliance-metadata.json << EOF
-              {
-                "backup_id": "${BACKUP_ID}",
-                "compliance_officer": "compliance@astralturf.com",
-                "legal_hold_status": "none",
-                "data_classification": "confidential",
-                "retention_schedule": "7_years_sox",
-                "encryption_status": "aes_256_gcm_encrypted",
-                "audit_trail": "complete",
-                "validation_status": "pending"
-              }
-              EOF
-              
-              # Create comprehensive checksums
-              echo "🔐 Atlas Enterprise DR: Creating integrity checksums..."
-              find ${BACKUP_DIR} -name "*.enc" -exec sha256sum {} \; > ${BACKUP_DIR}/all-checksums.sha256
-              
-              # Upload to multiple secure storage locations
-              echo "☁️  Atlas Enterprise DR: Uploading to enterprise storage..."
-              
-              # Primary: AWS S3 with compliance features
-              aws s3 cp ${BACKUP_DIR} s3://atlas-enterprise-backups-primary/full/${BACKUP_ID}/ \
-                --recursive \
-                --storage-class STANDARD_IA \
-                --server-side-encryption aws:kms \
-                --ssekms-key-id $AWS_KMS_KEY_ID \
-                --metadata compliance=sox-gdpr-pci,classification=confidential
-              
-              # Secondary: Azure with immutable storage
-              az storage blob upload-batch \
-                --destination atlas-enterprise-backups-secondary \
-                --source ${BACKUP_DIR} \
-                --destination-path full/${BACKUP_ID} \
-                --metadata compliance=sox-gdpr-pci classification=confidential
-              
-              # Tertiary: Google Cloud with retention policy
-              gsutil -m cp -r ${BACKUP_DIR} gs://atlas-enterprise-backups-tertiary/full/${BACKUP_ID}/
-              gsutil retention set 7y gs://atlas-enterprise-backups-tertiary/full/${BACKUP_ID}/
-              
-              # Archive: Glacier for long-term retention
-              aws s3 cp ${BACKUP_DIR} s3://atlas-enterprise-archive/full/${BACKUP_ID}/ \
-                --recursive \
-                --storage-class GLACIER
-              
-              # Update enterprise backup registry
-              kubectl create configmap enterprise-backup-registry-${BACKUP_ID} \
-                --from-file=${BACKUP_DIR}/enterprise-manifest.json \
-                --from-literal=status=completed \
-                --from-literal=validation=pending \
-                --namespace=atlas-enterprise-dr
-              
-              # Compliance notification
-              END_TIME=$(date +%s)
-              DURATION=$((END_TIME - START_TIME))
-              
-              cat > /tmp/compliance-notification.json << EOF
-              {
-                "backup_id": "${BACKUP_ID}",
-                "completion_time": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-                "duration_seconds": ${DURATION},
-                "compliance_status": "complete",
-                "retention_period": "7 years",
-                "data_classification": "confidential",
-                "storage_locations": 4,
-                "encryption_status": "AES-256-GCM",
-                "audit_required": true
-              }
-              EOF
-              
-              # Send compliance notification
-              curl -X POST "$COMPLIANCE_WEBHOOK" \
-                -H 'Content-type: application/json' \
-                --data @/tmp/compliance-notification.json
-              
-              echo "✅ Atlas Enterprise DR: Backup completed successfully - ${BACKUP_ID}"
-              echo "⏱️  Total backup duration: ${DURATION} seconds"
-              echo "📊 Compliance: SOX, GDPR, PCI DSS compliant"
-              echo "🔐 Encryption: AES-256-GCM with quarterly key rotation"
-            
-            env:
-            - name: DATABASE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: atlas-enterprise-db-secrets
-                  key: backup-url
-            - name: POSTGRES_WAL_PATH
-              value: "/var/lib/postgresql/wal"
-            - name: AWS_KMS_KEY_ID
-              valueFrom:
-                secretKeyRef:
-                  name: atlas-enterprise-cloud-secrets
-                  key: aws-kms-key-id
-            - name: COMPLIANCE_WEBHOOK
-              valueFrom:
-                secretKeyRef:
-                  name: atlas-enterprise-notification-secrets
-                  key: compliance-webhook
-            
-            volumeMounts:
-            - name: backup-storage
-              mountPath: /backup
-            - name: backup-encryption-keys
-              mountPath: /etc/backup-keys
-              readOnly: true
-            - name: postgres-wal
-              mountPath: /var/lib/postgresql/wal
-              readOnly: true
-            
-            resources:
-              requests:
-                memory: "4Gi"
-                cpu: "2000m"
-                ephemeral-storage: "10Gi"
-              limits:
-                memory: "8Gi"
-                cpu: "4000m"
-                ephemeral-storage: "20Gi"
-            
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities:
-                drop: ["ALL"]
-          
+            - name: enterprise-backup-orchestrator
+              image: atlas/enterprise-backup-orchestrator:v2.0.0
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  set -e
+
+                  BACKUP_ID="atlas-enterprise-$(date +%Y%m%d-%H%M%S)"
+                  BACKUP_DIR="/backup/${BACKUP_ID}"
+                  START_TIME=$(date +%s)
+
+                  echo "🚀 Atlas Enterprise DR: Starting comprehensive backup - ${BACKUP_ID}"
+                  echo "📊 Backup Classification: SOX/GDPR/PCI Compliant"
+
+                  mkdir -p ${BACKUP_DIR}/{database,application,kubernetes,compliance,audit}
+
+                  # Create enterprise backup manifest
+                  cat > ${BACKUP_DIR}/enterprise-manifest.json << EOF
+                  {
+                    "backup_id": "${BACKUP_ID}",
+                    "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+                    "type": "enterprise_full",
+                    "version": "2.0",
+                    "classification": "confidential",
+                    "compliance": {
+                      "sox": true,
+                      "gdpr": true,
+                      "pci_dss": true,
+                      "hipaa": false,
+                      "iso27001": true
+                    },
+                    "encryption": {
+                      "algorithm": "AES-256-GCM",
+                      "key_derivation": "PBKDF2-SHA256",
+                      "key_rotation": "quarterly",
+                      "compliance_level": "FIPS-140-2-Level-3"
+                    },
+                    "retention": {
+                      "operational": "30 days",
+                      "compliance": "7 years",
+                      "legal_hold": "indefinite"
+                    },
+                    "components": []
+                  }
+                  EOF
+
+                  # Database Backup with Point-in-Time Recovery
+                  echo "💾 Atlas Enterprise DR: Creating database backup with PITR..."
+
+                  # Full database backup
+                  pg_dump $DATABASE_URL \
+                    --verbose \
+                    --create \
+                    --clean \
+                    --if-exists \
+                    --format=custom \
+                    --compress=9 \
+                    --file=${BACKUP_DIR}/database/full-backup.dump
+
+                  # WAL archive backup for PITR
+                  psql $DATABASE_URL -c "SELECT pg_start_backup('${BACKUP_ID}', false, false);" 
+                  rsync -av $POSTGRES_WAL_PATH/ ${BACKUP_DIR}/database/wal-archive/
+                  psql $DATABASE_URL -c "SELECT pg_stop_backup(false, true);"
+
+                  # Encrypt database backup
+                  openssl enc -aes-256-gcm -salt \
+                    -in ${BACKUP_DIR}/database/full-backup.dump \
+                    -out ${BACKUP_DIR}/database/full-backup.dump.enc \
+                    -pass file:/etc/backup-keys/database-encryption.key
+
+                  # Create database backup verification
+                  sha256sum ${BACKUP_DIR}/database/full-backup.dump.enc > ${BACKUP_DIR}/database/checksums.sha256
+
+                  # Application Data Backup
+                  echo "📱 Atlas Enterprise DR: Creating application data backup..."
+
+                  # User uploads and formations
+                  kubectl create secret generic app-data-backup-${BACKUP_ID} \
+                    --from-literal=formations="$(kubectl get configmap tactical-formations -n astral-turf-production -o json | base64 -w 0)" \
+                    --from-literal=user-preferences="$(kubectl get configmap user-preferences -n astral-turf-production -o json | base64 -w 0)" \
+                    --dry-run=client -o yaml > ${BACKUP_DIR}/application/app-data.yaml
+
+                  # Encrypt application data
+                  openssl enc -aes-256-gcm -salt \
+                    -in ${BACKUP_DIR}/application/app-data.yaml \
+                    -out ${BACKUP_DIR}/application/app-data.yaml.enc \
+                    -pass file:/etc/backup-keys/application-encryption.key
+
+                  # Kubernetes Configuration Backup
+                  echo "⚙️  Atlas Enterprise DR: Creating Kubernetes configuration backup..."
+
+                  # Export all production namespace resources
+                  kubectl get all,configmaps,secrets,pv,pvc,ingresses,networkpolicies \
+                    -n astral-turf-production -o yaml > ${BACKUP_DIR}/kubernetes/production-resources.yaml
+
+                  # Export monitoring configuration
+                  kubectl get all,configmaps,secrets \
+                    -n atlas-enterprise-monitoring -o yaml > ${BACKUP_DIR}/kubernetes/monitoring-resources.yaml
+
+                  # Export DR configuration
+                  kubectl get all,configmaps,secrets \
+                    -n atlas-enterprise-dr -o yaml > ${BACKUP_DIR}/kubernetes/dr-resources.yaml
+
+                  # Encrypt Kubernetes configs
+                  openssl enc -aes-256-gcm -salt \
+                    -in ${BACKUP_DIR}/kubernetes/production-resources.yaml \
+                    -out ${BACKUP_DIR}/kubernetes/production-resources.yaml.enc \
+                    -pass file:/etc/backup-keys/k8s-encryption.key
+
+                  # Compliance and Audit Data Backup
+                  echo "📋 Atlas Enterprise DR: Creating compliance audit backup..."
+
+                  # Export audit logs
+                  kubectl logs -n atlas-enterprise-monitoring \
+                    -l atlas.audit/enabled=true \
+                    --since=24h > ${BACKUP_DIR}/compliance/audit-logs-24h.log
+
+                  # Export security events
+                  kubectl get events -n astral-turf-production \
+                    --field-selector type=Warning \
+                    -o json > ${BACKUP_DIR}/compliance/security-events.json
+
+                  # Compliance metadata
+                  cat > ${BACKUP_DIR}/compliance/compliance-metadata.json << EOF
+                  {
+                    "backup_id": "${BACKUP_ID}",
+                    "compliance_officer": "compliance@astralturf.com",
+                    "legal_hold_status": "none",
+                    "data_classification": "confidential",
+                    "retention_schedule": "7_years_sox",
+                    "encryption_status": "aes_256_gcm_encrypted",
+                    "audit_trail": "complete",
+                    "validation_status": "pending"
+                  }
+                  EOF
+
+                  # Create comprehensive checksums
+                  echo "🔐 Atlas Enterprise DR: Creating integrity checksums..."
+                  find ${BACKUP_DIR} -name "*.enc" -exec sha256sum {} \; > ${BACKUP_DIR}/all-checksums.sha256
+
+                  # Upload to multiple secure storage locations
+                  echo "☁️  Atlas Enterprise DR: Uploading to enterprise storage..."
+
+                  # Primary: AWS S3 with compliance features
+                  aws s3 cp ${BACKUP_DIR} s3://atlas-enterprise-backups-primary/full/${BACKUP_ID}/ \
+                    --recursive \
+                    --storage-class STANDARD_IA \
+                    --server-side-encryption aws:kms \
+                    --ssekms-key-id $AWS_KMS_KEY_ID \
+                    --metadata compliance=sox-gdpr-pci,classification=confidential
+
+                  # Secondary: Azure with immutable storage
+                  az storage blob upload-batch \
+                    --destination atlas-enterprise-backups-secondary \
+                    --source ${BACKUP_DIR} \
+                    --destination-path full/${BACKUP_ID} \
+                    --metadata compliance=sox-gdpr-pci classification=confidential
+
+                  # Tertiary: Google Cloud with retention policy
+                  gsutil -m cp -r ${BACKUP_DIR} gs://atlas-enterprise-backups-tertiary/full/${BACKUP_ID}/
+                  gsutil retention set 7y gs://atlas-enterprise-backups-tertiary/full/${BACKUP_ID}/
+
+                  # Archive: Glacier for long-term retention
+                  aws s3 cp ${BACKUP_DIR} s3://atlas-enterprise-archive/full/${BACKUP_ID}/ \
+                    --recursive \
+                    --storage-class GLACIER
+
+                  # Update enterprise backup registry
+                  kubectl create configmap enterprise-backup-registry-${BACKUP_ID} \
+                    --from-file=${BACKUP_DIR}/enterprise-manifest.json \
+                    --from-literal=status=completed \
+                    --from-literal=validation=pending \
+                    --namespace=atlas-enterprise-dr
+
+                  # Compliance notification
+                  END_TIME=$(date +%s)
+                  DURATION=$((END_TIME - START_TIME))
+
+                  cat > /tmp/compliance-notification.json << EOF
+                  {
+                    "backup_id": "${BACKUP_ID}",
+                    "completion_time": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+                    "duration_seconds": ${DURATION},
+                    "compliance_status": "complete",
+                    "retention_period": "7 years",
+                    "data_classification": "confidential",
+                    "storage_locations": 4,
+                    "encryption_status": "AES-256-GCM",
+                    "audit_required": true
+                  }
+                  EOF
+
+                  # Send compliance notification
+                  curl -X POST "$COMPLIANCE_WEBHOOK" \
+                    -H 'Content-type: application/json' \
+                    --data @/tmp/compliance-notification.json
+
+                  echo "✅ Atlas Enterprise DR: Backup completed successfully - ${BACKUP_ID}"
+                  echo "⏱️  Total backup duration: ${DURATION} seconds"
+                  echo "📊 Compliance: SOX, GDPR, PCI DSS compliant"
+                  echo "🔐 Encryption: AES-256-GCM with quarterly key rotation"
+
+              env:
+                - name: DATABASE_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: atlas-enterprise-db-secrets
+                      key: backup-url
+                - name: POSTGRES_WAL_PATH
+                  value: '/var/lib/postgresql/wal'
+                - name: AWS_KMS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: atlas-enterprise-cloud-secrets
+                      key: aws-kms-key-id
+                - name: COMPLIANCE_WEBHOOK
+                  valueFrom:
+                    secretKeyRef:
+                      name: atlas-enterprise-notification-secrets
+                      key: compliance-webhook
+
+              volumeMounts:
+                - name: backup-storage
+                  mountPath: /backup
+                - name: backup-encryption-keys
+                  mountPath: /etc/backup-keys
+                  readOnly: true
+                - name: postgres-wal
+                  mountPath: /var/lib/postgresql/wal
+                  readOnly: true
+
+              resources:
+                requests:
+                  memory: '4Gi'
+                  cpu: '2000m'
+                  ephemeral-storage: '10Gi'
+                limits:
+                  memory: '8Gi'
+                  cpu: '4000m'
+                  ephemeral-storage: '20Gi'
+
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: ['ALL']
+
           volumes:
-          - name: backup-storage
-            persistentVolumeClaim:
-              claimName: atlas-enterprise-backup-storage
-          - name: backup-encryption-keys
-            secret:
-              secretName: atlas-enterprise-backup-encryption-keys
-              defaultMode: 0400
-          - name: compliance-logs
-            hostPath:
-              path: /var/log
-              type: Directory
-          - name: postgres-wal
-            hostPath:
-              path: /var/lib/postgresql/wal
-              type: Directory
+            - name: backup-storage
+              persistentVolumeClaim:
+                claimName: atlas-enterprise-backup-storage
+            - name: backup-encryption-keys
+              secret:
+                secretName: atlas-enterprise-backup-encryption-keys
+                defaultMode: 0400
+            - name: compliance-logs
+              hostPath:
+                path: /var/log
+                type: Directory
+            - name: postgres-wal
+              hostPath:
+                path: /var/lib/postgresql/wal
+                type: Directory
 
 ---
-
 # Enterprise Disaster Recovery Services
 apiVersion: v1
 kind: Service
@@ -648,21 +645,20 @@ metadata:
   namespace: atlas-enterprise-dr
   labels:
     app: enterprise-dr-api
-    atlas.service/type: "disaster-recovery"
+    atlas.service/type: 'disaster-recovery'
 spec:
   type: ClusterIP
   ports:
-  - port: 8080
-    targetPort: 8080
-    name: api
-  - port: 9090
-    targetPort: 9090
-    name: metrics
+    - port: 8080
+      targetPort: 8080
+      name: api
+    - port: 9090
+      targetPort: 9090
+      name: metrics
   selector:
     app: enterprise-dr-api
 
 ---
-
 # Enterprise Storage for DR
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -670,18 +666,17 @@ metadata:
   name: atlas-enterprise-backup-storage
   namespace: atlas-enterprise-dr
   labels:
-    atlas.storage/type: "enterprise-backup"
-    atlas.storage/tier: "premium"
-    atlas.compliance/required: "true"
+    atlas.storage/type: 'enterprise-backup'
+    atlas.storage/tier: 'premium'
+    atlas.compliance/required: 'true'
 spec:
-  accessModes: ["ReadWriteOnce"]
-  storageClassName: "atlas-enterprise-storage"
+  accessModes: ['ReadWriteOnce']
+  storageClassName: 'atlas-enterprise-storage'
   resources:
     requests:
-      storage: "50Ti"  # 50 TB for enterprise backups
+      storage: '50Ti' # 50 TB for enterprise backups
 
 ---
-
 # Enterprise Service Accounts
 apiVersion: v1
 kind: ServiceAccount
@@ -689,16 +684,15 @@ metadata:
   name: atlas-enterprise-backup-sa
   namespace: atlas-enterprise-dr
   labels:
-    atlas.security/managed: "true"
-    atlas.compliance/required: "true"
+    atlas.security/managed: 'true'
+    atlas.compliance/required: 'true'
 
 ---
-
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: atlas-enterprise-dr-sa
   namespace: atlas-enterprise-dr
   labels:
-    atlas.security/managed: "true"
-    atlas.compliance/required: "true"
+    atlas.security/managed: 'true'
+    atlas.compliance/required: 'true'

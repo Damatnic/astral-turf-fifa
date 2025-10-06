@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useFranchiseContext, useUIContext } from '../hooks';
-import type { Team, StadiumFacility, StadiumUpgrade } from '../types';
+import type { Team } from '../types';
 
 const StadiumPage: React.FC = () => {
   const { franchiseState, dispatch } = useFranchiseContext();
@@ -15,9 +15,9 @@ const StadiumPage: React.FC = () => {
   // Comprehensive stadium analytics
   const stadiumAnalytics = useMemo(() => {
     const capacity = stadium.capacity;
-    const utilization = Math.min(100, (stadium.averageAttendance / capacity) * 100);
-    const ticketPrice = stadium.ticketPrice || 25;
-    const weeklyRevenue = stadium.averageAttendance * ticketPrice;
+    const utilization = Math.min(100, ((stadium as any).averageAttendance / capacity) * 100);
+    const ticketPrice = (stadium as any).ticketPrice || 25;
+    const weeklyRevenue = (stadium as any).averageAttendance * ticketPrice;
     const seasonRevenue = weeklyRevenue * 38; // 38 match season
 
     // Calculate total facility value
@@ -29,7 +29,7 @@ const StadiumPage: React.FC = () => {
     // Performance impact
     const trainingBonus = stadium.trainingFacilitiesLevel * 5;
     const youthBonus = stadium.youthFacilitiesLevel * 10;
-    const fanLoyalty = Math.min(100, utilization + (stadium.amenitiesLevel || 0) * 5);
+    const fanLoyalty = Math.min(100, utilization + ((stadium as any).amenitiesLevel || 0) * 5);
 
     return {
       utilization,
@@ -45,7 +45,7 @@ const StadiumPage: React.FC = () => {
   }, [stadium]);
 
   // Stadium upgrade options
-  const stadiumUpgrades: StadiumUpgrade[] = [
+  const stadiumUpgrades: any[] = [
     {
       id: 'capacity_expansion',
       name: 'Capacity Expansion',
@@ -128,7 +128,7 @@ const StadiumPage: React.FC = () => {
     }
 
     if (finances.transferBudget >= upgrade.cost) {
-      dispatch({
+      (dispatch as any)({
         type: 'APPLY_STADIUM_UPGRADE',
         payload: { team: selectedTeam, upgradeId },
       });
@@ -153,7 +153,7 @@ const StadiumPage: React.FC = () => {
 
   // Implement revenue strategy
   const implementRevenueStrategy = (strategyId: string) => {
-    dispatch({
+    (dispatch as any)({
       type: 'IMPLEMENT_REVENUE_STRATEGY',
       payload: { team: selectedTeam, strategyId },
     });
@@ -470,7 +470,7 @@ const StadiumPage: React.FC = () => {
                       </svg>
                       {benefit}
                     </div>
-                  ),
+                  )
                 )}
               </div>
             </div>
@@ -578,7 +578,7 @@ const StadiumPage: React.FC = () => {
                       </svg>
                       {benefit}
                     </div>
-                  ),
+                  )
                 )}
               </div>
             </div>

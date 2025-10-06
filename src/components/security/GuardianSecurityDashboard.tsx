@@ -26,7 +26,7 @@ import {
   AlertCircle,
   CheckCircle,
   XCircle,
-  RefreshCw
+  RefreshCw,
 } from 'lucide-react';
 import { guardianSecuritySuite } from '../../security/guardianSecuritySuite';
 import { guardianThreatDetection } from '../../security/threatDetection';
@@ -47,7 +47,12 @@ interface SecurityMetrics {
 
 interface SecurityEvent {
   id: string;
-  type: 'authentication' | 'authorization' | 'data_access' | 'threat_detected' | 'compliance_violation';
+  type:
+    | 'authentication'
+    | 'authorization'
+    | 'data_access'
+    | 'threat_detected'
+    | 'compliance_violation';
   severity: 'low' | 'medium' | 'high' | 'critical';
   description: string;
   timestamp: string;
@@ -73,14 +78,14 @@ export const GuardianSecurityDashboard: React.FC = () => {
     activeSessions: 0,
     lastSecurityScan: new Date().toISOString(),
     securityEvents: [],
-    recommendations: []
+    recommendations: [],
   });
 
   const [threatData, setThreatData] = useState<ThreatData>({
     threatsDetected: 0,
     threatsBlocked: 0,
     threatsByType: {},
-    threatsByLevel: {}
+    threatsByLevel: {},
   });
 
   const [timeframe, setTimeframe] = useState<'1h' | '24h' | '7d' | '30d'>('24h');
@@ -110,7 +115,7 @@ export const GuardianSecurityDashboard: React.FC = () => {
 
   useEffect(() => {
     loadSecurityData();
-    
+
     // Auto-refresh every 30 seconds
     const interval = setInterval(loadSecurityData, 30000);
     return () => clearInterval(interval);
@@ -170,11 +175,11 @@ export const GuardianSecurityDashboard: React.FC = () => {
               <p className="text-gray-600">Real-time security monitoring and threat detection</p>
             </div>
           </div>
-          
+
           <div className="flex items-center space-x-4">
             <select
               value={timeframe}
-              onChange={(e) => setTimeframe(e.target.value as any)}
+              onChange={e => setTimeframe(e.target.value as any)}
               className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             >
               <option value="1h">Last Hour</option>
@@ -182,7 +187,7 @@ export const GuardianSecurityDashboard: React.FC = () => {
               <option value="7d">Last 7 Days</option>
               <option value="30d">Last 30 Days</option>
             </select>
-            
+
             <button
               onClick={loadSecurityData}
               disabled={loading}
@@ -193,7 +198,7 @@ export const GuardianSecurityDashboard: React.FC = () => {
             </button>
           </div>
         </div>
-        
+
         <div className="mt-4 text-sm text-gray-500">
           Last updated: {formatTimestamp(lastUpdate.toISOString())}
         </div>
@@ -247,18 +252,18 @@ export const GuardianSecurityDashboard: React.FC = () => {
         {/* Threat Analysis */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Threat Analysis</h3>
-          
+
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <span className="text-sm text-gray-600">Threats Detected</span>
               <span className="font-semibold">{threatData.threatsDetected}</span>
             </div>
-            
+
             <div className="flex justify-between items-center">
               <span className="text-sm text-gray-600">Threats Blocked</span>
               <span className="font-semibold text-green-600">{threatData.threatsBlocked}</span>
             </div>
-            
+
             <div className="pt-4 border-t">
               <h4 className="text-sm font-medium text-gray-700 mb-2">Threats by Type</h4>
               <div className="space-y-2">
@@ -270,13 +275,15 @@ export const GuardianSecurityDashboard: React.FC = () => {
                 ))}
               </div>
             </div>
-            
+
             <div className="pt-4 border-t">
               <h4 className="text-sm font-medium text-gray-700 mb-2">Threats by Level</h4>
               <div className="space-y-2">
                 {Object.entries(threatData.threatsByLevel).map(([level, count]) => (
                   <div key={level} className="flex justify-between text-sm">
-                    <span className={`capitalize px-2 py-1 rounded-full text-xs ${getSeverityColor(level)}`}>
+                    <span
+                      className={`capitalize px-2 py-1 rounded-full text-xs ${getSeverityColor(level)}`}
+                    >
                       {level}
                     </span>
                     <span>{count}</span>
@@ -290,7 +297,7 @@ export const GuardianSecurityDashboard: React.FC = () => {
         {/* Security Metrics */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Security Metrics</h3>
-          
+
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
@@ -299,7 +306,7 @@ export const GuardianSecurityDashboard: React.FC = () => {
               </div>
               <span className="font-semibold">{metrics.activeSessions}</span>
             </div>
-            
+
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <Activity className="w-4 h-4 text-gray-500" />
@@ -307,7 +314,7 @@ export const GuardianSecurityDashboard: React.FC = () => {
               </div>
               <span className="font-semibold text-green-600">{metrics.vulnerabilityScore}%</span>
             </div>
-            
+
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <Clock className="w-4 h-4 text-gray-500" />
@@ -318,7 +325,7 @@ export const GuardianSecurityDashboard: React.FC = () => {
               </span>
             </div>
           </div>
-          
+
           {/* Security Recommendations */}
           {metrics.recommendations.length > 0 && (
             <div className="mt-6 pt-4 border-t">
@@ -339,7 +346,7 @@ export const GuardianSecurityDashboard: React.FC = () => {
       {/* Recent Security Events */}
       <div className="bg-white rounded-lg shadow-md p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Security Events</h3>
-        
+
         {metrics.securityEvents.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
             <Shield className="w-12 h-12 mx-auto mb-4 text-gray-300" />
@@ -347,19 +354,24 @@ export const GuardianSecurityDashboard: React.FC = () => {
           </div>
         ) : (
           <div className="space-y-3">
-            {metrics.securityEvents.slice(0, 10).map((event) => (
+            {metrics.securityEvents.slice(0, 10).map(event => (
               <div
                 key={event.id}
                 className="flex items-center justify-between p-4 border border-gray-200 rounded-lg"
               >
                 <div className="flex items-center space-x-4">
-                  <div className={`w-3 h-3 rounded-full ${
-                    event.severity === 'critical' ? 'bg-red-500' :
-                    event.severity === 'high' ? 'bg-orange-500' :
-                    event.severity === 'medium' ? 'bg-yellow-500' :
-                    'bg-blue-500'
-                  }`} />
-                  
+                  <div
+                    className={`w-3 h-3 rounded-full ${
+                      event.severity === 'critical'
+                        ? 'bg-red-500'
+                        : event.severity === 'high'
+                          ? 'bg-orange-500'
+                          : event.severity === 'medium'
+                            ? 'bg-yellow-500'
+                            : 'bg-blue-500'
+                    }`}
+                  />
+
                   <div>
                     <p className="font-medium text-gray-900">{event.description}</p>
                     <div className="flex items-center space-x-4 mt-1 text-sm text-gray-500">
@@ -369,21 +381,21 @@ export const GuardianSecurityDashboard: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center space-x-4">
-                  <div className={`px-2 py-1 rounded-full text-xs ${getSeverityColor(event.severity)}`}>
+                  <div
+                    className={`px-2 py-1 rounded-full text-xs ${getSeverityColor(event.severity)}`}
+                  >
                     {event.severity.toUpperCase()}
                   </div>
-                  
+
                   {event.resolved ? (
                     <CheckCircle className="w-5 h-5 text-green-500" />
                   ) : (
                     <XCircle className="w-5 h-5 text-red-500" />
                   )}
-                  
-                  <span className="text-sm text-gray-500">
-                    {formatTimestamp(event.timestamp)}
-                  </span>
+
+                  <span className="text-sm text-gray-500">{formatTimestamp(event.timestamp)}</span>
                 </div>
               </div>
             ))}
@@ -398,9 +410,9 @@ export const GuardianSecurityDashboard: React.FC = () => {
             {getStatusIcon(metrics.systemStatus)}
             <span className="text-sm font-medium text-gray-700">Guardian Active</span>
           </div>
-          
+
           <div className="h-4 w-px bg-gray-300" />
-          
+
           <div className="flex items-center space-x-2">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
             <span className="text-xs text-gray-500">Monitoring</span>

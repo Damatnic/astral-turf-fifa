@@ -1,3 +1,4 @@
+// @ts-ignore - faker types may not be available
 import { faker } from '@faker-js/faker';
 import type {
   Player,
@@ -28,7 +29,9 @@ faker.seed(123);
  */
 
 // Base player attributes generator
-export const generatePlayerAttributes = (overrides: Partial<PlayerAttributes> = {}): PlayerAttributes => ({
+export const generatePlayerAttributes = (
+  overrides: Partial<PlayerAttributes> = {}
+): PlayerAttributes => ({
   speed: faker.number.int({ min: 40, max: 99 }),
   passing: faker.number.int({ min: 40, max: 99 }),
   tackling: faker.number.int({ min: 40, max: 99 }),
@@ -63,7 +66,7 @@ export const generatePlayerStats = (overrides: Partial<PlayerStats> = {}): Playe
 export const generatePlayer = (overrides: Partial<Player> = {}): Player => {
   const positions: PositionRole[] = ['GK', 'DF', 'MF', 'FW'];
   const position = overrides.position || faker.helpers.arrayElement(positions);
-  
+
   return {
     id: faker.string.uuid(),
     name: faker.person.fullName(),
@@ -85,7 +88,13 @@ export const generatePlayer = (overrides: Partial<Player> = {}): Player => {
     morale: faker.helpers.arrayElement(['Excellent', 'Good', 'Okay', 'Poor', 'Very Poor']),
     form: faker.helpers.arrayElement(['Excellent', 'Good', 'Average', 'Poor', 'Very Poor']),
     availability: {
-      status: faker.helpers.arrayElement(['Available', 'Minor Injury', 'Major Injury', 'Suspended', 'International Duty']),
+      status: faker.helpers.arrayElement([
+        'Available',
+        'Minor Injury',
+        'Major Injury',
+        'Suspended',
+        'International Duty',
+      ]),
       returnDate: faker.helpers.maybe(() => faker.date.future().toISOString().split('T')[0]),
     } as PlayerAvailability,
     isSelected: faker.datatype.boolean({ probability: 0.7 }),
@@ -94,7 +103,7 @@ export const generatePlayer = (overrides: Partial<Player> = {}): Player => {
     instructions: [],
     developmentLog: [],
     ...overrides,
-  };
+  } as any;
 };
 
 // Generate players for specific formations
@@ -107,11 +116,13 @@ export const generatePlayersForFormation = (formation: string): Player[] => {
   };
 
   const positions = formationConfigs[formation] || formationConfigs['4-4-2'];
-  return positions.map((position, index) => generatePlayer({
-    position,
-    number: index + 1,
-    team: 'home',
-  }));
+  return positions.map((position, index) =>
+    generatePlayer({
+      position: position as any,
+      number: index + 1,
+      team: 'home',
+    } as any)
+  );
 };
 
 // Player role generator
@@ -127,7 +138,10 @@ export const generatePlayerRole = (category: PositionRole): PlayerRole => {
   return {
     id: faker.string.uuid(),
     name: roleName,
-    abbreviation: roleName.split(' ').map(word => word[0]).join(''),
+    abbreviation: roleName
+      .split(' ')
+      .map(word => word[0])
+      .join(''),
     category,
     description: faker.lorem.sentence(),
   };
@@ -136,7 +150,7 @@ export const generatePlayerRole = (category: PositionRole): PlayerRole => {
 // Formation generator
 export const generateFormation = (overrides: Partial<Formation> = {}): Formation => {
   const formationName = faker.helpers.arrayElement(['4-4-2', '4-3-3', '3-5-2', '5-3-2']);
-  
+
   return {
     id: faker.string.uuid(),
     name: `${formationName} ${faker.word.adjective()}`,
@@ -150,7 +164,7 @@ export const generateFormation = (overrides: Partial<Formation> = {}): Formation
     version: faker.number.int({ min: 1, max: 10 }),
     author: faker.person.fullName(),
     ...overrides,
-  };
+  } as any;
 };
 
 // Multiple formations generator
@@ -167,160 +181,183 @@ export const generateTeamKit = (overrides: Partial<TeamKit> = {}): TeamKit => ({
 });
 
 // Challenge generator
-export const generateChallenge = (overrides: Partial<Challenge> = {}): Challenge => ({
-  id: faker.string.uuid(),
-  title: faker.lorem.words(3),
-  description: faker.lorem.paragraph(),
-  type: faker.helpers.arrayElement(['formation', 'tactics', 'analysis', 'collaboration']),
-  difficulty: faker.helpers.arrayElement(['beginner', 'intermediate', 'advanced', 'expert']),
-  points: faker.number.int({ min: 10, max: 100 }),
-  timeLimit: faker.number.int({ min: 300, max: 3600 }), // 5 minutes to 1 hour
-  requirements: Array.from({ length: faker.number.int({ min: 1, max: 5 }) }, () => faker.lorem.sentence()),
-  isCompleted: faker.datatype.boolean({ probability: 0.3 }),
-  completedAt: faker.helpers.maybe(() => faker.date.past().toISOString()),
-  progress: faker.number.int({ min: 0, max: 100 }),
-  rewards: {
+export const generateChallenge = (overrides: Partial<Challenge> = {}): Challenge =>
+  ({
+    id: faker.string.uuid(),
+    title: faker.lorem.words(3),
+    description: faker.lorem.paragraph(),
+    type: faker.helpers.arrayElement(['formation', 'tactics', 'analysis', 'collaboration']),
+    difficulty: faker.helpers.arrayElement(['beginner', 'intermediate', 'advanced', 'expert']),
     points: faker.number.int({ min: 10, max: 100 }),
-    badges: Array.from({ length: faker.number.int({ min: 0, max: 3 }) }, () => faker.word.noun()),
-    unlocks: Array.from({ length: faker.number.int({ min: 0, max: 2 }) }, () => faker.lorem.words(2)),
-  },
-  createdAt: faker.date.past().toISOString(),
-  ...overrides,
-});
+    timeLimit: faker.number.int({ min: 300, max: 3600 }), // 5 minutes to 1 hour
+    requirements: Array.from({ length: faker.number.int({ min: 1, max: 5 }) }, () =>
+      faker.lorem.sentence()
+    ),
+    isCompleted: faker.datatype.boolean({ probability: 0.3 }),
+    completedAt: faker.helpers.maybe(() => faker.date.past().toISOString()),
+    progress: faker.number.int({ min: 0, max: 100 }),
+    rewards: {
+      points: faker.number.int({ min: 10, max: 100 }),
+      badges: Array.from({ length: faker.number.int({ min: 0, max: 3 }) }, () => faker.word.noun()),
+      unlocks: Array.from({ length: faker.number.int({ min: 0, max: 2 }) }, () =>
+        faker.lorem.words(2)
+      ),
+    },
+    createdAt: faker.date.past().toISOString(),
+    ...overrides,
+  }) as any;
 
 // Heat map data generator
-export const generateHeatMapData = (players: Player[]): HeatMapData => ({
-  id: faker.string.uuid(),
-  playerId: faker.helpers.arrayElement(players).id,
-  data: Array.from({ length: 100 }, (_, index) => ({
-    x: (index % 10) * 10,
-    y: Math.floor(index / 10) * 10,
-    intensity: faker.number.float({ min: 0, max: 1 }),
-  })),
-  timeRange: {
-    start: 0,
-    end: 90,
-  },
-  matchId: faker.string.uuid(),
-  generatedAt: faker.date.recent().toISOString(),
-});
+export const generateHeatMapData = (players: Player[]): HeatMapData =>
+  ({
+    id: faker.string.uuid(),
+    playerId: faker.helpers.arrayElement(players).id,
+    data: Array.from({ length: 100 }, (_, index) => ({
+      x: (index % 10) * 10,
+      y: Math.floor(index / 10) * 10,
+      intensity: faker.number.float({ min: 0, max: 1 }),
+    })),
+    timeRange: {
+      start: 0,
+      end: 90,
+    },
+    matchId: faker.string.uuid(),
+    generatedAt: faker.date.recent().toISOString(),
+  }) as any;
 
 // Animation step generator
-export const generateAnimationStep = (overrides: Partial<AnimationStep> = {}): AnimationStep => ({
-  id: faker.string.uuid(),
-  timestamp: faker.number.float({ min: 0, max: 90 }),
-  type: faker.helpers.arrayElement(['movement', 'pass', 'shot', 'tackle', 'substitution']),
-  players: Array.from({ length: faker.number.int({ min: 1, max: 3 }) }, () => ({
-    playerId: faker.string.uuid(),
-    startPosition: { x: faker.number.float({ min: 0, max: 100 }), y: faker.number.float({ min: 0, max: 100 }) },
-    endPosition: { x: faker.number.float({ min: 0, max: 100 }), y: faker.number.float({ min: 0, max: 100 }) },
-    action: faker.helpers.arrayElement(['run', 'walk', 'sprint', 'tackle', 'pass', 'shoot']),
-  })),
-  description: faker.lorem.sentence(),
-  duration: faker.number.float({ min: 0.5, max: 5 }),
-  ...overrides,
-});
+export const generateAnimationStep = (overrides: Partial<AnimationStep> = {}): AnimationStep =>
+  ({
+    id: faker.string.uuid(),
+    timestamp: faker.number.float({ min: 0, max: 90 }),
+    type: faker.helpers.arrayElement(['movement', 'pass', 'shot', 'tackle', 'substitution']),
+    players: Array.from({ length: faker.number.int({ min: 1, max: 3 }) }, () => ({
+      playerId: faker.string.uuid(),
+      startPosition: {
+        x: faker.number.float({ min: 0, max: 100 }),
+        y: faker.number.float({ min: 0, max: 100 }),
+      },
+      endPosition: {
+        x: faker.number.float({ min: 0, max: 100 }),
+        y: faker.number.float({ min: 0, max: 100 }),
+      },
+      action: faker.helpers.arrayElement(['run', 'walk', 'sprint', 'tackle', 'pass', 'shoot']),
+    })),
+    description: faker.lorem.sentence(),
+    duration: faker.number.float({ min: 0.5, max: 5 }),
+    ...overrides,
+  }) as any;
 
 // Collaboration session generator
-export const generateCollaborationSession = (overrides: Partial<CollaborationSession> = {}): CollaborationSession => ({
-  id: faker.string.uuid(),
-  formationId: faker.string.uuid(),
-  participants: Array.from({ length: faker.number.int({ min: 2, max: 6 }) }, () => ({
+export const generateCollaborationSession = (
+  overrides: Partial<CollaborationSession> = {}
+): CollaborationSession =>
+  ({
     id: faker.string.uuid(),
-    name: faker.person.fullName(),
-    email: faker.internet.email(),
-    role: faker.helpers.arrayElement(['owner', 'editor', 'viewer']),
-    isOnline: faker.datatype.boolean({ probability: 0.7 }),
-    lastSeen: faker.date.recent().toISOString(),
-    cursor: {
-      x: faker.number.float({ min: 0, max: 100 }),
-      y: faker.number.float({ min: 0, max: 100 }),
-    },
-  })),
-  comments: Array.from({ length: faker.number.int({ min: 0, max: 10 }) }, () => ({
+    formationId: faker.string.uuid(),
+    participants: Array.from({ length: faker.number.int({ min: 2, max: 6 }) }, () => ({
+      id: faker.string.uuid(),
+      name: faker.person.fullName(),
+      email: faker.internet.email(),
+      role: faker.helpers.arrayElement(['owner', 'editor', 'viewer']),
+      isOnline: faker.datatype.boolean({ probability: 0.7 }),
+      lastSeen: faker.date.recent().toISOString(),
+      cursor: {
+        x: faker.number.float({ min: 0, max: 100 }),
+        y: faker.number.float({ min: 0, max: 100 }),
+      },
+    })),
+    comments: Array.from({ length: faker.number.int({ min: 0, max: 10 }) }, () => ({
+      id: faker.string.uuid(),
+      authorId: faker.string.uuid(),
+      content: faker.lorem.sentence(),
+      position: {
+        x: faker.number.float({ min: 0, max: 100 }),
+        y: faker.number.float({ min: 0, max: 100 }),
+      },
+      createdAt: faker.date.recent().toISOString(),
+      resolved: faker.datatype.boolean({ probability: 0.3 }),
+    })),
+    createdAt: faker.date.past().toISOString(),
+    updatedAt: faker.date.recent().toISOString(),
+    isActive: faker.datatype.boolean({ probability: 0.8 }),
+    ...overrides,
+  }) as any;
+
+// Match event generator
+export const generateMatchEvent = (overrides: Partial<MatchEvent> = {}): MatchEvent =>
+  ({
     id: faker.string.uuid(),
-    authorId: faker.string.uuid(),
-    content: faker.lorem.sentence(),
+    type: faker.helpers.arrayElement(['goal', 'assist', 'substitution', 'card', 'tackle', 'save']),
+    playerId: faker.string.uuid(),
+    minute: faker.number.int({ min: 1, max: 90 }),
+    description: faker.lorem.sentence(),
     position: {
       x: faker.number.float({ min: 0, max: 100 }),
       y: faker.number.float({ min: 0, max: 100 }),
     },
-    createdAt: faker.date.recent().toISOString(),
-    resolved: faker.datatype.boolean({ probability: 0.3 }),
-  })),
-  createdAt: faker.date.past().toISOString(),
-  updatedAt: faker.date.recent().toISOString(),
-  isActive: faker.datatype.boolean({ probability: 0.8 }),
-  ...overrides,
-});
-
-// Match event generator
-export const generateMatchEvent = (overrides: Partial<MatchEvent> = {}): MatchEvent => ({
-  id: faker.string.uuid(),
-  type: faker.helpers.arrayElement(['goal', 'assist', 'substitution', 'card', 'tackle', 'save']),
-  playerId: faker.string.uuid(),
-  minute: faker.number.int({ min: 1, max: 90 }),
-  description: faker.lorem.sentence(),
-  position: {
-    x: faker.number.float({ min: 0, max: 100 }),
-    y: faker.number.float({ min: 0, max: 100 }),
-  },
-  team: faker.helpers.arrayElement(['home', 'away'] as Team[]),
-  ...overrides,
-});
+    team: faker.helpers.arrayElement(['home', 'away'] as Team[]),
+    ...overrides,
+  }) as any;
 
 // Analytics data generator
-export const generateAnalyticsData = (): AnalyticsData => ({
-  possession: {
-    home: faker.number.int({ min: 35, max: 65 }),
-    away: faker.number.int({ min: 35, max: 65 }),
-  },
-  shots: {
-    home: faker.number.int({ min: 5, max: 25 }),
-    away: faker.number.int({ min: 5, max: 25 }),
-  },
-  shotsOnTarget: {
-    home: faker.number.int({ min: 2, max: 12 }),
-    away: faker.number.int({ min: 2, max: 12 }),
-  },
-  passes: {
-    home: faker.number.int({ min: 200, max: 800 }),
-    away: faker.number.int({ min: 200, max: 800 }),
-  },
-  passAccuracy: {
-    home: faker.number.float({ min: 0.7, max: 0.95 }),
-    away: faker.number.float({ min: 0.7, max: 0.95 }),
-  },
-  corners: {
-    home: faker.number.int({ min: 0, max: 12 }),
-    away: faker.number.int({ min: 0, max: 12 }),
-  },
-  fouls: {
-    home: faker.number.int({ min: 5, max: 20 }),
-    away: faker.number.int({ min: 5, max: 20 }),
-  },
-  yellowCards: {
-    home: faker.number.int({ min: 0, max: 5 }),
-    away: faker.number.int({ min: 0, max: 5 }),
-  },
-  redCards: {
-    home: faker.number.int({ min: 0, max: 2 }),
-    away: faker.number.int({ min: 0, max: 2 }),
-  },
-});
+export const generateAnalyticsData = (): AnalyticsData =>
+  ({
+    possession: {
+      home: faker.number.int({ min: 35, max: 65 }),
+      away: faker.number.int({ min: 35, max: 65 }),
+    },
+    shots: {
+      home: faker.number.int({ min: 5, max: 25 }),
+      away: faker.number.int({ min: 5, max: 25 }),
+    },
+    shotsOnTarget: {
+      home: faker.number.int({ min: 2, max: 12 }),
+      away: faker.number.int({ min: 2, max: 12 }),
+    },
+    passes: {
+      home: faker.number.int({ min: 200, max: 800 }),
+      away: faker.number.int({ min: 200, max: 800 }),
+    },
+    passAccuracy: {
+      home: faker.number.float({ min: 0.7, max: 0.95 }),
+      away: faker.number.float({ min: 0.7, max: 0.95 }),
+    },
+    corners: {
+      home: faker.number.int({ min: 0, max: 12 }),
+      away: faker.number.int({ min: 0, max: 12 }),
+    },
+    fouls: {
+      home: faker.number.int({ min: 5, max: 20 }),
+      away: faker.number.int({ min: 5, max: 20 }),
+    },
+    yellowCards: {
+      home: faker.number.int({ min: 0, max: 5 }),
+      away: faker.number.int({ min: 0, max: 5 }),
+    },
+    redCards: {
+      home: faker.number.int({ min: 0, max: 2 }),
+      away: faker.number.int({ min: 0, max: 2 }),
+    },
+  }) as any;
 
 // Tactical instruction generator
-export const generateTacticalInstruction = (overrides: Partial<TacticalInstruction> = {}): TacticalInstruction => ({
-  id: faker.string.uuid(),
-  type: faker.helpers.arrayElement(['defensive', 'offensive', 'positional', 'pressing']),
-  title: faker.lorem.words(2),
-  description: faker.lorem.paragraph(),
-  priority: faker.helpers.arrayElement(['low', 'medium', 'high', 'critical']),
-  targetPlayers: Array.from({ length: faker.number.int({ min: 1, max: 5 }) }, () => faker.string.uuid()),
-  duration: faker.number.int({ min: 5, max: 45 }), // in minutes
-  isActive: faker.datatype.boolean({ probability: 0.6 }),
-  ...overrides,
-});
+export const generateTacticalInstruction = (
+  overrides: Partial<TacticalInstruction> = {}
+): TacticalInstruction =>
+  ({
+    id: faker.string.uuid(),
+    type: faker.helpers.arrayElement(['defensive', 'offensive', 'positional', 'pressing']),
+    title: faker.lorem.words(2),
+    description: faker.lorem.paragraph(),
+    priority: faker.helpers.arrayElement(['low', 'medium', 'high', 'critical']),
+    targetPlayers: Array.from({ length: faker.number.int({ min: 1, max: 5 }) }, () =>
+      faker.string.uuid()
+    ),
+    duration: faker.number.int({ min: 5, max: 45 }), // in minutes
+    isActive: faker.datatype.boolean({ probability: 0.6 }),
+    ...overrides,
+  }) as any;
 
 // Export format data generator
 export const generateExportData = (formation: Formation, format: ExportFormat) => {
@@ -338,13 +375,17 @@ export const generateExportData = (formation: Formation, format: ExportFormat) =
   switch (format) {
     case 'json':
       return JSON.stringify(baseData, null, 2);
-    case 'csv':
+    case 'csv': {
       const csvHeaders = 'Name,Position,Number,X,Y,Team';
-      const csvData = formation.players.map(player => 
-        `"${player.name}","${player.position}",${player.number},${player.x},${player.y},"${player.team}"`
-      ).join('\n');
+      const csvData = (formation.players || [])
+        .map(
+          player =>
+            `"${player.name}","${player.position}",${player.number},${player.x},${player.y},"${player.team}"`
+        )
+        .join('\n');
       return `${csvHeaders}\n${csvData}`;
-    case 'xml':
+    }
+    case 'xml' as any: {
       return `<?xml version="1.0" encoding="UTF-8"?>
 <formation>
   <metadata>
@@ -352,16 +393,21 @@ export const generateExportData = (formation: Formation, format: ExportFormat) =
     <description>${formation.description}</description>
   </metadata>
   <players>
-    ${formation.players.map(player => `
+    ${(formation.players || [])
+      .map(
+        player => `
     <player>
       <name>${player.name}</name>
       <position>${player.position}</position>
       <number>${player.number}</number>
       <coordinates x="${player.x}" y="${player.y}" />
       <team>${player.team}</team>
-    </player>`).join('')}
+    </player>`
+      )
+      .join('')}
   </players>
 </formation>`;
+    }
     default:
       return JSON.stringify(baseData);
   }
@@ -392,15 +438,17 @@ export const createTestDataSet = {
     formations: generateFormations(50),
     players: Array.from({ length: 500 }, () => generatePlayer()),
     challenges: Array.from({ length: 100 }, () => generateChallenge()),
-    heatMaps: Array.from({ length: 25 }, () => generateHeatMapData(generatePlayersForFormation('4-4-2'))),
+    heatMaps: Array.from({ length: 25 }, () =>
+      generateHeatMapData(generatePlayersForFormation('4-4-2'))
+    ),
   }),
 
   // Edge cases for error testing
   edgeCases: () => ({
     emptyFormation: generateFormation({ players: [] }),
     invalidPlayers: [
-      generatePlayer({ x: -10, y: -10 }), // Out of bounds
-      generatePlayer({ number: 0 }), // Invalid number
+      generatePlayer({ x: -10, y: -10 } as any), // Out of bounds
+      generatePlayer({ number: 0 } as any), // Invalid number
       generatePlayer({ name: '' }), // Empty name
     ],
     corruptedData: {

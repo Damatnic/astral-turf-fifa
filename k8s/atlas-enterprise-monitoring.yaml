@@ -12,19 +12,18 @@ metadata:
   labels:
     name: atlas-enterprise-monitoring
     tier: observability
-    atlas.monitoring: "enterprise"
-    atlas.alerting: "enabled"
-    atlas.tracing: "enabled"
-    atlas.logging: "enabled"
-    atlas.compliance: "sox-gdpr-pci"
+    atlas.monitoring: 'enterprise'
+    atlas.alerting: 'enabled'
+    atlas.tracing: 'enabled'
+    atlas.logging: 'enabled'
+    atlas.compliance: 'sox-gdpr-pci'
   annotations:
-    atlas.monitoring/retention: "90d"
-    atlas.alerting/channels: "slack,email,pagerduty,teams"
-    atlas.compliance/logging: "enabled"
-    atlas.security/level: "banking-grade"
+    atlas.monitoring/retention: '90d'
+    atlas.alerting/channels: 'slack,email,pagerduty,teams'
+    atlas.compliance/logging: 'enabled'
+    atlas.security/level: 'banking-grade'
 
 ---
-
 # Enterprise Prometheus Configuration with HA
 apiVersion: v1
 kind: ConfigMap
@@ -32,7 +31,7 @@ metadata:
   name: atlas-prometheus-enterprise-config
   namespace: atlas-enterprise-monitoring
   labels:
-    atlas.config/type: "monitoring-enterprise"
+    atlas.config/type: 'monitoring-enterprise'
 data:
   prometheus.yml: |
     global:
@@ -45,14 +44,14 @@ data:
         region: 'multi-cloud'
         deployment_strategy: 'blue-green'
         compliance_level: 'banking-grade'
-    
+
     rule_files:
       - "atlas_alert_rules.yml"
       - "atlas_performance_rules.yml"
       - "atlas_security_rules.yml"
       - "atlas_business_rules.yml"
       - "atlas_compliance_rules.yml"
-    
+
     alerting:
       alertmanagers:
       - static_configs:
@@ -61,7 +60,7 @@ data:
         path_prefix: /alertmanager
         scheme: http
         timeout: 10s
-    
+
     scrape_configs:
     # Astral Turf application monitoring with enhanced metrics
     - job_name: 'astral-turf-production'
@@ -95,7 +94,7 @@ data:
         target_label: kubernetes_pod_name
       scrape_interval: 5s
       metrics_path: /metrics
-    
+
     # Database monitoring with comprehensive metrics
     - job_name: 'atlas-database-enterprise'
       kubernetes_sd_configs:
@@ -110,7 +109,7 @@ data:
         action: keep
         regex: 'metrics'
       scrape_interval: 15s
-    
+
     # Load balancer and ingress monitoring
     - job_name: 'atlas-loadbalancers-enterprise'
       kubernetes_sd_configs:
@@ -125,7 +124,7 @@ data:
         action: keep
         regex: true
       scrape_interval: 30s
-    
+
     # Security and compliance monitoring
     - job_name: 'atlas-security-monitoring'
       kubernetes_sd_configs:
@@ -137,7 +136,7 @@ data:
         action: keep
         regex: '.*security.*|.*audit.*|.*compliance.*'
       scrape_interval: 30s
-    
+
     # Business metrics and KPIs
     - job_name: 'atlas-business-metrics'
       kubernetes_sd_configs:
@@ -149,7 +148,7 @@ data:
         action: keep
         regex: true
       scrape_interval: 60s
-    
+
     # External monitoring and synthetic tests
     - job_name: 'blackbox-external-enterprise'
       metrics_path: /probe
@@ -337,7 +336,6 @@ data:
           description: "Data has been retained for {{ $value }} days, exceeding 7-year policy"
 
 ---
-
 # Enterprise AlertManager with HA
 apiVersion: apps/v1
 kind: StatefulSet
@@ -346,8 +344,8 @@ metadata:
   namespace: atlas-enterprise-monitoring
   labels:
     app: alertmanager
-    atlas.monitoring: "alertmanager-enterprise"
-    atlas.ha: "enabled"
+    atlas.monitoring: 'alertmanager-enterprise'
+    atlas.ha: 'enabled'
 spec:
   serviceName: atlas-alertmanager-enterprise
   replicas: 3
@@ -358,10 +356,10 @@ spec:
     metadata:
       labels:
         app: alertmanager
-        atlas.monitoring: "alertmanager-enterprise"
+        atlas.monitoring: 'alertmanager-enterprise'
       annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "9093"
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '9093'
     spec:
       serviceAccountName: atlas-alertmanager
       securityContext:
@@ -370,100 +368,99 @@ spec:
         runAsNonRoot: true
         fsGroup: 65534
       containers:
-      - name: alertmanager
-        image: prom/alertmanager:v0.26.0
-        args:
-          - '--config.file=/etc/alertmanager/config.yml'
-          - '--storage.path=/alertmanager'
-          - '--data.retention=168h'
-          - '--cluster.listen-address=0.0.0.0:9094'
-          - '--cluster.peer=atlas-alertmanager-enterprise-0.atlas-alertmanager-enterprise:9094'
-          - '--cluster.peer=atlas-alertmanager-enterprise-1.atlas-alertmanager-enterprise:9094'
-          - '--cluster.peer=atlas-alertmanager-enterprise-2.atlas-alertmanager-enterprise:9094'
-          - '--cluster.gossip-interval=200ms'
-          - '--cluster.pushpull-interval=60s'
-          - '--web.external-url=https://alertmanager.astralturf.com'
-          - '--web.route-prefix=/'
-          - '--log.level=info'
-          - '--log.format=json'
-        ports:
-        - containerPort: 9093
-          name: web
-        - containerPort: 9094
-          name: cluster
-        env:
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        volumeMounts:
-        - name: alertmanager-config
-          mountPath: /etc/alertmanager
-        - name: alertmanager-storage
-          mountPath: /alertmanager
-        resources:
-          requests:
-            memory: "512Mi"
-            cpu: "250m"
-            ephemeral-storage: "1Gi"
-          limits:
-            memory: "1Gi"
-            cpu: "500m"
-            ephemeral-storage: "2Gi"
-        livenessProbe:
-          httpGet:
-            path: /-/healthy
-            port: 9093
-          initialDelaySeconds: 30
-          periodSeconds: 30
-          timeoutSeconds: 10
-          failureThreshold: 3
-        readinessProbe:
-          httpGet:
-            path: /-/ready
-            port: 9093
-          initialDelaySeconds: 5
-          periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 3
-        securityContext:
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
-          capabilities:
-            drop: ["ALL"]
-      
+        - name: alertmanager
+          image: prom/alertmanager:v0.26.0
+          args:
+            - '--config.file=/etc/alertmanager/config.yml'
+            - '--storage.path=/alertmanager'
+            - '--data.retention=168h'
+            - '--cluster.listen-address=0.0.0.0:9094'
+            - '--cluster.peer=atlas-alertmanager-enterprise-0.atlas-alertmanager-enterprise:9094'
+            - '--cluster.peer=atlas-alertmanager-enterprise-1.atlas-alertmanager-enterprise:9094'
+            - '--cluster.peer=atlas-alertmanager-enterprise-2.atlas-alertmanager-enterprise:9094'
+            - '--cluster.gossip-interval=200ms'
+            - '--cluster.pushpull-interval=60s'
+            - '--web.external-url=https://alertmanager.astralturf.com'
+            - '--web.route-prefix=/'
+            - '--log.level=info'
+            - '--log.format=json'
+          ports:
+            - containerPort: 9093
+              name: web
+            - containerPort: 9094
+              name: cluster
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          volumeMounts:
+            - name: alertmanager-config
+              mountPath: /etc/alertmanager
+            - name: alertmanager-storage
+              mountPath: /alertmanager
+          resources:
+            requests:
+              memory: '512Mi'
+              cpu: '250m'
+              ephemeral-storage: '1Gi'
+            limits:
+              memory: '1Gi'
+              cpu: '500m'
+              ephemeral-storage: '2Gi'
+          livenessProbe:
+            httpGet:
+              path: /-/healthy
+              port: 9093
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /-/ready
+              port: 9093
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ['ALL']
+
       volumes:
-      - name: alertmanager-config
-        configMap:
-          name: atlas-alertmanager-enterprise-config
-          defaultMode: 0644
-      
+        - name: alertmanager-config
+          configMap:
+            name: atlas-alertmanager-enterprise-config
+            defaultMode: 0644
+
       nodeSelector:
-        atlas.nodepool/type: "monitoring"
+        atlas.nodepool/type: 'monitoring'
       tolerations:
-      - key: "atlas.nodepool/monitoring"
-        operator: "Equal"
-        value: "true"
-        effect: "NoSchedule"
+        - key: 'atlas.nodepool/monitoring'
+          operator: 'Equal'
+          value: 'true'
+          effect: 'NoSchedule'
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchLabels:
-                app: alertmanager
-            topologyKey: kubernetes.io/hostname
+            - labelSelector:
+                matchLabels:
+                  app: alertmanager
+              topologyKey: kubernetes.io/hostname
   volumeClaimTemplates:
-  - metadata:
-      name: alertmanager-storage
-    spec:
-      accessModes: ["ReadWriteOnce"]
-      storageClassName: "atlas-fast-ssd"
-      resources:
-        requests:
-          storage: 50Gi
+    - metadata:
+        name: alertmanager-storage
+      spec:
+        accessModes: ['ReadWriteOnce']
+        storageClassName: 'atlas-fast-ssd'
+        resources:
+          requests:
+            storage: 50Gi
 
 ---
-
 # Enterprise AlertManager Configuration
 apiVersion: v1
 kind: ConfigMap
@@ -471,7 +468,7 @@ metadata:
   name: atlas-alertmanager-enterprise-config
   namespace: atlas-enterprise-monitoring
   labels:
-    atlas.config/type: "alerting-enterprise"
+    atlas.config/type: 'alerting-enterprise'
 data:
   config.yml: |
     global:
@@ -486,7 +483,7 @@ data:
       
     templates:
     - '/etc/alertmanager/templates/*.tmpl'
-    
+
     route:
       group_by: ['alertname', 'cluster', 'service', 'severity']
       group_wait: 10s
@@ -538,7 +535,7 @@ data:
       - match:
           team: product
         receiver: 'atlas-product-team'
-    
+
     receivers:
     - name: 'atlas-default'
       slack_configs:
@@ -706,7 +703,7 @@ data:
         subject: '[ATLAS PRODUCT] {{ .GroupLabels.alertname }}'
       slack_configs:
       - channel: '#product-alerts'
-    
+
     inhibit_rules:
     - source_match:
         severity: 'critical'
@@ -720,7 +717,6 @@ data:
       equal: ['service', 'instance']
 
 ---
-
 # Enterprise Grafana with Enhanced Features
 apiVersion: apps/v1
 kind: Deployment
@@ -729,7 +725,7 @@ metadata:
   namespace: atlas-enterprise-monitoring
   labels:
     app: grafana
-    atlas.monitoring: "grafana-enterprise"
+    atlas.monitoring: 'grafana-enterprise'
 spec:
   replicas: 2
   selector:
@@ -739,10 +735,10 @@ spec:
     metadata:
       labels:
         app: grafana
-        atlas.monitoring: "grafana-enterprise"
+        atlas.monitoring: 'grafana-enterprise'
       annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "3000"
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '3000'
     spec:
       serviceAccountName: atlas-grafana
       securityContext:
@@ -751,109 +747,108 @@ spec:
         runAsNonRoot: true
         fsGroup: 472
       containers:
-      - name: grafana
-        image: grafana/grafana-enterprise:10.2.0
-        ports:
-        - containerPort: 3000
-          name: grafana
-        env:
-        - name: GF_SECURITY_ADMIN_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: atlas-grafana-secrets
-              key: admin-password
-        - name: GF_INSTALL_PLUGINS
-          value: "grafana-kubernetes-app,grafana-worldmap-panel,grafana-piechart-panel,grafana-polystat-panel,grafana-statusmap,grafana-trackmap-panel,grafana-business-table"
-        - name: GF_SECURITY_SECRET_KEY
-          valueFrom:
-            secretKeyRef:
-              name: atlas-grafana-secrets
-              key: secret-key
-        - name: GF_DATABASE_TYPE
-          value: "postgres"
-        - name: GF_DATABASE_HOST
-          value: "atlas-postgres-primary-service.atlas-database-production.svc.cluster.local:5432"
-        - name: GF_DATABASE_NAME
-          value: "grafana"
-        - name: GF_DATABASE_USER
-          value: "grafana_user"
-        - name: GF_DATABASE_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: atlas-grafana-secrets
-              key: db-password
-        - name: GF_SESSION_PROVIDER
-          value: "postgres"
-        - name: GF_SESSION_PROVIDER_CONFIG
-          value: "user=grafana_user password=$(GF_DATABASE_PASSWORD) host=atlas-postgres-primary-service.atlas-database-production.svc.cluster.local port=5432 dbname=grafana sslmode=require"
-        volumeMounts:
-        - name: grafana-storage
-          mountPath: /var/lib/grafana
-        - name: grafana-config
-          mountPath: /etc/grafana/provisioning
-        - name: grafana-dashboards
-          mountPath: /var/lib/grafana/dashboards
-        resources:
-          requests:
-            memory: "1Gi"
-            cpu: "500m"
-            ephemeral-storage: "1Gi"
-          limits:
-            memory: "2Gi"
-            cpu: "1000m"
-            ephemeral-storage: "2Gi"
-        livenessProbe:
-          httpGet:
-            path: /api/health
-            port: 3000
-          initialDelaySeconds: 60
-          periodSeconds: 30
-          timeoutSeconds: 10
-          failureThreshold: 3
-        readinessProbe:
-          httpGet:
-            path: /api/health
-            port: 3000
-          initialDelaySeconds: 10
-          periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 3
-        securityContext:
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: false
-          capabilities:
-            drop: ["ALL"]
-      
+        - name: grafana
+          image: grafana/grafana-enterprise:10.2.0
+          ports:
+            - containerPort: 3000
+              name: grafana
+          env:
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: atlas-grafana-secrets
+                  key: admin-password
+            - name: GF_INSTALL_PLUGINS
+              value: 'grafana-kubernetes-app,grafana-worldmap-panel,grafana-piechart-panel,grafana-polystat-panel,grafana-statusmap,grafana-trackmap-panel,grafana-business-table'
+            - name: GF_SECURITY_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: atlas-grafana-secrets
+                  key: secret-key
+            - name: GF_DATABASE_TYPE
+              value: 'postgres'
+            - name: GF_DATABASE_HOST
+              value: 'atlas-postgres-primary-service.atlas-database-production.svc.cluster.local:5432'
+            - name: GF_DATABASE_NAME
+              value: 'grafana'
+            - name: GF_DATABASE_USER
+              value: 'grafana_user'
+            - name: GF_DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: atlas-grafana-secrets
+                  key: db-password
+            - name: GF_SESSION_PROVIDER
+              value: 'postgres'
+            - name: GF_SESSION_PROVIDER_CONFIG
+              value: 'user=grafana_user password=$(GF_DATABASE_PASSWORD) host=atlas-postgres-primary-service.atlas-database-production.svc.cluster.local port=5432 dbname=grafana sslmode=require'
+          volumeMounts:
+            - name: grafana-storage
+              mountPath: /var/lib/grafana
+            - name: grafana-config
+              mountPath: /etc/grafana/provisioning
+            - name: grafana-dashboards
+              mountPath: /var/lib/grafana/dashboards
+          resources:
+            requests:
+              memory: '1Gi'
+              cpu: '500m'
+              ephemeral-storage: '1Gi'
+            limits:
+              memory: '2Gi'
+              cpu: '1000m'
+              ephemeral-storage: '2Gi'
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop: ['ALL']
+
       volumes:
-      - name: grafana-storage
-        persistentVolumeClaim:
-          claimName: atlas-grafana-enterprise-storage
-      - name: grafana-config
-        configMap:
-          name: atlas-grafana-enterprise-config
-      - name: grafana-dashboards
-        configMap:
-          name: atlas-grafana-dashboards
-      
+        - name: grafana-storage
+          persistentVolumeClaim:
+            claimName: atlas-grafana-enterprise-storage
+        - name: grafana-config
+          configMap:
+            name: atlas-grafana-enterprise-config
+        - name: grafana-dashboards
+          configMap:
+            name: atlas-grafana-dashboards
+
       nodeSelector:
-        atlas.nodepool/type: "monitoring"
+        atlas.nodepool/type: 'monitoring'
       tolerations:
-      - key: "atlas.nodepool/monitoring"
-        operator: "Equal"
-        value: "true"
-        effect: "NoSchedule"
+        - key: 'atlas.nodepool/monitoring'
+          operator: 'Equal'
+          value: 'true'
+          effect: 'NoSchedule'
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchLabels:
-                  app: grafana
-              topologyKey: kubernetes.io/hostname
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: grafana
+                topologyKey: kubernetes.io/hostname
 
 ---
-
 # Services for Enterprise Monitoring
 apiVersion: v1
 kind: Service
@@ -862,18 +857,17 @@ metadata:
   namespace: atlas-enterprise-monitoring
   labels:
     app: prometheus
-    atlas.service/type: "monitoring"
+    atlas.service/type: 'monitoring'
 spec:
   type: ClusterIP
   ports:
-  - port: 9090
-    targetPort: 9090
-    name: prometheus
+    - port: 9090
+      targetPort: 9090
+      name: prometheus
   selector:
     app: prometheus
 
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
@@ -881,22 +875,21 @@ metadata:
   namespace: atlas-enterprise-monitoring
   labels:
     app: alertmanager
-    atlas.service/type: "alerting"
+    atlas.service/type: 'alerting'
 spec:
   type: ClusterIP
   clusterIP: None
   ports:
-  - port: 9093
-    targetPort: 9093
-    name: web
-  - port: 9094
-    targetPort: 9094
-    name: cluster
+    - port: 9093
+      targetPort: 9093
+      name: web
+    - port: 9094
+      targetPort: 9094
+      name: cluster
   selector:
     app: alertmanager
 
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
@@ -904,18 +897,17 @@ metadata:
   namespace: atlas-enterprise-monitoring
   labels:
     app: grafana
-    atlas.service/type: "visualization"
+    atlas.service/type: 'visualization'
 spec:
   type: ClusterIP
   ports:
-  - port: 3000
-    targetPort: 3000
-    name: grafana
+    - port: 3000
+      targetPort: 3000
+      name: grafana
   selector:
     app: grafana
 
 ---
-
 # ServiceAccounts and RBAC
 apiVersion: v1
 kind: ServiceAccount
@@ -923,30 +915,27 @@ metadata:
   name: atlas-prometheus
   namespace: atlas-enterprise-monitoring
   labels:
-    atlas.security/managed: "true"
+    atlas.security/managed: 'true'
 
 ---
-
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: atlas-alertmanager
   namespace: atlas-enterprise-monitoring
   labels:
-    atlas.security/managed: "true"
+    atlas.security/managed: 'true'
 
 ---
-
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: atlas-grafana
   namespace: atlas-enterprise-monitoring
   labels:
-    atlas.security/managed: "true"
+    atlas.security/managed: 'true'
 
 ---
-
 # Storage Claims
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -954,10 +943,10 @@ metadata:
   name: atlas-grafana-enterprise-storage
   namespace: atlas-enterprise-monitoring
   labels:
-    atlas.storage/type: "monitoring"
+    atlas.storage/type: 'monitoring'
 spec:
-  accessModes: ["ReadWriteOnce"]
-  storageClassName: "atlas-fast-ssd"
+  accessModes: ['ReadWriteOnce']
+  storageClassName: 'atlas-fast-ssd'
   resources:
     requests:
       storage: 100Gi

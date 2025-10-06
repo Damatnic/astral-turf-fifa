@@ -25,7 +25,8 @@ const RankingComparison: React.FC<RankingComparisonProps> = ({
     ? state.playerProfiles.get(playerB.id) || playerRankingService.getProfile(playerB.id)
     : null;
 
-  const comparison = profileB ? playerRankingService.compareProfiles(playerA.id, playerB.id) : null;
+  const comparison =
+    profileB && playerB ? playerRankingService.compareProfiles(playerA.id, playerB.id) : null;
 
   return (
     <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
@@ -122,7 +123,7 @@ const RankingComparison: React.FC<RankingComparisonProps> = ({
             {comparison.winner === 'A' && (
               <p className="text-lg font-bold text-blue-400">{playerA.name} is ahead!</p>
             )}
-            {comparison.winner === 'B' && (
+            {comparison.winner === 'B' && playerB && (
               <p className="text-lg font-bold text-purple-400">{playerB.name} is ahead!</p>
             )}
             {comparison.winner === 'tie' && (

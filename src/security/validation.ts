@@ -17,7 +17,7 @@ export const emailSchema = z
   .min(1, 'Email is required')
   .max(
     VALIDATION_CONFIG.MAX_EMAIL_LENGTH,
-    `Email must be less than ${VALIDATION_CONFIG.MAX_EMAIL_LENGTH} characters`,
+    `Email must be less than ${VALIDATION_CONFIG.MAX_EMAIL_LENGTH} characters`
   )
   .email('Invalid email format')
   .refine(email => VALIDATION_CONFIG.EMAIL_REGEX.test(email), 'Invalid email format')
@@ -27,11 +27,11 @@ export const passwordSchema = z
   .string()
   .min(
     PASSWORD_CONFIG.MIN_LENGTH,
-    `Password must be at least ${PASSWORD_CONFIG.MIN_LENGTH} characters`,
+    `Password must be at least ${PASSWORD_CONFIG.MIN_LENGTH} characters`
   )
   .max(
     PASSWORD_CONFIG.MAX_LENGTH,
-    `Password must be less than ${PASSWORD_CONFIG.MAX_LENGTH} characters`,
+    `Password must be less than ${PASSWORD_CONFIG.MAX_LENGTH} characters`
   )
   .refine(
     password => {
@@ -46,7 +46,7 @@ export const passwordSchema = z
       }
       if (PASSWORD_CONFIG.REQUIRE_SPECIAL_CHARS) {
         const specialCharsRegex = new RegExp(
-          `[${PASSWORD_CONFIG.SPECIAL_CHARS.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}]`,
+          `[${PASSWORD_CONFIG.SPECIAL_CHARS.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}]`
         );
         if (!specialCharsRegex.test(password)) {
           return false;
@@ -56,7 +56,7 @@ export const passwordSchema = z
     },
     {
       message: `Password must contain ${PASSWORD_CONFIG.REQUIRE_UPPERCASE ? 'uppercase, ' : ''}${PASSWORD_CONFIG.REQUIRE_LOWERCASE ? 'lowercase, ' : ''}${PASSWORD_CONFIG.REQUIRE_NUMBERS ? 'numbers, ' : ''}${PASSWORD_CONFIG.REQUIRE_SPECIAL_CHARS ? 'special characters' : ''}`,
-    },
+    }
   );
 
 export const nameSchema = z
@@ -64,7 +64,7 @@ export const nameSchema = z
   .min(1, 'Name is required')
   .max(
     VALIDATION_CONFIG.MAX_NAME_LENGTH,
-    `Name must be less than ${VALIDATION_CONFIG.MAX_NAME_LENGTH} characters`,
+    `Name must be less than ${VALIDATION_CONFIG.MAX_NAME_LENGTH} characters`
   )
   .refine(name => VALIDATION_CONFIG.NAME_REGEX.test(name), 'Name contains invalid characters')
   .transform(name => name.trim());
@@ -74,7 +74,7 @@ export const phoneSchema = z
   .optional()
   .refine(
     phone => !phone || VALIDATION_CONFIG.PHONE_REGEX.test(phone),
-    'Invalid phone number format',
+    'Invalid phone number format'
   )
   .transform(phone => phone?.trim());
 
@@ -85,7 +85,7 @@ export const messageSchema = z
   .min(1, 'Message is required')
   .max(
     VALIDATION_CONFIG.MAX_MESSAGE_LENGTH,
-    `Message must be less than ${VALIDATION_CONFIG.MAX_MESSAGE_LENGTH} characters`,
+    `Message must be less than ${VALIDATION_CONFIG.MAX_MESSAGE_LENGTH} characters`
   )
   .transform(message => message.trim());
 
@@ -93,7 +93,7 @@ export const descriptionSchema = z
   .string()
   .max(
     VALIDATION_CONFIG.MAX_DESCRIPTION_LENGTH,
-    `Description must be less than ${VALIDATION_CONFIG.MAX_DESCRIPTION_LENGTH} characters`,
+    `Description must be less than ${VALIDATION_CONFIG.MAX_DESCRIPTION_LENGTH} characters`
   )
   .optional()
   .transform(description => description?.trim());
@@ -189,10 +189,14 @@ export const alternativePositionSchema = z.array(positionSchema).max(3);
 export const tacticalInstructionSchema = z.object({
   type: z.enum(['defensive', 'offensive', 'set_piece', 'transition']),
   phase: z.enum(['build_up', 'attack', 'defense', 'set_piece']),
-  instruction: z.string().min(1).max(500).refine(
-    instruction => !detectXss(instruction) && !detectSqlInjection(instruction),
-    'Instruction contains potentially dangerous content'
-  ),
+  instruction: z
+    .string()
+    .min(1)
+    .max(500)
+    .refine(
+      instruction => !detectXss(instruction) && !detectSqlInjection(instruction),
+      'Instruction contains potentially dangerous content'
+    ),
   priority: z.enum(['high', 'medium', 'low']),
   playerIds: z.array(z.string().uuid()).optional(),
 });
@@ -200,10 +204,14 @@ export const tacticalInstructionSchema = z.object({
 export const playerPositionSchema = z.object({
   playerId: z.string().uuid(),
   position: positionSchema,
-  role: z.string().min(1).max(50).refine(
-    role => !detectXss(role) && /^[a-zA-Z0-9\s-_]+$/.test(role),
-    'Role contains invalid characters'
-  ),
+  role: z
+    .string()
+    .min(1)
+    .max(50)
+    .refine(
+      role => !detectXss(role) && /^[a-zA-Z0-9\s-_]+$/.test(role),
+      'Role contains invalid characters'
+    ),
   instructions: z.array(z.string().max(200)).max(10),
   alternativePositions: alternativePositionSchema.optional(),
 });
@@ -231,7 +239,7 @@ export const tacticalClassificationSchema = z.enum([
   'public_formation',
   'team_internal',
   'coach_confidential',
-  'strategic_secret'
+  'strategic_secret',
 ]);
 
 export const formationSlotSchema = z.object({
@@ -243,14 +251,22 @@ export const formationSlotSchema = z.object({
 
 export const tacticalFormationSchema = z.object({
   id: z.string().uuid(),
-  name: z.string().min(1).max(100).refine(
-    name => !detectXss(name) && !detectSqlInjection(name),
-    'Formation name contains potentially dangerous content'
-  ),
-  description: z.string().max(1000).optional().refine(
-    desc => !desc || (!detectXss(desc) && !detectSqlInjection(desc)),
-    'Formation description contains potentially dangerous content'
-  ),
+  name: z
+    .string()
+    .min(1)
+    .max(100)
+    .refine(
+      name => !detectXss(name) && !detectSqlInjection(name),
+      'Formation name contains potentially dangerous content'
+    ),
+  description: z
+    .string()
+    .max(1000)
+    .optional()
+    .refine(
+      desc => !desc || (!detectXss(desc) && !detectSqlInjection(desc)),
+      'Formation description contains potentially dangerous content'
+    ),
   formation: z.string().regex(/^\d+-\d+(-\d+)*$/, 'Invalid formation format'),
   playerPositions: z.array(playerPositionSchema).min(1).max(11),
   tacticalInstructions: z.array(tacticalInstructionSchema).max(20),
@@ -291,10 +307,14 @@ export const drawingLineSchema = z.object({
 export const tacticalAnnotationSchema = z.object({
   id: z.string().uuid(),
   position: positionSchema,
-  text: z.string().min(1).max(200).refine(
-    text => !detectXss(text) && !detectSqlInjection(text),
-    'Annotation contains potentially dangerous content'
-  ),
+  text: z
+    .string()
+    .min(1)
+    .max(200)
+    .refine(
+      text => !detectXss(text) && !detectSqlInjection(text),
+      'Annotation contains potentially dangerous content'
+    ),
   type: z.enum(['note', 'instruction', 'warning', 'highlight']),
   color: z.string().regex(/^#[0-9A-F]{6}$/i, 'Invalid color format'),
   fontSize: z.number().min(8).max(24),
@@ -327,9 +347,12 @@ export const fileUploadSchema = z.object({
     .instanceof(File)
     .refine(
       file => file.size <= VALIDATION_CONFIG.MAX_FILE_SIZE,
-      `File size must be less than ${VALIDATION_CONFIG.MAX_FILE_SIZE / 1024 / 1024}MB`,
+      `File size must be less than ${VALIDATION_CONFIG.MAX_FILE_SIZE / 1024 / 1024}MB`
     )
-    .refine(file => VALIDATION_CONFIG.ALLOWED_FILE_TYPES.includes(file.type), 'Invalid file type'),
+    .refine(
+      file => VALIDATION_CONFIG.ALLOWED_FILE_TYPES.includes(file.type as any),
+      'Invalid file type'
+    ),
 });
 
 // Search and filter schemas
@@ -339,7 +362,7 @@ export const searchQuerySchema = z
   .transform(query => query.trim())
   .refine(
     query => !/[<>"]/.test(query), // Prevent basic XSS attempts
-    'Search query contains invalid characters',
+    'Search query contains invalid characters'
   );
 
 // ID validation schemas
@@ -354,14 +377,14 @@ export const formationIdSchema = z.string().min(1, 'Formation ID is required');
 // Validate and sanitize input data
 export function validateInput<T>(
   schema: z.ZodSchema<T>,
-  data: unknown,
+  data: unknown
 ): { success: true; data: T } | { success: false; errors: string[] } {
   try {
     const result = schema.parse(data);
     return { success: true, data: result };
   } catch (_error) {
-    if (error instanceof z.ZodError) {
-      const errors = error.errors.map(err => `${err.path.join('.')}: ${err.message}`);
+    if (_error instanceof z.ZodError) {
+      const errors = _error.errors.map(err => `${err.path.join('.')}: ${err.message}`);
 
       securityLogger.warn('Input validation failed', {
         errors,
@@ -372,7 +395,7 @@ export function validateInput<T>(
     }
 
     securityLogger.error('Unexpected validation error', {
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: _error instanceof Error ? _error.message : 'Unknown error',
     });
 
     return { success: false, errors: ['Validation error occurred'] };
@@ -573,7 +596,7 @@ export function validateAndSanitize(
     sanitizeStrings = true,
     maxStringLength = 10000,
     maxDepth = 10,
-    depth = 0
+    depth = 0,
   } = options;
 
   if (depth > maxDepth) {
@@ -588,11 +611,11 @@ export function validateAndSanitize(
     if (data.length > maxStringLength) {
       throw new Error(`String length exceeds maximum of ${maxStringLength}`);
     }
-    
+
     if (detectXss(data) || detectSqlInjection(data)) {
       throw new Error('String contains potentially dangerous content');
     }
-    
+
     return sanitizeStrings ? sanitizeInput(data) : data;
   }
 
@@ -606,26 +629,26 @@ export function validateAndSanitize(
 
   if (typeof data === 'object') {
     const sanitized: Record<string, unknown> = {};
-    
+
     for (const [key, value] of Object.entries(data)) {
       // Skip dangerous prototype properties
       if (['__proto__', 'constructor', 'prototype'].includes(key)) {
         continue;
       }
-      
+
       // Check allowed fields if specified
       if (allowedFields && !allowedFields.includes(key)) {
         continue;
       }
-      
+
       // Validate and sanitize key
       if (detectXss(key) || detectSqlInjection(key)) {
         throw new Error(`Object key '${key}' contains potentially dangerous content`);
       }
-      
+
       sanitized[key] = validateAndSanitize(value, { ...options, depth: depth + 1 });
     }
-    
+
     return sanitized;
   }
 
@@ -638,10 +661,10 @@ export function validateTacticalData(
   type: 'formation' | 'drawing' | 'annotation' | 'export' | 'import'
 ): { valid: boolean; errors: string[]; sanitizedData?: unknown } {
   const errors: string[] = [];
-  
+
   try {
     let schema: z.ZodSchema;
-    
+
     switch (type) {
       case 'formation':
         schema = tacticalFormationSchema;
@@ -661,22 +684,21 @@ export function validateTacticalData(
       default:
         throw new Error(`Unknown tactical data type: ${type}`);
     }
-    
+
     const result = schema.parse(data);
     return { valid: true, errors: [], sanitizedData: result };
-    
   } catch (error) {
     if (error instanceof z.ZodError) {
       errors.push(...error.errors.map(err => `${err.path.join('.')}: ${err.message}`));
     } else {
       errors.push(error instanceof Error ? error.message : 'Unknown validation error');
     }
-    
+
     securityLogger.warn(`Tactical data validation failed for type: ${type}`, {
       errors,
-      dataType: typeof data
+      dataType: typeof data,
     });
-    
+
     return { valid: false, errors };
   }
 }

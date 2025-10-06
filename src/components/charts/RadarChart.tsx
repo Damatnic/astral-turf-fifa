@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { generateRadarChartDescription } from '@/utils/chartAccessibility';
 
 interface RadarChartProps {
   datasets: {
@@ -8,15 +9,22 @@ interface RadarChartProps {
   }[];
   labels: string[];
   size?: number;
+  title?: string;
 }
 
-const RadarChart: React.FC<RadarChartProps> = ({ datasets, labels, size = 300 }) => {
+const RadarChart: React.FC<RadarChartProps> = ({ datasets, labels, size = 300, title }) => {
   const center = size / 2;
   const numSides = labels.length;
   const angleSlice = (Math.PI * 2) / numSides;
 
   const gridLevels = 4;
   const maxVal = 100;
+
+  // Generate accessible description
+  const ariaDescription = useMemo(
+    () => generateRadarChartDescription(datasets, labels, title),
+    [datasets, labels, title]
+  );
 
   // Grid polygons and axis lines
   const grid = useMemo(() => {
@@ -38,7 +46,7 @@ const RadarChart: React.FC<RadarChartProps> = ({ datasets, labels, size = 300 })
           fill="none"
           stroke="var(--border-primary)"
           strokeWidth="0.5"
-        />,
+        />
       );
     }
     return levels;
@@ -121,7 +129,15 @@ const RadarChart: React.FC<RadarChartProps> = ({ datasets, labels, size = 300 })
   }, [datasets, center, angleSlice, maxVal]);
 
   return (
-    <svg viewBox={`0 0 ${size} ${size}`} width="100%" height="100%">
+    <svg
+      viewBox={`0 0 ${size} ${size}`}
+      width="100%"
+      height="100%"
+      role="img"
+      aria-label={title || 'Radar chart comparing multiple attributes'}
+      aria-describedby="radar-chart-desc"
+    >
+      <desc id="radar-chart-desc">{ariaDescription}</desc>
       <g>{grid}</g>
       <g>{axes}</g>
       <g>{axisLabels}</g>

@@ -12,26 +12,26 @@ metadata:
   namespace: astral-turf-production
   labels:
     app: astral-turf
-    atlas.lb/type: "application"
-    atlas.lb/provider: "aws"
-    atlas.lb/tier: "global"
+    atlas.lb/type: 'application'
+    atlas.lb/provider: 'aws'
+    atlas.lb/tier: 'global'
   annotations:
-    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
-    service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
-    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
-    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
-    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "arn:aws:acm:us-east-1:123456789012:certificate/12345678-1234-1234-1234-123456789012"
-    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
-    service.beta.kubernetes.io/aws-load-balancer-ssl-negotiation-policy: "ELBSecurityPolicy-TLS-1-2-2017-01"
-    service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: "atlas.deployment=production,atlas.environment=aws,atlas.tier=global"
-    service.beta.kubernetes.io/aws-load-balancer-healthcheck-path: "/health/live"
-    service.beta.kubernetes.io/aws-load-balancer-healthcheck-interval-seconds: "30"
-    service.beta.kubernetes.io/aws-load-balancer-healthcheck-timeout-seconds: "10"
-    service.beta.kubernetes.io/aws-load-balancer-healthy-threshold-count: "2"
-    service.beta.kubernetes.io/aws-load-balancer-unhealthy-threshold-count: "3"
-    atlas.traffic/weight: "40"
-    atlas.region/primary: "us-east-1"
-    atlas.failover/priority: "1"
+    service.beta.kubernetes.io/aws-load-balancer-type: 'nlb'
+    service.beta.kubernetes.io/aws-load-balancer-scheme: 'internet-facing'
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: 'http'
+    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: 'arn:aws:acm:us-east-1:123456789012:certificate/12345678-1234-1234-1234-123456789012'
+    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: 'https'
+    service.beta.kubernetes.io/aws-load-balancer-ssl-negotiation-policy: 'ELBSecurityPolicy-TLS-1-2-2017-01'
+    service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: 'atlas.deployment=production,atlas.environment=aws,atlas.tier=global'
+    service.beta.kubernetes.io/aws-load-balancer-healthcheck-path: '/health/live'
+    service.beta.kubernetes.io/aws-load-balancer-healthcheck-interval-seconds: '30'
+    service.beta.kubernetes.io/aws-load-balancer-healthcheck-timeout-seconds: '10'
+    service.beta.kubernetes.io/aws-load-balancer-healthy-threshold-count: '2'
+    service.beta.kubernetes.io/aws-load-balancer-unhealthy-threshold-count: '3'
+    atlas.traffic/weight: '40'
+    atlas.region/primary: 'us-east-1'
+    atlas.failover/priority: '1'
 spec:
   type: LoadBalancer
   sessionAffinity: ClientIP
@@ -39,25 +39,24 @@ spec:
     clientIP:
       timeoutSeconds: 3600
   ports:
-  - name: https
-    port: 443
-    targetPort: 3000
-    protocol: TCP
-  - name: http
-    port: 80
-    targetPort: 3000
-    protocol: TCP
-  - name: metrics
-    port: 8080
-    targetPort: 8080
-    protocol: TCP
+    - name: https
+      port: 443
+      targetPort: 3000
+      protocol: TCP
+    - name: http
+      port: 80
+      targetPort: 3000
+      protocol: TCP
+    - name: metrics
+      port: 8080
+      targetPort: 8080
+      protocol: TCP
   selector:
     app: astral-turf
     tier: frontend
-    atlas.cloud/provider: "aws"
+    atlas.cloud/provider: 'aws'
 
 ---
-
 # Azure Load Balancer
 apiVersion: v1
 kind: Service
@@ -66,20 +65,20 @@ metadata:
   namespace: astral-turf-production
   labels:
     app: astral-turf
-    atlas.lb/type: "application"
-    atlas.lb/provider: "azure"
-    atlas.lb/tier: "global"
+    atlas.lb/type: 'application'
+    atlas.lb/provider: 'azure'
+    atlas.lb/tier: 'global'
   annotations:
-    service.beta.kubernetes.io/azure-load-balancer-internal: "false"
-    service.beta.kubernetes.io/azure-load-balancer-mode: "auto"
-    service.beta.kubernetes.io/azure-dns-label-name: "astral-turf-azure"
-    service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: "/health/live"
-    service.beta.kubernetes.io/azure-load-balancer-health-probe-interval: "30"
-    service.beta.kubernetes.io/azure-load-balancer-health-probe-num-of-probe: "3"
-    service.beta.kubernetes.io/azure-pip-tags: "atlas.deployment=production,atlas.environment=azure,atlas.tier=global"
-    atlas.traffic/weight: "35"
-    atlas.region/primary: "eastus"
-    atlas.failover/priority: "2"
+    service.beta.kubernetes.io/azure-load-balancer-internal: 'false'
+    service.beta.kubernetes.io/azure-load-balancer-mode: 'auto'
+    service.beta.kubernetes.io/azure-dns-label-name: 'astral-turf-azure'
+    service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: '/health/live'
+    service.beta.kubernetes.io/azure-load-balancer-health-probe-interval: '30'
+    service.beta.kubernetes.io/azure-load-balancer-health-probe-num-of-probe: '3'
+    service.beta.kubernetes.io/azure-pip-tags: 'atlas.deployment=production,atlas.environment=azure,atlas.tier=global'
+    atlas.traffic/weight: '35'
+    atlas.region/primary: 'eastus'
+    atlas.failover/priority: '2'
 spec:
   type: LoadBalancer
   sessionAffinity: ClientIP
@@ -87,25 +86,24 @@ spec:
     clientIP:
       timeoutSeconds: 3600
   ports:
-  - name: https
-    port: 443
-    targetPort: 3000
-    protocol: TCP
-  - name: http
-    port: 80
-    targetPort: 3000
-    protocol: TCP
-  - name: metrics
-    port: 8080
-    targetPort: 8080
-    protocol: TCP
+    - name: https
+      port: 443
+      targetPort: 3000
+      protocol: TCP
+    - name: http
+      port: 80
+      targetPort: 3000
+      protocol: TCP
+    - name: metrics
+      port: 8080
+      targetPort: 8080
+      protocol: TCP
   selector:
     app: astral-turf
     tier: frontend
-    atlas.cloud/provider: "azure"
+    atlas.cloud/provider: 'azure'
 
 ---
-
 # Google Cloud Load Balancer
 apiVersion: v1
 kind: Service
@@ -114,17 +112,17 @@ metadata:
   namespace: astral-turf-production
   labels:
     app: astral-turf
-    atlas.lb/type: "application"
-    atlas.lb/provider: "gcp"
-    atlas.lb/tier: "global"
+    atlas.lb/type: 'application'
+    atlas.lb/provider: 'gcp'
+    atlas.lb/tier: 'global'
   annotations:
-    cloud.google.com/load-balancer-type: "External"
+    cloud.google.com/load-balancer-type: 'External'
     cloud.google.com/neg: '{"ingress": true}'
     cloud.google.com/backend-config: '{"ports": {"3000":"astral-turf-backend-config"}}'
     service.alpha.kubernetes.io/app-protocols: '{"https":"HTTPS","http":"HTTP"}'
-    atlas.traffic/weight: "25"
-    atlas.region/primary: "us-central1"
-    atlas.failover/priority: "3"
+    atlas.traffic/weight: '25'
+    atlas.region/primary: 'us-central1'
+    atlas.failover/priority: '3'
 spec:
   type: LoadBalancer
   sessionAffinity: ClientIP
@@ -132,25 +130,24 @@ spec:
     clientIP:
       timeoutSeconds: 3600
   ports:
-  - name: https
-    port: 443
-    targetPort: 3000
-    protocol: TCP
-  - name: http
-    port: 80
-    targetPort: 3000
-    protocol: TCP
-  - name: metrics
-    port: 8080
-    targetPort: 8080
-    protocol: TCP
+    - name: https
+      port: 443
+      targetPort: 3000
+      protocol: TCP
+    - name: http
+      port: 80
+      targetPort: 3000
+      protocol: TCP
+    - name: metrics
+      port: 8080
+      targetPort: 8080
+      protocol: TCP
   selector:
     app: astral-turf
     tier: frontend
-    atlas.cloud/provider: "gcp"
+    atlas.cloud/provider: 'gcp'
 
 ---
-
 # Global Ingress Controller
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -159,27 +156,27 @@ metadata:
   namespace: astral-turf-production
   labels:
     app: astral-turf
-    atlas.ingress/type: "global"
-    atlas.ingress/tier: "production"
+    atlas.ingress/type: 'global'
+    atlas.ingress/tier: 'production'
   annotations:
-    kubernetes.io/ingress.class: "nginx"
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
-    nginx.ingress.kubernetes.io/proxy-connect-timeout: "30"
-    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
-    nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
-    nginx.ingress.kubernetes.io/proxy-buffering: "on"
-    nginx.ingress.kubernetes.io/enable-cors: "true"
-    nginx.ingress.kubernetes.io/cors-allow-origin: "https://astralturf.com,https://app.astralturf.com"
-    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
-    nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization"
-    nginx.ingress.kubernetes.io/cors-expose-headers: "Content-Length,Content-Range"
-    nginx.ingress.kubernetes.io/cors-max-age: "86400"
-    nginx.ingress.kubernetes.io/rate-limit: "1000"
-    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+    kubernetes.io/ingress.class: 'nginx'
+    nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+    nginx.ingress.kubernetes.io/force-ssl-redirect: 'true'
+    nginx.ingress.kubernetes.io/use-regex: 'true'
+    nginx.ingress.kubernetes.io/proxy-body-size: '10m'
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: '30'
+    nginx.ingress.kubernetes.io/proxy-send-timeout: '60'
+    nginx.ingress.kubernetes.io/proxy-read-timeout: '60'
+    nginx.ingress.kubernetes.io/proxy-buffer-size: '16k'
+    nginx.ingress.kubernetes.io/proxy-buffering: 'on'
+    nginx.ingress.kubernetes.io/enable-cors: 'true'
+    nginx.ingress.kubernetes.io/cors-allow-origin: 'https://astralturf.com,https://app.astralturf.com'
+    nginx.ingress.kubernetes.io/cors-allow-methods: 'GET, POST, PUT, DELETE, OPTIONS'
+    nginx.ingress.kubernetes.io/cors-allow-headers: 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization'
+    nginx.ingress.kubernetes.io/cors-expose-headers: 'Content-Length,Content-Range'
+    nginx.ingress.kubernetes.io/cors-max-age: '86400'
+    nginx.ingress.kubernetes.io/rate-limit: '1000'
+    nginx.ingress.kubernetes.io/rate-limit-window: '1m'
     nginx.ingress.kubernetes.io/configuration-snippet: |
       # Security headers
       add_header X-Frame-Options "SAMEORIGIN" always;
@@ -188,13 +185,13 @@ metadata:
       add_header Referrer-Policy "strict-origin-when-cross-origin" always;
       add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
       add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:; media-src 'self'; object-src 'none'; frame-src 'none';" always;
-      
+
       # Performance optimizations
       gzip on;
       gzip_vary on;
       gzip_min_length 1024;
       gzip_types text/plain text/css text/xml text/javascript application/javascript application/xml+rss application/json;
-      
+
       # Atlas deployment info
       add_header X-Atlas-Deployment-Strategy "blue-green" always;
       add_header X-Atlas-Version "8.0.0" always;
@@ -205,75 +202,74 @@ metadata:
       client_body_timeout 60s;
       client_header_timeout 60s;
       keepalive_timeout 65s;
-      
+
       # Atlas monitoring
       location /atlas/health {
         access_log off;
         return 200 "healthy\n";
         add_header Content-Type text/plain;
       }
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
-    cert-manager.io/acme-challenge-type: "http01"
-    atlas.deployment/strategy: "blue-green"
-    atlas.traffic/intelligent-routing: "enabled"
-    atlas.cdn/enabled: "true"
-    atlas.edge/computing: "enabled"
+    cert-manager.io/cluster-issuer: 'letsencrypt-prod'
+    cert-manager.io/acme-challenge-type: 'http01'
+    atlas.deployment/strategy: 'blue-green'
+    atlas.traffic/intelligent-routing: 'enabled'
+    atlas.cdn/enabled: 'true'
+    atlas.edge/computing: 'enabled'
 spec:
   tls:
-  - hosts:
-    - astralturf.com
-    - app.astralturf.com
-    - api.astralturf.com
-    - cdn.astralturf.com
-    secretName: astral-turf-tls-cert
+    - hosts:
+        - astralturf.com
+        - app.astralturf.com
+        - api.astralturf.com
+        - cdn.astralturf.com
+      secretName: astral-turf-tls-cert
   rules:
-  - host: astralturf.com
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: astral-turf-service
-            port:
-              number: 80
-  - host: app.astralturf.com
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: astral-turf-service
-            port:
-              number: 80
-  - host: api.astralturf.com
-    http:
-      paths:
-      - path: /api
-        pathType: Prefix
-        backend:
-          service:
-            name: astral-turf-service
-            port:
-              number: 80
-      - path: /health
-        pathType: Prefix
-        backend:
-          service:
-            name: astral-turf-service
-            port:
-              number: 80
-      - path: /metrics
-        pathType: Prefix
-        backend:
-          service:
-            name: astral-turf-service
-            port:
-              number: 8080
+    - host: astralturf.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: astral-turf-service
+                port:
+                  number: 80
+    - host: app.astralturf.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: astral-turf-service
+                port:
+                  number: 80
+    - host: api.astralturf.com
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: astral-turf-service
+                port:
+                  number: 80
+          - path: /health
+            pathType: Prefix
+            backend:
+              service:
+                name: astral-turf-service
+                port:
+                  number: 80
+          - path: /metrics
+            pathType: Prefix
+            backend:
+              service:
+                name: astral-turf-service
+                port:
+                  number: 8080
 
 ---
-
 # Global Traffic Policy for Intelligent Routing
 apiVersion: v1
 kind: ConfigMap
@@ -282,7 +278,7 @@ metadata:
   namespace: astral-turf-production
   labels:
     app: astral-turf
-    atlas.traffic/policy: "global"
+    atlas.traffic/policy: 'global'
 data:
   traffic-policy.json: |
     {
@@ -383,7 +379,7 @@ data:
         }
       }
     }
-  
+
   edge-config.json: |
     {
       "edge": {
@@ -442,7 +438,6 @@ data:
     }
 
 ---
-
 # Global DNS Configuration
 apiVersion: v1
 kind: ConfigMap
@@ -451,7 +446,7 @@ metadata:
   namespace: astral-turf-production
   labels:
     app: astral-turf
-    atlas.dns/type: "global"
+    atlas.dns/type: 'global'
 data:
   dns-config.yaml: |
     dns:

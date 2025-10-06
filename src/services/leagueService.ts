@@ -31,7 +31,7 @@ export const createLeagueTable = (teams: LeagueTeam[]): Record<string, LeagueTab
 };
 
 export const getSortedLeagueTable = (
-  leagueTable: Record<string, LeagueTableEntry>,
+  leagueTable: Record<string, LeagueTableEntry>
 ): LeagueTableEntry[] => {
   return Object.values(leagueTable).sort((a, b) => {
     // Sort by points first
@@ -56,7 +56,7 @@ export const getSortedLeagueTable = (
 
 export const getCurrentPosition = (
   leagueTable: Record<string, LeagueTableEntry>,
-  teamName?: string,
+  teamName?: string
 ): number => {
   const userTeam = teamName || Object.values(leagueTable).find(entry => entry.isUserTeam);
   if (!userTeam) {
@@ -72,14 +72,14 @@ export const getCurrentPosition = (
 export const getNextFixture = (
   fixtures: Fixture[],
   currentWeek: number,
-  teamName?: string,
+  teamName?: string
 ): Fixture | null => {
   const upcomingFixtures = fixtures.filter(fixture => fixture.week >= currentWeek);
 
   if (teamName) {
     return (
       upcomingFixtures.find(
-        fixture => fixture.homeTeam === teamName || fixture.awayTeam === teamName,
+        fixture => fixture.homeTeam === teamName || fixture.awayTeam === teamName
       ) || null
     );
   }
@@ -91,13 +91,13 @@ export const getTeamForm = (
   fixtures: Fixture[],
   matchHistory: MatchResult[],
   teamName: string,
-  games: number = 5,
+  games: number = 5
 ): ('W' | 'D' | 'L')[] => {
   const recentFixtures = fixtures
     .filter(
       fixture =>
         (fixture.homeTeam === teamName || fixture.awayTeam === teamName) &&
-        fixture.week < new Date().getTime(), // Assuming played fixtures
+        fixture.week < new Date().getTime() // Assuming played fixtures
     )
     .slice(-games);
 
@@ -131,13 +131,13 @@ export const calculateLeagueStats = (leagueTable: Record<string, LeagueTableEntr
   // Find top scorer (this would need to be tracked separately in real implementation)
   const topScoringTeam = entries.reduce(
     (top, entry) => (entry.goalsFor > top.goalsFor ? entry : top),
-    entries[0] || { goalsFor: 0 },
+    entries[0] || { goalsFor: 0 }
   );
 
   // Best defense
   const bestDefense = entries.reduce(
     (best, entry) => (entry.goalsAgainst < best.goalsAgainst ? entry : best),
-    entries[0] || { goalsAgainst: 999 },
+    entries[0] || { goalsAgainst: 999 }
   );
 
   return {
@@ -151,7 +151,7 @@ export const calculateLeagueStats = (leagueTable: Record<string, LeagueTableEntr
 
 export const generateSeasonAwards = (
   leagueTable: Record<string, LeagueTableEntry>,
-  allPlayers: Player[],
+  allPlayers: Player[]
 ): SeasonAwards => {
   const sortedTable = getSortedLeagueTable(leagueTable);
   const champion = sortedTable[0]?.teamName || 'Unknown';
@@ -214,7 +214,7 @@ export const generateSeasonAwards = (
     playerOfTheSeason: { id: playerOfSeason.id, name: playerOfSeason.name },
     youngPlayerOfTheSeason: { id: youngPlayer.id, name: youngPlayer.name },
     topScorer: { id: topScorer.id, name: topScorer.name, goals: topScorer.stats.goals },
-    teamOfTheSeason,
+    teamOfTheSeason: teamOfSeason,
   };
 };
 
@@ -222,7 +222,7 @@ export const predictLeagueTable = (
   currentTable: Record<string, LeagueTableEntry>,
   fixtures: Fixture[],
   currentWeek: number,
-  teamStrengths: Record<string, number>,
+  teamStrengths: Record<string, number>
 ): Record<string, LeagueTableEntry> => {
   const predictedTable = JSON.parse(JSON.stringify(currentTable));
 
@@ -302,7 +302,7 @@ export const predictLeagueTable = (
 
 export const getChampionsLeagueSpots = (
   leagueTable: Record<string, LeagueTableEntry>,
-  spots: number = 4,
+  spots: number = 4
 ): string[] => {
   const sortedTable = getSortedLeagueTable(leagueTable);
   return sortedTable.slice(0, spots).map(entry => entry.teamName);
@@ -310,7 +310,7 @@ export const getChampionsLeagueSpots = (
 
 export const getRelegationZone = (
   leagueTable: Record<string, LeagueTableEntry>,
-  spots: number = 3,
+  spots: number = 3
 ): string[] => {
   const sortedTable = getSortedLeagueTable(leagueTable);
   return sortedTable.slice(-spots).map(entry => entry.teamName);
@@ -318,7 +318,7 @@ export const getRelegationZone = (
 
 export const generateRivalMatches = (
   fixtures: Fixture[],
-  rivalries: Record<string, string[]>,
+  rivalries: Record<string, string[]>
 ): Fixture[] => {
   return fixtures.filter(fixture => {
     const homeRivals = rivalries[fixture.homeTeam] || [];
@@ -331,7 +331,7 @@ export const generateRivalMatches = (
 export const calculatePointsNeededForSafety = (
   leagueTable: Record<string, LeagueTableEntry>,
   teamName: string,
-  safetyMargin: number = 10,
+  safetyMargin: number = 10
 ): number => {
   const sortedTable = getSortedLeagueTable(leagueTable);
   const totalTeams = sortedTable.length;

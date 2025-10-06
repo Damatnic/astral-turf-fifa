@@ -3,18 +3,22 @@ import { screen, fireEvent, waitFor, within, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { renderWithProviders } from '../utils/enhanced-mock-generators';
-import { 
+import {
   generateEnhancedFormation,
   generateEnhancedPlayer,
   generateCompleteTacticalSetup,
-  generatePerformanceTestData
+  generatePerformanceTestData,
 } from '../utils/enhanced-mock-generators';
-import { autoAssignPlayersToFormation, smartPlayerSwap, getFormationAnalysis } from '../../services/formationAutoAssignment';
+import {
+  autoAssignPlayersToFormation,
+  smartPlayerSwap,
+  getFormationAnalysis,
+} from '../../services/formationAutoAssignment';
 import type { Formation, Player, TacticsState } from '../../types';
 
 /**
  * FORMATION MANAGEMENT INTEGRATION TESTS
- * 
+ *
  * Comprehensive testing of formation management system including:
  * - Auto-assignment algorithms
  * - Player position optimization
@@ -30,10 +34,10 @@ describe('🏗️ Formation Management Integration Tests', () => {
   let tacticsState: Partial<TacticsState>;
 
   beforeEach(() => {
-    // Generate comprehensive test data
-    const setup442 = generateCompleteTacticalSetup('4-4-2', 'high');
-    const setup433 = generateCompleteTacticalSetup('4-3-3', 'medium');
-    const setup352 = generateCompleteTacticalSetup('3-5-2', 'low');
+    // Generate comprehensive test data using correct generator function signatures
+    const setup442 = generateCompleteTacticalSetup();
+    const setup433 = generateCompleteTacticalSetup();
+    const setup352 = generateCompleteTacticalSetup();
 
     testFormations = {
       '442': setup442.formation,
@@ -52,9 +56,9 @@ describe('🏗️ Formation Management Integration Tests', () => {
       formations: testFormations,
       activeFormationIds: { home: '442', away: '433' },
       teamTactics: {
-        home: setup442.teamTactics,
-        away: setup433.teamTactics,
-      },
+        home: { pressing: 'high', attackingStyle: 'possession' },
+        away: { pressing: 'medium', attackingStyle: 'counter' },
+      } as any,
       drawings: [],
       tacticalFamiliarity: {
         '442': 85,
@@ -100,7 +104,7 @@ describe('🏗️ Formation Management Integration Tests', () => {
 
       // Assign to initial formation
       const assignedInitial = autoAssignPlayersToFormation(players, initialFormation, 'home');
-      
+
       // Change to new formation
       const assignedNew = autoAssignPlayersToFormation(players, newFormation, 'home');
 
@@ -111,7 +115,7 @@ describe('🏗️ Formation Management Integration Tests', () => {
       // Verify different formations have different player arrangements
       const initialPositions = assignedInitial.slots.map(s => s.playerId).sort();
       const newPositions = assignedNew.slots.map(s => s.playerId).sort();
-      
+
       // Same players should be used, but in different positions
       expect(initialPositions).toEqual(newPositions);
     });
@@ -119,28 +123,28 @@ describe('🏗️ Formation Management Integration Tests', () => {
     it('should prioritize player fitness and availability', () => {
       const formation = generateEnhancedFormation('4-4-2');
       const players = [
-        generateEnhancedPlayer({ 
-          roleId: 'gk', 
+        generateEnhancedPlayer({
+          roleId: 'gk',
           team: 'home',
           availability: { status: 'Available' },
           form: 'Excellent',
-          morale: 'Excellent'
+          morale: 'Excellent',
         }),
-        generateEnhancedPlayer({ 
-          roleId: 'gk', 
+        generateEnhancedPlayer({
+          roleId: 'gk',
           team: 'home',
           availability: { status: 'Major Injury', returnDate: '2024-12-31' },
           form: 'Poor',
-          morale: 'Poor'
+          morale: 'Poor',
         }),
         ...Array.from({ length: 12 }, () => generateEnhancedPlayer({ team: 'home' })),
       ];
 
       const assignedFormation = autoAssignPlayersToFormation(players, formation, 'home');
-      
+
       const gkSlot = assignedFormation.slots.find(slot => slot.role === 'GK');
       const assignedGK = players.find(p => p.id === gkSlot?.playerId);
-      
+
       // Should assign the available, fit goalkeeper
       expect(assignedGK?.availability.status).toBe('Available');
       expect(assignedGK?.form).toBe('Excellent');
@@ -151,11 +155,11 @@ describe('🏗️ Formation Management Integration Tests', () => {
       const players = Array.from({ length: 5 }, () => generateEnhancedPlayer({ team: 'home' }));
 
       const assignedFormation = autoAssignPlayersToFormation(players, formation, 'home');
-      
+
       // Should assign available players to most important positions first
       const filledSlots = assignedFormation.slots.filter(slot => slot.playerId !== null);
       expect(filledSlots).toHaveLength(5);
-      
+
       // Goalkeeper should be prioritized
       const gkSlot = assignedFormation.slots.find(slot => slot.role === 'GK');
       expect(gkSlot?.playerId).toBeTruthy();
@@ -212,7 +216,7 @@ describe('🏗️ Formation Management Integration Tests', () => {
       expect(conflictResult.recommendations).toContainEqual(
         expect.objectContaining({
           action: 'swap',
-          description: expect.stringContaining('Swap')
+          description: expect.stringContaining('Swap'),
         })
       );
     });
@@ -220,41 +224,33 @@ describe('🏗️ Formation Management Integration Tests', () => {
     it('should handle position compatibility in swaps', () => {
       const formation = generateEnhancedFormation('4-4-2');
       const players = [
-        generateEnhancedPlayer({ 
-          id: 'goalkeeper', 
-          roleId: 'gk', 
+        generateEnhancedPlayer({
+          id: 'goalkeeper',
+          roleId: 'gk',
           team: 'home',
-          attributes: { ...generateEnhancedPlayer().attributes, positioning: 95 }
+          attributes: { ...generateEnhancedPlayer().attributes, positioning: 95 },
         }),
-        generateEnhancedPlayer({ 
-          id: 'striker', 
-          roleId: 'st', 
+        generateEnhancedPlayer({
+          id: 'striker',
+          roleId: 'st',
           team: 'home',
-          attributes: { ...generateEnhancedPlayer().attributes, shooting: 95 }
+          attributes: { ...generateEnhancedPlayer().attributes, shooting: 95 },
         }),
       ];
 
       // Try to swap goalkeeper and striker (incompatible)
       const gkSlot = formation.slots.find(s => s.role === 'GK');
       const fwSlot = formation.slots.find(s => s.role === 'FW');
-      
+
       if (gkSlot && fwSlot) {
         gkSlot.playerId = 'goalkeeper';
         fwSlot.playerId = 'striker';
 
-        const swapResult = smartPlayerSwap(
-          'goalkeeper',
-          fwSlot.id,
-          'striker',
-          formation,
-          players
-        );
+        const swapResult = smartPlayerSwap('goalkeeper', fwSlot.id, 'striker', formation, players);
 
         // Should suggest against this swap due to incompatibility
         expect(swapResult.success).toBe(true);
-        expect(swapResult.recommendations?.some(r => 
-          r.action === 'move_to_bench'
-        )).toBe(true);
+        expect(swapResult.recommendations?.some(r => r.action === 'move_to_bench')).toBe(true);
       }
     });
   });
@@ -262,7 +258,7 @@ describe('🏗️ Formation Management Integration Tests', () => {
   describe('📊 Formation Analysis & Validation', () => {
     it('should analyze formation effectiveness', () => {
       const formation = generateEnhancedFormation('4-4-2');
-      const players = Array.from({ length: 11 }, (_, i) => 
+      const players = Array.from({ length: 11 }, (_, i) =>
         generateEnhancedPlayer({ id: `player-${i}`, team: 'home' })
       );
 
@@ -295,11 +291,11 @@ describe('🏗️ Formation Management Integration Tests', () => {
       const formation = generateEnhancedFormation('4-4-2');
       const players = [
         // All players are strikers (poor fit for most positions)
-        ...Array.from({ length: 11 }, (_, i) => 
-          generateEnhancedPlayer({ 
-            id: `striker-${i}`, 
+        ...Array.from({ length: 11 }, (_, i) =>
+          generateEnhancedPlayer({
+            id: `striker-${i}`,
             roleId: 'st',
-            team: 'home'
+            team: 'home',
           })
         ),
       ];
@@ -316,7 +312,7 @@ describe('🏗️ Formation Management Integration Tests', () => {
       expect(analysis.averageScore).toBeLessThan(70); // Poor overall score
 
       // Should have specific recommendations
-      const poorFitRecommendations = analysis.recommendations.filter(r => 
+      const poorFitRecommendations = analysis.recommendations.filter(r =>
         r.issue.includes('not well-suited')
       );
       expect(poorFitRecommendations.length).toBeGreaterThan(0);
@@ -324,7 +320,7 @@ describe('🏗️ Formation Management Integration Tests', () => {
 
     it('should handle missing players in formation', () => {
       const formation = generateEnhancedFormation('4-4-2');
-      const players = Array.from({ length: 5 }, (_, i) => 
+      const players = Array.from({ length: 5 }, (_, i) =>
         generateEnhancedPlayer({ id: `player-${i}`, team: 'home' })
       );
 
@@ -336,7 +332,7 @@ describe('🏗️ Formation Management Integration Tests', () => {
       const analysis = getFormationAnalysis(formation, players);
 
       // Should identify empty positions
-      const emptyPositionRecommendations = analysis.recommendations.filter(r => 
+      const emptyPositionRecommendations = analysis.recommendations.filter(r =>
         r.issue.includes('No player assigned')
       );
       expect(emptyPositionRecommendations.length).toBe(6); // 6 empty positions
@@ -346,7 +342,7 @@ describe('🏗️ Formation Management Integration Tests', () => {
   describe('⚡ Performance Optimization', () => {
     it('should handle large player pools efficiently', () => {
       const formation = generateEnhancedFormation('4-4-2');
-      const largePlayerPool = Array.from({ length: 100 }, (_, i) => 
+      const largePlayerPool = Array.from({ length: 100 }, (_, i) =>
         generateEnhancedPlayer({ id: `player-${i}`, team: 'home' })
       );
 
@@ -363,7 +359,7 @@ describe('🏗️ Formation Management Integration Tests', () => {
 
     it('should optimize formation analysis for complex scenarios', () => {
       const formation = generateEnhancedFormation('3-5-2');
-      const players = Array.from({ length: 25 }, (_, i) => 
+      const players = Array.from({ length: 25 }, (_, i) =>
         generateEnhancedPlayer({ id: `player-${i}`, team: 'home' })
       );
 
@@ -383,7 +379,7 @@ describe('🏗️ Formation Management Integration Tests', () => {
 
     it('should cache formation calculations for repeated operations', () => {
       const formation = generateEnhancedFormation('4-4-2');
-      const players = Array.from({ length: 15 }, (_, i) => 
+      const players = Array.from({ length: 15 }, (_, i) =>
         generateEnhancedPlayer({ id: `player-${i}`, team: 'home' })
       );
 
@@ -401,7 +397,7 @@ describe('🏗️ Formation Management Integration Tests', () => {
 
       // Results should be consistent
       expect(assigned1.slots.length).toBe(assigned2.slots.length);
-      
+
       // Performance should be reasonable for both
       expect(time1).toBeLessThan(100);
       expect(time2).toBeLessThan(100);
@@ -411,7 +407,7 @@ describe('🏗️ Formation Management Integration Tests', () => {
   describe('🔄 Real-time Updates & State Management', () => {
     it('should handle concurrent formation updates', async () => {
       const formation = generateEnhancedFormation('4-4-2');
-      const players = Array.from({ length: 15 }, (_, i) => 
+      const players = Array.from({ length: 15 }, (_, i) =>
         generateEnhancedPlayer({ id: `player-${i}`, team: 'home' })
       );
 
@@ -430,7 +426,7 @@ describe('🏗️ Formation Management Integration Tests', () => {
 
     it('should maintain formation integrity during updates', () => {
       const formation = generateEnhancedFormation('4-3-3');
-      const players = Array.from({ length: 11 }, (_, i) => 
+      const players = Array.from({ length: 11 }, (_, i) =>
         generateEnhancedPlayer({ id: `player-${i}`, team: 'home' })
       );
 
@@ -451,11 +447,11 @@ describe('🏗️ Formation Management Integration Tests', () => {
 
     it('should handle player availability changes', () => {
       const formation = generateEnhancedFormation('4-4-2');
-      const players = Array.from({ length: 15 }, (_, i) => 
-        generateEnhancedPlayer({ 
-          id: `player-${i}`, 
+      const players = Array.from({ length: 15 }, (_, i) =>
+        generateEnhancedPlayer({
+          id: `player-${i}`,
           team: 'home',
-          availability: { status: 'Available' }
+          availability: { status: 'Available' },
         })
       );
 
@@ -464,9 +460,12 @@ describe('🏗️ Formation Management Integration Tests', () => {
       const initialCount = initialAssignment.slots.filter(s => s.playerId !== null).length;
 
       // Injure some players
-      const injuredPlayers = players.map((player, index) => 
-        index < 5 
-          ? { ...player, availability: { status: 'Major Injury' as const, returnDate: '2024-12-31' }}
+      const injuredPlayers = players.map((player, index) =>
+        index < 5
+          ? {
+              ...player,
+              availability: { status: 'Major Injury' as const, returnDate: '2024-12-31' },
+            }
           : player
       );
 
@@ -490,7 +489,7 @@ describe('🏗️ Formation Management Integration Tests', () => {
       const players = Array.from({ length: 5 }, () => generateEnhancedPlayer({ team: 'home' }));
 
       const result = autoAssignPlayersToFormation(players, emptyFormation, 'home');
-      
+
       expect(result.slots).toHaveLength(0);
       expect(result.id).toBe('empty');
     });
@@ -499,7 +498,7 @@ describe('🏗️ Formation Management Integration Tests', () => {
       const formation = generateEnhancedFormation('4-4-2');
       // Create duplicate slot ID
       formation.slots[1].id = formation.slots[0].id;
-      
+
       const players = Array.from({ length: 11 }, () => generateEnhancedPlayer({ team: 'home' }));
 
       // Should handle gracefully without crashing
@@ -510,22 +509,38 @@ describe('🏗️ Formation Management Integration Tests', () => {
     it('should handle extreme player attributes', () => {
       const formation = generateEnhancedFormation('4-4-2');
       const extremePlayers = [
-        generateEnhancedPlayer({ 
+        generateEnhancedPlayer({
           team: 'home',
-          attributes: { speed: 1, passing: 1, tackling: 1, shooting: 1, dribbling: 1, positioning: 1, stamina: 1 }
+          attributes: {
+            speed: 1,
+            passing: 1,
+            tackling: 1,
+            shooting: 1,
+            dribbling: 1,
+            positioning: 1,
+            stamina: 1,
+          },
         }),
-        generateEnhancedPlayer({ 
+        generateEnhancedPlayer({
           team: 'home',
-          attributes: { speed: 99, passing: 99, tackling: 99, shooting: 99, dribbling: 99, positioning: 99, stamina: 99 }
+          attributes: {
+            speed: 99,
+            passing: 99,
+            tackling: 99,
+            shooting: 99,
+            dribbling: 99,
+            positioning: 99,
+            stamina: 99,
+          },
         }),
         ...Array.from({ length: 9 }, () => generateEnhancedPlayer({ team: 'home' })),
       ];
 
       const result = autoAssignPlayersToFormation(extremePlayers, formation, 'home');
-      
+
       // Should handle extreme values without errors
       expect(result.slots.filter(s => s.playerId !== null)).toHaveLength(11);
-      
+
       const analysis = getFormationAnalysis(result, extremePlayers);
       expect(analysis.totalScore).toBeGreaterThan(0);
       expect(analysis.averageScore).toBeGreaterThan(0);
@@ -552,7 +567,7 @@ describe('🏗️ Formation Management Integration Tests', () => {
   describe('🎮 Interactive Formation Building', () => {
     it('should support step-by-step formation building', () => {
       const formation = generateEnhancedFormation('4-4-2');
-      const players = Array.from({ length: 15 }, (_, i) => 
+      const players = Array.from({ length: 15 }, (_, i) =>
         generateEnhancedPlayer({ id: `player-${i}`, team: 'home' })
       );
 
@@ -580,7 +595,7 @@ describe('🏗️ Formation Management Integration Tests', () => {
 
     it('should validate position constraints', () => {
       const formation = generateEnhancedFormation('4-4-2');
-      
+
       // Should have exactly one goalkeeper
       const gkSlots = formation.slots.filter(s => s.role === 'GK');
       expect(gkSlots).toHaveLength(1);
@@ -608,7 +623,7 @@ describe('🏗️ Formation Management Integration Tests', () => {
       formations.forEach(formation => {
         expect(formation.slots).toHaveLength(11); // Standard 11 players
         expect(formation.slots.filter(s => s.role === 'GK')).toHaveLength(1); // One GK
-        
+
         const outfieldPlayers = formation.slots.filter(s => s.role !== 'GK');
         expect(outfieldPlayers).toHaveLength(10); // 10 outfield players
       });

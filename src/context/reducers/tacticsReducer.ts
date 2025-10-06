@@ -10,15 +10,18 @@ import type {
   ContractClause,
 } from '../../types';
 import { PLAYER_ROLES } from '../../constants';
-import { autoAssignPlayersToFormation, updatePlayerPositionsFromFormation } from '../../services/formationAutoAssignment';
+import {
+  autoAssignPlayersToFormation,
+  updatePlayerPositionsFromFormation,
+} from '../../services/formationAutoAssignment';
 
 export const tacticsReducer = (draft: TacticsState, action: Action): TacticsState | void => {
-  switch (action.type) {
+  switch ((action as any).type) {
     case 'ADD_PLAYER':
-      draft.players.push(action.payload);
+      draft.players.push((action as any).payload);
       break;
     case 'UPDATE_PLAYER': {
-      const playerUpdate = action.payload;
+      const playerUpdate = (action as any).payload;
       const playerIndex = draft.players.findIndex(p => p.id === playerUpdate.id);
       if (playerIndex > -1) {
         draft.players[playerIndex] = playerUpdate;
@@ -26,10 +29,10 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
       break;
     }
     case 'UPDATE_PLAYERS':
-      draft.players = [...action.payload];
+      draft.players = [...(action as any).payload];
       break;
     case 'SET_CAPTAIN': {
-      const player = draft.players.find(p => p.id === action.payload);
+      const player = draft.players.find(p => p.id === (action as any).payload);
       if (!player) {
         break;
       }
@@ -46,7 +49,7 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
       break;
     }
     case 'ADD_DRAWING': {
-      draft.drawings.push(action.payload);
+      draft.drawings.push((action as any).payload);
       break;
     }
     case 'UNDO_LAST_DRAWING':
@@ -56,7 +59,7 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
       draft.drawings = [];
       break;
     case 'UPDATE_PLAYER_POSITION': {
-      const { playerId, position } = action.payload;
+      const { playerId, position } = (action as any).payload;
       const player = draft.players.find(p => p.id === playerId);
       if (player) {
         player.position = position;
@@ -73,7 +76,7 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
       break;
     }
     case 'BENCH_PLAYER': {
-      const { playerId } = action.payload;
+      const { playerId } = (action as any).payload;
       const player = draft.players.find(p => p.id === playerId);
       if (!player) {
         break;
@@ -87,7 +90,7 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
       break;
     }
     case 'BENCH_ALL_PLAYERS': {
-      const { team } = action.payload;
+      const { team } = (action as any).payload;
       const formation = draft.formations[draft.activeFormationIds[team]];
       if (!formation) {
         break;
@@ -103,7 +106,7 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
       break;
     }
     case 'ASSIGN_PLAYER_TO_SLOT': {
-      const { slotId, playerId, team } = action.payload;
+      const { slotId, playerId, team } = (action as any).payload;
       const formation = draft.formations[draft.activeFormationIds[team]];
       const slot = formation.slots.find(s => s.id === slotId);
       if (slot) {
@@ -116,45 +119,55 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
       break;
     }
     case 'SET_ACTIVE_FORMATION': {
-      const { formationId, team } = action.payload;
+      const { formationId, team } = (action as any).payload;
       draft.activeFormationIds[team] = formationId;
-      
+
       // Use intelligent auto-assignment system
       const baseFormation = draft.formations[formationId];
-      const autoAssignedFormation = autoAssignPlayersToFormation(draft.players, baseFormation, team);
-      
+      const autoAssignedFormation = autoAssignPlayersToFormation(
+        draft.players,
+        baseFormation,
+        team
+      );
+
       // Update the formation with auto-assigned players
       draft.formations[formationId] = autoAssignedFormation;
-      
+
       // Update player positions to match their assigned slots
-      const updatedPlayers = updatePlayerPositionsFromFormation(draft.players, autoAssignedFormation, team);
+      const updatedPlayers = updatePlayerPositionsFromFormation(
+        draft.players,
+        autoAssignedFormation,
+        team
+      );
       draft.players = updatedPlayers;
-      
+
       break;
     }
     case 'SAVE_CUSTOM_FORMATION':
-      draft.formations[action.payload.id] = action.payload;
+      draft.formations[(action as any).payload.id] = (action as any).payload;
       break;
     case 'DELETE_CUSTOM_FORMATION':
-      delete draft.formations[action.payload];
+      delete draft.formations[(action as any).payload];
       break;
     case 'SET_TEAM_TACTIC':
-      draft.teamTactics[action.payload.team][action.payload.tactic] = action.payload.value;
+      draft.teamTactics[(action as any).payload.team][(action as any).payload.tactic] = (
+        action as any
+      ).payload.value;
       break;
     case 'LOAD_PLAYBOOK_ITEM':
       draft.drawings = [];
       break;
     case 'LOAD_PLAYBOOK':
-      draft.playbook = action.payload;
+      draft.playbook = (action as any).payload;
       break;
 
     case 'DELETE_PLAYBOOK_ITEM': {
-      delete draft.playbook[action.payload];
+      delete draft.playbook[(action as any).payload];
       break;
     }
 
     case 'DUPLICATE_PLAYBOOK_ITEM': {
-      const originalItem = draft.playbook[action.payload];
+      const originalItem = draft.playbook[(action as any).payload];
       if (originalItem) {
         const newItemId = `pb_${Date.now()}`;
         const duplicatedItem: PlaybookItem = JSON.parse(JSON.stringify(originalItem)); // Deep copy
@@ -186,23 +199,26 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
     }
 
     case 'ADD_DEVELOPMENT_LOG': {
-      const player = draft.players.find(p => p.id === action.payload.playerId);
+      const player = draft.players.find(p => p.id === (action as any).payload.playerId);
       if (player) {
-        player.developmentLog.unshift({ ...action.payload.entry, id: `log_${Date.now()}` });
+        player.developmentLog.unshift({
+          ...(action as any).payload.entry,
+          id: `log_${Date.now()}`,
+        });
       }
       break;
     }
 
     case 'SEND_PLAYER_MESSAGE_START': {
-      const player = draft.players.find(p => p.id === action.payload.playerId);
+      const player = draft.players.find(p => p.id === (action as any).payload.playerId);
       if (player) {
-        player.conversationHistory.push(action.payload.message);
+        player.conversationHistory.push((action as any).payload.message);
       }
       break;
     }
 
     case 'SEND_PLAYER_MESSAGE_SUCCESS': {
-      const { playerId, response, moraleEffect } = action.payload;
+      const { playerId, response, moraleEffect } = (action as any).payload;
       const player = draft.players.find(p => p.id === playerId);
       if (player) {
         player.conversationHistory.push(response);
@@ -210,7 +226,7 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
         const currentMoraleIndex = moraleOrder.indexOf(player.morale);
         const newMoraleIndex = Math.max(
           0,
-          Math.min(moraleOrder.length - 1, currentMoraleIndex + moraleEffect),
+          Math.min(moraleOrder.length - 1, currentMoraleIndex + moraleEffect)
         );
         player.morale = moraleOrder[newMoraleIndex];
       }
@@ -218,7 +234,7 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
     }
 
     case 'SEND_PLAYER_MESSAGE_FAILURE': {
-      const player = draft.players.find(p => p.id === action.payload.playerId);
+      const player = draft.players.find(p => p.id === (action as any).payload.playerId);
       if (player) {
         player.conversationHistory.push({
           id: 'error',
@@ -230,10 +246,10 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
     }
 
     case 'ADD_COMMUNICATION_LOG': {
-      const player = draft.players.find(p => p.id === action.payload.playerId);
+      const player = draft.players.find(p => p.id === (action as any).payload.playerId);
       if (player) {
         const newEntry: CommunicationLogEntry = {
-          ...action.payload.entry,
+          ...(action as any).payload.entry,
           id: `comm_${Date.now()}`,
           date: new Date().toISOString(),
         };
@@ -243,11 +259,11 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
     }
 
     case 'ADD_CONTRACT_CLAUSE': {
-      const player = draft.players.find(p => p.id === action.payload.playerId);
+      const player = draft.players.find(p => p.id === (action as any).payload.playerId);
       if (player) {
         const newClause: ContractClause = {
           id: `clause_${Date.now()}`,
-          text: action.payload.clauseText,
+          text: (action as any).payload.clauseText,
           status: 'Unmet',
           isCustom: true,
         };
@@ -257,32 +273,32 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
     }
 
     case 'UPDATE_CONTRACT_CLAUSE': {
-      const player = draft.players.find(p => p.id === action.payload.playerId);
-      const clause = player?.contract.clauses.find(c => c.id === action.payload.clauseId);
+      const player = draft.players.find(p => p.id === (action as any).payload.playerId);
+      const clause = player?.contract.clauses.find(c => c.id === (action as any).payload.clauseId);
       if (clause) {
-        clause.status = action.payload.status;
+        clause.status = (action as any).payload.status;
       }
       break;
     }
 
     case 'REMOVE_CONTRACT_CLAUSE': {
-      const player = draft.players.find(p => p.id === action.payload.playerId);
+      const player = draft.players.find(p => p.id === (action as any).payload.playerId);
       if (player) {
         player.contract.clauses = player.contract.clauses.filter(
-          c => c.id !== action.payload.clauseId,
+          c => c.id !== (action as any).payload.clauseId
         );
       }
       break;
     }
 
     case 'TERMINATE_PLAYER_CONTRACT': {
-      const playerIndex = draft.players.findIndex(p => p.id === action.payload);
+      const playerIndex = draft.players.findIndex(p => p.id === (action as any).payload);
       if (playerIndex > -1) {
         draft.players.splice(playerIndex, 1);
         // Also remove from any formation
         Object.values(draft.formations).forEach(f => {
           f.slots.forEach(s => {
-            if (s.playerId === action.payload) {
+            if (s.playerId === (action as any).payload) {
               s.playerId = null;
             }
           });
@@ -292,7 +308,7 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
     }
 
     case 'SET_PLAYER_SESSION_DRILL': {
-      const { playerId, day, session, sessionPart, drillId } = action.payload;
+      const { playerId, day, session, sessionPart, drillId } = (action as any).payload;
       const player = draft.players.find(p => p.id === playerId);
       if (player && player.customTrainingSchedule) {
         player.customTrainingSchedule[day][session][sessionPart] = drillId;
@@ -303,7 +319,7 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
       break;
     }
     case 'SET_PLAYER_DAY_AS_REST': {
-      const { playerId, day } = action.payload;
+      const { playerId, day } = (action as any).payload;
       const player = draft.players.find(p => p.id === playerId);
       if (player && player.customTrainingSchedule) {
         player.customTrainingSchedule[day].isRestDay = true;
@@ -313,7 +329,7 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
       break;
     }
     case 'SET_PLAYER_DAY_AS_TRAINING': {
-      const { playerId, day } = action.payload;
+      const { playerId, day } = (action as any).payload;
       const player = draft.players.find(p => p.id === playerId);
       if (player && player.customTrainingSchedule) {
         player.customTrainingSchedule[day].isRestDay = false;
@@ -322,7 +338,7 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
     }
 
     case 'APPLY_TEAM_TALK_EFFECT': {
-      const { team, effect } = action.payload;
+      const { team, effect } = (action as any).payload;
       draft.players.forEach(p => {
         if (p.team === team) {
           p.moraleBoost = { duration: 30, effect }; // 30 minutes duration
@@ -332,7 +348,7 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
     }
 
     case 'CLEAR_MORALE_BOOSTS': {
-      const { team } = action.payload;
+      const { team } = (action as any).payload;
       draft.players.forEach(p => {
         if (p.team === team) {
           p.moraleBoost = null;
@@ -342,7 +358,7 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
     }
 
     case 'RECALL_PLAYER': {
-      const player = draft.players.find(p => p.id === action.payload.playerId);
+      const player = draft.players.find(p => p.id === (action as any).payload.playerId);
       if (player) {
         player.loan.isLoaned = false;
         player.loan.loanedTo = undefined;
@@ -352,7 +368,7 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
     }
 
     case 'UPDATE_PLAYER_CHALLENGE_COMPLETION': {
-      const { playerId, challengeId } = action.payload;
+      const { playerId, challengeId } = (action as any).payload;
       const player = draft.players.find(p => p.id === playerId);
       if (player) {
         const completedIndex = player.completedChallenges.indexOf(challengeId);
@@ -366,24 +382,24 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
     }
 
     case 'SWAP_PLAYERS': {
-      const { playerId1, playerId2 } = action.payload;
+      const { playerId1, playerId2 } = (action as any).payload;
       const player1 = draft.players.find(p => p.id === playerId1);
       const player2 = draft.players.find(p => p.id === playerId2);
-      
+
       if (player1 && player2) {
         // Swap positions
         const tempPosition = player1.position;
         player1.position = player2.position;
         player2.position = tempPosition;
-        
+
         // Swap formation slot assignments if they exist
         const formation1 = draft.formations[draft.activeFormationIds[player1.team]];
         const formation2 = draft.formations[draft.activeFormationIds[player2.team]];
-        
+
         if (formation1) {
           const slot1 = formation1.slots.find(s => s.playerId === playerId1);
           const slot2 = formation1.slots.find(s => s.playerId === playerId2);
-          
+
           if (slot1 && slot2) {
             slot1.playerId = playerId2;
             slot2.playerId = playerId1;
@@ -394,9 +410,9 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
     }
 
     case 'MOVE_TO_BENCH': {
-      const { playerId } = action.payload;
+      const { playerId } = (action as any).payload;
       const player = draft.players.find(p => p.id === playerId);
-      
+
       if (player) {
         // Remove from formation slot
         const formation = draft.formations[draft.activeFormationIds[player.team]];
@@ -406,7 +422,7 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
             slot.playerId = null;
           }
         }
-        
+
         // Move to bench position
         player.position = { x: -100, y: -100 };
       }

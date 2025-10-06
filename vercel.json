@@ -1,23 +1,12 @@
 {
-  "version": 2,
-  "name": "astral-turf-tactical-board",
   "buildCommand": "npm run vercel-build",
   "outputDirectory": "dist",
   "installCommand": "npm ci",
   "framework": "vite",
-  "regions": ["iad1", "fra1", "hnd1"],
   "build": {
     "env": {
       "NODE_ENV": "production",
       "VERCEL": "1"
-    }
-  },
-  "functions": {
-    "api/**/*.ts": {
-      "runtime": "nodejs20.x",
-      "regions": ["iad1"],
-      "maxDuration": 30,
-      "memory": 1024
     }
   },
   "headers": [
@@ -46,11 +35,11 @@
         },
         {
           "key": "Permissions-Policy",
-          "value": "camera=(), microphone=(), geolocation=(), interest-cohort=(), payment=(), usb=(), magnetometer=(), gyroscope=(), speaker=(self), fullscreen=(self), autoplay=(self)"
+          "value": "camera=(), microphone=(), geolocation=(), interest-cohort=(), payment=(), usb=(), magnetometer=(), gyroscope=(), fullscreen=(self), autoplay=(self)"
         },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://api.openai.com https://vercel.live; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://api.openai.com https://*.vercel.app wss://*.vercel.app; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://api.openai.com https://vercel.live; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com https://r2cdn.perplexity.ai; img-src 'self' data: blob: https:; connect-src 'self' https://api.openai.com https://*.vercel.app wss://*.vercel.app; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
         },
         {
           "key": "Cross-Origin-Embedder-Policy",

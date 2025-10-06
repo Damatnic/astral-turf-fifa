@@ -93,236 +93,258 @@ const ChallengeManagement: React.FC<ChallengeManagementProps> = ({
   const [showFilters, setShowFilters] = useState(false);
 
   // Pre-defined challenge database
-  const allChallenges = useMemo((): Challenge[] => [
-    {
-      id: 'formation_master_442',
-      title: 'Formation Master: 4-4-2',
-      description: 'Master the classic 4-4-2 formation by creating a balanced setup',
-      category: 'formation',
-      difficulty: 'beginner',
-      duration: 10,
-      objectives: [
-        {
-          id: 'obj1',
-          description: 'Create a 4-4-2 formation',
-          type: 'formation_create',
-          target: 1,
-          current: 0,
-          isCompleted: false,
-        },
-        {
-          id: 'obj2',
-          description: 'Position all 11 players correctly',
-          type: 'player_positioning',
-          target: 11,
-          current: 0,
-          isCompleted: false,
-        },
-        {
-          id: 'obj3',
-          description: 'Complete within 5 minutes',
-          type: 'time_limit',
-          target: 300,
-          current: 0,
-          isCompleted: false,
-        },
-      ],
-      rewards: [
-        { type: 'xp', value: 100, description: '+100 Tactical XP' },
-        { type: 'badge', value: '4-4-2 Master', description: 'Formation Specialist Badge' },
-      ],
-      prerequisites: [],
-      isCompleted: completedChallenges.includes('formation_master_442'),
-      attempts: 0,
-      unlocked: true,
-      icon: Target,
-      color: 'bg-blue-500',
-    },
-    {
-      id: 'pressing_game',
-      title: 'High-Intensity Pressing',
-      description: 'Learn to coordinate team pressing and win possession quickly',
-      category: 'tactical',
-      difficulty: 'intermediate',
-      duration: 15,
-      objectives: [
-        {
-          id: 'obj1',
-          description: 'Set up defensive press triggers',
-          type: 'tactical_analysis',
-          target: 3,
-          current: 0,
-          isCompleted: false,
-        },
-        {
-          id: 'obj2',
-          description: 'Coordinate 6+ players in press',
-          type: 'player_positioning',
-          target: 6,
-          current: 0,
-          isCompleted: false,
-        },
-        {
-          id: 'obj3',
-          description: 'Achieve 85% accuracy',
-          type: 'accuracy',
-          target: 85,
-          current: 0,
-          isCompleted: false,
-        },
-      ],
-      rewards: [
-        { type: 'xp', value: 200, description: '+200 Tactical XP' },
-        { type: 'skill_unlock', value: 'pressing_specialist', description: 'Pressing Specialist Skill' },
-      ],
-      prerequisites: ['formation_master_442'],
-      isCompleted: completedChallenges.includes('pressing_game'),
-      attempts: 0,
-      unlocked: completedChallenges.includes('formation_master_442'),
-      icon: Zap,
-      color: 'bg-yellow-500',
-    },
-    {
-      id: 'defensive_masterclass',
-      title: 'Defensive Masterclass',
-      description: 'Build an impenetrable defense with proper positioning',
-      category: 'strategy',
-      difficulty: 'advanced',
-      duration: 20,
-      objectives: [
-        {
-          id: 'obj1',
-          description: 'Create defensive line coordination',
-          type: 'player_positioning',
-          target: 4,
-          current: 0,
-          isCompleted: false,
-        },
-        {
-          id: 'obj2',
-          description: 'Set up cover and support systems',
-          type: 'tactical_analysis',
-          target: 2,
-          current: 0,
-          isCompleted: false,
-        },
-        {
-          id: 'obj3',
-          description: 'Complete without errors',
-          type: 'accuracy',
-          target: 100,
-          current: 0,
-          isCompleted: false,
-        },
-      ],
-      rewards: [
-        { type: 'xp', value: 300, description: '+300 Strategic XP' },
-        { type: 'formation_template', value: 'defensive_masterclass_template', description: 'Defensive Template' },
-        { type: 'badge', value: 'defensive_guru', description: 'Defensive Guru Badge' },
-      ],
-      prerequisites: ['pressing_game'],
-      isCompleted: completedChallenges.includes('defensive_masterclass'),
-      attempts: 0,
-      unlocked: completedChallenges.includes('pressing_game'),
-      icon: Shield,
-      color: 'bg-green-500',
-    },
-    {
-      id: 'team_chemistry',
-      title: 'Perfect Team Chemistry',
-      description: 'Create optimal player partnerships and synergies',
-      category: 'teamwork',
-      difficulty: 'intermediate',
-      duration: 12,
-      objectives: [
-        {
-          id: 'obj1',
-          description: 'Form 3 strong partnerships',
-          type: 'player_positioning',
-          target: 3,
-          current: 0,
-          isCompleted: false,
-        },
-        {
-          id: 'obj2',
-          description: 'Achieve 90%+ team chemistry',
-          type: 'tactical_analysis',
-          target: 90,
-          current: 0,
-          isCompleted: false,
-        },
-      ],
-      rewards: [
-        { type: 'xp', value: 150, description: '+150 Team XP' },
-        { type: 'skill_unlock', value: 'chemistry_expert', description: 'Chemistry Expert Skill' },
-      ],
-      prerequisites: [],
-      isCompleted: completedChallenges.includes('team_chemistry'),
-      attempts: 0,
-      unlocked: true,
-      icon: Users,
-      color: 'bg-purple-500',
-    },
-    {
-      id: 'tactical_genius',
-      title: 'Tactical Genius',
-      description: 'Master advanced tactical concepts and formations',
-      category: 'tactical',
-      difficulty: 'expert',
-      duration: 30,
-      objectives: [
-        {
-          id: 'obj1',
-          description: 'Create 3 different formations',
-          type: 'formation_create',
-          target: 3,
-          current: 0,
-          isCompleted: false,
-        },
-        {
-          id: 'obj2',
-          description: 'Demonstrate tactical flexibility',
-          type: 'tactical_analysis',
-          target: 5,
-          current: 0,
-          isCompleted: false,
-        },
-        {
-          id: 'obj3',
-          description: 'Perfect execution (100% accuracy)',
-          type: 'accuracy',
-          target: 100,
-          current: 0,
-          isCompleted: false,
-        },
-        {
-          id: 'obj4',
-          description: 'Complete under time pressure',
-          type: 'time_limit',
-          target: 1800,
-          current: 0,
-          isCompleted: false,
-        },
-      ],
-      rewards: [
-        { type: 'xp', value: 500, description: '+500 Master XP' },
-        { type: 'badge', value: 'tactical_genius', description: 'Tactical Genius Badge' },
-        { type: 'formation_template', value: 'genius_formations_pack', description: 'Genius Formations Pack' },
-      ],
-      prerequisites: ['defensive_masterclass', 'team_chemistry'],
-      isCompleted: completedChallenges.includes('tactical_genius'),
-      attempts: 0,
-      unlocked: completedChallenges.includes('defensive_masterclass') && completedChallenges.includes('team_chemistry'),
-      icon: Brain,
-      color: 'bg-red-500',
-    },
-  ], [completedChallenges]);
+  const allChallenges = useMemo(
+    (): Challenge[] => [
+      {
+        id: 'formation_master_442',
+        title: 'Formation Master: 4-4-2',
+        description: 'Master the classic 4-4-2 formation by creating a balanced setup',
+        category: 'formation',
+        difficulty: 'beginner',
+        duration: 10,
+        objectives: [
+          {
+            id: 'obj1',
+            description: 'Create a 4-4-2 formation',
+            type: 'formation_create',
+            target: 1,
+            current: 0,
+            isCompleted: false,
+          },
+          {
+            id: 'obj2',
+            description: 'Position all 11 players correctly',
+            type: 'player_positioning',
+            target: 11,
+            current: 0,
+            isCompleted: false,
+          },
+          {
+            id: 'obj3',
+            description: 'Complete within 5 minutes',
+            type: 'time_limit',
+            target: 300,
+            current: 0,
+            isCompleted: false,
+          },
+        ],
+        rewards: [
+          { type: 'xp', value: 100, description: '+100 Tactical XP' },
+          { type: 'badge', value: '4-4-2 Master', description: 'Formation Specialist Badge' },
+        ],
+        prerequisites: [],
+        isCompleted: completedChallenges.includes('formation_master_442'),
+        attempts: 0,
+        unlocked: true,
+        icon: Target,
+        color: 'bg-blue-500',
+      },
+      {
+        id: 'pressing_game',
+        title: 'High-Intensity Pressing',
+        description: 'Learn to coordinate team pressing and win possession quickly',
+        category: 'tactical',
+        difficulty: 'intermediate',
+        duration: 15,
+        objectives: [
+          {
+            id: 'obj1',
+            description: 'Set up defensive press triggers',
+            type: 'tactical_analysis',
+            target: 3,
+            current: 0,
+            isCompleted: false,
+          },
+          {
+            id: 'obj2',
+            description: 'Coordinate 6+ players in press',
+            type: 'player_positioning',
+            target: 6,
+            current: 0,
+            isCompleted: false,
+          },
+          {
+            id: 'obj3',
+            description: 'Achieve 85% accuracy',
+            type: 'accuracy',
+            target: 85,
+            current: 0,
+            isCompleted: false,
+          },
+        ],
+        rewards: [
+          { type: 'xp', value: 200, description: '+200 Tactical XP' },
+          {
+            type: 'skill_unlock',
+            value: 'pressing_specialist',
+            description: 'Pressing Specialist Skill',
+          },
+        ],
+        prerequisites: ['formation_master_442'],
+        isCompleted: completedChallenges.includes('pressing_game'),
+        attempts: 0,
+        unlocked: completedChallenges.includes('formation_master_442'),
+        icon: Zap,
+        color: 'bg-yellow-500',
+      },
+      {
+        id: 'defensive_masterclass',
+        title: 'Defensive Masterclass',
+        description: 'Build an impenetrable defense with proper positioning',
+        category: 'strategy',
+        difficulty: 'advanced',
+        duration: 20,
+        objectives: [
+          {
+            id: 'obj1',
+            description: 'Create defensive line coordination',
+            type: 'player_positioning',
+            target: 4,
+            current: 0,
+            isCompleted: false,
+          },
+          {
+            id: 'obj2',
+            description: 'Set up cover and support systems',
+            type: 'tactical_analysis',
+            target: 2,
+            current: 0,
+            isCompleted: false,
+          },
+          {
+            id: 'obj3',
+            description: 'Complete without errors',
+            type: 'accuracy',
+            target: 100,
+            current: 0,
+            isCompleted: false,
+          },
+        ],
+        rewards: [
+          { type: 'xp', value: 300, description: '+300 Strategic XP' },
+          {
+            type: 'formation_template',
+            value: 'defensive_masterclass_template',
+            description: 'Defensive Template',
+          },
+          { type: 'badge', value: 'defensive_guru', description: 'Defensive Guru Badge' },
+        ],
+        prerequisites: ['pressing_game'],
+        isCompleted: completedChallenges.includes('defensive_masterclass'),
+        attempts: 0,
+        unlocked: completedChallenges.includes('pressing_game'),
+        icon: Shield,
+        color: 'bg-green-500',
+      },
+      {
+        id: 'team_chemistry',
+        title: 'Perfect Team Chemistry',
+        description: 'Create optimal player partnerships and synergies',
+        category: 'teamwork',
+        difficulty: 'intermediate',
+        duration: 12,
+        objectives: [
+          {
+            id: 'obj1',
+            description: 'Form 3 strong partnerships',
+            type: 'player_positioning',
+            target: 3,
+            current: 0,
+            isCompleted: false,
+          },
+          {
+            id: 'obj2',
+            description: 'Achieve 90%+ team chemistry',
+            type: 'tactical_analysis',
+            target: 90,
+            current: 0,
+            isCompleted: false,
+          },
+        ],
+        rewards: [
+          { type: 'xp', value: 150, description: '+150 Team XP' },
+          {
+            type: 'skill_unlock',
+            value: 'chemistry_expert',
+            description: 'Chemistry Expert Skill',
+          },
+        ],
+        prerequisites: [],
+        isCompleted: completedChallenges.includes('team_chemistry'),
+        attempts: 0,
+        unlocked: true,
+        icon: Users,
+        color: 'bg-purple-500',
+      },
+      {
+        id: 'tactical_genius',
+        title: 'Tactical Genius',
+        description: 'Master advanced tactical concepts and formations',
+        category: 'tactical',
+        difficulty: 'expert',
+        duration: 30,
+        objectives: [
+          {
+            id: 'obj1',
+            description: 'Create 3 different formations',
+            type: 'formation_create',
+            target: 3,
+            current: 0,
+            isCompleted: false,
+          },
+          {
+            id: 'obj2',
+            description: 'Demonstrate tactical flexibility',
+            type: 'tactical_analysis',
+            target: 5,
+            current: 0,
+            isCompleted: false,
+          },
+          {
+            id: 'obj3',
+            description: 'Perfect execution (100% accuracy)',
+            type: 'accuracy',
+            target: 100,
+            current: 0,
+            isCompleted: false,
+          },
+          {
+            id: 'obj4',
+            description: 'Complete under time pressure',
+            type: 'time_limit',
+            target: 1800,
+            current: 0,
+            isCompleted: false,
+          },
+        ],
+        rewards: [
+          { type: 'xp', value: 500, description: '+500 Master XP' },
+          { type: 'badge', value: 'tactical_genius', description: 'Tactical Genius Badge' },
+          {
+            type: 'formation_template',
+            value: 'genius_formations_pack',
+            description: 'Genius Formations Pack',
+          },
+        ],
+        prerequisites: ['defensive_masterclass', 'team_chemistry'],
+        isCompleted: completedChallenges.includes('tactical_genius'),
+        attempts: 0,
+        unlocked:
+          completedChallenges.includes('defensive_masterclass') &&
+          completedChallenges.includes('team_chemistry'),
+        icon: Brain,
+        color: 'bg-red-500',
+      },
+    ],
+    [completedChallenges]
+  );
 
   // Filter challenges based on selections
   const filteredChallenges = useMemo(() => {
     return allChallenges.filter(challenge => {
       const categoryMatch = selectedCategory === 'all' || challenge.category === selectedCategory;
-      const difficultyMatch = selectedDifficulty === 'all' || challenge.difficulty === selectedDifficulty;
+      const difficultyMatch =
+        selectedDifficulty === 'all' || challenge.difficulty === selectedDifficulty;
       return categoryMatch && difficultyMatch;
     });
   }, [allChallenges, selectedCategory, selectedDifficulty]);
@@ -337,30 +359,41 @@ const ChallengeManagement: React.FC<ChallengeManagementProps> = ({
     return groups;
   }, [filteredChallenges]);
 
-  const startChallenge = useCallback((challenge: Challenge) => {
-    setActiveChallenge(challenge);
-    setCurrentObjectives(challenge.objectives.map(obj => ({ ...obj })));
-    setChallengeInProgress(true);
-    setChallengeTimer(challenge.duration * 60); // Convert to seconds
-    onChallengeStart(challenge.id);
-  }, [onChallengeStart]);
+  const startChallenge = useCallback(
+    (challenge: Challenge) => {
+      setActiveChallenge(challenge);
+      setCurrentObjectives(challenge.objectives.map(obj => ({ ...obj })));
+      setChallengeInProgress(true);
+      setChallengeTimer(challenge.duration * 60); // Convert to seconds
+      onChallengeStart(challenge.id);
+    },
+    [onChallengeStart]
+  );
 
-  const completeChallenge = useCallback((score: number) => {
-    if (activeChallenge) {
-      onChallengeComplete(activeChallenge.id, score);
-      setChallengeInProgress(false);
-      setActiveChallenge(null);
-      setCurrentObjectives([]);
-    }
-  }, [activeChallenge, onChallengeComplete]);
+  const completeChallenge = useCallback(
+    (score: number) => {
+      if (activeChallenge) {
+        onChallengeComplete(activeChallenge.id, score);
+        setChallengeInProgress(false);
+        setActiveChallenge(null);
+        setCurrentObjectives([]);
+      }
+    },
+    [activeChallenge, onChallengeComplete]
+  );
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case 'beginner': return 'text-green-400 bg-green-900/30';
-      case 'intermediate': return 'text-yellow-400 bg-yellow-900/30';
-      case 'advanced': return 'text-orange-400 bg-orange-900/30';
-      case 'expert': return 'text-red-400 bg-red-900/30';
-      default: return 'text-gray-400 bg-gray-900/30';
+      case 'beginner':
+        return 'text-green-400 bg-green-900/30';
+      case 'intermediate':
+        return 'text-yellow-400 bg-yellow-900/30';
+      case 'advanced':
+        return 'text-orange-400 bg-orange-900/30';
+      case 'expert':
+        return 'text-red-400 bg-red-900/30';
+      default:
+        return 'text-gray-400 bg-gray-900/30';
     }
   };
 
@@ -374,7 +407,9 @@ const ChallengeManagement: React.FC<ChallengeManagementProps> = ({
     return stars[difficulty as keyof typeof stars] || 1;
   };
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return null;
+  }
 
   return (
     <motion.div
@@ -453,9 +488,10 @@ const ChallengeManagement: React.FC<ChallengeManagementProps> = ({
                       onClick={() => setSelectedCategory(category.id as ChallengeCategory)}
                       className={`
                         flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all
-                        ${selectedCategory === category.id
-                          ? 'bg-blue-600/80 text-white'
-                          : 'bg-slate-700/50 text-slate-400 hover:text-white hover:bg-slate-600/50'
+                        ${
+                          selectedCategory === category.id
+                            ? 'bg-blue-600/80 text-white'
+                            : 'bg-slate-700/50 text-slate-400 hover:text-white hover:bg-slate-600/50'
                         }
                       `}
                     >
@@ -483,9 +519,10 @@ const ChallengeManagement: React.FC<ChallengeManagementProps> = ({
                     onClick={() => setSelectedDifficulty(difficulty.id as ChallengeDifficulty)}
                     className={`
                       px-3 py-2 rounded-lg text-sm font-medium transition-all
-                      ${selectedDifficulty === difficulty.id
-                        ? 'bg-blue-600/80 text-white'
-                        : 'bg-slate-700/50 text-slate-400 hover:text-white hover:bg-slate-600/50'
+                      ${
+                        selectedDifficulty === difficulty.id
+                          ? 'bg-blue-600/80 text-white'
+                          : 'bg-slate-700/50 text-slate-400 hover:text-white hover:bg-slate-600/50'
                       }
                     `}
                   >
@@ -519,26 +556,32 @@ const ChallengeManagement: React.FC<ChallengeManagementProps> = ({
                         onClick={() => startChallenge(challenge)}
                       >
                         <div className="flex items-start justify-between mb-3">
-                          <div className={`w-10 h-10 ${challenge.color} rounded-lg flex items-center justify-center`}>
+                          <div
+                            className={`w-10 h-10 ${challenge.color} rounded-lg flex items-center justify-center`}
+                          >
                             <IconComponent className="w-5 h-5 text-white" />
                           </div>
                           <div className="flex">
-                            {Array.from({ length: getDifficultyStars(challenge.difficulty) }).map((_, i) => (
-                              <Star key={i} className="w-3 h-3 text-yellow-400 fill-current" />
-                            ))}
+                            {Array.from({ length: getDifficultyStars(challenge.difficulty) }).map(
+                              (_, i) => (
+                                <Star key={i} className="w-3 h-3 text-yellow-400 fill-current" />
+                              )
+                            )}
                           </div>
                         </div>
 
                         <h4 className="font-semibold text-white mb-2 group-hover:text-blue-300 transition-colors">
                           {challenge.title}
                         </h4>
-                        
+
                         <p className="text-sm text-slate-300 mb-4 line-clamp-2">
                           {challenge.description}
                         </p>
 
                         <div className="flex items-center justify-between mb-3">
-                          <span className={`text-xs px-2 py-1 rounded-full ${getDifficultyColor(challenge.difficulty)}`}>
+                          <span
+                            className={`text-xs px-2 py-1 rounded-full ${getDifficultyColor(challenge.difficulty)}`}
+                          >
                             {challenge.difficulty.toUpperCase()}
                           </span>
                           <div className="flex items-center gap-1 text-xs text-slate-400">
@@ -593,7 +636,9 @@ const ChallengeManagement: React.FC<ChallengeManagementProps> = ({
                         <CheckCircle2 className="absolute top-2 right-2 w-5 h-5 text-green-400" />
 
                         <div className="flex items-start gap-3 mb-3">
-                          <div className={`w-10 h-10 ${challenge.color} rounded-lg flex items-center justify-center opacity-80`}>
+                          <div
+                            className={`w-10 h-10 ${challenge.color} rounded-lg flex items-center justify-center opacity-80`}
+                          >
                             <IconComponent className="w-5 h-5 text-white" />
                           </div>
                           <div className="flex-1">
@@ -601,7 +646,9 @@ const ChallengeManagement: React.FC<ChallengeManagementProps> = ({
                             <div className="flex items-center gap-2 text-xs">
                               <span className="text-green-400">✓ Completed</span>
                               {challenge.bestScore && (
-                                <span className="text-slate-400">Score: {challenge.bestScore}%</span>
+                                <span className="text-slate-400">
+                                  Score: {challenge.bestScore}%
+                                </span>
                               )}
                             </div>
                           </div>
@@ -644,7 +691,7 @@ const ChallengeManagement: React.FC<ChallengeManagementProps> = ({
                         className="bg-slate-800/20 border border-slate-600/30 rounded-xl p-5 opacity-60 relative"
                       >
                         <div className="absolute inset-0 bg-black/20 rounded-xl" />
-                        
+
                         <div className="relative">
                           <div className="flex items-start justify-between mb-3">
                             <div className="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center">
@@ -654,7 +701,7 @@ const ChallengeManagement: React.FC<ChallengeManagementProps> = ({
                           </div>
 
                           <h4 className="font-semibold text-slate-300 mb-2">{challenge.title}</h4>
-                          
+
                           <div className="text-xs text-slate-400 mb-3">
                             Prerequisites: {challenge.prerequisites.join(', ') || 'None'}
                           </div>
@@ -675,7 +722,9 @@ const ChallengeManagement: React.FC<ChallengeManagementProps> = ({
               <div className="text-center py-12">
                 <Trophy className="w-16 h-16 text-slate-400 mx-auto mb-4 opacity-50" />
                 <h3 className="text-lg font-medium text-slate-300 mb-2">No challenges found</h3>
-                <p className="text-sm text-slate-400">Try adjusting your filters to see more challenges.</p>
+                <p className="text-sm text-slate-400">
+                  Try adjusting your filters to see more challenges.
+                </p>
               </div>
             )}
           </div>

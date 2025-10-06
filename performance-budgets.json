@@ -105,7 +105,7 @@
     },
     {
       "auditId": "first-input-delay",
-      "level": "error", 
+      "level": "error",
       "options": {
         "maxNumericValue": 100
       }
@@ -157,7 +157,7 @@
       "level": "warn"
     },
     {
-      "auditId": "uses-webp-images", 
+      "auditId": "uses-webp-images",
       "level": "warn"
     },
     {

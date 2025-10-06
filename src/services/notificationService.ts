@@ -149,7 +149,7 @@ class NotificationService {
    */
   async setUserPreferences(
     userId: string,
-    preferences: Partial<NotificationPreference>,
+    preferences: Partial<NotificationPreference>
   ): Promise<void> {
     const currentPrefs = this.preferences.get(userId) || {
       userId,
@@ -184,7 +184,7 @@ class NotificationService {
     templateId: string,
     data: Record<string, unknown>,
     priority: ScheduledNotification['priority'] = 'medium',
-    customChannels?: string[],
+    customChannels?: string[]
   ): Promise<string> {
     const notificationId = uuidv4();
     const template = this.templates.get(templateId);
@@ -227,7 +227,7 @@ class NotificationService {
     templateId: string,
     scheduledTime: Date,
     data: Record<string, unknown>,
-    priority: ScheduledNotification['priority'] = 'medium',
+    priority: ScheduledNotification['priority'] = 'medium'
   ): Promise<string> {
     const notificationId = uuidv4();
     const template = this.templates.get(templateId);
@@ -268,11 +268,11 @@ class NotificationService {
       location: string;
       type: string;
     },
-    reminderMinutes: number = 60,
+    reminderMinutes: number = 60
   ): Promise<void> {
     const scheduledTime = new Date(
       new Date(`${trainingDetails.date} ${trainingDetails.time}`).getTime() -
-        reminderMinutes * 60 * 1000,
+        reminderMinutes * 60 * 1000
     );
 
     await this.scheduleNotification(
@@ -287,7 +287,7 @@ class NotificationService {
         trainingLocation: trainingDetails.location,
         minutesUntil: reminderMinutes,
       },
-      'medium',
+      'medium'
     );
   }
 
@@ -304,7 +304,7 @@ class NotificationService {
       isHome: boolean;
     },
     playerIds: string[],
-    notificationTimes: number[] = [180, 60, 30], // 3 hours, 1 hour, 30 minutes
+    notificationTimes: number[] = [180, 60, 30] // 3 hours, 1 hour, 30 minutes
   ): Promise<void> {
     const matchDateTime = new Date(`${matchDetails.date} ${matchDetails.time}`);
 
@@ -324,7 +324,7 @@ class NotificationService {
             homeAway: matchDetails.isHome ? 'Home' : 'Away',
             minutesUntil: minutes,
           },
-          'high',
+          'high'
         );
       }
     }
@@ -340,7 +340,7 @@ class NotificationService {
       severity: string;
       expectedReturn?: string;
       treatment: string;
-    },
+    }
   ): Promise<void> {
     await this.sendNotification(
       playerId,
@@ -351,7 +351,7 @@ class NotificationService {
         expectedReturn: injuryUpdate.expectedReturn,
         treatment: injuryUpdate.treatment,
       },
-      'high',
+      'high'
     );
 
     // Also notify coaches and medical staff
@@ -365,7 +365,7 @@ class NotificationService {
     userIds: string[],
     templateId: string,
     data: Record<string, unknown>,
-    staggerMinutes: number = 0,
+    staggerMinutes: number = 0
   ): Promise<string[]> {
     const notificationIds: string[] = [];
 
@@ -379,7 +379,7 @@ class NotificationService {
         templateId,
         scheduledTime,
         data,
-        'medium',
+        'medium'
       );
 
       notificationIds.push(notificationId);
@@ -441,7 +441,7 @@ class NotificationService {
 
   // Event listener setters
   onNotificationSent(
-    callback: (notification: ScheduledNotification, success: boolean) => void,
+    callback: (notification: ScheduledNotification, success: boolean) => void
   ): void {
     this.onNotificationSentCallback = callback;
   }
@@ -483,7 +483,7 @@ class NotificationService {
           () => {
             this.processNotification(notification);
           },
-          Math.pow(2, notification.attempts) * 1000,
+          Math.pow(2, notification.attempts) * 1000
         );
       } else {
         notification.status = 'failed';
@@ -498,7 +498,7 @@ class NotificationService {
   private async sendToChannel(
     channelId: string,
     userId: string,
-    content: { subject: string; content: string },
+    content: { subject: string; content: string }
   ): Promise<void> {
     const channel = this.channels.get(channelId);
     if (!channel || !channel.isEnabled) {
@@ -533,7 +533,8 @@ class NotificationService {
 
       this.recordDelivery(deliveryId, channelId, 'sent', {});
       channel.currentUsage++;
-    } catch (_error) {
+    } catch (err) {
+      const error = err instanceof Error ? err : new Error('Unknown error');
       this.recordDelivery(deliveryId, channelId, 'failed', { error: error.message });
       throw error;
     }
@@ -542,7 +543,7 @@ class NotificationService {
   private async sendEmail(
     channel: NotificationChannel,
     userId: string,
-    content: { subject: string; content: string },
+    content: { subject: string; content: string }
   ): Promise<void> {
     // Implementation would use actual email service (SendGrid, AWS SES, etc.)
     // // // // console.log(`📧 Sending email to ${userId}: ${content.subject}`);
@@ -554,7 +555,7 @@ class NotificationService {
   private async sendSMS(
     channel: NotificationChannel,
     userId: string,
-    content: { subject: string; content: string },
+    content: { subject: string; content: string }
   ): Promise<void> {
     // Implementation would use SMS service (Twilio, AWS SNS, etc.)
     // // // // console.log(`📱 Sending SMS to ${userId}: ${content.content}`);
@@ -566,7 +567,7 @@ class NotificationService {
   private async sendPushNotification(
     channel: NotificationChannel,
     userId: string,
-    content: { subject: string; content: string },
+    content: { subject: string; content: string }
   ): Promise<void> {
     // Implementation would use push service (FCM, APNs, etc.)
     // // // // console.log(`🔔 Sending push notification to ${userId}: ${content.subject}`);
@@ -578,10 +579,16 @@ class NotificationService {
   private async sendWebhook(
     channel: NotificationChannel,
     userId: string,
-    content: { subject: string; content: string },
+    content: { subject: string; content: string }
   ): Promise<void> {
+    const url = typeof channel.config.url === 'string' ? channel.config.url : '';
+    const headers =
+      typeof channel.config.headers === 'object' && channel.config.headers !== null
+        ? (channel.config.headers as Record<string, string>)
+        : {};
+
     await axios.post(
-      channel.config.url,
+      url,
       {
         userId,
         subject: content.subject,
@@ -591,15 +598,15 @@ class NotificationService {
       {
         headers: {
           'Content-Type': 'application/json',
-          ...(channel.config.headers || {}),
+          ...headers,
         },
-      },
+      }
     );
   }
 
   private processTemplate(
     template: NotificationTemplate,
-    data: Record<string, unknown>,
+    data: Record<string, unknown>
   ): { subject: string; content: string } {
     let subject = template.subject;
     let content = template.content;
@@ -607,8 +614,9 @@ class NotificationService {
     // Replace template variables
     Object.entries(data).forEach(([key, value]) => {
       const placeholder = `{{${key}}}`;
-      subject = subject.replace(new RegExp(placeholder, 'g'), String(value));
-      content = content.replace(new RegExp(placeholder, 'g'), String(value));
+      const stringValue = typeof value === 'string' ? value : String(value ?? '');
+      subject = subject.replace(new RegExp(placeholder, 'g'), stringValue);
+      content = content.replace(new RegExp(placeholder, 'g'), stringValue);
     });
 
     return { subject, content };
@@ -678,7 +686,7 @@ class NotificationService {
     deliveryId: string,
     channelId: string,
     status: NotificationDelivery['status'],
-    metadata: Record<string, unknown>,
+    metadata: Record<string, unknown>
   ): void {
     const delivery: NotificationDelivery = {
       id: deliveryId,

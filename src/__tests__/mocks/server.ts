@@ -1,47 +1,64 @@
 import { setupServer } from 'msw/node';
-import { rest } from 'msw';
+import { http, HttpResponse } from 'msw';
 import {
   generateFormation,
-  generatePlayer,
   generateChallenge,
   generateCollaborationSession,
   generateAnalyticsData,
   generateHeatMapData,
 } from '../utils/mock-generators';
-import type { Formation, Player, Challenge } from '../../types';
+
+type MockEntity = Record<string, unknown> & { id: string };
+type MockPlayer = MockEntity;
+type MockFormation = MockEntity & { players?: MockPlayer[] };
+type MockChallenge = MockEntity;
 
 /**
  * MSW (Mock Service Worker) server for API mocking
  * Provides realistic API responses for testing
  */
 
+// Utility helpers
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const getSearchParams = (request: { url: string }) => new URL(request.url).searchParams;
+const toParamString = (value: string | readonly string[] | undefined): string => {
+  if (Array.isArray(value)) {
+    return value[0] ?? '';
+  }
+
+  if (typeof value === 'string') {
+    return value;
+  }
+
+  return '';
+};
+
 // Mock data stores
-const mockFormations = new Map<string, Formation>();
-const mockPlayers = new Map<string, Player>();
-const mockChallenges = new Map<string, Challenge>();
+const mockFormations = new Map<string, MockFormation>();
+const mockPlayers = new Map<string, MockPlayer>();
+const mockChallenges = new Map<string, MockChallenge>();
 
 // Initialize with some default data
 for (let i = 0; i < 5; i++) {
-  const formation = generateFormation();
+  const formation = generateFormation() as unknown as MockFormation;
   mockFormations.set(formation.id, formation);
-  
-  formation.players.forEach(player => {
+
+  formation.players?.forEach(player => {
     mockPlayers.set(player.id, player);
   });
 }
 
 for (let i = 0; i < 10; i++) {
-  const challenge = generateChallenge();
+  const challenge = generateChallenge() as unknown as MockChallenge;
   mockChallenges.set(challenge.id, challenge);
 }
 
 // API handlers
 export const handlers = [
   // Authentication endpoints
-  rest.post('/api/auth/login', (req, res, ctx) => {
-    return res(
-      ctx.status(200),
-      ctx.json({
+  http.post('/api/auth/login', async () => {
+    return HttpResponse.json(
+      {
         token: 'mock-jwt-token',
         user: {
           id: 'user-1',
@@ -50,332 +67,332 @@ export const handlers = [
           role: 'user',
         },
         expiresIn: 3600,
-      })
+      },
+      { status: 200 }
     );
   }),
 
-  rest.post('/api/auth/logout', (req, res, ctx) => {
-    return res(ctx.status(200), ctx.json({ success: true }));
+  http.post('/api/auth/logout', async () => {
+    return HttpResponse.json({ success: true }, { status: 200 });
   }),
 
-  rest.get('/api/auth/me', (req, res, ctx) => {
-    const authHeader = req.headers.get('Authorization');
+  http.get('/api/auth/me', async ({ request }) => {
+    const authHeader = request.headers.get('Authorization');
     if (!authHeader || !authHeader.includes('Bearer')) {
-      return res(ctx.status(401), ctx.json({ error: 'Unauthorized' }));
+      return HttpResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    return res(
-      ctx.status(200),
-      ctx.json({
+    return HttpResponse.json(
+      {
         id: 'user-1',
         email: 'test@example.com',
         name: 'Test User',
         role: 'user',
-      })
+      },
+      { status: 200 }
     );
   }),
 
   // Formation endpoints
-  rest.get('/api/formations', (req, res, ctx) => {
-    const page = parseInt(req.url.searchParams.get('page') || '1');
-    const limit = parseInt(req.url.searchParams.get('limit') || '10');
-    const search = req.url.searchParams.get('search');
-    
+  http.get('/api/formations', async ({ request }) => {
+    const searchParams = getSearchParams(request);
+    const page = Number.parseInt(searchParams.get('page') ?? '1', 10);
+    const limit = Number.parseInt(searchParams.get('limit') ?? '10', 10);
+    const search = searchParams.get('search');
+
     let formations = Array.from(mockFormations.values());
-    
-    // Apply search filter
+
     if (search) {
-      formations = formations.filter(f => 
-        f.name.toLowerCase().includes(search.toLowerCase()) ||
-        f.description.toLowerCase().includes(search.toLowerCase())
-      );
+      const lowered = search.toLowerCase();
+      formations = formations.filter(formation => {
+        const name = typeof formation.name === 'string' ? formation.name : '';
+        const description = typeof formation.description === 'string' ? formation.description : '';
+        return name.toLowerCase().includes(lowered) || description.toLowerCase().includes(lowered);
+      });
     }
-    
-    // Apply pagination
+
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
     const paginatedFormations = formations.slice(startIndex, endIndex);
-    
-    return res(
-      ctx.status(200),
-      ctx.json({
+
+    return HttpResponse.json(
+      {
         formations: paginatedFormations,
         total: formations.length,
         page,
         limit,
         totalPages: Math.ceil(formations.length / limit),
-      })
+      },
+      { status: 200 }
     );
   }),
 
-  rest.get('/api/formations/:id', (req, res, ctx) => {
-    const { id } = req.params;
-    const formation = mockFormations.get(id as string);
-    
+  http.get('/api/formations/:id', async ({ params }) => {
+    const formationId = toParamString(params.id);
+    const formation = mockFormations.get(formationId);
+
     if (!formation) {
-      return res(ctx.status(404), ctx.json({ error: 'Formation not found' }));
+      return HttpResponse.json({ error: 'Formation not found' }, { status: 404 });
     }
-    
-    return res(ctx.status(200), ctx.json(formation));
+
+    return HttpResponse.json(formation, { status: 200 });
   }),
 
-  rest.post('/api/formations', async (req, res, ctx) => {
-    const formationData = await req.json();
-    const formation = {
-      ...generateFormation(),
+  http.post('/api/formations', async ({ request }) => {
+    const formationData = (await request.json()) as Record<string, unknown>;
+    const formation: MockFormation = {
+      ...(generateFormation() as unknown as MockFormation),
       ...formationData,
       id: `formation-${Date.now()}`,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    
+
     mockFormations.set(formation.id, formation);
-    
-    return res(ctx.status(201), ctx.json(formation));
+
+    return HttpResponse.json(formation, { status: 201 });
   }),
 
-  rest.put('/api/formations/:id', async (req, res, ctx) => {
-    const { id } = req.params;
-    const updates = await req.json();
-    const existingFormation = mockFormations.get(id as string);
-    
+  http.put('/api/formations/:id', async ({ request, params }) => {
+    const formationId = toParamString(params.id);
+    const existingFormation = mockFormations.get(formationId);
+
     if (!existingFormation) {
-      return res(ctx.status(404), ctx.json({ error: 'Formation not found' }));
+      return HttpResponse.json({ error: 'Formation not found' }, { status: 404 });
     }
-    
-    const updatedFormation = {
+
+    const updates = (await request.json()) as Record<string, unknown>;
+    const updatedFormation: MockFormation = {
       ...existingFormation,
       ...updates,
       updatedAt: new Date().toISOString(),
     };
-    
-    mockFormations.set(id as string, updatedFormation);
-    
-    return res(ctx.status(200), ctx.json(updatedFormation));
+
+    mockFormations.set(formationId, updatedFormation);
+
+    return HttpResponse.json(updatedFormation, { status: 200 });
   }),
 
-  rest.delete('/api/formations/:id', (req, res, ctx) => {
-    const { id } = req.params;
-    
-    if (!mockFormations.has(id as string)) {
-      return res(ctx.status(404), ctx.json({ error: 'Formation not found' }));
+  http.delete('/api/formations/:id', async ({ params }) => {
+    const formationId = toParamString(params.id);
+
+    if (!mockFormations.has(formationId)) {
+      return HttpResponse.json({ error: 'Formation not found' }, { status: 404 });
     }
-    
-    mockFormations.delete(id as string);
-    
-    return res(ctx.status(200), ctx.json({ success: true }));
+
+    mockFormations.delete(formationId);
+
+    return HttpResponse.json({ success: true }, { status: 200 });
   }),
 
   // Player endpoints
-  rest.get('/api/players', (req, res, ctx) => {
-    const position = req.url.searchParams.get('position');
-    const team = req.url.searchParams.get('team');
-    
+  http.get('/api/players', async ({ request }) => {
+    const searchParams = getSearchParams(request);
+    const position = searchParams.get('position');
+    const team = searchParams.get('team');
+
     let players = Array.from(mockPlayers.values());
-    
+
     if (position) {
-      players = players.filter(p => p.position === position);
+      players = players.filter(player => player.position === position);
     }
-    
+
     if (team) {
-      players = players.filter(p => p.team === team);
+      players = players.filter(player => player.team === team);
     }
-    
-    return res(ctx.status(200), ctx.json(players));
+
+    return HttpResponse.json(players, { status: 200 });
   }),
 
-  rest.get('/api/players/:id', (req, res, ctx) => {
-    const { id } = req.params;
-    const player = mockPlayers.get(id as string);
-    
+  http.get('/api/players/:id', async ({ params }) => {
+    const playerId = toParamString(params.id);
+    const player = mockPlayers.get(playerId);
+
     if (!player) {
-      return res(ctx.status(404), ctx.json({ error: 'Player not found' }));
+      return HttpResponse.json({ error: 'Player not found' }, { status: 404 });
     }
-    
-    return res(ctx.status(200), ctx.json(player));
+
+    return HttpResponse.json(player, { status: 200 });
   }),
 
-  rest.put('/api/players/:id', async (req, res, ctx) => {
-    const { id } = req.params;
-    const updates = await req.json();
-    const existingPlayer = mockPlayers.get(id as string);
-    
+  http.put('/api/players/:id', async ({ request, params }) => {
+    const playerId = toParamString(params.id);
+    const existingPlayer = mockPlayers.get(playerId);
+
     if (!existingPlayer) {
-      return res(ctx.status(404), ctx.json({ error: 'Player not found' }));
+      return HttpResponse.json({ error: 'Player not found' }, { status: 404 });
     }
-    
-    const updatedPlayer = { ...existingPlayer, ...updates };
-    mockPlayers.set(id as string, updatedPlayer);
-    
-    return res(ctx.status(200), ctx.json(updatedPlayer));
+
+    const updates = (await request.json()) as Record<string, unknown>;
+    const updatedPlayer: MockPlayer = { ...existingPlayer, ...updates };
+    mockPlayers.set(playerId, updatedPlayer);
+
+    return HttpResponse.json(updatedPlayer, { status: 200 });
   }),
 
   // Challenge endpoints
-  rest.get('/api/challenges', (req, res, ctx) => {
-    const type = req.url.searchParams.get('type');
-    const difficulty = req.url.searchParams.get('difficulty');
-    const completed = req.url.searchParams.get('completed');
-    
+  http.get('/api/challenges', async ({ request }) => {
+    const searchParams = getSearchParams(request);
+    const type = searchParams.get('type');
+    const difficulty = searchParams.get('difficulty');
+    const completed = searchParams.get('completed');
+
     let challenges = Array.from(mockChallenges.values());
-    
+
     if (type) {
-      challenges = challenges.filter(c => c.type === type);
+      challenges = challenges.filter(challenge => challenge.type === type);
     }
-    
+
     if (difficulty) {
-      challenges = challenges.filter(c => c.difficulty === difficulty);
+      challenges = challenges.filter(challenge => challenge.difficulty === difficulty);
     }
-    
+
     if (completed !== null) {
-      challenges = challenges.filter(c => c.isCompleted === (completed === 'true'));
+      const shouldBeCompleted = completed === 'true';
+      challenges = challenges.filter(challenge => challenge.isCompleted === shouldBeCompleted);
     }
-    
-    return res(ctx.status(200), ctx.json(challenges));
+
+    return HttpResponse.json(challenges, { status: 200 });
   }),
 
-  rest.get('/api/challenges/:id', (req, res, ctx) => {
-    const { id } = req.params;
-    const challenge = mockChallenges.get(id as string);
-    
+  http.get('/api/challenges/:id', async ({ params }) => {
+    const challengeId = toParamString(params.id);
+    const challenge = mockChallenges.get(challengeId);
+
     if (!challenge) {
-      return res(ctx.status(404), ctx.json({ error: 'Challenge not found' }));
+      return HttpResponse.json({ error: 'Challenge not found' }, { status: 404 });
     }
-    
-    return res(ctx.status(200), ctx.json(challenge));
+
+    return HttpResponse.json(challenge, { status: 200 });
   }),
 
-  rest.post('/api/challenges/:id/complete', async (req, res, ctx) => {
-    const { id } = req.params;
-    const challenge = mockChallenges.get(id as string);
-    
+  http.post('/api/challenges/:id/complete', async ({ params }) => {
+    const challengeId = toParamString(params.id);
+    const challenge = mockChallenges.get(challengeId);
+
     if (!challenge) {
-      return res(ctx.status(404), ctx.json({ error: 'Challenge not found' }));
+      return HttpResponse.json({ error: 'Challenge not found' }, { status: 404 });
     }
-    
-    const completedChallenge = {
+
+    const completedChallenge: MockChallenge = {
       ...challenge,
       isCompleted: true,
       completedAt: new Date().toISOString(),
       progress: 100,
     };
-    
-    mockChallenges.set(id as string, completedChallenge);
-    
-    return res(ctx.status(200), ctx.json(completedChallenge));
+
+    mockChallenges.set(challengeId, completedChallenge);
+
+    return HttpResponse.json(completedChallenge, { status: 200 });
   }),
 
   // Analytics endpoints
-  rest.get('/api/analytics/formation/:id', (req, res, ctx) => {
-    const { id } = req.params;
-    const formation = mockFormations.get(id as string);
-    
+  http.get('/api/analytics/formation/:id', async ({ params }) => {
+    const formationId = toParamString(params.id);
+    const formation = mockFormations.get(formationId);
+
     if (!formation) {
-      return res(ctx.status(404), ctx.json({ error: 'Formation not found' }));
+      return HttpResponse.json({ error: 'Formation not found' }, { status: 404 });
     }
-    
+
     const analytics = generateAnalyticsData();
-    
-    return res(ctx.status(200), ctx.json(analytics));
+    return HttpResponse.json(analytics, { status: 200 });
   }),
 
-  rest.get('/api/analytics/heatmap/:playerId', (req, res, ctx) => {
-    const { playerId } = req.params;
-    const player = mockPlayers.get(playerId as string);
-    
+  http.get('/api/analytics/heatmap/:playerId', async ({ params }) => {
+    const playerId = toParamString(params.playerId);
+    const player = mockPlayers.get(playerId);
+
     if (!player) {
-      return res(ctx.status(404), ctx.json({ error: 'Player not found' }));
+      return HttpResponse.json({ error: 'Player not found' }, { status: 404 });
     }
-    
-    const heatMapData = generateHeatMapData([player]);
-    
-    return res(ctx.status(200), ctx.json(heatMapData));
+
+    const heatMapData = generateHeatMapData([player as any]);
+    return HttpResponse.json(heatMapData, { status: 200 });
   }),
 
   // Collaboration endpoints
-  rest.get('/api/collaboration/sessions', (req, res, ctx) => {
+  http.get('/api/collaboration/sessions', async () => {
     const sessions = Array.from({ length: 3 }, () => generateCollaborationSession());
-    
-    return res(ctx.status(200), ctx.json(sessions));
+    return HttpResponse.json(sessions, { status: 200 });
   }),
 
-  rest.post('/api/collaboration/sessions', async (req, res, ctx) => {
-    const sessionData = await req.json();
+  http.post('/api/collaboration/sessions', async ({ request }) => {
+    const sessionData = (await request.json()) as Record<string, unknown>;
     const session = {
       ...generateCollaborationSession(),
       ...sessionData,
       id: `session-${Date.now()}`,
     };
-    
-    return res(ctx.status(201), ctx.json(session));
+
+    return HttpResponse.json(session, { status: 201 });
   }),
 
   // Export/Import endpoints
-  rest.post('/api/export/formation/:id', async (req, res, ctx) => {
-    const { id } = req.params;
-    const { format } = await req.json();
-    const formation = mockFormations.get(id as string);
-    
+  http.post('/api/export/formation/:id', async ({ request, params }) => {
+    const formationId = toParamString(params.id);
+    const formation = mockFormations.get(formationId);
+
     if (!formation) {
-      return res(ctx.status(404), ctx.json({ error: 'Formation not found' }));
+      return HttpResponse.json({ error: 'Formation not found' }, { status: 404 });
     }
-    
-    // Simulate export processing time
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
+
+    const { format } = (await request.json()) as { format: string };
+
+    await sleep(1000);
+
     const exportData = {
-      url: `https://example.com/exports/${id}.${format}`,
-      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24 hours
+      url: `https://example.com/exports/${formationId}.${format}`,
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
     };
-    
-    return res(ctx.status(200), ctx.json(exportData));
+
+    return HttpResponse.json(exportData, { status: 200 });
   }),
 
-  rest.post('/api/import/formation', async (req, res, ctx) => {
-    const formData = await req.json();
-    
-    // Simulate import processing
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    const importedFormation = generateFormation({
-      name: `Imported ${formData.name || 'Formation'}`,
+  http.post('/api/import/formation', async ({ request }) => {
+    const formData = (await request.json()) as Record<string, unknown> & { name?: string };
+
+    await sleep(2000);
+
+    const baseFormation = generateFormation() as unknown as MockFormation;
+    const importedFormation: MockFormation = {
+      ...baseFormation,
+      name: `Imported ${formData.name ?? 'Formation'}`,
       description: 'Imported formation',
-    });
-    
+    };
+
     mockFormations.set(importedFormation.id, importedFormation);
-    
-    return res(ctx.status(201), ctx.json(importedFormation));
+
+    return HttpResponse.json(importedFormation, { status: 201 });
   }),
 
-  // Error simulation endpoints for testing error handling
-  rest.get('/api/test/error/:statusCode', (req, res, ctx) => {
-    const statusCode = parseInt(req.params.statusCode as string);
-    
-    return res(
-      ctx.status(statusCode),
-      ctx.json({ error: `Test error with status ${statusCode}` })
+  // Error simulation endpoints
+  http.get('/api/test/error/:statusCode', async ({ params }) => {
+    const statusCode = Number.parseInt(toParamString(params.statusCode) || '500', 10);
+
+    return HttpResponse.json(
+      { error: `Test error with status ${statusCode}` },
+      { status: statusCode }
     );
   }),
 
-  rest.get('/api/test/timeout', (req, res, ctx) => {
-    // Simulate timeout by never responding
-    return new Promise(() => {});
+  http.get('/api/test/timeout', () => {
+    return new Promise<never>(() => {});
   }),
 
-  rest.get('/api/test/slow', async (req, res, ctx) => {
-    // Simulate slow response
-    await new Promise(resolve => setTimeout(resolve, 5000));
-    
-    return res(ctx.status(200), ctx.json({ message: 'Slow response' }));
+  http.get('/api/test/slow', async () => {
+    await sleep(5000);
+    return HttpResponse.json({ message: 'Slow response' }, { status: 200 });
   }),
 
-  // WebSocket simulation for real-time features
-  rest.get('/api/ws/collaboration/:sessionId', (req, res, ctx) => {
-    return res(
-      ctx.status(200),
-      ctx.json({
-        url: `ws://localhost:3001/collaboration/${req.params.sessionId}`,
+  // WebSocket simulation
+  http.get('/api/ws/collaboration/:sessionId', async ({ params }) => {
+    return HttpResponse.json(
+      {
+        url: `ws://localhost:3001/collaboration/${toParamString(params.sessionId)}`,
         token: 'mock-ws-token',
-      })
+      },
+      { status: 200 }
     );
   }),
 ];
@@ -385,64 +402,57 @@ export const server = setupServer(...handlers);
 
 // Server utilities for tests
 export const serverUtils = {
-  // Add custom handlers for specific tests
-  addHandlers: (...handlers: any[]) => {
-    server.use(...handlers);
+  addHandlers: (...customHandlers: Parameters<typeof server.use>) => {
+    server.use(...customHandlers);
   },
-  
-  // Reset to default handlers
+
   resetHandlers: () => {
     server.resetHandlers(...handlers);
   },
-  
-  // Simulate network conditions
+
   simulateNetworkError: (path: string) => {
     server.use(
-      rest.get(path, (req, res, ctx) => {
-        return res.networkError('Network error');
+      http.get(path, async () => {
+        return HttpResponse.error();
       })
     );
   },
-  
+
   simulateServerError: (path: string, statusCode = 500) => {
     server.use(
-      rest.get(path, (req, res, ctx) => {
-        return res(
-          ctx.status(statusCode),
-          ctx.json({ error: 'Server error' })
-        );
+      http.get(path, async () => {
+        return HttpResponse.json({ error: 'Server error' }, { status: statusCode });
       })
     );
   },
-  
+
   simulateSlowResponse: (path: string, delay = 3000) => {
     server.use(
-      rest.get(path, async (req, res, ctx) => {
-        await new Promise(resolve => setTimeout(resolve, delay));
-        return res(ctx.status(200), ctx.json({ message: 'Delayed response' }));
+      http.get(path, async () => {
+        await sleep(delay);
+        return HttpResponse.json({ message: 'Delayed response' }, { status: 200 });
       })
     );
   },
-  
-  // Mock data utilities
-  addFormation: (formation: Formation) => {
+
+  addFormation: (formation: MockFormation) => {
     mockFormations.set(formation.id, formation);
   },
-  
-  addPlayer: (player: Player) => {
+
+  addPlayer: (player: MockPlayer) => {
     mockPlayers.set(player.id, player);
   },
-  
-  addChallenge: (challenge: Challenge) => {
+
+  addChallenge: (challenge: MockChallenge) => {
     mockChallenges.set(challenge.id, challenge);
   },
-  
+
   clearMockData: () => {
     mockFormations.clear();
     mockPlayers.clear();
     mockChallenges.clear();
   },
-  
+
   getMockData: () => ({
     formations: Array.from(mockFormations.values()),
     players: Array.from(mockPlayers.values()),

@@ -1,13 +1,13 @@
 /**
  * Guardian Secure Session Manager
- * 
+ *
  * Military-grade session management with advanced security features
  * Provides secure authentication, session handling, and threat detection
  */
 
 import { encryptData, decryptData, DataClassification, generateSecureToken } from './encryption';
 import { securityLogger } from './logging';
-import { UserRole } from './rbac';
+import type { UserRole } from '../types';
 
 export interface SecureSession {
   sessionId: string;
@@ -52,7 +52,7 @@ export enum SessionSecurityLevel {
   LOW = 'low',
   MEDIUM = 'medium',
   HIGH = 'high',
-  CRITICAL = 'critical'
+  CRITICAL = 'critical',
 }
 
 export enum SessionFlag {
@@ -62,7 +62,7 @@ export enum SessionFlag {
   UNUSUAL_LOCATION = 'unusual_location',
   ELEVATED_PRIVILEGES = 'elevated_privileges',
   EXPIRED_PASSWORD = 'expired_password',
-  REQUIRES_MFA = 'requires_mfa'
+  REQUIRES_MFA = 'requires_mfa',
 }
 
 export interface AuthenticationRequest {
@@ -145,7 +145,7 @@ export class GuardianSecureSessionManager {
           errors: ['Invalid authentication request'],
           warnings: [],
           requiresMFA: false,
-          securityFlags: []
+          securityFlags: [],
         };
       }
 
@@ -153,15 +153,15 @@ export class GuardianSecureSessionManager {
       if (await this.isRateLimited(request.ipAddress, request.email)) {
         securityLogger.warn('Authentication rate limit exceeded', {
           email: request.email,
-          ipAddress: request.ipAddress
+          ipAddress: request.ipAddress,
         });
-        
+
         return {
           success: false,
           errors: ['Too many authentication attempts. Please try again later.'],
           warnings: [],
           requiresMFA: false,
-          securityFlags: [SessionFlag.SUSPICIOUS_ACTIVITY]
+          securityFlags: [SessionFlag.SUSPICIOUS_ACTIVITY],
         };
       }
 
@@ -192,7 +192,7 @@ export class GuardianSecureSessionManager {
           errors: ['Invalid credentials'],
           warnings: [],
           requiresMFA: false,
-          securityFlags: [SessionFlag.SUSPICIOUS_ACTIVITY]
+          securityFlags: [SessionFlag.SUSPICIOUS_ACTIVITY],
         };
       }
 
@@ -205,7 +205,7 @@ export class GuardianSecureSessionManager {
           warnings: [],
           requiresMFA: true,
           securityFlags,
-          nextAction: 'mfa_required'
+          nextAction: 'mfa_required',
         };
       }
 
@@ -218,7 +218,7 @@ export class GuardianSecureSessionManager {
             errors: ['Invalid MFA token'],
             warnings: [],
             requiresMFA: true,
-            securityFlags
+            securityFlags,
           };
         }
       }
@@ -237,7 +237,13 @@ export class GuardianSecureSessionManager {
       const riskScore = this.calculateRiskScore(request, securityFlags, user);
 
       // Step 10: Create secure session
-      const session = await this.createSession(user, request, securityLevel, riskScore, securityFlags);
+      const session = await this.createSession(
+        user,
+        request,
+        securityLevel,
+        riskScore,
+        securityFlags
+      );
 
       // Step 11: Generate tokens
       const tokens = await this.generateTokens(session);
@@ -254,8 +260,8 @@ export class GuardianSecureSessionManager {
           securityLevel: session.securityLevel,
           riskScore: session.metadata.riskScore,
           mfaUsed: !!request.mfaToken,
-          deviceTrusted: deviceAnalysis.trusted
-        }
+          deviceTrusted: deviceAnalysis.trusted,
+        },
       });
 
       return {
@@ -267,15 +273,14 @@ export class GuardianSecureSessionManager {
         warnings,
         requiresMFA: false,
         securityFlags,
-        nextAction: 'complete'
+        nextAction: 'complete',
       };
-
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Authentication failed';
       securityLogger.error('Authentication error', {
         error: errorMessage,
         email: request.email,
-        ipAddress: request.ipAddress
+        ipAddress: request.ipAddress,
       });
 
       return {
@@ -283,7 +288,7 @@ export class GuardianSecureSessionManager {
         errors: [errorMessage],
         warnings: [],
         requiresMFA: false,
-        securityFlags: [SessionFlag.SUSPICIOUS_ACTIVITY]
+        securityFlags: [SessionFlag.SUSPICIOUS_ACTIVITY],
       };
     }
   }
@@ -297,13 +302,13 @@ export class GuardianSecureSessionManager {
 
     try {
       const session = this.sessions.get(sessionId);
-      
+
       if (!session) {
         return {
           valid: false,
           errors: ['Session not found'],
           requiresReauth: true,
-          securityFlags: []
+          securityFlags: [],
         };
       }
 
@@ -314,7 +319,7 @@ export class GuardianSecureSessionManager {
           valid: false,
           errors: ['Session expired'],
           requiresReauth: true,
-          securityFlags: []
+          securityFlags: [],
         };
       }
 
@@ -324,7 +329,7 @@ export class GuardianSecureSessionManager {
           valid: false,
           errors: ['Session is inactive'],
           requiresReauth: true,
-          securityFlags: []
+          securityFlags: [],
         };
       }
 
@@ -335,13 +340,13 @@ export class GuardianSecureSessionManager {
           sessionId,
           originalIP: session.ipAddress,
           currentIP: ipAddress,
-          userId: session.userId
+          userId: session.userId,
         });
       }
 
       // Update last accessed time
       session.lastAccessedAt = new Date().toISOString();
-      
+
       // Extend session if needed
       const timeUntilExpiry = new Date(session.expiresAt).getTime() - Date.now();
       if (timeUntilExpiry < this.SESSION_DURATION / 2) {
@@ -353,22 +358,21 @@ export class GuardianSecureSessionManager {
         session,
         errors: [],
         requiresReauth: false,
-        securityFlags
+        securityFlags,
       };
-
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Session validation failed';
       securityLogger.error('Session validation error', {
         error: errorMessage,
         sessionId,
-        ipAddress
+        ipAddress,
       });
 
       return {
         valid: false,
         errors: [errorMessage],
         requiresReauth: true,
-        securityFlags: [SessionFlag.SUSPICIOUS_ACTIVITY]
+        securityFlags: [SessionFlag.SUSPICIOUS_ACTIVITY],
       };
     }
   }
@@ -378,7 +382,7 @@ export class GuardianSecureSessionManager {
    */
   async terminateSession(sessionId: string): Promise<void> {
     const session = this.sessions.get(sessionId);
-    
+
     if (session) {
       session.isActive = false;
       this.sessions.delete(sessionId);
@@ -388,8 +392,8 @@ export class GuardianSecureSessionManager {
         metadata: {
           sessionId,
           terminatedAt: new Date().toISOString(),
-          sessionDuration: Date.now() - new Date(session.createdAt).getTime()
-        }
+          sessionDuration: Date.now() - new Date(session.createdAt).getTime(),
+        },
       });
     }
   }
@@ -410,8 +414,8 @@ export class GuardianSecureSessionManager {
       userId,
       metadata: {
         sessionsTerminated: userSessions.length,
-        terminatedAt: new Date().toISOString()
-      }
+        terminatedAt: new Date().toISOString(),
+      },
     });
   }
 
@@ -461,8 +465,8 @@ export class GuardianSecureSessionManager {
         deviceTrusted: await this.isDeviceTrusted(request.deviceFingerprint, user.id),
         concurrentSessions: this.getActiveSessionsForUser(user.id).length,
         accountLocked: false,
-        failedAttempts: 0
-      }
+        failedAttempts: 0,
+      },
     };
 
     this.sessions.set(sessionId, session);
@@ -482,19 +486,16 @@ export class GuardianSecureSessionManager {
       userRole: session.userRole,
       permissions: session.permissions,
       issuedAt: Date.now(),
-      expiresAt: new Date(session.expiresAt).getTime()
+      expiresAt: new Date(session.expiresAt).getTime(),
     };
 
-    const accessToken = encryptData(
-      JSON.stringify(tokenPayload),
-      DataClassification.CONFIDENTIAL
-    );
+    const accessToken = encryptData(JSON.stringify(tokenPayload), DataClassification.CONFIDENTIAL);
 
     const refreshTokenPayload = {
       sessionId: session.sessionId,
       userId: session.userId,
       issuedAt: Date.now(),
-      expiresAt: Date.now() + this.REFRESH_TOKEN_DURATION
+      expiresAt: Date.now() + this.REFRESH_TOKEN_DURATION,
     };
 
     const refreshToken = encryptData(
@@ -504,7 +505,7 @@ export class GuardianSecureSessionManager {
 
     return {
       accessToken: JSON.stringify(accessToken),
-      refreshToken: JSON.stringify(refreshToken)
+      refreshToken: JSON.stringify(refreshToken),
     };
   }
 
@@ -575,14 +576,14 @@ export class GuardianSecureSessionManager {
     email: string
   ): Promise<{ trusted: boolean; isNew: boolean }> {
     const existing = this.deviceFingerprints.get(fingerprint);
-    
+
     if (!existing) {
       return { trusted: false, isNew: true };
     }
 
-    return { 
-      trusted: existing.trusted, 
-      isNew: false 
+    return {
+      trusted: existing.trusted,
+      isNew: false,
     };
   }
 
@@ -614,7 +615,7 @@ export class GuardianSecureSessionManager {
         email,
         role: 'coach',
         teamId: 'team-456',
-        permissions: ['VIEW_FORMATIONS', 'EDIT_FORMATIONS']
+        permissions: ['VIEW_FORMATIONS', 'EDIT_FORMATIONS'],
       };
     }
     return null;
@@ -623,11 +624,17 @@ export class GuardianSecureSessionManager {
   /**
    * Check if MFA should be required
    */
-  private shouldRequireMFA(user: any, flags: SessionFlag[], request: AuthenticationRequest): boolean {
+  private shouldRequireMFA(
+    user: any,
+    flags: SessionFlag[],
+    request: AuthenticationRequest
+  ): boolean {
     // Require MFA for suspicious activities or high-privilege users
-    return flags.includes(SessionFlag.SUSPICIOUS_ACTIVITY) ||
-           flags.includes(SessionFlag.NEW_DEVICE) ||
-           user.role === 'coach';
+    return (
+      flags.includes(SessionFlag.SUSPICIOUS_ACTIVITY) ||
+      flags.includes(SessionFlag.NEW_DEVICE) ||
+      user.role === 'coach'
+    );
   }
 
   /**
@@ -656,7 +663,7 @@ export class GuardianSecureSessionManager {
     request: AuthenticationRequest
   ): Promise<void> {
     const existing = this.deviceFingerprints.get(fingerprint);
-    
+
     if (existing) {
       existing.lastSeen = new Date().toISOString();
     } else {
@@ -673,8 +680,8 @@ export class GuardianSecureSessionManager {
           version: 'unknown',
           language: 'unknown',
           timezone: 'unknown',
-          screenResolution: 'unknown'
-        }
+          screenResolution: 'unknown',
+        },
       });
     }
   }
@@ -694,7 +701,7 @@ export class GuardianSecureSessionManager {
     securityLogger.warn('Failed authentication attempt', {
       email,
       ipAddress,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 
@@ -718,7 +725,7 @@ export class GuardianSecureSessionManager {
     if (expiredSessions.length > 0) {
       securityLogger.info('Cleanup expired sessions', {
         count: expiredSessions.length,
-        sessionIds: expiredSessions
+        sessionIds: expiredSessions,
       });
     }
   }

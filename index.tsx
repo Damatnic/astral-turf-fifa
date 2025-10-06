@@ -7,6 +7,7 @@ import { AppProvider } from './src/context/AppProvider';
 import { HashRouter } from 'react-router-dom';
 import SecurityProvider from './src/components/security/SecurityProvider';
 import SecurityErrorBoundary from './src/components/security/SecurityErrorBoundary';
+import * as serviceWorkerRegistration from './src/utils/registerServiceWorker';
 
 // Vercel Analytics Integration
 import { Analytics } from '@vercel/analytics/react';
@@ -14,32 +15,23 @@ import { SpeedInsights } from '@vercel/speed-insights/react';
 
 // Enhanced UI styles now embedded in index.html inline
 
-// Performance optimizations
+// Performance optimizations - Use enhanced service worker registration
 function registerServiceWorker() {
-  if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
-    window.addEventListener('load', async () => {
-      try {
-        const registration = await navigator.serviceWorker.register('/sw.js');
+  if (process.env.NODE_ENV === 'production') {
+    serviceWorkerRegistration.register({
+      onSuccess: registration => {
         // eslint-disable-next-line no-console
         console.log('Service Worker registered successfully:', registration);
-
-        // Handle service worker updates
-        registration.addEventListener('updatefound', () => {
-          const newWorker = registration.installing;
-          if (newWorker) {
-            newWorker.addEventListener('statechange', () => {
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                // eslint-disable-next-line no-console
-                console.log('New service worker available, page will refresh');
-                window.location.reload();
-              }
-            });
-          }
-        });
-      } catch (error) {
+      },
+      onUpdate: registration => {
+        // eslint-disable-next-line no-console
+        console.log('New service worker available:', registration);
+        // The PWAUpdatePrompt component will handle showing the update UI
+      },
+      onError: error => {
         // eslint-disable-next-line no-console
         console.error('Service Worker registration failed:', error);
-      }
+      },
     });
   }
 }
@@ -89,5 +81,5 @@ root.render(
         </HashRouter>
       </SecurityProvider>
     </SecurityErrorBoundary>
-  </React.StrictMode>
+  </React.StrictMode>,
 );

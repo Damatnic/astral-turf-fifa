@@ -81,10 +81,10 @@ describe('rootReducer', () => {
       ui: createMockUIState(),
       auth: createMockAuthState(),
       franchise: {
-        relationships: [],
+        relationships: [] as any,
         budget: 1000000,
         expenses: [],
-        staff: [],
+        staff: [] as any,
         facilities: [],
         achievements: [],
         history: [],
@@ -97,7 +97,7 @@ describe('rootReducer', () => {
           standings: [],
         },
         gameWeek: 1,
-      },
+      } as any,
     };
   });
 
@@ -110,7 +110,7 @@ describe('rootReducer', () => {
 
       const action: Action = {
         type: 'LOAD_STATE',
-        payload: loadStatePayload,
+        payload: loadStatePayload as RootState,
       };
 
       const newState = rootReducer(initialState, action);
@@ -119,7 +119,7 @@ describe('rootReducer', () => {
       expect(newState.ui.theme).toBe('light');
       // Should preserve initial state structure
       expect(newState.ui).toEqual(
-        expect.objectContaining({ ...initialState.ui, ...loadStatePayload.ui }),
+        expect.objectContaining({ ...initialState.ui, ...loadStatePayload.ui })
       );
     });
 
@@ -396,7 +396,7 @@ describe('rootReducer', () => {
               age: 22,
               team: 'home',
               attributeDevelopmentProgress: {},
-              individualTrainingFocus: { attribute: 'speed' },
+              individualTrainingFocus: { attribute: 'speed', intensity: 'medium' } as any,
             },
           ],
         },

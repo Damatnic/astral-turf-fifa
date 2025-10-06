@@ -43,6 +43,6 @@ export const Legend = vi.fn();
 export const Filler = vi.fn();
 
 // Mock register function
-Chart.register = mockChart.register;
+(Chart as any).register = mockChart.register;
 
 export default mockChart;

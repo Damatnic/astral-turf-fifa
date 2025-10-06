@@ -19,21 +19,29 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, '.', '');
   const isProd = mode === 'production';
   const isVercel = env.VERCEL === '1' || process.env.VERCEL === '1';
-  
+
   return {
     plugins: [
       react({
         // Use SWC for faster compilation
-        jsxRuntime: 'automatic'
+        jsxRuntime: 'automatic',
       }),
-      ...(isProd ? [optimizeReactPlugin()] : [])
+      ...(isProd ? [optimizeReactPlugin()] : []),
     ],
     test: {
       globals: true,
       environment: 'jsdom',
       setupFiles: ['./src/__tests__/setup.ts'],
       include: ['src/**/*.{test,spec}.{js,ts,jsx,tsx}'],
-      exclude: ['node_modules', 'dist', '.git', '.cache', 'src/**/*.spec.ts', 'src/**/*e2e*', 'src/**/*E2E*'],
+      exclude: [
+        'node_modules',
+        'dist',
+        '.git',
+        '.cache',
+        'src/**/*.spec.ts',
+        'src/**/*e2e*',
+        'src/**/*E2E*',
+      ],
       coverage: {
         reporter: ['text', 'json', 'html'],
         exclude: ['node_modules/', 'src/__tests__/', 'dist/', '*.config.*'],
@@ -50,7 +58,7 @@ export default defineConfig(({ mode }) => {
         ...getSecurityHeaders(),
         // Additional development-specific headers
         'X-Powered-By': '', // Remove server fingerprinting
-        'Server': '', // Remove server information
+        Server: '', // Remove server information
         'X-DNS-Prefetch-Control': 'off',
         'X-Download-Options': 'noopen',
         'X-Permitted-Cross-Domain-Policies': 'none',
@@ -65,9 +73,9 @@ export default defineConfig(({ mode }) => {
           'gyroscope=()',
           'speaker=(self)',
           'fullscreen=(self)',
-          'autoplay=(self)'
-        ].join(', ')
-      }
+          'autoplay=(self)',
+        ].join(', '),
+      },
     },
     define: {
       'process.env.API_KEY': JSON.stringify(env.OPENAI_API_KEY || env.API_KEY),
@@ -76,9 +84,16 @@ export default defineConfig(({ mode }) => {
     },
     optimizeDeps: {
       include: [
-        'react', 'react-dom', 'react-router-dom', 'react/jsx-runtime',
-        'framer-motion', 'lucide-react', '@react-spring/web',
-        'chart.js', 'react-chartjs-2', 'axios'
+        'react',
+        'react-dom',
+        'react-router-dom',
+        'react/jsx-runtime',
+        'framer-motion',
+        'lucide-react',
+        '@react-spring/web',
+        'chart.js',
+        'react-chartjs-2',
+        'axios',
       ],
       exclude: ['@tauri-apps/api'], // Exclude Tauri APIs from optimization
       force: true,
@@ -91,10 +106,10 @@ export default defineConfig(({ mode }) => {
         minifySyntax: isProd,
         legalComments: 'none',
         keepNames: false,
-        platform: 'browser'
-      }
+        platform: 'browser',
+      },
     },
-    
+
     // Performance-focused resolve configuration
     resolve: {
       alias: {
@@ -104,10 +119,10 @@ export default defineConfig(({ mode }) => {
         '@utils': resolve(__dirname, 'src/utils'),
         '@types': resolve(__dirname, 'src/types'),
         '@services': resolve(__dirname, 'src/services'),
-        '@context': resolve(__dirname, 'src/context')
+        '@context': resolve(__dirname, 'src/context'),
       },
       extensions: ['.ts', '.tsx', '.js', '.jsx'], // Prioritize TypeScript
-      mainFields: ['module', 'jsnext:main', 'main'] // Prefer ES modules
+      mainFields: ['module', 'jsnext:main', 'main'], // Prefer ES modules
     },
     esbuild: {
       loader: 'tsx',
@@ -120,13 +135,13 @@ export default defineConfig(({ mode }) => {
       tsconfigRaw: {
         compilerOptions: {
           experimentalDecorators: true,
-          useDefineForClassFields: false
-        }
+          useDefineForClassFields: false,
+        },
       },
       drop: isProd ? ['console', 'debugger'] : [],
       pure: isProd ? ['console.log', 'console.warn', 'console.error'] : [],
       legalComments: 'none',
-      keepNames: false
+      keepNames: false,
     },
     build: {
       target: 'es2022', // Target newer ES for better optimization
@@ -134,40 +149,40 @@ export default defineConfig(({ mode }) => {
       minify: 'esbuild', // Use esbuild for fastest minification
       reportCompressedSize: !isVercel, // Skip gzip size analysis for Vercel builds
       chunkSizeWarningLimit: isVercel ? 500 : 100, // Relaxed limits for Vercel edge functions
-      
+
       // Ultra-aggressive asset optimization
       assetsInlineLimit: 4096, // Inline smaller assets (4KB) for fewer requests
       cssCodeSplit: true,
       cssMinify: 'esbuild',
-      
+
       // Catalyst-specific optimizations
       modulePreload: {
-        polyfill: false // Modern browsers only
+        polyfill: false, // Modern browsers only
       },
-      
+
       // Advanced compression
       terserOptions: {
         compress: {
           drop_console: isProd,
           drop_debugger: isProd,
           pure_funcs: isProd ? ['console.log', 'console.warn'] : [],
-          passes: 3
+          passes: 3,
         },
         mangle: {
-          safari10: true
+          safari10: true,
         },
         format: {
-          comments: false
-        }
+          comments: false,
+        },
       },
-      
+
       rollupOptions: {
         treeshake: {
           moduleSideEffects: false,
           propertyReadSideEffects: false,
-          unknownGlobalSideEffects: false
+          unknownGlobalSideEffects: false,
         },
-        external: (_id) => {
+        external: _id => {
           // Don't externalize React - keep it bundled to prevent context issues
           return false;
         },
@@ -176,242 +191,290 @@ export default defineConfig(({ mode }) => {
           entryFileNames: isProd ? 'js/[name]-[hash].js' : 'js/[name].js',
           chunkFileNames: isProd ? 'js/[name]-[hash].js' : 'js/[name].js',
           assetFileNames: isProd ? 'assets/[name]-[hash].[ext]' : 'assets/[name].[ext]',
-          
+
           // Ultra-aggressive manual chunking for Catalyst performance
-          manualChunks: (id) => {
+          manualChunks: id => {
             // CRITICAL PATH - Priority 1 (sub-100KB chunks)
-            if (id.includes('react') && !id.includes('router') && !id.includes('spring') && !id.includes('aria')) {
+            if (
+              id.includes('react') &&
+              !id.includes('router') &&
+              !id.includes('spring') &&
+              !id.includes('aria')
+            ) {
               return 'react-core';
             }
-            
+
             // Performance utilities - Critical
-            if (id.includes('performanceOptimizations') || 
-                id.includes('cachingOptimizations') ||
-                id.includes('animationOptimizations') ||
-                id.includes('lazyLoadingOptimizations')) {
+            if (
+              id.includes('performanceOptimizations') ||
+              id.includes('cachingOptimizations') ||
+              id.includes('animationOptimizations') ||
+              id.includes('lazyLoadingOptimizations')
+            ) {
               return 'performance-core';
             }
-            
+
             // Essential UI components - Critical
-            if (id.includes('UnifiedTacticsBoard') ||
-                id.includes('ModernField') ||
-                id.includes('PlayerToken') ||
-                id.includes('ContextualToolbar')) {
+            if (
+              id.includes('UnifiedTacticsBoard') ||
+              id.includes('ModernField') ||
+              id.includes('PlayerToken') ||
+              id.includes('ContextualToolbar')
+            ) {
               return 'tactics-essential';
             }
-            
+
             // Formation engine - Critical
-            if (id.includes('formationAutoAssignment') ||
-                id.includes('formationCalculationWorker') ||
-                id.includes('tacticsReducer')) {
+            if (
+              id.includes('formationAutoAssignment') ||
+              id.includes('formationCalculationWorker') ||
+              id.includes('tacticsReducer')
+            ) {
               return 'formation-engine';
             }
-            
+
             // PRIORITY 2 - High-performance features (sub-150KB)
-            
+
             // Advanced tactical components
-            if (id.includes('QuickActionsPanel') ||
-                id.includes('PlayerStatsOverlay') ||
-                id.includes('TacticalDrawingTools') ||
-                id.includes('PositioningModeToggle')) {
+            if (
+              id.includes('QuickActionsPanel') ||
+              id.includes('PlayerStatsOverlay') ||
+              id.includes('TacticalDrawingTools') ||
+              id.includes('PositioningModeToggle')
+            ) {
               return 'tactics-advanced';
             }
-            
+
             // Canvas and rendering
-            if (id.includes('DrawingCanvas') ||
-                id.includes('CanvasRenderer') ||
-                id.includes('TacticalHeatMapCanvas') ||
-                id.includes('performance/CanvasRenderer')) {
+            if (
+              id.includes('DrawingCanvas') ||
+              id.includes('CanvasRenderer') ||
+              id.includes('TacticalHeatMapCanvas') ||
+              id.includes('performance/CanvasRenderer')
+            ) {
               return 'render-engine';
             }
-            
+
             // Analytics and visualization
-            if (id.includes('AdvancedAnalyticsDashboard') ||
-                id.includes('AdvancedMetricsRadar') ||
-                id.includes('HeatMapAnalytics') ||
-                id.includes('ChemistryVisualization')) {
+            if (
+              id.includes('AdvancedAnalyticsDashboard') ||
+              id.includes('AdvancedMetricsRadar') ||
+              id.includes('HeatMapAnalytics') ||
+              id.includes('ChemistryVisualization')
+            ) {
               return 'analytics-core';
             }
-            
+
             // Animation system
-            if (id.includes('framer-motion') ||
-                id.includes('@react-spring') ||
-                id.includes('AnimationTimeline') ||
-                id.includes('AnimationSystem')) {
+            if (
+              id.includes('framer-motion') ||
+              id.includes('@react-spring') ||
+              id.includes('AnimationTimeline') ||
+              id.includes('AnimationSystem')
+            ) {
               return 'animations';
             }
-            
+
             // PRIORITY 3 - Feature modules (lazy-loaded)
-            
+
             // Chart libraries
-            if (id.includes('chart.js') ||
-                id.includes('react-chartjs') ||
-                id.includes('RadarChart') ||
-                id.includes('PerformanceChart')) {
+            if (
+              id.includes('chart.js') ||
+              id.includes('react-chartjs') ||
+              id.includes('RadarChart') ||
+              id.includes('PerformanceChart')
+            ) {
               return 'charts';
             }
-            
+
             // UI icons and assets
             if (id.includes('lucide-react')) {
               return 'ui-icons';
             }
-            
+
             // Collaboration features
-            if (id.includes('CollaborationFeatures') ||
-                id.includes('ChallengeManagement') ||
-                id.includes('ConflictResolutionMenu')) {
+            if (
+              id.includes('CollaborationFeatures') ||
+              id.includes('ChallengeManagement') ||
+              id.includes('ConflictResolutionMenu')
+            ) {
               return 'collaboration';
             }
-            
+
             // Export/Import features
-            if (id.includes('EnhancedExportImport') ||
-                id.includes('PrintableLineup') ||
-                id.includes('PresentationControls')) {
+            if (
+              id.includes('EnhancedExportImport') ||
+              id.includes('PrintableLineup') ||
+              id.includes('PresentationControls')
+            ) {
               return 'export-import';
             }
-            
+
             // Management features
-            if (id.includes('DugoutManagement') ||
-                id.includes('ExpandedPlayerCard') ||
-                id.includes('ChallengeCreator')) {
+            if (
+              id.includes('DugoutManagement') ||
+              id.includes('ExpandedPlayerCard') ||
+              id.includes('ChallengeCreator')
+            ) {
               return 'management';
             }
-            
+
             // PRIORITY 4 - External services (lazy-loaded)
-            
+
             // AI services
-            if (id.includes('openai') ||
-                id.includes('@google/genai') ||
-                id.includes('IntelligentAssistant')) {
+            if (
+              id.includes('openai') ||
+              id.includes('@google/genai') ||
+              id.includes('IntelligentAssistant')
+            ) {
               return 'ai-services';
             }
-            
+
             // Database and persistence
-            if (id.includes('@prisma/client') ||
-                id.includes('indexedDBOptimizations') ||
-                id.includes('dexie')) {
+            if (
+              id.includes('@prisma/client') ||
+              id.includes('indexedDBOptimizations') ||
+              id.includes('dexie')
+            ) {
               return 'data-layer';
             }
-            
+
             // Security and crypto
-            if (id.includes('crypto-js') ||
-                id.includes('bcryptjs') ||
-                id.includes('jsonwebtoken') ||
-                id.includes('jose')) {
+            if (
+              id.includes('crypto-js') ||
+              id.includes('bcryptjs') ||
+              id.includes('jsonwebtoken') ||
+              id.includes('jose')
+            ) {
               return 'security';
             }
-            
+
             // PRIORITY 5 - Utilities and libraries
-            
+
             // HTTP and validation
-            if (id.includes('axios') ||
-                id.includes('zod') ||
-                id.includes('joi') ||
-                id.includes('validator')) {
+            if (
+              id.includes('axios') ||
+              id.includes('zod') ||
+              id.includes('joi') ||
+              id.includes('validator')
+            ) {
               return 'utilities';
             }
-            
+
             // Router (separate for code splitting)
             if (id.includes('react-router')) {
               return 'router';
             }
-            
+
             // Accessibility
-            if (id.includes('react-aria') ||
-                id.includes('@react-aria')) {
+            if (id.includes('react-aria') || id.includes('@react-aria')) {
               return 'accessibility';
             }
-            
+
             // Internationalization
-            if (id.includes('i18next') ||
-                id.includes('react-i18next')) {
+            if (id.includes('i18next') || id.includes('react-i18next')) {
               return 'i18n';
             }
-            
+
             // Everything else in node_modules
             if (id.includes('node_modules')) {
               // Split large vendor packages
-              if (id.includes('node_modules/react-dom')) return 'react-dom';
-              if (id.includes('node_modules/winston')) return 'logging';
-              if (id.includes('node_modules/prisma')) return 'database-client';
-              
+              if (id.includes('node_modules/react-dom')) {
+                return 'react-dom';
+              }
+              if (id.includes('node_modules/winston')) {
+                return 'logging';
+              }
+              if (id.includes('node_modules/prisma')) {
+                return 'database-client';
+              }
+
               return 'vendor';
             }
-            
+
             // Application code fallback
             return 'app';
           },
-          
+
           // Optimize imports
           hoistTransitiveImports: false,
           generatedCode: {
             preset: 'es2015',
             arrowFunctions: true,
             constBindings: true,
-            objectShorthand: true
+            objectShorthand: true,
           },
-          
+
           // Reduce bundle size
-          compact: true
+          compact: true,
         },
-        
+
         // Optimize external dependencies
         onwarn(warning, warn) {
           // Suppress 'this' has been rewritten to 'undefined' warning
-          if (warning.code === 'THIS_IS_UNDEFINED') return;
+          if (warning.code === 'THIS_IS_UNDEFINED') {
+            return;
+          }
           warn(warning);
-        }
+        },
       },
-      
+
       // Performance optimizations
       commonjsOptions: {
         transformMixedEsModules: true,
         include: [/node_modules/],
-        exclude: [/node_modules\/@tauri-apps/]
+        exclude: [/node_modules\/@tauri-apps/],
       },
-      
+
       // Advanced build optimizations
       copyPublicDir: true,
       emptyOutDir: true,
-      
+
       // Catalyst-specific build pipeline
-      plugins: isProd ? [
-        // Additional production optimizations would go here
-      ] : [],
-      
+      plugins: isProd
+        ? [
+            // Additional production optimizations would go here
+          ]
+        : [],
+
       // Experimental features for better performance
       experimental: {
         renderBuiltUrl(filename: string) {
           return `/${filename}`;
-        }
-      }
+        },
+      },
     },
-    
+
     // Catalyst Performance Features
     experimental: {
-      hmrPartialAccept: true // Enable partial HMR for better dev performance
+      hmrPartialAccept: true, // Enable partial HMR for better dev performance
     },
-    
+
     // Advanced preview configuration with Guardian Security
     preview: {
       port: 8080,
       strictPort: true,
       host: true,
       cors: {
-        origin: ['http://localhost:3011', 'http://localhost:3012', 'http://127.0.0.1:3011', 'http://127.0.0.1:3012'],
+        origin: [
+          'http://localhost:3011',
+          'http://localhost:3012',
+          'http://127.0.0.1:3011',
+          'http://127.0.0.1:3012',
+        ],
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-        allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token', 'X-Requested-With']
+        allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token', 'X-Requested-With'],
       },
       headers: {
         // Guardian Enterprise Security Headers
         ...getSecurityHeaders(),
         // Production-optimized caching
         'Cache-Control': 'public, max-age=31536000, immutable',
-        'Vary': 'Accept-Encoding',
+        Vary: 'Accept-Encoding',
         // Security hardening
         'X-Powered-By': '',
-        'Server': '',
+        Server: '',
         'X-DNS-Prefetch-Control': 'off',
         'X-Download-Options': 'noopen',
         'X-Permitted-Cross-Domain-Policies': 'none',
@@ -428,25 +491,25 @@ export default defineConfig(({ mode }) => {
           'fullscreen=(self)',
           'autoplay=(self)',
           'encrypted-media=(self)',
-          'picture-in-picture=(self)'
+          'picture-in-picture=(self)',
         ].join(', '),
         // Additional security headers
         'Cross-Origin-Embedder-Policy': 'require-corp',
         'Cross-Origin-Opener-Policy': 'same-origin',
-        'Cross-Origin-Resource-Policy': 'same-origin'
-      }
+        'Cross-Origin-Resource-Policy': 'same-origin',
+      },
     },
-    
+
     // Worker configuration for better performance
     worker: {
       format: 'es',
-      plugins: () => [react()]
+      plugins: () => [react()],
     },
-    
+
     // JSON optimization
     json: {
       namedExports: true,
-      stringify: isProd
-    }
+      stringify: isProd,
+    },
   };
 });

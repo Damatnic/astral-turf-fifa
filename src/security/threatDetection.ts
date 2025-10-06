@@ -1,18 +1,22 @@
 /**
  * Guardian Threat Detection System
- * 
+ *
  * Advanced threat detection and security monitoring for tactical board system
  * Provides real-time threat analysis, anomaly detection, and automated response
  */
 
 import { securityLogger } from './logging';
-import { guardianComplianceFramework, DataCategory, ProcessingLawfulness } from './complianceFramework';
+import {
+  guardianComplianceFramework,
+  DataCategory,
+  ProcessingLawfulness,
+} from './complianceFramework';
 
 export enum ThreatLevel {
   LOW = 'low',
   MEDIUM = 'medium',
   HIGH = 'high',
-  CRITICAL = 'critical'
+  CRITICAL = 'critical',
 }
 
 export enum ThreatType {
@@ -27,7 +31,7 @@ export enum ThreatType {
   PRIVILEGE_ESCALATION = 'privilege_escalation',
   MALWARE = 'malware',
   DDOS = 'ddos',
-  SOCIAL_ENGINEERING = 'social_engineering'
+  SOCIAL_ENGINEERING = 'social_engineering',
 }
 
 export enum ResponseAction {
@@ -38,7 +42,7 @@ export enum ResponseAction {
   REQUIRE_MFA = 'require_mfa',
   TERMINATE_SESSION = 'terminate_session',
   ESCALATE = 'escalate',
-  QUARANTINE = 'quarantine'
+  QUARANTINE = 'quarantine',
 }
 
 export interface ThreatEvent {
@@ -161,7 +165,7 @@ export class GuardianThreatDetection {
     [ThreatLevel.LOW]: 0.3,
     [ThreatLevel.MEDIUM]: 0.5,
     [ThreatLevel.HIGH]: 0.7,
-    [ThreatLevel.CRITICAL]: 0.9
+    [ThreatLevel.CRITICAL]: 0.9,
   };
 
   constructor() {
@@ -212,11 +216,10 @@ export class GuardianThreatDetection {
       }
 
       return threats;
-
     } catch (error) {
       securityLogger.error('Threat analysis failed', {
         error: error instanceof Error ? error.message : 'Unknown error',
-        context
+        context,
       });
       return [];
     }
@@ -234,12 +237,13 @@ export class GuardianThreatDetection {
       /\bxp_\w+/i,
       /\bsp_\w+/i,
       /'.*'.*OR.*'.*'/i,
-      /\b(CONCAT|SUBSTRING|ASCII|CHAR)\s*\(/i
+      /\b(CONCAT|SUBSTRING|ASCII|CHAR)\s*\(/i,
     ];
 
-    const payload = JSON.stringify(context.payload || {}) + 
-                   (context.requestPath || '') + 
-                   JSON.stringify(context.headers || {});
+    const payload =
+      JSON.stringify(context.payload || {}) +
+      (context.requestPath || '') +
+      JSON.stringify(context.headers || {});
 
     const detectedPatterns = sqlPatterns.filter(pattern => pattern.test(payload));
 
@@ -257,7 +261,7 @@ export class GuardianThreatDetection {
           name: 'SQL_INJECTION_PATTERN',
           value: pattern.source,
           confidence,
-          severity: threatLevel
+          severity: threatLevel,
         })),
         confidence
       );
@@ -280,12 +284,13 @@ export class GuardianThreatDetection {
       /<embed\b[^<]*(?:(?!<\/embed>)<[^<]*)*<\/embed>/gi,
       /document\.cookie/gi,
       /document\.write/gi,
-      /eval\s*\(/gi
+      /eval\s*\(/gi,
     ];
 
-    const payload = JSON.stringify(context.payload || {}) + 
-                   (context.requestPath || '') + 
-                   JSON.stringify(context.headers || {});
+    const payload =
+      JSON.stringify(context.payload || {}) +
+      (context.requestPath || '') +
+      JSON.stringify(context.headers || {});
 
     const detectedPatterns = xssPatterns.filter(pattern => pattern.test(payload));
 
@@ -303,7 +308,7 @@ export class GuardianThreatDetection {
           name: 'XSS_PATTERN',
           value: pattern.source,
           confidence,
-          severity: threatLevel
+          severity: threatLevel,
         })),
         confidence
       );
@@ -321,7 +326,7 @@ export class GuardianThreatDetection {
     }
 
     const recentAttempts = await this.getRecentFailedAttempts(context.ipAddress, 300000); // 5 minutes
-    
+
     if (recentAttempts >= 10) {
       const confidence = Math.min(recentAttempts / 20, 1.0);
       const threatLevel = this.calculateThreatLevel(confidence);
@@ -331,13 +336,15 @@ export class GuardianThreatDetection {
         threatLevel,
         context,
         `Brute force attack detected: ${recentAttempts} failed attempts`,
-        [{
-          type: 'statistical',
-          name: 'FAILED_ATTEMPTS_COUNT',
-          value: recentAttempts,
-          confidence,
-          severity: threatLevel
-        }],
+        [
+          {
+            type: 'statistical',
+            name: 'FAILED_ATTEMPTS_COUNT',
+            value: recentAttempts,
+            confidence,
+            severity: threatLevel,
+          },
+        ],
         confidence
       );
     }
@@ -370,7 +377,7 @@ export class GuardianThreatDetection {
         name: 'UNUSUAL_LOGIN_TIME',
         value: currentHour,
         confidence: 0.6,
-        severity: ThreatLevel.MEDIUM
+        severity: ThreatLevel.MEDIUM,
       });
     }
 
@@ -381,7 +388,7 @@ export class GuardianThreatDetection {
         name: 'UNUSUAL_LOCATION',
         value: context.ipAddress,
         confidence: 0.7,
-        severity: ThreatLevel.HIGH
+        severity: ThreatLevel.HIGH,
       });
     }
 
@@ -393,7 +400,7 @@ export class GuardianThreatDetection {
         name: 'RAPID_ACTIONS',
         value: recentActions,
         confidence: 0.8,
-        severity: ThreatLevel.HIGH
+        severity: ThreatLevel.HIGH,
       });
     }
 
@@ -434,18 +441,19 @@ export class GuardianThreatDetection {
         name: 'EXCESSIVE_EXPORTS',
         value: recentExports,
         confidence: 0.7,
-        severity: ThreatLevel.HIGH
+        severity: ThreatLevel.HIGH,
       });
     }
 
     // Check for large data exports
-    if (exportSize > 10 * 1024 * 1024) { // 10MB
+    if (exportSize > 10 * 1024 * 1024) {
+      // 10MB
       indicators.push({
         type: 'statistical',
         name: 'LARGE_EXPORT',
         value: exportSize,
         confidence: 0.6,
-        severity: ThreatLevel.MEDIUM
+        severity: ThreatLevel.MEDIUM,
       });
     }
 
@@ -457,7 +465,7 @@ export class GuardianThreatDetection {
         name: 'AFTER_HOURS_EXPORT',
         value: hour,
         confidence: 0.5,
-        severity: ThreatLevel.MEDIUM
+        severity: ThreatLevel.MEDIUM,
       });
     }
 
@@ -497,7 +505,7 @@ export class GuardianThreatDetection {
         threatId: threat.id,
         threatType: threat.threatType,
         threatLevel: threat.threatLevel,
-        confidence: threat.confidence
+        confidence: threat.confidence,
       }
     );
 
@@ -511,17 +519,21 @@ export class GuardianThreatDetection {
       await this.sendSecurityAlert(threat);
     }
 
-    securityLogger.logSecurityEvent('THREAT_DETECTED' as any, `Threat detected: ${threat.threatType}`, {
-      userId: threat.context.userId,
-      metadata: {
-        threatId: threat.id,
-        threatType: threat.threatType,
-        threatLevel: threat.threatLevel,
-        confidence: threat.confidence,
-        sourceIP: threat.source.identifier,
-        responseActions: threat.responseActions
+    securityLogger.logSecurityEvent(
+      'THREAT_DETECTED' as any,
+      `Threat detected: ${threat.threatType}`,
+      {
+        userId: threat.context.userId,
+        metadata: {
+          threatId: threat.id,
+          threatType: threat.threatType,
+          threatLevel: threat.threatLevel,
+          confidence: threat.confidence,
+          sourceIP: threat.source.identifier,
+          responseActions: threat.responseActions,
+        },
       }
-    });
+    );
   }
 
   /**
@@ -546,7 +558,9 @@ export class GuardianThreatDetection {
       case ResponseAction.TERMINATE_SESSION:
         if (threat.context.sessionId) {
           // Would integrate with session manager
-          securityLogger.warn(`Session terminated: ${threat.context.sessionId}`, { threatId: threat.id });
+          securityLogger.warn(`Session terminated: ${threat.context.sessionId}`, {
+            threatId: threat.id,
+          });
         }
         break;
 
@@ -585,13 +599,13 @@ export class GuardianThreatDetection {
         type: 'ip_address',
         identifier: context.ipAddress || 'unknown',
         reputation: 0,
-        userAgent: context.userAgent
+        userAgent: context.userAgent,
       },
       target: {
         type: 'application',
         identifier: 'tactical_board',
         criticality: 'high',
-        value: 100
+        value: 100,
       },
       description,
       indicators,
@@ -599,14 +613,17 @@ export class GuardianThreatDetection {
       mitigated: false,
       responseActions,
       context,
-      relatedEvents: []
+      relatedEvents: [],
     };
   }
 
   /**
    * Determine appropriate response actions
    */
-  private determineResponseActions(threatType: ThreatType, threatLevel: ThreatLevel): ResponseAction[] {
+  private determineResponseActions(
+    threatType: ThreatType,
+    threatLevel: ThreatLevel
+  ): ResponseAction[] {
     const actions: ResponseAction[] = [ResponseAction.LOG_ONLY];
 
     if (threatLevel === ThreatLevel.MEDIUM) {
@@ -615,7 +632,7 @@ export class GuardianThreatDetection {
 
     if (threatLevel === ThreatLevel.HIGH) {
       actions.push(ResponseAction.ALERT, ResponseAction.REQUIRE_MFA);
-      
+
       if (threatType === ThreatType.BRUTE_FORCE) {
         actions.push(ResponseAction.BLOCK_IP);
       }
@@ -623,11 +640,11 @@ export class GuardianThreatDetection {
 
     if (threatLevel === ThreatLevel.CRITICAL) {
       actions.push(ResponseAction.ALERT, ResponseAction.ESCALATE);
-      
+
       if (threatType === ThreatType.BRUTE_FORCE || threatType === ThreatType.SQL_INJECTION) {
         actions.push(ResponseAction.BLOCK_IP);
       }
-      
+
       if (threatType === ThreatType.INSIDER_THREAT || threatType === ThreatType.DATA_EXFILTRATION) {
         actions.push(ResponseAction.LOCK_ACCOUNT, ResponseAction.TERMINATE_SESSION);
       }
@@ -665,7 +682,7 @@ export class GuardianThreatDetection {
         threshold: 5,
         window: 5,
         actions: [ResponseAction.BLOCK_IP, ResponseAction.ALERT],
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
       },
       {
         id: 'data_export_volume',
@@ -676,8 +693,8 @@ export class GuardianThreatDetection {
         threshold: 100,
         window: 60,
         actions: [ResponseAction.ALERT, ResponseAction.REQUIRE_MFA],
-        lastUpdated: new Date().toISOString()
-      }
+        lastUpdated: new Date().toISOString(),
+      },
     ];
 
     rules.forEach(rule => this.detectionRules.set(rule.id, rule));
@@ -708,7 +725,7 @@ export class GuardianThreatDetection {
       threatLevel: threat.threatLevel,
       confidence: threat.confidence,
       source: threat.source.identifier,
-      target: threat.target.identifier
+      target: threat.target.identifier,
     });
 
     // In production, this would send alerts via email, SMS, Slack, etc.
@@ -723,7 +740,7 @@ export class GuardianThreatDetection {
       threatType: threat.threatType,
       threatLevel: threat.threatLevel,
       description: threat.description,
-      confidence: threat.confidence
+      confidence: threat.confidence,
     });
 
     // In production, this would create tickets, send notifications, etc.
@@ -758,28 +775,28 @@ export class GuardianThreatDetection {
         typicalHours: [new Date().getHours()],
         typicalDays: [new Date().getDay()],
         typicalLocations: context.ipAddress ? [context.ipAddress] : [],
-        typicalDevices: context.userAgent ? [context.userAgent] : []
+        typicalDevices: context.userAgent ? [context.userAgent] : [],
       },
       accessPatterns: {
         frequentResources: [],
         averageSessionDuration: 0,
-        typicalActions: []
+        typicalActions: [],
       },
       riskFactors: {
         privilegedUser: false,
         accessToSensitiveData: false,
         recentSecurityIncidents: 0,
-        accountAge: 0
+        accountAge: 0,
       },
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
     };
 
     this.behaviorProfiles.set(userId, profile);
   }
 
   private cleanupOldEvents(): void {
-    const cutoff = Date.now() - (7 * 24 * 60 * 60 * 1000); // 7 days
-    
+    const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000; // 7 days
+
     for (const [id, event] of this.threatEvents.entries()) {
       if (new Date(event.timestamp).getTime() < cutoff) {
         this.threatEvents.delete(id);
@@ -790,7 +807,7 @@ export class GuardianThreatDetection {
   private updateBehaviorProfiles(): void {
     // Update behavior profiles based on recent activity
     securityLogger.info('Updating behavior profiles', {
-      profileCount: this.behaviorProfiles.size
+      profileCount: this.behaviorProfiles.size,
     });
   }
 
@@ -802,15 +819,21 @@ export class GuardianThreatDetection {
       event => new Date(event.timestamp) >= startDate && new Date(event.timestamp) <= endDate
     );
 
-    const threatsByType = events.reduce((acc, event) => {
-      acc[event.threatType] = (acc[event.threatType] || 0) + 1;
-      return acc;
-    }, {} as Record<ThreatType, number>);
+    const threatsByType = events.reduce(
+      (acc, event) => {
+        acc[event.threatType] = (acc[event.threatType] || 0) + 1;
+        return acc;
+      },
+      {} as Record<ThreatType, number>
+    );
 
-    const threatsByLevel = events.reduce((acc, event) => {
-      acc[event.threatLevel] = (acc[event.threatLevel] || 0) + 1;
-      return acc;
-    }, {} as Record<ThreatLevel, number>);
+    const threatsByLevel = events.reduce(
+      (acc, event) => {
+        acc[event.threatLevel] = (acc[event.threatLevel] || 0) + 1;
+        return acc;
+      },
+      {} as Record<ThreatLevel, number>
+    );
 
     return {
       threatsDetected: events.length,
@@ -823,8 +846,8 @@ export class GuardianThreatDetection {
       topTargets: [], // Would be calculated from actual data
       period: {
         start: startDate.toISOString(),
-        end: endDate.toISOString()
-      }
+        end: endDate.toISOString(),
+      },
     };
   }
 

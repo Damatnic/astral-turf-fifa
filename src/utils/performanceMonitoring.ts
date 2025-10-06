@@ -3,6 +3,7 @@
  * Comprehensive real-time performance tracking and optimization
  */
 
+import React from 'react';
 import { type Player, type Formation } from '../types';
 
 // Performance thresholds and constants
@@ -27,7 +28,7 @@ interface PerformanceMetrics {
     max: number;
     slowRenders: number;
   };
-  
+
   // Memory metrics
   memory: {
     usedJSHeapSize: number;
@@ -35,7 +36,7 @@ interface PerformanceMetrics {
     jsHeapSizeLimit: number;
     trend: 'stable' | 'increasing' | 'decreasing';
   };
-  
+
   // Network metrics
   network: {
     latency: number;
@@ -43,7 +44,7 @@ interface PerformanceMetrics {
     connectionType: string;
     effectiveType: string;
   };
-  
+
   // Core Web Vitals
   webVitals: {
     lcp: number | null;
@@ -51,7 +52,7 @@ interface PerformanceMetrics {
     cls: number | null;
     ttfb: number | null;
   };
-  
+
   // Custom tactical metrics
   tactical: {
     playersRendered: number;
@@ -59,7 +60,7 @@ interface PerformanceMetrics {
     animationCount: number;
     interactionLatency: number;
   };
-  
+
   // Battery status
   battery: {
     level: number;
@@ -67,7 +68,7 @@ interface PerformanceMetrics {
     chargingTime: number;
     dischargingTime: number;
   };
-  
+
   // Device capabilities
   device: {
     hardwareConcurrency: number;
@@ -84,24 +85,705 @@ export class CatalystPerformanceMonitor {
   private metrics: PerformanceMetrics;
   private observers: Map<string, PerformanceObserver> = new Map();
   private subscribers: Array<(metrics: PerformanceMetrics) => void> = [];
-  private measurementHistory: Array<{ timestamp: number; metrics: Partial<PerformanceMetrics> }> = [];
+  private measurementHistory: Array<{ timestamp: number; metrics: Partial<PerformanceMetrics> }> =
+    [];
   private isMonitoring = false;
   private updateInterval: NodeJS.Timeout | null = null;
   private memoryHistory: number[] = [];
   private renderTimes: number[] = [];
-  
+
   static getInstance(): CatalystPerformanceMonitor {
     if (!CatalystPerformanceMonitor.instance) {
       CatalystPerformanceMonitor.instance = new CatalystPerformanceMonitor();
     }
     return CatalystPerformanceMonitor.instance;
   }
-  
+
   constructor() {
     this.metrics = this.initializeMetrics();
     this.setupPerformanceObservers();
     this.detectDeviceCapabilities();
   }
-  
+
   private initializeMetrics(): PerformanceMetrics {
-    return {\n      renderTime: {\n        current: 0,\n        average: 0,\n        max: 0,\n        slowRenders: 0\n      },\n      memory: {\n        usedJSHeapSize: 0,\n        totalJSHeapSize: 0,\n        jsHeapSizeLimit: 0,\n        trend: 'stable'\n      },\n      network: {\n        latency: 0,\n        bandwidth: 0,\n        connectionType: 'unknown',\n        effectiveType: 'unknown'\n      },\n      webVitals: {\n        lcp: null,\n        fid: null,\n        cls: null,\n        ttfb: null\n      },\n      tactical: {\n        playersRendered: 0,\n        formationComplexity: 0,\n        animationCount: 0,\n        interactionLatency: 0\n      },\n      battery: {\n        level: 1,\n        charging: true,\n        chargingTime: 0,\n        dischargingTime: Infinity\n      },\n      device: {\n        hardwareConcurrency: navigator.hardwareConcurrency || 4,\n        deviceMemory: (navigator as any).deviceMemory || 4,\n        connection: 'unknown',\n        platform: navigator.platform,\n        isMobile: /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)\n      }\n    };\n  }\n  \n  private setupPerformanceObservers(): void {\n    // Web Vitals observers\n    if ('PerformanceObserver' in window) {\n      // Largest Contentful Paint\n      try {\n        const lcpObserver = new PerformanceObserver((list) => {\n          const entries = list.getEntries();\n          const lastEntry = entries[entries.length - 1] as any;\n          this.metrics.webVitals.lcp = lastEntry.startTime;\n          this.notifySubscribers();\n        });\n        lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });\n        this.observers.set('lcp', lcpObserver);\n      } catch (error) {\n        console.warn('[Performance] LCP observer not supported:', error);\n      }\n      \n      // First Input Delay\n      try {\n        const fidObserver = new PerformanceObserver((list) => {\n          const entries = list.getEntries();\n          entries.forEach((entry: any) => {\n            this.metrics.webVitals.fid = entry.processingStart - entry.startTime;\n          });\n          this.notifySubscribers();\n        });\n        fidObserver.observe({ entryTypes: ['first-input'] });\n        this.observers.set('fid', fidObserver);\n      } catch (error) {\n        console.warn('[Performance] FID observer not supported:', error);\n      }\n      \n      // Cumulative Layout Shift\n      try {\n        const clsObserver = new PerformanceObserver((list) => {\n          let clsValue = 0;\n          const entries = list.getEntries();\n          \n          entries.forEach((entry: any) => {\n            if (!entry.hadRecentInput) {\n              clsValue += entry.value;\n            }\n          });\n          \n          this.metrics.webVitals.cls = clsValue;\n          this.notifySubscribers();\n        });\n        clsObserver.observe({ entryTypes: ['layout-shift'] });\n        this.observers.set('cls', clsObserver);\n      } catch (error) {\n        console.warn('[Performance] CLS observer not supported:', error);\n      }\n      \n      // Navigation timing\n      try {\n        const navigationObserver = new PerformanceObserver((list) => {\n          const entries = list.getEntries();\n          entries.forEach((entry: any) => {\n            this.metrics.webVitals.ttfb = entry.responseStart - entry.requestStart;\n          });\n          this.notifySubscribers();\n        });\n        navigationObserver.observe({ entryTypes: ['navigation'] });\n        this.observers.set('navigation', navigationObserver);\n      } catch (error) {\n        console.warn('[Performance] Navigation observer not supported:', error);\n      }\n      \n      // Long tasks observer\n      try {\n        const longTaskObserver = new PerformanceObserver((list) => {\n          const entries = list.getEntries();\n          entries.forEach((entry: any) => {\n            if (entry.duration > 50) {\n              console.warn(`[Performance] Long task detected: ${entry.duration}ms`);\n              this.logPerformanceIssue('long-task', {\n                duration: entry.duration,\n                startTime: entry.startTime,\n                name: entry.name\n              });\n            }\n          });\n        });\n        longTaskObserver.observe({ entryTypes: ['longtask'] });\n        this.observers.set('longtask', longTaskObserver);\n      } catch (error) {\n        console.warn('[Performance] Long task observer not supported:', error);\n      }\n    }\n  }\n  \n  private detectDeviceCapabilities(): void {\n    // Network information\n    const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection;\n    if (connection) {\n      this.metrics.network.connectionType = connection.type || 'unknown';\n      this.metrics.network.effectiveType = connection.effectiveType || 'unknown';\n      this.metrics.device.connection = connection.effectiveType || 'unknown';\n      \n      // Listen for network changes\n      connection.addEventListener('change', () => {\n        this.metrics.network.connectionType = connection.type || 'unknown';\n        this.metrics.network.effectiveType = connection.effectiveType || 'unknown';\n        this.notifySubscribers();\n      });\n    }\n    \n    // Battery API\n    if ('getBattery' in navigator) {\n      (navigator as any).getBattery().then((battery: any) => {\n        this.updateBatteryInfo(battery);\n        \n        battery.addEventListener('levelchange', () => this.updateBatteryInfo(battery));\n        battery.addEventListener('chargingchange', () => this.updateBatteryInfo(battery));\n        battery.addEventListener('chargingtimechange', () => this.updateBatteryInfo(battery));\n        battery.addEventListener('dischargingtimechange', () => this.updateBatteryInfo(battery));\n      }).catch((error: any) => {\n        console.warn('[Performance] Battery API not available:', error);\n      });\n    }\n  }\n  \n  private updateBatteryInfo(battery: any): void {\n    this.metrics.battery = {\n      level: battery.level,\n      charging: battery.charging,\n      chargingTime: battery.chargingTime,\n      dischargingTime: battery.dischargingTime\n    };\n    this.notifySubscribers();\n  }\n  \n  startMonitoring(): void {\n    if (this.isMonitoring) return;\n    \n    this.isMonitoring = true;\n    console.log('[Performance] Starting comprehensive monitoring');\n    \n    // Update metrics every second\n    this.updateInterval = setInterval(() => {\n      this.updateMetrics();\n    }, 1000);\n    \n    // Initial update\n    this.updateMetrics();\n  }\n  \n  stopMonitoring(): void {\n    if (!this.isMonitoring) return;\n    \n    this.isMonitoring = false;\n    console.log('[Performance] Stopping monitoring');\n    \n    if (this.updateInterval) {\n      clearInterval(this.updateInterval);\n      this.updateInterval = null;\n    }\n  }\n  \n  private updateMetrics(): void {\n    // Update memory metrics\n    if ((performance as any).memory) {\n      const memory = (performance as any).memory;\n      this.metrics.memory = {\n        usedJSHeapSize: memory.usedJSHeapSize,\n        totalJSHeapSize: memory.totalJSHeapSize,\n        jsHeapSizeLimit: memory.jsHeapSizeLimit,\n        trend: this.calculateMemoryTrend(memory.usedJSHeapSize)\n      };\n      \n      // Check memory warnings\n      if (memory.usedJSHeapSize > PERFORMANCE_THRESHOLDS.MEMORY_WARNING) {\n        this.logPerformanceIssue('memory-warning', {\n          usage: memory.usedJSHeapSize,\n          threshold: PERFORMANCE_THRESHOLDS.MEMORY_WARNING\n        });\n      }\n    }\n    \n    // Update network latency\n    this.measureNetworkLatency();\n    \n    // Calculate render time average\n    if (this.renderTimes.length > 0) {\n      this.metrics.renderTime.average = this.renderTimes.reduce((a, b) => a + b, 0) / this.renderTimes.length;\n      this.metrics.renderTime.max = Math.max(...this.renderTimes);\n    }\n    \n    // Store measurement history\n    this.measurementHistory.push({\n      timestamp: Date.now(),\n      metrics: {\n        memory: this.metrics.memory,\n        renderTime: this.metrics.renderTime,\n        network: this.metrics.network\n      }\n    });\n    \n    // Keep only last 100 measurements\n    if (this.measurementHistory.length > 100) {\n      this.measurementHistory = this.measurementHistory.slice(-100);\n    }\n    \n    this.notifySubscribers();\n  }\n  \n  private calculateMemoryTrend(currentUsage: number): 'stable' | 'increasing' | 'decreasing' {\n    this.memoryHistory.push(currentUsage);\n    \n    // Keep only last 10 measurements\n    if (this.memoryHistory.length > 10) {\n      this.memoryHistory = this.memoryHistory.slice(-10);\n    }\n    \n    if (this.memoryHistory.length < 5) return 'stable';\n    \n    const recent = this.memoryHistory.slice(-5);\n    const older = this.memoryHistory.slice(-10, -5);\n    \n    const recentAvg = recent.reduce((a, b) => a + b, 0) / recent.length;\n    const olderAvg = older.reduce((a, b) => a + b, 0) / older.length;\n    \n    const change = (recentAvg - olderAvg) / olderAvg;\n    \n    if (change > 0.05) return 'increasing';\n    if (change < -0.05) return 'decreasing';\n    return 'stable';\n  }\n  \n  private async measureNetworkLatency(): Promise<void> {\n    try {\n      const startTime = performance.now();\n      \n      // Use a small image or endpoint for latency measurement\n      const response = await fetch('/favicon.svg', {\n        method: 'HEAD',\n        cache: 'no-cache'\n      });\n      \n      if (response.ok) {\n        const endTime = performance.now();\n        this.metrics.network.latency = endTime - startTime;\n      }\n    } catch (error) {\n      // Network measurement failed, keep previous value\n    }\n  }\n  \n  // Render performance tracking\n  startRender(): () => void {\n    const startTime = performance.now();\n    \n    return () => {\n      const endTime = performance.now();\n      const renderTime = endTime - startTime;\n      \n      this.metrics.renderTime.current = renderTime;\n      this.renderTimes.push(renderTime);\n      \n      // Keep only last 60 render times (about 1 second at 60fps)\n      if (this.renderTimes.length > 60) {\n        this.renderTimes = this.renderTimes.slice(-60);\n      }\n      \n      // Check for slow renders\n      if (renderTime > PERFORMANCE_THRESHOLDS.RENDER_TIME_WARNING) {\n        this.metrics.renderTime.slowRenders++;\n        \n        if (renderTime > PERFORMANCE_THRESHOLDS.RENDER_TIME_CRITICAL) {\n          this.logPerformanceIssue('critical-render', {\n            renderTime,\n            threshold: PERFORMANCE_THRESHOLDS.RENDER_TIME_CRITICAL\n          });\n        }\n      }\n      \n      this.notifySubscribers();\n    };\n  }\n  \n  // Tactical-specific metrics\n  updateTacticalMetrics(data: {\n    playersRendered?: number;\n    formationComplexity?: number;\n    animationCount?: number;\n    interactionLatency?: number;\n  }): void {\n    Object.assign(this.metrics.tactical, data);\n    \n    // Check interaction latency\n    if (data.interactionLatency && data.interactionLatency > PERFORMANCE_THRESHOLDS.INTERACTION_WARNING) {\n      this.logPerformanceIssue('slow-interaction', {\n        latency: data.interactionLatency,\n        threshold: PERFORMANCE_THRESHOLDS.INTERACTION_WARNING\n      });\n    }\n    \n    this.notifySubscribers();\n  }\n  \n  // Formation complexity calculation\n  calculateFormationComplexity(formation: Formation, players: Player[]): number {\n    if (!formation || !players) return 0;\n    \n    let complexity = 0;\n    \n    // Base complexity from slot count\n    complexity += formation.slots.length * 10;\n    \n    // Add complexity for player assignments\n    const assignedSlots = formation.slots.filter(slot => slot.playerId);\n    complexity += assignedSlots.length * 5;\n    \n    // Add complexity for position variety\n    const roleTypes = new Set(formation.slots.map(slot => slot.role));\n    complexity += roleTypes.size * 15;\n    \n    // Add complexity for custom positions\n    const customPositions = formation.slots.filter(slot => \n      slot.defaultPosition.x !== Math.round(slot.defaultPosition.x) ||\n      slot.defaultPosition.y !== Math.round(slot.defaultPosition.y)\n    );\n    complexity += customPositions.length * 20;\n    \n    return Math.round(complexity);\n  }\n  \n  // Performance issue logging\n  private logPerformanceIssue(type: string, data: any): void {\n    const issue = {\n      type,\n      timestamp: Date.now(),\n      data,\n      userAgent: navigator.userAgent,\n      url: window.location.href,\n      metrics: this.metrics\n    };\n    \n    console.warn(`[Performance Issue] ${type}:`, issue);\n    \n    // In production, this could send to analytics service\n    if (typeof window !== 'undefined' && (window as any).gtag) {\n      (window as any).gtag('event', 'performance_issue', {\n        issue_type: type,\n        custom_parameter: JSON.stringify(data)\n      });\n    }\n  }\n  \n  // Subscription management\n  subscribe(callback: (metrics: PerformanceMetrics) => void): () => void {\n    this.subscribers.push(callback);\n    \n    // Return unsubscribe function\n    return () => {\n      const index = this.subscribers.indexOf(callback);\n      if (index > -1) {\n        this.subscribers.splice(index, 1);\n      }\n    };\n  }\n  \n  private notifySubscribers(): void {\n    this.subscribers.forEach(callback => {\n      try {\n        callback(this.metrics);\n      } catch (error) {\n        console.error('[Performance] Subscriber callback error:', error);\n      }\n    });\n  }\n  \n  // Get current metrics\n  getMetrics(): PerformanceMetrics {\n    return { ...this.metrics };\n  }\n  \n  // Get performance summary\n  getPerformanceSummary(): {\n    overall: 'excellent' | 'good' | 'fair' | 'poor';\n    score: number;\n    issues: string[];\n    recommendations: string[];\n  } {\n    const issues: string[] = [];\n    const recommendations: string[] = [];\n    let score = 100;\n    \n    // Check Web Vitals\n    if (this.metrics.webVitals.lcp && this.metrics.webVitals.lcp > PERFORMANCE_THRESHOLDS.LCP_TARGET) {\n      issues.push('Slow Largest Contentful Paint');\n      recommendations.push('Optimize critical resource loading');\n      score -= 20;\n    }\n    \n    if (this.metrics.webVitals.fid && this.metrics.webVitals.fid > PERFORMANCE_THRESHOLDS.FID_TARGET) {\n      issues.push('High First Input Delay');\n      recommendations.push('Reduce JavaScript execution time');\n      score -= 15;\n    }\n    \n    if (this.metrics.webVitals.cls && this.metrics.webVitals.cls > PERFORMANCE_THRESHOLDS.CLS_TARGET) {\n      issues.push('High Cumulative Layout Shift');\n      recommendations.push('Reserve space for dynamic content');\n      score -= 15;\n    }\n    \n    // Check render performance\n    if (this.metrics.renderTime.average > PERFORMANCE_THRESHOLDS.RENDER_TIME_WARNING) {\n      issues.push('Slow rendering performance');\n      recommendations.push('Optimize component re-renders');\n      score -= 20;\n    }\n    \n    // Check memory usage\n    if (this.metrics.memory.trend === 'increasing') {\n      issues.push('Increasing memory usage');\n      recommendations.push('Check for memory leaks');\n      score -= 10;\n    }\n    \n    // Check tactical performance\n    if (this.metrics.tactical.interactionLatency > PERFORMANCE_THRESHOLDS.INTERACTION_WARNING) {\n      issues.push('Slow user interactions');\n      recommendations.push('Optimize event handlers and state updates');\n      score -= 15;\n    }\n    \n    // Check device limitations\n    if (this.metrics.device.isMobile && this.metrics.tactical.playersRendered > 50) {\n      recommendations.push('Consider virtualization for mobile devices');\n      score -= 5;\n    }\n    \n    // Check battery status\n    if (this.metrics.battery.level < 0.2 && !this.metrics.battery.charging) {\n      recommendations.push('Enable power-saving mode');\n    }\n    \n    // Determine overall rating\n    let overall: 'excellent' | 'good' | 'fair' | 'poor';\n    if (score >= 90) overall = 'excellent';\n    else if (score >= 75) overall = 'good';\n    else if (score >= 60) overall = 'fair';\n    else overall = 'poor';\n    \n    return {\n      overall,\n      score: Math.max(0, score),\n      issues,\n      recommendations\n    };\n  }\n  \n  // Get measurement history\n  getHistory(): Array<{ timestamp: number; metrics: Partial<PerformanceMetrics> }> {\n    return [...this.measurementHistory];\n  }\n  \n  // Reset metrics\n  reset(): void {\n    this.metrics = this.initializeMetrics();\n    this.measurementHistory = [];\n    this.memoryHistory = [];\n    this.renderTimes = [];\n    this.notifySubscribers();\n  }\n  \n  // Cleanup\n  destroy(): void {\n    this.stopMonitoring();\n    \n    // Disconnect all observers\n    this.observers.forEach(observer => {\n      observer.disconnect();\n    });\n    this.observers.clear();\n    \n    // Clear subscribers\n    this.subscribers = [];\n    \n    console.log('[Performance] Monitor destroyed');\n  }\n}\n\n// Global instance\nexport const performanceMonitor = CatalystPerformanceMonitor.getInstance();\n\n// React hooks for performance monitoring\nexport function usePerformanceMonitor() {\n  const [metrics, setMetrics] = React.useState<PerformanceMetrics | null>(null);\n  \n  React.useEffect(() => {\n    const monitor = performanceMonitor;\n    \n    // Start monitoring\n    monitor.startMonitoring();\n    \n    // Subscribe to updates\n    const unsubscribe = monitor.subscribe(setMetrics);\n    \n    // Initial metrics\n    setMetrics(monitor.getMetrics());\n    \n    return () => {\n      unsubscribe();\n      // Don't stop monitoring here as other components might be using it\n    };\n  }, []);\n  \n  return metrics;\n}\n\nexport function usePerformanceSummary() {\n  const [summary, setSummary] = React.useState(performanceMonitor.getPerformanceSummary());\n  \n  React.useEffect(() => {\n    const unsubscribe = performanceMonitor.subscribe(() => {\n      setSummary(performanceMonitor.getPerformanceSummary());\n    });\n    \n    return unsubscribe;\n  }, []);\n  \n  return summary;\n}\n\n// Utility functions\nexport function measureAsyncOperation<T>(operation: () => Promise<T>, name: string): Promise<T> {\n  return new Promise(async (resolve, reject) => {\n    const startTime = performance.now();\n    \n    try {\n      const result = await operation();\n      const endTime = performance.now();\n      const duration = endTime - startTime;\n      \n      console.log(`[Performance] ${name}: ${duration.toFixed(2)}ms`);\n      \n      // Log slow operations\n      if (duration > 1000) {\n        performanceMonitor['logPerformanceIssue']('slow-operation', {\n          name,\n          duration\n        });\n      }\n      \n      resolve(result);\n    } catch (error) {\n      const endTime = performance.now();\n      const duration = endTime - startTime;\n      \n      console.error(`[Performance] ${name} failed after ${duration.toFixed(2)}ms:`, error);\n      reject(error);\n    }\n  });\n}\n\nexport function measureSyncOperation<T>(operation: () => T, name: string): T {\n  const startTime = performance.now();\n  \n  try {\n    const result = operation();\n    const endTime = performance.now();\n    const duration = endTime - startTime;\n    \n    console.log(`[Performance] ${name}: ${duration.toFixed(2)}ms`);\n    \n    // Log slow operations\n    if (duration > 100) {\n      performanceMonitor['logPerformanceIssue']('slow-sync-operation', {\n        name,\n        duration\n      });\n    }\n    \n    return result;\n  } catch (error) {\n    const endTime = performance.now();\n    const duration = endTime - startTime;\n    \n    console.error(`[Performance] ${name} failed after ${duration.toFixed(2)}ms:`, error);\n    throw error;\n  }\n}\n\nexport default {\n  CatalystPerformanceMonitor,\n  performanceMonitor,\n  usePerformanceMonitor,\n  usePerformanceSummary,\n  measureAsyncOperation,\n  measureSyncOperation,\n  PERFORMANCE_THRESHOLDS\n};
+    return {
+      renderTime: {
+        current: 0,
+        average: 0,
+        max: 0,
+        slowRenders: 0,
+      },
+      memory: {
+        usedJSHeapSize: 0,
+        totalJSHeapSize: 0,
+        jsHeapSizeLimit: 0,
+        trend: 'stable',
+      },
+      network: {
+        latency: 0,
+        bandwidth: 0,
+        connectionType: 'unknown',
+        effectiveType: 'unknown',
+      },
+      webVitals: {
+        lcp: null,
+        fid: null,
+        cls: null,
+        ttfb: null,
+      },
+      tactical: {
+        playersRendered: 0,
+        formationComplexity: 0,
+        animationCount: 0,
+        interactionLatency: 0,
+      },
+      battery: {
+        level: 1,
+        charging: true,
+        chargingTime: 0,
+        dischargingTime: Infinity,
+      },
+      device: {
+        hardwareConcurrency: navigator.hardwareConcurrency || 4,
+        deviceMemory: (navigator as any).deviceMemory || 4,
+        connection: 'unknown',
+        platform: navigator.platform,
+        isMobile: /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          navigator.userAgent
+        ),
+      },
+    };
+  }
+
+  private setupPerformanceObservers(): void {
+    // Web Vitals observers
+    if ('PerformanceObserver' in window) {
+      // Largest Contentful Paint
+      try {
+        const lcpObserver = new PerformanceObserver(list => {
+          const entries = list.getEntries();
+          const lastEntry = entries[entries.length - 1] as any;
+          this.metrics.webVitals.lcp = lastEntry.startTime;
+          this.notifySubscribers();
+        });
+        lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
+        this.observers.set('lcp', lcpObserver);
+      } catch (error) {
+        console.warn('[Performance] LCP observer not supported:', error);
+      }
+
+      // First Input Delay
+      try {
+        const fidObserver = new PerformanceObserver(list => {
+          const entries = list.getEntries();
+          entries.forEach((entry: any) => {
+            this.metrics.webVitals.fid = entry.processingStart - entry.startTime;
+          });
+          this.notifySubscribers();
+        });
+        fidObserver.observe({ entryTypes: ['first-input'] });
+        this.observers.set('fid', fidObserver);
+      } catch (error) {
+        console.warn('[Performance] FID observer not supported:', error);
+      }
+
+      // Cumulative Layout Shift
+      try {
+        const clsObserver = new PerformanceObserver(list => {
+          let clsValue = 0;
+          const entries = list.getEntries();
+
+          entries.forEach((entry: any) => {
+            if (!entry.hadRecentInput) {
+              clsValue += entry.value;
+            }
+          });
+
+          this.metrics.webVitals.cls = clsValue;
+          this.notifySubscribers();
+        });
+        clsObserver.observe({ entryTypes: ['layout-shift'] });
+        this.observers.set('cls', clsObserver);
+      } catch (error) {
+        console.warn('[Performance] CLS observer not supported:', error);
+      }
+
+      // Navigation timing
+      try {
+        const navigationObserver = new PerformanceObserver(list => {
+          const entries = list.getEntries();
+          entries.forEach((entry: any) => {
+            this.metrics.webVitals.ttfb = entry.responseStart - entry.requestStart;
+          });
+          this.notifySubscribers();
+        });
+        navigationObserver.observe({ entryTypes: ['navigation'] });
+        this.observers.set('navigation', navigationObserver);
+      } catch (error) {
+        console.warn('[Performance] Navigation observer not supported:', error);
+      }
+
+      // Long tasks observer
+      try {
+        const longTaskObserver = new PerformanceObserver(list => {
+          const entries = list.getEntries();
+          entries.forEach((entry: any) => {
+            if (entry.duration > 50) {
+              console.warn(`[Performance] Long task detected: ${entry.duration}ms`);
+              this.logPerformanceIssue('long-task', {
+                duration: entry.duration,
+                startTime: entry.startTime,
+                name: entry.name,
+              });
+            }
+          });
+        });
+        longTaskObserver.observe({ entryTypes: ['longtask'] });
+        this.observers.set('longtask', longTaskObserver);
+      } catch (error) {
+        console.warn('[Performance] Long task observer not supported:', error);
+      }
+    }
+  }
+
+  private detectDeviceCapabilities(): void {
+    // Network information
+    const connection =
+      (navigator as any).connection ||
+      (navigator as any).mozConnection ||
+      (navigator as any).webkitConnection;
+    if (connection) {
+      this.metrics.network.connectionType = connection.type || 'unknown';
+      this.metrics.network.effectiveType = connection.effectiveType || 'unknown';
+      this.metrics.device.connection = connection.effectiveType || 'unknown';
+
+      // Listen for network changes
+      connection.addEventListener('change', () => {
+        this.metrics.network.connectionType = connection.type || 'unknown';
+        this.metrics.network.effectiveType = connection.effectiveType || 'unknown';
+        this.notifySubscribers();
+      });
+    }
+
+    // Battery API
+    if ('getBattery' in navigator) {
+      (navigator as any)
+        .getBattery()
+        .then((battery: any) => {
+          this.updateBatteryInfo(battery);
+
+          battery.addEventListener('levelchange', () => this.updateBatteryInfo(battery));
+          battery.addEventListener('chargingchange', () => this.updateBatteryInfo(battery));
+          battery.addEventListener('chargingtimechange', () => this.updateBatteryInfo(battery));
+          battery.addEventListener('dischargingtimechange', () => this.updateBatteryInfo(battery));
+        })
+        .catch((error: any) => {
+          console.warn('[Performance] Battery API not available:', error);
+        });
+    }
+  }
+
+  private updateBatteryInfo(battery: any): void {
+    this.metrics.battery = {
+      level: battery.level,
+      charging: battery.charging,
+      chargingTime: battery.chargingTime,
+      dischargingTime: battery.dischargingTime,
+    };
+    this.notifySubscribers();
+  }
+
+  startMonitoring(): void {
+    if (this.isMonitoring) {
+      return;
+    }
+
+    this.isMonitoring = true;
+    console.log('[Performance] Starting comprehensive monitoring');
+
+    // Update metrics every second
+    this.updateInterval = setInterval(() => {
+      this.updateMetrics();
+    }, 1000);
+
+    // Initial update
+    this.updateMetrics();
+  }
+
+  stopMonitoring(): void {
+    if (!this.isMonitoring) {
+      return;
+    }
+
+    this.isMonitoring = false;
+    console.log('[Performance] Stopping monitoring');
+
+    if (this.updateInterval) {
+      clearInterval(this.updateInterval);
+      this.updateInterval = null;
+    }
+  }
+
+  private updateMetrics(): void {
+    // Update memory metrics
+    if ((performance as any).memory) {
+      const memory = (performance as any).memory;
+      this.metrics.memory = {
+        usedJSHeapSize: memory.usedJSHeapSize,
+        totalJSHeapSize: memory.totalJSHeapSize,
+        jsHeapSizeLimit: memory.jsHeapSizeLimit,
+        trend: this.calculateMemoryTrend(memory.usedJSHeapSize),
+      };
+
+      // Check memory warnings
+      if (memory.usedJSHeapSize > PERFORMANCE_THRESHOLDS.MEMORY_WARNING) {
+        this.logPerformanceIssue('memory-warning', {
+          usage: memory.usedJSHeapSize,
+          threshold: PERFORMANCE_THRESHOLDS.MEMORY_WARNING,
+        });
+      }
+    }
+
+    // Update network latency
+    this.measureNetworkLatency();
+
+    // Calculate render time average
+    if (this.renderTimes.length > 0) {
+      this.metrics.renderTime.average =
+        this.renderTimes.reduce((a, b) => a + b, 0) / this.renderTimes.length;
+      this.metrics.renderTime.max = Math.max(...this.renderTimes);
+    }
+
+    // Store measurement history
+    this.measurementHistory.push({
+      timestamp: Date.now(),
+      metrics: {
+        memory: this.metrics.memory,
+        renderTime: this.metrics.renderTime,
+        network: this.metrics.network,
+      },
+    });
+
+    // Keep only last 100 measurements
+    if (this.measurementHistory.length > 100) {
+      this.measurementHistory = this.measurementHistory.slice(-100);
+    }
+
+    this.notifySubscribers();
+  }
+
+  private calculateMemoryTrend(currentUsage: number): 'stable' | 'increasing' | 'decreasing' {
+    this.memoryHistory.push(currentUsage);
+
+    // Keep only last 10 measurements
+    if (this.memoryHistory.length > 10) {
+      this.memoryHistory = this.memoryHistory.slice(-10);
+    }
+
+    if (this.memoryHistory.length < 5) {
+      return 'stable';
+    }
+
+    const recent = this.memoryHistory.slice(-5);
+    const older = this.memoryHistory.slice(-10, -5);
+
+    const recentAvg = recent.reduce((a, b) => a + b, 0) / recent.length;
+    const olderAvg = older.reduce((a, b) => a + b, 0) / older.length;
+
+    const change = (recentAvg - olderAvg) / olderAvg;
+
+    if (change > 0.05) {
+      return 'increasing';
+    }
+    if (change < -0.05) {
+      return 'decreasing';
+    }
+    return 'stable';
+  }
+
+  private async measureNetworkLatency(): Promise<void> {
+    try {
+      const startTime = performance.now();
+
+      // Use a small image or endpoint for latency measurement
+      const response = await fetch('/favicon.svg', {
+        method: 'HEAD',
+        cache: 'no-cache',
+      });
+
+      if (response.ok) {
+        const endTime = performance.now();
+        this.metrics.network.latency = endTime - startTime;
+      }
+    } catch (error) {
+      // Network measurement failed, keep previous value
+    }
+  }
+
+  // Render performance tracking
+  startRender(): () => void {
+    const startTime = performance.now();
+
+    return () => {
+      const endTime = performance.now();
+      const renderTime = endTime - startTime;
+
+      this.metrics.renderTime.current = renderTime;
+      this.renderTimes.push(renderTime);
+
+      // Keep only last 60 render times (about 1 second at 60fps)
+      if (this.renderTimes.length > 60) {
+        this.renderTimes = this.renderTimes.slice(-60);
+      }
+
+      // Check for slow renders
+      if (renderTime > PERFORMANCE_THRESHOLDS.RENDER_TIME_WARNING) {
+        this.metrics.renderTime.slowRenders++;
+
+        if (renderTime > PERFORMANCE_THRESHOLDS.RENDER_TIME_CRITICAL) {
+          this.logPerformanceIssue('critical-render', {
+            renderTime,
+            threshold: PERFORMANCE_THRESHOLDS.RENDER_TIME_CRITICAL,
+          });
+        }
+      }
+
+      this.notifySubscribers();
+    };
+  }
+
+  // Tactical-specific metrics
+  updateTacticalMetrics(data: {
+    playersRendered?: number;
+    formationComplexity?: number;
+    animationCount?: number;
+    interactionLatency?: number;
+  }): void {
+    Object.assign(this.metrics.tactical, data);
+
+    // Check interaction latency
+    if (
+      data.interactionLatency &&
+      data.interactionLatency > PERFORMANCE_THRESHOLDS.INTERACTION_WARNING
+    ) {
+      this.logPerformanceIssue('slow-interaction', {
+        latency: data.interactionLatency,
+        threshold: PERFORMANCE_THRESHOLDS.INTERACTION_WARNING,
+      });
+    }
+
+    this.notifySubscribers();
+  }
+
+  // Formation complexity calculation
+  calculateFormationComplexity(formation: Formation, players: Player[]): number {
+    if (!formation || !players) {
+      return 0;
+    }
+
+    let complexity = 0;
+
+    // Base complexity from slot count
+    complexity += formation.slots.length * 10;
+
+    // Add complexity for player assignments
+    const assignedSlots = formation.slots.filter(slot => slot.playerId);
+    complexity += assignedSlots.length * 5;
+
+    // Add complexity for position variety
+    const roleTypes = new Set(formation.slots.map(slot => slot.role));
+    complexity += roleTypes.size * 15;
+
+    // Add complexity for custom positions
+    const customPositions = formation.slots.filter(
+      slot =>
+        slot.defaultPosition.x !== Math.round(slot.defaultPosition.x) ||
+        slot.defaultPosition.y !== Math.round(slot.defaultPosition.y)
+    );
+    complexity += customPositions.length * 20;
+
+    return Math.round(complexity);
+  }
+
+  // Performance issue logging
+  private logPerformanceIssue(type: string, data: any): void {
+    const issue = {
+      type,
+      timestamp: Date.now(),
+      data,
+      userAgent: navigator.userAgent,
+      url: window.location.href,
+      metrics: this.metrics,
+    };
+
+    console.warn(`[Performance Issue] ${type}:`, issue);
+
+    // In production, this could send to analytics service
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', 'performance_issue', {
+        issue_type: type,
+        custom_parameter: JSON.stringify(data),
+      });
+    }
+  }
+
+  // Subscription management
+  subscribe(callback: (metrics: PerformanceMetrics) => void): () => void {
+    this.subscribers.push(callback);
+
+    // Return unsubscribe function
+    return () => {
+      const index = this.subscribers.indexOf(callback);
+      if (index > -1) {
+        this.subscribers.splice(index, 1);
+      }
+    };
+  }
+
+  private notifySubscribers(): void {
+    this.subscribers.forEach(callback => {
+      try {
+        callback(this.metrics);
+      } catch (error) {
+        console.error('[Performance] Subscriber callback error:', error);
+      }
+    });
+  }
+
+  // Get current metrics
+  getMetrics(): PerformanceMetrics {
+    return { ...this.metrics };
+  }
+
+  // Get performance summary
+  getPerformanceSummary(): {
+    overall: 'excellent' | 'good' | 'fair' | 'poor';
+    score: number;
+    issues: string[];
+    recommendations: string[];
+  } {
+    const issues: string[] = [];
+    const recommendations: string[] = [];
+    let score = 100;
+
+    // Check Web Vitals
+    if (
+      this.metrics.webVitals.lcp &&
+      this.metrics.webVitals.lcp > PERFORMANCE_THRESHOLDS.LCP_TARGET
+    ) {
+      issues.push('Slow Largest Contentful Paint');
+      recommendations.push('Optimize critical resource loading');
+      score -= 20;
+    }
+
+    if (
+      this.metrics.webVitals.fid &&
+      this.metrics.webVitals.fid > PERFORMANCE_THRESHOLDS.FID_TARGET
+    ) {
+      issues.push('High First Input Delay');
+      recommendations.push('Reduce JavaScript execution time');
+      score -= 15;
+    }
+
+    if (
+      this.metrics.webVitals.cls &&
+      this.metrics.webVitals.cls > PERFORMANCE_THRESHOLDS.CLS_TARGET
+    ) {
+      issues.push('High Cumulative Layout Shift');
+      recommendations.push('Reserve space for dynamic content');
+      score -= 15;
+    }
+
+    // Check render performance
+    if (this.metrics.renderTime.average > PERFORMANCE_THRESHOLDS.RENDER_TIME_WARNING) {
+      issues.push('Slow rendering performance');
+      recommendations.push('Optimize component re-renders');
+      score -= 20;
+    }
+
+    // Check memory usage
+    if (this.metrics.memory.trend === 'increasing') {
+      issues.push('Increasing memory usage');
+      recommendations.push('Check for memory leaks');
+      score -= 10;
+    }
+
+    // Check tactical performance
+    if (this.metrics.tactical.interactionLatency > PERFORMANCE_THRESHOLDS.INTERACTION_WARNING) {
+      issues.push('Slow user interactions');
+      recommendations.push('Optimize event handlers and state updates');
+      score -= 15;
+    }
+
+    // Check device limitations
+    if (this.metrics.device.isMobile && this.metrics.tactical.playersRendered > 50) {
+      recommendations.push('Consider virtualization for mobile devices');
+      score -= 5;
+    }
+
+    // Check battery status
+    if (this.metrics.battery.level < 0.2 && !this.metrics.battery.charging) {
+      recommendations.push('Enable power-saving mode');
+    }
+
+    // Determine overall rating
+    let overall: 'excellent' | 'good' | 'fair' | 'poor';
+    if (score >= 90) {
+      overall = 'excellent';
+    } else if (score >= 75) {
+      overall = 'good';
+    } else if (score >= 60) {
+      overall = 'fair';
+    } else {
+      overall = 'poor';
+    }
+
+    return {
+      overall,
+      score: Math.max(0, score),
+      issues,
+      recommendations,
+    };
+  }
+
+  // Get measurement history
+  getHistory(): Array<{ timestamp: number; metrics: Partial<PerformanceMetrics> }> {
+    return [...this.measurementHistory];
+  }
+
+  // Reset metrics
+  reset(): void {
+    this.metrics = this.initializeMetrics();
+    this.measurementHistory = [];
+    this.memoryHistory = [];
+    this.renderTimes = [];
+    this.notifySubscribers();
+  }
+
+  // Cleanup
+  destroy(): void {
+    this.stopMonitoring();
+
+    // Disconnect all observers
+    this.observers.forEach(observer => {
+      observer.disconnect();
+    });
+    this.observers.clear();
+
+    // Clear subscribers
+    this.subscribers = [];
+
+    console.log('[Performance] Monitor destroyed');
+  }
+}
+
+// Global instance
+export const performanceMonitor = CatalystPerformanceMonitor.getInstance();
+
+// React hooks for performance monitoring
+export function usePerformanceMonitor() {
+  const [metrics, setMetrics] = React.useState<PerformanceMetrics | null>(null);
+
+  React.useEffect(() => {
+    const monitor = performanceMonitor;
+
+    // Start monitoring
+    monitor.startMonitoring();
+
+    // Subscribe to updates
+    const unsubscribe = monitor.subscribe(setMetrics);
+
+    // Initial metrics
+    setMetrics(monitor.getMetrics());
+
+    return () => {
+      unsubscribe();
+      // Don't stop monitoring here as other components might be using it
+    };
+  }, []);
+
+  return metrics;
+}
+
+export function usePerformanceSummary() {
+  const [summary, setSummary] = React.useState(performanceMonitor.getPerformanceSummary());
+
+  React.useEffect(() => {
+    const unsubscribe = performanceMonitor.subscribe(() => {
+      setSummary(performanceMonitor.getPerformanceSummary());
+    });
+
+    return unsubscribe;
+  }, []);
+
+  return summary;
+}
+
+// Utility functions
+export function measureAsyncOperation<T>(operation: () => Promise<T>, name: string): Promise<T> {
+  return new Promise(async (resolve, reject) => {
+    const startTime = performance.now();
+
+    try {
+      const result = await operation();
+      const endTime = performance.now();
+      const duration = endTime - startTime;
+
+      console.log(`[Performance] ${name}: ${duration.toFixed(2)}ms`);
+
+      // Log slow operations
+      if (duration > 1000) {
+        performanceMonitor['logPerformanceIssue']('slow-operation', {
+          name,
+          duration,
+        });
+      }
+
+      resolve(result);
+    } catch (error) {
+      const endTime = performance.now();
+      const duration = endTime - startTime;
+
+      console.error(`[Performance] ${name} failed after ${duration.toFixed(2)}ms:`, error);
+      reject(error);
+    }
+  });
+}
+
+export function measureSyncOperation<T>(operation: () => T, name: string): T {
+  const startTime = performance.now();
+
+  try {
+    const result = operation();
+    const endTime = performance.now();
+    const duration = endTime - startTime;
+
+    console.log(`[Performance] ${name}: ${duration.toFixed(2)}ms`);
+
+    // Log slow operations
+    if (duration > 100) {
+      performanceMonitor['logPerformanceIssue']('slow-sync-operation', {
+        name,
+        duration,
+      });
+    }
+
+    return result;
+  } catch (error) {
+    const endTime = performance.now();
+    const duration = endTime - startTime;
+
+    console.error(`[Performance] ${name} failed after ${duration.toFixed(2)}ms:`, error);
+    throw error;
+  }
+}
+
+export default {
+  CatalystPerformanceMonitor,
+  performanceMonitor,
+  usePerformanceMonitor,
+  usePerformanceSummary,
+  measureAsyncOperation,
+  measureSyncOperation,
+  PERFORMANCE_THRESHOLDS,
+};

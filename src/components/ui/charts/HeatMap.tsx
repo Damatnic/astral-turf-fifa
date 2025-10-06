@@ -79,7 +79,7 @@ export const HeatMap = forwardRef<HTMLDivElement, HeatMapProps>(
       onCellHover,
       ...props
     },
-    ref,
+    ref
   ) => {
     const [hoveredCell, setHoveredCell] = useState<HeatMapDataPoint | null>(null);
 
@@ -120,7 +120,7 @@ export const HeatMap = forwardRef<HTMLDivElement, HeatMapProps>(
         return null;
       }
 
-      const gridLines = [];
+      const gridLines: JSX.Element[] = [];
       const cols = Math.ceil(width / cellSize);
       const rows = Math.ceil(height / cellSize);
 
@@ -135,7 +135,7 @@ export const HeatMap = forwardRef<HTMLDivElement, HeatMapProps>(
             y2={height}
             stroke="rgba(255, 255, 255, 0.1)"
             strokeWidth="1"
-          />,
+          />
         );
       }
 
@@ -150,7 +150,7 @@ export const HeatMap = forwardRef<HTMLDivElement, HeatMapProps>(
             y2={i * cellSize}
             stroke="rgba(255, 255, 255, 0.1)"
             strokeWidth="1"
-          />,
+          />
         );
       }
 
@@ -173,7 +173,7 @@ export const HeatMap = forwardRef<HTMLDivElement, HeatMapProps>(
               className={cn(
                 'transition-all duration-300',
                 interactive && 'cursor-pointer hover:r-8',
-                animated && 'animate-scale-in',
+                animated && 'animate-scale-in'
               )}
               style={{
                 animationDelay: animated ? `${index * 50}ms` : '0ms',
@@ -283,6 +283,8 @@ export const HeatMap = forwardRef<HTMLDivElement, HeatMapProps>(
             src={backgroundImage}
             alt="Heat map background"
             className="absolute inset-0 w-full h-full object-cover opacity-30"
+            loading="lazy"
+            decoding="async"
           />
         )}
 
@@ -314,14 +316,14 @@ export const HeatMap = forwardRef<HTMLDivElement, HeatMapProps>(
         )}
       </div>
     );
-  },
+  }
 );
 
 HeatMap.displayName = 'HeatMap';
 
 // Preset heat map components for football
 export interface FootballHeatMapProps
-  extends Omit<HeatMapProps, 'backgroundImage' | 'width' | 'height'> {
+  extends Omit<HeatMapProps, 'backgroundImage' | 'width' | 'height' | 'data'> {
   fieldType?: '11v11' | '7v7' | '5v5';
   playerData: Array<{
     position: { x: number; y: number };
@@ -361,7 +363,7 @@ export const FootballHeatMap = forwardRef<HTMLDivElement, FootballHeatMapProps>(
         {...props}
       />
     );
-  },
+  }
 );
 
 FootballHeatMap.displayName = 'FootballHeatMap';

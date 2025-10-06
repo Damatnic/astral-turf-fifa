@@ -3,11 +3,11 @@ import { screen, fireEvent, waitFor, within, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { renderWithProviders, mockCanvas, mockDragAndDrop } from '../utils/test-helpers';
-import { 
+import {
   generateTacticalFormation,
   generatePlayerForConflict,
   generatePerformanceTestData,
-  generateDrawingShape
+  generateDrawingShape,
 } from '../utils/enhanced-mock-generators';
 import { UnifiedTacticsBoard } from '../../components/tactics/UnifiedTacticsBoard';
 import type { RootState } from '../../types';
@@ -44,7 +44,7 @@ describe('Tactical Board Workflow Integration Tests', () => {
 
   beforeEach(() => {
     user = userEvent.setup();
-    
+
     // Generate comprehensive test data
     mockFormation = generateTacticalFormation('4-4-2');
     mockPlayers = Array.from({ length: 20 }, (_, i) => {
@@ -53,7 +53,7 @@ describe('Tactical Board Workflow Integration Tests', () => {
         ...generatePlayerForConflict(i < 2 ? 'GK' : i < 8 ? 'DF' : i < 14 ? 'MF' : 'FW'),
         roleId: roles[i % roles.length],
         id: `player-${i + 1}`,
-        name: `Player ${i + 1}`
+        name: `Player ${i + 1}`,
       };
     });
 
@@ -70,14 +70,24 @@ describe('Tactical Board Workflow Integration Tests', () => {
         formations: { [mockFormation.id]: mockFormation },
         activeFormationIds: { home: mockFormation.id, away: '' },
         teamTactics: {
-          home: { mentality: 'balanced', pressing: 'medium', defensiveLine: 'medium', attackingWidth: 'medium' },
-          away: { mentality: 'balanced', pressing: 'medium', defensiveLine: 'medium', attackingWidth: 'medium' }
+          home: {
+            mentality: 'balanced',
+            pressing: 'medium',
+            defensiveLine: 'medium',
+            attackingWidth: 'medium',
+          },
+          away: {
+            mentality: 'balanced',
+            pressing: 'medium',
+            defensiveLine: 'medium',
+            attackingWidth: 'medium',
+          },
         },
         drawings: [],
         tacticalFamiliarity: {},
         chemistry: {},
         captainIds: { home: null, away: null },
-        setPieceTakers: { home: {}, away: {} }
+        setPieceTakers: { home: {}, away: {} },
       },
       ui: {
         theme: 'dark',
@@ -98,9 +108,9 @@ describe('Tactical Board Workflow Integration Tests', () => {
           showAvailability: true,
           iconType: 'circle',
           namePosition: 'below',
-          size: 'medium'
-        }
-      }
+          size: 'medium',
+        },
+      },
     } as any;
 
     mockCanvas();
@@ -143,7 +153,7 @@ describe('Tactical Board Workflow Integration Tests', () => {
       // 1. Select a player by clicking
       const playerTokens = screen.getAllByTestId(/player-token/);
       const firstPlayer = playerTokens[0];
-      
+
       await user.click(firstPlayer);
 
       // 2. Verify player is selected
@@ -156,13 +166,13 @@ describe('Tactical Board Workflow Integration Tests', () => {
 
       // 4. Move player by clicking field
       const field = screen.getByTestId('modern-field');
-      await user.click(field, { clientX: 400, clientY: 300 });
+      await user.click(field);
 
       // 5. Verify position change is reflected
       await waitFor(() => {
         // Player position should have updated
-        expect(firstPlayer).toHaveStyle({ 
-          transform: expect.stringContaining('translate') 
+        expect(firstPlayer).toHaveStyle({
+          transform: expect.stringContaining('translate'),
         });
       });
     });
@@ -181,7 +191,7 @@ describe('Tactical Board Workflow Integration Tests', () => {
       // 2. Initiate drag from bench
       const benchPlayers = screen.getAllByTestId('position-group-player');
       const benchPlayer = benchPlayers[0];
-      
+
       fireEvent.dragStart(benchPlayer);
 
       // 3. Verify drag state
@@ -211,7 +221,7 @@ describe('Tactical Board Workflow Integration Tests', () => {
 
       // 3. Draw arrow on field
       const field = screen.getByTestId('modern-field');
-      
+
       fireEvent.mouseDown(field, { clientX: 200, clientY: 200 });
       fireEvent.mouseMove(field, { clientX: 300, clientY: 250 });
       fireEvent.mouseUp(field, { clientX: 300, clientY: 250 });
@@ -310,7 +320,7 @@ describe('Tactical Board Workflow Integration Tests', () => {
 
       // 1. Select multiple players with Ctrl+Click
       const playerTokens = screen.getAllByTestId(/player-token/);
-      
+
       await user.click(playerTokens[0]);
       await user.keyboard('[ControlLeft>]');
       await user.click(playerTokens[1]);
@@ -325,7 +335,7 @@ describe('Tactical Board Workflow Integration Tests', () => {
       await user.click(zoneTool);
 
       const field = screen.getByTestId('modern-field');
-      
+
       // Draw rectangular zone around selected players
       fireEvent.mouseDown(field, { clientX: 150, clientY: 150 });
       fireEvent.mouseMove(field, { clientX: 350, clientY: 250 });
@@ -375,11 +385,9 @@ describe('Tactical Board Workflow Integration Tests', () => {
         tactics: {
           ...initialState.tactics!,
           players: largeDataset.players,
-          formations: Object.fromEntries(
-            largeDataset.formations.map(f => [f.id, f])
-          ),
-          drawings: largeDataset.drawings
-        }
+          formations: Object.fromEntries(largeDataset.formations.map(f => [f.id, f])),
+          drawings: largeDataset.drawings,
+        },
       };
 
       const renderStart = performance.now();
@@ -407,22 +415,22 @@ describe('Tactical Board Workflow Integration Tests', () => {
       renderWithProviders(<UnifiedTacticsBoard />, { initialState });
 
       const field = screen.getByTestId('modern-field');
-      
+
       // Rapid clicking should not break the interface
       for (let i = 0; i < 20; i++) {
-        fireEvent.click(field, { 
-          clientX: 200 + i * 10, 
-          clientY: 200 + i * 5 
+        fireEvent.click(field, {
+          clientX: 200 + i * 10,
+          clientY: 200 + i * 5,
         });
       }
 
       // Interface should remain responsive
       expect(screen.getByTestId('unified-tactics-board')).toBeInTheDocument();
-      
+
       // Should be able to interact normally
       const playerTokens = screen.getAllByTestId(/player-token/);
       await user.click(playerTokens[0]);
-      
+
       expect(playerTokens[0]).toHaveAttribute('data-selected', 'true');
     });
   });
@@ -435,8 +443,8 @@ describe('Tactical Board Workflow Integration Tests', () => {
         tactics: {
           ...initialState.tactics!,
           players: [{ id: null, name: null }] as any,
-          formations: { 'invalid': null } as any
-        }
+          formations: { invalid: null } as any,
+        },
       };
 
       expect(() => {
@@ -453,8 +461,8 @@ describe('Tactical Board Workflow Integration Tests', () => {
           ...initialState.tactics!,
           players: [],
           formations: {},
-          drawings: []
-        }
+          drawings: [],
+        },
       };
 
       renderWithProviders(<UnifiedTacticsBoard />, { initialState: emptyState });
@@ -471,7 +479,7 @@ describe('Tactical Board Workflow Integration Tests', () => {
         () => user.click(screen.getByRole('button', { name: /toggle grid/i })),
         () => user.click(screen.getAllByTestId(/player-token/)[0]),
         () => user.click(screen.getByRole('button', { name: /arrow/i })),
-        () => user.click(screen.getByRole('button', { name: /toggle right sidebar/i }))
+        () => user.click(screen.getByRole('button', { name: /toggle right sidebar/i })),
       ];
 
       // Execute all operations rapidly
@@ -479,7 +487,7 @@ describe('Tactical Board Workflow Integration Tests', () => {
 
       // State should remain consistent
       expect(screen.getByTestId('unified-tactics-board')).toBeInTheDocument();
-      
+
       // All changes should be reflected
       expect(screen.getByRole('button', { name: /toggle grid/i })).toHaveClass('bg-blue-500');
       expect(screen.getByRole('button', { name: /arrow/i })).toHaveClass('bg-blue-500');
@@ -519,7 +527,9 @@ describe('Tactical Board Workflow Integration Tests', () => {
       Object.defineProperty(window, 'matchMedia', {
         writable: true,
         value: vi.fn().mockImplementation(query => ({
-          matches: query.includes('prefers-contrast: high') || query.includes('prefers-reduced-motion: reduce'),
+          matches:
+            query.includes('prefers-contrast: high') ||
+            query.includes('prefers-reduced-motion: reduce'),
           media: query,
           addEventListener: vi.fn(),
           removeEventListener: vi.fn(),

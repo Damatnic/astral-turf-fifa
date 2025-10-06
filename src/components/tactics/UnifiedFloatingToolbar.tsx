@@ -23,7 +23,7 @@ import {
   Eye,
   EyeOff,
   Maximize2,
-  Minimize2
+  Minimize2,
 } from 'lucide-react';
 import type { DrawingTool, DrawingShape, Formation, Player } from '../../types';
 import { FormationAutoSave } from './FormationAutoSave';
@@ -49,7 +49,7 @@ interface UnifiedFloatingToolbarProps {
   drawingTool: DrawingTool;
   drawingColor: string;
   drawings: DrawingShape[];
-  onToolChange: (tool: DrawingTool) => void;
+  onToolChange: (tool?: DrawingTool) => void;
   onColorChange: (color: string) => void;
   onUndoDrawing: () => void;
   onClearDrawings: () => void;
@@ -95,11 +95,12 @@ const ToolButton: React.FC<{
     disabled={disabled}
     className={`
       relative p-3 rounded-lg transition-all duration-200 flex items-center justify-center
-      ${isActive
-        ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/25 scale-105'
-        : disabled
-        ? 'text-slate-500 cursor-not-allowed'
-        : 'text-slate-300 hover:bg-slate-700 hover:text-white hover:scale-105'
+      ${
+        isActive
+          ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/25 scale-105'
+          : disabled
+            ? 'text-slate-500 cursor-not-allowed'
+            : 'text-slate-300 hover:bg-slate-700 hover:text-white hover:scale-105'
       }
       ${!disabled && !isActive ? 'hover:shadow-md' : ''}
     `}
@@ -118,12 +119,22 @@ const ColorPicker: React.FC<{
   onColorChange: (color: string) => void;
 }> = ({ currentColor, onColorChange }) => {
   const predefinedColors = [
-    '#ffffff', '#ef4444', '#f59e0b', '#eab308',
-    '#22c55e', '#06b6d4', '#3b82f6', '#8b5cf6',
-    '#ec4899', '#f97316', '#10b981', '#6366f1'
+    '#ffffff',
+    '#ef4444',
+    '#f59e0b',
+    '#eab308',
+    '#22c55e',
+    '#06b6d4',
+    '#3b82f6',
+    '#8b5cf6',
+    '#ec4899',
+    '#f97316',
+    '#10b981',
+    '#6366f1',
   ];
 
-  const sizeClass = 'w-8 h-8';
+  // WCAG 2.1 compliant minimum touch target size (44x44px)
+  const sizeClass = 'w-11 h-11 min-w-[44px] min-h-[44px]';
 
   return (
     <div className="relative group">
@@ -135,23 +146,25 @@ const ColorPicker: React.FC<{
           <input
             type="color"
             value={currentColor}
-            onChange={(e) => onColorChange(e.target.value)}
+            onChange={e => onColorChange(e.target.value)}
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
             aria-label="Select drawing color"
           />
         </div>
         <Palette className="w-3 h-3 text-slate-400" />
       </div>
-      
+
       {/* Predefined colors popup */}
       <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-slate-800 border border-slate-600 rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none group-hover:pointer-events-auto">
         <div className="grid grid-cols-4 gap-1">
-          {predefinedColors.map((color) => (
+          {predefinedColors.map(color => (
             <button
               key={color}
               onClick={() => onColorChange(color)}
               className={`w-5 h-5 rounded border-2 transition-all ${
-                currentColor === color ? 'border-white scale-110' : 'border-slate-500 hover:scale-105'
+                currentColor === color
+                  ? 'border-white scale-110'
+                  : 'border-slate-500 hover:scale-105'
               }`}
               style={{ backgroundColor: color }}
               aria-label={`Select color ${color}`}
@@ -194,48 +207,51 @@ const UnifiedFloatingToolbar: React.FC<UnifiedFloatingToolbarProps> = ({
   onToggleFullscreen,
   playerDisplayConfig,
   onPlayerDisplayConfigChange,
-  className = ''
+  className = '',
 }) => {
   // Keyboard shortcuts
-  const handleKeyPress = useCallback((event: KeyboardEvent) => {
-    // Don't trigger shortcuts when typing in inputs
-    if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
-      return;
-    }
+  const handleKeyPress = useCallback(
+    (event: KeyboardEvent) => {
+      // Don't trigger shortcuts when typing in inputs
+      if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
+        return;
+      }
 
-    switch (event.key.toLowerCase()) {
-      case 'v':
-        onToolChange('select');
-        break;
-      case 'a':
-        onToolChange('arrow');
-        break;
-      case 'l':
-        onToolChange('line');
-        break;
-      case 'r':
-        onToolChange('zone');
-        break;
-      case 'p':
-        onToolChange('pen');
-        break;
-      case 't':
-        onToolChange('text');
-        break;
-      case 'g':
-        onGridToggle();
-        break;
-      case 'z':
-        if (event.ctrlKey || event.metaKey) {
-          event.preventDefault();
-          onUndoDrawing();
-        }
-        break;
-      case 'escape':
-        onToolChange('select');
-        break;
-    }
-  }, [onToolChange, onGridToggle, onUndoDrawing]);
+      switch (event.key.toLowerCase()) {
+        case 'v':
+          onToolChange('select');
+          break;
+        case 'a':
+          onToolChange('arrow');
+          break;
+        case 'l':
+          onToolChange('line');
+          break;
+        case 'r':
+          onToolChange('zone');
+          break;
+        case 'p':
+          onToolChange('pen');
+          break;
+        case 't':
+          onToolChange('text');
+          break;
+        case 'g':
+          onGridToggle();
+          break;
+        case 'z':
+          if (event.ctrlKey || event.metaKey) {
+            event.preventDefault();
+            onUndoDrawing();
+          }
+          break;
+        case 'escape':
+          onToolChange('select');
+          break;
+      }
+    },
+    [onToolChange, onGridToggle, onUndoDrawing]
+  );
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyPress);
@@ -261,7 +277,6 @@ const UnifiedFloatingToolbar: React.FC<UnifiedFloatingToolbarProps> = ({
           label="Toggle Left Sidebar"
           isActive={showLeftSidebar}
           onClick={onToggleLeftSidebar}
-          size="sm"
         >
           <Menu className="w-4 h-4" />
         </ToolButton>
@@ -270,7 +285,6 @@ const UnifiedFloatingToolbar: React.FC<UnifiedFloatingToolbarProps> = ({
           label="Toggle Right Sidebar"
           isActive={showRightSidebar}
           onClick={onToggleRightSidebar}
-          size="sm"
         >
           <Sidebar className="w-4 h-4" />
         </ToolButton>
@@ -278,12 +292,11 @@ const UnifiedFloatingToolbar: React.FC<UnifiedFloatingToolbarProps> = ({
         {/* Formation Info */}
         {currentFormation && (
           <div className="flex items-center gap-2 bg-slate-700/50 rounded-lg px-2 py-1">
-            <div className="text-white font-medium text-xs">
-              {currentFormation.name}
-            </div>
+            <div className="text-white font-medium text-xs">{currentFormation.name}</div>
             <div className="w-1 h-1 bg-slate-400 rounded-full" />
             <div className="text-slate-400 text-xs">
-              {currentFormation.slots?.filter(slot => slot.playerId).length || 0}/{currentFormation.slots?.length || 11}
+              {currentFormation.slots?.filter(slot => slot.playerId).length || 0}/
+              {currentFormation.slots?.length || 11}
             </div>
           </div>
         )}
@@ -291,77 +304,77 @@ const UnifiedFloatingToolbar: React.FC<UnifiedFloatingToolbarProps> = ({
 
       {/* Center Section - Drawing Tools */}
       <div className="flex items-center gap-1 px-3 py-2">
-        <ToolButton 
-          label="Select" 
-          shortcut="V" 
-          tool="select" 
-          isActive={drawingTool === 'select'} 
+        <ToolButton
+          label="Select"
+          shortcut="V"
+          tool="select"
+          isActive={drawingTool === 'select'}
           onClick={onToolChange}
         >
           <MousePointer2 className="w-5 h-5" />
         </ToolButton>
-        <ToolButton 
-          label="Arrow" 
-          shortcut="A" 
-          tool="arrow" 
-          isActive={drawingTool === 'arrow'} 
+        <ToolButton
+          label="Arrow"
+          shortcut="A"
+          tool="arrow"
+          isActive={drawingTool === 'arrow'}
           onClick={onToolChange}
         >
           <ArrowRight className="w-5 h-5" />
         </ToolButton>
-        <ToolButton 
-          label="Line" 
-          shortcut="L" 
-          tool="line" 
-          isActive={drawingTool === 'line'} 
+        <ToolButton
+          label="Line"
+          shortcut="L"
+          tool="line"
+          isActive={drawingTool === 'line'}
           onClick={onToolChange}
         >
           <Minus className="w-5 h-5" />
         </ToolButton>
-        <ToolButton 
-          label="Zone" 
-          shortcut="R" 
-          tool="zone" 
-          isActive={drawingTool === 'zone'} 
+        <ToolButton
+          label="Zone"
+          shortcut="R"
+          tool="zone"
+          isActive={drawingTool === 'zone'}
           onClick={onToolChange}
         >
           <Square className="w-5 h-5" />
         </ToolButton>
-        <ToolButton 
-          label="Pen" 
-          shortcut="P" 
-          tool="pen" 
-          isActive={drawingTool === 'pen'} 
+        <ToolButton
+          label="Pen"
+          shortcut="P"
+          tool="pen"
+          isActive={drawingTool === 'pen'}
           onClick={onToolChange}
         >
           <Pen className="w-5 h-5" />
         </ToolButton>
-        <ToolButton 
-          label="Text" 
-          shortcut="T" 
-          tool="text" 
-          isActive={drawingTool === 'text'} 
+        <ToolButton
+          label="Text"
+          shortcut="T"
+          tool="text"
+          isActive={drawingTool === 'text'}
           onClick={onToolChange}
         >
           <Type className="w-5 h-5" />
         </ToolButton>
-        
+
         <ColorPicker currentColor={drawingColor} onColorChange={onColorChange} />
       </div>
 
       {/* Right Section - View Controls & Actions */}
       <div className="flex items-center gap-1 px-3 py-2">
-        <ToolButton 
-          label="Toggle Grid" 
-          shortcut="G" 
-          isActive={isGridVisible} 
+        <ToolButton
+          label="Toggle Grid"
+          shortcut="G"
+          isActive={isGridVisible}
           onClick={onGridToggle}
         >
           <Grid3X3 className="w-5 h-5" />
         </ToolButton>
-        <ToolButton 
-          label="Formation Strength" 
-          isActive={isFormationStrengthVisible} 
+        <ToolButton
+          label="Formation Strength"
+          isActive={isFormationStrengthVisible}
           onClick={onFormationStrengthToggle}
         >
           <Activity className="w-5 h-5" />
@@ -378,18 +391,14 @@ const UnifiedFloatingToolbar: React.FC<UnifiedFloatingToolbarProps> = ({
       {/* Animation Controls */}
       <div className="flex items-center gap-1 px-3 py-2">
         {isAnimating ? (
-          <ToolButton 
-            label="Reset Animation" 
-            isActive={false} 
-            onClick={onResetAnimation}
-          >
+          <ToolButton label="Reset Animation" isActive={false} onClick={onResetAnimation}>
             <RotateCcw className="w-5 h-5 text-red-400" />
           </ToolButton>
         ) : (
-          <ToolButton 
-            label="Play Animation" 
+          <ToolButton
+            label="Play Animation"
             disabled={!canPlayAnimation}
-            isActive={false} 
+            isActive={false}
             onClick={onPlayAnimation}
           >
             <Play className="w-5 h-5" />
@@ -399,19 +408,19 @@ const UnifiedFloatingToolbar: React.FC<UnifiedFloatingToolbarProps> = ({
 
       {/* Drawing Actions */}
       <div className="flex items-center gap-1 px-3 py-2">
-        <ToolButton 
-          label="Undo Last Drawing" 
+        <ToolButton
+          label="Undo Last Drawing"
           shortcut="Ctrl+Z"
           disabled={drawings.length === 0}
-          isActive={false} 
+          isActive={false}
           onClick={onUndoDrawing}
         >
           <Undo className="w-5 h-5" />
         </ToolButton>
-        <ToolButton 
-          label="Clear All Drawings" 
+        <ToolButton
+          label="Clear All Drawings"
           disabled={drawings.length === 0}
-          isActive={false} 
+          isActive={false}
           onClick={onClearDrawings}
         >
           <Trash2 className="w-5 h-5 text-red-400" />
@@ -425,24 +434,27 @@ const UnifiedFloatingToolbar: React.FC<UnifiedFloatingToolbarProps> = ({
             label={viewMode === 'fullscreen' ? 'Exit Fullscreen' : 'Enter Fullscreen'}
             isActive={false}
             onClick={onToggleFullscreen}
-            size="sm"
           >
-            {viewMode === 'fullscreen' ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+            {viewMode === 'fullscreen' ? (
+              <Minimize2 className="w-4 h-4" />
+            ) : (
+              <Maximize2 className="w-4 h-4" />
+            )}
           </ToolButton>
         )}
-        
+
         <FormationAutoSave
           currentFormation={currentFormation}
           currentPlayers={currentPlayers}
           onLoadFormation={onFormationChange}
           onNotification={onNotification}
         />
-        
+
         <button className="flex items-center gap-1 px-2 py-1 bg-blue-600/80 hover:bg-blue-700 text-white rounded-lg transition-all text-xs">
           <Share2 className="w-3 h-3" />
           Share
         </button>
-        
+
         {/* Player Display Settings */}
         {playerDisplayConfig && onPlayerDisplayConfigChange && (
           <PlayerDisplaySettings

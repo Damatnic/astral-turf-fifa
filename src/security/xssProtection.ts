@@ -14,7 +14,12 @@ export interface XSSDetectionResult {
 }
 
 export interface XSSThreat {
-  type: 'script_injection' | 'html_injection' | 'attribute_injection' | 'url_injection' | 'css_injection';
+  type:
+    | 'script_injection'
+    | 'html_injection'
+    | 'attribute_injection'
+    | 'url_injection'
+    | 'css_injection';
   payload: string;
   severity: 'low' | 'medium' | 'high' | 'critical';
   description: string;
@@ -38,22 +43,46 @@ export interface XSSProtectionConfig {
 const DEFAULT_XSS_CONFIG: XSSProtectionConfig = {
   enableStrictMode: true,
   allowedTags: [
-    'b', 'i', 'em', 'strong', 'u', 'br', 'p', 'div', 'span', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-    'ul', 'ol', 'li', 'a', 'img', 'table', 'thead', 'tbody', 'tr', 'td', 'th'
+    'b',
+    'i',
+    'em',
+    'strong',
+    'u',
+    'br',
+    'p',
+    'div',
+    'span',
+    'h1',
+    'h2',
+    'h3',
+    'h4',
+    'h5',
+    'h6',
+    'ul',
+    'ol',
+    'li',
+    'a',
+    'img',
+    'table',
+    'thead',
+    'tbody',
+    'tr',
+    'td',
+    'th',
   ],
   allowedAttributes: {
-    'a': ['href', 'title', 'target'],
-    'img': ['src', 'alt', 'width', 'height'],
-    'div': ['class', 'id'],
-    'span': ['class', 'id'],
-    'p': ['class', 'id'],
-    '*': ['class', 'id']
+    a: ['href', 'title', 'target'],
+    img: ['src', 'alt', 'width', 'height'],
+    div: ['class', 'id'],
+    span: ['class', 'id'],
+    p: ['class', 'id'],
+    '*': ['class', 'id'],
   },
   blockDataURIs: true,
   blockJavaScriptURIs: true,
   removeComments: true,
   removeProcessingInstructions: true,
-  logViolations: true
+  logViolations: true,
 };
 
 /**
@@ -67,9 +96,9 @@ const XSS_PATTERNS = {
     /<script\s*>[\s\S]*?<\/script>/gi,
     /<script\s+[^>]*>[\s\S]*?<\/script>/gi,
     /javascript:/gi,
-    /vbscript:/gi
+    /vbscript:/gi,
   ],
-  
+
   // HTML injection patterns
   html_injection: [
     /<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi,
@@ -77,9 +106,9 @@ const XSS_PATTERNS = {
     /<embed\b[^<]*(?:(?!<\/embed>)<[^<]*)*<\/embed>/gi,
     /<applet\b[^<]*(?:(?!<\/applet>)<[^<]*)*<\/applet>/gi,
     /<form\b[^<]*(?:(?!<\/form>)<[^<]*)*<\/form>/gi,
-    /<svg\b[^<]*(?:(?!<\/svg>)<[^<]*)*<\/svg>/gi
+    /<svg\b[^<]*(?:(?!<\/svg>)<[^<]*)*<\/svg>/gi,
   ],
-  
+
   // Attribute injection patterns
   attribute_injection: [
     /on\w+\s*=/gi,
@@ -90,9 +119,9 @@ const XSS_PATTERNS = {
     /onfocus\s*=/gi,
     /onblur\s*=/gi,
     /onchange\s*=/gi,
-    /onsubmit\s*=/gi
+    /onsubmit\s*=/gi,
   ],
-  
+
   // URL injection patterns
   url_injection: [
     /data:text\/html/gi,
@@ -102,9 +131,9 @@ const XSS_PATTERNS = {
     /javascript:/gi,
     /vbscript:/gi,
     /livescript:/gi,
-    /mocha:/gi
+    /mocha:/gi,
   ],
-  
+
   // CSS injection patterns
   css_injection: [
     /expression\s*\(/gi,
@@ -112,8 +141,8 @@ const XSS_PATTERNS = {
     /-moz-binding\s*:/gi,
     /javascript\s*:/gi,
     /@import/gi,
-    /url\s*\(\s*['"]*javascript:/gi
-  ]
+    /url\s*\(\s*['"]*javascript:/gi,
+  ],
 };
 
 /**
@@ -121,7 +150,12 @@ const XSS_PATTERNS = {
  */
 class XSSProtectionService {
   private config: XSSProtectionConfig;
-  private violations: Array<{ timestamp: string; threat: XSSThreat; userAgent?: string; ip?: string }> = [];
+  private violations: Array<{
+    timestamp: string;
+    threat: XSSThreat;
+    userAgent?: string;
+    ip?: string;
+  }> = [];
 
   constructor(config: Partial<XSSProtectionConfig> = {}) {
     this.config = { ...DEFAULT_XSS_CONFIG, ...config };
@@ -153,7 +187,7 @@ class XSSProtectionService {
 
       // Step 3: Sanitize content
       let sanitizedContent = content;
-      
+
       switch (context.contentType) {
         case 'html':
           sanitizedContent = this.sanitizeHTML(content);
@@ -182,28 +216,29 @@ class XSSProtectionService {
         isClean: threats.length === 0,
         threats,
         sanitizedContent,
-        riskScore
+        riskScore,
       };
-
     } catch (error) {
       securityLogger.error('XSS protection failed', {
         error: error instanceof Error ? error.message : 'Unknown error',
         contentLength: content.length,
-        contentType: context.contentType
+        contentType: context.contentType,
       });
 
       // Return safe fallback
       return {
         isClean: false,
-        threats: [{
-          type: 'script_injection',
-          payload: 'Protection error',
-          severity: 'critical',
-          description: 'XSS protection system error',
-          location: 'unknown'
-        }],
+        threats: [
+          {
+            type: 'script_injection',
+            payload: 'Protection error',
+            severity: 'critical',
+            description: 'XSS protection system error',
+            location: 'unknown',
+          },
+        ],
         sanitizedContent: '',
-        riskScore: 1.0
+        riskScore: 1.0,
       };
     }
   }
@@ -224,7 +259,7 @@ class XSSProtectionService {
               payload: match,
               severity: this.assessThreatSeverity(type, match),
               description: this.getThreatDescription(type, match),
-              location: this.findThreatLocation(content, match)
+              location: this.findThreatLocation(content, match),
             });
           });
         }
@@ -239,17 +274,18 @@ class XSSProtectionService {
    */
   private sanitizeHTML(html: string): string {
     try {
-      return DOMPurify.sanitize(html, {
-        ALLOWED_TAGS: this.config.allowedTags,
-        ALLOWED_ATTR: Object.values(this.config.allowedAttributes).flat(),
-        FORBID_SCRIPTS: true,
-        FORBID_TAGS: ['script', 'object', 'embed', 'applet', 'form', 'input', 'button'],
-        FORBID_ATTR: ['onclick', 'onload', 'onerror', 'onmouseover', 'onfocus'],
-        ALLOW_DATA_ATTR: false,
-        ALLOW_UNKNOWN_PROTOCOLS: false,
-        SANITIZE_DOM: true,
-        KEEP_CONTENT: false
-      });
+      return String(
+        DOMPurify.sanitize(html, {
+          ALLOWED_TAGS: this.config.allowedTags,
+          ALLOWED_ATTR: Object.values(this.config.allowedAttributes).flat(),
+          FORBID_TAGS: ['script', 'object', 'embed', 'applet', 'form', 'input', 'button'],
+          FORBID_ATTR: ['onclick', 'onload', 'onerror', 'onmouseover', 'onfocus'],
+          ALLOW_DATA_ATTR: false,
+          ALLOW_UNKNOWN_PROTOCOLS: false,
+          SANITIZE_DOM: true,
+          KEEP_CONTENT: false,
+        } as any)
+      );
     } catch (error) {
       securityLogger.error('HTML sanitization failed', { error });
       return '';
@@ -264,7 +300,7 @@ class XSSProtectionService {
       // Block dangerous protocols
       const dangerousProtocols = ['javascript:', 'vbscript:', 'data:', 'blob:', 'file:'];
       const lowerUrl = url.toLowerCase();
-      
+
       if (dangerousProtocols.some(protocol => lowerUrl.startsWith(protocol))) {
         return '';
       }
@@ -349,14 +385,14 @@ class XSSProtectionService {
    * Configure DOMPurify with security settings
    */
   private configureDOMPurify(): void {
-    DOMPurify.addHook('beforeSanitizeElements', (node) => {
+    DOMPurify.addHook('beforeSanitizeElements', node => {
       // Remove any script elements
       if (node.nodeName === 'SCRIPT') {
-        node.remove();
+        (node as Element).remove();
       }
     });
 
-    DOMPurify.addHook('beforeSanitizeAttributes', (node) => {
+    DOMPurify.addHook('beforeSanitizeAttributes', node => {
       // Remove event handlers
       if (node.hasAttributes()) {
         const attributes = Array.from(node.attributes);
@@ -373,13 +409,15 @@ class XSSProtectionService {
    * Calculate risk score based on detected threats
    */
   private calculateRiskScore(threats: XSSThreat[]): number {
-    if (threats.length === 0) return 0;
+    if (threats.length === 0) {
+      return 0;
+    }
 
     const severityWeights = {
       low: 0.1,
       medium: 0.3,
       high: 0.6,
-      critical: 1.0
+      critical: 1.0,
     };
 
     const totalScore = threats.reduce((score, threat) => {
@@ -426,7 +464,7 @@ class XSSProtectionService {
       html_injection: 'Potentially dangerous HTML element detected',
       attribute_injection: 'Event handler or dangerous attribute detected',
       url_injection: 'Dangerous URL protocol detected',
-      css_injection: 'CSS injection or expression detected'
+      css_injection: 'CSS injection or expression detected',
     };
 
     return descriptions[type as keyof typeof descriptions] || 'Unknown XSS threat detected';
@@ -437,7 +475,9 @@ class XSSProtectionService {
    */
   private findThreatLocation(content: string, threat: string): string {
     const index = content.indexOf(threat);
-    if (index === -1) return 'unknown';
+    if (index === -1) {
+      return 'unknown';
+    }
 
     const lineNumber = content.substring(0, index).split('\n').length;
     const columnNumber = index - content.lastIndexOf('\n', index - 1);
@@ -460,7 +500,7 @@ class XSSProtectionService {
       timestamp: new Date().toISOString(),
       threat,
       userAgent: context.userAgent,
-      ip: context.ipAddress
+      ip: context.ipAddress,
     };
 
     this.violations.push(violation);
@@ -473,8 +513,8 @@ class XSSProtectionService {
         payload: threat.payload.substring(0, 100),
         location: threat.location,
         userAgent: context.userAgent,
-        ipAddress: context.ipAddress
-      }
+        ipAddress: context.ipAddress,
+      },
     });
 
     // Keep only last 1000 violations
@@ -502,25 +542,32 @@ class XSSProtectionService {
     }[timeframe];
 
     const cutoff = new Date(now.getTime() - timeframeMs);
-    const recentViolations = this.violations.filter(
-      v => new Date(v.timestamp) >= cutoff
+    const recentViolations = this.violations.filter(v => new Date(v.timestamp) >= cutoff);
+
+    const violationsByType = recentViolations.reduce(
+      (acc, v) => {
+        acc[v.threat.type] = (acc[v.threat.type] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
     );
 
-    const violationsByType = recentViolations.reduce((acc, v) => {
-      acc[v.threat.type] = (acc[v.threat.type] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const violationsBySeverity = recentViolations.reduce(
+      (acc, v) => {
+        acc[v.threat.severity] = (acc[v.threat.severity] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
 
-    const violationsBySeverity = recentViolations.reduce((acc, v) => {
-      acc[v.threat.severity] = (acc[v.threat.severity] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-
-    const payloadCounts = recentViolations.reduce((acc, v) => {
-      const payload = v.threat.payload.substring(0, 50);
-      acc[payload] = (acc[payload] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const payloadCounts = recentViolations.reduce(
+      (acc, v) => {
+        const payload = v.threat.payload.substring(0, 50);
+        acc[payload] = (acc[payload] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
 
     const topPayloads = Object.entries(payloadCounts)
       .sort(([, a], [, b]) => b - a)
@@ -532,7 +579,7 @@ class XSSProtectionService {
       violationsByType,
       violationsBySeverity,
       topPayloads,
-      trends: [] // Would implement trend calculation
+      trends: [], // Would implement trend calculation
     };
   }
 
@@ -559,16 +606,16 @@ export const protectFromXSS = (
   }
 ) => xssProtection.protectContent(content, context);
 
-export const sanitizeHTML = (html: string) => 
+export const sanitizeHTML = (html: string) =>
   xssProtection.protectContent(html, { contentType: 'html' });
 
-export const sanitizeURL = (url: string) => 
+export const sanitizeURL = (url: string) =>
   xssProtection.protectContent(url, { contentType: 'url' });
 
-export const sanitizeCSS = (css: string) => 
+export const sanitizeCSS = (css: string) =>
   xssProtection.protectContent(css, { contentType: 'css' });
 
-export const getXSSStats = (timeframe?: '1h' | '24h' | '7d' | '30d') => 
+export const getXSSStats = (timeframe?: '1h' | '24h' | '7d' | '30d') =>
   xssProtection.getViolationStats(timeframe);
 
 export default xssProtection;

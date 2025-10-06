@@ -16,6 +16,8 @@ import {
 } from 'lucide-react';
 import { type Formation, type Player } from '../../types';
 
+type FormationExport = any;
+
 interface TacticalPlaybookProps {
   currentFormation?: Formation;
   currentPlayers?: Player[];
@@ -78,7 +80,9 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
   };
 
   const handleSaveCurrentFormation = async () => {
-    if (!currentFormation || !formationName.trim()) {return;}
+    if (!currentFormation || !formationName.trim()) {
+      return;
+    }
 
     try {
       const players = currentPlayers || [];
@@ -86,7 +90,7 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
         ...currentFormation,
         name: formationName.trim(),
         players,
-        savedAt: new Date().toISOString()
+        savedAt: new Date().toISOString(),
       };
 
       const updatedFormations = [...savedFormations, formationData];
@@ -127,11 +131,11 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json';
-    input.onchange = (e) => {
+    input.onchange = e => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (file) {
         const reader = new (window as any).FileReader();
-        reader.onload = (e) => {
+        reader.onload = (e: any) => {
           try {
             const importedData = JSON.parse(e.target?.result as string);
             if (importedData.formation) {
@@ -150,7 +154,9 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
   };
 
   const handleExportFormation = (formation: FormationExport) => {
-    const blob = new (window as any).Blob([JSON.stringify(formation, null, 2)], { type: 'application/json' });
+    const blob = new (window as any).Blob([JSON.stringify(formation, null, 2)], {
+      type: 'application/json',
+    });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
@@ -168,7 +174,7 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
     // Apply search filter
     if (searchTerm) {
       filtered = filtered.filter(formation =>
-        formation.name.toLowerCase().includes(searchTerm.toLowerCase()),
+        formation.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
@@ -178,16 +184,16 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
         filtered = filtered.filter(formation => favorites.has(formation.id));
         break;
       case 'recent':
-        filtered = filtered
-          .sort((a, b) => b.timestamp - a.timestamp)
-          .slice(0, 10);
+        filtered = filtered.sort((a, b) => b.timestamp - a.timestamp).slice(0, 10);
         break;
     }
 
     return filtered;
   }, [savedFormations, searchTerm, filterBy, favorites]);
 
-  if (!isOpen) {return null;}
+  if (!isOpen) {
+    return null;
+  }
 
   return (
     <AnimatePresence>
@@ -196,7 +202,7 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
-        onClick={(e) => e.target === e.currentTarget && onClose()}
+        onClick={e => e.target === e.currentTarget && onClose()}
       >
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
@@ -209,7 +215,9 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
             <div className="flex items-center gap-3">
               <BookOpen className="w-6 h-6 text-blue-400" />
               <h2 className="text-xl font-bold text-white">Tactical Playbook</h2>
-              <span className="text-sm text-slate-400">({filteredFormations.length} formations)</span>
+              <span className="text-sm text-slate-400">
+                ({filteredFormations.length} formations)
+              </span>
             </div>
 
             <div className="flex items-center gap-2">
@@ -254,7 +262,7 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
                   type="text"
                   placeholder="Search formations..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={e => setSearchTerm(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 bg-slate-800/50 border border-slate-700/50 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-blue-500/50"
                 />
               </div>
@@ -263,7 +271,7 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
                 <Filter className="w-4 h-4 text-slate-400" />
                 <select
                   value={filterBy}
-                  onChange={(e) => setFilterBy(e.target.value as 'all' | 'favorite' | 'recent')}
+                  onChange={e => setFilterBy(e.target.value as 'all' | 'favorite' | 'recent')}
                   className="bg-slate-800/50 border border-slate-700/50 rounded-lg text-white px-3 py-2 focus:outline-none focus:border-blue-500/50"
                 >
                   <option value="all">All</option>
@@ -281,12 +289,14 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
                 <BookOpen className="w-16 h-16 text-slate-600 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-slate-400 mb-2">No formations found</h3>
                 <p className="text-slate-500">
-                  {searchTerm ? 'Try adjusting your search terms' : 'Save your first formation to get started'}
+                  {searchTerm
+                    ? 'Try adjusting your search terms'
+                    : 'Save your first formation to get started'}
                 </p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {filteredFormations.map((formation) => (
+                {filteredFormations.map(formation => (
                   <motion.div
                     key={formation.id}
                     initial={{ opacity: 0, y: 20 }}
@@ -303,7 +313,10 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
                           onClick={() => toggleFavorite(formation.id)}
                           className={`p-1 rounded ${favorites.has(formation.id) ? 'text-yellow-400' : 'text-slate-500 hover:text-yellow-400'}`}
                         >
-                          <Star className="w-4 h-4" fill={favorites.has(formation.id) ? 'currentColor' : 'none'} />
+                          <Star
+                            className="w-4 h-4"
+                            fill={favorites.has(formation.id) ? 'currentColor' : 'none'}
+                          />
                         </motion.button>
 
                         <motion.button
@@ -371,7 +384,7 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="absolute inset-0 bg-black/50 flex items-center justify-center p-4"
-              onClick={(e) => e.target === e.currentTarget && setShowSaveDialog(false)}
+              onClick={e => e.target === e.currentTarget && setShowSaveDialog(false)}
             >
               <motion.div
                 initial={{ scale: 0.9, opacity: 0 }}
@@ -385,7 +398,7 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
                   type="text"
                   placeholder="Enter formation name..."
                   value={formationName}
-                  onChange={(e) => setFormationName(e.target.value)}
+                  onChange={e => setFormationName(e.target.value)}
                   className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700/50 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-blue-500/50 mb-4"
                   autoFocus
                 />

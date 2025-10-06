@@ -20,23 +20,23 @@ on:
         default: 'blue-green'
         type: choice
         options:
-        - blue-green
-        - canary
-        - rolling
-        - immediate
+          - blue-green
+          - canary
+          - rolling
+          - immediate
       target_clouds:
         description: 'Target Cloud Providers'
         required: true
         default: 'aws,azure,gcp'
         type: choice
         options:
-        - aws
-        - azure
-        - gcp
-        - aws,azure
-        - aws,gcp
-        - azure,gcp
-        - aws,azure,gcp
+          - aws
+          - azure
+          - gcp
+          - aws,azure
+          - aws,gcp
+          - azure,gcp
+          - aws,azure,gcp
       enable_edge_deployment:
         description: 'Enable Edge Computing Deployment'
         required: false
@@ -54,22 +54,22 @@ env:
   DEPLOYMENT_TIMEOUT: 1800
   HEALTH_CHECK_TIMEOUT: 300
   ROLLBACK_TIMEOUT: 180
-  
+
   # Security and compliance
   SECURITY_SCAN_ENABLED: true
   COMPLIANCE_CHECK_ENABLED: true
-  VULNERABILITY_THRESHOLD: "HIGH"
-  
+  VULNERABILITY_THRESHOLD: 'HIGH'
+
   # Performance monitoring
   PERFORMANCE_MONITORING: true
   LOAD_TEST_ENABLED: true
   CHAOS_ENGINEERING: false
-  
+
   # Multi-cloud configuration
   AWS_REGION: us-east-1
   AZURE_REGION: eastus
   GCP_REGION: us-central1
-  EDGE_REGIONS: "us-east-1,eu-west-1,ap-southeast-1"
+  EDGE_REGIONS: 'us-east-1,eu-west-1,ap-southeast-1'
 
 concurrency:
   group: atlas-deployment-${{ github.ref }}
@@ -87,56 +87,56 @@ jobs:
       security-approved: ${{ steps.security-check.outputs.approved }}
       compliance-status: ${{ steps.compliance-check.outputs.status }}
     steps:
-    - name: 🔐 Checkout with security verification
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-        token: ${{ secrets.ATLAS_GITHUB_TOKEN }}
-    
-    - name: 🔍 Advanced Security Scanning
-      id: security-scan
-      uses: github/super-linter@v5
-      env:
-        DEFAULT_BRANCH: main
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        VALIDATE_ALL_CODEBASE: true
-        VALIDATE_TYPESCRIPT_ES: true
-        VALIDATE_DOCKERFILE_HADOLINT: true
-        VALIDATE_KUBERNETES_KUBEVAL: true
-    
-    - name: 🛡️ Container Security Scan
-      uses: aquasecurity/trivy-action@master
-      with:
-        image-ref: '.'
-        format: 'sarif'
-        output: 'trivy-results.sarif'
-        severity: 'CRITICAL,HIGH,MEDIUM'
-        exit-code: 1
-    
-    - name: 🎯 SAST Security Analysis
-      uses: github/codeql-action/init@v3
-      with:
-        languages: typescript, javascript
-        queries: security-and-quality
-    
-    - name: 🔐 Secrets Detection
-      uses: trufflesecurity/trufflehog@main
-      with:
-        path: ./
-        base: main
-        head: HEAD
-    
-    - name: ✅ Security Approval Gate
-      id: security-check
-      run: |
-        echo "approved=true" >> $GITHUB_OUTPUT
-        echo "🔒 Security audit completed successfully"
-    
-    - name: 📋 Compliance Validation
-      id: compliance-check
-      run: |
-        echo "status=compliant" >> $GITHUB_OUTPUT
-        echo "📋 SOX, GDPR, PCI-DSS compliance verified"
+      - name: 🔐 Checkout with security verification
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.ATLAS_GITHUB_TOKEN }}
+
+      - name: 🔍 Advanced Security Scanning
+        id: security-scan
+        uses: github/super-linter@v5
+        env:
+          DEFAULT_BRANCH: main
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VALIDATE_ALL_CODEBASE: true
+          VALIDATE_TYPESCRIPT_ES: true
+          VALIDATE_DOCKERFILE_HADOLINT: true
+          VALIDATE_KUBERNETES_KUBEVAL: true
+
+      - name: 🛡️ Container Security Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH,MEDIUM'
+          exit-code: 1
+
+      - name: 🎯 SAST Security Analysis
+        uses: github/codeql-action/init@v3
+        with:
+          languages: typescript, javascript
+          queries: security-and-quality
+
+      - name: 🔐 Secrets Detection
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: main
+          head: HEAD
+
+      - name: ✅ Security Approval Gate
+        id: security-check
+        run: |
+          echo "approved=true" >> $GITHUB_OUTPUT
+          echo "🔒 Security audit completed successfully"
+
+      - name: 📋 Compliance Validation
+        id: compliance-check
+        run: |
+          echo "status=compliant" >> $GITHUB_OUTPUT
+          echo "📋 SOX, GDPR, PCI-DSS compliance verified"
 
   # ================================================================
   # PERFORMANCE AND QUALITY VALIDATION
@@ -150,56 +150,56 @@ jobs:
       matrix:
         test-suite: [unit, integration, e2e, performance, accessibility]
     steps:
-    - name: 🔄 Checkout Code
-      uses: actions/checkout@v4
-    
-    - name: ⚡ Setup Node.js 20
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'npm'
-        registry-url: 'https://registry.npmjs.org'
-    
-    - name: 📦 Install Dependencies
-      run: |
-        npm ci --silent --prefer-offline --no-audit
-        npm ls --production=false
-    
-    - name: 🧪 Run Test Suite - ${{ matrix.test-suite }}
-      run: |
-        case "${{ matrix.test-suite }}" in
-          "unit")
-            npm run test:unit-only
-            ;;
-          "integration")
-            npm run test:integration-only
-            ;;
-          "e2e")
-            npm run e2e
-            ;;
-          "performance")
-            npm run test:performance
-            npm run performance:lighthouse
-            ;;
-          "accessibility")
-            npm run test:a11y
-            ;;
-        esac
-    
-    - name: 📊 Upload Test Results
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: test-results-${{ matrix.test-suite }}
-        path: |
-          coverage/
-          test-results/
-          lighthouse-reports/
-        retention-days: 30
-    
-    - name: 🎯 Quality Gate Check
-      run: |
-        echo "✅ Quality assurance passed for ${{ matrix.test-suite }}"
+      - name: 🔄 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: ⚡ Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: 📦 Install Dependencies
+        run: |
+          npm ci --silent --prefer-offline --no-audit
+          npm ls --production=false
+
+      - name: 🧪 Run Test Suite - ${{ matrix.test-suite }}
+        run: |
+          case "${{ matrix.test-suite }}" in
+            "unit")
+              npm run test:unit-only
+              ;;
+            "integration")
+              npm run test:integration-only
+              ;;
+            "e2e")
+              npm run e2e
+              ;;
+            "performance")
+              npm run test:performance
+              npm run performance:lighthouse
+              ;;
+            "accessibility")
+              npm run test:a11y
+              ;;
+          esac
+
+      - name: 📊 Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-${{ matrix.test-suite }}
+          path: |
+            coverage/
+            test-results/
+            lighthouse-reports/
+          retention-days: 30
+
+      - name: 🎯 Quality Gate Check
+        run: |
+          echo "✅ Quality assurance passed for ${{ matrix.test-suite }}"
 
   # ================================================================
   # MULTI-CLOUD CONTAINER BUILD AND PUSH
@@ -214,98 +214,98 @@ jobs:
       image-digest: ${{ steps.image-build.outputs.digest }}
       image-tag: ${{ steps.meta.outputs.tags }}
     steps:
-    - name: 🔄 Checkout Code
-      uses: actions/checkout@v4
-    
-    - name: 🔐 Configure Multi-Cloud Authentication
-      run: |
-        # AWS ECR
-        echo "${{ secrets.AWS_ACCESS_KEY_ID }}" | base64 -d
-        # Azure ACR
-        echo "${{ secrets.AZURE_CLIENT_SECRET }}" | base64 -d
-        # GCP Artifact Registry
-        echo "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" | base64 -d
-    
-    - name: 🏗️ Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-      with:
-        platforms: linux/amd64,linux/arm64
-        driver-opts: |
-          network=host
-          image=moby/buildkit:latest
-    
-    - name: 🔐 Login to Container Registries
-      run: |
-        # GitHub Container Registry
-        echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-        
-        # AWS ECR
-        aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
-        
-        # Azure ACR
-        az acr login --name ${{ secrets.AZURE_REGISTRY_NAME }}
-        
-        # Google Artifact Registry
-        echo "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" | docker login -u _json_key --password-stdin https://gcr.io
-    
-    - name: 🏷️ Extract Metadata
-      id: meta
-      uses: docker/metadata-action@v5
-      with:
-        images: |
-          ghcr.io/${{ env.IMAGE_NAME }}
-          ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.IMAGE_NAME }}
-          ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}
-          gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ env.IMAGE_NAME }}
-        tags: |
-          type=ref,event=branch
-          type=ref,event=pr
-          type=semver,pattern={{version}}
-          type=semver,pattern={{major}}.{{minor}}
-          type=semver,pattern={{major}}
-          type=sha,prefix={{branch}}-
-          type=raw,value=latest,enable={{is_default_branch}}
-        labels: |
-          org.opencontainers.image.title=Astral Turf Tactical Board
-          org.opencontainers.image.description=Enterprise AI-powered soccer tactical planner
-          org.opencontainers.image.vendor=Astral Turf
-          atlas.security.level=enterprise
-          atlas.deployment.strategy=blue-green
-          atlas.multicloud.enabled=true
-    
-    - name: 🚀 Build and Push Multi-Cloud Images
-      id: image-build
-      uses: docker/build-push-action@v5
-      with:
-        context: .
-        file: ./Dockerfile
-        push: true
-        platforms: linux/amd64,linux/arm64
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
-        target: runner
-        build-args: |
-          NODE_ENV=production
-          ATLAS_BUILD_VERSION=${{ github.sha }}
-          ATLAS_BUILD_TIMESTAMP=${{ github.event.head_commit.timestamp }}
-        provenance: true
-        sbom: true
-    
-    - name: 🔍 Container Security Scan
-      uses: aquasecurity/trivy-action@master
-      with:
-        image-ref: ghcr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}
-        format: 'json'
-        output: 'security-scan-results.json'
-        severity: 'CRITICAL,HIGH'
-    
-    - name: 📊 Upload Security Scan Results
-      uses: actions/upload-artifact@v4
-      with:
-        name: container-security-scan
-        path: security-scan-results.json
+      - name: 🔄 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🔐 Configure Multi-Cloud Authentication
+        run: |
+          # AWS ECR
+          echo "${{ secrets.AWS_ACCESS_KEY_ID }}" | base64 -d
+          # Azure ACR
+          echo "${{ secrets.AZURE_CLIENT_SECRET }}" | base64 -d
+          # GCP Artifact Registry
+          echo "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" | base64 -d
+
+      - name: 🏗️ Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          platforms: linux/amd64,linux/arm64
+          driver-opts: |
+            network=host
+            image=moby/buildkit:latest
+
+      - name: 🔐 Login to Container Registries
+        run: |
+          # GitHub Container Registry
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+          # AWS ECR
+          aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
+
+          # Azure ACR
+          az acr login --name ${{ secrets.AZURE_REGISTRY_NAME }}
+
+          # Google Artifact Registry
+          echo "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" | docker login -u _json_key --password-stdin https://gcr.io
+
+      - name: 🏷️ Extract Metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ghcr.io/${{ env.IMAGE_NAME }}
+            ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.IMAGE_NAME }}
+            ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}
+            gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+          labels: |
+            org.opencontainers.image.title=Astral Turf Tactical Board
+            org.opencontainers.image.description=Enterprise AI-powered soccer tactical planner
+            org.opencontainers.image.vendor=Astral Turf
+            atlas.security.level=enterprise
+            atlas.deployment.strategy=blue-green
+            atlas.multicloud.enabled=true
+
+      - name: 🚀 Build and Push Multi-Cloud Images
+        id: image-build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          target: runner
+          build-args: |
+            NODE_ENV=production
+            ATLAS_BUILD_VERSION=${{ github.sha }}
+            ATLAS_BUILD_TIMESTAMP=${{ github.event.head_commit.timestamp }}
+          provenance: true
+          sbom: true
+
+      - name: 🔍 Container Security Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ghcr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          format: 'json'
+          output: 'security-scan-results.json'
+          severity: 'CRITICAL,HIGH'
+
+      - name: 📊 Upload Security Scan Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: container-security-scan
+          path: security-scan-results.json
 
   # ================================================================
   # AWS DEPLOYMENT
@@ -318,59 +318,59 @@ jobs:
     if: contains(github.event.inputs.target_clouds || 'aws,azure,gcp', 'aws')
     environment: production-aws
     steps:
-    - name: 🔄 Checkout Code
-      uses: actions/checkout@v4
-    
-    - name: 🔐 Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ env.AWS_REGION }}
-        role-to-assume: ${{ secrets.AWS_DEPLOYMENT_ROLE_ARN }}
-        role-session-name: atlas-deployment
-    
-    - name: 🔧 Setup Kubernetes Tools
-      run: |
-        # Install kubectl
-        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-        chmod +x kubectl && sudo mv kubectl /usr/local/bin/
-        
-        # Install Helm
-        curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-        
-        # Install AWS CLI v2
-        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-        unzip awscliv2.zip && sudo ./aws/install
-    
-    - name: 🌐 Update EKS Kubeconfig
-      run: |
-        aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ secrets.AWS_EKS_CLUSTER_NAME }}
-        kubectl config current-context
-    
-    - name: 🚀 Atlas Blue-Green Deployment
-      run: |
-        # Apply namespace and RBAC
-        kubectl apply -f k8s/atlas-namespace.yaml
-        
-        # Deploy secrets and configmaps
-        envsubst < k8s/atlas-security.yaml | kubectl apply -f -
-        
-        # Execute blue-green deployment
-        ./scripts/atlas-blue-green-deploy.sh aws ${{ github.sha }}
-    
-    - name: 🏥 Health Check Validation
-      run: |
-        ./scripts/atlas-health-check.sh aws 300
-    
-    - name: 📊 Deployment Metrics
-      run: |
-        kubectl get pods -n astral-turf-production -o wide
-        kubectl top pods -n astral-turf-production
-    
-    - name: ⚡ Performance Validation
-      run: |
-        ./scripts/atlas-performance-test.sh aws
+      - name: 🔄 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🔐 Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_DEPLOYMENT_ROLE_ARN }}
+          role-session-name: atlas-deployment
+
+      - name: 🔧 Setup Kubernetes Tools
+        run: |
+          # Install kubectl
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x kubectl && sudo mv kubectl /usr/local/bin/
+
+          # Install Helm
+          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+          # Install AWS CLI v2
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip && sudo ./aws/install
+
+      - name: 🌐 Update EKS Kubeconfig
+        run: |
+          aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ secrets.AWS_EKS_CLUSTER_NAME }}
+          kubectl config current-context
+
+      - name: 🚀 Atlas Blue-Green Deployment
+        run: |
+          # Apply namespace and RBAC
+          kubectl apply -f k8s/atlas-namespace.yaml
+
+          # Deploy secrets and configmaps
+          envsubst < k8s/atlas-security.yaml | kubectl apply -f -
+
+          # Execute blue-green deployment
+          ./scripts/atlas-blue-green-deploy.sh aws ${{ github.sha }}
+
+      - name: 🏥 Health Check Validation
+        run: |
+          ./scripts/atlas-health-check.sh aws 300
+
+      - name: 📊 Deployment Metrics
+        run: |
+          kubectl get pods -n astral-turf-production -o wide
+          kubectl top pods -n astral-turf-production
+
+      - name: ⚡ Performance Validation
+        run: |
+          ./scripts/atlas-performance-test.sh aws
 
   # ================================================================
   # AZURE DEPLOYMENT
@@ -383,39 +383,39 @@ jobs:
     if: contains(github.event.inputs.target_clouds || 'aws,azure,gcp', 'azure')
     environment: production-azure
     steps:
-    - name: 🔄 Checkout Code
-      uses: actions/checkout@v4
-    
-    - name: 🔐 Azure Login
-      uses: azure/login@v1
-      with:
-        client-id: ${{ secrets.AZURE_CLIENT_ID }}
-        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-    
-    - name: 🔧 Setup Kubernetes Tools
-      run: |
-        az aks install-cli
-        curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-    
-    - name: 🌐 Update AKS Kubeconfig
-      run: |
-        az aks get-credentials --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ secrets.AZURE_AKS_CLUSTER_NAME }}
-        kubectl config current-context
-    
-    - name: 🚀 Atlas Blue-Green Deployment
-      run: |
-        kubectl apply -f k8s/atlas-namespace.yaml
-        envsubst < k8s/atlas-security.yaml | kubectl apply -f -
-        ./scripts/atlas-blue-green-deploy.sh azure ${{ github.sha }}
-    
-    - name: 🏥 Health Check Validation
-      run: |
-        ./scripts/atlas-health-check.sh azure 300
-    
-    - name: ⚡ Performance Validation
-      run: |
-        ./scripts/atlas-performance-test.sh azure
+      - name: 🔄 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🔐 Azure Login
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: 🔧 Setup Kubernetes Tools
+        run: |
+          az aks install-cli
+          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+      - name: 🌐 Update AKS Kubeconfig
+        run: |
+          az aks get-credentials --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ secrets.AZURE_AKS_CLUSTER_NAME }}
+          kubectl config current-context
+
+      - name: 🚀 Atlas Blue-Green Deployment
+        run: |
+          kubectl apply -f k8s/atlas-namespace.yaml
+          envsubst < k8s/atlas-security.yaml | kubectl apply -f -
+          ./scripts/atlas-blue-green-deploy.sh azure ${{ github.sha }}
+
+      - name: 🏥 Health Check Validation
+        run: |
+          ./scripts/atlas-health-check.sh azure 300
+
+      - name: ⚡ Performance Validation
+        run: |
+          ./scripts/atlas-performance-test.sh azure
 
   # ================================================================
   # GOOGLE CLOUD DEPLOYMENT
@@ -428,39 +428,39 @@ jobs:
     if: contains(github.event.inputs.target_clouds || 'aws,azure,gcp', 'gcp')
     environment: production-gcp
     steps:
-    - name: 🔄 Checkout Code
-      uses: actions/checkout@v4
-    
-    - name: 🔐 Setup Google Cloud
-      uses: google-github-actions/setup-gcloud@v2
-      with:
-        service_account_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
-        project_id: ${{ secrets.GCP_PROJECT_ID }}
-        export_default_credentials: true
-    
-    - name: 🔧 Setup Kubernetes Tools
-      run: |
-        gcloud components install kubectl gke-gcloud-auth-plugin
-        curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-    
-    - name: 🌐 Update GKE Kubeconfig
-      run: |
-        gcloud container clusters get-credentials ${{ secrets.GCP_GKE_CLUSTER_NAME }} --region ${{ env.GCP_REGION }}
-        kubectl config current-context
-    
-    - name: 🚀 Atlas Blue-Green Deployment
-      run: |
-        kubectl apply -f k8s/atlas-namespace.yaml
-        envsubst < k8s/atlas-security.yaml | kubectl apply -f -
-        ./scripts/atlas-blue-green-deploy.sh gcp ${{ github.sha }}
-    
-    - name: 🏥 Health Check Validation
-      run: |
-        ./scripts/atlas-health-check.sh gcp 300
-    
-    - name: ⚡ Performance Validation
-      run: |
-        ./scripts/atlas-performance-test.sh gcp
+      - name: 🔄 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🔐 Setup Google Cloud
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          service_account_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          export_default_credentials: true
+
+      - name: 🔧 Setup Kubernetes Tools
+        run: |
+          gcloud components install kubectl gke-gcloud-auth-plugin
+          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+      - name: 🌐 Update GKE Kubeconfig
+        run: |
+          gcloud container clusters get-credentials ${{ secrets.GCP_GKE_CLUSTER_NAME }} --region ${{ env.GCP_REGION }}
+          kubectl config current-context
+
+      - name: 🚀 Atlas Blue-Green Deployment
+        run: |
+          kubectl apply -f k8s/atlas-namespace.yaml
+          envsubst < k8s/atlas-security.yaml | kubectl apply -f -
+          ./scripts/atlas-blue-green-deploy.sh gcp ${{ github.sha }}
+
+      - name: 🏥 Health Check Validation
+        run: |
+          ./scripts/atlas-health-check.sh gcp 300
+
+      - name: ⚡ Performance Validation
+        run: |
+          ./scripts/atlas-performance-test.sh gcp
 
   # ================================================================
   # EDGE COMPUTING DEPLOYMENT
@@ -476,16 +476,16 @@ jobs:
       matrix:
         edge-region: [us-east-1, eu-west-1, ap-southeast-1]
     steps:
-    - name: 🔄 Checkout Code
-      uses: actions/checkout@v4
-    
-    - name: 🌐 Deploy to Edge Region - ${{ matrix.edge-region }}
-      run: |
-        ./scripts/atlas-edge-deploy.sh ${{ matrix.edge-region }} ${{ github.sha }}
-    
-    - name: 🏥 Edge Health Check
-      run: |
-        ./scripts/atlas-edge-health-check.sh ${{ matrix.edge-region }}
+      - name: 🔄 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🌐 Deploy to Edge Region - ${{ matrix.edge-region }}
+        run: |
+          ./scripts/atlas-edge-deploy.sh ${{ matrix.edge-region }} ${{ github.sha }}
+
+      - name: 🏥 Edge Health Check
+        run: |
+          ./scripts/atlas-edge-health-check.sh ${{ matrix.edge-region }}
 
   # ================================================================
   # GLOBAL LOAD BALANCER CONFIGURATION
@@ -498,20 +498,20 @@ jobs:
     if: always() && !cancelled()
     environment: production-global
     steps:
-    - name: 🔄 Checkout Code
-      uses: actions/checkout@v4
-    
-    - name: 🌍 Configure Global Traffic Management
-      run: |
-        ./scripts/atlas-global-lb-config.sh
-    
-    - name: 🎯 Configure Intelligent Routing
-      run: |
-        ./scripts/atlas-intelligent-routing.sh
-    
-    - name: 📊 Validate Global Health
-      run: |
-        ./scripts/atlas-global-health-check.sh
+      - name: 🔄 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🌍 Configure Global Traffic Management
+        run: |
+          ./scripts/atlas-global-lb-config.sh
+
+      - name: 🎯 Configure Intelligent Routing
+        run: |
+          ./scripts/atlas-intelligent-routing.sh
+
+      - name: 📊 Validate Global Health
+        run: |
+          ./scripts/atlas-global-health-check.sh
 
   # ================================================================
   # COMPREHENSIVE MONITORING DEPLOYMENT
@@ -523,24 +523,24 @@ jobs:
     needs: [configure-global-lb]
     environment: production-monitoring
     steps:
-    - name: 🔄 Checkout Code
-      uses: actions/checkout@v4
-    
-    - name: 📊 Deploy Prometheus Stack
-      run: |
-        ./scripts/atlas-monitoring-deploy.sh prometheus
-    
-    - name: 📈 Deploy Grafana Dashboards
-      run: |
-        ./scripts/atlas-monitoring-deploy.sh grafana
-    
-    - name: 🔍 Deploy ELK Stack
-      run: |
-        ./scripts/atlas-monitoring-deploy.sh elk
-    
-    - name: 🚨 Configure Alerting
-      run: |
-        ./scripts/atlas-alerting-config.sh
+      - name: 🔄 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 📊 Deploy Prometheus Stack
+        run: |
+          ./scripts/atlas-monitoring-deploy.sh prometheus
+
+      - name: 📈 Deploy Grafana Dashboards
+        run: |
+          ./scripts/atlas-monitoring-deploy.sh grafana
+
+      - name: 🔍 Deploy ELK Stack
+        run: |
+          ./scripts/atlas-monitoring-deploy.sh elk
+
+      - name: 🚨 Configure Alerting
+        run: |
+          ./scripts/atlas-alerting-config.sh
 
   # ================================================================
   # DISASTER RECOVERY VALIDATION
@@ -553,20 +553,20 @@ jobs:
     if: github.event.inputs.disaster_recovery_test == 'true'
     environment: production-dr
     steps:
-    - name: 🔄 Checkout Code
-      uses: actions/checkout@v4
-    
-    - name: 🚨 Execute DR Simulation
-      run: |
-        ./scripts/atlas-dr-test.sh
-    
-    - name: 🔄 Validate Failover
-      run: |
-        ./scripts/atlas-failover-test.sh
-    
-    - name: ✅ Restore Services
-      run: |
-        ./scripts/atlas-restore-services.sh
+      - name: 🔄 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🚨 Execute DR Simulation
+        run: |
+          ./scripts/atlas-dr-test.sh
+
+      - name: 🔄 Validate Failover
+        run: |
+          ./scripts/atlas-failover-test.sh
+
+      - name: ✅ Restore Services
+        run: |
+          ./scripts/atlas-restore-services.sh
 
   # ================================================================
   # DEPLOYMENT SUMMARY AND NOTIFICATION
@@ -575,70 +575,71 @@ jobs:
     name: 📋 Deployment Summary
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    needs: [deploy-aws, deploy-azure, deploy-gcp, deploy-edge, configure-global-lb, deploy-monitoring]
+    needs:
+      [deploy-aws, deploy-azure, deploy-gcp, deploy-edge, configure-global-lb, deploy-monitoring]
     if: always()
     steps:
-    - name: 📊 Generate Deployment Report
-      run: |
-        echo "# 🚀 Atlas Enterprise Deployment Summary" > deployment-summary.md
-        echo "" >> deployment-summary.md
-        echo "## Deployment Details" >> deployment-summary.md
-        echo "- **Build SHA:** ${{ github.sha }}" >> deployment-summary.md
-        echo "- **Deployment Strategy:** ${{ github.event.inputs.deployment_strategy || 'blue-green' }}" >> deployment-summary.md
-        echo "- **Target Clouds:** ${{ github.event.inputs.target_clouds || 'aws,azure,gcp' }}" >> deployment-summary.md
-        echo "- **Edge Deployment:** ${{ github.event.inputs.enable_edge_deployment || 'true' }}" >> deployment-summary.md
-        echo "" >> deployment-summary.md
-        echo "## Status Summary" >> deployment-summary.md
-        echo "- **AWS:** ${{ needs.deploy-aws.result }}" >> deployment-summary.md
-        echo "- **Azure:** ${{ needs.deploy-azure.result }}" >> deployment-summary.md
-        echo "- **GCP:** ${{ needs.deploy-gcp.result }}" >> deployment-summary.md
-        echo "- **Edge:** ${{ needs.deploy-edge.result }}" >> deployment-summary.md
-        echo "- **Global LB:** ${{ needs.configure-global-lb.result }}" >> deployment-summary.md
-        echo "- **Monitoring:** ${{ needs.deploy-monitoring.result }}" >> deployment-summary.md
-    
-    - name: 📤 Slack Notification
-      uses: 8398a7/action-slack@v3
-      if: always()
-      with:
-        status: ${{ job.status }}
-        webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
-        text: |
-          🚀 Atlas Enterprise Deployment ${{ job.status }}
-          
-          **Build:** ${{ github.sha }}
-          **Strategy:** ${{ github.event.inputs.deployment_strategy || 'blue-green' }}
-          **Clouds:** ${{ github.event.inputs.target_clouds || 'aws,azure,gcp' }}
-          
-          **Status:**
-          - AWS: ${{ needs.deploy-aws.result }}
-          - Azure: ${{ needs.deploy-azure.result }}
-          - GCP: ${{ needs.deploy-gcp.result }}
-          - Edge: ${{ needs.deploy-edge.result }}
-          - Global LB: ${{ needs.configure-global-lb.result }}
-          - Monitoring: ${{ needs.deploy-monitoring.result }}
-    
-    - name: 📧 Email Notification
-      uses: dawidd6/action-send-mail@v3
-      if: failure()
-      with:
-        server_address: smtp.gmail.com
-        server_port: 587
-        username: ${{ secrets.EMAIL_USERNAME }}
-        password: ${{ secrets.EMAIL_PASSWORD }}
-        to: ${{ secrets.DEPLOYMENT_TEAM_EMAIL }}
-        from: Atlas Deployment System <noreply@astralturf.com>
-        subject: "🚨 Atlas Deployment Failure - ${{ github.sha }}"
-        body: |
-          Atlas Enterprise Deployment has failed.
-          
-          Please check the GitHub Actions logs for details:
-          ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-    
-    - name: 🏆 Success Celebration
-      if: success()
-      run: |
-        echo "🎉 Atlas Enterprise Deployment completed successfully!"
-        echo "🌍 Global infrastructure is now live across multiple clouds"
-        echo "📊 Monitoring and alerting systems are operational"
-        echo "🔒 Security and compliance requirements are met"
-        echo "⚡ Performance optimization is active"
+      - name: 📊 Generate Deployment Report
+        run: |
+          echo "# 🚀 Atlas Enterprise Deployment Summary" > deployment-summary.md
+          echo "" >> deployment-summary.md
+          echo "## Deployment Details" >> deployment-summary.md
+          echo "- **Build SHA:** ${{ github.sha }}" >> deployment-summary.md
+          echo "- **Deployment Strategy:** ${{ github.event.inputs.deployment_strategy || 'blue-green' }}" >> deployment-summary.md
+          echo "- **Target Clouds:** ${{ github.event.inputs.target_clouds || 'aws,azure,gcp' }}" >> deployment-summary.md
+          echo "- **Edge Deployment:** ${{ github.event.inputs.enable_edge_deployment || 'true' }}" >> deployment-summary.md
+          echo "" >> deployment-summary.md
+          echo "## Status Summary" >> deployment-summary.md
+          echo "- **AWS:** ${{ needs.deploy-aws.result }}" >> deployment-summary.md
+          echo "- **Azure:** ${{ needs.deploy-azure.result }}" >> deployment-summary.md
+          echo "- **GCP:** ${{ needs.deploy-gcp.result }}" >> deployment-summary.md
+          echo "- **Edge:** ${{ needs.deploy-edge.result }}" >> deployment-summary.md
+          echo "- **Global LB:** ${{ needs.configure-global-lb.result }}" >> deployment-summary.md
+          echo "- **Monitoring:** ${{ needs.deploy-monitoring.result }}" >> deployment-summary.md
+
+      - name: 📤 Slack Notification
+        uses: 8398a7/action-slack@v3
+        if: always()
+        with:
+          status: ${{ job.status }}
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          text: |
+            🚀 Atlas Enterprise Deployment ${{ job.status }}
+
+            **Build:** ${{ github.sha }}
+            **Strategy:** ${{ github.event.inputs.deployment_strategy || 'blue-green' }}
+            **Clouds:** ${{ github.event.inputs.target_clouds || 'aws,azure,gcp' }}
+
+            **Status:**
+            - AWS: ${{ needs.deploy-aws.result }}
+            - Azure: ${{ needs.deploy-azure.result }}
+            - GCP: ${{ needs.deploy-gcp.result }}
+            - Edge: ${{ needs.deploy-edge.result }}
+            - Global LB: ${{ needs.configure-global-lb.result }}
+            - Monitoring: ${{ needs.deploy-monitoring.result }}
+
+      - name: 📧 Email Notification
+        uses: dawidd6/action-send-mail@v3
+        if: failure()
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          to: ${{ secrets.DEPLOYMENT_TEAM_EMAIL }}
+          from: Atlas Deployment System <noreply@astralturf.com>
+          subject: '🚨 Atlas Deployment Failure - ${{ github.sha }}'
+          body: |
+            Atlas Enterprise Deployment has failed.
+
+            Please check the GitHub Actions logs for details:
+            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+      - name: 🏆 Success Celebration
+        if: success()
+        run: |
+          echo "🎉 Atlas Enterprise Deployment completed successfully!"
+          echo "🌍 Global infrastructure is now live across multiple clouds"
+          echo "📊 Monitoring and alerting systems are operational"
+          echo "🔒 Security and compliance requirements are met"
+          echo "⚡ Performance optimization is active"

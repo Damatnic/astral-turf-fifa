@@ -34,16 +34,16 @@ export function useTacticsBoard(): TacticsBoardState & TacticsBoardActions {
     dragPreview: null,
   });
 
-  const dragTimeoutRef =
-    useRef < // NodeJS.Timeout>();
-    // Cleanup timeout on unmount
-    useEffect(() => {
-      return () => {
-        if (dragTimeoutRef.current) {
-          clearTimeout(dragTimeoutRef.current);
-        }
-      };
-    }, []);
+  const dragTimeoutRef = useRef<NodeJS.Timeout>();
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (dragTimeoutRef.current) {
+        clearTimeout(dragTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const validateDrop = useCallback(
     (playerId: string, targetSlotId?: string): boolean => {
@@ -65,7 +65,7 @@ export function useTacticsBoard(): TacticsBoardState & TacticsBoardActions {
       }
 
       // Check if player is available for positioning
-      if (player.availability && player.availability !== 'available') {
+      if (player.availability && player.availability !== ('available' as any)) {
         // // console.warn('validateDrop: Player not available', { playerId, availability: player.availability });
         return false;
       }
@@ -128,7 +128,7 @@ export function useTacticsBoard(): TacticsBoardState & TacticsBoardActions {
 
       return true;
     },
-    [players, formations, activeFormationIds],
+    [players, formations, activeFormationIds]
   );
 
   const getValidDropZones = useCallback(
@@ -189,7 +189,7 @@ export function useTacticsBoard(): TacticsBoardState & TacticsBoardActions {
 
       return validZones;
     },
-    [players, formations, activeFormationIds, validateDrop],
+    [players, formations, activeFormationIds, validateDrop]
   );
 
   const startDrag = useCallback(
@@ -265,10 +265,10 @@ export function useTacticsBoard(): TacticsBoardState & TacticsBoardActions {
           }
         }, 0);
       } catch (_error) {
-        console.error('Failed to start drag operation:', error);
+        console.error('Failed to start drag operation:', _error);
       }
     },
-    [drawingTool, getValidDropZones],
+    [drawingTool, getValidDropZones]
   );
 
   const endDrag = useCallback(() => {
@@ -304,7 +304,7 @@ export function useTacticsBoard(): TacticsBoardState & TacticsBoardActions {
         dragOverSlot: slotId,
       }));
     },
-    [validateDrop],
+    [validateDrop]
   );
 
   const handleSlotDragLeave = useCallback(() => {
@@ -354,13 +354,13 @@ export function useTacticsBoard(): TacticsBoardState & TacticsBoardActions {
 
           if (draggedPlayer?.name && occupyingPlayer?.name) {
             const shouldSwap = window.confirm(
-              `Swap ${draggedPlayer.name} with ${occupyingPlayer.name}?`,
+              `Swap ${draggedPlayer.name} with ${occupyingPlayer.name}?`
             );
 
             if (shouldSwap) {
               dispatch({
                 type: 'SWAP_PLAYERS',
-                payload: { playerId1: playerId, playerId2: slot.playerId },
+                payload: { sourcePlayerId: playerId, targetPlayerId: slot.playerId },
               });
             }
           } else {
@@ -374,12 +374,12 @@ export function useTacticsBoard(): TacticsBoardState & TacticsBoardActions {
           });
         }
       } catch (_error) {
-        console.error('Failed to handle slot drop:', error);
+        console.error('Failed to handle slot drop:', _error);
       } finally {
         endDrag();
       }
     },
-    [validateDrop, players, dispatch, endDrag],
+    [validateDrop, players, dispatch, endDrag]
   );
 
   const handleFieldDrop = useCallback(
@@ -429,11 +429,11 @@ export function useTacticsBoard(): TacticsBoardState & TacticsBoardActions {
 
       const x = Math.max(
         5,
-        Math.min(95, ((event.clientX - fieldRect.left) / fieldRect.width) * 100),
+        Math.min(95, ((event.clientX - fieldRect.left) / fieldRect.width) * 100)
       );
       const y = Math.max(
         5,
-        Math.min(95, ((event.clientY - fieldRect.top) / fieldRect.height) * 100),
+        Math.min(95, ((event.clientY - fieldRect.top) / fieldRect.height) * 100)
       );
 
       if (isNaN(x) || isNaN(y)) {
@@ -448,12 +448,12 @@ export function useTacticsBoard(): TacticsBoardState & TacticsBoardActions {
           payload: { playerId, position: { x, y } },
         });
       } catch (_error) {
-        console.error('handleFieldDrop: Failed to update player position:', error);
+        console.error('handleFieldDrop: Failed to update player position:', _error);
       } finally {
         endDrag();
       }
     },
-    [validateDrop, positioningMode, dispatch, endDrag],
+    [validateDrop, positioningMode, dispatch, endDrag]
   );
 
   return {

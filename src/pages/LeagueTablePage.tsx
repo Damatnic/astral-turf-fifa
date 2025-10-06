@@ -256,7 +256,7 @@ const LeagueTablePage: React.FC = () => {
               {Math.max(
                 0,
                 (sortedTable.find(team => team.isUserTeam)?.points || 0) -
-                  (sortedTable[17]?.points || 0),
+                  (sortedTable[17]?.points || 0)
               )}
             </div>
             <p className="text-gray-400">Points Above Relegation</p>

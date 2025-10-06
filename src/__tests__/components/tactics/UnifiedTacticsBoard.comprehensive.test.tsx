@@ -16,7 +16,7 @@ import {
   waitFor,
   within,
   act,
-  userEvent
+  userEvent,
 } from '../../utils/comprehensive-test-providers';
 import { UnifiedTacticsBoard } from '../../../components/tactics/UnifiedTacticsBoard';
 import type { Formation, Player } from '../../../types';
@@ -24,20 +24,16 @@ import type { Formation, Player } from '../../../types';
 // Mock heavy components and services
 vi.mock('../../../components/tactics/IntelligentAssistant', () => ({
   default: React.forwardRef<HTMLDivElement>((props: any, ref) => (
-    <div 
-      ref={ref}
-      data-testid="intelligent-assistant"
-      className={props.className}
-    >
+    <div ref={ref} data-testid="intelligent-assistant" className={props.className}>
       AI Assistant Mock
     </div>
-  ))
+  )),
 }));
 
 vi.mock('../../../components/tactics/FormationTemplates', () => ({
   default: ({ onSelect, onClose }: any) => (
     <div data-testid="formation-templates">
-      <button 
+      <button
         onClick={() => onSelect({ id: 'test-formation', name: 'Test Formation' })}
         data-testid="select-formation"
       >
@@ -47,13 +43,13 @@ vi.mock('../../../components/tactics/FormationTemplates', () => ({
         Close
       </button>
     </div>
-  )
+  ),
 }));
 
 vi.mock('../../../components/tactics/TacticalPlaybook', () => ({
   default: ({ onLoadFormation, onClose }: any) => (
     <div data-testid="tactical-playbook">
-      <button 
+      <button
         onClick={() => onLoadFormation({ id: 'playbook-formation', name: 'Playbook Formation' })}
         data-testid="load-playbook-formation"
       >
@@ -63,7 +59,7 @@ vi.mock('../../../components/tactics/TacticalPlaybook', () => ({
         Close
       </button>
     </div>
-  )
+  ),
 }));
 
 vi.mock('../../../components/analytics/AdvancedAnalyticsDashboard', () => ({
@@ -73,25 +69,22 @@ vi.mock('../../../components/analytics/AdvancedAnalyticsDashboard', () => ({
         Close Analytics
       </button>
     </div>
-  )
+  ),
 }));
 
 // Mock other lazy-loaded components
 vi.mock('../../../components/tactics/AnimationTimeline', () => ({
-  default: () => <div data-testid="animation-timeline">Animation Timeline</div>
+  default: () => <div data-testid="animation-timeline">Animation Timeline</div>,
 }));
 
 vi.mock('../../../components/tactics/PresentationControls', () => ({
   default: ({ isPresenting, onTogglePresentation }: any) => (
     <div data-testid="presentation-controls">
-      <button 
-        onClick={onTogglePresentation}
-        data-testid="toggle-presentation"
-      >
+      <button onClick={onTogglePresentation} data-testid="toggle-presentation">
         {isPresenting ? 'Exit Presentation' : 'Enter Presentation'}
       </button>
     </div>
-  )
+  ),
 }));
 
 vi.mock('../../../components/tactics/DugoutManagement', () => ({
@@ -101,7 +94,7 @@ vi.mock('../../../components/tactics/DugoutManagement', () => ({
         Close Dugout
       </button>
     </div>
-  )
+  ),
 }));
 
 vi.mock('../../../components/tactics/ChallengeManagement', () => ({
@@ -111,7 +104,7 @@ vi.mock('../../../components/tactics/ChallengeManagement', () => ({
         Close Challenges
       </button>
     </div>
-  )
+  ),
 }));
 
 vi.mock('../../../components/tactics/CollaborationFeatures', () => ({
@@ -121,7 +114,7 @@ vi.mock('../../../components/tactics/CollaborationFeatures', () => ({
         Close Collaboration
       </button>
     </div>
-  )
+  ),
 }));
 
 vi.mock('../../../components/tactics/EnhancedExportImport', () => ({
@@ -131,7 +124,7 @@ vi.mock('../../../components/tactics/EnhancedExportImport', () => ({
         Close Export/Import
       </button>
     </div>
-  )
+  ),
 }));
 
 // Mock performance worker
@@ -139,7 +132,7 @@ vi.mock('../../../workers/formationCalculationWorker', () => ({
   FormationWebWorker: class {
     validatePlayerPosition = vi.fn().mockResolvedValue({ isValid: true });
     terminate = vi.fn();
-  }
+  },
 }));
 
 // Mock framer-motion to avoid animation issues in tests
@@ -147,9 +140,9 @@ vi.mock('framer-motion', () => ({
   motion: {
     div: React.forwardRef<HTMLDivElement, any>((props, ref) => (
       <div ref={ref} {...props} style={{ ...props.style, ...props.animate }} />
-    ))
+    )),
   },
-  AnimatePresence: ({ children }: any) => children
+  AnimatePresence: ({ children }: any) => children,
 }));
 
 describe('UnifiedTacticsBoard - Comprehensive Test Suite', () => {
@@ -180,7 +173,7 @@ describe('UnifiedTacticsBoard - Comprehensive Test Suite', () => {
     }));
 
     // Mock requestFullscreen
-    Object.defineProperty(Element.prototype, 'requestFullscreen', {
+    Object.defineProperty(HTMLElement.prototype, 'requestFullscreen', {
       value: vi.fn().mockResolvedValue(undefined),
       writable: true,
     });
@@ -203,13 +196,10 @@ describe('UnifiedTacticsBoard - Comprehensive Test Suite', () => {
 
   describe('Core Rendering and Layout', () => {
     it('should render the main tactical board interface with all core components', async () => {
-      const { container } = renderWithProviders(
-        <UnifiedTacticsBoard {...mockProps} />,
-        {
-          initialTacticsState: testData.tacticsState,
-          initialUIState: testData.uiState
-        }
-      );
+      const { container } = renderWithProviders(<UnifiedTacticsBoard {...mockProps} />, {
+        initialTacticsState: testData.tacticsState,
+        initialUIState: testData.uiState,
+      });
 
       // Check main container exists
       const board = container.querySelector('[role="application"]');
@@ -217,11 +207,14 @@ describe('UnifiedTacticsBoard - Comprehensive Test Suite', () => {
       expect(board).toHaveAttribute('aria-label', 'Soccer Tactics Board');
 
       // Wait for async components to render
-      await waitFor(() => {
-        // Check for main tactical field
-        const field = container.querySelector('[role="main"]');
-        expect(field).toBeInTheDocument();
-      }, { timeout: 3000 });
+      await waitFor(
+        () => {
+          // Check for main tactical field
+          const field = container.querySelector('[role="main"]');
+          expect(field).toBeInTheDocument();
+        },
+        { timeout: 3000 }
+      );
     });
 
     it('should apply custom className when provided', () => {
@@ -235,18 +228,22 @@ describe('UnifiedTacticsBoard - Comprehensive Test Suite', () => {
     });
 
     it('should handle sample data initialization when no data is provided', async () => {
-      renderWithProviders(
-        <UnifiedTacticsBoard {...mockProps} />,
-        {
-          initialTacticsState: { players: [], formations: {}, activeFormationIds: {} },
-          initialUIState: testData.uiState
-        }
-      );
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />, {
+        initialTacticsState: {
+          players: [],
+          formations: {},
+          activeFormationIds: { home: '', away: '' },
+        },
+        initialUIState: testData.uiState,
+      });
 
       // Should initialize with sample data
-      await waitFor(() => {
-        expect(screen.queryByText(/no formation loaded/i)).not.toBeInTheDocument();
-      }, { timeout: 3000 });
+      await waitFor(
+        () => {
+          expect(screen.queryByText(/no formation loaded/i)).not.toBeInTheDocument();
+        },
+        { timeout: 3000 }
+      );
     });
   });
 
@@ -273,13 +270,10 @@ describe('UnifiedTacticsBoard - Comprehensive Test Suite', () => {
         })),
       });
 
-      renderWithProviders(
-        <UnifiedTacticsBoard {...mockProps} />,
-        {
-          initialTacticsState: testData.tacticsState,
-          initialUIState: testData.uiState
-        }
-      );
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />, {
+        initialTacticsState: testData.tacticsState,
+        initialUIState: testData.uiState,
+      });
 
       // Trigger resize event
       fireEvent(window, new Event('resize'));
@@ -291,22 +285,19 @@ describe('UnifiedTacticsBoard - Comprehensive Test Suite', () => {
     });
 
     it('should manage sidebar visibility based on screen size', async () => {
-      const { container, rerender } = renderWithProviders(
-        <UnifiedTacticsBoard {...mockProps} />,
-        {
-          initialTacticsState: testData.tacticsState,
-          initialUIState: testData.uiState
-        }
-      );
+      const { container, rerender } = renderWithProviders(<UnifiedTacticsBoard {...mockProps} />, {
+        initialTacticsState: testData.tacticsState,
+        initialUIState: testData.uiState,
+      });
 
       // Desktop should show both sidebars
       Object.defineProperty(window, 'innerWidth', {
         value: 1200,
-        configurable: true
+        configurable: true,
       });
-      
+
       fireEvent(window, new Event('resize'));
-      
+
       await waitFor(() => {
         const leftSidebar = container.querySelector('[aria-label="Left sidebar"]');
         const rightSidebar = container.querySelector('[aria-label="Right sidebar"]');
@@ -318,13 +309,10 @@ describe('UnifiedTacticsBoard - Comprehensive Test Suite', () => {
 
   describe('Formation and Player Management', () => {
     it('should display formation when provided', async () => {
-      renderWithProviders(
-        <UnifiedTacticsBoard {...mockProps} />,
-        {
-          initialTacticsState: testData.tacticsState,
-          initialUIState: testData.uiState
-        }
-      );
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />, {
+        initialTacticsState: testData.tacticsState,
+        initialUIState: testData.uiState,
+      });
 
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
@@ -332,13 +320,10 @@ describe('UnifiedTacticsBoard - Comprehensive Test Suite', () => {
     });
 
     it('should handle player selection and movement', async () => {
-      const { container } = renderWithProviders(
-        <UnifiedTacticsBoard {...mockProps} />,
-        {
-          initialTacticsState: testData.tacticsState,
-          initialUIState: testData.uiState
-        }
-      );
+      const { container } = renderWithProviders(<UnifiedTacticsBoard {...mockProps} />, {
+        initialTacticsState: testData.tacticsState,
+        initialUIState: testData.uiState,
+      });
 
       await waitFor(() => {
         const field = container.querySelector('[role="main"]');
@@ -354,13 +339,10 @@ describe('UnifiedTacticsBoard - Comprehensive Test Suite', () => {
     });
 
     it('should handle formation save action', async () => {
-      renderWithProviders(
-        <UnifiedTacticsBoard {...mockProps} />,
-        {
-          initialTacticsState: testData.tacticsState,
-          initialUIState: testData.uiState
-        }
-      );
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />, {
+        initialTacticsState: testData.tacticsState,
+        initialUIState: testData.uiState,
+      });
 
       // Look for save functionality in the toolbar or controls
       await waitFor(() => {
@@ -375,17 +357,14 @@ describe('UnifiedTacticsBoard - Comprehensive Test Suite', () => {
 
   describe('Drawing and Tactical Tools', () => {
     it('should handle drawing tool interactions', async () => {
-      renderWithProviders(
-        <UnifiedTacticsBoard {...mockProps} />,
-        {
-          initialTacticsState: testData.tacticsState,
-          initialUIState: {
-            ...testData.uiState,
-            drawingTool: 'pen',
-            drawingColor: '#ff0000'
-          }
-        }
-      );
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />, {
+        initialTacticsState: testData.tacticsState,
+        initialUIState: {
+          ...testData.uiState,
+          drawingTool: 'pen',
+          drawingColor: '#ff0000',
+        },
+      });
 
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
@@ -396,25 +375,20 @@ describe('UnifiedTacticsBoard - Comprehensive Test Suite', () => {
     });
 
     it('should support different drawing tools and colors', async () => {
-      const { rerender } = renderWithProviders(
-        <UnifiedTacticsBoard {...mockProps} />,
-        {
-          initialTacticsState: testData.tacticsState,
-          initialUIState: {
-            ...testData.uiState,
-            drawingTool: 'line'
-          }
-        }
-      );
+      const { rerender } = renderWithProviders(<UnifiedTacticsBoard {...mockProps} />, {
+        initialTacticsState: testData.tacticsState,
+        initialUIState: {
+          ...testData.uiState,
+          drawingTool: 'line',
+        },
+      });
 
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
       });
 
       // Test tool change
-      rerender(
-        <UnifiedTacticsBoard {...mockProps} />
-      );
+      rerender(<UnifiedTacticsBoard {...mockProps} />);
 
       // Drawing tools state would be managed through the UI context
       expect(screen.getByRole('application')).toBeInTheDocument();
@@ -423,13 +397,10 @@ describe('UnifiedTacticsBoard - Comprehensive Test Suite', () => {
 
   describe('Modal and Panel Management', () => {
     it('should open and close formation templates modal', async () => {
-      renderWithProviders(
-        <UnifiedTacticsBoard {...mockProps} />,
-        {
-          initialTacticsState: testData.tacticsState,
-          initialUIState: testData.uiState
-        }
-      );
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />, {
+        initialTacticsState: testData.tacticsState,
+        initialUIState: testData.uiState,
+      });
 
       // Formation templates would be opened through toolbar actions
       // The modal management is handled internally
@@ -439,13 +410,10 @@ describe('UnifiedTacticsBoard - Comprehensive Test Suite', () => {
     });
 
     it('should manage AI assistant panel visibility', async () => {
-      renderWithProviders(
-        <UnifiedTacticsBoard {...mockProps} />,
-        {
-          initialTacticsState: testData.tacticsState,
-          initialUIState: testData.uiState
-        }
-      );
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />, {
+        initialTacticsState: testData.tacticsState,
+        initialUIState: testData.uiState,
+      });
 
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
@@ -456,13 +424,10 @@ describe('UnifiedTacticsBoard - Comprehensive Test Suite', () => {
     });
 
     it('should handle analytics dashboard display', async () => {
-      renderWithProviders(
-        <UnifiedTacticsBoard {...mockProps} />,
-        {
-          initialTacticsState: testData.tacticsState,
-          initialUIState: testData.uiState
-        }
-      );
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />, {
+        initialTacticsState: testData.tacticsState,
+        initialUIState: testData.uiState,
+      });
 
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
@@ -475,13 +440,10 @@ describe('UnifiedTacticsBoard - Comprehensive Test Suite', () => {
 
   describe('View Mode Transitions', () => {
     it('should handle fullscreen mode toggle', async () => {
-      const { container } = renderWithProviders(
-        <UnifiedTacticsBoard {...mockProps} />,
-        {
-          initialTacticsState: testData.tacticsState,
-          initialUIState: testData.uiState
-        }
-      );
+      const { container } = renderWithProviders(<UnifiedTacticsBoard {...mockProps} />, {
+        initialTacticsState: testData.tacticsState,
+        initialUIState: testData.uiState,
+      });
 
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
@@ -493,13 +455,10 @@ describe('UnifiedTacticsBoard - Comprehensive Test Suite', () => {
     });
 
     it('should handle presentation mode', async () => {
-      renderWithProviders(
-        <UnifiedTacticsBoard {...mockProps} />,
-        {
-          initialTacticsState: testData.tacticsState,
-          initialUIState: testData.uiState
-        }
-      );
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />, {
+        initialTacticsState: testData.tacticsState,
+        initialUIState: testData.uiState,
+      });
 
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
@@ -513,23 +472,18 @@ describe('UnifiedTacticsBoard - Comprehensive Test Suite', () => {
   describe('Performance and Optimization', () => {
     it('should handle large player datasets efficiently', async () => {
       const performanceData = createTestData.performance(100);
-      
+
       const renderTime = await testUtils.measureRenderTime(() => {
-        renderWithProviders(
-          <UnifiedTacticsBoard {...mockProps} />,
-          {
-            initialTacticsState: {
-              players: performanceData.players,
-              formations: { [performanceData.formation.id]: performanceData.formation },
-              activeFormationIds: { home: performanceData.formation.id },
-              drawings: [],
-              playbook: {},
-              matchState: null,
-              notifications: []
-            },
-            initialUIState: testData.uiState
-          }
-        );
+        renderWithProviders(<UnifiedTacticsBoard {...mockProps} />, {
+          initialTacticsState: {
+            players: performanceData.players,
+            formations: { [performanceData.formation.id]: performanceData.formation },
+            activeFormationIds: { home: performanceData.formation.id, away: '' },
+            drawings: [],
+            playbook: {},
+          },
+          initialUIState: testData.uiState,
+        });
       });
 
       // Should render within reasonable time even with large datasets
@@ -538,22 +492,22 @@ describe('UnifiedTacticsBoard - Comprehensive Test Suite', () => {
 
     it('should implement proper virtualization for large datasets', async () => {
       const largeDataset = createTestData.performance(200);
-      
-      renderWithProviders(
-        <UnifiedTacticsBoard {...mockProps} />,
-        {
-          initialTacticsState: {
-            players: largeDataset.players,
-            formations: { [largeDataset.formation.id]: largeDataset.formation },
-            activeFormationIds: { home: largeDataset.formation.id },
-            drawings: [],
-            playbook: {},
-            matchState: null,
-            notifications: []
-          },
-          initialUIState: testData.uiState
-        }
-      );
+
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />, {
+        initialTacticsState: {
+          players: largeDataset.players,
+          formations: { [largeDataset.formation.id]: largeDataset.formation },
+          activeFormationIds: { home: largeDataset.formation.id, away: '' },
+          teamTactics: { home: {} as any, away: {} as any },
+          drawings: [],
+          playbook: {},
+          tacticalFamiliarity: {},
+          chemistry: {},
+          captainIds: { home: null, away: null },
+          setPieceTakers: { home: {}, away: {} },
+        },
+        initialUIState: testData.uiState,
+      });
 
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
@@ -564,13 +518,10 @@ describe('UnifiedTacticsBoard - Comprehensive Test Suite', () => {
     });
 
     it('should use deferred values for performance optimization', async () => {
-      renderWithProviders(
-        <UnifiedTacticsBoard {...mockProps} />,
-        {
-          initialTacticsState: testData.tacticsState,
-          initialUIState: testData.uiState
-        }
-      );
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />, {
+        initialTacticsState: testData.tacticsState,
+        initialUIState: testData.uiState,
+      });
 
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
@@ -583,13 +534,10 @@ describe('UnifiedTacticsBoard - Comprehensive Test Suite', () => {
 
   describe('Accessibility and ARIA Support', () => {
     it('should have proper ARIA labels and roles', async () => {
-      const { container } = renderWithProviders(
-        <UnifiedTacticsBoard {...mockProps} />,
-        {
-          initialTacticsState: testData.tacticsState,
-          initialUIState: testData.uiState
-        }
-      );
+      const { container } = renderWithProviders(<UnifiedTacticsBoard {...mockProps} />, {
+        initialTacticsState: testData.tacticsState,
+        initialUIState: testData.uiState,
+      });
 
       await waitFor(() => {
         const board = container.querySelector('[role="application"]');
@@ -601,13 +549,10 @@ describe('UnifiedTacticsBoard - Comprehensive Test Suite', () => {
     });
 
     it('should support keyboard navigation', async () => {
-      renderWithProviders(
-        <UnifiedTacticsBoard {...mockProps} />,
-        {
-          initialTacticsState: testData.tacticsState,
-          initialUIState: testData.uiState
-        }
-      );
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />, {
+        initialTacticsState: testData.tacticsState,
+        initialUIState: testData.uiState,
+      });
 
       await waitFor(() => {
         const board = screen.getByRole('application');
@@ -617,20 +562,17 @@ describe('UnifiedTacticsBoard - Comprehensive Test Suite', () => {
       // Test keyboard navigation
       const board = screen.getByRole('application');
       board.focus();
-      
+
       // Test tab navigation
       await user.tab();
       expect(document.activeElement).toBeDefined();
     });
 
     it('should announce state changes to screen readers', async () => {
-      const { container } = renderWithProviders(
-        <UnifiedTacticsBoard {...mockProps} />,
-        {
-          initialTacticsState: testData.tacticsState,
-          initialUIState: testData.uiState
-        }
-      );
+      const { container } = renderWithProviders(<UnifiedTacticsBoard {...mockProps} />, {
+        initialTacticsState: testData.tacticsState,
+        initialUIState: testData.uiState,
+      });
 
       await waitFor(() => {
         const board = container.querySelector('[role="application"]');
@@ -645,21 +587,21 @@ describe('UnifiedTacticsBoard - Comprehensive Test Suite', () => {
 
   describe('Error Handling and Edge Cases', () => {
     it('should handle missing formation data gracefully', async () => {
-      renderWithProviders(
-        <UnifiedTacticsBoard {...mockProps} />,
-        {
-          initialTacticsState: {
-            players: testData.players,
-            formations: {},
-            activeFormationIds: {},
-            drawings: [],
-            playbook: {},
-            matchState: null,
-            notifications: []
-          },
-          initialUIState: testData.uiState
-        }
-      );
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />, {
+        initialTacticsState: {
+          players: testData.players,
+          formations: {},
+          activeFormationIds: { home: '', away: '' },
+          teamTactics: { home: {} as any, away: {} as any },
+          drawings: [],
+          playbook: {},
+          tacticalFamiliarity: {},
+          chemistry: {},
+          captainIds: { home: null, away: null },
+          setPieceTakers: { home: {}, away: {} },
+        },
+        initialUIState: testData.uiState,
+      });
 
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
@@ -670,21 +612,21 @@ describe('UnifiedTacticsBoard - Comprehensive Test Suite', () => {
     });
 
     it('should handle empty player arrays', async () => {
-      renderWithProviders(
-        <UnifiedTacticsBoard {...mockProps} />,
-        {
-          initialTacticsState: {
-            players: [],
-            formations: {},
-            activeFormationIds: {},
-            drawings: [],
-            playbook: {},
-            matchState: null,
-            notifications: []
-          },
-          initialUIState: testData.uiState
-        }
-      );
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />, {
+        initialTacticsState: {
+          players: [],
+          formations: {},
+          activeFormationIds: { home: '', away: '' },
+          teamTactics: { home: {} as any, away: {} as any },
+          drawings: [],
+          playbook: {},
+          tacticalFamiliarity: {},
+          chemistry: {},
+          captainIds: { home: null, away: null },
+          setPieceTakers: { home: {}, away: {} },
+        },
+        initialUIState: testData.uiState,
+      });
 
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
@@ -696,15 +638,12 @@ describe('UnifiedTacticsBoard - Comprehensive Test Suite', () => {
 
     it('should recover from rendering errors', async () => {
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      
+
       try {
-        renderWithProviders(
-          <UnifiedTacticsBoard {...mockProps} />,
-          {
-            initialTacticsState: testData.tacticsState,
-            initialUIState: testData.uiState
-          }
-        );
+        renderWithProviders(<UnifiedTacticsBoard {...mockProps} />, {
+          initialTacticsState: testData.tacticsState,
+          initialUIState: testData.uiState,
+        });
 
         await waitFor(() => {
           expect(screen.getByRole('application')).toBeInTheDocument();
@@ -720,13 +659,10 @@ describe('UnifiedTacticsBoard - Comprehensive Test Suite', () => {
 
   describe('Integration with Child Components', () => {
     it('should properly integrate with ModernField component', async () => {
-      const { container } = renderWithProviders(
-        <UnifiedTacticsBoard {...mockProps} />,
-        {
-          initialTacticsState: testData.tacticsState,
-          initialUIState: testData.uiState
-        }
-      );
+      const { container } = renderWithProviders(<UnifiedTacticsBoard {...mockProps} />, {
+        initialTacticsState: testData.tacticsState,
+        initialUIState: testData.uiState,
+      });
 
       await waitFor(() => {
         const field = container.querySelector('[role="main"]');
@@ -735,13 +671,10 @@ describe('UnifiedTacticsBoard - Comprehensive Test Suite', () => {
     });
 
     it('should integrate with UnifiedFloatingToolbar', async () => {
-      renderWithProviders(
-        <UnifiedTacticsBoard {...mockProps} />,
-        {
-          initialTacticsState: testData.tacticsState,
-          initialUIState: testData.uiState
-        }
-      );
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />, {
+        initialTacticsState: testData.tacticsState,
+        initialUIState: testData.uiState,
+      });
 
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
@@ -752,13 +685,10 @@ describe('UnifiedTacticsBoard - Comprehensive Test Suite', () => {
     });
 
     it('should integrate with PlayerDisplaySettings', async () => {
-      renderWithProviders(
-        <UnifiedTacticsBoard {...mockProps} />,
-        {
-          initialTacticsState: testData.tacticsState,
-          initialUIState: testData.uiState
-        }
-      );
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />, {
+        initialTacticsState: testData.tacticsState,
+        initialUIState: testData.uiState,
+      });
 
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
@@ -769,13 +699,10 @@ describe('UnifiedTacticsBoard - Comprehensive Test Suite', () => {
     });
 
     it('should integrate with PositionalBench component', async () => {
-      renderWithProviders(
-        <UnifiedTacticsBoard {...mockProps} />,
-        {
-          initialTacticsState: testData.tacticsState,
-          initialUIState: testData.uiState
-        }
-      );
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />, {
+        initialTacticsState: testData.tacticsState,
+        initialUIState: testData.uiState,
+      });
 
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
@@ -788,13 +715,10 @@ describe('UnifiedTacticsBoard - Comprehensive Test Suite', () => {
 
   describe('Prop Callback Integration', () => {
     it('should call onSimulateMatch when simulation is triggered', async () => {
-      renderWithProviders(
-        <UnifiedTacticsBoard {...mockProps} />,
-        {
-          initialTacticsState: testData.tacticsState,
-          initialUIState: testData.uiState
-        }
-      );
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />, {
+        initialTacticsState: testData.tacticsState,
+        initialUIState: testData.uiState,
+      });
 
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
@@ -805,13 +729,10 @@ describe('UnifiedTacticsBoard - Comprehensive Test Suite', () => {
     });
 
     it('should call onExportFormation when export is triggered', async () => {
-      renderWithProviders(
-        <UnifiedTacticsBoard {...mockProps} />,
-        {
-          initialTacticsState: testData.tacticsState,
-          initialUIState: testData.uiState
-        }
-      );
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />, {
+        initialTacticsState: testData.tacticsState,
+        initialUIState: testData.uiState,
+      });
 
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();
@@ -822,13 +743,10 @@ describe('UnifiedTacticsBoard - Comprehensive Test Suite', () => {
     });
 
     it('should call onAnalyticsView when analytics is opened', async () => {
-      renderWithProviders(
-        <UnifiedTacticsBoard {...mockProps} />,
-        {
-          initialTacticsState: testData.tacticsState,
-          initialUIState: testData.uiState
-        }
-      );
+      renderWithProviders(<UnifiedTacticsBoard {...mockProps} />, {
+        initialTacticsState: testData.tacticsState,
+        initialUIState: testData.uiState,
+      });
 
       await waitFor(() => {
         expect(screen.getByRole('application')).toBeInTheDocument();

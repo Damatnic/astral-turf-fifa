@@ -45,14 +45,14 @@ export interface RateLimitConfig {
   enabled: boolean;
   skipSuccessfulRequests: boolean;
   skipFailedRequests: boolean;
-  keyGenerator?: (request: unknown) => string;
+  keyGenerator?: (request: any) => string;
   onLimitReached?: (key: string, details: RateLimitHit) => void;
   customRules?: RateLimitRule[];
 }
 
 // Rate limit rule
 export interface RateLimitRule {
-  condition: (request: unknown) => boolean;
+  condition: (request: any) => boolean;
   maxRequests: number;
   windowMs: number;
   action: 'block' | 'delay' | 'challenge';
@@ -255,7 +255,7 @@ export class RateLimitingEngine {
     });
   }
 
-  public checkRateLimit(request: unknown, configId?: string): RateLimitHit | null {
+  public checkRateLimit(request: any, configId?: string): RateLimitHit | null {
     if (!this.enabled) {
       return null;
     }
@@ -265,6 +265,10 @@ export class RateLimitingEngine {
       : Array.from(this.configs.values()).filter(c => c.enabled);
 
     for (const config of configs) {
+      if (!config) {
+        continue;
+      }
+
       // Apply custom rules first
       if (config.customRules) {
         for (const rule of config.customRules.sort((a, b) => b.priority - a.priority)) {
@@ -288,9 +292,9 @@ export class RateLimitingEngine {
   }
 
   private checkRule(
-    request: unknown,
+    request: any,
     config: RateLimitConfig,
-    rule: RateLimitRule,
+    rule: RateLimitRule
   ): RateLimitHit | null {
     const key = this.generateKey(request, config);
     const now = Date.now();
@@ -343,7 +347,7 @@ export class RateLimitingEngine {
     return null;
   }
 
-  private checkStandardLimit(request: unknown, config: RateLimitConfig): RateLimitHit | null {
+  private checkStandardLimit(request: any, config: RateLimitConfig): RateLimitHit | null {
     const key = this.generateKey(request, config);
 
     switch (config.algorithm) {
@@ -365,9 +369,9 @@ export class RateLimitingEngine {
   }
 
   private checkTokenBucket(
-    request: unknown,
+    request: any,
     config: RateLimitConfig,
-    key: string,
+    key: string
   ): RateLimitHit | null {
     const store = this.getStore(config.id);
     const now = Date.now();
@@ -403,7 +407,7 @@ export class RateLimitingEngine {
         blocked: true,
         threatLevel: this.calculateThreatLevel(
           config.maxRequests - entry.tokens,
-          config.maxRequests,
+          config.maxRequests
         ),
         userAgent: request.userAgent,
         ipAddress: request.ip,
@@ -423,9 +427,9 @@ export class RateLimitingEngine {
   }
 
   private checkSlidingWindow(
-    request: unknown,
+    request: any,
     config: RateLimitConfig,
-    key: string,
+    key: string
   ): RateLimitHit | null {
     const store = this.getStore(config.id);
     const now = Date.now();
@@ -465,9 +469,9 @@ export class RateLimitingEngine {
   }
 
   private checkFixedWindow(
-    request: unknown,
+    request: any,
     config: RateLimitConfig,
-    key: string,
+    key: string
   ): RateLimitHit | null {
     const store = this.getStore(config.id);
     const now = Date.now();
@@ -506,9 +510,9 @@ export class RateLimitingEngine {
   }
 
   private checkLeakyBucket(
-    request: unknown,
+    request: any,
     config: RateLimitConfig,
-    key: string,
+    key: string
   ): RateLimitHit | null {
     const store = this.getStore(config.id);
     const now = Date.now();
@@ -550,7 +554,7 @@ export class RateLimitingEngine {
     return null;
   }
 
-  private generateKey(request: unknown, config: RateLimitConfig): string {
+  private generateKey(request: any, config: RateLimitConfig): string {
     if (config.keyGenerator) {
       return config.keyGenerator(request);
     }
@@ -666,14 +670,14 @@ export class RateLimitingEngine {
       'IP address blocked due to abuse',
       {
         metadata: { ipAddress, durationMs, reason: 'rate_limiting' },
-      },
+      }
     );
   }
 
   public challengeIP(
     ipAddress: string,
     challengeType: 'captcha' | 'js_challenge' | 'proof_of_work',
-    durationMs: number,
+    durationMs: number
   ): void {
     const challenge: ChallengeInfo = {
       type: challengeType,
@@ -695,7 +699,7 @@ export class RateLimitingEngine {
       'Challenge issued to IP address',
       {
         metadata: { ipAddress, challengeType, durationMs },
-      },
+      }
     );
   }
 
@@ -734,7 +738,7 @@ export class RateLimitingEngine {
     securityLogger.warn('Rate limiting engine disabled');
   }
 
-  public getStats(): unknown {
+  public getStats(): any {
     return {
       enabled: this.enabled,
       configs: this.configs.size,
@@ -785,12 +789,12 @@ setInterval(
   () => {
     rateLimitingEngine.cleanup();
   },
-  5 * 60 * 1000,
+  5 * 60 * 1000
 );
 
 // Export utilities
 export const rateLimitUtils = {
-  checkRateLimit: (request: unknown, configId?: string) =>
+  checkRateLimit: (request: any, configId?: string) =>
     rateLimitingEngine.checkRateLimit(request, configId),
   isBlocked: (ipAddress: string) => rateLimitingEngine.isBlocked(ipAddress),
   isChallenged: (ipAddress: string) => rateLimitingEngine.isChallenged(ipAddress),
@@ -798,7 +802,7 @@ export const rateLimitUtils = {
   challengeIP: (
     ipAddress: string,
     type: 'captcha' | 'js_challenge' | 'proof_of_work',
-    duration: number,
+    duration: number
   ) => rateLimitingEngine.challengeIP(ipAddress, type, duration),
   solveChallenge: (ipAddress: string) => rateLimitingEngine.solveChallenge(ipAddress),
   getStats: () => rateLimitingEngine.getStats(),

@@ -4,7 +4,16 @@ import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Progress } from '../ui/progress';
-import { Lightbulb, Target, Users, TrendingUp, AlertTriangle, CheckCircle, Brain, Zap } from 'lucide-react';
+import {
+  Lightbulb,
+  Target,
+  Users,
+  TrendingUp,
+  AlertTriangle,
+  CheckCircle,
+  Brain,
+  Zap,
+} from 'lucide-react';
 import { openAiService } from '../../services/openAiService';
 import type { Player, Formation } from '../../types';
 
@@ -44,12 +53,13 @@ export const SmartCoachingAssistant: React.FC<SmartCoachingAssistantProps> = ({
   availablePlayers,
   matchContext,
   onFormationChange,
-  onPlayerChange
+  onPlayerChange,
 }) => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [recommendations, setRecommendations] = useState<FormationRecommendation[]>([]);
   const [tacticalInsights, setTacticalInsights] = useState<TacticalInsight[]>([]);
-  const [selectedRecommendation, setSelectedRecommendation] = useState<FormationRecommendation | null>(null);
+  const [selectedRecommendation, setSelectedRecommendation] =
+    useState<FormationRecommendation | null>(null);
   const [optimizationProgress, setOptimizationProgress] = useState(0);
 
   const analyzeFormation = async () => {
@@ -63,7 +73,7 @@ export const SmartCoachingAssistant: React.FC<SmartCoachingAssistantProps> = ({
         { progress: 40, message: 'Evaluating player positions...' },
         { progress: 60, message: 'Generating recommendations...' },
         { progress: 80, message: 'Calculating effectiveness...' },
-        { progress: 100, message: 'Analysis complete!' }
+        { progress: 100, message: 'Analysis complete!' },
       ];
 
       for (const step of progressSteps) {
@@ -74,8 +84,7 @@ export const SmartCoachingAssistant: React.FC<SmartCoachingAssistantProps> = ({
       // Generate AI-powered recommendations
       const formationAnalysis = await openAiService.getFormationAnalysis(
         currentFormation,
-        availablePlayers,
-        matchContext
+        availablePlayers
       );
 
       // Create formation recommendations
@@ -86,7 +95,8 @@ export const SmartCoachingAssistant: React.FC<SmartCoachingAssistantProps> = ({
           effectiveness: 87,
           strengths: ['High pressing', 'Wing play', 'Counter-attacks'],
           weaknesses: ['Defensive stability', 'Midfield control'],
-          reasoning: 'Optimized for attacking play with strong wing presence and high pressing to dominate possession.'
+          reasoning:
+            'Optimized for attacking play with strong wing presence and high pressing to dominate possession.',
         },
         {
           formation: '4-2-3-1 Balanced',
@@ -94,7 +104,8 @@ export const SmartCoachingAssistant: React.FC<SmartCoachingAssistantProps> = ({
           effectiveness: 92,
           strengths: ['Defensive stability', 'Midfield control', 'Flexibility'],
           weaknesses: ['Wide play', 'Aerial presence'],
-          reasoning: 'Perfect balance between attack and defense with strong central control and tactical flexibility.'
+          reasoning:
+            'Perfect balance between attack and defense with strong central control and tactical flexibility.',
         },
         {
           formation: '3-5-2 Possession',
@@ -102,8 +113,9 @@ export const SmartCoachingAssistant: React.FC<SmartCoachingAssistantProps> = ({
           effectiveness: 84,
           strengths: ['Possession control', 'Midfield dominance', 'Defensive solidity'],
           weaknesses: ['Width in attack', 'Pace on counters'],
-          reasoning: 'Ideal for controlling the game through possession with numerical advantage in midfield.'
-        }
+          reasoning:
+            'Ideal for controlling the game through possession with numerical advantage in midfield.',
+        },
       ];
 
       // Generate tactical insights
@@ -114,7 +126,7 @@ export const SmartCoachingAssistant: React.FC<SmartCoachingAssistantProps> = ({
           title: 'Optimize Right-Back Position',
           description: 'Your right-back is too narrow, reducing width in attack',
           action: 'Move 15 yards wider to provide overlapping runs',
-          impact: 23
+          impact: 23,
         },
         {
           type: 'formation',
@@ -122,7 +134,7 @@ export const SmartCoachingAssistant: React.FC<SmartCoachingAssistantProps> = ({
           title: 'Consider Formation Switch',
           description: 'Current formation lacks midfield presence against strong opposition',
           action: 'Switch to 4-2-3-1 for better balance',
-          impact: 18
+          impact: 18,
         },
         {
           type: 'strategy',
@@ -130,7 +142,7 @@ export const SmartCoachingAssistant: React.FC<SmartCoachingAssistantProps> = ({
           title: 'Exploit Left Flank',
           description: 'Opposition weak on their right side',
           action: 'Instruct left winger to stay wide and take on defender',
-          impact: 31
+          impact: 31,
         },
         {
           type: 'substitution',
@@ -138,8 +150,8 @@ export const SmartCoachingAssistant: React.FC<SmartCoachingAssistantProps> = ({
           title: 'Fresh Legs Needed',
           description: 'Central midfielder showing fatigue signs',
           action: 'Prepare substitution for 65th minute',
-          impact: 12
-        }
+          impact: 12,
+        },
       ];
 
       setRecommendations(newRecommendations);
@@ -156,11 +168,12 @@ export const SmartCoachingAssistant: React.FC<SmartCoachingAssistantProps> = ({
     // Apply the recommended formation
     onFormationChange({
       name: recommendation.formation,
-      players: recommendation.players.map((player, index) => ({
-        ...player,
-        position: getOptimalPosition(recommendation.formation, index)
-      }))
-    });
+      slots: recommendation.players.map((player, index) => ({
+        id: `slot-${index}`,
+        playerId: player.id,
+        position: getOptimalPosition(recommendation.formation, index),
+      })),
+    } as any);
   };
 
   const getOptimalPosition = (formation: string, playerIndex: number) => {
@@ -168,23 +181,43 @@ export const SmartCoachingAssistant: React.FC<SmartCoachingAssistantProps> = ({
     const formations: Record<string, Array<{ x: number; y: number }>> = {
       '4-3-3 Attacking': [
         { x: 50, y: 90 }, // GK
-        { x: 20, y: 75 }, { x: 35, y: 75 }, { x: 65, y: 75 }, { x: 80, y: 75 }, // Defense
-        { x: 30, y: 55 }, { x: 50, y: 55 }, { x: 70, y: 55 }, // Midfield
-        { x: 20, y: 25 }, { x: 50, y: 25 }, { x: 80, y: 25 } // Attack
+        { x: 20, y: 75 },
+        { x: 35, y: 75 },
+        { x: 65, y: 75 },
+        { x: 80, y: 75 }, // Defense
+        { x: 30, y: 55 },
+        { x: 50, y: 55 },
+        { x: 70, y: 55 }, // Midfield
+        { x: 20, y: 25 },
+        { x: 50, y: 25 },
+        { x: 80, y: 25 }, // Attack
       ],
       '4-2-3-1 Balanced': [
         { x: 50, y: 90 }, // GK
-        { x: 20, y: 75 }, { x: 35, y: 75 }, { x: 65, y: 75 }, { x: 80, y: 75 }, // Defense
-        { x: 40, y: 60 }, { x: 60, y: 60 }, // Defensive Mid
-        { x: 25, y: 40 }, { x: 50, y: 40 }, { x: 75, y: 40 }, // Attacking Mid
-        { x: 50, y: 20 } // Striker
+        { x: 20, y: 75 },
+        { x: 35, y: 75 },
+        { x: 65, y: 75 },
+        { x: 80, y: 75 }, // Defense
+        { x: 40, y: 60 },
+        { x: 60, y: 60 }, // Defensive Mid
+        { x: 25, y: 40 },
+        { x: 50, y: 40 },
+        { x: 75, y: 40 }, // Attacking Mid
+        { x: 50, y: 20 }, // Striker
       ],
       '3-5-2 Possession': [
         { x: 50, y: 90 }, // GK
-        { x: 30, y: 75 }, { x: 50, y: 75 }, { x: 70, y: 75 }, // Defense
-        { x: 15, y: 55 }, { x: 35, y: 55 }, { x: 50, y: 55 }, { x: 65, y: 55 }, { x: 85, y: 55 }, // Midfield
-        { x: 40, y: 25 }, { x: 60, y: 25 } // Attack
-      ]
+        { x: 30, y: 75 },
+        { x: 50, y: 75 },
+        { x: 70, y: 75 }, // Defense
+        { x: 15, y: 55 },
+        { x: 35, y: 55 },
+        { x: 50, y: 55 },
+        { x: 65, y: 55 },
+        { x: 85, y: 55 }, // Midfield
+        { x: 40, y: 25 },
+        { x: 60, y: 25 }, // Attack
+      ],
     };
 
     return formations[formation]?.[playerIndex] || { x: 50, y: 50 };
@@ -192,20 +225,29 @@ export const SmartCoachingAssistant: React.FC<SmartCoachingAssistantProps> = ({
 
   const getPriorityIcon = (priority: string) => {
     switch (priority) {
-      case 'high': return <AlertTriangle className="w-4 h-4 text-red-500" />;
-      case 'medium': return <Target className="w-4 h-4 text-yellow-500" />;
-      case 'low': return <CheckCircle className="w-4 h-4 text-green-500" />;
-      default: return null;
+      case 'high':
+        return <AlertTriangle className="w-4 h-4 text-red-500" />;
+      case 'medium':
+        return <Target className="w-4 h-4 text-yellow-500" />;
+      case 'low':
+        return <CheckCircle className="w-4 h-4 text-green-500" />;
+      default:
+        return null;
     }
   };
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'formation': return <Users className="w-4 h-4" />;
-      case 'positioning': return <Target className="w-4 h-4" />;
-      case 'strategy': return <Brain className="w-4 h-4" />;
-      case 'substitution': return <Zap className="w-4 h-4" />;
-      default: return <Lightbulb className="w-4 h-4" />;
+      case 'formation':
+        return <Users className="w-4 h-4" />;
+      case 'positioning':
+        return <Target className="w-4 h-4" />;
+      case 'strategy':
+        return <Brain className="w-4 h-4" />;
+      case 'substitution':
+        return <Zap className="w-4 h-4" />;
+      default:
+        return <Lightbulb className="w-4 h-4" />;
     }
   };
 
@@ -237,8 +279,8 @@ export const SmartCoachingAssistant: React.FC<SmartCoachingAssistantProps> = ({
           <TabsContent value="recommendations" className="space-y-4 mt-4">
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold text-white">Formation Recommendations</h3>
-              <Button 
-                onClick={analyzeFormation} 
+              <Button
+                onClick={analyzeFormation}
                 disabled={isAnalyzing}
                 className="bg-blue-500/20 hover:bg-blue-500/30 border-blue-500/30"
               >
@@ -250,26 +292,29 @@ export const SmartCoachingAssistant: React.FC<SmartCoachingAssistantProps> = ({
             {isAnalyzing && (
               <div className="space-y-2">
                 <Progress value={optimizationProgress} className="w-full" />
-                <p className="text-sm text-gray-300 text-center">
-                  AI analyzing your formation...
-                </p>
+                <p className="text-sm text-gray-300 text-center">AI analyzing your formation...</p>
               </div>
             )}
 
             <div className="grid gap-4">
               {recommendations.map((rec, index) => (
-                <Card key={index} className="bg-white/5 border-white/10 hover:bg-white/10 transition-all">
+                <Card
+                  key={index}
+                  className="bg-white/5 border-white/10 hover:bg-white/10 transition-all"
+                >
                   <CardContent className="p-4">
                     <div className="flex justify-between items-start mb-3">
                       <div>
                         <h4 className="font-semibold text-white">{rec.formation}</h4>
                         <div className="flex items-center gap-2 mt-1">
                           <TrendingUp className="w-4 h-4 text-green-400" />
-                          <span className="text-green-400 font-medium">{rec.effectiveness}% Effective</span>
+                          <span className="text-green-400 font-medium">
+                            {rec.effectiveness}% Effective
+                          </span>
                         </div>
                       </div>
-                      <Button 
-                        size="sm" 
+                      <Button
+                        size="sm"
                         onClick={() => applyRecommendation(rec)}
                         className="bg-green-500/20 hover:bg-green-500/30 border-green-500/30"
                       >
@@ -311,10 +356,13 @@ export const SmartCoachingAssistant: React.FC<SmartCoachingAssistantProps> = ({
 
           <TabsContent value="insights" className="space-y-4 mt-4">
             <h3 className="text-lg font-semibold text-white">Tactical Insights</h3>
-            
+
             <div className="space-y-3">
               {tacticalInsights.map((insight, index) => (
-                <Card key={index} className="bg-white/5 border-white/10 hover:bg-white/10 transition-all">
+                <Card
+                  key={index}
+                  className="bg-white/5 border-white/10 hover:bg-white/10 transition-all"
+                >
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-center gap-2">
@@ -322,17 +370,22 @@ export const SmartCoachingAssistant: React.FC<SmartCoachingAssistantProps> = ({
                         {getTypeIcon(insight.type)}
                         <h4 className="font-semibold text-white">{insight.title}</h4>
                       </div>
-                      <Badge 
-                        variant={insight.priority === 'high' ? 'destructive' : 
-                                insight.priority === 'medium' ? 'default' : 'secondary'}
+                      <Badge
+                        variant={
+                          insight.priority === 'high'
+                            ? 'destructive'
+                            : insight.priority === 'medium'
+                              ? 'default'
+                              : 'secondary'
+                        }
                         className="capitalize"
                       >
                         {insight.priority}
                       </Badge>
                     </div>
-                    
+
                     <p className="text-gray-300 text-sm mb-3">{insight.description}</p>
-                    
+
                     <div className="flex items-center justify-between">
                       <p className="text-blue-400 text-sm font-medium">{insight.action}</p>
                       <div className="flex items-center gap-2">
@@ -348,36 +401,34 @@ export const SmartCoachingAssistant: React.FC<SmartCoachingAssistantProps> = ({
 
           <TabsContent value="optimization" className="space-y-4 mt-4">
             <h3 className="text-lg font-semibold text-white">Live Optimization</h3>
-            
+
             <Card className="bg-white/5 border-white/10">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-4">
                   <h4 className="font-semibold text-white">Real-time Analysis</h4>
-                  <Badge className="bg-green-500/20 text-green-400">
-                    Live
-                  </Badge>
+                  <Badge className="bg-green-500/20 text-green-400">Live</Badge>
                 </div>
-                
+
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
                     <span className="text-gray-300">Formation Effectiveness</span>
                     <span className="text-green-400 font-medium">87%</span>
                   </div>
                   <Progress value={87} className="w-full" />
-                  
+
                   <div className="flex justify-between items-center">
                     <span className="text-gray-300">Defensive Stability</span>
                     <span className="text-blue-400 font-medium">92%</span>
                   </div>
                   <Progress value={92} className="w-full" />
-                  
+
                   <div className="flex justify-between items-center">
                     <span className="text-gray-300">Attacking Potential</span>
                     <span className="text-yellow-400 font-medium">78%</span>
                   </div>
                   <Progress value={78} className="w-full" />
                 </div>
-                
+
                 <Button className="w-full mt-4 bg-blue-500/20 hover:bg-blue-500/30 border-blue-500/30">
                   Auto-Optimize Formation
                   <Zap className="w-4 h-4 ml-2" />

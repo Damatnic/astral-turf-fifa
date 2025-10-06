@@ -3,10 +3,28 @@
 import type { Team, PlayerStats } from './player';
 
 export interface MatchEvent {
+  id?: string;
   minute: number;
-  type: 'Goal' | 'Yellow Card' | 'Red Card' | 'Injury';
+  type:
+    | 'Goal'
+    | 'Yellow Card'
+    | 'Red Card'
+    | 'Injury'
+    | 'shot_on_target'
+    | 'shot_off_target'
+    | 'goal'
+    | 'corner'
+    | 'foul'
+    | 'yellow_card'
+    | 'red_card'
+    | 'substitution'
+    | 'penalty'
+    | 'free_kick'
+    | 'offside';
   team: Team;
-  playerName: string;
+  playerName?: string;
+  playerId?: string;
+  player?: string;
   description: string;
   injuryType?: 'Minor Injury' | 'Major Injury';
   assisterName?: string;
@@ -18,12 +36,18 @@ export interface MatchCommentary {
 }
 
 export interface MatchResult {
+  id?: string;
+  homeTeam?: string;
+  awayTeam?: string;
   homeScore: number;
   awayScore: number;
+  date?: string;
   events: MatchEvent[];
-  commentaryLog: MatchCommentary[];
-  isRivalry: boolean;
-  playerStats: Record<string, Partial<PlayerStats>>;
+  commentaryLog?: MatchCommentary[];
+  isRivalry?: boolean;
+  playerStats?: Record<string, Partial<PlayerStats>>;
+  statistics?: any;
+  playerRatings?: any;
 }
 
 // Team tactics and strategy
@@ -63,6 +87,8 @@ export interface FormationSlot {
   defaultPosition: { x: number; y: number };
   position?: { x: number; y: number }; // Current position during play
   playerId: string | null;
+  roleId?: string;
+  preferredRoles?: string[];
 }
 
 export interface Formation {
@@ -71,6 +97,27 @@ export interface Formation {
   slots: FormationSlot[];
   isCustom?: boolean;
   notes?: string;
+
+  // Additional optional properties
+  description?: string; // Formation description
+  players?: any[]; // Assigned players (using any to avoid circular dependency)
+  tactics?: TacticsData; // Associated tactics
+  strengths?: string[]; // Formation strengths
+  weaknesses?: string[]; // Formation weaknesses
+  suitableFor?: string[]; // Best suited playing styles
+  popularityRating?: number; // How common this formation is
+  offensiveRating?: number; // Offensive capability (0-100)
+  defensiveRating?: number; // Defensive capability (0-100)
+  flexibilityRating?: number; // Tactical flexibility (0-100)
+  strengthRating?: number; // Overall strength rating
+}
+
+// Tactics data structure
+export interface TacticsData {
+  attackingStyle?: 'possession' | 'counter' | 'direct' | 'wing-play';
+  defensiveStyle?: 'high-press' | 'mid-block' | 'low-block' | 'zonal';
+  buildUpSpeed?: 'slow' | 'balanced' | 'fast';
+  width?: 'narrow' | 'balanced' | 'wide';
 }
 
 // Team appearance

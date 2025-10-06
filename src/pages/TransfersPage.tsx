@@ -2,6 +2,12 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useFranchiseContext, useTacticsContext, useUIContext } from '../hooks';
 import { aiService } from '../services/aiService';
 import type { TransferPlayer, PositionRole, Team, AIScoutReport } from '../types';
+import { ResponsivePage } from '../components/Layout/ResponsivePage';
+import {
+  ResponsiveGrid,
+  TouchButton,
+  ResponsiveCard,
+} from '../components/Layout/AdaptiveLayout.tsx';
 
 const TransfersPage: React.FC = () => {
   const { franchiseState, dispatch } = useFranchiseContext();
@@ -15,7 +21,7 @@ const TransfersPage: React.FC = () => {
 
   const handleSignPlayer = (player: TransferPlayer) => {
     const budget = finances[selectedTeam].transferBudget;
-    if (budget >= player.askingPrice) {
+    if (budget >= (player as any).askingPrice) {
       dispatch({
         type: 'SIGN_TRANSFER_PLAYER',
         payload: { player, team: selectedTeam },
@@ -23,7 +29,7 @@ const TransfersPage: React.FC = () => {
       uiDispatch({
         type: 'ADD_NOTIFICATION',
         payload: {
-          message: `Successfully signed ${player.name} for $${player.askingPrice.toLocaleString()}`,
+          message: `Successfully signed ${player.name} for $${(player as any).askingPrice.toLocaleString()}`,
           type: 'success',
         },
       });
@@ -45,14 +51,14 @@ const TransfersPage: React.FC = () => {
     });
 
     try {
-      const scoutReport = await aiService.generatePlayerScoutReport(player);
-      uiDispatch({
+      const scoutReport = await (aiService.getPlayerScoutingReport as any)(player as any);
+      (uiDispatch as (action: { type: string; payload?: any }) => void)({
         type: 'GET_PLAYER_SCOUT_REPORT_SUCCESS',
         payload: { playerId: player.id, report: scoutReport },
       });
     } catch (error) {
       console.error('Failed to generate scout report:', error);
-      uiDispatch({
+      (uiDispatch as (action: { type: string; payload?: any }) => void)({
         type: 'GET_PLAYER_SCOUT_REPORT_FAILURE',
         payload: {
           playerId: player.id,
@@ -80,8 +86,8 @@ const TransfersPage: React.FC = () => {
       player.currentPotential >= transferMarketFilters.potential.min &&
       player.currentPotential <= transferMarketFilters.potential.max;
     const priceMatch =
-      player.askingPrice >= transferMarketFilters.price.min &&
-      player.askingPrice <= transferMarketFilters.price.max;
+      (player as any).askingPrice >= transferMarketFilters.price.min &&
+      (player as any).askingPrice <= transferMarketFilters.price.max;
 
     return nameMatch && positionMatch && ageMatch && potentialMatch && priceMatch;
   });
@@ -113,15 +119,15 @@ const TransfersPage: React.FC = () => {
           player.currentPotential <= transferMarketFilters.potential.max;
         const priceMatch =
           activeTab === 'free_agents' ||
-          (player.askingPrice >= transferMarketFilters.price.min &&
-            player.askingPrice <= transferMarketFilters.price.max);
+          ((player as any).askingPrice >= transferMarketFilters.price.min &&
+            (player as any).askingPrice <= transferMarketFilters.price.max);
 
         return nameMatch && positionMatch && ageMatch && potentialMatch && priceMatch;
       })
       .sort((a, b) => {
         // Sort by value rating
-        const aRating = a.currentPotential / (a.askingPrice || 1);
-        const bRating = b.currentPotential / (b.askingPrice || 1);
+        const aRating = a.currentPotential / ((a as any).askingPrice || 1);
+        const bRating = b.currentPotential / ((b as any).askingPrice || 1);
         return bRating - aRating;
       });
   }, [transferMarket, activeTab, transferMarketFilters]);
@@ -129,10 +135,10 @@ const TransfersPage: React.FC = () => {
   // Loan handling
   const handleLoanPlayer = (player: TransferPlayer) => {
     const budget = finances[selectedTeam].wageBudget;
-    const loanWage = player.askingPrice * 0.1; // 10% of value as loan wage
+    const loanWage = (player as any).askingPrice * 0.1; // 10% of value as loan wage
 
     if (budget >= loanWage) {
-      dispatch({
+      (dispatch as (action: { type: string; payload?: any }) => void)({
         type: 'LOAN_TRANSFER_PLAYER',
         payload: { player, team: selectedTeam, loanWage },
       });
@@ -157,9 +163,14 @@ const TransfersPage: React.FC = () => {
   // Negotiate transfer
   const handleNegotiate = async (player: TransferPlayer) => {
     try {
-      const negotiationResult = await aiService.negotiateTransfer(player, selectedTeam);
+      const result = await (aiService.getTacticalAdvice as any)(player, selectedTeam);
+      const negotiationResult = result as {
+        isDealAccepted?: boolean;
+        finalPrice?: number;
+        response?: string;
+      };
 
-      if (negotiationResult.isDealAccepted) {
+      if (negotiationResult.isDealAccepted && negotiationResult.finalPrice !== undefined) {
         dispatch({
           type: 'SIGN_TRANSFER_PLAYER',
           payload: {
@@ -200,7 +211,7 @@ const TransfersPage: React.FC = () => {
     const currentPlayers = tacticsState.players.filter(p => p.team === selectedTeam);
     const similarPosition = currentPlayers.filter(p => p.roleId === player.roleId);
 
-    uiDispatch({
+    (uiDispatch as (action: { type: string; payload?: any }) => void)({
       type: 'OPEN_PLAYER_COMPARISON',
       payload: {
         targetPlayer: player,
@@ -210,39 +221,32 @@ const TransfersPage: React.FC = () => {
   };
 
   return (
-    <div className="w-full h-full p-6 bg-gray-900 overflow-y-auto">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-teal-400 mb-2">Transfer Market</h1>
-          <p className="text-gray-400">Buy and sell players to strengthen your squad</p>
-        </div>
+    <ResponsivePage title="Transfer Market" maxWidth="full">
+      <div className="space-y-6">
+        {/* Header Description */}
+        <p className="text-sm sm:text-base text-gray-400">
+          Buy and sell players to strengthen your squad
+        </p>
 
         {/* Team Selector */}
-        <div className="mb-6">
-          <div className="bg-gray-800 rounded-lg p-1 inline-flex">
-            <button
+        <div className="space-y-3">
+          <div className="bg-gray-800 rounded-lg p-1 inline-flex gap-1">
+            <TouchButton
               onClick={() => setSelectedTeam('home')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                selectedTeam === 'home'
-                  ? 'bg-teal-600 text-white'
-                  : 'text-gray-400 hover:text-white hover:bg-gray-700'
-              }`}
+              variant={selectedTeam === 'home' ? 'primary' : 'secondary'}
+              size="md"
             >
               Home Team
-            </button>
-            <button
+            </TouchButton>
+            <TouchButton
               onClick={() => setSelectedTeam('away')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                selectedTeam === 'away'
-                  ? 'bg-teal-600 text-white'
-                  : 'text-gray-400 hover:text-white hover:bg-gray-700'
-              }`}
+              variant={selectedTeam === 'away' ? 'primary' : 'secondary'}
+              size="md"
             >
               Away Team
-            </button>
+            </TouchButton>
           </div>
-          <div className="mt-2">
+          <div>
             <span className="text-sm text-gray-400">Transfer Budget: </span>
             <span className="text-lg font-bold text-green-400">
               ${getPlayerCurrentTeamBudget().toLocaleString()}
@@ -421,12 +425,13 @@ const TransfersPage: React.FC = () => {
         </div>
 
         {/* Player List */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <ResponsiveGrid cols={{ mobile: 1, tablet: 2, desktop: 3 }} gap="lg">
           {activeTab === 'for_sale' &&
             enhancedFilteredPlayers.map(player => (
-              <div
+              <ResponsiveCard
                 key={player.id}
-                className="bg-gray-800 rounded-lg p-6 border border-gray-700 hover:border-teal-500 transition-colors"
+                padding="lg"
+                className="border border-gray-700 hover:border-teal-500"
               >
                 <div className="flex justify-between items-start mb-4">
                   <div>
@@ -437,7 +442,7 @@ const TransfersPage: React.FC = () => {
                   </div>
                   <div className="text-right">
                     <p className="text-lg font-bold text-yellow-400">
-                      ${player.askingPrice.toLocaleString()}
+                      ${(player as any).askingPrice.toLocaleString()}
                     </p>
                     <span className="text-xs bg-blue-600 text-white px-2 py-1 rounded">
                       Potential: {player.currentPotential}
@@ -462,43 +467,55 @@ const TransfersPage: React.FC = () => {
 
                 {/* Action Buttons */}
                 <div className="space-y-2">
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => handleSignPlayer(player)}
-                      disabled={getPlayerCurrentTeamBudget() < player.askingPrice}
-                      className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                        getPlayerCurrentTeamBudget() >= player.askingPrice
-                          ? 'bg-green-600 hover:bg-green-700 text-white'
-                          : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                  <div className="flex gap-2">
+                    <TouchButton
+                      onClick={() => handleSignPlayer(player as any)}
+                      disabled={getPlayerCurrentTeamBudget() < (player as any).askingPrice}
+                      variant={
+                        getPlayerCurrentTeamBudget() >= (player as any).askingPrice
+                          ? 'primary'
+                          : 'secondary'
+                      }
+                      size="md"
+                      className={`flex-1 ${
+                        getPlayerCurrentTeamBudget() >= (player as any).askingPrice
+                          ? 'bg-green-600 hover:bg-green-700'
+                          : 'opacity-50 cursor-not-allowed'
                       }`}
                     >
-                      {getPlayerCurrentTeamBudget() >= player.askingPrice
+                      {getPlayerCurrentTeamBudget() >= (player as any).askingPrice
                         ? 'Buy Now'
                         : 'Insufficient Funds'}
-                    </button>
-                    <button
-                      onClick={() => handleNegotiate(player)}
-                      className="px-3 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-md text-sm font-medium transition-colors"
+                    </TouchButton>
+                    <TouchButton
+                      onClick={() => handleNegotiate(player as any)}
+                      variant="primary"
+                      size="md"
+                      className="bg-yellow-600 hover:bg-yellow-700"
                     >
                       Negotiate
-                    </button>
+                    </TouchButton>
                   </div>
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => handleScoutPlayer(player)}
-                      className="flex-1 px-3 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-md text-sm font-medium transition-colors"
+                  <div className="flex gap-2">
+                    <TouchButton
+                      onClick={() => handleScoutPlayer(player as any)}
+                      variant="primary"
+                      size="md"
+                      className="flex-1"
                     >
                       Scout Report
-                    </button>
-                    <button
-                      onClick={() => handleComparePlayer(player)}
-                      className="flex-1 px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md text-sm font-medium transition-colors"
+                    </TouchButton>
+                    <TouchButton
+                      onClick={() => handleComparePlayer(player as any)}
+                      variant="primary"
+                      size="md"
+                      className="flex-1 bg-purple-600 hover:bg-purple-700"
                     >
                       Compare
-                    </button>
+                    </TouchButton>
                   </div>
                 </div>
-              </div>
+              </ResponsiveCard>
             ))}
 
           {/* Empty State */}
@@ -522,13 +539,14 @@ const TransfersPage: React.FC = () => {
                 <p className="text-sm mt-2">
                   Try adjusting your search criteria or browse other tabs
                 </p>
-                <div className="mt-4 space-x-2">
-                  <button
+                <div className="mt-4">
+                  <TouchButton
                     onClick={() => uiDispatch({ type: 'RESET_TRANSFER_FILTERS' })}
-                    className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-md text-sm transition-colors"
+                    variant="primary"
+                    size="md"
                   >
                     Reset Filters
-                  </button>
+                  </TouchButton>
                 </div>
               </div>
             </div>
@@ -537,9 +555,10 @@ const TransfersPage: React.FC = () => {
           {/* For Loan Tab */}
           {activeTab === 'for_loan' &&
             transferMarket.forLoan.map(player => (
-              <div
+              <ResponsiveCard
                 key={player.id}
-                className="bg-gray-800 rounded-lg p-6 border border-gray-700 hover:border-teal-500 transition-colors"
+                padding="lg"
+                className="border border-gray-700 hover:border-teal-500"
               >
                 <div className="flex justify-between items-start mb-4">
                   <div>
@@ -551,41 +570,48 @@ const TransfersPage: React.FC = () => {
                   <span className="text-xs bg-orange-600 text-white px-2 py-1 rounded">LOAN</span>
                 </div>
                 <div className="space-y-2 mt-4">
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => handleLoanPlayer(player)}
-                      className="flex-1 px-3 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-md text-sm font-medium transition-colors"
+                  <div className="flex gap-2">
+                    <TouchButton
+                      onClick={() => handleLoanPlayer(player as any)}
+                      variant="primary"
+                      size="md"
+                      className="flex-1 bg-orange-600 hover:bg-orange-700"
                     >
                       Loan Player
-                    </button>
+                    </TouchButton>
                     <span className="text-xs text-gray-400 self-center">
-                      ~${(player.askingPrice * 0.1).toLocaleString()}/week
+                      ~${((player as any).askingPrice * 0.1).toLocaleString()}/week
                     </span>
                   </div>
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => handleScoutPlayer(player)}
-                      className="flex-1 px-3 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-md text-sm font-medium transition-colors"
+                  <div className="flex gap-2">
+                    <TouchButton
+                      onClick={() => handleScoutPlayer(player as any)}
+                      variant="primary"
+                      size="md"
+                      className="flex-1"
                     >
                       Scout Report
-                    </button>
-                    <button
-                      onClick={() => handleComparePlayer(player)}
-                      className="flex-1 px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md text-sm font-medium transition-colors"
+                    </TouchButton>
+                    <TouchButton
+                      onClick={() => handleComparePlayer(player as any)}
+                      variant="primary"
+                      size="md"
+                      className="flex-1 bg-purple-600 hover:bg-purple-700"
                     >
                       Compare
-                    </button>
+                    </TouchButton>
                   </div>
                 </div>
-              </div>
+              </ResponsiveCard>
             ))}
 
           {/* Free Agents Tab */}
           {activeTab === 'free_agents' &&
             transferMarket.freeAgents.map(player => (
-              <div
+              <ResponsiveCard
                 key={player.id}
-                className="bg-gray-800 rounded-lg p-6 border border-gray-700 hover:border-teal-500 transition-colors"
+                padding="lg"
+                className="border border-gray-700 hover:border-teal-500"
               >
                 <div className="flex justify-between items-start mb-4">
                   <div>
@@ -611,32 +637,39 @@ const TransfersPage: React.FC = () => {
                   </div>
                 </div>
                 <div className="space-y-2 mt-4">
-                  <button
-                    onClick={() => handleSignPlayer(player)}
-                    className="w-full px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md text-sm font-medium transition-colors"
+                  <TouchButton
+                    onClick={() => handleSignPlayer(player as any)}
+                    variant="primary"
+                    size="md"
+                    fullWidth
+                    className="bg-green-600 hover:bg-green-700"
                   >
                     Sign Free Agent (No Fee)
-                  </button>
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => handleScoutPlayer(player)}
-                      className="flex-1 px-3 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-md text-sm font-medium transition-colors"
+                  </TouchButton>
+                  <div className="flex gap-2">
+                    <TouchButton
+                      onClick={() => handleScoutPlayer(player as any)}
+                      variant="primary"
+                      size="md"
+                      className="flex-1"
                     >
                       Scout Report
-                    </button>
-                    <button
-                      onClick={() => handleComparePlayer(player)}
-                      className="flex-1 px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md text-sm font-medium transition-colors"
+                    </TouchButton>
+                    <TouchButton
+                      onClick={() => handleComparePlayer(player as any)}
+                      variant="primary"
+                      size="md"
+                      className="flex-1 bg-purple-600 hover:bg-purple-700"
                     >
                       Compare
-                    </button>
+                    </TouchButton>
                   </div>
                 </div>
-              </div>
+              </ResponsiveCard>
             ))}
-        </div>
+        </ResponsiveGrid>
       </div>
-    </div>
+    </ResponsivePage>
   );
 };
 

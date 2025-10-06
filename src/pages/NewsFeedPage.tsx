@@ -8,7 +8,7 @@ const NewsFeedPage: React.FC = () => {
   const [selectedFilter, setSelectedFilter] = useState<'all' | NewsItem['type']>('all');
 
   const filteredNews = newsFeed.filter(
-    item => selectedFilter === 'all' || item.type === selectedFilter,
+    item => selectedFilter === 'all' || item.type === selectedFilter
   );
 
   const getNewsIcon = (type: NewsItem['type']) => {
@@ -375,7 +375,9 @@ const NewsFeedPage: React.FC = () => {
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             {newsTypes.slice(1).map(({ key, label, count }) => (
               <div key={key} className="text-center">
-                <div className={`text-2xl font-bold ${getNewsTypeColor(key)}`}>{count}</div>
+                <div className={`text-2xl font-bold ${getNewsTypeColor(key as NewsItem['type'])}`}>
+                  {count}
+                </div>
                 <div className="text-xs text-gray-400 mt-1">{label}</div>
               </div>
             ))}

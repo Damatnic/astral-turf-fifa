@@ -24,9 +24,10 @@ const DragIndicator: React.FC<DragIndicatorProps> = ({ position, isValid, fieldD
       <motion.div
         className={`
           w-16 h-16 rounded-full border-2 backdrop-blur-sm
-          ${isValid
-            ? 'border-green-400 bg-green-400/20 shadow-lg shadow-green-400/30'
-            : 'border-red-400 bg-red-400/20 shadow-lg shadow-red-400/30'
+          ${
+            isValid
+              ? 'border-green-400 bg-green-400/20 shadow-lg shadow-green-400/30'
+              : 'border-red-400 bg-red-400/20 shadow-lg shadow-red-400/30'
           }
         `}
         animate={{
@@ -36,7 +37,7 @@ const DragIndicator: React.FC<DragIndicatorProps> = ({ position, isValid, fieldD
         transition={{
           duration: 1.5,
           repeat: Infinity,
-          ease: "easeInOut",
+          ease: 'easeInOut',
         }}
       />
 
@@ -53,7 +54,7 @@ const DragIndicator: React.FC<DragIndicatorProps> = ({ position, isValid, fieldD
         transition={{
           duration: 2,
           repeat: Infinity,
-          ease: "easeOut",
+          ease: 'easeOut',
         }}
       />
 
@@ -70,20 +71,19 @@ const DragIndicator: React.FC<DragIndicatorProps> = ({ position, isValid, fieldD
           transition={{
             duration: 0.8,
             repeat: Infinity,
-            ease: "easeInOut",
+            ease: 'easeInOut',
           }}
         />
       </div>
 
       {/* Status Text */}
       <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2">
-        <div className={`
+        <div
+          className={`
           text-xs font-medium px-2 py-1 rounded backdrop-blur-sm
-          ${isValid
-            ? 'text-green-400 bg-green-900/50'
-            : 'text-red-400 bg-red-900/50'
-          }
-        `}>
+          ${isValid ? 'text-green-400 bg-green-900/50' : 'text-red-400 bg-red-900/50'}
+        `}
+        >
           {isValid ? 'Valid Position' : 'Invalid Position'}
         </div>
       </div>

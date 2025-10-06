@@ -9,3 +9,5 @@ export const TacticsContext = createContext<{
   tacticsState: INITIAL_STATE.tactics,
   dispatch: () => null,
 });
+
+export { TacticsProvider, useTacticsContext } from './TacticsContext.tsx';

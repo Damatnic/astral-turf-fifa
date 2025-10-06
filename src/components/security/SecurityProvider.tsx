@@ -67,7 +67,7 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
         features: ['monitoring', 'csp', 'error_handling', 'violation_detection'],
         environment: ENVIRONMENT_CONFIG.isDevelopment ? 'development' : 'production',
       });
-    } catch (_error) {
+    } catch (error) {
       securityLogger.error('Failed to initialize security systems', {
         error: error instanceof Error ? error.message : 'Unknown error',
       });
@@ -95,7 +95,7 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
         });
 
         observer.observe({ entryTypes: ['navigation', 'resource', 'measure'] });
-      } catch (_error) {
+      } catch (error) {
         securityLogger.warn('Performance monitoring setup failed', {
           error: error instanceof Error ? error.message : 'Unknown error',
         });
@@ -172,7 +172,7 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
             reason: sanitizeUserInput(reason.message || ''),
             stack: ENVIRONMENT_CONFIG.isDevelopment ? reason.stack : '[REDACTED]',
           },
-        },
+        }
       );
     };
 
@@ -223,11 +223,11 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
   const reportSecurityEvent = useCallback((eventType: SecurityEventType, details: unknown) => {
     try {
       monitorSecurityEvent(eventType, {
-        ...details,
+        ...(details as object),
         reportedBy: 'user_action',
         timestamp: new Date().toISOString(),
       });
-    } catch (_error) {
+    } catch (error) {
       securityLogger.error('Failed to report security event', {
         eventType,
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -274,7 +274,7 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
         metadata: violation.metadata,
       });
     },
-    [reportSecurityEvent],
+    [reportSecurityEvent]
   );
 
   const contextValue: SecurityContextType = {
@@ -307,7 +307,7 @@ export function useSecurityReporting() {
         source: 'component',
       });
     },
-    [reportSecurityEvent],
+    [reportSecurityEvent]
   );
 
   const reportUnauthorizedAccess = useCallback(
@@ -318,7 +318,7 @@ export function useSecurityReporting() {
         source: 'component',
       });
     },
-    [reportSecurityEvent],
+    [reportSecurityEvent]
   );
 
   const reportInputThreat = useCallback(
@@ -330,7 +330,7 @@ export function useSecurityReporting() {
         source: 'component',
       });
     },
-    [reportSecurityEvent],
+    [reportSecurityEvent]
   );
 
   return {

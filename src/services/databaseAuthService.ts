@@ -73,7 +73,7 @@ class DatabaseAuthService {
    */
   async signup(
     signupData: DatabaseSignupData,
-    context: LoginContext,
+    context: LoginContext
   ): Promise<DatabaseLoginResponse> {
     const startTime = Date.now();
 
@@ -89,7 +89,7 @@ class DatabaseAuthService {
           {
             ipAddress: context.ipAddress,
             remaining: rateLimitResult.remaining,
-          },
+          }
         );
         throw new Error('Signup rate limit exceeded. Please try again later.');
       }
@@ -101,11 +101,13 @@ class DatabaseAuthService {
       }
 
       const sanitizedData = validationResult.data;
-      sanitizedData.email = sanitizeUserInput(sanitizedData.email.toLowerCase().trim());
+      (sanitizedData as any).email = sanitizeUserInput(
+        (sanitizedData as any).email.toLowerCase().trim()
+      );
 
       // Check if user already exists
       const existingUser = await this.db.user.findUnique({
-        where: { email: sanitizedData.email },
+        where: { email: (sanitizedData as any).email },
       });
 
       if (existingUser) {
@@ -113,38 +115,38 @@ class DatabaseAuthService {
           SecurityEventType.SUSPICIOUS_ACTIVITY,
           'Signup attempt with existing email',
           {
-            email: sanitizedData.email,
+            email: (sanitizedData as any).email,
             ipAddress: context.ipAddress,
-          },
+          }
         );
         throw new Error('User with this email already exists');
       }
 
       // Validate password strength
-      const passwordValidation = validatePasswordStrength(sanitizedData.password);
+      const passwordValidation = validatePasswordStrength((sanitizedData as any).password);
       if (!passwordValidation.isValid) {
         throw new Error(`Password requirements not met: ${passwordValidation.errors.join(', ')}`);
       }
 
       // Check terms acceptance
-      if (!sanitizedData.acceptedTerms || !sanitizedData.acceptedPrivacyPolicy) {
+      if (!(sanitizedData as any).acceptedTerms || !(sanitizedData as any).acceptedPrivacyPolicy) {
         throw new Error('You must accept the terms and privacy policy to create an account');
       }
 
       // Hash password
-      const passwordHash = await hashPassword(sanitizedData.password);
+      const passwordHash = await hashPassword((sanitizedData as any).password);
 
       // Create user in database using transaction
       const result = await databaseService.executeTransaction(async prisma => {
         // Create user
         const newUser = await prisma.user.create({
           data: {
-            email: sanitizedData.email,
+            email: (sanitizedData as any).email,
             passwordHash,
-            firstName: sanitizedData.firstName,
-            lastName: sanitizedData.lastName,
-            role: sanitizedData.role,
-            phoneNumber: sanitizedData.phoneNumber,
+            firstName: (sanitizedData as any).firstName,
+            lastName: (sanitizedData as any).lastName,
+            role: (sanitizedData as any).role,
+            phoneNumber: (sanitizedData as any).phoneNumber,
             isActive: true,
             lastPasswordChangeAt: new Date(),
             passwordHistory: {
@@ -160,7 +162,7 @@ class DatabaseAuthService {
                 matchUpdates: true,
                 trainingReminders: true,
                 emergencyAlerts: true,
-                paymentReminders: sanitizedData.role === 'FAMILY',
+                paymentReminders: (sanitizedData as any).role === 'FAMILY',
               },
             },
           },
@@ -183,21 +185,25 @@ class DatabaseAuthService {
           role: result.role,
           ipAddress: context.ipAddress,
           userAgent: context.userAgent,
-        },
+        }
       );
 
       // Automatically log in the new user
-      return await this.login(sanitizedData.email, sanitizedData.password, context);
-    } catch (_error) {
+      return await this.login(
+        (sanitizedData as any).email,
+        (sanitizedData as any).password,
+        context
+      );
+    } catch (_error: any) {
       securityLogger.error('Database signup failed', {
         email: signupData.email,
         role: signupData.role,
         ipAddress: context.ipAddress,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
         duration: Date.now() - startTime,
       });
 
-      throw error;
+      throw _error;
     }
   }
 
@@ -207,7 +213,7 @@ class DatabaseAuthService {
   async login(
     email: string,
     password: string,
-    context: LoginContext,
+    context: LoginContext
   ): Promise<DatabaseLoginResponse> {
     const startTime = Date.now();
 
@@ -223,7 +229,7 @@ class DatabaseAuthService {
           {
             ipAddress: context.ipAddress,
             email: sanitizeUserInput(email),
-          },
+          }
         );
         throw new Error('Too many login attempts. Please try again later.');
       }
@@ -269,7 +275,7 @@ class DatabaseAuthService {
             userId: user.id,
             ipAddress: context.ipAddress,
             userAgent: context.userAgent,
-          },
+          }
         );
         throw new Error('Account is temporarily locked. Please try again later.');
       }
@@ -314,7 +320,7 @@ class DatabaseAuthService {
       });
 
       // Generate JWT tokens
-      const tokens = generateTokenPair(this.convertToPublicUser(user), sessionId);
+      const tokens = await generateTokenPair(user as any, sessionId);
 
       // Cache session data in Redis
       await cache.set(
@@ -326,7 +332,7 @@ class DatabaseAuthService {
           ipAddress: session.ipAddress,
           userAgent: session.userAgent,
         },
-        { ttl: 24 * 60 * 60 },
+        { ttl: 24 * 60 * 60 }
       ); // 24 hours
 
       // Record successful login
@@ -351,8 +357,8 @@ class DatabaseAuthService {
         },
         securityNotices,
       };
-    } catch (_error) {
-      const errorMessage = error instanceof Error ? error.message : 'Login failed';
+    } catch (_error: any) {
+      const errorMessage = _error instanceof Error ? _error.message : 'Login failed';
 
       securityLogger.error('Database login failed', {
         email: sanitizeUserInput(email),
@@ -361,7 +367,7 @@ class DatabaseAuthService {
         duration: Date.now() - startTime,
       });
 
-      throw error;
+      throw _error;
     }
   }
 
@@ -391,13 +397,13 @@ class DatabaseAuthService {
           ipAddress: context.ipAddress,
         });
       }
-    } catch (_error) {
+    } catch (_error: any) {
       securityLogger.error('Logout failed', {
         sessionId,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
         ipAddress: context.ipAddress,
       });
-      throw error;
+      throw _error;
     }
   }
 
@@ -445,7 +451,7 @@ class DatabaseAuthService {
               ipAddress: session.ipAddress,
               userAgent: session.userAgent,
             },
-            { ttl: 24 * 60 * 60 },
+            { ttl: 24 * 60 * 60 }
           );
         }
       }
@@ -483,10 +489,10 @@ class DatabaseAuthService {
       });
 
       return this.convertToPublicUser(user);
-    } catch (_error) {
+    } catch (_error: any) {
       securityLogger.error('Get current user failed', {
         sessionId,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
       });
       return null;
     }
@@ -518,12 +524,12 @@ class DatabaseAuthService {
       });
 
       return this.convertToPublicUser(updatedUser);
-    } catch (_error) {
+    } catch (_error: any) {
       securityLogger.error('Update user profile failed', {
         userId,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
       });
-      throw error;
+      throw _error;
     }
   }
 
@@ -534,7 +540,7 @@ class DatabaseAuthService {
     userId: string,
     currentPassword: string,
     newPassword: string,
-    context: LoginContext,
+    context: LoginContext
   ): Promise<void> {
     try {
       const user = await this.db.user.findUnique({
@@ -557,7 +563,7 @@ class DatabaseAuthService {
         securityLogger.logSecurityEvent(
           SecurityEventType.UNAUTHORIZED_ACCESS,
           'Invalid current password during password change',
-          { userId, ipAddress: context.ipAddress },
+          { userId, ipAddress: context.ipAddress }
         );
         throw new Error('Current password is incorrect');
       }
@@ -635,15 +641,15 @@ class DatabaseAuthService {
         {
           userId,
           ipAddress: context.ipAddress,
-        },
+        }
       );
-    } catch (_error) {
+    } catch (_error: any) {
       securityLogger.error('Password change failed', {
         userId,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
         ipAddress: context.ipAddress,
       });
-      throw error;
+      throw _error;
     }
   }
 
@@ -655,7 +661,7 @@ class DatabaseAuthService {
     email: string,
     context: LoginContext,
     reason: string,
-    userId?: string,
+    userId?: string
   ): Promise<void> {
     try {
       if (userId) {
@@ -677,9 +683,9 @@ class DatabaseAuthService {
         userAgent: context.userAgent,
         reason,
       });
-    } catch (_error) {
+    } catch (_error: any) {
       securityLogger.error('Failed to record login failure', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
       });
     }
   }
@@ -697,17 +703,17 @@ class DatabaseAuthService {
       securityLogger.logSecurityEvent(
         SecurityEventType.ACCOUNT_LOCKED,
         'Account locked due to failed login attempts',
-        { userId },
+        { userId }
       );
-    } catch (_error) {
+    } catch (_error: any) {
       securityLogger.error('Failed to lock account', {
         userId,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
       });
     }
   }
 
-  private convertToPublicUser(prismaUser: PrismaUser & { notifications?: unknown }): User {
+  private convertToPublicUser(prismaUser: PrismaUser & { notifications?: any }): User {
     return {
       id: prismaUser.id,
       email: prismaUser.email,
@@ -718,6 +724,7 @@ class DatabaseAuthService {
       phoneNumber: prismaUser.phoneNumber || undefined,
       timezone: prismaUser.timezone,
       language: prismaUser.language,
+      createdAt: prismaUser.createdAt?.toISOString() || new Date().toISOString(),
       lastLoginAt: prismaUser.lastLoginAt?.toISOString(),
       notifications: prismaUser.notifications
         ? {
@@ -743,7 +750,7 @@ class DatabaseAuthService {
 
   private async generateSecurityNotices(
     user: PrismaUser & { sessions?: UserSession[] },
-    context: LoginContext,
+    context: LoginContext
   ): Promise<string[]> {
     const notices: string[] = [];
 
@@ -779,10 +786,10 @@ class DatabaseAuthService {
       if (activeSessions > 2) {
         notices.push(`You have ${activeSessions} active sessions`);
       }
-    } catch (_error) {
+    } catch (_error: any) {
       securityLogger.error('Failed to generate security notices', {
         userId: user.id,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
       });
     }
 

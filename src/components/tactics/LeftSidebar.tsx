@@ -1,15 +1,15 @@
 import React, { useMemo, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useTacticsContext, useUIContext } from '../../hooks';
-import { 
-  Users, 
-  Settings, 
-  Play, 
-  Search, 
-  Filter, 
-  Target, 
-  Plus, 
-  Star, 
+import {
+  Users,
+  Settings,
+  Play,
+  Search,
+  Filter,
+  Target,
+  Plus,
+  Star,
   ChevronRight,
   ChevronDown,
   Copy,
@@ -17,7 +17,7 @@ import {
   PlusCircle,
   Sparkles,
   BarChart3,
-  Zap
+  Zap,
 } from 'lucide-react';
 import type { Player, Formation, Team } from '../../types';
 
@@ -41,7 +41,7 @@ const PlayerListItem: React.FC<PlayerListItemProps> = ({
   onDoubleClick,
   onDragStart,
   onAssignTeam,
-  isOnField
+  isOnField,
 }) => {
   const handleTeamClick = (e: React.MouseEvent, team: Team) => {
     e.stopPropagation();
@@ -52,28 +52,29 @@ const PlayerListItem: React.FC<PlayerListItemProps> = ({
     <motion.div
       layout
       draggable
-      onDragStart={onDragStart}
+      onDragStart={onDragStart as any}
       onClick={onSelect}
       onDoubleClick={onDoubleClick}
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       className={`
         group relative flex items-center p-3 rounded-lg cursor-pointer transition-all
-        ${isSelected 
-          ? 'bg-blue-600/30 ring-1 ring-blue-500' 
-          : isOnField
-            ? 'bg-green-900/25 border border-green-500/40'
-            : 'bg-slate-800/40 hover:bg-slate-700/50'
+        ${
+          isSelected
+            ? 'bg-blue-600/30 ring-1 ring-blue-500'
+            : isOnField
+              ? 'bg-green-900/25 border border-green-500/40'
+              : 'bg-slate-800/40 hover:bg-slate-700/50'
         }
       `}
     >
       {/* Player Avatar */}
       <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm mr-3 border-2 border-slate-600">
-        <div 
+        <div
           className="w-full h-full rounded-full flex items-center justify-center text-white"
           style={{ backgroundColor: player.teamColor || '#6b7280' }}
         >
-          {player.number || player.name.charAt(0)}
+          {(player as any).number || player.name.charAt(0)}
         </div>
       </div>
 
@@ -81,42 +82,40 @@ const PlayerListItem: React.FC<PlayerListItemProps> = ({
       <div className="flex-grow min-w-0">
         <div className="flex items-center">
           <p className="font-semibold text-sm text-white truncate">{player.name}</p>
-          {isOnField && (
-            <div className="ml-2 w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-          )}
+          {isOnField && <div className="ml-2 w-2 h-2 bg-green-400 rounded-full animate-pulse" />}
         </div>
         <div className="flex items-center mt-1">
           <p className="text-xs text-slate-400 capitalize truncate">
             {player.roleId?.replace('-', ' ') || 'Player'}
           </p>
-          <span className="ml-2 text-xs text-slate-400">
-            Rating: {player.rating || 75}
-          </span>
+          <span className="ml-2 text-xs text-slate-400">Rating: {player.rating || 75}</span>
         </div>
       </div>
 
       {/* Team Assignment Buttons */}
       <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-        <button 
-          onClick={(e) => handleTeamClick(e, 'home')} 
+        <button
+          onClick={e => handleTeamClick(e, 'home')}
           className={`
             w-6 h-6 text-xs font-bold rounded flex items-center justify-center transition-colors
-            ${player.team === 'home' 
-              ? 'bg-blue-600 text-white ring-1 ring-white' 
-              : 'bg-slate-600 text-slate-300 hover:bg-blue-600'
+            ${
+              player.team === 'home'
+                ? 'bg-blue-600 text-white ring-1 ring-white'
+                : 'bg-slate-600 text-slate-300 hover:bg-blue-600'
             }
           `}
           title="Assign to Home"
         >
           H
         </button>
-        <button 
-          onClick={(e) => handleTeamClick(e, 'away')} 
+        <button
+          onClick={e => handleTeamClick(e, 'away')}
           className={`
             w-6 h-6 text-xs font-bold rounded flex items-center justify-center transition-colors
-            ${player.team === 'away' 
-              ? 'bg-red-600 text-white ring-1 ring-white' 
-              : 'bg-slate-600 text-slate-300 hover:bg-red-600'
+            ${
+              player.team === 'away'
+                ? 'bg-red-600 text-white ring-1 ring-white'
+                : 'bg-slate-600 text-slate-300 hover:bg-red-600'
             }
           `}
           title="Assign to Away"
@@ -149,7 +148,7 @@ const FormationSelector: React.FC<{
 
       <select
         value={activeFormationId}
-        onChange={(e) => onFormationChange(e.target.value)}
+        onChange={e => onFormationChange(e.target.value)}
         className="w-full p-2.5 bg-slate-800/50 border border-slate-600/50 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/30"
       >
         {Object.entries(formations).map(([id, formation]) => (
@@ -206,7 +205,9 @@ const PlaybookSection: React.FC<{
     const plays = Object.values(playbook || {});
     return plays.reduce((acc: any, play: any) => {
       const category = play.category || 'General';
-      if (!acc[category]) acc[category] = [];
+      if (!acc[category]) {
+        acc[category] = [];
+      }
       acc[category].push(play);
       return acc;
     }, {});
@@ -229,13 +230,15 @@ const PlaybookSection: React.FC<{
       </div>
 
       <div className="space-y-2 max-h-64 overflow-y-auto">
-        {Object.entries(playsByCategory).map(([category, plays]: [string, any[]]) => (
+        {Object.entries(playsByCategory as Record<string, any[]>).map(([category, plays]) => (
           <div key={category}>
             <button
               onClick={() => toggleCategory(category)}
               className="w-full flex items-center justify-between text-left text-xs font-bold uppercase text-slate-400 hover:bg-slate-700/50 px-2 py-1 rounded"
             >
-              <span>{category} ({plays.length})</span>
+              <span>
+                {category} ({plays.length})
+              </span>
               {expandedCategories.has(category) ? (
                 <ChevronDown className="w-3 h-3" />
               ) : (
@@ -250,9 +253,10 @@ const PlaybookSection: React.FC<{
                     key={play.id}
                     className={`
                       group flex items-center justify-between text-sm p-2 rounded cursor-pointer transition-colors
-                      ${activePlayId === play.id 
-                        ? 'bg-blue-600/30 text-white font-semibold' 
-                        : 'hover:bg-slate-700/50 text-slate-300'
+                      ${
+                        activePlayId === play.id
+                          ? 'bg-blue-600/30 text-white font-semibold'
+                          : 'hover:bg-slate-700/50 text-slate-300'
                       }
                     `}
                     onClick={() => onLoadPlay(play.id)}
@@ -260,14 +264,20 @@ const PlaybookSection: React.FC<{
                     <span className="truncate">{play.name}</span>
                     <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
-                        onClick={(e) => { e.stopPropagation(); onDuplicatePlay(play.id); }}
+                        onClick={e => {
+                          e.stopPropagation();
+                          onDuplicatePlay(play.id);
+                        }}
                         className="p-1 hover:text-blue-400"
                         title="Duplicate"
                       >
                         <Copy className="w-3 h-3" />
                       </button>
                       <button
-                        onClick={(e) => { e.stopPropagation(); onDeletePlay(play.id); }}
+                        onClick={e => {
+                          e.stopPropagation();
+                          onDeletePlay(play.id);
+                        }}
                         className="p-1 hover:text-red-400"
                         title="Delete"
                       >
@@ -307,8 +317,9 @@ export const LeftSidebar: React.FC = () => {
 
   // Filter and sort players
   const filteredPlayers = useMemo(() => {
-    let filtered = players.filter(player => {
-      const matchesSearch = player.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    const filtered = players.filter(player => {
+      const matchesSearch =
+        player.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (player.roleId || '').toLowerCase().includes(searchQuery.toLowerCase());
       const matchesRole = filterRole === 'all' || (player.roleId || '').includes(filterRole);
       return matchesSearch && matchesRole;
@@ -332,13 +343,11 @@ export const LeftSidebar: React.FC = () => {
 
   // Determine which players are on field
   const playersOnField = useMemo(() => {
-    if (!currentFormation?.slots) return new Set();
-    
-    return new Set(
-      currentFormation.slots
-        .map(slot => slot.playerId)
-        .filter(Boolean)
-    );
+    if (!currentFormation?.slots) {
+      return new Set();
+    }
+
+    return new Set(currentFormation.slots.map(slot => slot.playerId).filter(Boolean));
   }, [currentFormation]);
 
   // Separate on-field and bench players
@@ -346,38 +355,47 @@ export const LeftSidebar: React.FC = () => {
   const benchPlayers = filteredPlayers.filter(p => !playersOnField.has(p.id));
 
   // Event handlers
-  const handleFormationChange = useCallback((formationId: string) => {
-    dispatch({
-      type: 'SET_ACTIVE_FORMATION',
-      payload: { formationId, team: 'home' }
-    });
-  }, [dispatch]);
+  const handleFormationChange = useCallback(
+    (formationId: string) => {
+      dispatch({
+        type: 'SET_ACTIVE_FORMATION',
+        payload: { formationId, team: 'home' },
+      });
+    },
+    [dispatch]
+  );
 
-  const handlePlayerSelect = useCallback((playerId: string) => {
-    dispatch({
-      type: 'SELECT_PLAYER',
-      payload: playerId
-    });
-  }, [dispatch]);
+  const handlePlayerSelect = useCallback(
+    (playerId: string) => {
+      dispatch({
+        type: 'SELECT_PLAYER',
+        payload: playerId,
+      });
+    },
+    [dispatch]
+  );
 
   const handlePlayerDragStart = useCallback((e: React.DragEvent, playerId: string) => {
     e.dataTransfer.setData('text/plain', playerId);
     e.dataTransfer.effectAllowed = 'move';
   }, []);
 
-  const handleAssignTeam = useCallback((playerId: string, team: Team) => {
-    dispatch({
-      type: 'ASSIGN_PLAYER_TEAM',
-      payload: { playerId, team }
-    });
-  }, [dispatch]);
+  const handleAssignTeam = useCallback(
+    (playerId: string, team: Team) => {
+      dispatch({
+        type: 'ASSIGN_PLAYER_TEAM',
+        payload: { playerId, team },
+      });
+    },
+    [dispatch]
+  );
 
   const handleSuggestFormation = useCallback(async () => {
     setIsSuggestingFormation(true);
     try {
       // Mock AI suggestion - replace with actual AI service
       await new Promise(resolve => setTimeout(resolve, 2000));
-      
+
       // For now, just switch to a different formation
       const formationIds = Object.keys(formations);
       const currentIndex = formationIds.indexOf(activeFormationId);
@@ -406,9 +424,9 @@ export const LeftSidebar: React.FC = () => {
         <PlaybookSection
           playbook={playbook}
           onCreatePlay={() => console.log('Create play')}
-          onLoadPlay={(playId) => console.log('Load play:', playId)}
-          onDuplicatePlay={(playId) => console.log('Duplicate play:', playId)}
-          onDeletePlay={(playId) => console.log('Delete play:', playId)}
+          onLoadPlay={playId => console.log('Load play:', playId)}
+          onDuplicatePlay={playId => console.log('Duplicate play:', playId)}
+          onDeletePlay={playId => console.log('Delete play:', playId)}
         />
 
         {/* Player Roster */}
@@ -432,7 +450,7 @@ export const LeftSidebar: React.FC = () => {
                 type="text"
                 placeholder="Search players..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={e => setSearchQuery(e.target.value)}
                 className="w-full pl-9 pr-4 py-2 bg-slate-800/50 border border-slate-600/50 rounded-lg text-white text-sm placeholder-slate-400 focus:outline-none focus:border-blue-500/50"
               />
             </div>
@@ -440,7 +458,7 @@ export const LeftSidebar: React.FC = () => {
             <div className="flex items-center space-x-2">
               <select
                 value={filterRole}
-                onChange={(e) => setFilterRole(e.target.value)}
+                onChange={e => setFilterRole(e.target.value)}
                 className="flex-1 p-2 bg-slate-800/50 border border-slate-600/50 rounded text-white text-xs"
               >
                 <option value="all">All Positions</option>
@@ -452,7 +470,7 @@ export const LeftSidebar: React.FC = () => {
 
               <select
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
+                onChange={e => setSortBy(e.target.value as any)}
                 className="flex-1 p-2 bg-slate-800/50 border border-slate-600/50 rounded text-white text-xs"
               >
                 <option value="name">Sort by Name</option>
@@ -468,68 +486,90 @@ export const LeftSidebar: React.FC = () => {
               // Group players by position
               const playersByPosition = {
                 goalkeeper: filteredPlayers.filter(p => p.roleId?.includes('goalkeeper')),
-                defender: filteredPlayers.filter(p => p.roleId?.includes('back') || p.roleId?.includes('defender')),
-                midfielder: filteredPlayers.filter(p => p.roleId?.includes('midfielder') || p.roleId?.includes('mid')),
-                forward: filteredPlayers.filter(p => p.roleId?.includes('forward') || p.roleId?.includes('striker') || p.roleId?.includes('winger')),
-                other: filteredPlayers.filter(p => !p.roleId || (!p.roleId.includes('goalkeeper') && !p.roleId.includes('back') && !p.roleId.includes('defender') && !p.roleId.includes('midfielder') && !p.roleId.includes('mid') && !p.roleId.includes('forward') && !p.roleId.includes('striker') && !p.roleId.includes('winger')))
+                defender: filteredPlayers.filter(
+                  p => p.roleId?.includes('back') || p.roleId?.includes('defender')
+                ),
+                midfielder: filteredPlayers.filter(
+                  p => p.roleId?.includes('midfielder') || p.roleId?.includes('mid')
+                ),
+                forward: filteredPlayers.filter(
+                  p =>
+                    p.roleId?.includes('forward') ||
+                    p.roleId?.includes('striker') ||
+                    p.roleId?.includes('winger')
+                ),
+                other: filteredPlayers.filter(
+                  p =>
+                    !p.roleId ||
+                    (!p.roleId.includes('goalkeeper') &&
+                      !p.roleId.includes('back') &&
+                      !p.roleId.includes('defender') &&
+                      !p.roleId.includes('midfielder') &&
+                      !p.roleId.includes('mid') &&
+                      !p.roleId.includes('forward') &&
+                      !p.roleId.includes('striker') &&
+                      !p.roleId.includes('winger'))
+                ),
               };
 
               const positionConfig = [
-                { 
-                  key: 'goalkeeper', 
-                  name: 'Goalkeepers', 
-                  icon: Target, 
+                {
+                  key: 'goalkeeper',
+                  name: 'Goalkeepers',
+                  icon: Target,
                   color: 'text-yellow-400',
-                  bgColor: 'bg-yellow-900/20'
+                  bgColor: 'bg-yellow-900/20',
                 },
-                { 
-                  key: 'defender', 
-                  name: 'Defenders', 
-                  icon: Star, 
+                {
+                  key: 'defender',
+                  name: 'Defenders',
+                  icon: Star,
                   color: 'text-blue-400',
-                  bgColor: 'bg-blue-900/20'
+                  bgColor: 'bg-blue-900/20',
                 },
-                { 
-                  key: 'midfielder', 
-                  name: 'Midfielders', 
-                  icon: BarChart3, 
+                {
+                  key: 'midfielder',
+                  name: 'Midfielders',
+                  icon: BarChart3,
                   color: 'text-green-400',
-                  bgColor: 'bg-green-900/20'
+                  bgColor: 'bg-green-900/20',
                 },
-                { 
-                  key: 'forward', 
-                  name: 'Forwards', 
-                  icon: Zap, 
+                {
+                  key: 'forward',
+                  name: 'Forwards',
+                  icon: Zap,
                   color: 'text-red-400',
-                  bgColor: 'bg-red-900/20'
+                  bgColor: 'bg-red-900/20',
                 },
-                { 
-                  key: 'other', 
-                  name: 'Others', 
-                  icon: Users, 
+                {
+                  key: 'other',
+                  name: 'Others',
+                  icon: Users,
                   color: 'text-slate-400',
-                  bgColor: 'bg-slate-900/20'
-                }
+                  bgColor: 'bg-slate-900/20',
+                },
               ];
 
               return positionConfig.map(({ key, name, icon: Icon, color, bgColor }) => {
                 const positionPlayers = playersByPosition[key as keyof typeof playersByPosition];
                 const onFieldCount = positionPlayers.filter(p => playersOnField.has(p.id)).length;
-                
-                if (positionPlayers.length === 0) return null;
+
+                if (positionPlayers.length === 0) {
+                  return null;
+                }
 
                 return (
                   <div key={key} className={`${bgColor} rounded-lg p-3`}>
-                    <h4 className={`text-xs font-bold uppercase px-2 mb-3 flex items-center justify-between ${color}`}>
+                    <h4
+                      className={`text-xs font-bold uppercase px-2 mb-3 flex items-center justify-between ${color}`}
+                    >
                       <div className="flex items-center">
                         <Icon className="w-3 h-3 mr-2" />
                         {name} ({positionPlayers.length})
                       </div>
                       <div className="text-xs font-normal">
                         {onFieldCount > 0 && (
-                          <span className="text-green-400">
-                            {onFieldCount} on field
-                          </span>
+                          <span className="text-green-400">{onFieldCount} on field</span>
                         )}
                       </div>
                     </h4>
@@ -541,8 +581,8 @@ export const LeftSidebar: React.FC = () => {
                           isSelected={selectedPlayerId === player.id}
                           onSelect={() => handlePlayerSelect(player.id)}
                           onDoubleClick={() => console.log('Edit player:', player.id)}
-                          onDragStart={(e) => handlePlayerDragStart(e, player.id)}
-                          onAssignTeam={(team) => handleAssignTeam(player.id, team)}
+                          onDragStart={e => handlePlayerDragStart(e, player.id)}
+                          onAssignTeam={team => handleAssignTeam(player.id, team)}
                           isOnField={playersOnField.has(player.id)}
                         />
                       ))}

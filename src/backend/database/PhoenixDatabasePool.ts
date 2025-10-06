@@ -1,6 +1,6 @@
 /**
  * Phoenix Database Pool - Enterprise-grade connection pooling with advanced optimization
- * 
+ *
  * Features:
  * - Intelligent connection pooling with predictive scaling
  * - Sub-50ms query performance optimization
@@ -63,7 +63,7 @@ export interface QueryPlan {
  * Phoenix Database Pool - Advanced PostgreSQL connection pooling
  */
 export class PhoenixDatabasePool extends EventEmitter {
-  private pool: Pool;
+  private pool!: Pool;
   private config: PhoenixPoolConfig;
   private queryStats: Map<string, QueryStats[]> = new Map();
   private queryPlanCache: Map<string, QueryPlan> = new Map();
@@ -76,9 +76,13 @@ export class PhoenixDatabasePool extends EventEmitter {
   private preparedStatements: Map<string, string> = new Map();
   private queryOptimizations: Map<string, string> = new Map();
 
+  // Error tracking for error rate calculation
+  private queryErrors: Array<{ timestamp: number; query: string; error: Error }> = [];
+  private totalQueries = 0;
+
   constructor(config: PhoenixPoolConfig) {
     super();
-    
+
     this.config = {
       // Base PostgreSQL config
       host: config.host || process.env.DB_HOST || 'localhost',
@@ -86,13 +90,13 @@ export class PhoenixDatabasePool extends EventEmitter {
       database: config.database || process.env.DB_NAME,
       user: config.user || process.env.DB_USER,
       password: config.password || process.env.DB_PASSWORD,
-      
+
       // Connection pool optimization
       min: config.min || 10,
       max: config.max || 100,
       idleTimeoutMillis: config.idleTimeoutMillis || 30000,
       connectionTimeoutMillis: config.connectionTimeoutMillis || 10000,
-      
+
       // Phoenix enhancements
       adaptivePooling: config.adaptivePooling ?? true,
       predictiveScaling: config.predictiveScaling ?? true,
@@ -103,23 +107,22 @@ export class PhoenixDatabasePool extends EventEmitter {
       enableQueryOptimization: config.enableQueryOptimization ?? true,
       maxRetries: config.maxRetries || 3,
       retryDelay: config.retryDelay || 1000,
-      
-      // Advanced PostgreSQL settings
-      statement_timeout: config.queryTimeout || 30000,
-      idle_in_transaction_session_timeout: 60000,
-      log_statement: process.env.NODE_ENV === 'development' ? 'all' : 'none',
-      log_duration: process.env.NODE_ENV === 'development',
-      shared_preload_libraries: 'pg_stat_statements',
-      
+
+      // Advanced PostgreSQL settings via options
+      options: `-c statement_timeout=${config.queryTimeout || 30000}`,
+
       // SSL configuration
-      ssl: process.env.NODE_ENV === 'production' ? {
-        rejectUnauthorized: false,
-        ca: process.env.DB_SSL_CA,
-        cert: process.env.DB_SSL_CERT,
-        key: process.env.DB_SSL_KEY,
-      } : false,
-      
-      ...config
+      ssl:
+        process.env.NODE_ENV === 'production'
+          ? {
+              rejectUnauthorized: false,
+              ca: process.env.DB_SSL_CA,
+              cert: process.env.DB_SSL_CERT,
+              key: process.env.DB_SSL_KEY,
+            }
+          : false,
+
+      ...config,
     };
 
     this.createPool();
@@ -130,19 +133,19 @@ export class PhoenixDatabasePool extends EventEmitter {
 
   private createPool(): void {
     this.pool = new Pool(this.config);
-    
+
     // Pool event handlers
-    this.pool.on('connect', (client) => {
+    this.pool.on('connect', client => {
       this.optimizeClientConnection(client);
       this.emit('connect', client);
     });
 
-    this.pool.on('acquire', (client) => {
+    this.pool.on('acquire', client => {
       this.trackConnectionAcquisition(client);
       this.emit('acquire', client);
     });
 
-    this.pool.on('remove', (client) => {
+    this.pool.on('remove', client => {
       this.trackConnectionRemoval(client);
       this.emit('remove', client);
     });
@@ -179,7 +182,6 @@ export class PhoenixDatabasePool extends EventEmitter {
       if (this.config.enableQueryOptimization) {
         await client.query('SET plan_cache_mode = force_generic_plan');
       }
-
     } catch (error) {
       console.warn('Failed to optimize client connection:', error);
     }
@@ -189,9 +191,9 @@ export class PhoenixDatabasePool extends EventEmitter {
     // Handle graceful shutdown
     process.on('SIGTERM', () => this.gracefulShutdown());
     process.on('SIGINT', () => this.gracefulShutdown());
-    
+
     // Memory management
-    process.on('uncaughtException', (error) => {
+    process.on('uncaughtException', error => {
       console.error('Uncaught exception in database pool:', error);
       this.emit('error', error);
     });
@@ -240,17 +242,17 @@ export class PhoenixDatabasePool extends EventEmitter {
 
     while (retries >= 0) {
       let client: PoolClient | null = null;
-      
+
       try {
         client = await this.acquireClient();
-        
+
         // Set query timeout if specified
         if (options.timeout) {
           await client.query(`SET statement_timeout = ${options.timeout}`);
         }
 
         // Execute query
-        const result = await client.query(optimizedQuery, params);
+        const result = await client.query(optimizedQuery, params || []);
         const duration = Date.now() - startTime;
 
         // Record query statistics
@@ -258,7 +260,7 @@ export class PhoenixDatabasePool extends EventEmitter {
 
         // Optimize query if it's slow
         if (duration > 100 && this.config.enableQueryOptimization) {
-          await this.optimizeSlowQuery(text, params, client);
+          await this.optimizeSlowQuery(text, params || [], client);
         }
 
         this.emit('query', { text, params, duration, rows: result.rowCount });
@@ -266,9 +268,8 @@ export class PhoenixDatabasePool extends EventEmitter {
         return {
           rows: result.rows,
           rowCount: result.rowCount || 0,
-          duration
+          duration,
         };
-
       } catch (error) {
         const duration = Date.now() - startTime;
         this.recordQueryError(text, error as Error, duration);
@@ -302,13 +303,13 @@ export class PhoenixDatabasePool extends EventEmitter {
     } = {}
   ): Promise<T> {
     let retries = options.retries ?? this.config.maxRetries ?? 3;
-    
+
     while (retries >= 0) {
       const client = await this.acquireClient();
-      
+
       try {
         await client.query('BEGIN');
-        
+
         if (options.isolationLevel) {
           await client.query(`SET TRANSACTION ISOLATION LEVEL ${options.isolationLevel}`);
         }
@@ -319,10 +320,9 @@ export class PhoenixDatabasePool extends EventEmitter {
 
         const result = await callback(client);
         await client.query('COMMIT');
-        
+
         this.emit('transaction', { type: 'commit', isolationLevel: options.isolationLevel });
         return result;
-
       } catch (error) {
         try {
           await client.query('ROLLBACK');
@@ -357,7 +357,7 @@ export class PhoenixDatabasePool extends EventEmitter {
       return Promise.all(queries.map(q => this.query(q.text, q.params, options)));
     }
 
-    const results = [];
+    const results: Array<{ rows: T[]; rowCount: number; duration: number }> = [];
     for (const query of queries) {
       const result = await this.query(query.text, query.params, options);
       results.push(result);
@@ -373,21 +373,22 @@ export class PhoenixDatabasePool extends EventEmitter {
     try {
       const poolStats = this.getPoolStats();
       const dbStats = await this.getDatabaseStats();
-      
+
       const recentStats = this.getRecentQueryStats();
-      const avgQueryTime = recentStats.length > 0 
-        ? recentStats.reduce((sum, stat) => sum + stat.duration, 0) / recentStats.length
-        : 0;
+      const avgQueryTime =
+        recentStats.length > 0
+          ? recentStats.reduce((sum, stat) => sum + stat.duration, 0) / recentStats.length
+          : 0;
 
       const errorRate = this.calculateErrorRate();
 
       let status: 'healthy' | 'degraded' | 'critical' = 'healthy';
-      
-      if (avgQueryTime > 1000 || errorRate > 0.05 || poolStats.waitingClients > 10) {
+
+      if (avgQueryTime > 1000 || errorRate > 0.05 || poolStats.waitingCount > 10) {
         status = 'degraded';
       }
-      
-      if (avgQueryTime > 5000 || errorRate > 0.1 || poolStats.waitingClients > 20) {
+
+      if (avgQueryTime > 5000 || errorRate > 0.1 || poolStats.waitingCount > 20) {
         status = 'critical';
       }
 
@@ -399,9 +400,8 @@ export class PhoenixDatabasePool extends EventEmitter {
         waitingClients: poolStats.waitingCount,
         lastHealthCheck: Date.now(),
         avgQueryTime,
-        errorRate
+        errorRate,
       };
-
     } catch (error) {
       return {
         status: 'critical',
@@ -411,7 +411,7 @@ export class PhoenixDatabasePool extends EventEmitter {
         waitingClients: 0,
         lastHealthCheck: Date.now(),
         avgQueryTime: 0,
-        errorRate: 1
+        errorRate: 1,
       };
     }
   }
@@ -426,7 +426,7 @@ export class PhoenixDatabasePool extends EventEmitter {
   } {
     const cutoff = Date.now() - timeRange;
     const allStats: QueryStats[] = [];
-    
+
     for (const stats of this.queryStats.values()) {
       allStats.push(...stats.filter(s => s.timestamp >= cutoff));
     }
@@ -443,7 +443,7 @@ export class PhoenixDatabasePool extends EventEmitter {
       const existing = queryFrequency.get(stat.query) || { count: 0, totalDuration: 0 };
       queryFrequency.set(stat.query, {
         count: existing.count + 1,
-        totalDuration: existing.totalDuration + stat.duration
+        totalDuration: existing.totalDuration + stat.duration,
       });
     });
 
@@ -451,7 +451,7 @@ export class PhoenixDatabasePool extends EventEmitter {
       .map(([query, stats]) => ({
         query,
         count: stats.count,
-        avgDuration: stats.totalDuration / stats.count
+        avgDuration: stats.totalDuration / stats.count,
       }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 10);
@@ -463,7 +463,7 @@ export class PhoenixDatabasePool extends EventEmitter {
       const bucket = hourlyBuckets.get(hour) || { totalDuration: 0, count: 0 };
       hourlyBuckets.set(hour, {
         totalDuration: bucket.totalDuration + stat.duration,
-        count: bucket.count + 1
+        count: bucket.count + 1,
       });
     });
 
@@ -471,7 +471,7 @@ export class PhoenixDatabasePool extends EventEmitter {
       .map(([timestamp, stats]) => ({
         timestamp,
         avgDuration: stats.totalDuration / stats.count,
-        queryCount: stats.count
+        queryCount: stats.count,
       }))
       .sort((a, b) => a.timestamp - b.timestamp);
 
@@ -483,22 +483,21 @@ export class PhoenixDatabasePool extends EventEmitter {
    */
   async optimize(): Promise<void> {
     const client = await this.acquireClient();
-    
+
     try {
       // Update table statistics
       await client.query('ANALYZE');
-      
+
       // Rebuild indexes if needed
       await this.rebuildFragmentedIndexes(client);
-      
+
       // Update query planner statistics
       await client.query('SELECT pg_stat_reset()');
-      
+
       // Optimize configuration based on current load
       await this.adaptiveOptimization(client);
-      
+
       this.emit('optimize', { timestamp: Date.now() });
-      
     } finally {
       client.release();
     }
@@ -508,10 +507,12 @@ export class PhoenixDatabasePool extends EventEmitter {
    * Graceful shutdown with connection draining
    */
   async gracefulShutdown(timeout: number = 10000): Promise<void> {
-    if (this.isShuttingDown) return;
-    
+    if (this.isShuttingDown) {
+      return;
+    }
+
     this.isShuttingDown = true;
-    
+
     // Clear timers
     if (this.healthCheckTimer) {
       clearInterval(this.healthCheckTimer);
@@ -522,10 +523,7 @@ export class PhoenixDatabasePool extends EventEmitter {
 
     try {
       // Wait for active queries to complete or timeout
-      await Promise.race([
-        this.drainConnections(),
-        this.delay(timeout)
-      ]);
+      await Promise.race([this.drainConnections(), this.delay(timeout)]);
     } catch (error) {
       console.error('Error during graceful shutdown:', error);
     }
@@ -541,7 +539,7 @@ export class PhoenixDatabasePool extends EventEmitter {
     if (this.isShuttingDown) {
       throw new Error('Pool is shutting down');
     }
-    
+
     return this.pool.connect();
   }
 
@@ -549,7 +547,7 @@ export class PhoenixDatabasePool extends EventEmitter {
     return {
       totalCount: this.pool.totalCount,
       idleCount: this.pool.idleCount,
-      waitingCount: this.pool.waitingCount
+      waitingCount: this.pool.waitingCount,
     };
   }
 
@@ -576,7 +574,7 @@ export class PhoenixDatabasePool extends EventEmitter {
     let hash = 0;
     for (let i = 0; i < content.length; i++) {
       const char = content.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash; // Convert to 32-bit integer
     }
     return hash.toString();
@@ -589,8 +587,11 @@ export class PhoenixDatabasePool extends EventEmitter {
       rows,
       cached: false,
       timestamp: Date.now(),
-      planHash: hash
+      planHash: hash,
     };
+
+    // Track total queries for error rate calculation
+    this.totalQueries++;
 
     if (!this.queryStats.has(hash)) {
       this.queryStats.set(hash, []);
@@ -606,23 +607,69 @@ export class PhoenixDatabasePool extends EventEmitter {
   }
 
   private recordQueryError(query: string, error: Error, duration: number): void {
+    // Store error with timestamp for error rate calculation
+    this.queryErrors.push({
+      timestamp: Date.now(),
+      query,
+      error,
+    });
+
+    // Keep only last 1000 errors
+    if (this.queryErrors.length > 1000) {
+      this.queryErrors = this.queryErrors.slice(-500);
+    }
+
     this.emit('queryError', { query, error, duration });
   }
 
   private getRecentQueryStats(minutes: number = 5): QueryStats[] {
-    const cutoff = Date.now() - (minutes * 60 * 1000);
+    const cutoff = Date.now() - minutes * 60 * 1000;
     const recent: QueryStats[] = [];
-    
+
     for (const stats of this.queryStats.values()) {
       recent.push(...stats.filter(s => s.timestamp >= cutoff));
     }
-    
+
     return recent;
   }
 
-  private calculateErrorRate(): number {
-    // Implementation would track error rate over time
-    return 0; // Placeholder
+  /**
+   * Calculate error rate over the specified time window
+   * @param timeWindow - Time window in milliseconds (default: 5 minutes)
+   * @returns Error rate as a percentage (0-1)
+   */
+  private calculateErrorRate(timeWindow: number = 300000): number {
+    const cutoff = Date.now() - timeWindow;
+
+    // Count errors within the time window
+    const recentErrors = this.queryErrors.filter(e => e.timestamp >= cutoff).length;
+
+    // Get total queries within the same time window
+    const recentQueries: QueryStats[] = [];
+    for (const stats of this.queryStats.values()) {
+      recentQueries.push(...stats.filter(s => s.timestamp >= cutoff));
+    }
+
+    const totalRecentQueries = recentQueries.length;
+
+    // Calculate error rate (errors / total queries)
+    if (totalRecentQueries === 0) {
+      return 0;
+    }
+
+    return recentErrors / (totalRecentQueries + recentErrors);
+  }
+
+  /**
+   * Get current pool utilization percentage
+   * @returns Utilization percentage (0-100)
+   */
+  getPoolUtilization(): number {
+    const stats = this.getPoolStats();
+    const maxConnections = this.config.max || 100;
+    const activeConnections = stats.totalCount - stats.idleCount;
+
+    return (activeConnections / maxConnections) * 100;
   }
 
   private isRetryableError(error: Error): boolean {
@@ -631,12 +678,10 @@ export class PhoenixDatabasePool extends EventEmitter {
       'connection reset',
       'timeout',
       'deadlock detected',
-      'serialization failure'
+      'serialization failure',
     ];
-    
-    return retryableErrors.some(msg => 
-      error.message.toLowerCase().includes(msg)
-    );
+
+    return retryableErrors.some(msg => error.message.toLowerCase().includes(msg));
   }
 
   private async optimizeSlowQuery(query: string, params: any[], client: PoolClient): Promise<void> {
@@ -644,14 +689,13 @@ export class PhoenixDatabasePool extends EventEmitter {
       // Get query execution plan
       const explainResult = await client.query(`EXPLAIN (FORMAT JSON, ANALYZE) ${query}`, params);
       const plan = explainResult.rows[0]['QUERY PLAN'][0];
-      
+
       // Analyze and suggest optimizations
       const suggestions = this.analyzeQueryPlan(plan);
-      
+
       if (suggestions.length > 0) {
         this.emit('slowQuery', { query, params, plan, suggestions });
       }
-      
     } catch (error) {
       // Ignore EXPLAIN errors
     }
@@ -659,22 +703,22 @@ export class PhoenixDatabasePool extends EventEmitter {
 
   private analyzeQueryPlan(plan: any): string[] {
     const suggestions: string[] = [];
-    
+
     // Recursive function to analyze plan nodes
     const analyzePlanNode = (node: any) => {
       if (node['Node Type'] === 'Seq Scan' && node['Total Cost'] > 1000) {
         suggestions.push('Consider adding an index for sequential scan');
       }
-      
+
       if (node['Node Type'] === 'Sort' && node['Sort Method'] === 'external merge') {
         suggestions.push('Consider increasing work_mem for external sort');
       }
-      
+
       if (node['Plans']) {
         node['Plans'].forEach((child: any) => analyzePlanNode(child));
       }
     };
-    
+
     analyzePlanNode(plan.Plan);
     return suggestions;
   }
@@ -691,7 +735,7 @@ export class PhoenixDatabasePool extends EventEmitter {
         WHERE idx_scan < 10 
         AND pg_relation_size(indexrelid) > 10485760
       `);
-      
+
       for (const row of result.rows) {
         await client.query(`REINDEX INDEX CONCURRENTLY ${row.schemaname}.${row.indexname}`);
       }
@@ -701,16 +745,18 @@ export class PhoenixDatabasePool extends EventEmitter {
   }
 
   private async adaptiveOptimization(client: PoolClient): Promise<void> {
-    if (!this.config.adaptivePooling) return;
-    
+    if (!this.config.adaptivePooling) {
+      return;
+    }
+
     const health = await this.getHealthMetrics();
-    
+
     // Adjust pool size based on load
     if (health.avgQueryTime > 500 && health.waitingClients > 5) {
       // Consider increasing pool size
-      this.emit('poolAdjustment', { 
-        type: 'increase', 
-        reason: 'high_latency_and_waiting_clients' 
+      this.emit('poolAdjustment', {
+        type: 'increase',
+        reason: 'high_latency_and_waiting_clients',
       });
     }
   }
@@ -719,7 +765,7 @@ export class PhoenixDatabasePool extends EventEmitter {
     try {
       const health = await this.getHealthMetrics();
       this.emit('healthCheck', health);
-      
+
       if (health.status === 'critical') {
         this.emit('criticalHealth', health);
       }
@@ -731,13 +777,13 @@ export class PhoenixDatabasePool extends EventEmitter {
   private detectConnectionLeaks(): void {
     const stats = this.getPoolStats();
     const threshold = this.config.leakDetectionThreshold || 60000;
-    
+
     // Check for connections that have been active too long
     if (stats.totalCount > (this.config.max || 100) * 0.8) {
       this.emit('potentialLeak', {
         totalConnections: stats.totalCount,
         maxConnections: this.config.max,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
     }
   }
@@ -746,7 +792,7 @@ export class PhoenixDatabasePool extends EventEmitter {
     const clientId = (client as any).processID;
     this.connectionMetrics.set(clientId, {
       acquiredAt: Date.now(),
-      queries: 0
+      queries: 0,
     });
   }
 
@@ -757,7 +803,7 @@ export class PhoenixDatabasePool extends EventEmitter {
 
   private handlePoolError(error: Error, client?: PoolClient): void {
     console.error('Pool error:', error);
-    
+
     if (client) {
       const clientId = (client as any).processID;
       this.connectionMetrics.delete(clientId);
@@ -793,8 +839,5 @@ export const phoenixPool = new PhoenixDatabasePool({
   leakDetectionThreshold: 60000,
   statementCacheSize: 100,
   maxRetries: 3,
-  retryDelay: 1000
+  retryDelay: 1000,
 });
-
-// Export types
-export type { PhoenixPoolConfig, QueryStats, ConnectionHealth, QueryPlan };

@@ -1,6 +1,6 @@
 /**
  * Phoenix Monitoring & Observability System - Enterprise-grade monitoring suite
- * 
+ *
  * Features:
  * - Real-time application performance monitoring (APM)
  * - Distributed tracing with correlation IDs
@@ -125,19 +125,19 @@ export class PhoenixMonitoring extends EventEmitter {
   private slaMetrics: Map<string, SLAMetric> = new Map();
   private businessMetrics: Map<string, BusinessMetric[]> = new Map();
 
-  private logger: winston.Logger;
+  private logger!: winston.Logger;
   private startTime: number;
   private cleanupIntervals: NodeJS.Timeout[] = [];
 
   // Configuration
   private config = {
     metricsRetention: 24 * 60 * 60 * 1000, // 24 hours
-    tracesRetention: 1 * 60 * 60 * 1000,   // 1 hour
-    healthCheckInterval: 30 * 1000,        // 30 seconds
+    tracesRetention: 1 * 60 * 60 * 1000, // 1 hour
+    healthCheckInterval: 30 * 1000, // 30 seconds
     alertingEnabled: true,
-    exportInterval: 60 * 1000,             // 1 minute
+    exportInterval: 60 * 1000, // 1 minute
     maxMetricsPerName: 1000,
-    maxTraceSpans: 100
+    maxTraceSpans: 100,
   };
 
   constructor() {
@@ -161,7 +161,7 @@ export class PhoenixMonitoring extends EventEmitter {
           winston.format.printf(({ timestamp, level, message, ...meta }) => {
             return `${timestamp} [${level}]: ${message} ${Object.keys(meta).length ? JSON.stringify(meta) : ''}`;
           })
-        )
+        ),
       }),
 
       // Application logs
@@ -170,10 +170,7 @@ export class PhoenixMonitoring extends EventEmitter {
         datePattern: 'YYYY-MM-DD',
         maxSize: '20m',
         maxFiles: '14d',
-        format: winston.format.combine(
-          winston.format.timestamp(),
-          winston.format.json()
-        )
+        format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
       }),
 
       // Error logs
@@ -183,10 +180,7 @@ export class PhoenixMonitoring extends EventEmitter {
         level: 'error',
         maxSize: '20m',
         maxFiles: '30d',
-        format: winston.format.combine(
-          winston.format.timestamp(),
-          winston.format.json()
-        )
+        format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
       }),
 
       // Performance logs
@@ -195,10 +189,7 @@ export class PhoenixMonitoring extends EventEmitter {
         datePattern: 'YYYY-MM-DD',
         maxSize: '20m',
         maxFiles: '7d',
-        format: winston.format.combine(
-          winston.format.timestamp(),
-          winston.format.json()
-        )
+        format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
       }),
 
       // Security logs
@@ -207,10 +198,7 @@ export class PhoenixMonitoring extends EventEmitter {
         datePattern: 'YYYY-MM-DD',
         maxSize: '20m',
         maxFiles: '90d',
-        format: winston.format.combine(
-          winston.format.timestamp(),
-          winston.format.json()
-        )
+        format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
       }),
 
       // Audit logs
@@ -219,11 +207,8 @@ export class PhoenixMonitoring extends EventEmitter {
         datePattern: 'YYYY-MM-DD',
         maxSize: '20m',
         maxFiles: '365d',
-        format: winston.format.combine(
-          winston.format.timestamp(),
-          winston.format.json()
-        )
-      })
+        format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
+      }),
     ];
 
     this.logger = winston.createLogger({
@@ -234,17 +219,17 @@ export class PhoenixMonitoring extends EventEmitter {
           filename: 'logs/exceptions-%DATE%.log',
           datePattern: 'YYYY-MM-DD',
           maxSize: '20m',
-          maxFiles: '30d'
-        })
+          maxFiles: '30d',
+        }),
       ],
       rejectionHandlers: [
         new DailyRotateFile({
           filename: 'logs/rejections-%DATE%.log',
           datePattern: 'YYYY-MM-DD',
           maxSize: '20m',
-          maxFiles: '30d'
-        })
-      ]
+          maxFiles: '30d',
+        }),
+      ],
     });
   }
 
@@ -273,14 +258,20 @@ export class PhoenixMonitoring extends EventEmitter {
 
   private startCleanupTasks(): void {
     // Cleanup old metrics every hour
-    const metricsCleanup = setInterval(() => {
-      this.cleanupOldMetrics();
-    }, 60 * 60 * 1000);
+    const metricsCleanup = setInterval(
+      () => {
+        this.cleanupOldMetrics();
+      },
+      60 * 60 * 1000
+    );
 
     // Cleanup old traces every 15 minutes
-    const tracesCleanup = setInterval(() => {
-      this.cleanupOldTraces();
-    }, 15 * 60 * 1000);
+    const tracesCleanup = setInterval(
+      () => {
+        this.cleanupOldTraces();
+      },
+      15 * 60 * 1000
+    );
 
     // Export metrics every minute
     const metricsExport = setInterval(() => {
@@ -298,7 +289,7 @@ export class PhoenixMonitoring extends EventEmitter {
       condition: 'avg(api_response_time) > 1000',
       threshold: 1000,
       description: 'API response time is above 1 second',
-      runbook: 'Check database performance and connection pool usage'
+      runbook: 'Check database performance and connection pool usage',
     });
 
     // High error rate alert
@@ -308,7 +299,7 @@ export class PhoenixMonitoring extends EventEmitter {
       condition: 'rate(errors) > 0.05',
       threshold: 0.05,
       description: 'Error rate is above 5%',
-      runbook: 'Check application logs and recent deployments'
+      runbook: 'Check application logs and recent deployments',
     });
 
     // Database connection pool alert
@@ -318,7 +309,7 @@ export class PhoenixMonitoring extends EventEmitter {
       condition: 'db_pool_usage > 0.8',
       threshold: 0.8,
       description: 'Database connection pool usage is above 80%',
-      runbook: 'Review slow queries and connection leaks'
+      runbook: 'Review slow queries and connection leaks',
     });
 
     // Memory usage alert
@@ -328,19 +319,24 @@ export class PhoenixMonitoring extends EventEmitter {
       condition: 'memory_usage > 0.85',
       threshold: 0.85,
       description: 'Memory usage is above 85%',
-      runbook: 'Check for memory leaks and optimize data structures'
+      runbook: 'Check for memory leaks and optimize data structures',
     });
   }
 
   // Metrics Collection
 
-  recordMetric(name: string, value: number, tags: Record<string, string> = {}, type: MetricPoint['type'] = 'gauge'): void {
+  recordMetric(
+    name: string,
+    value: number,
+    tags: Record<string, string> = {},
+    type: MetricPoint['type'] = 'gauge'
+  ): void {
     const metric: MetricPoint = {
       name,
       value,
       tags,
       timestamp: new Date(),
-      type
+      type,
     };
 
     if (!this.metrics.has(name)) {
@@ -381,10 +377,8 @@ export class PhoenixMonitoring extends EventEmitter {
   // Distributed Tracing
 
   startTrace(operationName: string, parentSpanId?: string): TraceSpan {
-    const traceId = parentSpanId ? 
-      this.getTraceIdFromSpan(parentSpanId) : 
-      uuidv4();
-    
+    const traceId = parentSpanId ? this.getTraceIdFromSpan(parentSpanId) : uuidv4();
+
     const span: TraceSpan = {
       traceId,
       spanId: uuidv4(),
@@ -393,7 +387,7 @@ export class PhoenixMonitoring extends EventEmitter {
       startTime: performance.now(),
       tags: {},
       logs: [],
-      status: 'ok'
+      status: 'ok',
     };
 
     this.activeSpans.set(span.spanId, span);
@@ -410,11 +404,13 @@ export class PhoenixMonitoring extends EventEmitter {
 
   finishTrace(spanId: string, error?: Error): void {
     const span = this.activeSpans.get(spanId);
-    if (!span) return;
+    if (!span) {
+      return;
+    }
 
     span.endTime = performance.now();
     span.duration = span.endTime - span.startTime;
-    
+
     if (error) {
       span.status = 'error';
       span.error = error;
@@ -422,7 +418,7 @@ export class PhoenixMonitoring extends EventEmitter {
         timestamp: performance.now(),
         level: 'error',
         message: error.message,
-        fields: { stack: error.stack }
+        fields: { stack: error.stack },
       });
     }
 
@@ -432,7 +428,7 @@ export class PhoenixMonitoring extends EventEmitter {
     // Record trace duration metric
     this.recordTimer('trace_duration', span.startTime, {
       operation: span.operationName,
-      status: span.status
+      status: span.status,
     });
   }
 
@@ -443,25 +439,34 @@ export class PhoenixMonitoring extends EventEmitter {
     }
   }
 
-  addTraceLog(spanId: string, level: TraceLog['level'], message: string, fields?: Record<string, any>): void {
+  addTraceLog(
+    spanId: string,
+    level: TraceLog['level'],
+    message: string,
+    fields?: Record<string, any>
+  ): void {
     const span = this.activeSpans.get(spanId);
     if (span) {
       span.logs.push({
         timestamp: performance.now(),
         level,
         message,
-        fields
+        fields,
       });
     }
   }
 
   // Logging
 
-  log(level: 'debug' | 'info' | 'warn' | 'error', message: string, meta?: Record<string, any>): void {
+  log(
+    level: 'debug' | 'info' | 'warn' | 'error',
+    message: string,
+    meta?: Record<string, any>
+  ): void {
     this.logger.log(level, message, {
       ...meta,
       timestamp: new Date().toISOString(),
-      correlationId: meta?.correlationId || uuidv4()
+      correlationId: meta?.correlationId || uuidv4(),
     });
 
     // Record log metrics
@@ -477,12 +482,12 @@ export class PhoenixMonitoring extends EventEmitter {
       type: 'performance',
       operation,
       duration,
-      ...meta
+      ...meta,
     });
 
     this.recordTimer('operation_duration', performance.now() - duration, {
       operation,
-      ...meta?.tags
+      ...meta?.tags,
     });
   }
 
@@ -492,7 +497,7 @@ export class PhoenixMonitoring extends EventEmitter {
       event,
       userId,
       timestamp: new Date().toISOString(),
-      ...meta
+      ...meta,
     });
 
     this.incrementCounter('security_events', 1, { event });
@@ -505,7 +510,7 @@ export class PhoenixMonitoring extends EventEmitter {
       userId,
       resource,
       timestamp: new Date().toISOString(),
-      ...meta
+      ...meta,
     });
 
     this.incrementCounter('audit_events', 1, { action, resource });
@@ -513,7 +518,14 @@ export class PhoenixMonitoring extends EventEmitter {
 
   // Health Checks
 
-  addHealthCheck(name: string, checkFn: () => Promise<{ status: HealthCheck['status']; message?: string; details?: Record<string, any> }>): void {
+  addHealthCheck(
+    name: string,
+    checkFn: () => Promise<{
+      status: HealthCheck['status'];
+      message?: string;
+      details?: Record<string, any>;
+    }>
+  ): void {
     // Store health check function for periodic execution
     setInterval(async () => {
       const startTime = performance.now();
@@ -527,11 +539,11 @@ export class PhoenixMonitoring extends EventEmitter {
           timestamp: new Date(),
           responseTime,
           message: result.message,
-          details: result.details
+          details: result.details,
         };
 
         this.healthChecks.set(name, healthCheck);
-        
+
         // Record health check metrics
         this.recordGauge('health_check_status', result.status === 'healthy' ? 1 : 0, { name });
         this.recordTimer('health_check_duration', startTime, { name });
@@ -539,12 +551,13 @@ export class PhoenixMonitoring extends EventEmitter {
         this.emit('health_check', healthCheck);
       } catch (error) {
         const responseTime = performance.now() - startTime;
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         const healthCheck: HealthCheck = {
           name,
           status: 'unhealthy',
           timestamp: new Date(),
           responseTime,
-          message: error.message
+          message: errorMessage,
         };
 
         this.healthChecks.set(name, healthCheck);
@@ -555,12 +568,12 @@ export class PhoenixMonitoring extends EventEmitter {
 
   getHealthStatus(): { status: 'healthy' | 'degraded' | 'unhealthy'; checks: HealthCheck[] } {
     const checks = Array.from(this.healthChecks.values());
-    
+
     const unhealthyChecks = checks.filter(c => c.status === 'unhealthy').length;
     const degradedChecks = checks.filter(c => c.status === 'degraded').length;
 
     let status: 'healthy' | 'degraded' | 'unhealthy' = 'healthy';
-    
+
     if (unhealthyChecks > 0) {
       status = 'unhealthy';
     } else if (degradedChecks > 0) {
@@ -572,15 +585,18 @@ export class PhoenixMonitoring extends EventEmitter {
 
   // Alerting
 
-  createAlert(id: string, config: {
-    name: string;
-    severity: Alert['severity'];
-    condition: string;
-    threshold: number;
-    description: string;
-    runbook?: string;
-    labels?: Record<string, string>;
-  }): void {
+  createAlert(
+    id: string,
+    config: {
+      name: string;
+      severity: Alert['severity'];
+      condition: string;
+      threshold: number;
+      description: string;
+      runbook?: string;
+      labels?: Record<string, string>;
+    }
+  ): void {
     // Store alert configuration for evaluation
     this.alerts.set(id, {
       id,
@@ -593,12 +609,14 @@ export class PhoenixMonitoring extends EventEmitter {
       triggerTime: new Date(),
       description: config.description,
       runbook: config.runbook,
-      labels: config.labels || {}
+      labels: config.labels || {},
     });
   }
 
   private checkAlerts(metricName: string, value: number): void {
-    if (!this.config.alertingEnabled) return;
+    if (!this.config.alertingEnabled) {
+      return;
+    }
 
     for (const alert of this.alerts.values()) {
       // Simple condition evaluation (would be more sophisticated in production)
@@ -607,14 +625,14 @@ export class PhoenixMonitoring extends EventEmitter {
           alert.status = 'firing';
           alert.triggerTime = new Date();
           alert.currentValue = value;
-          
+
           this.emit('alert_fired', alert);
           this.logSecurity('alert_fired', undefined, { alert: alert.name, value });
         }
       } else if (alert.status === 'firing') {
         alert.status = 'resolved';
         alert.resolveTime = new Date();
-        
+
         this.emit('alert_resolved', alert);
         this.logSecurity('alert_resolved', undefined, { alert: alert.name });
       }
@@ -635,7 +653,13 @@ export class PhoenixMonitoring extends EventEmitter {
 
   // Performance Benchmarking
 
-  addBenchmark(name: string, category: PerformanceBenchmark['category'], baseline: number, threshold: number, unit: string): void {
+  addBenchmark(
+    name: string,
+    category: PerformanceBenchmark['category'],
+    baseline: number,
+    threshold: number,
+    unit: string
+  ): void {
     const benchmark: PerformanceBenchmark = {
       id: uuidv4(),
       name,
@@ -646,7 +670,7 @@ export class PhoenixMonitoring extends EventEmitter {
       unit,
       passed: true,
       timestamp: new Date(),
-      details: {}
+      details: {},
     };
 
     this.benchmarks.set(name, benchmark);
@@ -660,10 +684,10 @@ export class PhoenixMonitoring extends EventEmitter {
       benchmark.timestamp = new Date();
       benchmark.details = details || {};
 
-      this.recordGauge('benchmark_value', value, { 
-        name, 
+      this.recordGauge('benchmark_value', value, {
+        name,
         category: benchmark.category,
-        passed: benchmark.passed.toString()
+        passed: benchmark.passed.toString(),
       });
 
       this.emit('benchmark', benchmark);
@@ -682,13 +706,13 @@ export class PhoenixMonitoring extends EventEmitter {
         successCount: 0,
         totalCount: 0,
         errorBudget: 0.1,
-        status: 'healthy'
+        status: 'healthy',
       });
     }
 
     const sla = this.slaMetrics.get(name)!;
     sla.totalCount++;
-    
+
     if (success) {
       sla.successCount++;
     }
@@ -710,7 +734,13 @@ export class PhoenixMonitoring extends EventEmitter {
 
   // Business Metrics
 
-  recordBusinessMetric(name: string, value: number, category: string, unit: string, dimensions: Record<string, string> = {}): void {
+  recordBusinessMetric(
+    name: string,
+    value: number,
+    category: string,
+    unit: string,
+    dimensions: Record<string, string> = {}
+  ): void {
     if (!this.businessMetrics.has(name)) {
       this.businessMetrics.set(name, []);
     }
@@ -723,12 +753,14 @@ export class PhoenixMonitoring extends EventEmitter {
       value,
       previousValue: previousMetric?.value,
       change: previousMetric ? value - previousMetric.value : 0,
-      changePercent: previousMetric && previousMetric.value > 0 ? 
-        ((value - previousMetric.value) / previousMetric.value) * 100 : 0,
+      changePercent:
+        previousMetric && previousMetric.value > 0
+          ? ((value - previousMetric.value) / previousMetric.value) * 100
+          : 0,
       unit,
       category,
       timestamp: new Date(),
-      dimensions
+      dimensions,
     };
 
     metrics.push(metric);
@@ -738,11 +770,11 @@ export class PhoenixMonitoring extends EventEmitter {
       metrics.splice(0, metrics.length - 100);
     }
 
-    this.recordGauge('business_metric', value, { 
-      name, 
-      category, 
+    this.recordGauge('business_metric', value, {
+      name,
+      category,
       unit,
-      ...dimensions 
+      ...dimensions,
     });
 
     this.emit('business_metric', metric);
@@ -756,7 +788,7 @@ export class PhoenixMonitoring extends EventEmitter {
     const systemLoad = os.loadavg();
     const systemMemory = {
       total: os.totalmem(),
-      free: os.freemem()
+      free: os.freemem(),
     };
 
     // CPU metrics
@@ -771,7 +803,10 @@ export class PhoenixMonitoring extends EventEmitter {
 
     this.recordGauge('system_memory_total', systemMemory.total);
     this.recordGauge('system_memory_free', systemMemory.free);
-    this.recordGauge('system_memory_usage', (systemMemory.total - systemMemory.free) / systemMemory.total);
+    this.recordGauge(
+      'system_memory_usage',
+      (systemMemory.total - systemMemory.free) / systemMemory.total
+    );
 
     // Load average
     this.recordGauge('system_load_1m', systemLoad[0]);
@@ -800,7 +835,7 @@ export class PhoenixMonitoring extends EventEmitter {
       const before = process.memoryUsage();
       global.gc();
       const after = process.memoryUsage();
-      
+
       this.recordGauge('gc_memory_freed', before.heapUsed - after.heapUsed);
     }
   }
@@ -808,7 +843,7 @@ export class PhoenixMonitoring extends EventEmitter {
   private async collectDatabaseMetrics(): Promise<void> {
     try {
       const health = await phoenixPool.getHealthMetrics();
-      
+
       this.recordGauge('db_total_connections', health.totalConnections);
       this.recordGauge('db_active_connections', health.activeConnections);
       this.recordGauge('db_idle_connections', health.idleConnections);
@@ -817,7 +852,8 @@ export class PhoenixMonitoring extends EventEmitter {
       this.recordGauge('db_error_rate', health.errorRate);
       this.recordGauge('db_status', health.status === 'healthy' ? 1 : 0);
     } catch (error) {
-      this.log('error', 'Failed to collect database metrics', { error: error.message });
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      this.log('error', 'Failed to collect database metrics', { error: errorMessage });
     }
   }
 
@@ -827,14 +863,19 @@ export class PhoenixMonitoring extends EventEmitter {
       try {
         const health = await phoenixPool.getHealthMetrics();
         return {
-          status: health.status === 'healthy' ? 'healthy' : 
-                 health.status === 'degraded' ? 'degraded' : 'unhealthy',
-          details: health
+          status:
+            health.status === 'healthy'
+              ? 'healthy'
+              : health.status === 'degraded'
+                ? 'degraded'
+                : 'unhealthy',
+          details: health,
         };
       } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         return {
           status: 'unhealthy',
-          message: error.message
+          message: errorMessage,
         };
       }
     });
@@ -846,13 +887,12 @@ export class PhoenixMonitoring extends EventEmitter {
       const usage = (totalMemory - freeMemory) / totalMemory;
 
       return {
-        status: usage > 0.9 ? 'unhealthy' : 
-               usage > 0.8 ? 'degraded' : 'healthy',
+        status: usage > 0.9 ? 'unhealthy' : usage > 0.8 ? 'degraded' : 'healthy',
         details: {
           memoryUsage,
           systemMemoryUsage: usage,
-          heapUsagePercent: memoryUsage.heapUsed / memoryUsage.heapTotal
-        }
+          heapUsagePercent: memoryUsage.heapUsed / memoryUsage.heapTotal,
+        },
       };
     });
 
@@ -860,7 +900,7 @@ export class PhoenixMonitoring extends EventEmitter {
       // This would check disk space in a real implementation
       return {
         status: 'healthy',
-        details: { diskUsage: '45%' }
+        details: { diskUsage: '45%' },
       };
     });
   }
@@ -869,7 +909,7 @@ export class PhoenixMonitoring extends EventEmitter {
 
   private cleanupOldMetrics(): void {
     const cutoff = Date.now() - this.config.metricsRetention;
-    
+
     for (const [name, metrics] of this.metrics.entries()) {
       const filtered = metrics.filter(m => m.timestamp.getTime() > cutoff);
       this.metrics.set(name, filtered);
@@ -878,7 +918,7 @@ export class PhoenixMonitoring extends EventEmitter {
 
   private cleanupOldTraces(): void {
     const cutoff = Date.now() - this.config.tracesRetention;
-    
+
     for (const [traceId, spans] of this.traces.entries()) {
       const hasRecentSpans = spans.some(s => s.startTime > cutoff);
       if (!hasRecentSpans) {
@@ -891,13 +931,14 @@ export class PhoenixMonitoring extends EventEmitter {
     try {
       // Export to time series database (would integrate with Prometheus, InfluxDB, etc.)
       const allMetrics = Array.from(this.metrics.values()).flat();
-      
+
       // Example: Save to database for historical analysis
       if (allMetrics.length > 0) {
         await this.saveMetricsToDatabase(allMetrics);
       }
     } catch (error) {
-      this.log('error', 'Failed to export metrics', { error: error.message });
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      this.log('error', 'Failed to export metrics', { error: errorMessage });
     }
   }
 
@@ -957,13 +998,13 @@ export class PhoenixMonitoring extends EventEmitter {
   async shutdown(): Promise<void> {
     // Clear all intervals
     this.cleanupIntervals.forEach(interval => clearInterval(interval));
-    
+
     // Export final metrics
     await this.exportMetrics();
-    
+
     // Close logger
     this.logger.end();
-    
+
     this.emit('shutdown');
   }
 }
@@ -975,7 +1016,7 @@ export const phoenixMonitoring = new PhoenixMonitoring();
 export function instrumentationMiddleware(req: any, res: any, next: any): void {
   const startTime = performance.now();
   const span = phoenixMonitoring.startTrace(`${req.method} ${req.route?.path || req.path}`);
-  
+
   // Add request metadata
   phoenixMonitoring.addTraceTag(span.spanId, 'http.method', req.method);
   phoenixMonitoring.addTraceTag(span.spanId, 'http.url', req.originalUrl);
@@ -987,20 +1028,23 @@ export function instrumentationMiddleware(req: any, res: any, next: any): void {
 
   res.on('finish', () => {
     const duration = performance.now() - startTime;
-    
+
     phoenixMonitoring.addTraceTag(span.spanId, 'http.status_code', res.statusCode.toString());
-    phoenixMonitoring.finishTrace(span.spanId, res.statusCode >= 400 ? new Error(`HTTP ${res.statusCode}`) : undefined);
-    
+    phoenixMonitoring.finishTrace(
+      span.spanId,
+      res.statusCode >= 400 ? new Error(`HTTP ${res.statusCode}`) : undefined
+    );
+
     // Record metrics
     phoenixMonitoring.recordTimer('http_request_duration', startTime, {
       method: req.method,
       route: req.route?.path || req.path,
-      status_code: res.statusCode.toString()
+      status_code: res.statusCode.toString(),
     });
 
     phoenixMonitoring.incrementCounter('http_requests_total', 1, {
       method: req.method,
-      status_code: res.statusCode.toString()
+      status_code: res.statusCode.toString(),
     });
 
     // Log request
@@ -1010,7 +1054,7 @@ export function instrumentationMiddleware(req: any, res: any, next: any): void {
       status: res.statusCode,
       userAgent: req.headers['user-agent'],
       ip: req.ip,
-      userId: req.user?.id
+      userId: req.user?.id,
     });
 
     // Record SLA event
@@ -1019,15 +1063,3 @@ export function instrumentationMiddleware(req: any, res: any, next: any): void {
 
   next();
 }
-
-// Export types and main class
-export type {
-  MetricPoint,
-  TraceSpan,
-  TraceLog,
-  HealthCheck,
-  Alert,
-  PerformanceBenchmark,
-  SLAMetric,
-  BusinessMetric
-};

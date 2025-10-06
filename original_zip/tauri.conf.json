@@ -1,0 +1,46 @@
+{
+  "build": {
+    "beforeDevCommand": "npm run vite:dev",
+    "beforeBuildCommand": "npm run build",
+    "devPath": "http://localhost:8080",
+    "distDir": "../dist",
+    "withGlobalTauri": true
+  },
+  "package": {
+    "productName": "Astral Turf",
+    "version": "../package.json"
+  },
+  "tauri": {
+    "allowlist": {
+      "all": false,
+      "dialog": {
+        "all": true
+      },
+      "fs": {
+        "all": true
+      },
+      "shell": {
+        "all": false,
+        "open": true
+      }
+    },
+    "bundle": {
+      "active": true,
+      "targets": "all",
+      "identifier": "com.astralturf.dev",
+      "icon": ["icons/icon.png"]
+    },
+    "security": {
+      "csp": null
+    },
+    "windows": [
+      {
+        "fullscreen": false,
+        "height": 900,
+        "resizable": true,
+        "title": "Astral Turf",
+        "width": 1600
+      }
+    ]
+  }
+}

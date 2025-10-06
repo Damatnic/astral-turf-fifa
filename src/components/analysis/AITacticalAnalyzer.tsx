@@ -93,20 +93,30 @@ const AIAnalysisPanel: React.FC<{
   onAnalyze: () => void;
   onApplySuggestion: (suggestion: TacticalSuggestion) => void;
 }> = React.memo(({ analysis, isAnalyzing, onAnalyze, onApplySuggestion }) => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'suggestions' | 'weaknesses' | 'strengths'>('overview');
+  const [activeTab, setActiveTab] = useState<
+    'overview' | 'suggestions' | 'weaknesses' | 'strengths'
+  >('overview');
 
   const getEffectivenessColor = (value: number) => {
-    if (value >= 80) return 'text-green-400';
-    if (value >= 60) return 'text-yellow-400';
+    if (value >= 80) {
+      return 'text-green-400';
+    }
+    if (value >= 60) {
+      return 'text-yellow-400';
+    }
     return 'text-red-400';
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high': return 'border-red-500 bg-red-500/10';
-      case 'medium': return 'border-yellow-500 bg-yellow-500/10';
-      case 'low': return 'border-blue-500 bg-blue-500/10';
-      default: return 'border-gray-500 bg-gray-500/10';
+      case 'high':
+        return 'border-red-500 bg-red-500/10';
+      case 'medium':
+        return 'border-yellow-500 bg-yellow-500/10';
+      case 'low':
+        return 'border-blue-500 bg-blue-500/10';
+      default:
+        return 'border-gray-500 bg-gray-500/10';
     }
   };
 
@@ -138,10 +148,10 @@ const AIAnalysisPanel: React.FC<{
             )}
           </button>
         </div>
-        
+
         {analysis && (
           <div className="mt-2 text-xs text-gray-400">
-            Confidence: {(analysis.confidence * 100).toFixed(1)}% • 
+            Confidence: {(analysis.confidence * 100).toFixed(1)}% •
             {new Date(analysis.timestamp).toLocaleTimeString()}
           </div>
         )}
@@ -180,7 +190,9 @@ const AIAnalysisPanel: React.FC<{
           <div className="text-center text-gray-400 py-8">
             <div className="text-4xl mb-4">🤖</div>
             <div className="text-lg font-medium mb-2">AI Ready for Analysis</div>
-            <div className="text-sm">Click "Analyze Formation" to get intelligent tactical insights</div>
+            <div className="text-sm">
+              Click "Analyze Formation" to get intelligent tactical insights
+            </div>
           </div>
         ) : (
           <>
@@ -193,15 +205,23 @@ const AIAnalysisPanel: React.FC<{
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <div className="text-blue-400 font-medium text-sm">Home Team</div>
-                      <div className="text-white text-lg">{analysis.formationAnalysis.homeTeam.formation}</div>
-                      <div className={`text-sm ${getEffectivenessColor(analysis.formationAnalysis.homeTeam.effectiveness)}`}>
+                      <div className="text-white text-lg">
+                        {analysis.formationAnalysis.homeTeam.formation}
+                      </div>
+                      <div
+                        className={`text-sm ${getEffectivenessColor(analysis.formationAnalysis.homeTeam.effectiveness)}`}
+                      >
                         {analysis.formationAnalysis.homeTeam.effectiveness}% Effective
                       </div>
                     </div>
                     <div>
                       <div className="text-red-400 font-medium text-sm">Away Team</div>
-                      <div className="text-white text-lg">{analysis.formationAnalysis.awayTeam.formation}</div>
-                      <div className={`text-sm ${getEffectivenessColor(analysis.formationAnalysis.awayTeam.effectiveness)}`}>
+                      <div className="text-white text-lg">
+                        {analysis.formationAnalysis.awayTeam.formation}
+                      </div>
+                      <div
+                        className={`text-sm ${getEffectivenessColor(analysis.formationAnalysis.awayTeam.effectiveness)}`}
+                      >
                         {analysis.formationAnalysis.awayTeam.effectiveness}% Effective
                       </div>
                     </div>
@@ -212,12 +232,16 @@ const AIAnalysisPanel: React.FC<{
                 <div className="bg-gray-800/50 rounded-lg p-3">
                   <h4 className="text-white font-medium mb-3">Key Battles</h4>
                   <div className="space-y-2">
-                    {analysis.formationAnalysis.comparison.keyBattles.slice(0, 3).map((battle, index) => (
-                      <div key={index} className="flex items-center justify-between text-sm">
-                        <div className="text-gray-300">{battle.area}</div>
-                        <div className="text-white font-medium">{(battle.importance * 100).toFixed(0)}%</div>
-                      </div>
-                    ))}
+                    {analysis.formationAnalysis.comparison.keyBattles
+                      .slice(0, 3)
+                      .map((battle, index) => (
+                        <div key={index} className="flex items-center justify-between text-sm">
+                          <div className="text-gray-300">{battle.area}</div>
+                          <div className="text-white font-medium">
+                            {(battle.importance * 100).toFixed(0)}%
+                          </div>
+                        </div>
+                      ))}
                   </div>
                 </div>
 
@@ -225,7 +249,10 @@ const AIAnalysisPanel: React.FC<{
                 <div className="bg-gray-800/50 rounded-lg p-3">
                   <h4 className="text-white font-medium mb-2">Match Prediction</h4>
                   <div className="text-green-400 font-medium">
-                    {(analysis.formationAnalysis.comparison.predictedOutcome.probability * 100).toFixed(1)}% Win Probability
+                    {(
+                      analysis.formationAnalysis.comparison.predictedOutcome.probability * 100
+                    ).toFixed(1)}
+                    % Win Probability
                   </div>
                   <div className="text-gray-300 text-sm mt-1">
                     {analysis.formationAnalysis.comparison.predictedOutcome.reasoning}
@@ -246,11 +273,15 @@ const AIAnalysisPanel: React.FC<{
                       <div className="flex-1">
                         <div className="flex items-center space-x-2 mb-1">
                           <div className="text-white font-medium text-sm">{suggestion.title}</div>
-                          <span className={`px-2 py-1 rounded text-xs font-medium ${
-                            suggestion.priority === 'high' ? 'bg-red-500 text-white' :
-                            suggestion.priority === 'medium' ? 'bg-yellow-500 text-black' :
-                            'bg-blue-500 text-white'
-                          }`}>
+                          <span
+                            className={`px-2 py-1 rounded text-xs font-medium ${
+                              suggestion.priority === 'high'
+                                ? 'bg-red-500 text-white'
+                                : suggestion.priority === 'medium'
+                                  ? 'bg-yellow-500 text-black'
+                                  : 'bg-blue-500 text-white'
+                            }`}
+                          >
                             {suggestion.priority.toUpperCase()}
                           </span>
                         </div>
@@ -276,9 +307,14 @@ const AIAnalysisPanel: React.FC<{
             {activeTab === 'weaknesses' && (
               <div className="space-y-3">
                 {analysis.weaknesses.map(weakness => (
-                  <div key={weakness.id} className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
+                  <div
+                    key={weakness.id}
+                    className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg"
+                  >
                     <div className="flex items-center justify-between mb-2">
-                      <div className="text-red-400 font-medium text-sm capitalize">{weakness.area}</div>
+                      <div className="text-red-400 font-medium text-sm capitalize">
+                        {weakness.area}
+                      </div>
                       <div className="text-red-300 text-xs">
                         Risk: {(weakness.exploitationRisk * 100).toFixed(0)}%
                       </div>
@@ -296,9 +332,14 @@ const AIAnalysisPanel: React.FC<{
             {activeTab === 'strengths' && (
               <div className="space-y-3">
                 {analysis.strengths.map(strength => (
-                  <div key={strength.id} className="p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
+                  <div
+                    key={strength.id}
+                    className="p-3 bg-green-500/10 border border-green-500/30 rounded-lg"
+                  >
                     <div className="flex items-center justify-between mb-2">
-                      <div className="text-green-400 font-medium text-sm capitalize">{strength.area}</div>
+                      <div className="text-green-400 font-medium text-sm capitalize">
+                        {strength.area}
+                      </div>
                       <div className="text-green-300 text-xs">
                         Leverage: {(strength.leverageOpportunity * 100).toFixed(0)}%
                       </div>
@@ -352,10 +393,16 @@ const AITacticalAnalyzer: React.FC = () => {
         Analyze this tactical setup:
         
         Home Formation: ${homeFormation.name || 'Unknown'}
-        - Players: ${players.filter(p => p.team === 'home').map(p => `${p.name} (${p.roleId})`).join(', ')}
+        - Players: ${players
+          .filter(p => p.team === 'home')
+          .map(p => `${p.name} (${p.roleId})`)
+          .join(', ')}
         
         Away Formation: ${awayFormation.name || 'Unknown'}
-        - Players: ${players.filter(p => p.team === 'away').map(p => `${p.name} (${p.roleId})`).join(', ')}
+        - Players: ${players
+          .filter(p => p.team === 'away')
+          .map(p => `${p.name} (${p.roleId})`)
+          .join(', ')}
         
         Provide tactical analysis including:
         1. Formation effectiveness assessment
@@ -367,7 +414,10 @@ const AITacticalAnalyzer: React.FC = () => {
         Focus on practical, actionable insights for a football coach.
       `;
 
-      const aiResponse = await openAiService.generateTacticalAnalysis(analysisPrompt);
+      const aiResponse = await openAiService.generateTacticalAnalysis(
+        homeFormation,
+        players.filter(p => p.team === 'home')
+      );
 
       // Parse AI response and create structured analysis
       const analysis: TacticalAnalysis = {
@@ -474,7 +524,6 @@ const AITacticalAnalyzer: React.FC = () => {
         analysisHistory: [analysis, ...prev.analysisHistory.slice(0, 9)], // Keep last 10
         isAnalyzing: false,
       }));
-
     } catch (error) {
       console.error('Failed to perform tactical analysis:', error);
       setAnalysisState(prev => ({ ...prev, isAnalyzing: false }));
@@ -482,34 +531,37 @@ const AITacticalAnalyzer: React.FC = () => {
   }, [formations, activeFormationIds, players]);
 
   // Apply AI suggestion
-  const applySuggestion = useCallback((suggestion: TacticalSuggestion) => {
-    // Implementation would depend on suggestion type
-    switch (suggestion.type) {
-      case 'formation':
-        // Modify formation structure
-        console.log('Applying formation suggestion:', suggestion.title);
-        break;
-      case 'player':
-        // Adjust player positions
-        console.log('Applying player suggestion:', suggestion.title);
-        break;
-      case 'strategy':
-        // Update tactical instructions
-        console.log('Applying strategy suggestion:', suggestion.title);
-        break;
-      default:
-        console.log('Unknown suggestion type:', suggestion.type);
-    }
+  const applySuggestion = useCallback(
+    (suggestion: TacticalSuggestion) => {
+      // Implementation would depend on suggestion type
+      switch (suggestion.type) {
+        case 'formation':
+          // Modify formation structure
+          console.log('Applying formation suggestion:', suggestion.title);
+          break;
+        case 'player':
+          // Adjust player positions
+          console.log('Applying player suggestion:', suggestion.title);
+          break;
+        case 'strategy':
+          // Update tactical instructions
+          console.log('Applying strategy suggestion:', suggestion.title);
+          break;
+        default:
+          console.log('Unknown suggestion type:', suggestion.type);
+      }
 
-    // Provide feedback
-    dispatch({
-      type: 'ADD_NOTIFICATION',
-      payload: {
-        message: `Applied suggestion: ${suggestion.title}`,
-        type: 'success',
-      },
-    });
-  }, [dispatch]);
+      // Provide feedback
+      dispatch({
+        type: 'ADD_NOTIFICATION',
+        payload: {
+          message: `Applied suggestion: ${suggestion.title}`,
+          type: 'success',
+        },
+      });
+    },
+    [dispatch]
+  );
 
   // Auto-analyze when formation changes
   useEffect(() => {
@@ -517,22 +569,23 @@ const AITacticalAnalyzer: React.FC = () => {
       const timeout = setTimeout(performTacticalAnalysis, 2000);
       return () => clearTimeout(timeout);
     }
+    return undefined;
   }, [activeFormationIds, analysisState.autoAnalyze, performTacticalAnalysis]);
 
   const [isMinimized, setIsMinimized] = useState(false);
   const [position, setPosition] = useState({ x: 20, y: 20 });
 
   return (
-    <div 
+    <div
       className="fixed z-30 select-none"
-      style={{ 
-        top: `${position.y}px`, 
+      style={{
+        top: `${position.y}px`,
         right: `${position.x}px`,
-        transition: isMinimized ? 'all 0.3s ease' : 'none'
+        transition: isMinimized ? 'all 0.3s ease' : 'none',
       }}
     >
       {isMinimized ? (
-        <div 
+        <div
           className="bg-gray-800/90 backdrop-blur-sm border border-gray-600 rounded-lg p-2 cursor-pointer hover:bg-gray-700/90 transition-colors"
           onClick={() => setIsMinimized(false)}
         >
@@ -554,7 +607,12 @@ const AITacticalAnalyzer: React.FC = () => {
               title="Minimize"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
               </svg>
             </button>
           </div>

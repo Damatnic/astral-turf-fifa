@@ -2,7 +2,7 @@ import { test, expect, Page, BrowserContext } from '@playwright/test';
 
 /**
  * END-TO-END TACTICAL BOARD WORKFLOW TESTS
- * 
+ *
  * Comprehensive E2E testing covering complete user workflows:
  * - Formation creation and management
  * - Player positioning and tactics
@@ -21,14 +21,14 @@ test.describe('🎯 Tactical Board Workflows - E2E Tests', () => {
       viewport: { width: 1920, height: 1080 },
       recordVideo: {
         dir: 'test-results/videos/',
-        size: { width: 1920, height: 1080 }
+        size: { width: 1920, height: 1080 },
       },
       recordHar: {
-        path: 'test-results/har/tactical-board.har'
-      }
+        path: 'test-results/har/tactical-board.har',
+      },
     });
     page = await context.newPage();
-    
+
     // Navigate to application
     await page.goto('/');
     await page.waitForLoadState('networkidle');
@@ -57,7 +57,7 @@ test.describe('🎯 Tactical Board Workflows - E2E Tests', () => {
 
       // Verify formation is applied
       await expect(page.locator('[data-testid="formation-overlay"]')).toBeVisible();
-      
+
       // Count player slots
       const playerSlots = page.locator('[data-testid="formation-slot"]');
       await expect(playerSlots).toHaveCount(11);
@@ -109,7 +109,7 @@ test.describe('🎯 Tactical Board Workflows - E2E Tests', () => {
       // Add players to squad first
       await page.click('[data-testid="player-management-button"]');
       await page.click('[data-testid="add-player-button"]');
-      
+
       // Add goalkeeper
       await page.fill('[data-testid="player-name"]', 'Test Goalkeeper');
       await page.selectOption('[data-testid="player-position"]', 'GK');
@@ -134,7 +134,9 @@ test.describe('🎯 Tactical Board Workflows - E2E Tests', () => {
       await page.click('[data-testid="auto-assign-players"]');
 
       // Verify all positions are filled
-      const assignedSlots = page.locator('[data-testid="formation-slot"][data-player-assigned="true"]');
+      const assignedSlots = page.locator(
+        '[data-testid="formation-slot"][data-player-assigned="true"]'
+      );
       await expect(assignedSlots).toHaveCount(11);
 
       // Verify goalkeeper is in correct position
@@ -167,7 +169,7 @@ test.describe('🎯 Tactical Board Workflows - E2E Tests', () => {
 
       // Select zone tool and draw area
       await page.click('[data-testid="drawing-tool-zone"]');
-      
+
       // Draw rectangular zone
       await field.click({ position: { x: 300, y: 200 } });
       await field.click({ position: { x: 500, y: 200 } });
@@ -190,7 +192,7 @@ test.describe('🎯 Tactical Board Workflows - E2E Tests', () => {
       // Change drawing color
       await page.click('[data-testid="color-picker-button"]');
       await page.click('[data-testid="color-red"]');
-      
+
       // Draw with new color
       await page.click('[data-testid="drawing-tool-pen"]');
       await field.click({ position: { x: 100, y: 100 } });
@@ -205,9 +207,9 @@ test.describe('🎯 Tactical Board Workflows - E2E Tests', () => {
       // Create multiple drawings first
       await page.click('[data-testid="drawing-tools-toggle"]');
       await page.click('[data-testid="drawing-tool-arrow"]');
-      
+
       const field = page.locator('[data-testid="modern-field"]');
-      
+
       // Draw 3 arrows
       for (let i = 0; i < 3; i++) {
         await field.click({ position: { x: 100 + i * 50, y: 200 } });
@@ -237,10 +239,10 @@ test.describe('🎯 Tactical Board Workflows - E2E Tests', () => {
     test('should save and load tactical playbooks', async () => {
       // Create a tactical play
       await page.click('[data-testid="drawing-tools-toggle"]');
-      
+
       // Set up formation first
       await page.click('[data-testid="formation-442"]');
-      
+
       // Add some tactical drawings
       await page.click('[data-testid="drawing-tool-arrow"]');
       const field = page.locator('[data-testid="modern-field"]');
@@ -267,7 +269,9 @@ test.describe('🎯 Tactical Board Workflows - E2E Tests', () => {
 
       // Verify play is loaded
       await expect(page.locator('[data-testid="drawing-shape-arrow"]')).toBeVisible();
-      await expect(page.locator('[data-testid="current-play-name"]')).toContainText('Wing Attack Play');
+      await expect(page.locator('[data-testid="current-play-name"]')).toContainText(
+        'Wing Attack Play'
+      );
     });
   });
 
@@ -313,7 +317,7 @@ test.describe('🎯 Tactical Board Workflows - E2E Tests', () => {
 
       // Verify players are swapped
       await expect(page.locator('[data-testid="conflict-resolution-menu"]')).not.toBeVisible();
-      
+
       // Verify swap notification
       await expect(page.locator('[data-testid="swap-notification"]')).toBeVisible();
     });
@@ -342,7 +346,7 @@ test.describe('🎯 Tactical Board Workflows - E2E Tests', () => {
 
       // Check chemistry connections
       await expect(page.locator('[data-testid="chemistry-lines"]')).toBeVisible();
-      
+
       // Hover over chemistry line to see details
       await page.hover('[data-testid="chemistry-line"]');
       await expect(page.locator('[data-testid="chemistry-tooltip"]')).toBeVisible();
@@ -411,7 +415,7 @@ test.describe('🎯 Tactical Board Workflows - E2E Tests', () => {
       // Setup formation with drawings
       await page.click('[data-testid="formation-442"]');
       await page.click('[data-testid="auto-assign-players"]');
-      
+
       // Add some tactical drawings
       await page.click('[data-testid="drawing-tools-toggle"]');
       await page.click('[data-testid="drawing-tool-arrow"]');
@@ -426,28 +430,28 @@ test.describe('🎯 Tactical Board Workflows - E2E Tests', () => {
       // Test PNG export
       const [pngDownload] = await Promise.all([
         page.waitForEvent('download'),
-        page.click('[data-testid="export-png"]')
+        page.click('[data-testid="export-png"]'),
       ]);
       expect(pngDownload.suggestedFilename()).toContain('.png');
 
       // Test PDF export
       const [pdfDownload] = await Promise.all([
         page.waitForEvent('download'),
-        page.click('[data-testid="export-pdf"]')
+        page.click('[data-testid="export-pdf"]'),
       ]);
       expect(pdfDownload.suggestedFilename()).toContain('.pdf');
 
       // Test JSON export (for sharing)
       const [jsonDownload] = await Promise.all([
         page.waitForEvent('download'),
-        page.click('[data-testid="export-json"]')
+        page.click('[data-testid="export-json"]'),
       ]);
       expect(jsonDownload.suggestedFilename()).toContain('.json');
 
       // Test sharing link
       await page.click('[data-testid="generate-share-link"]');
       await expect(page.locator('[data-testid="share-link"]')).toBeVisible();
-      
+
       // Copy share link
       await page.click('[data-testid="copy-share-link"]');
       await expect(page.locator('[data-testid="copy-success"]')).toBeVisible();
@@ -466,16 +470,14 @@ test.describe('🎯 Tactical Board Workflows - E2E Tests', () => {
           { name: 'Imported GK', position: 'GK', x: 10, y: 50 },
           // ... more players
         ],
-        drawings: [
-          { type: 'arrow', start: { x: 200, y: 300 }, end: { x: 400, y: 200 } }
-        ]
+        drawings: [{ type: 'arrow', start: { x: 200, y: 300 }, end: { x: 400, y: 200 } }],
       };
 
       // Simulate file upload
       await page.setInputFiles('[data-testid="import-file-input"]', {
         name: 'formation.json',
         mimeType: 'application/json',
-        buffer: Buffer.from(JSON.stringify(formationData))
+        buffer: Buffer.from(JSON.stringify(formationData)),
       });
 
       // Validate and import
@@ -485,7 +487,9 @@ test.describe('🎯 Tactical Board Workflows - E2E Tests', () => {
       await page.click('[data-testid="confirm-import"]');
 
       // Verify formation is loaded
-      await expect(page.locator('[data-testid="current-formation-name"]')).toContainText('Imported 4-4-2');
+      await expect(page.locator('[data-testid="current-formation-name"]')).toContainText(
+        'Imported 4-4-2'
+      );
       await expect(page.locator('[data-testid="drawing-shape-arrow"]')).toBeVisible();
     });
   });
@@ -494,13 +498,13 @@ test.describe('🎯 Tactical Board Workflows - E2E Tests', () => {
     test('should handle large formations smoothly', async () => {
       // Create large formation with many annotations
       await page.click('[data-testid="formation-442"]');
-      
+
       // Add many drawings to test performance
       await page.click('[data-testid="drawing-tools-toggle"]');
       await page.click('[data-testid="drawing-tool-pen"]');
-      
+
       const field = page.locator('[data-testid="modern-field"]');
-      
+
       // Draw multiple shapes rapidly
       for (let i = 0; i < 20; i++) {
         await field.click({ position: { x: 100 + i * 10, y: 200 + i * 5 } });
@@ -538,7 +542,7 @@ test.describe('🎯 Tactical Board Workflows - E2E Tests', () => {
       // Rapid tool switching
       await page.click('[data-testid="drawing-tools-toggle"]');
       const tools = ['arrow', 'zone', 'pen', 'line', 'text'];
-      
+
       for (const tool of tools) {
         await page.click(`[data-testid="drawing-tool-${tool}"]`);
         await expect(page.locator(`[data-testid="drawing-tool-${tool}"]`)).toHaveClass(/active/);
@@ -556,17 +560,17 @@ test.describe('🎯 Tactical Board Workflows - E2E Tests', () => {
 
       // Monitor animation performance
       await page.evaluate(() => {
-        return new Promise((resolve) => {
+        return new Promise(resolve => {
           let frameCount = 0;
           let lastTime = performance.now();
-          
+
           function checkFrame(currentTime: number) {
             frameCount++;
             if (currentTime - lastTime >= 1000) {
               const fps = frameCount;
               frameCount = 0;
               lastTime = currentTime;
-              
+
               // Expect at least 50fps (accounting for test environment)
               if (fps >= 50) {
                 resolve(fps);
@@ -574,9 +578,9 @@ test.describe('🎯 Tactical Board Workflows - E2E Tests', () => {
             }
             requestAnimationFrame(checkFrame);
           }
-          
+
           requestAnimationFrame(checkFrame);
-          
+
           // Timeout after 3 seconds
           setTimeout(() => resolve(0), 3000);
         });
@@ -593,24 +597,27 @@ test.describe('🎯 Tactical Board Workflows - E2E Tests', () => {
 
       for (const viewport of viewports) {
         await page.setViewportSize(viewport);
-        
+
         // Navigate to tactical board
         await page.goto('/');
         await page.click('[data-testid="tactical-board-menu"]');
-        
+
         // Verify layout adapts
         await expect(page.locator('[data-testid="unified-tactics-board"]')).toBeVisible();
-        
+
         if (viewport.width < 768) {
           // Mobile layout
           await expect(page.locator('[data-testid="mobile-layout"]')).toBeVisible();
-          await expect(page.locator('[data-testid="sidebar"]')).toHaveAttribute('data-collapsed', 'true');
+          await expect(page.locator('[data-testid="sidebar"]')).toHaveAttribute(
+            'data-collapsed',
+            'true'
+          );
         } else {
           // Desktop/tablet layout
           await expect(page.locator('[data-testid="desktop-layout"]')).toBeVisible();
           await expect(page.locator('[data-testid="sidebar"]')).toBeVisible();
         }
-        
+
         // Test core functionality works
         await page.click('[data-testid="formation-442"]');
         await expect(page.locator('[data-testid="formation-overlay"]')).toBeVisible();
@@ -621,21 +628,24 @@ test.describe('🎯 Tactical Board Workflows - E2E Tests', () => {
   test.describe('♿ Accessibility and Keyboard Navigation', () => {
     test('should support full keyboard navigation', async () => {
       await page.click('[data-testid="tactical-board-menu"]');
-      
+
       // Tab through main interface
       await page.keyboard.press('Tab');
-      await expect(page.locator(':focus')).toHaveAttribute('data-testid', 'formation-templates-button');
-      
+      await expect(page.locator(':focus')).toHaveAttribute(
+        'data-testid',
+        'formation-templates-button'
+      );
+
       await page.keyboard.press('Tab');
       await expect(page.locator(':focus')).toHaveAttribute('data-testid', 'drawing-tools-toggle');
-      
+
       await page.keyboard.press('Tab');
       await expect(page.locator(':focus')).toHaveAttribute('data-testid', 'export-button');
 
       // Test keyboard shortcuts
       await page.keyboard.press('F11'); // Fullscreen
       await expect(page.locator('[data-testid="fullscreen-indicator"]')).toBeVisible();
-      
+
       await page.keyboard.press('Escape'); // Exit fullscreen
       await expect(page.locator('[data-testid="fullscreen-indicator"]')).not.toBeVisible();
 
@@ -643,7 +653,7 @@ test.describe('🎯 Tactical Board Workflows - E2E Tests', () => {
       await page.click('[data-testid="modern-field"]');
       await page.keyboard.press('ArrowRight');
       await page.keyboard.press('ArrowDown');
-      
+
       // Verify field navigation
       await expect(page.locator('[data-testid="field-cursor"]')).toBeVisible();
     });
@@ -663,10 +673,10 @@ test.describe('🎯 Tactical Board Workflows - E2E Tests', () => {
       });
 
       await page.click('[data-testid="tactical-board-menu"]');
-      
+
       // Formation change should be announced
       await page.click('[data-testid="formation-442"]');
-      
+
       const announcement = await page.evaluate(() => (window as any).__lastAnnouncement);
       expect(announcement).toContain('4-4-2');
 
@@ -674,60 +684,66 @@ test.describe('🎯 Tactical Board Workflows - E2E Tests', () => {
       await page.click('[data-testid="auto-assign-players"]');
       const striker = page.locator('[data-testid="formation-slot"][data-role="FW"]').first();
       await striker.click();
-      
+
       // Verify aria-live regions are updated
       await expect(page.locator('[aria-live="polite"]')).toContainText(/selected/i);
     });
 
     test('should have proper ARIA labels and roles', async () => {
       await page.click('[data-testid="tactical-board-menu"]');
-      
+
       // Check main application role
-      await expect(page.locator('[data-testid="unified-tactics-board"]')).toHaveAttribute('role', 'application');
-      
+      await expect(page.locator('[data-testid="unified-tactics-board"]')).toHaveAttribute(
+        'role',
+        'application'
+      );
+
       // Check field has proper grid role
       await expect(page.locator('[data-testid="modern-field"]')).toHaveAttribute('role', 'grid');
-      
+
       // Check players have proper button roles and labels
       await page.click('[data-testid="formation-442"]');
       await page.click('[data-testid="auto-assign-players"]');
-      
+
       const players = page.locator('[data-testid="formation-slot"]');
       const firstPlayer = players.first();
-      
+
       await expect(firstPlayer).toHaveAttribute('role', 'button');
       await expect(firstPlayer).toHaveAttribute('aria-label');
       await expect(firstPlayer).toHaveAttribute('tabindex', '0');
-      
+
       // Check drawing tools have proper labels
       await page.click('[data-testid="drawing-tools-toggle"]');
-      await expect(page.locator('[data-testid="drawing-tool-arrow"]')).toHaveAttribute('aria-label');
+      await expect(page.locator('[data-testid="drawing-tool-arrow"]')).toHaveAttribute(
+        'aria-label'
+      );
     });
 
     test('should support high contrast and reduced motion', async () => {
       // Test high contrast mode
-      await page.emulateMedia({ 
+      await page.emulateMedia({
         colorScheme: 'dark',
-        reducedMotion: 'reduce'
+        reducedMotion: 'reduce',
       });
-      
+
       await page.click('[data-testid="tactical-board-menu"]');
-      
+
       // Verify high contrast styles are applied
       const field = page.locator('[data-testid="modern-field"]');
       const fieldStyles = await field.evaluate(el => getComputedStyle(el));
-      
+
       // Should have high contrast colors
       expect(fieldStyles.backgroundColor).not.toBe('');
       expect(fieldStyles.border).toContain('px');
-      
+
       // Test reduced motion
       await page.click('[data-testid="formation-442"]');
-      
+
       // Animations should be reduced or disabled
-      const transition = await page.locator('[data-testid="formation-overlay"]')
+      const transition = await page
+        .locator('[data-testid="formation-overlay"]')
         .evaluate(el => getComputedStyle(el).transitionDuration);
-      
+
       // Should have minimal or no transition
       expect(transition === '0s' || transition === 'none').toBeTruthy();
     });
@@ -737,45 +753,45 @@ test.describe('🎯 Tactical Board Workflows - E2E Tests', () => {
     test('should handle network errors gracefully', async () => {
       // Simulate network failure
       await page.route('**/api/**', route => route.abort());
-      
+
       await page.click('[data-testid="tactical-board-menu"]');
-      
+
       // Attempt operation that requires network
       await page.click('[data-testid="save-formation-button"]');
-      
+
       // Should show error message
       await expect(page.locator('[data-testid="error-message"]')).toBeVisible();
       await expect(page.locator('[data-testid="error-message"]')).toContainText(/network/i);
-      
+
       // Should provide retry option
       await expect(page.locator('[data-testid="retry-button"]')).toBeVisible();
-      
+
       // Restore network and retry
       await page.unroute('**/api/**');
       await page.click('[data-testid="retry-button"]');
-      
+
       // Should recover successfully
       await expect(page.locator('[data-testid="error-message"]')).not.toBeVisible();
     });
 
     test('should handle malformed data imports', async () => {
       await page.click('[data-testid="import-button"]');
-      
+
       // Try to import malformed JSON
       const malformedData = '{ "invalid": json }';
-      
+
       await page.setInputFiles('[data-testid="import-file-input"]', {
         name: 'malformed.json',
         mimeType: 'application/json',
-        buffer: Buffer.from(malformedData)
+        buffer: Buffer.from(malformedData),
       });
-      
+
       await page.click('[data-testid="validate-import"]');
-      
+
       // Should show validation error
       await expect(page.locator('[data-testid="validation-error"]')).toBeVisible();
       await expect(page.locator('[data-testid="validation-error"]')).toContainText(/invalid/i);
-      
+
       // Should not allow import
       await expect(page.locator('[data-testid="confirm-import"]')).toBeDisabled();
     });
@@ -784,31 +800,31 @@ test.describe('🎯 Tactical Board Workflows - E2E Tests', () => {
       // Setup a formation
       await page.click('[data-testid="formation-442"]');
       await page.click('[data-testid="auto-assign-players"]');
-      
+
       // Add some drawings
       await page.click('[data-testid="drawing-tools-toggle"]');
       await page.click('[data-testid="drawing-tool-arrow"]');
       const field = page.locator('[data-testid="modern-field"]');
       await field.click({ position: { x: 200, y: 300 } });
       await field.click({ position: { x: 400, y: 200 } });
-      
+
       // Verify state is saved to localStorage
       const savedState = await page.evaluate(() => {
         return localStorage.getItem('tacticalBoardState');
       });
       expect(savedState).toBeTruthy();
-      
+
       // Simulate page reload (crash recovery)
       await page.reload();
       await page.waitForLoadState('networkidle');
-      
+
       // Navigate back to tactical board
       await page.click('[data-testid="tactical-board-menu"]');
-      
+
       // Verify state is restored
       await expect(page.locator('[data-testid="formation-overlay"]')).toBeVisible();
       await expect(page.locator('[data-testid="drawing-shape-arrow"]')).toBeVisible();
-      
+
       // Show recovery notification
       await expect(page.locator('[data-testid="state-restored-notification"]')).toBeVisible();
     });

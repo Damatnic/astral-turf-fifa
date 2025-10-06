@@ -119,7 +119,7 @@ describe('Public Pages - ZENITH Test Suite', () => {
 
     it('should handle form submission correctly', async () => {
       const user = userEvent.setup();
-      
+
       render(
         <ZenithTestWrapper>
           <LoginPage />
@@ -138,7 +138,7 @@ describe('Public Pages - ZENITH Test Suite', () => {
 
     it('should validate form inputs', async () => {
       const user = userEvent.setup();
-      
+
       render(
         <ZenithTestWrapper>
           <LoginPage />
@@ -182,7 +182,7 @@ describe('Public Pages - ZENITH Test Suite', () => {
 
     it('should handle form submission correctly', async () => {
       const user = userEvent.setup();
-      
+
       render(
         <ZenithTestWrapper>
           <SignupPage />
@@ -202,7 +202,7 @@ describe('Public Pages - ZENITH Test Suite', () => {
 
     it('should validate password strength', async () => {
       const user = userEvent.setup();
-      
+
       render(
         <ZenithTestWrapper>
           <SignupPage />
@@ -210,7 +210,7 @@ describe('Public Pages - ZENITH Test Suite', () => {
       );
 
       await user.type(screen.getByLabelText(/password/i), '123');
-      
+
       // Should show password strength indicator
       expect(screen.getByText(/weak password/i)).toBeInTheDocument();
     });
@@ -366,7 +366,11 @@ describe('Protected Pages - ZENITH Test Suite', () => {
   });
 
   describe('AdvancedAnalyticsPage', () => {
-    ZenithTestUtils.createPageTest('AdvancedAnalyticsPage', AdvancedAnalyticsPage, '/advanced-analytics');
+    ZenithTestUtils.createPageTest(
+      'AdvancedAnalyticsPage',
+      AdvancedAnalyticsPage,
+      '/advanced-analytics'
+    );
 
     it('should display advanced charts', () => {
       render(
@@ -467,7 +471,7 @@ describe('Protected Pages - ZENITH Test Suite', () => {
 
     it('should handle settings changes', async () => {
       const user = userEvent.setup();
-      
+
       render(
         <ZenithTestWrapper>
           <SettingsPage />
@@ -649,11 +653,11 @@ describe('Page Performance Tests - ZENITH Standards', () => {
             <Component />
           </ZenithTestWrapper>
         );
-        
+
         await waitFor(() => {
           expect(screen.getByRole('main')).toBeInTheDocument();
         });
-        
+
         unmount();
       });
 
@@ -704,10 +708,10 @@ describe('Page SEO and Accessibility Tests - ZENITH AAA Standards', () => {
 
       const headings = screen.getAllByRole('heading');
       expect(headings.length).toBeGreaterThan(0);
-      
+
       // First heading should be h1
       expect(headings[0]).toHaveAttribute('aria-level', '1');
-      
+
       cleanup();
     }
   });
@@ -722,7 +726,7 @@ describe('Page SEO and Accessibility Tests - ZENITH AAA Standards', () => {
 
       const isAccessible = await ZenithTestUtils.checkAccessibility(container);
       expect(isAccessible).toBe(true);
-      
+
       cleanup();
     }
   });
@@ -737,7 +741,7 @@ describe('Page SEO and Accessibility Tests - ZENITH AAA Standards', () => {
 
       // Should have main content
       expect(screen.getByRole('main')).toBeInTheDocument();
-      
+
       cleanup();
     }
   });

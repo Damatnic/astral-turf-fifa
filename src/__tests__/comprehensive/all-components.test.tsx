@@ -6,7 +6,12 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ZenithTestWrapper, ZenithComponentTester, ZenithTestUtils } from '../zenith-test-framework';
+import {
+  ZenithTestWrapper,
+  ZenithComponentTester,
+  ZenithTestUtils,
+} from '../zenith-test-framework';
+import { createMockPlayer } from '../../test-utils/mock-factories/player.factory';
 
 // Import all components for testing
 import { UnifiedTacticsBoard } from '../../components/tactics/UnifiedTacticsBoard';
@@ -14,9 +19,9 @@ import { ModernField } from '../../components/tactics/ModernField';
 import { PlayerToken } from '../../components/tactics/PlayerToken';
 import { QuickActionsPanel } from '../../components/tactics/QuickActionsPanel';
 import { ContextualToolbar } from '../../components/tactics/ContextualToolbar';
-import { AdvancedMetricsRadar } from '../../components/analytics/AdvancedMetricsRadar';
-import { ProtectedRoute } from '../../components/ProtectedRoute';
-import Header from '../../components/ui/Header';
+import AdvancedMetricsRadar from '../../components/analytics/AdvancedMetricsRadar';
+import ProtectedRoute from '../../components/ProtectedRoute';
+import { Header } from '../../components/ui/Header';
 import { Button } from '../../components/ui/modern/Button';
 import { Card } from '../../components/ui/modern/Card';
 import { Dialog } from '../../components/ui/modern/Dialog';
@@ -52,18 +57,20 @@ describe('Tactics Board Components - ZENITH Test Suite', () => {
       { name: 'with disabled features', props: { disabled: true } },
     ];
 
-    ZenithTestUtils.createComponentTest('UnifiedTacticsBoard', UnifiedTacticsBoard, defaultProps, variants);
+    ZenithTestUtils.createComponentTest(
+      'UnifiedTacticsBoard',
+      UnifiedTacticsBoard,
+      defaultProps,
+      variants
+    );
 
     it('should handle formation changes correctly', async () => {
       const user = userEvent.setup();
       const onSaveFormation = vi.fn();
-      
+
       render(
         <ZenithTestWrapper>
-          <UnifiedTacticsBoard
-            {...defaultProps}
-            onSaveFormation={onSaveFormation}
-          />
+          <UnifiedTacticsBoard {...defaultProps} onSaveFormation={onSaveFormation} />
         </ZenithTestWrapper>
       );
 
@@ -78,7 +85,7 @@ describe('Tactics Board Components - ZENITH Test Suite', () => {
 
     it('should handle player movements correctly', async () => {
       const user = userEvent.setup();
-      
+
       render(
         <ZenithTestWrapper>
           <UnifiedTacticsBoard {...defaultProps} />
@@ -102,13 +109,10 @@ describe('Tactics Board Components - ZENITH Test Suite', () => {
     it('should handle simulation correctly', async () => {
       const user = userEvent.setup();
       const onSimulateMatch = vi.fn();
-      
+
       render(
         <ZenithTestWrapper>
-          <UnifiedTacticsBoard
-            {...defaultProps}
-            onSimulateMatch={onSimulateMatch}
-          />
+          <UnifiedTacticsBoard {...defaultProps} onSimulateMatch={onSimulateMatch} />
         </ZenithTestWrapper>
       );
 
@@ -122,13 +126,10 @@ describe('Tactics Board Components - ZENITH Test Suite', () => {
     it('should export formations correctly', async () => {
       const user = userEvent.setup();
       const onExportFormation = vi.fn();
-      
+
       render(
         <ZenithTestWrapper>
-          <UnifiedTacticsBoard
-            {...defaultProps}
-            onExportFormation={onExportFormation}
-          />
+          <UnifiedTacticsBoard {...defaultProps} onExportFormation={onExportFormation} />
         </ZenithTestWrapper>
       );
 
@@ -152,7 +153,7 @@ describe('Tactics Board Components - ZENITH Test Suite', () => {
     it('should render field markings correctly', () => {
       render(
         <ZenithTestWrapper>
-          <ModernField {...defaultProps} />
+          <ModernField {...(defaultProps as any)} />
         </ZenithTestWrapper>
       );
 
@@ -164,7 +165,7 @@ describe('Tactics Board Components - ZENITH Test Suite', () => {
     it('should position players according to formation', () => {
       render(
         <ZenithTestWrapper>
-          <ModernField {...defaultProps} />
+          <ModernField {...(defaultProps as any)} />
         </ZenithTestWrapper>
       );
 
@@ -176,15 +177,15 @@ describe('Tactics Board Components - ZENITH Test Suite', () => {
 
   describe('PlayerToken', () => {
     const defaultProps = {
-      player: {
+      player: createMockPlayer({
         id: 'player-1',
         name: 'Test Player',
-        position: 'MID',
-        rating: 85,
+        roleId: 'midfielder',
+        currentPotential: 85,
         age: 25,
-      },
+      }),
       position: { x: 50, y: 50 },
-      onMove: vi.fn(),
+      isSelected: false,
       onSelect: vi.fn(),
     };
 
@@ -204,7 +205,7 @@ describe('Tactics Board Components - ZENITH Test Suite', () => {
     it('should handle selection correctly', async () => {
       const user = userEvent.setup();
       const onSelect = vi.fn();
-      
+
       render(
         <ZenithTestWrapper>
           <PlayerToken {...defaultProps} onSelect={onSelect} />
@@ -219,15 +220,15 @@ describe('Tactics Board Components - ZENITH Test Suite', () => {
 
     it('should handle drag operations correctly', () => {
       const onMove = vi.fn();
-      
+
       render(
         <ZenithTestWrapper>
-          <PlayerToken {...defaultProps} onMove={onMove} />
+          <PlayerToken {...(defaultProps as any)} onMove={onMove} />
         </ZenithTestWrapper>
       );
 
       const player = screen.getByRole('button');
-      
+
       fireEvent.mouseDown(player, { clientX: 0, clientY: 0 });
       fireEvent.mouseMove(player, { clientX: 50, clientY: 50 });
       fireEvent.mouseUp(player);
@@ -254,7 +255,7 @@ describe('Tactics Board Components - ZENITH Test Suite', () => {
     it('should display quick actions correctly', () => {
       render(
         <ZenithTestWrapper>
-          <QuickActionsPanel {...defaultProps} />
+          <QuickActionsPanel {...(defaultProps as any)} />
         </ZenithTestWrapper>
       );
 
@@ -265,10 +266,10 @@ describe('Tactics Board Components - ZENITH Test Suite', () => {
     it('should handle formation changes correctly', async () => {
       const user = userEvent.setup();
       const onFormationChange = vi.fn();
-      
+
       render(
         <ZenithTestWrapper>
-          <QuickActionsPanel {...defaultProps} onFormationChange={onFormationChange} />
+          <QuickActionsPanel {...(defaultProps as any)} onFormationChange={onFormationChange} />
         </ZenithTestWrapper>
       );
 
@@ -306,7 +307,7 @@ describe('UI Components - ZENITH Test Suite', () => {
     it('should handle click events correctly', async () => {
       const user = userEvent.setup();
       const onClick = vi.fn();
-      
+
       render(
         <ZenithTestWrapper>
           <Button onClick={onClick}>Click me</Button>
@@ -320,10 +321,12 @@ describe('UI Components - ZENITH Test Suite', () => {
     it('should prevent clicks when disabled', async () => {
       const user = userEvent.setup();
       const onClick = vi.fn();
-      
+
       render(
         <ZenithTestWrapper>
-          <Button onClick={onClick} disabled>Click me</Button>
+          <Button onClick={onClick} disabled>
+            Click me
+          </Button>
         </ZenithTestWrapper>
       );
 
@@ -334,7 +337,7 @@ describe('UI Components - ZENITH Test Suite', () => {
     it('should show loading state correctly', () => {
       render(
         <ZenithTestWrapper>
-          <Button loading>Loading</Button>
+          <Button {...({ loading: true } as any)}>Loading</Button>
         </ZenithTestWrapper>
       );
 
@@ -368,10 +371,12 @@ describe('UI Components - ZENITH Test Suite', () => {
     it('should handle interactive cards correctly', async () => {
       const user = userEvent.setup();
       const onClick = vi.fn();
-      
+
       render(
         <ZenithTestWrapper>
-          <Card interactive onClick={onClick}>Interactive card</Card>
+          <Card {...({ interactive: true } as any)} onClick={onClick}>
+            Interactive card
+          </Card>
         </ZenithTestWrapper>
       );
 
@@ -393,10 +398,12 @@ describe('UI Components - ZENITH Test Suite', () => {
     it('should handle close events correctly', async () => {
       const user = userEvent.setup();
       const onClose = vi.fn();
-      
+
       render(
         <ZenithTestWrapper>
-          <Dialog isOpen onClose={onClose} title="Test">Content</Dialog>
+          <Dialog {...({ isOpen: true } as any)} onClose={onClose} title="Test">
+            Content
+          </Dialog>
         </ZenithTestWrapper>
       );
 
@@ -409,10 +416,12 @@ describe('UI Components - ZENITH Test Suite', () => {
     it('should handle escape key correctly', async () => {
       const user = userEvent.setup();
       const onClose = vi.fn();
-      
+
       render(
         <ZenithTestWrapper>
-          <Dialog isOpen onClose={onClose} title="Test">Content</Dialog>
+          <Dialog {...({ isOpen: true } as any)} onClose={onClose} title="Test">
+            Content
+          </Dialog>
         </ZenithTestWrapper>
       );
 
@@ -423,7 +432,7 @@ describe('UI Components - ZENITH Test Suite', () => {
     it('should trap focus correctly', () => {
       render(
         <ZenithTestWrapper>
-          <Dialog isOpen onClose={vi.fn()} title="Test">
+          <Dialog {...({ isOpen: true } as any)} onClose={vi.fn()} title="Test">
             <input placeholder="First input" />
             <input placeholder="Second input" />
           </Dialog>
@@ -452,7 +461,7 @@ describe('UI Components - ZENITH Test Suite', () => {
     it('should handle value changes correctly', async () => {
       const user = userEvent.setup();
       const onChange = vi.fn();
-      
+
       render(
         <ZenithTestWrapper>
           <Input onChange={onChange} placeholder="Test input" />
@@ -489,7 +498,7 @@ describe('UI Components - ZENITH Test Suite', () => {
     it('should toggle correctly', async () => {
       const user = userEvent.setup();
       const onChange = vi.fn();
-      
+
       render(
         <ZenithTestWrapper>
           <Switch checked={false} onChange={onChange} />
@@ -546,7 +555,7 @@ describe('Analytics Components - ZENITH Test Suite', () => {
     it('should render chart correctly', () => {
       render(
         <ZenithTestWrapper>
-          <AdvancedMetricsRadar {...defaultProps} />
+          <AdvancedMetricsRadar {...(defaultProps as any)} />
         </ZenithTestWrapper>
       );
 
@@ -558,15 +567,15 @@ describe('Analytics Components - ZENITH Test Suite', () => {
     it('should handle data updates correctly', () => {
       const { rerender } = render(
         <ZenithTestWrapper>
-          <AdvancedMetricsRadar {...defaultProps} />
+          <AdvancedMetricsRadar {...(defaultProps as any)} />
         </ZenithTestWrapper>
       );
 
       const newData = { ...defaultProps.data, speed: 95 };
-      
+
       rerender(
         <ZenithTestWrapper>
-          <AdvancedMetricsRadar data={newData} />
+          <AdvancedMetricsRadar {...({ data: newData } as any)} />
         </ZenithTestWrapper>
       );
 
@@ -604,7 +613,11 @@ describe('Route Protection Components - ZENITH Test Suite', () => {
 describe('Component Performance Tests - ZENITH Standards', () => {
   it('should render all components within performance budget', async () => {
     const components = [
-      { name: 'UnifiedTacticsBoard', Component: UnifiedTacticsBoard, props: { onSimulateMatch: vi.fn() } },
+      {
+        name: 'UnifiedTacticsBoard',
+        Component: UnifiedTacticsBoard,
+        props: { onSimulateMatch: vi.fn() },
+      },
       { name: 'Button', Component: Button, props: { children: 'Test' } },
       { name: 'Card', Component: Card, props: { children: 'Test' } },
       { name: 'Input', Component: Input, props: {} },

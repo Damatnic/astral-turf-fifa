@@ -10,7 +10,7 @@ metadata:
   labels:
     name: monitoring
     app.kubernetes.io/name: monitoring
-    prometheus.io/scrape: "false"
+    prometheus.io/scrape: 'false'
 
 ---
 apiVersion: monitoring.coreos.com/v1
@@ -25,21 +25,21 @@ spec:
   replicas: 3
   retention: 30d
   retentionSize: 500GB
-  
+
   # High availability configuration
   externalUrl: https://prometheus.astral-turf.com
   routePrefix: /
-  
+
   # Storage configuration
   storage:
     volumeClaimTemplate:
       spec:
         storageClassName: ssd-high-iops
-        accessModes: ["ReadWriteOnce"]
+        accessModes: ['ReadWriteOnce']
         resources:
           requests:
             storage: 200Gi
-  
+
   # Resource allocation
   resources:
     requests:
@@ -48,56 +48,56 @@ spec:
     limits:
       cpu: 4000m
       memory: 16Gi
-  
+
   # Security context
   securityContext:
     runAsNonRoot: true
     runAsUser: 1000
     fsGroup: 2000
-  
+
   # Service account
   serviceAccountName: prometheus
-  
+
   # Service monitor selector
   serviceMonitorSelector:
     matchLabels:
       team: platform
-  
+
   # Pod monitor selector
   podMonitorSelector:
     matchLabels:
       team: platform
-  
+
   # Rule selector
   ruleSelector:
     matchLabels:
       team: platform
-  
+
   # Alerting configuration
   alerting:
     alertmanagers:
-    - namespace: monitoring
-      name: alertmanager-main
-      port: web
-      pathPrefix: /
-      apiVersion: v2
-  
+      - namespace: monitoring
+        name: alertmanager-main
+        port: web
+        pathPrefix: /
+        apiVersion: v2
+
   # Additional configuration
   enableAdminAPI: false
   logLevel: info
   logFormat: logfmt
-  
+
   # Pod anti-affinity for high availability
   affinity:
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
-      - labelSelector:
-          matchExpressions:
-          - key: app.kubernetes.io/name
-            operator: In
-            values:
-            - prometheus
-        topologyKey: kubernetes.io/hostname
+        - labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - prometheus
+          topologyKey: kubernetes.io/hostname
 
 ---
 apiVersion: monitoring.coreos.com/v1
@@ -113,23 +113,23 @@ spec:
     matchLabels:
       app.kubernetes.io/name: astral-turf
   endpoints:
-  - port: metrics
-    interval: 15s
-    path: /metrics
-    scheme: http
-    scrapeTimeout: 10s
-    metricRelabelings:
-    - sourceLabels: [__name__]
-      regex: 'http_request_duration_seconds_.*'
-      targetLabel: __tmp_duration
-      replacement: '${1}'
-    - sourceLabels: [__tmp_duration]
-      regex: '.*'
-      targetLabel: service
-      replacement: astral-turf
+    - port: metrics
+      interval: 15s
+      path: /metrics
+      scheme: http
+      scrapeTimeout: 10s
+      metricRelabelings:
+        - sourceLabels: [__name__]
+          regex: 'http_request_duration_seconds_.*'
+          targetLabel: __tmp_duration
+          replacement: '${1}'
+        - sourceLabels: [__tmp_duration]
+          regex: '.*'
+          targetLabel: service
+          replacement: astral-turf
   namespaceSelector:
     matchNames:
-    - astral-turf
+      - astral-turf
 
 ---
 apiVersion: monitoring.coreos.com/v1
@@ -145,27 +145,27 @@ spec:
     matchLabels:
       app.kubernetes.io/name: astral-turf
   endpoints:
-  - port: metrics
-    interval: 10s
-    path: /business-metrics
-    scheme: http
-    scrapeTimeout: 8s
-    metricRelabelings:
-    - sourceLabels: [__name__]
-      regex: 'tactical_sessions_.*'
-      targetLabel: metric_type
-      replacement: business
-    - sourceLabels: [__name__]
-      regex: 'user_engagement_.*'
-      targetLabel: metric_type
-      replacement: business
-    - sourceLabels: [__name__]
-      regex: 'performance_.*'
-      targetLabel: metric_type
-      replacement: technical
+    - port: metrics
+      interval: 10s
+      path: /business-metrics
+      scheme: http
+      scrapeTimeout: 8s
+      metricRelabelings:
+        - sourceLabels: [__name__]
+          regex: 'tactical_sessions_.*'
+          targetLabel: metric_type
+          replacement: business
+        - sourceLabels: [__name__]
+          regex: 'user_engagement_.*'
+          targetLabel: metric_type
+          replacement: business
+        - sourceLabels: [__name__]
+          regex: 'performance_.*'
+          targetLabel: metric_type
+          replacement: technical
   namespaceSelector:
     matchNames:
-    - astral-turf
+      - astral-turf
 
 ---
 apiVersion: monitoring.coreos.com/v1
@@ -178,129 +178,129 @@ metadata:
     team: platform
 spec:
   groups:
-  - name: astral-turf.business.rules
-    interval: 30s
-    rules:
-    # Business KPI metrics
-    - record: business:tactical_sessions:rate5m
-      expr: rate(tactical_sessions_total[5m])
-    
-    - record: business:user_engagement:avg5m
-      expr: avg_over_time(user_engagement_score[5m])
-    
-    - record: business:revenue_impact:rate1h
-      expr: rate(revenue_generating_actions_total[1h])
-    
-    # SLI/SLO metrics
-    - record: sli:availability:ratio5m
-      expr: (
-        sum(rate(http_requests_total{job="astral-turf-app",code!~"5.."}[5m])) /
-        sum(rate(http_requests_total{job="astral-turf-app"}[5m]))
-      )
-    
-    - record: sli:latency:p99_5m
-      expr: histogram_quantile(0.99, 
-        sum(rate(http_request_duration_seconds_bucket{job="astral-turf-app"}[5m])) by (le)
-      )
-    
-    - record: sli:error_rate:ratio5m
-      expr: (
-        sum(rate(http_requests_total{job="astral-turf-app",code=~"5.."}[5m])) /
-        sum(rate(http_requests_total{job="astral-turf-app"}[5m]))
-      )
-    
-    # Advanced performance metrics
-    - record: performance:websocket_connections:current
-      expr: websocket_connections_active
-    
-    - record: performance:database_pool:utilization
-      expr: database_connection_pool_active / database_connection_pool_max
-    
-    - record: performance:cache_hit_ratio:5m
-      expr: rate(cache_hits_total[5m]) / rate(cache_requests_total[5m])
+    - name: astral-turf.business.rules
+      interval: 30s
+      rules:
+        # Business KPI metrics
+        - record: business:tactical_sessions:rate5m
+          expr: rate(tactical_sessions_total[5m])
 
-  - name: astral-turf.alerts
-    interval: 30s
-    rules:
-    # Critical business alerts
-    - alert: TacticalSessionsDropping
-      expr: business:tactical_sessions:rate5m < 0.5
-      for: 5m
-      labels:
-        severity: warning
-        team: product
-      annotations:
-        summary: "Tactical sessions are dropping below normal levels"
-        description: "Active tactical sessions rate is {{ $value }} sessions/second, which is below the normal threshold"
-        runbook_url: "https://runbooks.astral-turf.com/tactical-sessions-low"
-    
-    - alert: UserEngagementCritical
-      expr: business:user_engagement:avg5m < 0.3
-      for: 10m
-      labels:
-        severity: critical
-        team: product
-      annotations:
-        summary: "User engagement critically low"
-        description: "User engagement score is {{ $value }}, indicating potential platform issues"
-        runbook_url: "https://runbooks.astral-turf.com/user-engagement-low"
-    
-    # SLO violation alerts
-    - alert: AvailabilitySLOViolation
-      expr: sli:availability:ratio5m < 0.9999
-      for: 1m
-      labels:
-        severity: critical
-        team: sre
-      annotations:
-        summary: "Availability SLO violation detected"
-        description: "Service availability is {{ $value | humanizePercentage }}, below 99.99% SLO"
-        runbook_url: "https://runbooks.astral-turf.com/availability-slo"
-    
-    - alert: LatencySLOViolation
-      expr: sli:latency:p99_5m > 0.1
-      for: 2m
-      labels:
-        severity: warning
-        team: sre
-      annotations:
-        summary: "Latency SLO violation detected"
-        description: "P99 latency is {{ $value }}s, above 100ms SLO"
-        runbook_url: "https://runbooks.astral-turf.com/latency-slo"
-    
-    - alert: ErrorRateTooHigh
-      expr: sli:error_rate:ratio5m > 0.001
-      for: 5m
-      labels:
-        severity: critical
-        team: sre
-      annotations:
-        summary: "Error rate too high"
-        description: "Error rate is {{ $value | humanizePercentage }}, above 0.1% threshold"
-        runbook_url: "https://runbooks.astral-turf.com/error-rate-high"
-    
-    # Infrastructure alerts
-    - alert: DatabaseConnectionPoolHigh
-      expr: performance:database_pool:utilization > 0.8
-      for: 5m
-      labels:
-        severity: warning
-        team: infrastructure
-      annotations:
-        summary: "Database connection pool utilization high"
-        description: "Database connection pool is {{ $value | humanizePercentage }} utilized"
-        runbook_url: "https://runbooks.astral-turf.com/database-pool-high"
-    
-    - alert: CacheHitRateLow
-      expr: performance:cache_hit_ratio:5m < 0.9
-      for: 10m
-      labels:
-        severity: warning
-        team: infrastructure
-      annotations:
-        summary: "Cache hit ratio is low"
-        description: "Cache hit ratio is {{ $value | humanizePercentage }}, indicating potential cache issues"
-        runbook_url: "https://runbooks.astral-turf.com/cache-hit-low"
+        - record: business:user_engagement:avg5m
+          expr: avg_over_time(user_engagement_score[5m])
+
+        - record: business:revenue_impact:rate1h
+          expr: rate(revenue_generating_actions_total[1h])
+
+        # SLI/SLO metrics
+        - record: sli:availability:ratio5m
+          expr: |
+            sum(rate(http_requests_total{job="astral-turf-app",code!~"5.."}[5m])) /
+            sum(rate(http_requests_total{job="astral-turf-app"}[5m]))
+
+        - record: sli:latency:p99_5m
+          expr: |
+            histogram_quantile(
+              0.99,
+              sum(rate(http_request_duration_seconds_bucket{job="astral-turf-app"}[5m])) by (le)
+            )
+
+        - record: sli:error_rate:ratio5m
+          expr: |
+            sum(rate(http_requests_total{job="astral-turf-app",code=~"5.."}[5m])) /
+            sum(rate(http_requests_total{job="astral-turf-app"}[5m]))
+
+        # Advanced performance metrics
+        - record: performance:websocket_connections:current
+          expr: websocket_connections_active
+
+        - record: performance:database_pool:utilization
+          expr: database_connection_pool_active / database_connection_pool_max
+
+        - record: performance:cache_hit_ratio:5m
+          expr: rate(cache_hits_total[5m]) / rate(cache_requests_total[5m])
+
+    - name: astral-turf.alerts
+      interval: 30s
+      rules:
+        # Critical business alerts
+        - alert: TacticalSessionsDropping
+          expr: business:tactical_sessions:rate5m < 0.5
+          for: 5m
+          labels:
+            severity: warning
+            team: product
+          annotations:
+            summary: 'Tactical sessions are dropping below normal levels'
+            description: 'Active tactical sessions rate is {{ $value }} sessions/second, which is below the normal threshold'
+            runbook_url: 'https://runbooks.astral-turf.com/tactical-sessions-low'
+
+        - alert: UserEngagementCritical
+          expr: business:user_engagement:avg5m < 0.3
+          for: 10m
+          labels:
+            severity: critical
+            team: product
+          annotations:
+            summary: 'User engagement critically low'
+            description: 'User engagement score is {{ $value }}, indicating potential platform issues'
+            runbook_url: 'https://runbooks.astral-turf.com/user-engagement-low'
+
+        # SLO violation alerts
+        - alert: AvailabilitySLOViolation
+          expr: sli:availability:ratio5m < 0.9999
+          for: 1m
+          labels:
+            severity: critical
+            team: sre
+          annotations:
+            summary: 'Availability SLO violation detected'
+            description: 'Service availability is {{ $value | humanizePercentage }}, below 99.99% SLO'
+            runbook_url: 'https://runbooks.astral-turf.com/availability-slo'
+
+        - alert: LatencySLOViolation
+          expr: sli:latency:p99_5m > 0.1
+          for: 2m
+          labels:
+            severity: warning
+            team: sre
+          annotations:
+            summary: 'Latency SLO violation detected'
+            description: 'P99 latency is {{ $value }}s, above 100ms SLO'
+            runbook_url: 'https://runbooks.astral-turf.com/latency-slo'
+
+        - alert: ErrorRateTooHigh
+          expr: sli:error_rate:ratio5m > 0.001
+          for: 5m
+          labels:
+            severity: critical
+            team: sre
+          annotations:
+            summary: 'Error rate too high'
+            description: 'Error rate is {{ $value | humanizePercentage }}, above 0.1% threshold'
+            runbook_url: 'https://runbooks.astral-turf.com/error-rate-high'
+
+        # Infrastructure alerts
+        - alert: DatabaseConnectionPoolHigh
+          expr: performance:database_pool:utilization > 0.8
+          for: 5m
+          labels:
+            severity: warning
+            team: infrastructure
+          annotations:
+            summary: 'Database connection pool utilization high'
+            description: 'Database connection pool is {{ $value | humanizePercentage }} utilized'
+            runbook_url: 'https://runbooks.astral-turf.com/database-pool-high'
+
+        - alert: CacheHitRateLow
+          expr: performance:cache_hit_ratio:5m < 0.9
+          for: 10m
+          labels:
+            severity: warning
+            team: infrastructure
+          annotations:
+            summary: 'Cache hit ratio is low'
+            description: 'Cache hit ratio is {{ $value | humanizePercentage }}, indicating potential cache issues'
+            runbook_url: 'https://runbooks.astral-turf.com/cache-hit-low'
 
 ---
 apiVersion: v1
@@ -320,23 +320,23 @@ metadata:
   labels:
     app.kubernetes.io/name: prometheus
 rules:
-- apiGroups: [""]
-  resources:
-  - nodes
-  - nodes/proxy
-  - nodes/metrics
-  - services
-  - endpoints
-  - pods
-  - ingresses
-  - configmaps
-  verbs: ["get", "list", "watch"]
-- apiGroups: ["extensions", "networking.k8s.io"]
-  resources:
-  - ingresses
-  verbs: ["get", "list", "watch"]
-- nonResourceURLs: ["/metrics", "/metrics/cadvisor"]
-  verbs: ["get"]
+  - apiGroups: ['']
+    resources:
+      - nodes
+      - nodes/proxy
+      - nodes/metrics
+      - services
+      - endpoints
+      - pods
+      - ingresses
+      - configmaps
+    verbs: ['get', 'list', 'watch']
+  - apiGroups: ['extensions', 'networking.k8s.io']
+    resources:
+      - ingresses
+    verbs: ['get', 'list', 'watch']
+  - nonResourceURLs: ['/metrics', '/metrics/cadvisor']
+    verbs: ['get']
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -350,6 +350,6 @@ roleRef:
   kind: ClusterRole
   name: prometheus
 subjects:
-- kind: ServiceAccount
-  name: prometheus
-  namespace: monitoring
+  - kind: ServiceAccount
+    name: prometheus
+    namespace: monitoring

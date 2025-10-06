@@ -88,7 +88,7 @@ export const PlayerStats = forwardRef<HTMLDivElement, PlayerStatsProps>(
       onAttributeChange,
       ...props
     },
-    ref,
+    ref
   ) => {
     const groupedAttributes = player.attributes.reduce(
       (acc, attr) => {
@@ -98,7 +98,7 @@ export const PlayerStats = forwardRef<HTMLDivElement, PlayerStatsProps>(
         acc[attr.category].push(attr);
         return acc;
       },
-      {} as Record<string, PlayerAttribute[]>,
+      {} as Record<string, PlayerAttribute[]>
     );
 
     const getRatingColor = (rating: number) => {
@@ -142,6 +142,8 @@ export const PlayerStats = forwardRef<HTMLDivElement, PlayerStatsProps>(
               src={player.photo}
               alt={player.name}
               className="w-16 h-16 rounded-full border-2 border-secondary-600 object-cover"
+              loading="lazy"
+              decoding="async"
             />
           ) : (
             <div className="w-16 h-16 rounded-full bg-secondary-700 border-2 border-secondary-600 flex items-center justify-center text-2xl font-bold text-white">
@@ -165,8 +167,11 @@ export const PlayerStats = forwardRef<HTMLDivElement, PlayerStatsProps>(
             {player.nationality && (
               <img
                 src={`https://flagcdn.com/w20/${player.nationality.toLowerCase()}.png`}
+                srcSet={`https://flagcdn.com/w20/${player.nationality.toLowerCase()}.png 1x, https://flagcdn.com/w40/${player.nationality.toLowerCase()}.png 2x`}
                 alt={player.nationality}
                 className="w-5 h-auto rounded-sm"
+                loading="lazy"
+                decoding="async"
                 onError={e => (e.currentTarget.style.display = 'none')}
               />
             )}
@@ -255,7 +260,7 @@ export const PlayerStats = forwardRef<HTMLDivElement, PlayerStatsProps>(
                       <span
                         className={cn(
                           'text-sm',
-                          attr.important ? 'font-medium text-white' : 'text-secondary-400',
+                          attr.important ? 'font-medium text-white' : 'text-secondary-400'
                         )}
                       >
                         {attr.name}
@@ -445,7 +450,7 @@ export const PlayerStats = forwardRef<HTMLDivElement, PlayerStatsProps>(
         )}
       </div>
     );
-  },
+  }
 );
 
 PlayerStats.displayName = 'PlayerStats';

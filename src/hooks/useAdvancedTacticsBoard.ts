@@ -87,7 +87,7 @@ export function useAdvancedTacticsBoard(): AdvancedTacticsBoardState & AdvancedT
       }
 
       // Check player availability
-      if (player.availability && player.availability !== 'available') {
+      if (player.availability && (player.availability as any) !== 'available') {
         return false;
       }
 
@@ -116,51 +116,54 @@ export function useAdvancedTacticsBoard(): AdvancedTacticsBoardState & AdvancedT
         const playerRole = player.roleId || 'unknown';
         const slotRole = targetSlot.roleId || 'unknown';
 
-        const advancedRoleCompatibility: Record<string, { primary: string[]; secondary: string[]; restricted: string[] }> = {
-          goalkeeper: { 
-            primary: ['goalkeeper'], 
-            secondary: [], 
-            restricted: ['striker', 'winger', 'attacking-midfielder'] 
+        const advancedRoleCompatibility: Record<
+          string,
+          { primary: string[]; secondary: string[]; restricted: string[] }
+        > = {
+          goalkeeper: {
+            primary: ['goalkeeper'],
+            secondary: [],
+            restricted: ['striker', 'winger', 'attacking-midfielder'],
           },
-          'center-back': { 
-            primary: ['center-back'], 
-            secondary: ['defensive-midfielder', 'full-back'], 
-            restricted: ['striker', 'winger'] 
+          'center-back': {
+            primary: ['center-back'],
+            secondary: ['defensive-midfielder', 'full-back'],
+            restricted: ['striker', 'winger'],
           },
-          'full-back': { 
-            primary: ['full-back', 'wing-back'], 
-            secondary: ['winger', 'center-back'], 
-            restricted: ['goalkeeper', 'striker'] 
+          'full-back': {
+            primary: ['full-back', 'wing-back'],
+            secondary: ['winger', 'center-back'],
+            restricted: ['goalkeeper', 'striker'],
           },
-          'wing-back': { 
-            primary: ['wing-back', 'full-back'], 
-            secondary: ['winger', 'defensive-midfielder'], 
-            restricted: ['goalkeeper', 'striker'] 
+          'wing-back': {
+            primary: ['wing-back', 'full-back'],
+            secondary: ['winger', 'defensive-midfielder'],
+            restricted: ['goalkeeper', 'striker'],
           },
-          'defensive-midfielder': { 
-            primary: ['defensive-midfielder'], 
-            secondary: ['center-back', 'central-midfielder'], 
-            restricted: ['goalkeeper', 'striker'] 
+          'defensive-midfielder': {
+            primary: ['defensive-midfielder'],
+            secondary: ['center-back', 'central-midfielder'],
+            restricted: ['goalkeeper', 'striker'],
           },
-          'central-midfielder': { 
-            primary: ['central-midfielder'], 
-            secondary: ['defensive-midfielder', 'attacking-midfielder'], 
-            restricted: ['goalkeeper'] 
+          'central-midfielder': {
+            primary: ['central-midfielder'],
+            secondary: ['defensive-midfielder', 'attacking-midfielder'],
+            restricted: ['goalkeeper'],
           },
-          'attacking-midfielder': { 
-            primary: ['attacking-midfielder'], 
-            secondary: ['central-midfielder', 'winger'], 
-            restricted: ['goalkeeper', 'center-back'] 
+          'attacking-midfielder': {
+            primary: ['attacking-midfielder'],
+            secondary: ['central-midfielder', 'winger'],
+            restricted: ['goalkeeper', 'center-back'],
           },
-          winger: { 
-            primary: ['winger'], 
-            secondary: ['wing-back', 'attacking-midfielder'], 
-            restricted: ['goalkeeper', 'center-back'] 
+          winger: {
+            primary: ['winger'],
+            secondary: ['wing-back', 'attacking-midfielder'],
+            restricted: ['goalkeeper', 'center-back'],
           },
-          striker: { 
-            primary: ['striker'], 
-            secondary: ['attacking-midfielder'], 
-            restricted: ['goalkeeper', 'center-back', 'full-back'] 
+          striker: {
+            primary: ['striker'],
+            secondary: ['attacking-midfielder'],
+            restricted: ['goalkeeper', 'center-back', 'full-back'],
           },
         };
 
@@ -171,13 +174,16 @@ export function useAdvancedTacticsBoard(): AdvancedTacticsBoardState & AdvancedT
             return false;
           }
           // Allow primary and secondary roles
-          return compatibility.primary.includes(playerRole) || compatibility.secondary.includes(playerRole);
+          return (
+            compatibility.primary.includes(playerRole) ||
+            compatibility.secondary.includes(playerRole)
+          );
         }
       }
 
       return true;
     },
-    [players, formations, activeFormationIds],
+    [players, formations, activeFormationIds]
   );
 
   // Get magnetic snap position for smooth snapping
@@ -187,11 +193,12 @@ export function useAdvancedTacticsBoard(): AdvancedTacticsBoardState & AdvancedT
       let minDistance = SNAP_DISTANCE;
 
       for (const slot of targetSlots) {
-        if (!slot.position) continue;
+        if (!slot.position) {
+          continue;
+        }
 
         const distance = Math.sqrt(
-          Math.pow(position.x - slot.position.x, 2) + 
-          Math.pow(position.y - slot.position.y, 2)
+          Math.pow(position.x - slot.position.x, 2) + Math.pow(position.y - slot.position.y, 2)
         );
 
         if (distance < minDistance) {
@@ -202,7 +209,7 @@ export function useAdvancedTacticsBoard(): AdvancedTacticsBoardState & AdvancedT
 
       return snapPosition;
     },
-    [],
+    []
   );
 
   // Get valid drop zones with magnetic zones
@@ -242,11 +249,11 @@ export function useAdvancedTacticsBoard(): AdvancedTacticsBoardState & AdvancedT
             .forEach((slot: any) => {
               if (validateDrop(playerId, slot.id)) {
                 validZones.push(slot.id);
-                
+
                 // Check if this is a preferred position (magnetic zone)
                 const playerRole = player.roleId || 'unknown';
                 const slotRole = slot.roleId || 'unknown';
-                
+
                 if (playerRole === slotRole) {
                   magneticZones.push(slot.id);
                 }
@@ -260,19 +267,23 @@ export function useAdvancedTacticsBoard(): AdvancedTacticsBoardState & AdvancedT
 
       return { valid: validZones, magnetic: magneticZones };
     },
-    [players, formations, activeFormationIds, validateDrop],
+    [players, formations, activeFormationIds, validateDrop]
   );
 
   // Enhanced drag start with multi-touch support
   const startDrag = useCallback(
     (player: Player, event: React.DragEvent | React.TouchEvent) => {
       if (!player || !player.id || !player.name) {
-        if ('preventDefault' in event) event.preventDefault();
+        if ('preventDefault' in event) {
+          event.preventDefault();
+        }
         return;
       }
 
       if (drawingTool !== 'select') {
-        if ('preventDefault' in event) event.preventDefault();
+        if ('preventDefault' in event) {
+          event.preventDefault();
+        }
         return;
       }
 
@@ -296,15 +307,16 @@ export function useAdvancedTacticsBoard(): AdvancedTacticsBoardState & AdvancedT
         if ('dataTransfer' in event) {
           const dragImage = document.createElement('div');
           dragImage.className = 'advanced-drag-preview';
-          
-          const playerInitials = player.name
-            ?.split(' ')
-            .map(n => n[0] || '')
-            .join('')
-            .slice(0, 2) || '??';
+
+          const playerInitials =
+            player.name
+              ?.split(' ')
+              .map(n => n[0] || '')
+              .join('')
+              .slice(0, 2) || '??';
 
           const teamColor = player.team === 'home' ? '#3b82f6' : '#ef4444';
-          
+
           dragImage.innerHTML = `
             <div style="
               width: 60px; 
@@ -353,7 +365,7 @@ export function useAdvancedTacticsBoard(): AdvancedTacticsBoardState & AdvancedT
         console.error('Failed to start drag operation:', error);
       }
     },
-    [drawingTool, getValidDropZones],
+    [drawingTool, getValidDropZones]
   );
 
   // Multi-select functionality
@@ -366,40 +378,47 @@ export function useAdvancedTacticsBoard(): AdvancedTacticsBoardState & AdvancedT
     }));
   }, []);
 
-  const updateMultiSelect = useCallback((currentPosition: Position) => {
-    if (!multiSelectStartRef.current) return;
+  const updateMultiSelect = useCallback(
+    (currentPosition: Position) => {
+      if (!multiSelectStartRef.current) {
+        return;
+      }
 
-    const startPos = multiSelectStartRef.current;
-    const distance = Math.sqrt(
-      Math.pow(currentPosition.x - startPos.x, 2) + 
-      Math.pow(currentPosition.y - startPos.y, 2)
-    );
+      const startPos = multiSelectStartRef.current;
+      const distance = Math.sqrt(
+        Math.pow(currentPosition.x - startPos.x, 2) + Math.pow(currentPosition.y - startPos.y, 2)
+      );
 
-    if (distance > MULTI_SELECT_THRESHOLD) {
-      // Find players within selection rectangle
-      const minX = Math.min(startPos.x, currentPosition.x);
-      const maxX = Math.max(startPos.x, currentPosition.x);
-      const minY = Math.min(startPos.y, currentPosition.y);
-      const maxY = Math.max(startPos.y, currentPosition.y);
+      if (distance > MULTI_SELECT_THRESHOLD) {
+        // Find players within selection rectangle
+        const minX = Math.min(startPos.x, currentPosition.x);
+        const maxX = Math.max(startPos.x, currentPosition.x);
+        const minY = Math.min(startPos.y, currentPosition.y);
+        const maxY = Math.max(startPos.y, currentPosition.y);
 
-      const selectedPlayerIds = players
-        ?.filter(player => {
-          if (!player.position) return false;
-          return (
-            player.position.x >= minX &&
-            player.position.x <= maxX &&
-            player.position.y >= minY &&
-            player.position.y <= maxY
-          );
-        })
-        .map(player => player.id) || [];
+        const selectedPlayerIds =
+          players
+            ?.filter(player => {
+              if (!player.position) {
+                return false;
+              }
+              return (
+                player.position.x >= minX &&
+                player.position.x <= maxX &&
+                player.position.y >= minY &&
+                player.position.y <= maxY
+              );
+            })
+            .map(player => player.id) || [];
 
-      setBoardState(prev => ({
-        ...prev,
-        multiSelectPlayers: selectedPlayerIds,
-      }));
-    }
-  }, [players]);
+        setBoardState(prev => ({
+          ...prev,
+          multiSelectPlayers: selectedPlayerIds,
+        }));
+      }
+    },
+    [players]
+  );
 
   const endMultiSelect = useCallback(() => {
     multiSelectStartRef.current = null;
@@ -452,7 +471,7 @@ export function useAdvancedTacticsBoard(): AdvancedTacticsBoardState & AdvancedT
         navigator.vibrate(10);
       }
     },
-    [validateDrop],
+    [validateDrop]
   );
 
   const handleSlotDragLeave = useCallback(() => {
@@ -496,10 +515,15 @@ export function useAdvancedTacticsBoard(): AdvancedTacticsBoardState & AdvancedT
         }
 
         // Handle multi-player operations
-        if (boardState.multiSelectPlayers.length > 0 && boardState.multiSelectPlayers.includes(playerId)) {
+        if (
+          boardState.multiSelectPlayers.length > 0 &&
+          boardState.multiSelectPlayers.includes(playerId)
+        ) {
           // Multi-player assignment logic
-          const availableSlots = formations?.[activeFormationIds?.[team]]?.slots
-            ?.filter(s => !s.playerId && validateDrop(playerId, s.id)) || [];
+          const availableSlots =
+            formations?.[activeFormationIds?.[team]]?.slots?.filter(
+              s => !s.playerId && validateDrop(playerId, s.id)
+            ) || [];
 
           boardState.multiSelectPlayers.forEach((pid, index) => {
             if (availableSlots[index]) {
@@ -519,13 +543,13 @@ export function useAdvancedTacticsBoard(): AdvancedTacticsBoardState & AdvancedT
 
             if (draggedPlayer?.name && occupyingPlayer?.name) {
               const shouldSwap = window.confirm(
-                `Swap ${draggedPlayer.name} with ${occupyingPlayer.name}?`,
+                `Swap ${draggedPlayer.name} with ${occupyingPlayer.name}?`
               );
 
               if (shouldSwap) {
                 dispatch({
                   type: 'SWAP_PLAYERS',
-                  payload: { playerId1: playerId, playerId2: slot.playerId },
+                  payload: { sourcePlayerId: playerId, targetPlayerId: slot.playerId },
                 });
               }
             }
@@ -542,7 +566,15 @@ export function useAdvancedTacticsBoard(): AdvancedTacticsBoardState & AdvancedT
         endDrag();
       }
     },
-    [validateDrop, players, dispatch, endDrag, boardState.multiSelectPlayers, formations, activeFormationIds],
+    [
+      validateDrop,
+      players,
+      dispatch,
+      endDrag,
+      boardState.multiSelectPlayers,
+      formations,
+      activeFormationIds,
+    ]
   );
 
   // Enhanced field drop with magnetic snapping
@@ -551,9 +583,10 @@ export function useAdvancedTacticsBoard(): AdvancedTacticsBoardState & AdvancedT
       event.preventDefault();
       event.stopPropagation();
 
-      const playerId = 'dataTransfer' in event 
-        ? event.dataTransfer.getData('text/plain')
-        : boardState.draggedPlayer?.id;
+      const playerId =
+        'dataTransfer' in event
+          ? event.dataTransfer.getData('text/plain')
+          : boardState.draggedPlayer?.id;
 
       if (!playerId || typeof playerId !== 'string') {
         endDrag();
@@ -601,7 +634,7 @@ export function useAdvancedTacticsBoard(): AdvancedTacticsBoardState & AdvancedT
       }
 
       // Apply magnetic snapping if enabled
-      if (positioningMode === 'snap') {
+      if ((positioningMode as string) === 'snap' || positioningMode === 'free') {
         const allSlots = [
           ...(formations?.[activeFormationIds?.home]?.slots || []),
           ...(formations?.[activeFormationIds?.away]?.slots || []),
@@ -628,7 +661,16 @@ export function useAdvancedTacticsBoard(): AdvancedTacticsBoardState & AdvancedT
         endDrag();
       }
     },
-    [validateDrop, positioningMode, dispatch, endDrag, boardState.draggedPlayer, formations, activeFormationIds, getMagneticSnapPosition],
+    [
+      validateDrop,
+      positioningMode,
+      dispatch,
+      endDrag,
+      boardState.draggedPlayer,
+      formations,
+      activeFormationIds,
+      getMagneticSnapPosition,
+    ]
   );
 
   // Multi-selection management

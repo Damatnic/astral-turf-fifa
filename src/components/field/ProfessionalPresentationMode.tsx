@@ -37,7 +37,9 @@ const LaserPointer: React.FC<{
   position: { x: number; y: number };
   isActive: boolean;
 }> = React.memo(({ position, isActive }) => {
-  if (!isActive) return null;
+  if (!isActive) {
+    return null;
+  }
 
   return (
     <div
@@ -51,7 +53,7 @@ const LaserPointer: React.FC<{
       {/* Laser dot */}
       <div className="w-4 h-4 bg-red-500 rounded-full animate-ping opacity-75" />
       <div className="absolute inset-0 w-4 h-4 bg-red-600 rounded-full" />
-      
+
       {/* Glow effect */}
       <div className="absolute inset-0 w-8 h-8 bg-red-500/30 rounded-full animate-pulse transform -translate-x-2 -translate-y-2" />
     </div>
@@ -67,76 +69,90 @@ const SlideNavigation: React.FC<{
   onPause: () => void;
   onStop: () => void;
   isPlaying: boolean;
-}> = React.memo(({
-  currentSlide,
-  totalSlides,
-  onSlideChange,
-  onPlay,
-  onPause,
-  onStop,
-  isPlaying,
-}) => {
-  return (
-    <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50">
-      <div className="bg-black/80 backdrop-blur-md rounded-full px-6 py-3 border border-white/20">
-        <div className="flex items-center space-x-4">
-          {/* Previous */}
-          <button
-            onClick={() => onSlideChange(Math.max(0, currentSlide - 1))}
-            disabled={currentSlide === 0}
-            className="p-2 rounded-full hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
-            </svg>
-          </button>
-
-          {/* Play/Pause */}
-          <button
-            onClick={isPlaying ? onPause : onPlay}
-            className="p-3 rounded-full bg-blue-600 hover:bg-blue-500 transition-colors"
-          >
-            {isPlaying ? (
+}> = React.memo(
+  ({ currentSlide, totalSlides, onSlideChange, onPlay, onPause, onStop, isPlaying }) => {
+    return (
+      <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50">
+        <div className="bg-black/80 backdrop-blur-md rounded-full px-6 py-3 border border-white/20">
+          <div className="flex items-center space-x-4">
+            {/* Previous */}
+            <button
+              onClick={() => onSlideChange(Math.max(0, currentSlide - 1))}
+              disabled={currentSlide === 0}
+              className="p-2 rounded-full hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
               <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                <path
+                  fillRule="evenodd"
+                  d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                  clipRule="evenodd"
+                />
               </svg>
-            ) : (
+            </button>
+
+            {/* Play/Pause */}
+            <button
+              onClick={isPlaying ? onPause : onPlay}
+              className="p-3 rounded-full bg-blue-600 hover:bg-blue-500 transition-colors"
+            >
+              {isPlaying ? (
+                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fillRule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              )}
+            </button>
+
+            {/* Next */}
+            <button
+              onClick={() => onSlideChange(Math.min(totalSlides - 1, currentSlide + 1))}
+              disabled={currentSlide === totalSlides - 1}
+              className="p-2 rounded-full hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
               <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                <path
+                  fillRule="evenodd"
+                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                  clipRule="evenodd"
+                />
               </svg>
-            )}
-          </button>
+            </button>
 
-          {/* Next */}
-          <button
-            onClick={() => onSlideChange(Math.min(totalSlides - 1, currentSlide + 1))}
-            disabled={currentSlide === totalSlides - 1}
-            className="p-2 rounded-full hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-            </svg>
-          </button>
+            {/* Slide counter */}
+            <div className="text-white text-sm font-medium px-3">
+              {currentSlide + 1} / {totalSlides}
+            </div>
 
-          {/* Slide counter */}
-          <div className="text-white text-sm font-medium px-3">
-            {currentSlide + 1} / {totalSlides}
+            {/* Stop */}
+            <button
+              onClick={onStop}
+              className="p-2 rounded-full hover:bg-white/10 transition-colors"
+            >
+              <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
           </div>
-
-          {/* Stop */}
-          <button
-            onClick={onStop}
-            className="p-2 rounded-full hover:bg-white/10 transition-colors"
-          >
-            <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z" clipRule="evenodd" />
-            </svg>
-          </button>
         </div>
       </div>
-    </div>
-  );
-});
+    );
+  }
+);
 
 // Presentation controls overlay
 const PresentationControls: React.FC<{
@@ -148,84 +164,86 @@ const PresentationControls: React.FC<{
   laserActive: boolean;
   annotationsVisible: boolean;
   zoomLevel: number;
-}> = React.memo(({
-  onToggleLaser,
-  onToggleAnnotations,
-  onZoomIn,
-  onZoomOut,
-  onResetZoom,
-  laserActive,
-  annotationsVisible,
-  zoomLevel,
-}) => {
-  return (
-    <div className="fixed top-8 right-8 z-50">
-      <div className="bg-black/80 backdrop-blur-md rounded-lg p-4 border border-white/20 space-y-3">
-        <div className="text-white text-sm font-medium mb-3">Presentation Tools</div>
-        
-        {/* Laser pointer */}
-        <button
-          onClick={onToggleLaser}
-          className={`w-full px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-            laserActive
-              ? 'bg-red-600 text-white'
-              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-          }`}
-        >
-          🔴 Laser Pointer
-        </button>
+}> = React.memo(
+  ({
+    onToggleLaser,
+    onToggleAnnotations,
+    onZoomIn,
+    onZoomOut,
+    onResetZoom,
+    laserActive,
+    annotationsVisible,
+    zoomLevel,
+  }) => {
+    return (
+      <div className="fixed top-8 right-8 z-50">
+        <div className="bg-black/80 backdrop-blur-md rounded-lg p-4 border border-white/20 space-y-3">
+          <div className="text-white text-sm font-medium mb-3">Presentation Tools</div>
 
-        {/* Annotations */}
-        <button
-          onClick={onToggleAnnotations}
-          className={`w-full px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-            annotationsVisible
-              ? 'bg-blue-600 text-white'
-              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-          }`}
-        >
-          📝 Annotations
-        </button>
+          {/* Laser pointer */}
+          <button
+            onClick={onToggleLaser}
+            className={`w-full px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              laserActive ? 'bg-red-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+            }`}
+          >
+            🔴 Laser Pointer
+          </button>
 
-        {/* Zoom controls */}
-        <div className="space-y-2">
-          <div className="text-white text-xs">Zoom: {(zoomLevel * 100).toFixed(0)}%</div>
-          <div className="flex space-x-1">
-            <button
-              onClick={onZoomOut}
-              className="flex-1 px-2 py-1 bg-gray-700 hover:bg-gray-600 text-white text-xs rounded transition-colors"
-            >
-              −
-            </button>
-            <button
-              onClick={onResetZoom}
-              className="flex-1 px-2 py-1 bg-gray-700 hover:bg-gray-600 text-white text-xs rounded transition-colors"
-            >
-              100%
-            </button>
-            <button
-              onClick={onZoomIn}
-              className="flex-1 px-2 py-1 bg-gray-700 hover:bg-gray-600 text-white text-xs rounded transition-colors"
-            >
-              +
-            </button>
+          {/* Annotations */}
+          <button
+            onClick={onToggleAnnotations}
+            className={`w-full px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              annotationsVisible
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+            }`}
+          >
+            📝 Annotations
+          </button>
+
+          {/* Zoom controls */}
+          <div className="space-y-2">
+            <div className="text-white text-xs">Zoom: {(zoomLevel * 100).toFixed(0)}%</div>
+            <div className="flex space-x-1">
+              <button
+                onClick={onZoomOut}
+                className="flex-1 px-2 py-1 bg-gray-700 hover:bg-gray-600 text-white text-xs rounded transition-colors"
+              >
+                −
+              </button>
+              <button
+                onClick={onResetZoom}
+                className="flex-1 px-2 py-1 bg-gray-700 hover:bg-gray-600 text-white text-xs rounded transition-colors"
+              >
+                100%
+              </button>
+              <button
+                onClick={onZoomIn}
+                className="flex-1 px-2 py-1 bg-gray-700 hover:bg-gray-600 text-white text-xs rounded transition-colors"
+              >
+                +
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  );
-});
+    );
+  }
+);
 
 // Slide content overlay
 const SlideOverlay: React.FC<{
   slide: PresentationSlide;
   isVisible: boolean;
 }> = React.memo(({ slide, isVisible }) => {
-  if (!isVisible) return null;
+  if (!isVisible) {
+    return null;
+  }
 
   return (
     <div className="fixed top-8 left-8 z-40 max-w-md">
-      <div 
+      <div
         className="bg-black/90 backdrop-blur-md rounded-lg p-6 border border-white/20 transform transition-all duration-500"
         style={{
           transform: isVisible ? 'translateY(0)' : 'translateY(-20px)',
@@ -233,7 +251,7 @@ const SlideOverlay: React.FC<{
         }}
       >
         <h2 className="text-2xl font-bold text-white mb-4">{slide.title}</h2>
-        
+
         {slide.content.annotations && slide.content.annotations.length > 0 && (
           <div className="space-y-2">
             {slide.content.annotations.map((annotation, index) => (
@@ -298,11 +316,7 @@ const ProfessionalPresentationMode: React.FC = () => {
           'Player positioning strategies',
           'Tactical advantages and weaknesses',
         ],
-        highlights: [
-          'AI-powered insights',
-          'Real-time adjustments',
-          'Professional visualization',
-        ],
+        highlights: ['AI-powered insights', 'Real-time adjustments', 'Professional visualization'],
       },
       transitions: {
         enter: 'fade',
@@ -404,7 +418,9 @@ const ProfessionalPresentationMode: React.FC = () => {
 
   // Mouse tracking for laser pointer
   useEffect(() => {
-    if (!presentationState.laserPointer) return;
+    if (!presentationState.laserPointer) {
+      return;
+    }
 
     const handleMouseMove = (e: MouseEvent) => {
       setPresentationState(prev => ({
@@ -419,14 +435,18 @@ const ProfessionalPresentationMode: React.FC = () => {
 
   // Keyboard controls
   useEffect(() => {
-    if (!presentationState.isActive) return;
+    if (!presentationState.isActive) {
+      return;
+    }
 
     const handleKeyPress = (e: KeyboardEvent) => {
       switch (e.key) {
         case 'ArrowRight':
         case ' ':
           e.preventDefault();
-          handleSlideChange(Math.min(presentationState.slides.length - 1, presentationState.currentSlide + 1));
+          handleSlideChange(
+            Math.min(presentationState.slides.length - 1, presentationState.currentSlide + 1)
+          );
           break;
         case 'ArrowLeft':
           e.preventDefault();
@@ -471,7 +491,13 @@ const ProfessionalPresentationMode: React.FC = () => {
         clearTimeout(slideTimerRef.current);
       }
     };
-  }, [presentationState.isPlaying, presentationState.autoAdvance, presentationState.currentSlide, presentationState.slideDuration, presentationState.slides.length]);
+  }, [
+    presentationState.isPlaying,
+    presentationState.autoAdvance,
+    presentationState.currentSlide,
+    presentationState.slideDuration,
+    presentationState.slides.length,
+  ]);
 
   // Control functions
   const handleSlideChange = useCallback((slideIndex: number) => {
@@ -493,7 +519,7 @@ const ProfessionalPresentationMode: React.FC = () => {
       currentSlide: 0,
       isActive: false,
     }));
-    uiDispatch({ type: 'TOGGLE_PRESENTATION_MODE' });
+    (uiDispatch as (action: { type: string }) => void)({ type: 'TOGGLE_PRESENTATION_MODE' });
   }, [uiDispatch]);
 
   const handleToggleLaser = useCallback(() => {
@@ -544,7 +570,7 @@ const ProfessionalPresentationMode: React.FC = () => {
   const currentSlide = presentationState.slides[presentationState.currentSlide];
 
   return (
-    <div 
+    <div
       ref={presentationRef}
       className="fixed inset-0 bg-black z-50"
       style={{
@@ -591,11 +617,21 @@ const ProfessionalPresentationMode: React.FC = () => {
       <div className="fixed bottom-8 left-8 z-40">
         <div className="bg-black/50 backdrop-blur-md rounded-lg p-3 border border-white/20">
           <div className="text-white text-xs space-y-1">
-            <div><kbd className="bg-gray-700 px-1 rounded">→</kbd> Next slide</div>
-            <div><kbd className="bg-gray-700 px-1 rounded">←</kbd> Previous slide</div>
-            <div><kbd className="bg-gray-700 px-1 rounded">L</kbd> Laser pointer</div>
-            <div><kbd className="bg-gray-700 px-1 rounded">F</kbd> Fullscreen</div>
-            <div><kbd className="bg-gray-700 px-1 rounded">ESC</kbd> Exit</div>
+            <div>
+              <kbd className="bg-gray-700 px-1 rounded">→</kbd> Next slide
+            </div>
+            <div>
+              <kbd className="bg-gray-700 px-1 rounded">←</kbd> Previous slide
+            </div>
+            <div>
+              <kbd className="bg-gray-700 px-1 rounded">L</kbd> Laser pointer
+            </div>
+            <div>
+              <kbd className="bg-gray-700 px-1 rounded">F</kbd> Fullscreen
+            </div>
+            <div>
+              <kbd className="bg-gray-700 px-1 rounded">ESC</kbd> Exit
+            </div>
           </div>
         </div>
       </div>

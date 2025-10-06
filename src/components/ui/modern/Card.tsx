@@ -42,7 +42,7 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
         {children}
       </div>
     );
-  },
+  }
 );
 
 Card.displayName = 'Card';
@@ -70,7 +70,7 @@ export const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
         {children}
       </div>
     );
-  },
+  }
 );
 
 CardHeader.displayName = 'CardHeader';
@@ -94,7 +94,7 @@ export const CardBody = forwardRef<HTMLDivElement, CardBodyProps>(
         {children}
       </div>
     );
-  },
+  }
 );
 
 CardBody.displayName = 'CardBody';
@@ -122,7 +122,7 @@ export const CardFooter = forwardRef<HTMLDivElement, CardFooterProps>(
         {children}
       </div>
     );
-  },
+  }
 );
 
 CardFooter.displayName = 'CardFooter';
@@ -178,7 +178,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
   const overall = player.attributes
     ? Math.round(
         Object.values(player.attributes).reduce((a, b) => a + b, 0) /
-          Object.keys(player.attributes).length,
+          Object.keys(player.attributes).length
       )
     : 0;
 
@@ -188,7 +188,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
       className={cn(
         'relative group animate-fade-in-scale',
         isSelected && 'ring-2 ring-primary-500/50 bg-primary-900/20',
-        className,
+        className
       )}
       onClick={onSelect}
       {...props}
@@ -217,8 +217,11 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
               {player.nationality && (
                 <img
                   src={`https://flagcdn.com/w20/${player.nationality.toLowerCase()}.png`}
+                  srcSet={`https://flagcdn.com/w20/${player.nationality.toLowerCase()}.png 1x, https://flagcdn.com/w40/${player.nationality.toLowerCase()}.png 2x`}
                   alt={player.nationality}
                   className="w-4 h-auto rounded-sm"
+                  loading="lazy"
+                  decoding="async"
                   onError={e => (e.currentTarget.style.display = 'none')}
                 />
               )}
@@ -245,7 +248,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
             <div
               className={cn(
                 'w-2 h-2 rounded-full',
-                getStatusColor(player.availability?.status || ''),
+                getStatusColor(player.availability?.status || '')
               )}
             />
             <span className="text-xs text-secondary-400 capitalize">

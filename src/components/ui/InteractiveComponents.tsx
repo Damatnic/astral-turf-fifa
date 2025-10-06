@@ -2,9 +2,7 @@ import React, { useState, useRef } from 'react';
 import { motion, useMotionValue, useTransform, useSpring } from 'framer-motion';
 
 // Define our own HTMLMotionProps equivalent since it's not exported in v12+
-type HTMLMotionProps<T extends keyof React.JSX.IntrinsicElements> = React.ComponentProps<
-  (typeof motion)[T]
->;
+type HTMLMotionProps<T extends keyof React.JSX.IntrinsicElements> = any;
 import { useTheme } from '../../context/ThemeContext';
 
 // Enhanced Button Component
@@ -199,7 +197,9 @@ export const EnhancedCard: React.FC<EnhancedCardProps> = ({
       boxShadow: 'none',
     },
     glass: {
-      backgroundColor: theme.isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.7)',
+      backgroundColor: (theme as any).isDark
+        ? 'rgba(255, 255, 255, 0.05)'
+        : 'rgba(255, 255, 255, 0.7)',
       border: `1px solid ${theme.colors.border.secondary}`,
       backdropFilter: 'blur(10px)',
       boxShadow: tokens.shadows.sm,
@@ -337,7 +337,7 @@ export const EnhancedInput: React.FC<EnhancedInputProps> = ({
         )}
 
         <motion.input
-          {...props}
+          {...(props as any)}
           style={{
             ...sizeStyles[size],
             ...variantStyles[variant],
@@ -527,7 +527,7 @@ export const EnhancedTooltip: React.FC<EnhancedTooltipProps> = ({
 
   const handleMouseLeave = () => {
     if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
+      clearTimeout(timeoutRef.current as any);
     }
     setIsVisible(false);
   };

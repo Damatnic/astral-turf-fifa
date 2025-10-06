@@ -25,18 +25,18 @@ const FieldMarkings: React.FC<FieldMarkingsProps> = ({ showGrid, viewMode }) => 
         </filter>
 
         <filter id="fieldLineGlow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="0.8" result="coloredBlur"/>
+          <feGaussianBlur stdDeviation="0.8" result="coloredBlur" />
           <feMerge>
-            <feMergeNode in="coloredBlur"/>
-            <feMergeNode in="SourceGraphic"/>
+            <feMergeNode in="coloredBlur" />
+            <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
 
         <filter id="centerSpotGlow" x="-100%" y="-100%" width="300%" height="300%">
-          <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+          <feGaussianBlur stdDeviation="1.5" result="coloredBlur" />
           <feMerge>
-            <feMergeNode in="coloredBlur"/>
-            <feMergeNode in="SourceGraphic"/>
+            <feMergeNode in="coloredBlur" />
+            <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
       </defs>

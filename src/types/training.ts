@@ -70,3 +70,24 @@ export interface YouthAcademy {
   prospects: unknown[]; // YouthProspect[] when player types are imported
   lastGeneratedWeek: number;
 }
+
+// Youth development programs
+export interface YouthDevelopmentProgram {
+  id: string;
+  name: string;
+  description: string;
+  duration: number; // Weeks
+  cost: number; // Currency
+  benefits: {
+    technical?: number;
+    physical?: number;
+    mental?: number;
+    tactical?: number;
+    [key: string]: number | undefined;
+  };
+  requirements: {
+    academyLevel: number;
+    age: [number, number]; // Min and max age
+    minimumPotential?: number;
+  };
+}

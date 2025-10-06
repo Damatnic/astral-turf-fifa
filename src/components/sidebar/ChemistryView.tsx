@@ -27,7 +27,7 @@ const ChemistryView: React.FC<ChemistryViewProps> = ({ team }) => {
   const chemistryPairs = useMemo(() => {
     try {
       const pairs: { p1: string; p2: string; score: number; relationship?: string }[] = [];
-      
+
       if (!Array.isArray(teamPlayers) || teamPlayers.length === 0) {
         return [];
       }
@@ -36,7 +36,7 @@ const ChemistryView: React.FC<ChemistryViewProps> = ({ team }) => {
         for (let j = i + 1; j < teamPlayers.length; j++) {
           const p1 = teamPlayers[i];
           const p2 = teamPlayers[j];
-          
+
           if (!p1 || !p2 || !p1.name || !p2.name) {
             continue;
           }
@@ -46,7 +46,7 @@ const ChemistryView: React.FC<ChemistryViewProps> = ({ team }) => {
             p2,
             chemistry,
             relationships,
-            mentoringGroups?.[team],
+            mentoringGroups?.[team]
           );
           const relationship = relationships?.[p1.id]?.[p2.id] || relationships?.[p2.id]?.[p1.id];
 
@@ -71,7 +71,9 @@ const ChemistryView: React.FC<ChemistryViewProps> = ({ team }) => {
   }, [teamPlayers, chemistry, relationships, mentoringGroups, team]);
 
   const top5 = Array.isArray(chemistryPairs) ? chemistryPairs.slice(0, 5).filter(Boolean) : [];
-  const bottom5 = Array.isArray(chemistryPairs) ? chemistryPairs.slice(-5).reverse().filter(Boolean) : [];
+  const bottom5 = Array.isArray(chemistryPairs)
+    ? chemistryPairs.slice(-5).reverse().filter(Boolean)
+    : [];
 
   const RelationshipIcon: React.FC<{ type?: string }> = ({ type }) => {
     if (type === 'friendship') {
@@ -88,53 +90,61 @@ const ChemistryView: React.FC<ChemistryViewProps> = ({ team }) => {
       <div>
         <h4 className="font-bold text-green-400 mb-2">Top 5 Chemistry Links</h4>
         <div className="space-y-1">
-          {top5.map((pair, i) => {
-            if (!pair || typeof pair !== 'object') return null;
-            const p1Name = pair.p1 || 'Unknown Player';
-            const p2Name = pair.p2 || 'Unknown Player';
-            const score = pair.score || 0;
-            
-            return (
-              <div
-                key={`top-${i}-${p1Name}-${p2Name}`}
-                className="flex items-center justify-between text-sm p-1 bg-gray-700/50 rounded"
-              >
-                <div className="flex items-center truncate">
-                  <RelationshipIcon type={pair.relationship || undefined} />
-                  <span className="ml-1.5 truncate" title={`${p1Name} & ${p2Name}`}>
-                    {p1Name} & {p2Name}
-                  </span>
+          {top5
+            .map((pair, i) => {
+              if (!pair || typeof pair !== 'object') {
+                return null;
+              }
+              const p1Name = pair.p1 || 'Unknown Player';
+              const p2Name = pair.p2 || 'Unknown Player';
+              const score = pair.score || 0;
+
+              return (
+                <div
+                  key={`top-${i}-${p1Name}-${p2Name}`}
+                  className="flex items-center justify-between text-sm p-1 bg-gray-700/50 rounded"
+                >
+                  <div className="flex items-center truncate">
+                    <RelationshipIcon type={pair.relationship || undefined} />
+                    <span className="ml-1.5 truncate" title={`${p1Name} & ${p2Name}`}>
+                      {p1Name} & {p2Name}
+                    </span>
+                  </div>
+                  <span className="font-bold text-green-300">{score}</span>
                 </div>
-                <span className="font-bold text-green-300">{score}</span>
-              </div>
-            );
-          }).filter(Boolean)}
+              );
+            })
+            .filter(Boolean)}
         </div>
       </div>
       <div>
         <h4 className="font-bold text-red-400 mb-2">Bottom 5 Chemistry Links</h4>
         <div className="space-y-1">
-          {bottom5.map((pair, i) => {
-            if (!pair || typeof pair !== 'object') return null;
-            const p1Name = pair.p1 || 'Unknown Player';
-            const p2Name = pair.p2 || 'Unknown Player';
-            const score = pair.score || 0;
-            
-            return (
-              <div
-                key={`bottom-${i}-${p1Name}-${p2Name}`}
-                className="flex items-center justify-between text-sm p-1 bg-gray-700/50 rounded"
-              >
-                <div className="flex items-center truncate">
-                  <RelationshipIcon type={pair.relationship || undefined} />
-                  <span className="ml-1.5 truncate" title={`${p1Name} & ${p2Name}`}>
-                    {p1Name} & {p2Name}
-                  </span>
+          {bottom5
+            .map((pair, i) => {
+              if (!pair || typeof pair !== 'object') {
+                return null;
+              }
+              const p1Name = pair.p1 || 'Unknown Player';
+              const p2Name = pair.p2 || 'Unknown Player';
+              const score = pair.score || 0;
+
+              return (
+                <div
+                  key={`bottom-${i}-${p1Name}-${p2Name}`}
+                  className="flex items-center justify-between text-sm p-1 bg-gray-700/50 rounded"
+                >
+                  <div className="flex items-center truncate">
+                    <RelationshipIcon type={pair.relationship || undefined} />
+                    <span className="ml-1.5 truncate" title={`${p1Name} & ${p2Name}`}>
+                      {p1Name} & {p2Name}
+                    </span>
+                  </div>
+                  <span className="font-bold text-red-300">{score}</span>
                 </div>
-                <span className="font-bold text-red-300">{score}</span>
-              </div>
-            );
-          }).filter(Boolean)}
+              );
+            })
+            .filter(Boolean)}
         </div>
       </div>
     </div>

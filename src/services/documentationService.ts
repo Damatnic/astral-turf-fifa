@@ -1,6 +1,6 @@
 /**
  * Documentation Service
- * 
+ *
  * Provides searchable documentation system with version control,
  * content management, and analytics for the Astral Turf application.
  */
@@ -29,15 +29,15 @@ export const DocumentationSchema = z.object({
     helpful: z.number(),
     comments: z.number(),
     lastViewed: z.string().optional(),
-    bookmarked: z.boolean().optional()
-  })
+    bookmarked: z.boolean().optional(),
+  }),
 });
 
 export const SearchResultSchema = z.object({
   document: DocumentationSchema,
   relevance: z.number(),
   matchedTerms: z.array(z.string()),
-  excerpt: z.string()
+  excerpt: z.string(),
 });
 
 export const VersionSchema = z.object({
@@ -45,7 +45,7 @@ export const VersionSchema = z.object({
   timestamp: z.string(),
   author: z.string(),
   changes: z.array(z.string()),
-  content: z.string()
+  content: z.string(),
 });
 
 export const AnalyticsSchema = z.object({
@@ -53,7 +53,7 @@ export const AnalyticsSchema = z.object({
   event: z.enum(['view', 'search', 'helpful', 'bookmark', 'share', 'comment']),
   timestamp: z.string(),
   userId: z.string().optional(),
-  metadata: z.record(z.any()).optional()
+  metadata: z.record(z.any()).optional(),
 });
 
 export type Documentation = z.infer<typeof DocumentationSchema>;
@@ -180,7 +180,14 @@ Ready to begin your tactical journey? Let's create something amazing!`,
         lastUpdated: new Date().toISOString(),
         author: 'Astral Turf Team',
         status: 'published',
-        searchTerms: ['getting started', 'introduction', 'basics', 'tutorial', 'quickstart', 'first time'],
+        searchTerms: [
+          'getting started',
+          'introduction',
+          'basics',
+          'tutorial',
+          'quickstart',
+          'first time',
+        ],
         relatedDocs: ['tactical-board-guide', 'player-management', 'ai-analysis'],
         difficulty: 'beginner',
         estimatedReadTime: 8,
@@ -191,8 +198,8 @@ Ready to begin your tactical journey? Let's create something amazing!`,
           helpful: 1231,
           comments: 45,
           lastViewed: new Date().toISOString(),
-          bookmarked: false
-        }
+          bookmarked: false,
+        },
       },
       {
         id: 'tactical-board-guide',
@@ -329,8 +336,8 @@ Master these concepts and you'll be creating professional-level tactics in no ti
           helpful: 1089,
           comments: 67,
           lastViewed: new Date().toISOString(),
-          bookmarked: false
-        }
+          bookmarked: false,
+        },
       },
       {
         id: 'api-reference',
@@ -522,21 +529,23 @@ Check our [GitHub repository](https://github.com/astral-turf/examples) for compl
           helpful: 654,
           comments: 23,
           lastViewed: new Date().toISOString(),
-          bookmarked: false
-        }
-      }
+          bookmarked: false,
+        },
+      },
     ];
 
     sampleDocs.forEach(doc => {
       this.documents.set(doc.id, doc);
       // Initialize version history
-      this.versions.set(doc.id, [{
-        version: doc.version,
-        timestamp: doc.lastUpdated,
-        author: doc.author,
-        changes: ['Initial version'],
-        content: doc.content
-      }]);
+      this.versions.set(doc.id, [
+        {
+          version: doc.version,
+          timestamp: doc.lastUpdated,
+          author: doc.author,
+          changes: ['Initial version'],
+          content: doc.content,
+        },
+      ]);
     });
   }
 
@@ -545,20 +554,18 @@ Check our [GitHub repository](https://github.com/astral-turf/examples) for compl
    */
   private buildSearchIndex(): void {
     this.searchIndex.clear();
-    
-    this.documents.forEach((doc) => {
+
+    this.documents.forEach(doc => {
       // Index title, content, and search terms
-      const allText = [
-        doc.title,
-        doc.content,
-        ...doc.searchTerms,
-        ...doc.tags
-      ].join(' ').toLowerCase();
+      const allText = [doc.title, doc.content, ...doc.searchTerms, ...doc.tags]
+        .join(' ')
+        .toLowerCase();
 
       // Extract words and create index
       const words = allText.match(/\w+/g) || [];
       words.forEach(word => {
-        if (word.length > 2) { // Ignore very short words
+        if (word.length > 2) {
+          // Ignore very short words
           if (!this.searchIndex.has(word)) {
             this.searchIndex.set(word, new Set());
           }
@@ -580,7 +587,7 @@ Check our [GitHub repository](https://github.com/astral-turf/examples) for compl
       limit = 20,
       offset = 0,
       sortBy = 'relevance',
-      sortOrder = 'desc'
+      sortOrder = 'desc',
     } = options;
 
     // Track search analytics
@@ -588,15 +595,15 @@ Check our [GitHub repository](https://github.com/astral-turf/examples) for compl
       documentId: '',
       event: 'search',
       timestamp: new Date().toISOString(),
-      metadata: { query, categories, tags, difficulty }
+      metadata: { query, categories, tags, difficulty },
     });
 
-    let candidateIds = new Set<string>();
+    const candidateIds = new Set<string>();
 
     if (query.trim()) {
       // Text search
       const queryWords = query.toLowerCase().match(/\w+/g) || [];
-      
+
       queryWords.forEach(word => {
         if (this.searchIndex.has(word)) {
           this.searchIndex.get(word)!.forEach(id => candidateIds.add(id));
@@ -611,9 +618,15 @@ Check our [GitHub repository](https://github.com/astral-turf/examples) for compl
     const filteredDocs = Array.from(candidateIds)
       .map(id => this.documents.get(id)!)
       .filter(doc => {
-        if (categories.length > 0 && !categories.includes(doc.category)) return false;
-        if (tags.length > 0 && !tags.some(tag => doc.tags.includes(tag))) return false;
-        if (difficulty.length > 0 && !difficulty.includes(doc.difficulty)) return false;
+        if (categories.length > 0 && !categories.includes(doc.category)) {
+          return false;
+        }
+        if (tags.length > 0 && !tags.some(tag => doc.tags.includes(tag))) {
+          return false;
+        }
+        if (difficulty.length > 0 && !difficulty.includes(doc.difficulty)) {
+          return false;
+        }
         return doc.status === 'published';
       });
 
@@ -627,21 +640,21 @@ Check our [GitHub repository](https://github.com/astral-turf/examples) for compl
         document: doc,
         relevance,
         matchedTerms,
-        excerpt
+        excerpt,
       };
     });
 
     // Sort results
     results.sort((a, b) => {
       let comparison = 0;
-      
+
       switch (sortBy) {
         case 'relevance':
           comparison = b.relevance - a.relevance;
           break;
         case 'date':
-          comparison = new Date(b.document.lastUpdated).getTime() - 
-                      new Date(a.document.lastUpdated).getTime();
+          comparison =
+            new Date(b.document.lastUpdated).getTime() - new Date(a.document.lastUpdated).getTime();
           break;
         case 'popularity':
           comparison = b.document.popularity - a.document.popularity;
@@ -650,7 +663,7 @@ Check our [GitHub repository](https://github.com/astral-turf/examples) for compl
           comparison = b.document.rating - a.document.rating;
           break;
       }
-      
+
       return sortOrder === 'desc' ? comparison : -comparison;
     });
 
@@ -662,7 +675,9 @@ Check our [GitHub repository](https://github.com/astral-turf/examples) for compl
    * Calculate relevance score for search ranking
    */
   private calculateRelevance(doc: Documentation, query: string): number {
-    if (!query.trim()) return doc.popularity / 100;
+    if (!query.trim()) {
+      return doc.popularity / 100;
+    }
 
     const queryWords = query.toLowerCase().match(/\w+/g) || [];
     let score = 0;
@@ -672,25 +687,25 @@ Check our [GitHub repository](https://github.com/astral-turf/examples) for compl
       if (doc.title.toLowerCase().includes(word)) {
         score += 10;
       }
-      
+
       // Search terms matches
       if (doc.searchTerms.some(term => term.toLowerCase().includes(word))) {
         score += 8;
       }
-      
+
       // Tags matches
       if (doc.tags.some(tag => tag.toLowerCase().includes(word))) {
         score += 6;
       }
-      
+
       // Content matches
       const contentMatches = (doc.content.toLowerCase().match(new RegExp(word, 'g')) || []).length;
       score += Math.min(contentMatches * 0.5, 5); // Cap content score
     });
 
     // Boost by popularity and rating
-    score *= (1 + doc.popularity / 100);
-    score *= (1 + doc.rating / 5);
+    score *= 1 + doc.popularity / 100;
+    score *= 1 + doc.rating / 5;
 
     return score;
   }
@@ -705,16 +720,14 @@ Check our [GitHub repository](https://github.com/astral-turf/examples) for compl
 
     const queryWords = query.toLowerCase().match(/\w+/g) || [];
     const sentences = content.split(/[.!?]+/);
-    
+
     // Find sentence with most query word matches
     let bestSentence = sentences[0] || '';
     let maxMatches = 0;
 
     sentences.forEach(sentence => {
-      const matches = queryWords.filter(word => 
-        sentence.toLowerCase().includes(word)
-      ).length;
-      
+      const matches = queryWords.filter(word => sentence.toLowerCase().includes(word)).length;
+
       if (matches > maxMatches) {
         maxMatches = matches;
         bestSentence = sentence;
@@ -737,9 +750,15 @@ Check our [GitHub repository](https://github.com/astral-turf/examples) for compl
     const matched: string[] = [];
 
     queryWords.forEach(word => {
-      if (doc.title.toLowerCase().includes(word)) matched.push(word);
-      if (doc.searchTerms.some(term => term.toLowerCase().includes(word))) matched.push(word);
-      if (doc.tags.some(tag => tag.toLowerCase().includes(word))) matched.push(word);
+      if (doc.title.toLowerCase().includes(word)) {
+        matched.push(word);
+      }
+      if (doc.searchTerms.some(term => term.toLowerCase().includes(word))) {
+        matched.push(word);
+      }
+      if (doc.tags.some(tag => tag.toLowerCase().includes(word))) {
+        matched.push(word);
+      }
     });
 
     return [...new Set(matched)]; // Remove duplicates
@@ -755,9 +774,9 @@ Check our [GitHub repository](https://github.com/astral-turf/examples) for compl
       this.trackEvent({
         documentId: id,
         event: 'view',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
-      
+
       // Update view count
       doc.metadata.views++;
       doc.metadata.lastViewed = new Date().toISOString();
@@ -777,7 +796,9 @@ Check our [GitHub repository](https://github.com/astral-turf/examples) for compl
    */
   async getRelatedDocuments(id: string, limit: number = 5): Promise<Documentation[]> {
     const doc = this.documents.get(id);
-    if (!doc) return [];
+    if (!doc) {
+      return [];
+    }
 
     const related = doc.relatedDocs
       .map(relatedId => this.documents.get(relatedId))
@@ -813,17 +834,21 @@ Check our [GitHub repository](https://github.com/astral-turf/examples) for compl
   async getDocumentVersion(id: string, version: string): Promise<Documentation | null> {
     const versions = this.versions.get(id) || [];
     const versionData = versions.find(v => v.version === version);
-    
-    if (!versionData) return null;
+
+    if (!versionData) {
+      return null;
+    }
 
     const doc = this.documents.get(id);
-    if (!doc) return null;
+    if (!doc) {
+      return null;
+    }
 
     return {
       ...doc,
       content: versionData.content,
       version: versionData.version,
-      lastUpdated: versionData.timestamp
+      lastUpdated: versionData.timestamp,
     };
   }
 
@@ -832,7 +857,9 @@ Check our [GitHub repository](https://github.com/astral-turf/examples) for compl
    */
   async updateDocument(id: string, updates: Partial<Documentation>): Promise<boolean> {
     const doc = this.documents.get(id);
-    if (!doc) return false;
+    if (!doc) {
+      return false;
+    }
 
     // Create new version if content changed
     if (updates.content && updates.content !== doc.content) {
@@ -842,7 +869,7 @@ Check our [GitHub repository](https://github.com/astral-turf/examples) for compl
         timestamp: new Date().toISOString(),
         author: updates.author || 'System',
         changes: ['Content updated'],
-        content: updates.content
+        content: updates.content,
       };
       versions.push(newVersion);
       this.versions.set(id, versions);
@@ -870,7 +897,9 @@ Check our [GitHub repository](https://github.com/astral-turf/examples) for compl
    */
   async markHelpful(id: string, helpful: boolean): Promise<boolean> {
     const doc = this.documents.get(id);
-    if (!doc) return false;
+    if (!doc) {
+      return false;
+    }
 
     if (helpful) {
       doc.metadata.helpful++;
@@ -880,7 +909,7 @@ Check our [GitHub repository](https://github.com/astral-turf/examples) for compl
       documentId: id,
       event: 'helpful',
       timestamp: new Date().toISOString(),
-      metadata: { helpful }
+      metadata: { helpful },
     });
 
     return true;
@@ -891,7 +920,9 @@ Check our [GitHub repository](https://github.com/astral-turf/examples) for compl
    */
   async bookmarkDocument(id: string): Promise<boolean> {
     const doc = this.documents.get(id);
-    if (!doc) return false;
+    if (!doc) {
+      return false;
+    }
 
     this.bookmarks.add(id);
     doc.metadata.bookmarked = true;
@@ -899,7 +930,7 @@ Check our [GitHub repository](https://github.com/astral-turf/examples) for compl
     this.trackEvent({
       documentId: id,
       event: 'bookmark',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
 
     return true;
@@ -917,10 +948,10 @@ Check our [GitHub repository](https://github.com/astral-turf/examples) for compl
   /**
    * Get analytics data
    */
-  async getAnalytics(filters?: { 
-    documentId?: string; 
-    event?: string; 
-    dateRange?: { start: string; end: string } 
+  async getAnalytics(filters?: {
+    documentId?: string;
+    event?: string;
+    dateRange?: { start: string; end: string };
   }): Promise<Analytics[]> {
     let results = this.analytics;
 
@@ -932,9 +963,8 @@ Check our [GitHub repository](https://github.com/astral-turf/examples) for compl
         results = results.filter(a => a.event === filters.event);
       }
       if (filters.dateRange) {
-        results = results.filter(a => 
-          a.timestamp >= filters.dateRange!.start && 
-          a.timestamp <= filters.dateRange!.end
+        results = results.filter(
+          a => a.timestamp >= filters.dateRange!.start && a.timestamp <= filters.dateRange!.end
         );
       }
     }
@@ -967,7 +997,7 @@ Check our [GitHub repository](https://github.com/astral-turf/examples) for compl
    */
   async getCategories(): Promise<Array<{ category: string; count: number }>> {
     const categories = new Map<string, number>();
-    
+
     this.documents.forEach(doc => {
       if (doc.status === 'published') {
         categories.set(doc.category, (categories.get(doc.category) || 0) + 1);
@@ -976,7 +1006,7 @@ Check our [GitHub repository](https://github.com/astral-turf/examples) for compl
 
     return Array.from(categories.entries()).map(([category, count]) => ({
       category,
-      count
+      count,
     }));
   }
 
@@ -985,7 +1015,7 @@ Check our [GitHub repository](https://github.com/astral-turf/examples) for compl
    */
   async exportDocumentation(format: 'json' | 'markdown' = 'json'): Promise<string> {
     const docs = Array.from(this.documents.values());
-    
+
     if (format === 'json') {
       return JSON.stringify(docs, null, 2);
     } else {

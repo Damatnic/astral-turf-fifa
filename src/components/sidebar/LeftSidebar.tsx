@@ -114,9 +114,12 @@ const PlayerListItem: React.FC<PlayerListItemProps> = React.memo(
             {player.nationality && (
               <img
                 src={`https://flagcdn.com/w20/${player.nationality.toLowerCase()}.png`}
+                srcSet={`https://flagcdn.com/w20/${player.nationality.toLowerCase()}.png 1x, https://flagcdn.com/w40/${player.nationality.toLowerCase()}.png 2x`}
                 alt={player.nationality}
                 className="w-5 h-auto mr-1.5 rounded-sm"
                 title={player.nationality}
+                loading="lazy"
+                decoding="async"
                 onError={e => (e.currentTarget.style.display = 'none')}
               />
             )}
@@ -160,7 +163,7 @@ const PlayerListItem: React.FC<PlayerListItemProps> = React.memo(
         </div>
       </li>
     );
-  },
+  }
 );
 
 const CreatePlaybookItemForm: React.FC<{
@@ -240,7 +243,7 @@ export const LeftSidebar: React.FC = () => {
 
   const playersInContext = useMemo(
     () => players.filter(p => activeTeamContext === 'both' || p.team === activeTeamContext),
-    [players, activeTeamContext],
+    [players, activeTeamContext]
   );
 
   const sortedPlayers = useMemo(() => {
@@ -283,7 +286,7 @@ export const LeftSidebar: React.FC = () => {
       const step = item?.steps[activeStepIndex];
       if (step) {
         return new Set(
-          Object.keys(step.playerPositions).filter(pId => step.playerPositions[pId].x > -1),
+          Object.keys(step.playerPositions).filter(pId => step.playerPositions[pId].x > -1)
         );
       }
     }
@@ -311,11 +314,11 @@ export const LeftSidebar: React.FC = () => {
 
   const onFieldPlayers = useMemo(
     () => sortedPlayers.filter(p => playersOnFieldIds.has(p.id)),
-    [sortedPlayers, playersOnFieldIds],
+    [sortedPlayers, playersOnFieldIds]
   );
   const benchedPlayers = useMemo(
     () => sortedPlayers.filter(p => !playersOnFieldIds.has(p.id)),
-    [sortedPlayers, playersOnFieldIds],
+    [sortedPlayers, playersOnFieldIds]
   );
 
   const handleFormationChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -381,7 +384,7 @@ export const LeftSidebar: React.FC = () => {
       const playersForSuggestion = players.filter(p => p.team === activeTeam);
       const suggestion = await getAIFormationSuggestion(
         playersForSuggestion,
-        settings.aiPersonality,
+        settings.aiPersonality
       );
       uiDispatch({ type: 'SUGGEST_FORMATION_SUCCESS', payload: suggestion });
     } catch (_error) {
@@ -407,7 +410,7 @@ export const LeftSidebar: React.FC = () => {
         (acc[item.category] = acc[item.category] || []).push(item);
         return acc;
       },
-      {} as Record<PlayCategory, PlaybookItem[]>,
+      {} as Record<PlayCategory, PlaybookItem[]>
     );
   }, [playbook]);
 
@@ -446,7 +449,7 @@ export const LeftSidebar: React.FC = () => {
                   'text-white text-sm font-medium',
                   'focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500',
                   'disabled:bg-secondary-800 disabled:cursor-not-allowed disabled:opacity-50',
-                  'transition-all duration-200',
+                  'transition-all duration-200'
                 )}
               >
                 {Object.keys(formations).map(name => (
@@ -658,7 +661,7 @@ export const LeftSidebar: React.FC = () => {
                   'p-2 text-sm bg-secondary-700/50 border border-secondary-600/50 rounded-lg',
                   'text-white font-medium',
                   'focus:outline-none focus:ring-2 focus:ring-primary-500/50',
-                  'transition-all duration-200',
+                  'transition-all duration-200'
                 )}
               >
                 <option value="name" className="bg-secondary-800">
@@ -684,7 +687,7 @@ export const LeftSidebar: React.FC = () => {
                       'px-2 py-1 text-xs font-medium rounded-md border transition-all duration-200',
                       rosterRoleFilters.includes(role)
                         ? 'bg-primary-500 border-primary-400 text-white shadow-glow-primary'
-                        : 'bg-secondary-700/50 border-secondary-600/50 text-secondary-300 hover:bg-primary-500/20 hover:border-primary-500/50',
+                        : 'bg-secondary-700/50 border-secondary-600/50 text-secondary-300 hover:bg-primary-500/20 hover:border-primary-500/50'
                     )}
                   >
                     {role}

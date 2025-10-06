@@ -61,14 +61,20 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
 }) => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
-  const [coachingRecommendations, setCoachingRecommendations] = useState<CoachingRecommendation[]>([]);
-  const [chatMessages, setChatMessages] = useState<Array<{id: string, type: 'user' | 'ai', content: string}>>([]);
+  const [coachingRecommendations, setCoachingRecommendations] = useState<CoachingRecommendation[]>(
+    []
+  );
+  const [chatMessages, setChatMessages] = useState<
+    Array<{ id: string; type: 'user' | 'ai'; content: string }>
+  >([]);
   const [chatInput, setChatInput] = useState('');
   const [activeTab, setActiveTab] = useState<'analysis' | 'coaching' | 'chat'>('coaching');
 
   // Generate AI coaching recommendations
   const generateCoachingRecommendations = useCallback(async () => {
-    if (!currentFormation || players.length === 0) {return;}
+    if (!currentFormation || players.length === 0) {
+      return;
+    }
 
     setIsAnalyzing(true);
 
@@ -79,7 +85,7 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
         {
           gamePhase: 'mid',
           gameState: 'normal',
-        },
+        }
       );
 
       setCoachingRecommendations(recommendations);
@@ -92,7 +98,9 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
 
   // Analyze current formation (legacy)
   const analyzeFormation = useCallback(async () => {
-    if (!currentFormation) {return;}
+    if (!currentFormation) {
+      return;
+    }
 
     setIsAnalyzing(true);
 
@@ -105,7 +113,7 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
 
     // Generate analysis based on formation structure
     const analysis: AnalysisResult = {
-      overallRating: Math.round(65 + (completeness * 30) + Math.random() * 10),
+      overallRating: Math.round(65 + completeness * 30 + Math.random() * 10),
       strengths: [
         'Good positional balance',
         'Strong midfield presence',
@@ -137,7 +145,8 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
           id: 'tactical-adjustment',
           type: 'tactical',
           title: 'Tactical Weakness Detected',
-          description: 'Your right flank appears vulnerable to attacks. Consider defensive reinforcement.',
+          description:
+            'Your right flank appears vulnerable to attacks. Consider defensive reinforcement.',
           confidence: 91,
           priority: 'high',
         },
@@ -160,7 +169,9 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
 
   // Handle chat message sending
   const handleSendMessage = useCallback(() => {
-    if (!chatInput.trim()) {return;}
+    if (!chatInput.trim()) {
+      return;
+    }
 
     const userMessage = {
       id: Date.now().toString(),
@@ -189,9 +200,9 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
     if (lowerInput.includes('formation')) {
       return "Based on your current setup, I'd recommend maintaining the 4-3-3 structure but adjusting the midfield positioning for better ball retention. The wide forwards should track back more to help with defensive transitions.";
     } else if (lowerInput.includes('player') || lowerInput.includes('position')) {
-      return "I notice some positional imbalances. Your central midfielder would be more effective in a slightly deeper role, allowing for better distribution and defensive coverage.";
+      return 'I notice some positional imbalances. Your central midfielder would be more effective in a slightly deeper role, allowing for better distribution and defensive coverage.';
     } else if (lowerInput.includes('attack')) {
-      return "To improve your attacking threat, consider overlapping runs from your fullbacks and having your wingers cut inside more frequently. This will create numerical advantages in central areas.";
+      return 'To improve your attacking threat, consider overlapping runs from your fullbacks and having your wingers cut inside more frequently. This will create numerical advantages in central areas.';
     } else if (lowerInput.includes('defense')) {
       return "Your defensive line looks solid, but I'd suggest a higher press from your forwards to regain possession earlier. Also, ensure your midfielders are covering the spaces behind when fullbacks advance.";
     } else {
@@ -200,21 +211,36 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
   }, []);
 
   // Suggestion priority icons
-  const getSuggestionIcon = useCallback((type: Suggestion['type'], priority: Suggestion['priority']) => {
-    if (priority === 'high') {return AlertTriangle;}
-    if (type === 'formation') {return Target;}
-    if (type === 'player') {return Zap;}
-    if (type === 'tactical') {return TrendingUp;}
-    return Lightbulb;
-  }, []);
+  const getSuggestionIcon = useCallback(
+    (type: Suggestion['type'], priority: Suggestion['priority']) => {
+      if (priority === 'high') {
+        return AlertTriangle;
+      }
+      if (type === 'formation') {
+        return Target;
+      }
+      if (type === 'player') {
+        return Zap;
+      }
+      if (type === 'tactical') {
+        return TrendingUp;
+      }
+      return Lightbulb;
+    },
+    []
+  );
 
   // Suggestion priority colors
   const getSuggestionColor = useCallback((priority: Suggestion['priority']) => {
     switch (priority) {
-      case 'high': return 'text-red-400 bg-red-900/20 border-red-500/30';
-      case 'medium': return 'text-yellow-400 bg-yellow-900/20 border-yellow-500/30';
-      case 'low': return 'text-blue-400 bg-blue-900/20 border-blue-500/30';
-      default: return 'text-gray-400 bg-gray-900/20 border-gray-500/30';
+      case 'high':
+        return 'text-red-400 bg-red-900/20 border-red-500/30';
+      case 'medium':
+        return 'text-yellow-400 bg-yellow-900/20 border-yellow-500/30';
+      case 'low':
+        return 'text-blue-400 bg-blue-900/20 border-blue-500/30';
+      default:
+        return 'text-gray-400 bg-gray-900/20 border-gray-500/30';
     }
   }, []);
 
@@ -225,7 +251,7 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
-        onClick={(e) => e.target === e.currentTarget && onClose()}
+        onClick={e => e.target === e.currentTarget && onClose()}
       >
         <motion.div
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -241,7 +267,9 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
               </div>
               <div>
                 <h2 className="text-xl font-bold text-white">AI Tactical Assistant</h2>
-                <p className="text-slate-400 text-sm">Advanced formation analysis and recommendations</p>
+                <p className="text-slate-400 text-sm">
+                  Advanced formation analysis and recommendations
+                </p>
               </div>
             </div>
             <button
@@ -266,9 +294,10 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
                   onClick={() => setActiveTab(tab.id as any)}
                   className={`
                     flex items-center gap-2 px-6 py-3 font-medium transition-all relative
-                    ${activeTab === tab.id
-                      ? 'text-blue-400 border-b-2 border-blue-400'
-                      : 'text-slate-400 hover:text-white'
+                    ${
+                      activeTab === tab.id
+                        ? 'text-blue-400 border-b-2 border-blue-400'
+                        : 'text-slate-400 hover:text-white'
                     }
                   `}
                 >
@@ -294,23 +323,31 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
                     <div className="text-center">
                       <motion.div
                         animate={{ rotate: 360 }}
-                        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                        transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
                         className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"
                       />
                       <div className="text-white font-medium mb-2">AI Coach Analyzing...</div>
-                      <div className="text-slate-400 text-sm">Generating personalized coaching recommendations</div>
+                      <div className="text-slate-400 text-sm">
+                        Generating personalized coaching recommendations
+                      </div>
                     </div>
                   </div>
                 ) : coachingRecommendations.length === 0 ? (
                   <div className="text-center py-12">
                     <Brain className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-slate-400 mb-2">No recommendations available</h3>
-                    <p className="text-slate-500">Set up your formation and players to get AI coaching insights.</p>
+                    <h3 className="text-lg font-semibold text-slate-400 mb-2">
+                      No recommendations available
+                    </h3>
+                    <p className="text-slate-500">
+                      Set up your formation and players to get AI coaching insights.
+                    </p>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     <div className="flex items-center justify-between mb-6">
-                      <h3 className="text-lg font-semibold text-white">AI Coaching Recommendations</h3>
+                      <h3 className="text-lg font-semibold text-white">
+                        AI Coaching Recommendations
+                      </h3>
                       <button
                         onClick={generateCoachingRecommendations}
                         disabled={isAnalyzing}
@@ -331,9 +368,9 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
 
                       const impactIcons = {
                         'game-changing': Star,
-                        'significant': TrendingUp,
-                        'moderate': Target,
-                        'minor': Settings,
+                        significant: TrendingUp,
+                        moderate: Target,
+                        minor: Settings,
                       };
 
                       const ImpactIcon = impactIcons[recommendation.impact] || Settings;
@@ -352,19 +389,30 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
                                 <ImpactIcon className="w-5 h-5 text-blue-400 mt-0.5" />
                               </div>
                               <div>
-                                <h4 className="font-semibold text-white mb-2">{recommendation.title}</h4>
-                                <p className="text-slate-300 text-sm mb-3">{recommendation.description}</p>
-                                <p className="text-slate-400 text-xs italic">{recommendation.reasoning}</p>
+                                <h4 className="font-semibold text-white mb-2">
+                                  {recommendation.title}
+                                </h4>
+                                <p className="text-slate-300 text-sm mb-3">
+                                  {recommendation.description}
+                                </p>
+                                <p className="text-slate-400 text-xs italic">
+                                  {recommendation.reasoning}
+                                </p>
                               </div>
                             </div>
 
                             <div className="flex flex-col items-end gap-2">
-                              <span className={`px-2 py-1 rounded text-xs font-medium uppercase ${
-                                recommendation.priority === 'critical' ? 'bg-red-600 text-white' :
-                                recommendation.priority === 'high' ? 'bg-orange-600 text-white' :
-                                recommendation.priority === 'medium' ? 'bg-yellow-600 text-black' :
-                                'bg-blue-600 text-white'
-                              }`}>
+                              <span
+                                className={`px-2 py-1 rounded text-xs font-medium uppercase ${
+                                  recommendation.priority === 'critical'
+                                    ? 'bg-red-600 text-white'
+                                    : recommendation.priority === 'high'
+                                      ? 'bg-orange-600 text-white'
+                                      : recommendation.priority === 'medium'
+                                        ? 'bg-yellow-600 text-black'
+                                        : 'bg-blue-600 text-white'
+                                }`}
+                              >
                                 {recommendation.priority}
                               </span>
 
@@ -377,10 +425,15 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
 
                           {recommendation.actions && recommendation.actions.length > 0 && (
                             <div className="border-t border-slate-700/50 pt-4">
-                              <h5 className="text-sm font-medium text-slate-300 mb-2">Suggested Actions:</h5>
+                              <h5 className="text-sm font-medium text-slate-300 mb-2">
+                                Suggested Actions:
+                              </h5>
                               <div className="space-y-2">
                                 {recommendation.actions.map((action, actionIndex) => (
-                                  <div key={actionIndex} className="flex items-center gap-2 text-sm text-slate-400">
+                                  <div
+                                    key={actionIndex}
+                                    className="flex items-center gap-2 text-sm text-slate-400"
+                                  >
                                     <div className="w-1 h-1 bg-slate-500 rounded-full" />
                                     {action.description}
                                   </div>
@@ -418,76 +471,84 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
                     <div className="text-center">
                       <motion.div
                         animate={{ rotate: 360 }}
-                        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                        transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
                         className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"
                       />
                       <div className="text-white font-medium mb-2">Analyzing Formation...</div>
-                      <div className="text-slate-400 text-sm">AI is evaluating tactical balance and positioning</div>
+                      <div className="text-slate-400 text-sm">
+                        AI is evaluating tactical balance and positioning
+                      </div>
                     </div>
                   </div>
-                ) : analysisResult && (
-                  <>
-                    {/* Overall Rating */}
-                    <div className="bg-slate-800/50 rounded-lg p-6 border border-slate-700/50">
-                      <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-semibold text-white">Formation Rating</h3>
-                        <div className="text-2xl font-bold text-blue-400">
-                          {analysisResult.overallRating}/100
+                ) : (
+                  analysisResult && (
+                    <>
+                      {/* Overall Rating */}
+                      <div className="bg-slate-800/50 rounded-lg p-6 border border-slate-700/50">
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="text-lg font-semibold text-white">Formation Rating</h3>
+                          <div className="text-2xl font-bold text-blue-400">
+                            {analysisResult.overallRating}/100
+                          </div>
+                        </div>
+
+                        {/* Balance Meters */}
+                        <div className="grid grid-cols-3 gap-4">
+                          {Object.entries(analysisResult.formationBalance).map(([area, rating]) => (
+                            <div key={area} className="text-center">
+                              <div className="text-sm text-slate-400 mb-2 capitalize">{area}</div>
+                              <div className="relative w-full h-2 bg-slate-700 rounded-full overflow-hidden">
+                                <motion.div
+                                  initial={{ width: 0 }}
+                                  animate={{ width: `${rating}%` }}
+                                  transition={{ duration: 1, delay: 0.5 }}
+                                  className="h-full bg-gradient-to-r from-blue-500 to-green-500 rounded-full"
+                                />
+                              </div>
+                              <div className="text-xs text-white mt-1">{rating}%</div>
+                            </div>
+                          ))}
                         </div>
                       </div>
 
-                      {/* Balance Meters */}
-                      <div className="grid grid-cols-3 gap-4">
-                        {Object.entries(analysisResult.formationBalance).map(([area, rating]) => (
-                          <div key={area} className="text-center">
-                            <div className="text-sm text-slate-400 mb-2 capitalize">{area}</div>
-                            <div className="relative w-full h-2 bg-slate-700 rounded-full overflow-hidden">
-                              <motion.div
-                                initial={{ width: 0 }}
-                                animate={{ width: `${rating}%` }}
-                                transition={{ duration: 1, delay: 0.5 }}
-                                className="h-full bg-gradient-to-r from-blue-500 to-green-500 rounded-full"
-                              />
-                            </div>
-                            <div className="text-xs text-white mt-1">{rating}%</div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
+                      {/* Strengths & Weaknesses */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-4">
+                          <h4 className="text-green-400 font-medium mb-3 flex items-center gap-2">
+                            <CheckCircle className="w-4 h-4" />
+                            Strengths
+                          </h4>
+                          <ul className="space-y-2">
+                            {analysisResult.strengths.map((strength, index) => (
+                              <li key={index} className="text-green-300 text-sm">
+                                • {strength}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
 
-                    {/* Strengths & Weaknesses */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-4">
-                        <h4 className="text-green-400 font-medium mb-3 flex items-center gap-2">
-                          <CheckCircle className="w-4 h-4" />
-                          Strengths
-                        </h4>
-                        <ul className="space-y-2">
-                          {analysisResult.strengths.map((strength, index) => (
-                            <li key={index} className="text-green-300 text-sm">• {strength}</li>
-                          ))}
-                        </ul>
+                        <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4">
+                          <h4 className="text-red-400 font-medium mb-3 flex items-center gap-2">
+                            <AlertTriangle className="w-4 h-4" />
+                            Areas for Improvement
+                          </h4>
+                          <ul className="space-y-2">
+                            {analysisResult.weaknesses.map((weakness, index) => (
+                              <li key={index} className="text-red-300 text-sm">
+                                • {weakness}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
                       </div>
-
-                      <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4">
-                        <h4 className="text-red-400 font-medium mb-3 flex items-center gap-2">
-                          <AlertTriangle className="w-4 h-4" />
-                          Areas for Improvement
-                        </h4>
-                        <ul className="space-y-2">
-                          {analysisResult.weaknesses.map((weakness, index) => (
-                            <li key={index} className="text-red-300 text-sm">• {weakness}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-                  </>
+                    </>
+                  )
                 )}
               </div>
             )}
 
             {/* Suggestions Tab */}
-            {activeTab === 'suggestions' && analysisResult && (
+            {(activeTab as string) === 'suggestions' && analysisResult && (
               <div className="space-y-4">
                 {analysisResult.suggestions.map(suggestion => {
                   const IconComponent = getSuggestionIcon(suggestion.type, suggestion.priority);
@@ -533,7 +594,9 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
                     <div className="text-center text-slate-400 py-8">
                       <Brain className="w-12 h-12 mx-auto mb-4 opacity-50" />
                       <p>Ask me anything about your tactical setup!</p>
-                      <p className="text-sm mt-2">I can help with formations, player positioning, and tactical strategies.</p>
+                      <p className="text-sm mt-2">
+                        I can help with formations, player positioning, and tactical strategies.
+                      </p>
                     </div>
                   )}
 
@@ -547,9 +610,10 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
                       <div
                         className={`
                           max-w-sm p-3 rounded-lg
-                          ${message.type === 'user'
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-slate-700/50 text-slate-200 border border-slate-600/50'
+                          ${
+                            message.type === 'user'
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-slate-700/50 text-slate-200 border border-slate-600/50'
                           }
                         `}
                       >
@@ -564,8 +628,8 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
                   <input
                     type="text"
                     value={chatInput}
-                    onChange={(e) => setChatInput(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                    onChange={e => setChatInput(e.target.value)}
+                    onKeyPress={e => e.key === 'Enter' && handleSendMessage()}
                     placeholder="Ask about formations, tactics, or strategy..."
                     className="flex-1 px-4 py-2 bg-slate-800/50 border border-slate-600/50 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-blue-500/50"
                   />

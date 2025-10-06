@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useTacticsContext, useUIContext } from '../../hooks';
-import { 
+import {
   Brain,
   User,
   Settings,
@@ -16,7 +16,7 @@ import {
   Users,
   BarChart3,
   Shield,
-  Sparkles
+  Sparkles,
 } from 'lucide-react';
 import PositionalBench from './PositionalBench';
 import { getBenchPlayers } from '../../utils/sampleTacticsData';
@@ -25,17 +25,23 @@ import type { Player, Formation } from '../../types';
 /**
  * Individual attribute bar component
  */
-const AttributeBar: React.FC<{ label: string; value: number; maxValue?: number }> = ({ 
-  label, 
-  value, 
-  maxValue = 100 
+const AttributeBar: React.FC<{ label: string; value: number; maxValue?: number }> = ({
+  label,
+  value,
+  maxValue = 100,
 }) => {
   const percentage = Math.min((value / maxValue) * 100, 100);
-  
+
   const getBarColor = (percentage: number) => {
-    if (percentage >= 80) return 'bg-green-500';
-    if (percentage >= 60) return 'bg-yellow-500';
-    if (percentage >= 40) return 'bg-orange-500';
+    if (percentage >= 80) {
+      return 'bg-green-500';
+    }
+    if (percentage >= 60) {
+      return 'bg-yellow-500';
+    }
+    if (percentage >= 40) {
+      return 'bg-orange-500';
+    }
     return 'bg-red-500';
   };
 
@@ -46,11 +52,11 @@ const AttributeBar: React.FC<{ label: string; value: number; maxValue?: number }
         <span className="text-xs font-bold text-white">{value}</span>
       </div>
       <div className="w-full bg-slate-700 rounded-full h-2">
-        <motion.div 
+        <motion.div
           className={`h-2 rounded-full ${getBarColor(percentage)}`}
           initial={{ width: 0 }}
           animate={{ width: `${percentage}%` }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
         />
       </div>
     </div>
@@ -64,12 +70,12 @@ const PlayerDetails: React.FC<{ player: Player }> = ({ player }) => {
   // Calculate overall rating from attributes
   const overallRating = useMemo(() => {
     if (!player.attributes || Object.keys(player.attributes).length === 0) {
-      return player.rating || 75;
+      return (player as any).rating || 75;
     }
-    
+
     const values = Object.values(player.attributes) as number[];
     return Math.round(values.reduce((sum, val) => sum + val, 0) / values.length);
-  }, [player.attributes, player.rating]);
+  }, [player.attributes, (player as any).rating]);
 
   const handleEditPlayer = () => {
     console.log('Edit player:', player.id);
@@ -91,11 +97,11 @@ const PlayerDetails: React.FC<{ player: Player }> = ({ player }) => {
 
       {/* Player Info */}
       <div className="flex items-center space-x-4">
-        <div 
+        <div
           className="w-16 h-16 rounded-full flex items-center justify-center font-bold text-xl border-2 border-slate-600"
           style={{ backgroundColor: player.teamColor || '#6b7280' }}
         >
-          <span className="text-white">{player.number || player.name.charAt(0)}</span>
+          <span className="text-white">{(player as any).number || player.name.charAt(0)}</span>
         </div>
         <div className="flex-1 min-w-0">
           <h3 className="text-xl font-bold text-white truncate">{player.name}</h3>
@@ -146,7 +152,7 @@ const PlayerDetails: React.FC<{ player: Player }> = ({ player }) => {
           </h4>
           <div className="flex flex-wrap gap-2">
             {player.traits.map((trait, index) => (
-              <span 
+              <span
                 key={index}
                 className="text-xs font-semibold bg-purple-600/20 text-purple-300 px-2 py-1 rounded-full border border-purple-500/30"
               >
@@ -183,11 +189,11 @@ const AIInsights: React.FC = () => {
 
   const handleGenerateInsights = useCallback(async () => {
     setIsGenerating(true);
-    
+
     try {
       // Mock AI analysis - replace with actual AI service
       await new Promise(resolve => setTimeout(resolve, 2000));
-      
+
       setInsights({
         formationStrength: 8.2,
         defensiveRating: 'High',
@@ -195,18 +201,18 @@ const AIInsights: React.FC = () => {
         keyAdvantages: [
           'Strong midfield presence',
           'Excellent defensive stability',
-          'Good ball retention capabilities'
+          'Good ball retention capabilities',
         ],
         vulnerabilities: [
           'Limited width in attack',
           'Potential gaps between lines',
-          'Lack of pace on flanks'
+          'Lack of pace on flanks',
         ],
         recommendations: [
           'Consider more aggressive fullback positioning',
           'Utilize quick passing combinations',
-          'Maintain compact defensive shape'
-        ]
+          'Maintain compact defensive shape',
+        ],
       });
     } catch (error) {
       console.error('AI insights generation failed:', error);
@@ -225,7 +231,8 @@ const AIInsights: React.FC = () => {
       </div>
 
       <p className="text-xs text-slate-400">
-        Advanced AI analysis of your current formation ({activeFormation?.name || 'Unknown'}) and tactical setup.
+        Advanced AI analysis of your current formation ({activeFormation?.name || 'Unknown'}) and
+        tactical setup.
       </p>
 
       <button
@@ -249,7 +256,9 @@ const AIInsights: React.FC = () => {
           <div className="p-3 bg-slate-800/50 rounded-lg">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-semibold text-slate-300">Formation Strength</span>
-              <span className="text-lg font-bold text-green-400">{insights.formationStrength}/10</span>
+              <span className="text-lg font-bold text-green-400">
+                {insights.formationStrength}/10
+              </span>
             </div>
             <div className="grid grid-cols-2 gap-4 text-xs">
               <div>
@@ -335,7 +344,7 @@ const TeamTacticsSettings: React.FC = () => {
   const tacticOptions = {
     mentality: ['Defensive', 'Balanced', 'Attacking'],
     pressure: ['Low', 'Medium', 'High'],
-    width: ['Narrow', 'Standard', 'Wide']
+    width: ['Narrow', 'Standard', 'Wide'],
   };
 
   const TacticSelector: React.FC<{
@@ -353,9 +362,10 @@ const TeamTacticsSettings: React.FC = () => {
             onClick={() => onChange(option)}
             className={`
               flex-1 text-xs font-semibold px-3 py-2 rounded transition-colors
-              ${value === option 
-                ? 'bg-blue-600 text-white' 
-                : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
+              ${
+                value === option
+                  ? 'bg-blue-600 text-white'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
               }
             `}
           >
@@ -429,7 +439,7 @@ const ChemistryView: React.FC = () => {
   const { players, formations, activeFormationIds } = tacticsState;
 
   const activeFormation = formations[activeFormationIds?.home || Object.keys(formations)[0]];
-  const onFieldPlayers = players.filter(player => 
+  const onFieldPlayers = players.filter(player =>
     activeFormation?.slots?.some(slot => slot.playerId === player.id)
   );
 
@@ -454,15 +464,18 @@ const ChemistryView: React.FC = () => {
 
       <div className="space-y-3">
         <h4 className="text-sm font-semibold text-slate-300">Player Connections</h4>
-        
+
         {onFieldPlayers.slice(0, 5).map((player, index) => (
-          <div key={player.id} className="flex items-center justify-between p-2 bg-slate-800/30 rounded">
+          <div
+            key={player.id}
+            className="flex items-center justify-between p-2 bg-slate-800/30 rounded"
+          >
             <div className="flex items-center space-x-2">
-              <div 
+              <div
                 className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
                 style={{ backgroundColor: player.teamColor || '#6b7280' }}
               >
-                {player.number || player.name.charAt(0)}
+                {(player as any).number || player.name.charAt(0)}
               </div>
               <span className="text-sm text-white truncate">{player.name}</span>
             </div>
@@ -471,9 +484,7 @@ const ChemistryView: React.FC = () => {
                 <div
                   key={i}
                   className={`w-2 h-2 rounded-full ${
-                    i < Math.floor(Math.random() * 3) + 2 
-                      ? 'bg-green-400' 
-                      : 'bg-slate-600'
+                    i < Math.floor(Math.random() * 3) + 2 ? 'bg-green-400' : 'bg-slate-600'
                   }`}
                 />
               ))}
@@ -508,9 +519,10 @@ const TabButton: React.FC<{
     title={label}
     className={`
       flex-1 flex justify-center items-center p-3 transition-colors border-b-2
-      ${active 
-        ? 'bg-slate-800/50 text-blue-400 border-blue-500' 
-        : 'text-slate-400 hover:text-white hover:bg-slate-800/30 border-transparent'
+      ${
+        active
+          ? 'bg-slate-800/50 text-blue-400 border-blue-500'
+          : 'text-slate-400 hover:text-white hover:bg-slate-800/30 border-transparent'
       }
     `}
   >
@@ -552,11 +564,11 @@ export const RightSidebar: React.FC = () => {
               <PositionalBench
                 players={benchPlayers}
                 selectedPlayer={selectedPlayer}
-                onPlayerSelect={(player) => {
+                onPlayerSelect={player => {
                   // Handle player selection from bench
                   console.log('Selected bench player:', player);
                 }}
-                onPlayerDragStart={(player) => {
+                onPlayerDragStart={player => {
                   // Handle drag start from bench
                   console.log('Dragging bench player:', player);
                 }}

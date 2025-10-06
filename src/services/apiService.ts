@@ -5,8 +5,73 @@
  * and external system connectivity with authentication, rate limiting, and monitoring
  */
 
-import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
+import axios, { AxiosInstance } from 'axios';
 import { v4 as uuidv4 } from 'uuid';
+
+type FetchRequestInit = NonNullable<Parameters<typeof fetch>[1]>;
+type FetchResponse = Awaited<ReturnType<typeof fetch>>;
+type FetchAbortSignal = FetchRequestInit extends { signal?: infer S } ? S : undefined;
+type FetchBody = FetchRequestInit extends { body?: infer B } ? B : undefined;
+type AbortEventTarget = {
+  addEventListener: (type: 'abort', listener: () => void, options?: { once?: boolean }) => void;
+  removeEventListener: (type: 'abort', listener: () => void) => void;
+  aborted?: boolean;
+};
+type NormalizedAbortSignal = FetchAbortSignal extends null | undefined
+  ? Exclude<FetchAbortSignal, null | undefined>
+  : FetchAbortSignal;
+type AbortSignalWithTarget = NormalizedAbortSignal & AbortEventTarget;
+type AbortControllerLike = {
+  new (): {
+    signal: FetchAbortSignal;
+    abort: (reason?: unknown) => void;
+  };
+};
+
+type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+
+interface RequestOptions {
+  params?: Record<string, unknown>;
+  headers?: Record<string, string>;
+  timeout?: number;
+  retries?: number;
+  retryDelay?: number;
+  cache?: boolean;
+  cacheTTL?: number;
+  signal?: FetchAbortSignal | null;
+  onUploadProgress?: (progress: number) => void;
+  onDownloadProgress?: (progress: number) => void;
+}
+
+interface RequestConfig {
+  url: string;
+  method: HttpMethod;
+  headers: Record<string, string>;
+  body?: FetchBody | null;
+  signal?: FetchAbortSignal | null;
+}
+
+type RequestInterceptor = (config: RequestConfig) => RequestConfig | Promise<RequestConfig>;
+type ResponseInterceptor = (data: unknown) => unknown | Promise<unknown>;
+
+interface InterceptorOptions {
+  persistent?: boolean;
+}
+
+interface RequestInterceptorEntry {
+  handler: RequestInterceptor;
+  persistent: boolean;
+}
+
+interface ResponseInterceptorEntry {
+  handler: ResponseInterceptor;
+  persistent: boolean;
+}
+
+interface CachedResponse {
+  data: unknown;
+  expiresAt: number | null;
+}
 
 export interface ApiEndpoint {
   id: string;
@@ -158,6 +223,12 @@ class ApiService {
   private rateLimiter: Map<string, { count: number; resetTime: number }> = new Map();
   private apiClients: Map<string, AxiosInstance> = new Map();
   private graphqlSchema: GraphQLSchema;
+  private baseURL = '';
+  private requestInterceptors: RequestInterceptorEntry[] = [];
+  private responseInterceptors: ResponseInterceptorEntry[] = [];
+  private responseCache: Map<string, CachedResponse> = new Map();
+  private __debugTimeoutCount = 0;
+  private __debugTimeoutValues: Array<number | null> = [];
 
   // Event callbacks
   private onApiCallCallback?: (usage: ApiUsage) => void;
@@ -172,6 +243,516 @@ class ApiService {
     this.graphqlSchema = this.initializeGraphQLSchema();
     this.initializeEndpoints();
     this.setupRateLimitReset();
+  }
+
+  setBaseURL(url: string): void {
+    this.baseURL = (url || '').replace(/\/+$/, '');
+  }
+
+  addRequestInterceptor(
+    interceptor: RequestInterceptor,
+    options: InterceptorOptions = {},
+  ): () => void {
+    const entry: RequestInterceptorEntry = {
+      handler: interceptor,
+      persistent: options.persistent ?? false,
+    };
+    this.requestInterceptors.push(entry);
+
+    return () => {
+      this.requestInterceptors = this.requestInterceptors.filter(item => item !== entry);
+    };
+  }
+
+  addResponseInterceptor(
+    interceptor: ResponseInterceptor,
+    options: InterceptorOptions = {},
+  ): () => void {
+    const entry: ResponseInterceptorEntry = {
+      handler: interceptor,
+      persistent: options.persistent ?? false,
+    };
+    this.responseInterceptors.push(entry);
+
+    return () => {
+      this.responseInterceptors = this.responseInterceptors.filter(item => item !== entry);
+    };
+  }
+
+  clearCache(): void {
+    this.responseCache.clear();
+  }
+
+  async get<T = unknown>(endpoint: string, options: RequestOptions = {}): Promise<T> {
+    return this.performRequest<T>('GET', endpoint, undefined, options);
+  }
+
+  async post<T = unknown>(
+    endpoint: string,
+    data?: unknown,
+    options: RequestOptions = {},
+  ): Promise<T> {
+    return this.performRequest<T>('POST', endpoint, data, options);
+  }
+
+  async put<T = unknown>(
+    endpoint: string,
+    data?: unknown,
+    options: RequestOptions = {},
+  ): Promise<T> {
+    return this.performRequest<T>('PUT', endpoint, data, options);
+  }
+
+  async patch<T = unknown>(
+    endpoint: string,
+    data?: unknown,
+    options: RequestOptions = {},
+  ): Promise<T> {
+    return this.performRequest<T>('PATCH', endpoint, data, options);
+  }
+
+  async delete<T = unknown>(endpoint: string, options: RequestOptions = {}): Promise<T> {
+    return this.performRequest<T>('DELETE', endpoint, undefined, options);
+  }
+
+  private isAbsoluteURL(url: string): boolean {
+    return /^https?:\/\//i.test(url);
+  }
+
+  private resolveURL(path: string): string {
+    if (this.isAbsoluteURL(path)) {
+      return path;
+    }
+
+    if (!this.baseURL) {
+      return path;
+    }
+
+    const trimmedBase = this.baseURL.replace(/\/+$/, '');
+    const trimmedPath = path.replace(/^\/+/, '');
+    return `${trimmedBase}/${trimmedPath}`;
+  }
+
+  private serializeParams(params?: Record<string, unknown>): string {
+    if (!params || Object.keys(params).length === 0) {
+      return '';
+    }
+
+    const searchParams = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+      if (value === undefined || value === null) {
+        return;
+      }
+
+      if (Array.isArray(value)) {
+        value.forEach(item => searchParams.append(key, String(item)));
+      } else {
+        searchParams.append(key, String(value));
+      }
+    });
+
+    return searchParams.toString();
+  }
+
+  private buildURL(endpoint: string, params?: Record<string, unknown>): string {
+    const resolved = this.resolveURL(endpoint);
+    const queryString = this.serializeParams(params);
+
+    if (!queryString) {
+      return resolved;
+    }
+
+    const separator = resolved.includes('?') ? '&' : '?';
+    return `${resolved}${separator}${queryString}`;
+  }
+
+  private getAbortSignalTarget(
+    signal: FetchAbortSignal | null | undefined,
+  ): AbortSignalWithTarget | null {
+    if (!signal) {
+      return null;
+    }
+
+    const candidate = signal as unknown as AbortEventTarget;
+    const hasHandlers =
+      typeof candidate.addEventListener === 'function' &&
+      typeof candidate.removeEventListener === 'function';
+
+    return hasHandlers ? (signal as unknown as AbortSignalWithTarget) : null;
+  }
+
+  private isAbortSignalAborted(signal: FetchAbortSignal | null | undefined): boolean {
+    if (!signal) {
+      return false;
+    }
+
+    const candidate = signal as unknown as { aborted?: boolean };
+    return Boolean(candidate.aborted);
+  }
+
+  private createCacheKey(method: HttpMethod, url: string): string {
+    return `${method}:${url}`;
+  }
+
+  private getCachedResponse<T>(key: string): T | undefined {
+    const cached = this.responseCache.get(key);
+    if (!cached) {
+      return undefined;
+    }
+
+    if (cached.expiresAt !== null && cached.expiresAt < Date.now()) {
+      this.responseCache.delete(key);
+      return undefined;
+    }
+
+    return cached.data as T;
+  }
+
+  private setCachedResponse(key: string, data: unknown, ttl?: number): void {
+    const expiresAt = ttl ? Date.now() + ttl : null;
+    this.responseCache.set(key, {
+      data,
+      expiresAt,
+    });
+  }
+
+  private async applyRequestInterceptors(config: RequestConfig): Promise<RequestConfig> {
+    const interceptors = [...this.requestInterceptors];
+    let currentConfig = { ...config };
+
+    try {
+      for (const entry of interceptors) {
+        currentConfig = await entry.handler({ ...currentConfig });
+      }
+      return currentConfig;
+    } finally {
+      this.requestInterceptors = this.requestInterceptors.filter(entry => entry.persistent);
+    }
+  }
+
+  private async applyResponseInterceptors(data: unknown): Promise<unknown> {
+    const interceptors = [...this.responseInterceptors];
+    let currentData = data;
+
+    try {
+      for (const entry of interceptors) {
+        currentData = await entry.handler(currentData);
+      }
+      return currentData;
+    } finally {
+      this.responseInterceptors = this.responseInterceptors.filter(entry => entry.persistent);
+    }
+  }
+
+  private async fetchWithTimeout(
+    url: string,
+    init: FetchRequestInit,
+    timeout?: number,
+    externalSignal?: FetchAbortSignal | null,
+    startedAt?: number,
+  ): Promise<FetchResponse> {
+    if (timeout !== undefined && typeof timeout !== 'number') {
+      throw new Error('Invalid timeout value');
+    }
+
+    if (!timeout && !externalSignal) {
+      if (timeout !== undefined) {
+        throw new Error(`Unexpected falsy timeout: ${timeout}`);
+      }
+      return fetch(url, init);
+    }
+
+    const AbortControllerCtor = (globalThis as typeof globalThis & {
+      AbortController?: AbortControllerLike;
+    }).AbortController;
+
+    return new Promise<FetchResponse>((resolve, reject) => {
+  const originalTimeout = timeout ?? null;
+  this.__debugTimeoutValues.push(originalTimeout);
+      let settled = false;
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      let externalSubscription: { target: AbortSignalWithTarget; handler: () => void } | null =
+        null;
+      let timeoutFired = false;
+      let externalFired = false;
+
+      const supportsAbortController = Boolean(AbortControllerCtor);
+      const controller = supportsAbortController ? new AbortControllerCtor() : null;
+
+      const initWithSignal: FetchRequestInit = {
+        ...init,
+        ...(controller ? { signal: controller.signal } : {}),
+      } as FetchRequestInit;
+
+      if (!controller && externalSignal) {
+        initWithSignal.signal = externalSignal ?? undefined;
+      }
+
+      const cleanup = () => {
+        if (timer) {
+          clearTimeout(timer);
+          timer = undefined;
+        }
+
+        if (externalSubscription) {
+          externalSubscription.target.removeEventListener('abort', externalSubscription.handler);
+          externalSubscription = null;
+        }
+      };
+
+      const settle = (value: unknown, isError: boolean) => {
+        if (settled) {
+          return;
+        }
+        settled = true;
+        cleanup();
+
+        if (isError) {
+          const error = value instanceof Error ? value : new Error(String(value));
+          reject(error);
+        } else {
+          resolve(value as FetchResponse);
+        }
+      };
+
+      const rejectWith = (reason: unknown) => settle(reason, true);
+      const resolveWith = (response: FetchResponse) => settle(response, false);
+
+      if (externalSignal) {
+        if (this.isAbortSignalAborted(externalSignal)) {
+          rejectWith(new Error('Request aborted'));
+          return;
+        }
+
+        const target = this.getAbortSignalTarget(externalSignal);
+        const onExternalAbort = () => {
+          externalFired = true;
+          rejectWith(new Error('Request aborted'));
+          if (controller) {
+            controller.abort();
+          }
+        };
+
+        if (target) {
+          target.addEventListener('abort', onExternalAbort, { once: true });
+          externalSubscription = { target, handler: onExternalAbort };
+        } else if (!controller) {
+          rejectWith(new Error('Request aborted'));
+          return;
+        }
+      }
+
+      let effectiveTimeout = timeout;
+
+      if (timeout && typeof startedAt === 'number') {
+        const elapsed = Date.now() - startedAt;
+        effectiveTimeout = timeout - elapsed;
+
+        if (effectiveTimeout <= 0) {
+          this.__debugTimeoutCount += 1;
+          timeoutFired = true;
+          rejectWith(new Error('timeout'));
+          if (controller) {
+            controller.abort();
+          }
+          return;
+        }
+      }
+
+      if (effectiveTimeout && effectiveTimeout > 0) {
+        this.__debugTimeoutCount += 1;
+        timer = setTimeout(() => {
+          timeoutFired = true;
+          rejectWith(new Error('timeout'));
+          if (controller) {
+            controller.abort();
+          }
+        }, effectiveTimeout);
+      }
+
+      fetch(url, initWithSignal)
+        .then(response => {
+          resolveWith(response as FetchResponse);
+        })
+        .catch(error => {
+          if (settled) {
+            return;
+          }
+
+          if (error instanceof Error && error.name === 'AbortError') {
+            if (timeoutFired) {
+              rejectWith(new Error('timeout'));
+              return;
+            }
+
+            if (externalFired || this.isAbortSignalAborted(externalSignal)) {
+              rejectWith(new Error('Request aborted'));
+              return;
+            }
+
+            rejectWith(new Error('Request aborted'));
+            return;
+          }
+
+          rejectWith(error);
+        });
+    });
+  }
+
+  private delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  private async executeWithRetries<T>(
+    operation: () => Promise<T>,
+    retries: number,
+    retryDelay: number,
+  ): Promise<T> {
+    let attempt = 0;
+    let lastError: unknown;
+
+    while (attempt <= retries) {
+      try {
+        return await operation();
+      } catch (error) {
+        lastError = error;
+        if (attempt === retries) {
+          throw error;
+        }
+
+        const delayDuration = retryDelay * Math.pow(2, attempt);
+        await this.delay(delayDuration);
+        attempt += 1;
+      }
+    }
+
+    throw lastError instanceof Error ? lastError : new Error('Request failed');
+  }
+
+  private async performRequest<T>(
+    method: HttpMethod,
+    endpoint: string,
+    data?: unknown,
+    options: RequestOptions = {},
+  ): Promise<T> {
+    const { params, headers = {}, timeout, retries = 0, retryDelay = 500, cache, cacheTTL, signal } =
+      options;
+    if (options.timeout !== undefined && timeout === undefined) {
+      throw new Error('Timeout option lost');
+    }
+
+    const url = this.buildURL(endpoint, params);
+    const headersWithDefaults: Record<string, string> = {
+      'Content-Type': 'application/json',
+      ...headers,
+    };
+
+    let body: FetchBody | null = null;
+    const FormDataCtor = (globalThis as typeof globalThis & {
+      FormData?: new (...args: unknown[]) => unknown;
+    }).FormData;
+    const isFormData = Boolean(FormDataCtor && data instanceof FormDataCtor);
+
+    if (method !== 'GET' && data !== undefined && data !== null) {
+      if (isFormData) {
+        body = data as FetchBody;
+        delete headersWithDefaults['Content-Type'];
+      } else if (data instanceof URLSearchParams || typeof data === 'string') {
+        body = data as FetchBody;
+      } else {
+        body = JSON.stringify(data) as FetchBody;
+      }
+    }
+
+    const initialConfig: RequestConfig = {
+      url,
+      method,
+      headers: headersWithDefaults,
+      body,
+      signal,
+    };
+
+    const cacheKey = this.createCacheKey(method, url);
+
+    if (method === 'GET' && cache) {
+      const cachedResponse = this.getCachedResponse<T>(cacheKey);
+      if (cachedResponse !== undefined) {
+        return cachedResponse;
+      }
+    }
+
+    const attemptRequest = async (): Promise<T> => {
+      const attemptStartedAt = Date.now();
+      const config = await this.applyRequestInterceptors(initialConfig);
+      const requestInit: FetchRequestInit = {
+        method: config.method,
+        headers: config.headers,
+        body: (config.body ?? undefined) as FetchRequestInit['body'],
+      };
+
+      const uploadCallback = options.onUploadProgress;
+      if (uploadCallback && body) {
+        uploadCallback(0);
+      }
+
+      const downloadCallback = options.onDownloadProgress;
+      if (downloadCallback) {
+        downloadCallback(0);
+      }
+
+      const normalizedSignal = (config.signal ?? null) as FetchAbortSignal | null;
+      const response = await this.fetchWithTimeout(
+        config.url,
+        requestInit,
+        timeout,
+        normalizedSignal,
+        attemptStartedAt,
+      );
+
+      if (!response.ok) {
+        let errorPayload: unknown = null;
+        try {
+          errorPayload = await response.json();
+        } catch {
+          const text = await response.text().catch(() => undefined);
+          errorPayload = text ?? null;
+        }
+
+        const httpError = new Error(`HTTP ${response.status}`) as Error & {
+          status?: number;
+          data?: unknown;
+        };
+        httpError.status = response.status;
+        httpError.data = errorPayload;
+        throw httpError;
+      }
+
+      let responseData: unknown;
+      try {
+        responseData = await response.json();
+      } catch {
+        throw new Error('Invalid JSON');
+      }
+
+      if (uploadCallback && body) {
+        uploadCallback(100);
+      }
+
+      if (downloadCallback) {
+        downloadCallback(100);
+      }
+
+      const transformedData = await this.applyResponseInterceptors(responseData);
+
+      if (method === 'GET' && cache) {
+        const ttl = cacheTTL ?? 60000;
+        this.setCachedResponse(cacheKey, transformedData, ttl);
+      }
+
+      return transformedData as T;
+    };
+
+    return this.executeWithRetries(attemptRequest, retries, retryDelay);
   }
 
   /**
@@ -273,7 +854,8 @@ class ApiService {
       });
 
       return response;
-    } catch (_error) {
+    } catch (err) {
+      const error = err instanceof Error ? err : new Error('Unknown error');
       // Log failed usage
       this.logApiUsage({
         apiKeyId: 'unknown',
@@ -334,12 +916,13 @@ class ApiService {
         responseSize: JSON.stringify(result).length,
       });
 
-      return result;
-    } catch (_error) {
+      return result as { data: unknown; errors?: unknown[] };
+    } catch (err) {
+      const error = err instanceof Error ? err : new Error('Unknown error');
       return {
         data: null,
         errors: [{ message: error.message, timestamp: Date.now() }],
-      };
+      } as { data: unknown; errors?: unknown[] };
     }
   }
 
@@ -386,6 +969,7 @@ class ApiService {
       try {
         await this.deliverWebhook(webhook, event, data);
       } catch (_error) {
+        // eslint-disable-next-line no-console
         console.error(`❌ Failed to deliver webhook ${webhook.id}:`, _error);
       }
     }
@@ -795,9 +1379,9 @@ class ApiService {
 
   private async executeEndpoint(
     endpoint: ApiEndpoint,
-    data?: unknown,
-    params?: Record<string, unknown>,
-    headers?: Record<string, string>,
+    _data?: unknown,
+    _params?: Record<string, unknown>,
+    _headers?: Record<string, string>,
   ): Promise<{ status: number; data: unknown; headers: Record<string, string> }> {
     // Simulate endpoint execution
     // In real implementation, this would route to actual handlers
@@ -970,8 +1554,8 @@ class ApiService {
   }
 
   private async executeGraphQLQuery(
-    parsedQuery: unknown,
-    variables: Record<string, unknown>,
+    _parsedQuery: unknown,
+    _variables: Record<string, unknown>,
   ): Promise<unknown> {
     // Simulate GraphQL execution
     return {
@@ -1019,7 +1603,8 @@ class ApiService {
       if (this.onWebhookDeliveryCallback) {
         this.onWebhookDeliveryCallback(webhook.id, true, response.data);
       }
-    } catch (_error) {
+    } catch (err) {
+      const error = err instanceof Error ? err : new Error('Unknown error');
       webhook.failureCount++;
       webhook.retryAttempts++;
 
@@ -1060,7 +1645,7 @@ class ApiService {
       });
 
       // // // // console.log(`✅ Webhook endpoint test successful: ${webhook.url}`);
-    } catch (_error) {
+  } catch {
       // // // // console.warn(`⚠️ Webhook endpoint test failed: ${webhook.url}`);
       // Don't disable webhook, just log the warning
     }
@@ -1341,7 +1926,7 @@ $players = $api->getPlayers(['team' => 'home']);
         const now = Date.now();
         const hourAgo = now - 60 * 60 * 1000;
 
-        for (const [key, limiter] of this.rateLimiter.entries()) {
+  for (const [, limiter] of this.rateLimiter.entries()) {
           if (limiter.resetTime < hourAgo) {
             limiter.count = 0;
             limiter.resetTime = now;
@@ -1357,7 +1942,7 @@ $players = $api->getPlayers(['team' => 'home']);
     // // // // console.log('🔑 Loading API keys');
   }
 
-  private async saveApiKey(apiKey: ApiKey): Promise<void> {
+  private async saveApiKey(_apiKey: ApiKey): Promise<void> {
     // Save API key to storage
     // // // // console.log(`💾 API key saved: ${apiKey.name}`);
   }

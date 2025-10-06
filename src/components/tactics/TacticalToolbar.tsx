@@ -1,21 +1,21 @@
 import React, { useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  MousePointer2, 
-  ArrowRight, 
-  Minus, 
-  Square, 
-  Circle, 
-  Pen, 
-  Type, 
-  Grid3X3, 
-  Target, 
-  Play, 
-  RotateCcw, 
-  Undo, 
-  Trash2, 
+import {
+  MousePointer2,
+  ArrowRight,
+  Minus,
+  Square,
+  Circle,
+  Pen,
+  Type,
+  Grid3X3,
+  Target,
+  Play,
+  RotateCcw,
+  Undo,
+  Trash2,
   Palette,
-  Activity
+  Activity,
 } from 'lucide-react';
 import type { DrawingTool, DrawingShape } from '../../types';
 
@@ -53,7 +53,7 @@ const ToolButton: React.FC<{
   label: string;
   shortcut?: string;
   tool?: DrawingTool;
-  onClick: (tool?: DrawingTool) => void;
+  onClick: (tool: DrawingTool) => void;
   isActive: boolean;
   disabled?: boolean;
   children: React.ReactNode;
@@ -61,15 +61,16 @@ const ToolButton: React.FC<{
   <button
     aria-label={`${label}${shortcut ? ` (${shortcut})` : ''}`}
     title={`${label}${shortcut ? ` (${shortcut})` : ''}`}
-    onClick={() => onClick(tool)}
+    onClick={() => tool && onClick(tool)}
     disabled={disabled}
     className={`
       relative p-3 rounded-lg transition-all duration-200 flex items-center justify-center
-      ${isActive
-        ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/25 scale-105'
-        : disabled
-        ? 'text-slate-500 cursor-not-allowed'
-        : 'text-slate-300 hover:bg-slate-700 hover:text-white hover:scale-105'
+      ${
+        isActive
+          ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/25 scale-105'
+          : disabled
+            ? 'text-slate-500 cursor-not-allowed'
+            : 'text-slate-300 hover:bg-slate-700 hover:text-white hover:scale-105'
       }
       ${!disabled && !isActive ? 'hover:shadow-md' : ''}
     `}
@@ -88,9 +89,18 @@ const ColorPicker: React.FC<{
   onColorChange: (color: string) => void;
 }> = ({ currentColor, onColorChange }) => {
   const predefinedColors = [
-    '#ffffff', '#ef4444', '#f59e0b', '#eab308',
-    '#22c55e', '#06b6d4', '#3b82f6', '#8b5cf6',
-    '#ec4899', '#f97316', '#10b981', '#6366f1'
+    '#ffffff',
+    '#ef4444',
+    '#f59e0b',
+    '#eab308',
+    '#22c55e',
+    '#06b6d4',
+    '#3b82f6',
+    '#8b5cf6',
+    '#ec4899',
+    '#f97316',
+    '#10b981',
+    '#6366f1',
   ];
 
   return (
@@ -103,23 +113,25 @@ const ColorPicker: React.FC<{
           <input
             type="color"
             value={currentColor}
-            onChange={(e) => onColorChange(e.target.value)}
+            onChange={e => onColorChange(e.target.value)}
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
             aria-label="Select drawing color"
           />
         </div>
         <Palette className="w-4 h-4 text-slate-400" />
       </div>
-      
+
       {/* Predefined colors popup */}
       <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-slate-800 border border-slate-600 rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none group-hover:pointer-events-auto">
         <div className="grid grid-cols-4 gap-1">
-          {predefinedColors.map((color) => (
+          {predefinedColors.map(color => (
             <button
               key={color}
               onClick={() => onColorChange(color)}
               className={`w-6 h-6 rounded border-2 transition-all ${
-                currentColor === color ? 'border-white scale-110' : 'border-slate-500 hover:scale-105'
+                currentColor === color
+                  ? 'border-white scale-110'
+                  : 'border-slate-500 hover:scale-105'
               }`}
               style={{ backgroundColor: color }}
               aria-label={`Select color ${color}`}
@@ -149,48 +161,51 @@ const TacticalToolbar: React.FC<TacticalToolbarProps> = ({
   onResetAnimation,
   onUndoDrawing,
   onClearDrawings,
-  className = ''
+  className = '',
 }) => {
   // Keyboard shortcuts
-  const handleKeyPress = useCallback((event: KeyboardEvent) => {
-    // Don't trigger shortcuts when typing in inputs
-    if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
-      return;
-    }
+  const handleKeyPress = useCallback(
+    (event: KeyboardEvent) => {
+      // Don't trigger shortcuts when typing in inputs
+      if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
+        return;
+      }
 
-    switch (event.key.toLowerCase()) {
-      case 'v':
-        onToolChange('select');
-        break;
-      case 'a':
-        onToolChange('arrow');
-        break;
-      case 'l':
-        onToolChange('line');
-        break;
-      case 'r':
-        onToolChange('zone');
-        break;
-      case 'p':
-        onToolChange('pen');
-        break;
-      case 't':
-        onToolChange('text');
-        break;
-      case 'g':
-        onGridToggle();
-        break;
-      case 'z':
-        if (event.ctrlKey || event.metaKey) {
-          event.preventDefault();
-          onUndoDrawing();
-        }
-        break;
-      case 'escape':
-        onToolChange('select');
-        break;
-    }
-  }, [onToolChange, onGridToggle, onUndoDrawing]);
+      switch (event.key.toLowerCase()) {
+        case 'v':
+          onToolChange('select');
+          break;
+        case 'a':
+          onToolChange('arrow');
+          break;
+        case 'l':
+          onToolChange('line');
+          break;
+        case 'r':
+          onToolChange('zone');
+          break;
+        case 'p':
+          onToolChange('pen');
+          break;
+        case 't':
+          onToolChange('text');
+          break;
+        case 'g':
+          onGridToggle();
+          break;
+        case 'z':
+          if (event.ctrlKey || event.metaKey) {
+            event.preventDefault();
+            onUndoDrawing();
+          }
+          break;
+        case 'escape':
+          onToolChange('select');
+          break;
+      }
+    },
+    [onToolChange, onGridToggle, onUndoDrawing]
+  );
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyPress);
@@ -212,56 +227,56 @@ const TacticalToolbar: React.FC<TacticalToolbarProps> = ({
     >
       {/* Drawing Tools */}
       <div className="flex items-center space-x-1">
-        <ToolButton 
-          label="Select" 
-          shortcut="V" 
-          tool="select" 
-          isActive={drawingTool === 'select'} 
+        <ToolButton
+          label="Select"
+          shortcut="V"
+          tool="select"
+          isActive={drawingTool === 'select'}
           onClick={onToolChange}
         >
           <MousePointer2 className="w-5 h-5" />
         </ToolButton>
-        <ToolButton 
-          label="Arrow" 
-          shortcut="A" 
-          tool="arrow" 
-          isActive={drawingTool === 'arrow'} 
+        <ToolButton
+          label="Arrow"
+          shortcut="A"
+          tool="arrow"
+          isActive={drawingTool === 'arrow'}
           onClick={onToolChange}
         >
           <ArrowRight className="w-5 h-5" />
         </ToolButton>
-        <ToolButton 
-          label="Line" 
-          shortcut="L" 
-          tool="line" 
-          isActive={drawingTool === 'line'} 
+        <ToolButton
+          label="Line"
+          shortcut="L"
+          tool="line"
+          isActive={drawingTool === 'line'}
           onClick={onToolChange}
         >
           <Minus className="w-5 h-5" />
         </ToolButton>
-        <ToolButton 
-          label="Zone" 
-          shortcut="R" 
-          tool="zone" 
-          isActive={drawingTool === 'zone'} 
+        <ToolButton
+          label="Zone"
+          shortcut="R"
+          tool="zone"
+          isActive={drawingTool === 'zone'}
           onClick={onToolChange}
         >
           <Square className="w-5 h-5" />
         </ToolButton>
-        <ToolButton 
-          label="Pen" 
-          shortcut="P" 
-          tool="pen" 
-          isActive={drawingTool === 'pen'} 
+        <ToolButton
+          label="Pen"
+          shortcut="P"
+          tool="pen"
+          isActive={drawingTool === 'pen'}
           onClick={onToolChange}
         >
           <Pen className="w-5 h-5" />
         </ToolButton>
-        <ToolButton 
-          label="Text" 
-          shortcut="T" 
-          tool="text" 
-          isActive={drawingTool === 'text'} 
+        <ToolButton
+          label="Text"
+          shortcut="T"
+          tool="text"
+          isActive={drawingTool === 'text'}
           onClick={onToolChange}
         >
           <Type className="w-5 h-5" />
@@ -272,17 +287,17 @@ const TacticalToolbar: React.FC<TacticalToolbarProps> = ({
 
       {/* View Options */}
       <div className="flex items-center space-x-1">
-        <ToolButton 
-          label="Toggle Grid" 
-          shortcut="G" 
-          isActive={isGridVisible} 
+        <ToolButton
+          label="Toggle Grid"
+          shortcut="G"
+          isActive={isGridVisible}
           onClick={onGridToggle}
         >
           <Grid3X3 className="w-5 h-5" />
         </ToolButton>
-        <ToolButton 
-          label="Formation Strength" 
-          isActive={isFormationStrengthVisible} 
+        <ToolButton
+          label="Formation Strength"
+          isActive={isFormationStrengthVisible}
           onClick={onFormationStrengthToggle}
         >
           <Activity className="w-5 h-5" />
@@ -302,18 +317,14 @@ const TacticalToolbar: React.FC<TacticalToolbarProps> = ({
       {/* Animation Controls */}
       <div className="flex items-center space-x-1">
         {isAnimating ? (
-          <ToolButton 
-            label="Reset Animation" 
-            isActive={false} 
-            onClick={onResetAnimation}
-          >
+          <ToolButton label="Reset Animation" isActive={false} onClick={onResetAnimation}>
             <RotateCcw className="w-5 h-5 text-red-400" />
           </ToolButton>
         ) : (
-          <ToolButton 
-            label="Play Animation" 
+          <ToolButton
+            label="Play Animation"
             disabled={!canPlayAnimation}
-            isActive={false} 
+            isActive={false}
             onClick={onPlayAnimation}
           >
             <Play className="w-5 h-5" />
@@ -325,19 +336,19 @@ const TacticalToolbar: React.FC<TacticalToolbarProps> = ({
 
       {/* Drawing Actions */}
       <div className="flex items-center space-x-1">
-        <ToolButton 
-          label="Undo Last Drawing" 
+        <ToolButton
+          label="Undo Last Drawing"
           shortcut="Ctrl+Z"
           disabled={drawings.length === 0}
-          isActive={false} 
+          isActive={false}
           onClick={onUndoDrawing}
         >
           <Undo className="w-5 h-5" />
         </ToolButton>
-        <ToolButton 
-          label="Clear All Drawings" 
+        <ToolButton
+          label="Clear All Drawings"
           disabled={drawings.length === 0}
-          isActive={false} 
+          isActive={false}
           onClick={onClearDrawings}
         >
           <Trash2 className="w-5 h-5 text-red-400" />

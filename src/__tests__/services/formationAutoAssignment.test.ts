@@ -3,13 +3,13 @@ import {
   autoAssignPlayersToFormation,
   smartPlayerSwap,
   updatePlayerPositionsFromFormation,
-  getFormationAnalysis
+  getFormationAnalysis,
 } from '../../services/formationAutoAssignment';
 import type { Player, Formation, FormationSlot } from '../../types';
 
 /**
  * Comprehensive Test Suite for Formation Auto-Assignment System
- * 
+ *
  * Tests cover:
  * - Player-slot scoring algorithm accuracy
  * - Auto-assignment optimization
@@ -47,7 +47,7 @@ describe('Formation Auto-Assignment System', () => {
           shooting: 15,
           dribbling: 40,
           positioning: 95,
-          stamina: 80
+          stamina: 80,
         },
         position: { x: 10, y: 50 },
         availability: { status: 'Available' },
@@ -65,7 +65,7 @@ describe('Formation Auto-Assignment System', () => {
           saves: 120,
           passesCompleted: 800,
           passesAttempted: 900,
-          careerHistory: []
+          careerHistory: [],
         },
         loan: { isLoaned: false },
         traits: ['Leader'],
@@ -78,7 +78,7 @@ describe('Formation Auto-Assignment System', () => {
         injuryRisk: 10,
         lastConversationInitiatedWeek: 0,
         moraleBoost: null,
-        completedChallenges: []
+        completedChallenges: [],
       },
       // Defender
       {
@@ -100,7 +100,7 @@ describe('Formation Auto-Assignment System', () => {
           shooting: 45,
           dribbling: 70,
           positioning: 90,
-          stamina: 85
+          stamina: 85,
         },
         position: { x: 25, y: 40 },
         availability: { status: 'Available' },
@@ -118,7 +118,7 @@ describe('Formation Auto-Assignment System', () => {
           saves: 0,
           passesCompleted: 1800,
           passesAttempted: 2000,
-          careerHistory: []
+          careerHistory: [],
         },
         loan: { isLoaned: false },
         traits: ['Leader', 'Consistent'],
@@ -131,7 +131,7 @@ describe('Formation Auto-Assignment System', () => {
         injuryRisk: 5,
         lastConversationInitiatedWeek: 0,
         moraleBoost: null,
-        completedChallenges: []
+        completedChallenges: [],
       },
       // Midfielder
       {
@@ -153,7 +153,7 @@ describe('Formation Auto-Assignment System', () => {
           shooting: 88,
           dribbling: 85,
           positioning: 88,
-          stamina: 80
+          stamina: 80,
         },
         position: { x: 50, y: 50 },
         availability: { status: 'Available' },
@@ -171,7 +171,7 @@ describe('Formation Auto-Assignment System', () => {
           saves: 0,
           passesCompleted: 2200,
           passesAttempted: 2500,
-          careerHistory: []
+          careerHistory: [],
         },
         loan: { isLoaned: false },
         traits: ['Ambitious'],
@@ -184,7 +184,7 @@ describe('Formation Auto-Assignment System', () => {
         injuryRisk: 15,
         lastConversationInitiatedWeek: 0,
         moraleBoost: null,
-        completedChallenges: []
+        completedChallenges: [],
       },
       // Forward
       {
@@ -206,7 +206,7 @@ describe('Formation Auto-Assignment System', () => {
           shooting: 95,
           dribbling: 78,
           positioning: 90,
-          stamina: 85
+          stamina: 85,
         },
         position: { x: 80, y: 50 },
         availability: { status: 'Available' },
@@ -224,7 +224,7 @@ describe('Formation Auto-Assignment System', () => {
           saves: 0,
           passesCompleted: 600,
           passesAttempted: 800,
-          careerHistory: []
+          careerHistory: [],
         },
         loan: { isLoaned: false },
         traits: ['Ambitious'],
@@ -237,7 +237,7 @@ describe('Formation Auto-Assignment System', () => {
         injuryRisk: 20,
         lastConversationInitiatedWeek: 0,
         moraleBoost: null,
-        completedChallenges: []
+        completedChallenges: [],
       },
       // Injured player to test availability handling
       {
@@ -259,7 +259,7 @@ describe('Formation Auto-Assignment System', () => {
           shooting: 80,
           dribbling: 85,
           positioning: 80,
-          stamina: 80
+          stamina: 80,
         },
         position: { x: 60, y: 40 },
         availability: { status: 'Major Injury', returnDate: '2024-02-15' },
@@ -277,7 +277,7 @@ describe('Formation Auto-Assignment System', () => {
           saves: 0,
           passesCompleted: 900,
           passesAttempted: 1100,
-          careerHistory: []
+          careerHistory: [],
         },
         loan: { isLoaned: false },
         traits: ['Injury Prone'],
@@ -290,8 +290,8 @@ describe('Formation Auto-Assignment System', () => {
         injuryRisk: 80,
         lastConversationInitiatedWeek: 0,
         moraleBoost: null,
-        completedChallenges: []
-      }
+        completedChallenges: [],
+      },
     ];
 
     // Create formation slots for 4-3-3 formation
@@ -301,42 +301,42 @@ describe('Formation Auto-Assignment System', () => {
         role: 'GK',
         defaultPosition: { x: 10, y: 50 },
         playerId: null,
-        preferredRoles: ['gk', 'sk']
+        preferredRoles: ['gk', 'sk'],
       },
       {
         id: 'cb-1-slot',
         role: 'DF',
         defaultPosition: { x: 25, y: 35 },
         playerId: null,
-        preferredRoles: ['cb', 'bpd']
+        preferredRoles: ['cb', 'bpd'],
       },
       {
         id: 'cb-2-slot',
         role: 'DF',
         defaultPosition: { x: 25, y: 65 },
         playerId: null,
-        preferredRoles: ['cb', 'ncb']
+        preferredRoles: ['cb', 'ncb'],
       },
       {
         id: 'cm-slot',
         role: 'MF',
         defaultPosition: { x: 50, y: 50 },
         playerId: null,
-        preferredRoles: ['cm', 'dlp', 'ap']
+        preferredRoles: ['cm', 'dlp', 'ap'],
       },
       {
         id: 'fw-slot',
         role: 'FW',
         defaultPosition: { x: 80, y: 50 },
         playerId: null,
-        preferredRoles: ['cf', 'tf']
-      }
+        preferredRoles: ['cf', 'tf'],
+      },
     ];
 
     mockFormation = {
       id: 'test-formation',
       name: '4-3-3 Test Formation',
-      slots: mockFormationSlots
+      slots: mockFormationSlots,
     };
   });
 
@@ -370,13 +370,13 @@ describe('Formation Auto-Assignment System', () => {
           role: 'MF',
           defaultPosition: { x: 50, y: 30 },
           playerId: null,
-          preferredRoles: ['cm', 'dlp']
-        }
+          preferredRoles: ['cm', 'dlp'],
+        },
       ];
 
       const extendedFormation = {
         ...mockFormation,
-        slots: extendedSlots
+        slots: extendedSlots,
       };
 
       const result = autoAssignPlayersToFormation(mockPlayers, extendedFormation, 'home');
@@ -392,7 +392,7 @@ describe('Formation Auto-Assignment System', () => {
     it('should handle empty formation slots gracefully', () => {
       const emptyFormation = {
         ...mockFormation,
-        slots: []
+        slots: [],
       };
 
       const result = autoAssignPlayersToFormation(mockPlayers, emptyFormation, 'home');
@@ -415,8 +415,8 @@ describe('Formation Auto-Assignment System', () => {
         {
           ...mockPlayers[0],
           id: 'away-gk',
-          team: 'away' as const
-        }
+          team: 'away' as const,
+        },
       ];
 
       const allPlayers = [...mockPlayers, ...awayPlayers];
@@ -439,20 +439,20 @@ describe('Formation Auto-Assignment System', () => {
         ...mockPlayers[1], // Use defender as base
         id: 'player-1',
         form: 'Excellent' as const,
-        morale: 'Excellent' as const
+        morale: 'Excellent' as const,
       };
 
       const player2 = {
         ...mockPlayers[1],
         id: 'player-2',
         form: 'Terrible' as const,
-        morale: 'Very Poor' as const
+        morale: 'Very Poor' as const,
       };
 
       const competingPlayers = [player1, player2];
       const singleSlotFormation = {
         ...mockFormation,
-        slots: [mockFormationSlots[1]] // Only one defender slot
+        slots: [mockFormationSlots[1]], // Only one defender slot
       };
 
       const result = autoAssignPlayersToFormation(competingPlayers, singleSlotFormation, 'home');
@@ -465,12 +465,12 @@ describe('Formation Auto-Assignment System', () => {
       // Test cross-position compatibility (e.g., MF in DF position)
       const midfielder = {
         ...mockPlayers[2], // Use midfielder
-        id: 'versatile-mid'
+        id: 'versatile-mid',
       };
 
       const defenderSlotOnly = {
         ...mockFormation,
-        slots: [mockFormationSlots[1]] // Only defender slot
+        slots: [mockFormationSlots[1]], // Only defender slot
       };
 
       const result = autoAssignPlayersToFormation([midfielder], defenderSlotOnly, 'home');
@@ -513,7 +513,7 @@ describe('Formation Auto-Assignment System', () => {
       const defender2 = {
         ...mockPlayers[1],
         id: 'cb-2',
-        name: 'John Stones'
+        name: 'John Stones',
       };
 
       const playersWithSecondDefender = [...mockPlayers, defender2];
@@ -543,7 +543,7 @@ describe('Formation Auto-Assignment System', () => {
       );
 
       expect(result.success).toBe(true);
-      
+
       // Should suggest moving defender to empty slot if available
       const reassignOption = result.recommendations!.find(r => r.action === 'reassign');
       if (mockFormation.slots.some(s => !s.playerId)) {
@@ -552,13 +552,7 @@ describe('Formation Auto-Assignment System', () => {
     });
 
     it('should handle invalid player IDs gracefully', () => {
-      const result = smartPlayerSwap(
-        'invalid-id',
-        'cb-1-slot',
-        'cb-1',
-        mockFormation,
-        mockPlayers
-      );
+      const result = smartPlayerSwap('invalid-id', 'cb-1-slot', 'cb-1', mockFormation, mockPlayers);
 
       expect(result.success).toBe(false);
       expect(result.recommendations).toBeUndefined();
@@ -599,7 +593,7 @@ describe('Formation Auto-Assignment System', () => {
     it('should not update positions for players not in formation', () => {
       const originalFW = mockPlayers.find(p => p.id === 'fw-1');
       const result = updatePlayerPositionsFromFormation(mockPlayers, mockFormation, 'home');
-      
+
       const updatedFW = result.find(p => p.id === 'fw-1');
       expect(updatedFW?.position).toEqual(originalFW?.position);
     });
@@ -608,7 +602,7 @@ describe('Formation Auto-Assignment System', () => {
       const awayPlayer = {
         ...mockPlayers[0],
         id: 'away-player',
-        team: 'away' as const
+        team: 'away' as const,
       };
 
       const allPlayers = [...mockPlayers, awayPlayer];
@@ -657,10 +651,10 @@ describe('Formation Auto-Assignment System', () => {
       const result = getFormationAnalysis(mockFormation, mockPlayers);
 
       // Should have recommendations for injured player
-      const injuredPlayerRecommendations = result.recommendations.filter(
-        r => r.issue.includes('Injured Player')
+      const injuredPlayerRecommendations = result.recommendations.filter(r =>
+        r.issue.includes('Injured Player')
       );
-      
+
       expect(injuredPlayerRecommendations.length).toBeGreaterThan(0);
     });
 
@@ -674,9 +668,9 @@ describe('Formation Auto-Assignment System', () => {
             id: 'empty-slot',
             role: 'MF' as const,
             defaultPosition: { x: 40, y: 30 },
-            playerId: null
-          }
-        ]
+            playerId: null,
+          },
+        ],
       };
 
       const result = getFormationAnalysis(formationWithEmpty, mockPlayers);
@@ -701,7 +695,7 @@ describe('Formation Auto-Assignment System', () => {
     it('should handle formation with no players assigned', () => {
       const emptyFormation = {
         ...mockFormation,
-        slots: mockFormation.slots.map(slot => ({ ...slot, playerId: null }))
+        slots: mockFormation.slots.map(slot => ({ ...slot, playerId: null })),
       };
 
       const result = getFormationAnalysis(emptyFormation, mockPlayers);
@@ -719,7 +713,7 @@ describe('Formation Auto-Assignment System', () => {
       const largePlayers = Array.from({ length: 100 }, (_, i) => ({
         ...mockPlayers[i % mockPlayers.length],
         id: `player-${i}`,
-        name: `Player ${i}`
+        name: `Player ${i}`,
       }));
 
       const startTime = performance.now();
@@ -736,12 +730,12 @@ describe('Formation Auto-Assignment System', () => {
         id: `slot-${i}`,
         role: (['GK', 'DF', 'MF', 'FW'] as const)[i % 4],
         defaultPosition: { x: (i % 10) * 10, y: Math.floor(i / 10) * 50 },
-        playerId: null
+        playerId: null,
       }));
 
       const bigFormation = {
         ...mockFormation,
-        slots: manySlots
+        slots: manySlots,
       };
 
       const result = autoAssignPlayersToFormation(mockPlayers, bigFormation, 'home');
@@ -756,12 +750,12 @@ describe('Formation Auto-Assignment System', () => {
       const malformedPlayers = [
         {
           ...mockPlayers[0],
-          attributes: {} as any // Missing attributes
+          attributes: {} as any, // Missing attributes
         },
         {
           ...mockPlayers[1],
-          availability: null as any // Null availability
-        }
+          availability: null as any, // Null availability
+        },
       ];
 
       expect(() => {

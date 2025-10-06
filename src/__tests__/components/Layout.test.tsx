@@ -25,7 +25,7 @@ vi.mock('../../components/ui/NotificationContainer', () => ({
 
 vi.mock('../../components/export/PrintableLineup', () => ({
   default: React.forwardRef<HTMLDivElement, any>((props: unknown, ref: unknown) => (
-    <div data-testid="printable-lineup" ref={ref}>
+    <div data-testid="printable-lineup" ref={ref as any}>
       Printable Lineup
     </div>
   )),
@@ -105,7 +105,7 @@ describe('Layout Component', () => {
         <Layout>
           <div data-testid="test-content">Test Content</div>
         </Layout>
-      </BrowserRouter>,
+      </BrowserRouter>
     );
 
     expect(screen.getByTestId('header')).toBeInTheDocument();
@@ -121,7 +121,7 @@ describe('Layout Component', () => {
         <Layout>
           <div>Content</div>
         </Layout>
-      </BrowserRouter>,
+      </BrowserRouter>
     );
 
     const layoutDiv = container.firstChild as HTMLElement;
@@ -136,7 +136,7 @@ describe('Layout Component', () => {
         <Layout>
           <div>Content</div>
         </Layout>
-      </BrowserRouter>,
+      </BrowserRouter>
     );
 
     const layoutDiv = container.firstChild as HTMLElement;
@@ -156,7 +156,7 @@ describe('Layout Component', () => {
         <Layout>
           <div>Content</div>
         </Layout>
-      </BrowserRouter>,
+      </BrowserRouter>
     );
 
     const layoutDiv = container.firstChild as HTMLElement;
@@ -176,7 +176,7 @@ describe('Layout Component', () => {
         <Layout>
           <div>Content</div>
         </Layout>
-      </BrowserRouter>,
+      </BrowserRouter>
     );
 
     const layoutDiv = container.firstChild as HTMLElement;
@@ -191,7 +191,7 @@ describe('Layout Component', () => {
         <Layout>
           <div>Content</div>
         </Layout>
-      </BrowserRouter>,
+      </BrowserRouter>
     );
 
     expect(screen.queryByTestId('header')).not.toBeInTheDocument();
@@ -205,7 +205,7 @@ describe('Layout Component', () => {
         <Layout>
           <div>Content</div>
         </Layout>
-      </BrowserRouter>,
+      </BrowserRouter>
     );
 
     expect(screen.getByTestId('header')).toBeInTheDocument();
@@ -219,7 +219,7 @@ describe('Layout Component', () => {
         <Layout>
           <div>Content</div>
         </Layout>
-      </BrowserRouter>,
+      </BrowserRouter>
     );
 
     // Wait for Suspense to resolve
@@ -236,7 +236,7 @@ describe('Layout Component', () => {
         <Layout>
           <div>Content</div>
         </Layout>
-      </BrowserRouter>,
+      </BrowserRouter>
     );
 
     await waitFor(() => {
@@ -252,7 +252,7 @@ describe('Layout Component', () => {
         <Layout>
           <div>Content</div>
         </Layout>
-      </BrowserRouter>,
+      </BrowserRouter>
     );
 
     expect(screen.queryByTestId('player-edit-popup')).not.toBeInTheDocument();
@@ -267,7 +267,7 @@ describe('Layout Component', () => {
         <Layout>
           <div>Content</div>
         </Layout>
-      </BrowserRouter>,
+      </BrowserRouter>
     );
 
     // Modal should be displayed (since activeModal is set)
@@ -280,7 +280,7 @@ describe('Layout Component', () => {
         // Either loading spinner should be present OR modal content should be loaded
         expect(modalBackdrop || modalContent).toBeTruthy();
       },
-      { timeout: 2000 },
+      { timeout: 2000 }
     );
   });
 
@@ -292,7 +292,7 @@ describe('Layout Component', () => {
         <Layout>
           <div>Content</div>
         </Layout>
-      </BrowserRouter>,
+      </BrowserRouter>
     );
 
     expect(screen.getByTestId('printable-lineup')).toBeInTheDocument();
@@ -306,7 +306,7 @@ describe('Layout Component', () => {
         <Layout>
           <div>Content</div>
         </Layout>
-      </BrowserRouter>,
+      </BrowserRouter>
     );
 
     expect(screen.queryByTestId('printable-lineup')).not.toBeInTheDocument();
@@ -320,7 +320,7 @@ describe('Layout Component', () => {
         <Layout>
           <div>Content</div>
         </Layout>
-      </BrowserRouter>,
+      </BrowserRouter>
     );
 
     // Simulate pressing 'v' for select tool
@@ -344,7 +344,7 @@ describe('Layout Component', () => {
         <Layout>
           <div>Content</div>
         </Layout>
-      </BrowserRouter>,
+      </BrowserRouter>
     );
 
     // Simulate pressing Ctrl+R
@@ -360,7 +360,7 @@ describe('Layout Component', () => {
         <Layout>
           <input data-testid="test-input" />
         </Layout>
-      </BrowserRouter>,
+      </BrowserRouter>
     );
 
     const input = screen.getByTestId('test-input');
@@ -384,7 +384,7 @@ describe('Layout Component', () => {
         <Layout>
           <div>Content</div>
         </Layout>
-      </BrowserRouter>,
+      </BrowserRouter>
     );
 
     fireEvent.keyDown(document, { key: 'v', ctrlKey: false });
@@ -408,7 +408,7 @@ describe('Layout Component', () => {
         <Layout>
           <div>Content</div>
         </Layout>
-      </BrowserRouter>,
+      </BrowserRouter>
     );
 
     const layoutDiv = container.firstChild as HTMLElement;
@@ -431,7 +431,7 @@ describe('Layout Component', () => {
         <Layout>
           <div>Content</div>
         </Layout>
-      </BrowserRouter>,
+      </BrowserRouter>
     );
 
     const layoutDiv = container.firstChild as HTMLElement;

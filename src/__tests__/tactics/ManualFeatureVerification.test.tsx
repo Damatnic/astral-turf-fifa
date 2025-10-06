@@ -1,30 +1,55 @@
 import { describe, it, expect, vi } from 'vitest';
 import { type Formation, type Player } from '../../types';
+import { createMockPlayer } from '../../test-utils/mock-factories/player.factory';
 
 describe('Manual Feature Verification', () => {
   const testFormation: Formation = {
     id: 'test-433',
     name: '4-3-3',
-    positions: {
-      'gk1': { x: 50, y: 5 },
-      'cb1': { x: 35, y: 20 },
-      'cb2': { x: 65, y: 20 },
-      'st1': { x: 50, y: 85 }
-    }
+    slots: [
+      { id: 'gk1', role: 'goalkeeper', defaultPosition: { x: 50, y: 5 }, playerId: null },
+      { id: 'cb1', role: 'center-back', defaultPosition: { x: 35, y: 20 }, playerId: null },
+      { id: 'cb2', role: 'center-back', defaultPosition: { x: 65, y: 20 }, playerId: null },
+      { id: 'st1', role: 'striker', defaultPosition: { x: 50, y: 85 }, playerId: null },
+    ],
   };
 
   const testPlayers: Player[] = [
-    { id: 'gk1', name: 'Goalkeeper', position: 'GK', currentPotential: 85, age: 28 },
-    { id: 'cb1', name: 'Center Back 1', position: 'CB', currentPotential: 82, age: 25 },
-    { id: 'cb2', name: 'Center Back 2', position: 'CB', currentPotential: 80, age: 27 },
-    { id: 'st1', name: 'Striker', position: 'ST', currentPotential: 90, age: 25 }
+    createMockPlayer({
+      id: 'gk1',
+      name: 'Goalkeeper',
+      roleId: 'goalkeeper',
+      currentPotential: 85,
+      age: 28,
+    }),
+    createMockPlayer({
+      id: 'cb1',
+      name: 'Center Back 1',
+      roleId: 'center-back',
+      currentPotential: 82,
+      age: 25,
+    }),
+    createMockPlayer({
+      id: 'cb2',
+      name: 'Center Back 2',
+      roleId: 'center-back',
+      currentPotential: 80,
+      age: 27,
+    }),
+    createMockPlayer({
+      id: 'st1',
+      name: 'Striker',
+      roleId: 'striker',
+      currentPotential: 90,
+      age: 25,
+    }),
   ];
 
   describe('Core Feature Verification', () => {
     it('1. ✅ Match Simulation Integration - Features Available', () => {
       // Verify the UnifiedTacticsBoard has match simulation integration
       expect(true).toBe(true); // Integration implemented in TacticsBoardPage.tsx
-      
+
       console.log('✅ Match Simulation Integration:');
       console.log('  - Navigation to match simulation page');
       console.log('  - Formation data transfer via session storage');
@@ -34,7 +59,7 @@ describe('Manual Feature Verification', () => {
     it('2. ✅ Tactical Playbook System - Features Available', () => {
       // Verify tactical playbook functionality
       expect(true).toBe(true); // TacticalPlaybook component implemented
-      
+
       console.log('✅ Tactical Playbook System:');
       console.log('  - Save/load formations with localStorage');
       console.log('  - Formation favorites and search');
@@ -45,7 +70,7 @@ describe('Manual Feature Verification', () => {
     it('3. ✅ Advanced Analytics Panel - Features Available', () => {
       // Verify analytics integration
       expect(true).toBe(true); // TacticalAnalyticsPanel component implemented
-      
+
       console.log('✅ Advanced Analytics Panel:');
       console.log('  - Formation balance metrics');
       console.log('  - Player performance analysis');
@@ -56,7 +81,7 @@ describe('Manual Feature Verification', () => {
     it('4. ✅ Player Statistics & Heat Maps - Features Available', () => {
       // Verify player stats overlay
       expect(true).toBe(true); // PlayerStatsOverlay component implemented
-      
+
       console.log('✅ Player Statistics & Heat Maps:');
       console.log('  - Real-time player performance overlays');
       console.log('  - Interactive heat map visualization');
@@ -67,7 +92,7 @@ describe('Manual Feature Verification', () => {
     it('5. ✅ AI Coaching Recommendations - Features Available', () => {
       // Verify AI coaching system
       expect(true).toBe(true); // Enhanced IntelligentAssistant with aiCoachingService
-      
+
       console.log('✅ AI Coaching Recommendations:');
       console.log('  - Formation structure analysis');
       console.log('  - Player positioning optimization');
@@ -78,7 +103,7 @@ describe('Manual Feature Verification', () => {
     it('6. ✅ Export & Sharing Capabilities - Features Available', () => {
       // Verify export functionality
       expect(true).toBe(true); // Export functions implemented in multiple components
-      
+
       console.log('✅ Export & Sharing Capabilities:');
       console.log('  - JSON formation export');
       console.log('  - Direct file download');
@@ -89,7 +114,7 @@ describe('Manual Feature Verification', () => {
     it('7. ✅ Seamless App Integration - Features Available', () => {
       // Verify app navigation integration
       expect(true).toBe(true); // Navigation implemented in TacticsBoardPage.tsx
-      
+
       console.log('✅ Seamless App Integration:');
       console.log('  - Navigation to Analytics page');
       console.log('  - Navigation to Match Simulation');
@@ -101,7 +126,7 @@ describe('Manual Feature Verification', () => {
   describe('UI/UX Enhancements Verification', () => {
     it('✅ Enhanced Quick Actions Panel', () => {
       expect(true).toBe(true);
-      
+
       console.log('✅ Enhanced Quick Actions Panel:');
       console.log('  - Heat Map toggle button');
       console.log('  - Player Stats toggle button');
@@ -112,7 +137,7 @@ describe('Manual Feature Verification', () => {
 
     it('✅ Professional UI Components', () => {
       expect(true).toBe(true);
-      
+
       console.log('✅ Professional UI Components:');
       console.log('  - Modern modal designs');
       console.log('  - Smooth animations with Framer Motion');
@@ -122,7 +147,7 @@ describe('Manual Feature Verification', () => {
 
     it('✅ Interactive Field Overlays', () => {
       expect(true).toBe(true);
-      
+
       console.log('✅ Interactive Field Overlays:');
       console.log('  - Real-time heat map visualization');
       console.log('  - Player performance indicators');
@@ -136,10 +161,10 @@ describe('Manual Feature Verification', () => {
       // Verify types are properly defined
       const formation: Formation = testFormation;
       const players: Player[] = testPlayers;
-      
+
       expect(formation.id).toBeDefined();
       expect(players.length).toBeGreaterThan(0);
-      
+
       console.log('✅ TypeScript Integration:');
       console.log('  - Complete type safety');
       console.log('  - Interface definitions');
@@ -148,7 +173,7 @@ describe('Manual Feature Verification', () => {
 
     it('✅ Service Architecture', () => {
       expect(true).toBe(true);
-      
+
       console.log('✅ Service Architecture:');
       console.log('  - tacticalIntegrationService.ts');
       console.log('  - aiCoachingService.ts');
@@ -158,7 +183,7 @@ describe('Manual Feature Verification', () => {
 
     it('✅ Component Architecture', () => {
       expect(true).toBe(true);
-      
+
       console.log('✅ Component Architecture:');
       console.log('  - TacticalPlaybook.tsx');
       console.log('  - TacticalAnalyticsPanel.tsx');
@@ -168,7 +193,7 @@ describe('Manual Feature Verification', () => {
 
     it('✅ Performance Optimizations', () => {
       expect(true).toBe(true);
-      
+
       console.log('✅ Performance Optimizations:');
       console.log('  - Lazy loading with React.lazy()');
       console.log('  - React.memo for component optimization');
@@ -180,7 +205,7 @@ describe('Manual Feature Verification', () => {
   describe('Build and Integration Status', () => {
     it('✅ Build Verification', () => {
       expect(true).toBe(true);
-      
+
       console.log('✅ Build Verification:');
       console.log('  - ✅ TypeScript compilation successful');
       console.log('  - ✅ No build errors');
@@ -190,7 +215,7 @@ describe('Manual Feature Verification', () => {
 
     it('✅ Feature Integration Status', () => {
       expect(true).toBe(true);
-      
+
       console.log('✅ Feature Integration Status:');
       console.log('  - ✅ All 7 major enhancements implemented');
       console.log('  - ✅ Components properly connected');
@@ -208,7 +233,7 @@ describe('Manual Feature Verification', () => {
         'Player Statistics Integration & Heat Maps',
         'AI Coaching Recommendations',
         'Export & Sharing Capabilities',
-        'Seamless App Integration'
+        'Seamless App Integration',
       ];
 
       const enhancedComponents = [
@@ -216,7 +241,7 @@ describe('Manual Feature Verification', () => {
         'TacticsBoardPage.tsx - Added navigation handlers',
         'QuickActionsPanel.tsx - Added new action buttons',
         'ModernField.tsx - Added stats overlay support',
-        'IntelligentAssistant.tsx - Enhanced with AI coaching'
+        'IntelligentAssistant.tsx - Enhanced with AI coaching',
       ];
 
       const newComponents = [
@@ -224,7 +249,7 @@ describe('Manual Feature Verification', () => {
         'TacticalAnalyticsPanel.tsx - Advanced analytics display',
         'PlayerStatsOverlay.tsx - Real-time player statistics',
         'tacticalIntegrationService.ts - Core tactical analysis',
-        'aiCoachingService.ts - AI-powered coaching recommendations'
+        'aiCoachingService.ts - AI-powered coaching recommendations',
       ];
 
       expect(completedFeatures.length).toBe(7);
@@ -266,7 +291,7 @@ describe('📋 Manual Testing Checklist', () => {
   it('🔍 User Workflow Verification', () => {
     console.log('\n📋 MANUAL TESTING CHECKLIST:');
     console.log('============================');
-    
+
     const testCases = [
       {
         feature: 'Heat Map Visualization',
@@ -274,8 +299,8 @@ describe('📋 Manual Testing Checklist', () => {
           '1. Open tactics board',
           '2. Click Heat Map button in QuickActions',
           '3. Verify colored zones appear on field',
-          '4. Check legend shows attack/defense/midfield zones'
-        ]
+          '4. Check legend shows attack/defense/midfield zones',
+        ],
       },
       {
         feature: 'Player Statistics Overlay',
@@ -283,8 +308,8 @@ describe('📋 Manual Testing Checklist', () => {
           '1. Click Player Stats button',
           '2. Select a player on the field',
           '3. Verify performance ring appears',
-          '4. Check detailed stats panel shows metrics'
-        ]
+          '4. Check detailed stats panel shows metrics',
+        ],
       },
       {
         feature: 'AI Coaching Recommendations',
@@ -292,8 +317,8 @@ describe('📋 Manual Testing Checklist', () => {
           '1. Click AI Assistant button',
           '2. Navigate to AI Coaching tab',
           '3. Verify recommendations appear with priorities',
-          '4. Check confidence scores and reasoning'
-        ]
+          '4. Check confidence scores and reasoning',
+        ],
       },
       {
         feature: 'Tactical Playbook',
@@ -301,8 +326,8 @@ describe('📋 Manual Testing Checklist', () => {
           '1. Click Tactical Playbook button',
           '2. Save current formation with name',
           '3. Verify formation appears in list',
-          '4. Test load and export functionality'
-        ]
+          '4. Test load and export functionality',
+        ],
       },
       {
         feature: 'Live Analytics',
@@ -310,8 +335,8 @@ describe('📋 Manual Testing Checklist', () => {
           '1. Click Live Analysis button',
           '2. Verify formation metrics display',
           '3. Check player performance analysis',
-          '4. Review AI tactical insights'
-        ]
+          '4. Review AI tactical insights',
+        ],
       },
       {
         feature: 'Match Simulation Integration',
@@ -319,8 +344,8 @@ describe('📋 Manual Testing Checklist', () => {
           '1. Click Simulate Match button',
           '2. Verify navigation to match simulation',
           '3. Check formation data transfers correctly',
-          '4. Confirm tactical setup applies'
-        ]
+          '4. Confirm tactical setup applies',
+        ],
       },
       {
         feature: 'Export & Sharing',
@@ -328,9 +353,9 @@ describe('📋 Manual Testing Checklist', () => {
           '1. Create or select formation',
           '2. Click Export & Share button',
           '3. Verify JSON file downloads',
-          '4. Check analysis data included'
-        ]
-      }
+          '4. Check analysis data included',
+        ],
+      },
     ];
 
     testCases.forEach(testCase => {
@@ -341,7 +366,7 @@ describe('📋 Manual Testing Checklist', () => {
     });
 
     console.log('\n✅ All features ready for manual verification!');
-    
+
     expect(testCases.length).toBe(7);
   });
 });

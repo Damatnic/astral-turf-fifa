@@ -16,7 +16,7 @@ const analyticsEventSchema = z.object({
   userId: z.string().optional(),
   sessionId: z.string().optional(),
   metadata: z.record(z.any()).optional(),
-  timestamp: z.string().datetime().optional()
+  timestamp: z.string().datetime().optional(),
 });
 
 /**
@@ -39,20 +39,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     switch (req.method) {
       case 'POST':
         return await handleTrackEvent(req, res);
-      
+
       case 'GET':
         return await handleGetAnalytics(req, res);
-      
+
       default:
         return res.status(405).json({
           error: 'Method not allowed',
-          message: `Method ${req.method} is not supported`
+          message: `Method ${req.method} is not supported`,
         });
     }
-
   } catch (error) {
     console.error('Analytics API error:', error);
-    
+
     try {
       await prisma.$disconnect();
     } catch (disconnectError) {
@@ -61,7 +60,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     return res.status(500).json({
       error: 'Internal server error',
-      message: 'An error occurred while processing analytics request'
+      message: 'An error occurred while processing analytics request',
     });
   }
 }
@@ -75,12 +74,12 @@ async function handleTrackEvent(req: VercelRequest, res: VercelResponse) {
     if (!validationResult.success) {
       return res.status(400).json({
         error: 'Validation failed',
-        details: validationResult.error.errors
+        details: validationResult.error.errors,
       });
     }
 
     const { eventType, page, userId, sessionId, metadata } = validationResult.data;
-    
+
     // Get client information
     const ipAddress = req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || 'unknown';
     const userAgent = req.headers['user-agent'] || 'unknown';
@@ -101,9 +100,9 @@ async function handleTrackEvent(req: VercelRequest, res: VercelResponse) {
           page,
           referer,
           timestamp: new Date().toISOString(),
-          ...metadata
-        }
-      }
+          ...metadata,
+        },
+      },
     });
 
     await prisma.$disconnect();
@@ -111,9 +110,8 @@ async function handleTrackEvent(req: VercelRequest, res: VercelResponse) {
     return res.status(200).json({
       success: true,
       message: 'Event tracked successfully',
-      eventId: `evt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      eventId: `evt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     });
-
   } catch (error) {
     console.error('Error tracking analytics event:', error);
     throw error;
@@ -125,25 +123,17 @@ async function handleTrackEvent(req: VercelRequest, res: VercelResponse) {
  */
 async function handleGetAnalytics(req: VercelRequest, res: VercelResponse) {
   try {
-    const { 
-      startDate, 
-      endDate, 
-      eventType, 
-      page, 
-      userId,
-      limit = '100',
-      offset = '0'
-    } = req.query;
+    const { startDate, endDate, eventType, page, userId, limit = '100', offset = '0' } = req.query;
 
     // Build where clause
     const whereClause: any = {
-      securityEventType: 'analytics_event'
+      securityEventType: 'analytics_event',
     };
 
     if (startDate && endDate) {
       whereClause.timestamp = {
         gte: new Date(startDate as string),
-        lte: new Date(endDate as string)
+        lte: new Date(endDate as string),
       };
     }
 
@@ -153,7 +143,7 @@ async function handleGetAnalytics(req: VercelRequest, res: VercelResponse) {
 
     if (eventType || page) {
       whereClause.metadata = {
-        path: []
+        path: [],
       };
 
       if (eventType) {
@@ -177,18 +167,18 @@ async function handleGetAnalytics(req: VercelRequest, res: VercelResponse) {
         userId: true,
         sessionId: true,
         ipAddress: true,
-        metadata: true
+        metadata: true,
       },
       orderBy: {
-        timestamp: 'desc'
+        timestamp: 'desc',
       },
       take: parseInt(limit as string),
-      skip: parseInt(offset as string)
+      skip: parseInt(offset as string),
     });
 
     // Get total count
     const totalCount = await prisma.systemLog.count({
-      where: whereClause
+      where: whereClause,
     });
 
     // Aggregate data for insights
@@ -200,10 +190,10 @@ async function handleGetAnalytics(req: VercelRequest, res: VercelResponse) {
         _count: true,
         orderBy: {
           _count: {
-            metadata: 'desc'
-          }
+            metadata: 'desc',
+          },
         },
-        take: 10
+        take: 10,
       }),
 
       // Events by hour (last 24 hours)
@@ -216,7 +206,7 @@ async function handleGetAnalytics(req: VercelRequest, res: VercelResponse) {
           AND timestamp >= NOW() - INTERVAL '24 hours'
         GROUP BY DATE_TRUNC('hour', timestamp)
         ORDER BY hour DESC
-      `
+      `,
     ]);
 
     await prisma.$disconnect();
@@ -229,15 +219,14 @@ async function handleGetAnalytics(req: VercelRequest, res: VercelResponse) {
           total: totalCount,
           limit: parseInt(limit as string),
           offset: parseInt(offset as string),
-          hasMore: totalCount > parseInt(offset as string) + parseInt(limit as string)
+          hasMore: totalCount > parseInt(offset as string) + parseInt(limit as string),
         },
         insights: {
           topPages: aggregations[0],
-          hourlyEvents: aggregations[1]
-        }
-      }
+          hourlyEvents: aggregations[1],
+        },
+      },
     });
-
   } catch (error) {
     console.error('Error retrieving analytics data:', error);
     throw error;

@@ -3,11 +3,28 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import LoginPage from '../../pages/LoginPage';
-import { renderWithProviders, mockAuthService } from '../utils/test-utils';
+import { renderWithProviders } from '../utils/test-utils';
 import { createMockUser } from '../factories';
 import '../mocks/modules';
 
-// Mock the authService
+// Mock the authService - define mock inline to avoid hoisting issues
+const mockAuthService = {
+  login: vi.fn(),
+  signup: vi.fn(),
+  logout: vi.fn(),
+  getCurrentUser: vi.fn(),
+  getFamilyAssociations: vi.fn(),
+  updateUserProfile: vi.fn(),
+  requestPasswordReset: vi.fn(),
+  resetPassword: vi.fn(),
+  createFamilyAssociation: vi.fn(),
+  approveFamilyAssociation: vi.fn(),
+  updateNotificationSettings: vi.fn(),
+  deactivateUser: vi.fn(),
+  activateUser: vi.fn(),
+  getAllUsers: vi.fn(),
+};
+
 vi.mock('../../services/authService', () => ({
   authService: mockAuthService,
 }));

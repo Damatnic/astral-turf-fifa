@@ -41,7 +41,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       id,
       ...props
     },
-    ref,
+    ref
   ) => {
     const [isFocused, setIsFocused] = useState(false);
     const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
@@ -54,7 +54,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             htmlFor={inputId}
             className={cn(
               'block text-sm font-medium transition-colors',
-              error ? 'text-error-400' : 'text-secondary-300',
+              error ? 'text-error-400' : 'text-secondary-300'
             )}
           >
             {label}
@@ -94,7 +94,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               // Error state
               error && 'border-error-500 focus:border-error-500 focus:ring-error-500/50',
 
-              className,
+              className
             )}
             onFocus={e => {
               setIsFocused(true);
@@ -123,7 +123,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         )}
       </div>
     );
-  },
+  }
 );
 
 Input.displayName = 'Input';
@@ -151,7 +151,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       id,
       ...props
     },
-    ref,
+    ref
   ) => {
     const textareaId = id || `textarea-${Math.random().toString(36).substr(2, 9)}`;
 
@@ -170,7 +170,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             htmlFor={textareaId}
             className={cn(
               'block text-sm font-medium transition-colors',
-              error ? 'text-error-400' : 'text-secondary-300',
+              error ? 'text-error-400' : 'text-secondary-300'
             )}
           >
             {label}
@@ -198,7 +198,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             // Error state
             error && 'border-error-500 focus:border-error-500 focus:ring-error-500/50',
 
-            className,
+            className
           )}
           {...props}
         />
@@ -211,7 +211,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         )}
       </div>
     );
-  },
+  }
 );
 
 Textarea.displayName = 'Textarea';
@@ -225,7 +225,7 @@ export interface SearchInputProps extends Omit<InputProps, 'leftIcon' | 'type'> 
 export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
   (
     { onClear, showClearButton = true, value, onChange, placeholder = 'Search...', ...props },
-    ref,
+    ref
   ) => {
     const handleClear = () => {
       onClear?.();
@@ -274,7 +274,7 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
         {...props}
       />
     );
-  },
+  }
 );
 
 SearchInput.displayName = 'SearchInput';

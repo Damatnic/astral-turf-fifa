@@ -10,10 +10,14 @@ import { SmartSidebar } from '../../../components/tactics/SmartSidebar';
 vi.mock('framer-motion', () => ({
   motion: {
     div: React.forwardRef<HTMLDivElement, any>(({ children, ...props }, ref) => (
-      <div ref={ref} {...props}>{children}</div>
+      <div ref={ref} {...props}>
+        {children}
+      </div>
     )),
     aside: React.forwardRef<HTMLElement, any>(({ children, ...props }, ref) => (
-      <aside ref={ref} {...props}>{children}</aside>
+      <aside ref={ref} {...props}>
+        {children}
+      </aside>
     )),
   },
   AnimatePresence: ({ children }: { children: React.ReactNode }) => children,
@@ -235,10 +239,7 @@ describe('SmartSidebar', () => {
         },
       };
 
-      renderWithProviders(
-        <SmartSidebar {...mockProps} activeTab="formations" />,
-        { initialState }
-      );
+      renderWithProviders(<SmartSidebar {...mockProps} activeTab="formations" />, { initialState });
 
       expect(screen.getByText('4-4-2 Classic')).toBeInTheDocument();
       expect(screen.getByText('4-3-3 Attack')).toBeInTheDocument();
@@ -252,10 +253,7 @@ describe('SmartSidebar', () => {
         },
       };
 
-      renderWithProviders(
-        <SmartSidebar {...mockProps} activeTab="formations" />,
-        { initialState }
-      );
+      renderWithProviders(<SmartSidebar {...mockProps} activeTab="formations" />, { initialState });
 
       const formationItem = screen.getByText('4-4-2 Classic');
       await user.click(formationItem);
@@ -271,10 +269,7 @@ describe('SmartSidebar', () => {
         },
       };
 
-      renderWithProviders(
-        <SmartSidebar {...mockProps} activeTab="formations" />,
-        { initialState }
-      );
+      renderWithProviders(<SmartSidebar {...mockProps} activeTab="formations" />, { initialState });
 
       const formationItem = screen.getByText('4-4-2 Classic');
       await user.hover(formationItem);
@@ -291,10 +286,7 @@ describe('SmartSidebar', () => {
         },
       };
 
-      renderWithProviders(
-        <SmartSidebar {...mockProps} activeTab="formations" />,
-        { initialState }
-      );
+      renderWithProviders(<SmartSidebar {...mockProps} activeTab="formations" />, { initialState });
 
       expect(screen.getByText(/no formations available/i)).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /create new formation/i })).toBeInTheDocument();
@@ -312,10 +304,7 @@ describe('SmartSidebar', () => {
         },
       };
 
-      renderWithProviders(
-        <SmartSidebar {...mockProps} activeTab="formations" />,
-        { initialState }
-      );
+      renderWithProviders(<SmartSidebar {...mockProps} activeTab="formations" />, { initialState });
 
       const searchInput = screen.getByPlaceholderText(/search formations/i);
       await user.type(searchInput, '4-4-2');
@@ -329,8 +318,8 @@ describe('SmartSidebar', () => {
   describe('Players Panel', () => {
     it('should display players list when players tab is active', () => {
       const players = [
-        generatePlayer({ id: 'player-1', name: 'John Doe', position: 'FW' }),
-        generatePlayer({ id: 'player-2', name: 'Jane Smith', position: 'MF' }),
+        generatePlayer({ id: 'player-1', name: 'John Doe', position: 'FW' as any }),
+        generatePlayer({ id: 'player-2', name: 'Jane Smith', position: 'MF' as any }),
       ];
       const initialState = {
         tactics: {
@@ -338,10 +327,7 @@ describe('SmartSidebar', () => {
         },
       };
 
-      renderWithProviders(
-        <SmartSidebar {...mockProps} activeTab="players" />,
-        { initialState }
-      );
+      renderWithProviders(<SmartSidebar {...mockProps} activeTab="players" />, { initialState });
 
       expect(screen.getByText('John Doe')).toBeInTheDocument();
       expect(screen.getByText('Jane Smith')).toBeInTheDocument();
@@ -355,10 +341,7 @@ describe('SmartSidebar', () => {
         },
       };
 
-      renderWithProviders(
-        <SmartSidebar {...mockProps} activeTab="players" />,
-        { initialState }
-      );
+      renderWithProviders(<SmartSidebar {...mockProps} activeTab="players" />, { initialState });
 
       const playerItem = screen.getByText('John Doe');
       await user.click(playerItem);
@@ -368,9 +351,9 @@ describe('SmartSidebar', () => {
 
     it('should filter players by position', async () => {
       const players = [
-        generatePlayer({ id: 'player-1', name: 'John Doe', position: 'FW' }),
-        generatePlayer({ id: 'player-2', name: 'Jane Smith', position: 'MF' }),
-        generatePlayer({ id: 'player-3', name: 'Bob Wilson', position: 'DF' }),
+        generatePlayer({ id: 'player-1', name: 'John Doe', position: 'FW' as any }),
+        generatePlayer({ id: 'player-2', name: 'Jane Smith', position: 'MF' as any }),
+        generatePlayer({ id: 'player-3', name: 'Bob Wilson', position: 'DF' as any }),
       ];
       const initialState = {
         tactics: {
@@ -378,10 +361,7 @@ describe('SmartSidebar', () => {
         },
       };
 
-      renderWithProviders(
-        <SmartSidebar {...mockProps} activeTab="players" />,
-        { initialState }
-      );
+      renderWithProviders(<SmartSidebar {...mockProps} activeTab="players" />, { initialState });
 
       const positionFilter = screen.getByRole('button', { name: /forward/i });
       await user.click(positionFilter);
@@ -393,9 +373,9 @@ describe('SmartSidebar', () => {
 
     it('should sort players by different criteria', async () => {
       const players = [
-        generatePlayer({ id: 'player-1', name: 'Alice', attributes: { speed: 70 } }),
-        generatePlayer({ id: 'player-2', name: 'Bob', attributes: { speed: 90 } }),
-        generatePlayer({ id: 'player-3', name: 'Charlie', attributes: { speed: 80 } }),
+        generatePlayer({ id: 'player-1', name: 'Alice', attributes: { speed: 70 } as any }),
+        generatePlayer({ id: 'player-2', name: 'Bob', attributes: { speed: 90 } as any }),
+        generatePlayer({ id: 'player-3', name: 'Charlie', attributes: { speed: 80 } as any }),
       ];
       const initialState = {
         tactics: {
@@ -403,10 +383,7 @@ describe('SmartSidebar', () => {
         },
       };
 
-      renderWithProviders(
-        <SmartSidebar {...mockProps} activeTab="players" />,
-        { initialState }
-      );
+      renderWithProviders(<SmartSidebar {...mockProps} activeTab="players" />, { initialState });
 
       const sortButton = screen.getByRole('button', { name: /sort by speed/i });
       await user.click(sortButton);
@@ -428,10 +405,7 @@ describe('SmartSidebar', () => {
         challenges,
       };
 
-      renderWithProviders(
-        <SmartSidebar {...mockProps} activeTab="challenges" />,
-        { initialState }
-      );
+      renderWithProviders(<SmartSidebar {...mockProps} activeTab="challenges" />, { initialState });
 
       expect(screen.getByText('Master the 4-3-3')).toBeInTheDocument();
       expect(screen.getByText('Perfect Positioning')).toBeInTheDocument();
@@ -443,10 +417,7 @@ describe('SmartSidebar', () => {
         challenges: [challenge],
       };
 
-      renderWithProviders(
-        <SmartSidebar {...mockProps} activeTab="challenges" />,
-        { initialState }
-      );
+      renderWithProviders(<SmartSidebar {...mockProps} activeTab="challenges" />, { initialState });
 
       const challengeItem = screen.getByText('Master the 4-3-3');
       await user.click(challengeItem);
@@ -463,10 +434,7 @@ describe('SmartSidebar', () => {
         challenges,
       };
 
-      renderWithProviders(
-        <SmartSidebar {...mockProps} activeTab="challenges" />,
-        { initialState }
-      );
+      renderWithProviders(<SmartSidebar {...mockProps} activeTab="challenges" />, { initialState });
 
       const beginnerFilter = screen.getByRole('button', { name: /beginner/i });
       await user.click(beginnerFilter);
@@ -484,10 +452,7 @@ describe('SmartSidebar', () => {
         challenges,
       };
 
-      renderWithProviders(
-        <SmartSidebar {...mockProps} activeTab="challenges" />,
-        { initialState }
-      );
+      renderWithProviders(<SmartSidebar {...mockProps} activeTab="challenges" />, { initialState });
 
       expect(screen.getByText('60%')).toBeInTheDocument();
       expect(screen.getByTestId('completed-badge')).toBeInTheDocument();
@@ -541,7 +506,7 @@ describe('SmartSidebar', () => {
       renderWithProviders(<SmartSidebar {...mockProps} />);
 
       const sidebar = screen.getByTestId('smart-sidebar');
-      
+
       // Simulate swipe left gesture
       fireEvent.touchStart(sidebar, { touches: [{ clientX: 200, clientY: 100 }] });
       fireEvent.touchMove(sidebar, { touches: [{ clientX: 50, clientY: 100 }] });
@@ -566,7 +531,7 @@ describe('SmartSidebar', () => {
 
   describe('Performance Optimization', () => {
     it('should render within performance threshold', async () => {
-      const renderTime = await testUtils.measureRenderTime(() => {
+      const renderTime = await (testUtils as any).measureRenderTime(() => {
         renderWithProviders(<SmartSidebar {...mockProps} />);
       });
 
@@ -574,7 +539,7 @@ describe('SmartSidebar', () => {
     });
 
     it('should virtualize long lists', () => {
-      const manyPlayers = Array.from({ length: 1000 }, (_, i) => 
+      const manyPlayers = Array.from({ length: 1000 }, (_, i) =>
         generatePlayer({ id: `player-${i}`, name: `Player ${i}` })
       );
       const initialState = {
@@ -583,10 +548,7 @@ describe('SmartSidebar', () => {
         },
       };
 
-      renderWithProviders(
-        <SmartSidebar {...mockProps} activeTab="players" />,
-        { initialState }
-      );
+      renderWithProviders(<SmartSidebar {...mockProps} activeTab="players" />, { initialState });
 
       // Only a subset should be rendered in DOM
       const renderedPlayers = screen.getAllByTestId('player-item');

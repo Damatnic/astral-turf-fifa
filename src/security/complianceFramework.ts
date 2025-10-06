@@ -1,6 +1,6 @@
 /**
  * Guardian Compliance Framework
- * 
+ *
  * Enterprise-grade compliance and audit system for tactical board security
  * Supports GDPR, SOC2, ISO27001, and custom compliance requirements
  */
@@ -14,7 +14,7 @@ export enum ComplianceFramework {
   ISO27001 = 'ISO27001',
   HIPAA = 'HIPAA',
   PCI_DSS = 'PCI_DSS',
-  CUSTOM = 'CUSTOM'
+  CUSTOM = 'CUSTOM',
 }
 
 export enum DataCategory {
@@ -23,7 +23,7 @@ export enum DataCategory {
   FINANCIAL_DATA = 'financial_data',
   MEDICAL_DATA = 'medical_data',
   COMMUNICATION_DATA = 'communication_data',
-  SYSTEM_DATA = 'system_data'
+  SYSTEM_DATA = 'system_data',
 }
 
 export enum ProcessingLawfulness {
@@ -32,7 +32,7 @@ export enum ProcessingLawfulness {
   LEGAL_OBLIGATION = 'legal_obligation',
   VITAL_INTERESTS = 'vital_interests',
   PUBLIC_TASK = 'public_task',
-  LEGITIMATE_INTERESTS = 'legitimate_interests'
+  LEGITIMATE_INTERESTS = 'legitimate_interests',
 }
 
 export enum DataSubjectRights {
@@ -42,7 +42,7 @@ export enum DataSubjectRights {
   RESTRICT_PROCESSING = 'restrict_processing',
   DATA_PORTABILITY = 'data_portability',
   OBJECT = 'object',
-  WITHDRAW_CONSENT = 'withdraw_consent'
+  WITHDRAW_CONSENT = 'withdraw_consent',
 }
 
 export interface ComplianceAuditEntry {
@@ -178,7 +178,7 @@ export class GuardianComplianceFramework {
       archiveAfter: 1095, // 3 years
       deleteAfter: 2555,
       legalHold: false,
-      reason: 'Contract and legal obligations'
+      reason: 'Contract and legal obligations',
     },
     [DataCategory.TACTICAL_DATA]: {
       category: DataCategory.TACTICAL_DATA,
@@ -186,7 +186,7 @@ export class GuardianComplianceFramework {
       archiveAfter: 365, // 1 year
       deleteAfter: 1095,
       legalHold: false,
-      reason: 'Business operations and analysis'
+      reason: 'Business operations and analysis',
     },
     [DataCategory.FINANCIAL_DATA]: {
       category: DataCategory.FINANCIAL_DATA,
@@ -194,7 +194,7 @@ export class GuardianComplianceFramework {
       archiveAfter: 1095, // 3 years
       deleteAfter: 2555,
       legalHold: false,
-      reason: 'Tax and regulatory requirements'
+      reason: 'Tax and regulatory requirements',
     },
     [DataCategory.MEDICAL_DATA]: {
       category: DataCategory.MEDICAL_DATA,
@@ -202,7 +202,7 @@ export class GuardianComplianceFramework {
       archiveAfter: 1095, // 3 years
       deleteAfter: 3650,
       legalHold: false,
-      reason: 'Medical record keeping requirements'
+      reason: 'Medical record keeping requirements',
     },
     [DataCategory.COMMUNICATION_DATA]: {
       category: DataCategory.COMMUNICATION_DATA,
@@ -210,7 +210,7 @@ export class GuardianComplianceFramework {
       archiveAfter: 90, // 3 months
       deleteAfter: 365,
       legalHold: false,
-      reason: 'Communication history and support'
+      reason: 'Communication history and support',
     },
     [DataCategory.SYSTEM_DATA]: {
       category: DataCategory.SYSTEM_DATA,
@@ -218,8 +218,8 @@ export class GuardianComplianceFramework {
       archiveAfter: 30, // 1 month
       deleteAfter: 90,
       legalHold: false,
-      reason: 'System operations and security'
-    }
+      reason: 'System operations and security',
+    },
   };
 
   /**
@@ -251,7 +251,7 @@ export class GuardianComplianceFramework {
       location: 'EU/US', // Would be determined by actual deployment
       details,
       ipAddress: context?.ipAddress,
-      userAgent: context?.userAgent
+      userAgent: context?.userAgent,
     };
 
     this.auditLog.set(auditEntry.id, auditEntry);
@@ -265,8 +265,8 @@ export class GuardianComplianceFramework {
         dataType,
         purpose,
         lawfulness,
-        framework
-      }
+        framework,
+      },
     });
 
     // Check for compliance violations
@@ -296,7 +296,7 @@ export class GuardianComplianceFramework {
       consentTimestamp: new Date().toISOString(),
       consentVersion,
       ipAddress,
-      userAgent
+      userAgent,
     };
 
     this.consentRecords.set(consentRecord.id, consentRecord);
@@ -308,8 +308,8 @@ export class GuardianComplianceFramework {
         purpose,
         dataCategories,
         consentGiven,
-        consentVersion
-      }
+        consentVersion,
+      },
     });
 
     return consentRecord;
@@ -324,7 +324,7 @@ export class GuardianComplianceFramework {
     reason?: string
   ): Promise<{ success: boolean; error?: string }> {
     const consentRecord = this.consentRecords.get(consentId);
-    
+
     if (!consentRecord) {
       return { success: false, error: 'Consent record not found' };
     }
@@ -341,8 +341,8 @@ export class GuardianComplianceFramework {
       metadata: {
         consentId,
         reason,
-        originalPurpose: consentRecord.purpose
-      }
+        originalPurpose: consentRecord.purpose,
+      },
     });
 
     // Process data deletion/anonymization if required
@@ -368,27 +368,31 @@ export class GuardianComplianceFramework {
       verification: {
         method: verificationMethod,
         verified: false,
-        additionalChecks: []
+        additionalChecks: [],
       },
       compliance: {
         framework: ComplianceFramework.GDPR,
         requirements: await this.getComplianceRequirements(requestType),
         overallCompliance: false,
         lastChecked: new Date().toISOString(),
-        nextReview: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 days
-      }
+        nextReview: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days
+      },
     };
 
     this.dataSubjectRequests.set(request.id, request);
 
-    securityLogger.logSecurityEvent('DATA_SUBJECT_REQUEST' as any, `Data subject request: ${requestType}`, {
-      userId,
-      metadata: {
-        requestId: request.id,
-        requestType,
-        verificationMethod
+    securityLogger.logSecurityEvent(
+      'DATA_SUBJECT_REQUEST' as any,
+      `Data subject request: ${requestType}`,
+      {
+        userId,
+        metadata: {
+          requestId: request.id,
+          requestType,
+          verificationMethod,
+        },
       }
-    });
+    );
 
     // Auto-start verification process
     await this.initiateVerification(request);
@@ -399,9 +403,11 @@ export class GuardianComplianceFramework {
   /**
    * Process data access request (Right to Access)
    */
-  async processAccessRequest(requestId: string): Promise<{ success: boolean; data?: unknown; error?: string }> {
+  async processAccessRequest(
+    requestId: string
+  ): Promise<{ success: boolean; data?: unknown; error?: string }> {
     const request = this.dataSubjectRequests.get(requestId);
-    
+
     if (!request || request.requestType !== DataSubjectRights.ACCESS) {
       return { success: false, error: 'Invalid access request' };
     }
@@ -415,28 +421,28 @@ export class GuardianComplianceFramework {
 
       // Collect all user data
       const userData = await this.collectUserData(request.userId);
-      
+
       // Encrypt sensitive data
-      const encryptedData = encryptData(
-        JSON.stringify(userData),
-        DataClassification.CONFIDENTIAL
-      );
+      const encryptedData = encryptData(JSON.stringify(userData), DataClassification.CONFIDENTIAL);
 
       request.status = 'completed';
       request.processedAt = new Date().toISOString();
       request.dataExported = true;
 
-      securityLogger.logSecurityEvent('DATA_ACCESS_GRANTED' as any, 'Data access request processed', {
-        userId: request.userId,
-        metadata: {
-          requestId,
-          dataSize: JSON.stringify(userData).length,
-          processedAt: request.processedAt
+      securityLogger.logSecurityEvent(
+        'DATA_ACCESS_GRANTED' as any,
+        'Data access request processed',
+        {
+          userId: request.userId,
+          metadata: {
+            requestId,
+            dataSize: JSON.stringify(userData).length,
+            processedAt: request.processedAt,
+          },
         }
-      });
+      );
 
       return { success: true, data: encryptedData };
-
     } catch (error) {
       request.status = 'rejected';
       request.reason = error instanceof Error ? error.message : 'Processing failed';
@@ -450,7 +456,7 @@ export class GuardianComplianceFramework {
    */
   async processErasureRequest(requestId: string): Promise<{ success: boolean; error?: string }> {
     const request = this.dataSubjectRequests.get(requestId);
-    
+
     if (!request || request.requestType !== DataSubjectRights.ERASURE) {
       return { success: false, error: 'Invalid erasure request' };
     }
@@ -482,12 +488,11 @@ export class GuardianComplianceFramework {
         metadata: {
           requestId,
           processedAt: request.processedAt,
-          erasureMethod: 'deletion_and_anonymization'
-        }
+          erasureMethod: 'deletion_and_anonymization',
+        },
       });
 
       return { success: true };
-
     } catch (error) {
       request.status = 'rejected';
       request.reason = error instanceof Error ? error.message : 'Erasure failed';
@@ -505,27 +510,28 @@ export class GuardianComplianceFramework {
     endDate: Date
   ): Promise<ComplianceReport> {
     const auditEntries = Array.from(this.auditLog.values()).filter(
-      entry => entry.framework === framework &&
-               new Date(entry.timestamp) >= startDate &&
-               new Date(entry.timestamp) <= endDate
+      entry =>
+        entry.framework === framework &&
+        new Date(entry.timestamp) >= startDate &&
+        new Date(entry.timestamp) <= endDate
     );
 
     const report: ComplianceReport = {
       framework,
       period: {
         start: startDate.toISOString(),
-        end: endDate.toISOString()
+        end: endDate.toISOString(),
       },
       summary: {
         totalEntries: auditEntries.length,
         dataCategories: this.groupByCategory(auditEntries),
         lawfulnessBases: this.groupByLawfulness(auditEntries),
-        violations: auditEntries.filter(entry => this.isViolation(entry)).length
+        violations: auditEntries.filter(entry => this.isViolation(entry)).length,
       },
       entries: auditEntries,
       recommendations: await this.generateRecommendations(auditEntries),
       generatedAt: new Date().toISOString(),
-      generatedBy: 'Guardian Compliance Framework'
+      generatedBy: 'Guardian Compliance Framework',
     };
 
     return report;
@@ -557,7 +563,7 @@ export class GuardianComplianceFramework {
         auditId: entry.id,
         violations,
         dataCategory: entry.dataCategory,
-        action: entry.action
+        action: entry.action,
       });
     }
   }
@@ -570,7 +576,7 @@ export class GuardianComplianceFramework {
       DataCategory.PERSONAL_DATA,
       DataCategory.FINANCIAL_DATA,
       DataCategory.MEDICAL_DATA,
-      DataCategory.TACTICAL_DATA
+      DataCategory.TACTICAL_DATA,
     ].includes(category);
   }
 
@@ -604,20 +610,26 @@ export class GuardianComplianceFramework {
    * Group audit entries by data category
    */
   private groupByCategory(entries: ComplianceAuditEntry[]): Record<string, number> {
-    return entries.reduce((acc, entry) => {
-      acc[entry.dataCategory] = (acc[entry.dataCategory] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    return entries.reduce(
+      (acc, entry) => {
+        acc[entry.dataCategory] = (acc[entry.dataCategory] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
   }
 
   /**
    * Group audit entries by lawfulness basis
    */
   private groupByLawfulness(entries: ComplianceAuditEntry[]): Record<string, number> {
-    return entries.reduce((acc, entry) => {
-      acc[entry.lawfulness] = (acc[entry.lawfulness] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    return entries.reduce(
+      (acc, entry) => {
+        acc[entry.lawfulness] = (acc[entry.lawfulness] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
   }
 
   /**
@@ -627,18 +639,21 @@ export class GuardianComplianceFramework {
     const recommendations: string[] = [];
 
     // Check for high-risk patterns
-    const highRiskEntries = entries.filter(entry => 
-      entry.dataCategory === DataCategory.MEDICAL_DATA ||
-      entry.dataCategory === DataCategory.FINANCIAL_DATA
+    const highRiskEntries = entries.filter(
+      entry =>
+        entry.dataCategory === DataCategory.MEDICAL_DATA ||
+        entry.dataCategory === DataCategory.FINANCIAL_DATA
     );
 
     if (highRiskEntries.length > 100) {
-      recommendations.push('Consider implementing additional controls for high-risk data processing');
+      recommendations.push(
+        'Consider implementing additional controls for high-risk data processing'
+      );
     }
 
     // Check encryption usage
-    const unencryptedEntries = entries.filter(entry => 
-      this.requiresEncryption(entry.dataCategory) && !entry.encryption
+    const unencryptedEntries = entries.filter(
+      entry => this.requiresEncryption(entry.dataCategory) && !entry.encryption
     );
 
     if (unencryptedEntries.length > 0) {
@@ -651,25 +666,27 @@ export class GuardianComplianceFramework {
   /**
    * Get compliance requirements for request type
    */
-  private async getComplianceRequirements(requestType: DataSubjectRights): Promise<ComplianceRequirement[]> {
+  private async getComplianceRequirements(
+    requestType: DataSubjectRights
+  ): Promise<ComplianceRequirement[]> {
     const baseRequirements: ComplianceRequirement[] = [
       {
         id: 'identity_verification',
         description: 'Verify identity of data subject',
-        status: 'pending',
+        status: 'not_applicable',
         evidence: [],
         lastVerified: new Date().toISOString(),
-        responsible: 'Data Protection Officer'
+        responsible: 'Data Protection Officer',
       },
       {
         id: 'response_timeframe',
         description: 'Respond within 1 month',
-        status: 'pending',
+        status: 'not_applicable',
         evidence: [],
         lastVerified: new Date().toISOString(),
         responsible: 'Data Controller',
-        deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
-      }
+        deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      },
     ];
 
     return baseRequirements;
@@ -693,7 +710,7 @@ export class GuardianComplianceFramework {
       personalData: { userId, note: 'Personal data would be collected here' },
       tacticalData: { userId, note: 'Tactical formations and data would be collected here' },
       communicationData: { userId, note: 'Messages and communications would be collected here' },
-      systemData: { userId, note: 'Login history and system interactions would be collected here' }
+      systemData: { userId, note: 'Login history and system interactions would be collected here' },
     };
   }
 
@@ -732,7 +749,7 @@ export class GuardianComplianceFramework {
   private async handleDataDeletion(userId: string, dataCategories: DataCategory[]): Promise<void> {
     for (const category of dataCategories) {
       const policy = this.RETENTION_POLICIES[category];
-      
+
       // Check if immediate deletion is required
       if (!policy.legalHold) {
         await this.scheduleDataDeletion(userId, category);
@@ -747,7 +764,7 @@ export class GuardianComplianceFramework {
     securityLogger.info('Data deletion scheduled', {
       userId,
       dataCategory: category,
-      scheduledFor: new Date().toISOString()
+      scheduledFor: new Date().toISOString(),
     });
   }
 }

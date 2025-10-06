@@ -34,9 +34,7 @@ const TestApp: React.FC = () => {
           <header className="bg-slate-900 border-b border-slate-700 px-6 py-4">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-white">
-                  🏆 Astral Turf - Test Environment
-                </h1>
+                <h1 className="text-2xl font-bold text-white">🏆 Astral Turf - Test Environment</h1>
                 <p className="text-slate-400 text-sm mt-1">
                   Port 6000 • All Features Active • Comprehensive Testing
                 </p>
@@ -113,7 +111,7 @@ const TestApp: React.FC = () => {
               <div>✅ Performance monitoring on</div>
               <div>✅ Error tracking enabled</div>
             </div>
-            <button 
+            <button
               onClick={() => window.open('/test-dashboard', '_blank')}
               className="mt-3 w-full bg-blue-600 hover:bg-blue-700 text-white text-xs py-1 px-2 rounded transition-colors"
             >

@@ -6,7 +6,7 @@ metadata:
   name: atlas-security
   labels:
     name: atlas-security
-    atlas.security: "enabled"
+    atlas.security: 'enabled'
 ---
 # Cert-Manager for SSL Certificate Management
 apiVersion: v1
@@ -31,15 +31,15 @@ spec:
     privateKeySecretRef:
       name: letsencrypt-prod
     solvers:
-    - http01:
-        ingress:
-          class: nginx
-    - dns01:
-        cloudDNS:
-          project: atlas-production
-          serviceAccountSecretRef:
-            name: clouddns-dns01-solver-svc-acct
-            key: key.json
+      - http01:
+          ingress:
+            class: nginx
+      - dns01:
+          cloudDNS:
+            project: atlas-production
+            serviceAccountSecretRef:
+              name: clouddns-dns01-solver-svc-acct
+              key: key.json
 ---
 # Atlas SSL Certificate Issuer (Let's Encrypt Staging)
 apiVersion: cert-manager.io/v1
@@ -55,15 +55,15 @@ spec:
     privateKeySecretRef:
       name: letsencrypt-staging
     solvers:
-    - http01:
-        ingress:
-          class: nginx
-    - dns01:
-        cloudDNS:
-          project: atlas-production
-          serviceAccountSecretRef:
-            name: clouddns-dns01-solver-svc-acct
-            key: key.json
+      - http01:
+          ingress:
+            class: nginx
+      - dns01:
+          cloudDNS:
+            project: atlas-production
+            serviceAccountSecretRef:
+              name: clouddns-dns01-solver-svc-acct
+              key: key.json
 ---
 # Atlas Wildcard SSL Certificate
 apiVersion: cert-manager.io/v1
@@ -79,11 +79,11 @@ spec:
     name: letsencrypt-prod
     kind: ClusterIssuer
   dnsNames:
-  - astralturf.com
-  - "*.astralturf.com"
-  - api.astralturf.com
-  - cdn.astralturf.com
-  - admin.astralturf.com
+    - astralturf.com
+    - '*.astralturf.com'
+    - api.astralturf.com
+    - cdn.astralturf.com
+    - admin.astralturf.com
 ---
 # Atlas Security Policies (OPA Gatekeeper)
 apiVersion: templates.gatekeeper.sh/v1beta1
@@ -114,7 +114,7 @@ spec:
     - target: admission.k8s.gatekeeper.sh
       rego: |
         package atlassecuritybaseline
-        
+
         violation[{"msg": msg}] {
           # Require security labels
           required := input.parameters.requiredLabels
@@ -123,7 +123,7 @@ spec:
           not provided[missing]
           msg := sprintf("Missing required label: %v", [missing])
         }
-        
+
         violation[{"msg": msg}] {
           # Check image registry
           allowed := input.parameters.allowedRegistries
@@ -131,7 +131,7 @@ spec:
           not startswith(image, allowed[_])
           msg := sprintf("Image from unauthorized registry: %v", [image])
         }
-        
+
         violation[{"msg": msg}] {
           # Limit replica count
           replicas := input.review.object.spec.replicas
@@ -139,14 +139,14 @@ spec:
           replicas > max_replicas
           msg := sprintf("Too many replicas: %v (max: %v)", [replicas, max_replicas])
         }
-        
+
         violation[{"msg": msg}] {
           # Require non-root containers
           container := input.review.object.spec.template.spec.containers[_]
           not container.securityContext.runAsNonRoot
           msg := "Container must run as non-root user"
         }
-        
+
         violation[{"msg": msg}] {
           # Require read-only root filesystem
           container := input.review.object.spec.template.spec.containers[_]
@@ -164,16 +164,16 @@ metadata:
 spec:
   match:
     kinds:
-      - apiGroups: ["apps"]
-        kinds: ["Deployment"]
-    namespaces: ["astral-turf", "atlas-monitoring"]
+      - apiGroups: ['apps']
+        kinds: ['Deployment']
+    namespaces: ['astral-turf', 'atlas-monitoring']
   parameters:
-    requiredLabels: ["atlas.security", "app"]
-    allowedRegistries: 
-      - "ghcr.io/astralturf/"
-      - "gcr.io/atlas-production/"
-      - "docker.io/library/"
-      - "quay.io/atlas/"
+    requiredLabels: ['atlas.security', 'app']
+    allowedRegistries:
+      - 'ghcr.io/astralturf/'
+      - 'gcr.io/atlas-production/'
+      - 'docker.io/library/'
+      - 'quay.io/atlas/'
     maxReplicas: 100
 ---
 # Atlas Pod Security Policy
@@ -238,83 +238,83 @@ spec:
       hostNetwork: true
       hostPID: true
       containers:
-      - name: falco
-        image: falcosecurity/falco:latest
-        args:
-          - /usr/bin/falco
-          - --cri=/run/containerd/containerd.sock
-          - --k8s-api=https://kubernetes.default:443
-          - --k8s-api-cert=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-          - --k8s-api-token=/var/run/secrets/kubernetes.io/serviceaccount/token
-        env:
-        - name: FALCO_GRPC_ENABLED
-          value: "true"
-        - name: FALCO_GRPC_BIND_ADDRESS
-          value: "0.0.0.0:5060"
-        - name: FALCO_OUTPUT_OUTPUTS
-          value: "stdout,grpc"
-        securityContext:
-          privileged: true
-        volumeMounts:
-        - mountPath: /host/var/run/docker.sock
-          name: docker-socket
-        - mountPath: /host/run/containerd/containerd.sock
-          name: containerd-socket
-        - mountPath: /host/dev
-          name: dev-fs
-        - mountPath: /host/proc
-          name: proc-fs
-          readOnly: true
-        - mountPath: /host/boot
-          name: boot-fs
-          readOnly: true
-        - mountPath: /host/lib/modules
-          name: lib-modules
-        - mountPath: /host/usr
-          name: usr-fs
-          readOnly: true
-        - mountPath: /host/etc
-          name: etc-fs
-          readOnly: true
-        - mountPath: /etc/falco
-          name: falco-config
-        resources:
-          requests:
-            memory: "512Mi"
-            cpu: "100m"
-          limits:
-            memory: "1Gi"
-            cpu: "500m"
+        - name: falco
+          image: falcosecurity/falco:latest
+          args:
+            - /usr/bin/falco
+            - --cri=/run/containerd/containerd.sock
+            - --k8s-api=https://kubernetes.default:443
+            - --k8s-api-cert=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+            - --k8s-api-token=/var/run/secrets/kubernetes.io/serviceaccount/token
+          env:
+            - name: FALCO_GRPC_ENABLED
+              value: 'true'
+            - name: FALCO_GRPC_BIND_ADDRESS
+              value: '0.0.0.0:5060'
+            - name: FALCO_OUTPUT_OUTPUTS
+              value: 'stdout,grpc'
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - mountPath: /host/var/run/docker.sock
+              name: docker-socket
+            - mountPath: /host/run/containerd/containerd.sock
+              name: containerd-socket
+            - mountPath: /host/dev
+              name: dev-fs
+            - mountPath: /host/proc
+              name: proc-fs
+              readOnly: true
+            - mountPath: /host/boot
+              name: boot-fs
+              readOnly: true
+            - mountPath: /host/lib/modules
+              name: lib-modules
+            - mountPath: /host/usr
+              name: usr-fs
+              readOnly: true
+            - mountPath: /host/etc
+              name: etc-fs
+              readOnly: true
+            - mountPath: /etc/falco
+              name: falco-config
+          resources:
+            requests:
+              memory: '512Mi'
+              cpu: '100m'
+            limits:
+              memory: '1Gi'
+              cpu: '500m'
       volumes:
-      - name: docker-socket
-        hostPath:
-          path: /var/run/docker.sock
-      - name: containerd-socket
-        hostPath:
-          path: /run/containerd/containerd.sock
-      - name: dev-fs
-        hostPath:
-          path: /dev
-      - name: proc-fs
-        hostPath:
-          path: /proc
-      - name: boot-fs
-        hostPath:
-          path: /boot
-      - name: lib-modules
-        hostPath:
-          path: /lib/modules
-      - name: usr-fs
-        hostPath:
-          path: /usr
-      - name: etc-fs
-        hostPath:
-          path: /etc
-      - name: falco-config
-        configMap:
-          name: atlas-falco-config
+        - name: docker-socket
+          hostPath:
+            path: /var/run/docker.sock
+        - name: containerd-socket
+          hostPath:
+            path: /run/containerd/containerd.sock
+        - name: dev-fs
+          hostPath:
+            path: /dev
+        - name: proc-fs
+          hostPath:
+            path: /proc
+        - name: boot-fs
+          hostPath:
+            path: /boot
+        - name: lib-modules
+          hostPath:
+            path: /lib/modules
+        - name: usr-fs
+          hostPath:
+            path: /usr
+        - name: etc-fs
+          hostPath:
+            path: /etc
+        - name: falco-config
+          configMap:
+            name: atlas-falco-config
       tolerations:
-      - operator: Exists
+        - operator: Exists
 ---
 # Atlas Falco Configuration
 apiVersion: v1
@@ -329,34 +329,34 @@ data:
     rules_file:
       - /etc/falco/falco_rules.yaml
       - /etc/falco/atlas_rules.yaml
-    
+
     time_format_iso_8601: true
     json_output: true
     json_include_output_property: true
-    
+
     priority: debug
-    
+
     grpc:
       enabled: true
       bind_address: "0.0.0.0:5060"
       threadiness: 8
-    
+
     grpc_output:
       enabled: true
-    
+
     outputs:
       rate: 1
       max_burst: 1000
-    
+
     syslog_output:
       enabled: false
-    
+
     file_output:
       enabled: false
-    
+
     stdout_output:
       enabled: true
-    
+
     webserver:
       enabled: true
       listen_port: 8765
@@ -376,7 +376,7 @@ data:
         (user=%user.name command=%proc.cmdline container=%container.name image=%container.image)
       priority: WARNING
       tags: [atlas, container, process]
-    
+
     - rule: Atlas Sensitive File Access
       desc: Detect access to sensitive files in Astral Turf containers
       condition: >
@@ -392,7 +392,7 @@ data:
         (user=%user.name file=%fd.name container=%container.name)
       priority: CRITICAL
       tags: [atlas, container, filesystem]
-    
+
     - rule: Atlas Network Connection to Suspicious Hosts
       desc: Detect connections to suspicious external hosts
       condition: >
@@ -418,8 +418,8 @@ metadata:
 spec:
   podSelector: {}
   policyTypes:
-  - Ingress
-  - Egress
+    - Ingress
+    - Egress
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -433,21 +433,21 @@ spec:
     matchLabels:
       app: astral-turf
   policyTypes:
-  - Ingress
+    - Ingress
   ingress:
-  - from:
-    - namespaceSelector:
-        matchLabels:
-          name: kube-system
-    - namespaceSelector:
-        matchLabels:
-          name: ingress-nginx
-    - namespaceSelector:
-        matchLabels:
-          name: atlas-monitoring
-    ports:
-    - protocol: TCP
-      port: 3000
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: kube-system
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+        - namespaceSelector:
+            matchLabels:
+              name: atlas-monitoring
+      ports:
+        - protocol: TCP
+          port: 3000
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -461,31 +461,31 @@ spec:
     matchLabels:
       app: astral-turf
   policyTypes:
-  - Egress
+    - Egress
   egress:
-  # Allow DNS
-  - to: []
-    ports:
-    - protocol: UDP
-      port: 53
-  # Allow database connections
-  - to:
-    - namespaceSelector:
-        matchLabels:
-          name: database
-    ports:
-    - protocol: TCP
-      port: 5432
-  # Allow HTTPS to external services
-  - to: []
-    ports:
-    - protocol: TCP
-      port: 443
-  # Allow HTTP to external services (for health checks)
-  - to: []
-    ports:
-    - protocol: TCP
-      port: 80
+    # Allow DNS
+    - to: []
+      ports:
+        - protocol: UDP
+          port: 53
+    # Allow database connections
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: database
+      ports:
+        - protocol: TCP
+          port: 5432
+    # Allow HTTPS to external services
+    - to: []
+      ports:
+        - protocol: TCP
+          port: 443
+    # Allow HTTP to external services (for health checks)
+    - to: []
+      ports:
+        - protocol: TCP
+          port: 80
 ---
 # Atlas Security Monitoring Service
 apiVersion: apps/v1
@@ -508,46 +508,46 @@ spec:
     spec:
       serviceAccountName: atlas-security-monitor
       containers:
-      - name: security-monitor
-        image: atlas/security-monitor:latest
-        ports:
-        - containerPort: 8080
-        env:
-        - name: FALCO_GRPC_ENDPOINT
-          value: "atlas-falco:5060"
-        - name: PROMETHEUS_ENDPOINT
-          value: "http://atlas-prometheus.atlas-monitoring:9090"
-        - name: ALERT_WEBHOOK_URL
-          valueFrom:
-            secretKeyRef:
-              name: security-secrets
-              key: alert-webhook-url
-        volumeMounts:
-        - name: security-rules
-          mountPath: /etc/security-rules
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "100m"
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 8080
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /ready
-            port: 8080
-          initialDelaySeconds: 5
-          periodSeconds: 5
+        - name: security-monitor
+          image: atlas/security-monitor:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: FALCO_GRPC_ENDPOINT
+              value: 'atlas-falco:5060'
+            - name: PROMETHEUS_ENDPOINT
+              value: 'http://atlas-prometheus.atlas-monitoring:9090'
+            - name: ALERT_WEBHOOK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: security-secrets
+                  key: alert-webhook-url
+          volumeMounts:
+            - name: security-rules
+              mountPath: /etc/security-rules
+          resources:
+            requests:
+              memory: '256Mi'
+              cpu: '100m'
+            limits:
+              memory: '512Mi'
+              cpu: '500m'
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
       volumes:
-      - name: security-rules
-        configMap:
-          name: atlas-security-rules
+        - name: security-rules
+          configMap:
+            name: atlas-security-rules
 ---
 # Atlas Security Rules Configuration
 apiVersion: v1
@@ -620,41 +620,41 @@ spec:
         app: waf
     spec:
       containers:
-      - name: nginx-waf
-        image: owasp/modsecurity:nginx
-        ports:
-        - containerPort: 80
-        volumeMounts:
-        - name: waf-config
-          mountPath: /etc/nginx/conf.d
-        - name: modsecurity-config
-          mountPath: /etc/modsecurity
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "100m"
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 80
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /health
-            port: 80
-          initialDelaySeconds: 5
-          periodSeconds: 5
+        - name: nginx-waf
+          image: owasp/modsecurity:nginx
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: waf-config
+              mountPath: /etc/nginx/conf.d
+            - name: modsecurity-config
+              mountPath: /etc/modsecurity
+          resources:
+            requests:
+              memory: '256Mi'
+              cpu: '100m'
+            limits:
+              memory: '512Mi'
+              cpu: '500m'
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5
       volumes:
-      - name: waf-config
-        configMap:
-          name: atlas-waf-nginx-config
-      - name: modsecurity-config
-        configMap:
-          name: atlas-modsecurity-config
+        - name: waf-config
+          configMap:
+            name: atlas-waf-nginx-config
+        - name: modsecurity-config
+          configMap:
+            name: atlas-modsecurity-config
 ---
 # Atlas Service Accounts and RBAC
 apiVersion: v1
@@ -681,15 +681,15 @@ metadata:
   labels:
     atlas.security: rbac
 rules:
-- apiGroups: [""]
-  resources: ["pods", "services", "endpoints"]
-  verbs: ["get", "list", "watch"]
-- apiGroups: ["apps"]
-  resources: ["deployments", "replicasets"]
-  verbs: ["get", "list", "watch", "update", "patch"]
-- apiGroups: ["networking.k8s.io"]
-  resources: ["networkpolicies"]
-  verbs: ["get", "list", "create", "update", "patch"]
+  - apiGroups: ['']
+    resources: ['pods', 'services', 'endpoints']
+    verbs: ['get', 'list', 'watch']
+  - apiGroups: ['apps']
+    resources: ['deployments', 'replicasets']
+    verbs: ['get', 'list', 'watch', 'update', 'patch']
+  - apiGroups: ['networking.k8s.io']
+    resources: ['networkpolicies']
+    verbs: ['get', 'list', 'create', 'update', 'patch']
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -698,9 +698,9 @@ metadata:
   labels:
     atlas.security: rbac
 subjects:
-- kind: ServiceAccount
-  name: atlas-security-monitor
-  namespace: atlas-security
+  - kind: ServiceAccount
+    name: atlas-security-monitor
+    namespace: atlas-security
 roleRef:
   kind: ClusterRole
   name: atlas-security-monitor
@@ -713,9 +713,9 @@ metadata:
   labels:
     atlas.security: rbac
 subjects:
-- kind: ServiceAccount
-  name: falco
-  namespace: atlas-security
+  - kind: ServiceAccount
+    name: falco
+    namespace: atlas-security
 roleRef:
   kind: ClusterRole
   name: view

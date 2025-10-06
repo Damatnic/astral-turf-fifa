@@ -24,26 +24,26 @@ export enum Permission {
   SHARE_FORMATIONS = 'SHARE_FORMATIONS',
   EXPORT_FORMATIONS = 'EXPORT_FORMATIONS',
   IMPORT_FORMATIONS = 'IMPORT_FORMATIONS',
-  
+
   // Tactical board specific permissions
   VIEW_TACTICAL_BOARD = 'VIEW_TACTICAL_BOARD',
   EDIT_TACTICAL_BOARD = 'EDIT_TACTICAL_BOARD',
   CREATE_TACTICAL_DRAWINGS = 'CREATE_TACTICAL_DRAWINGS',
   DELETE_TACTICAL_DRAWINGS = 'DELETE_TACTICAL_DRAWINGS',
   ANNOTATE_TACTICAL_BOARD = 'ANNOTATE_TACTICAL_BOARD',
-  
+
   // Advanced tactical permissions
   VIEW_OPPONENT_ANALYSIS = 'VIEW_OPPONENT_ANALYSIS',
   EDIT_OPPONENT_ANALYSIS = 'EDIT_OPPONENT_ANALYSIS',
   CREATE_TACTICAL_INSTRUCTIONS = 'CREATE_TACTICAL_INSTRUCTIONS',
   VIEW_TACTICAL_INSTRUCTIONS = 'VIEW_TACTICAL_INSTRUCTIONS',
-  
+
   // Formation classification access
   VIEW_PUBLIC_FORMATIONS = 'VIEW_PUBLIC_FORMATIONS',
   VIEW_INTERNAL_FORMATIONS = 'VIEW_INTERNAL_FORMATIONS',
   VIEW_CONFIDENTIAL_FORMATIONS = 'VIEW_CONFIDENTIAL_FORMATIONS',
   VIEW_SECRET_FORMATIONS = 'VIEW_SECRET_FORMATIONS',
-  
+
   // Collaboration permissions
   REAL_TIME_COLLABORATION = 'REAL_TIME_COLLABORATION',
   PRESENTATION_MODE = 'PRESENTATION_MODE',
@@ -570,12 +570,12 @@ export function hasPermission(
   userRole: UserRole,
   permission: Permission,
   resource: Resource,
-  context?: PermissionContext,
+  context?: PermissionContext
 ): PermissionResult {
   try {
     const rolePermissions = ROLE_PERMISSIONS[userRole];
     const matchingRule = rolePermissions.find(
-      rule => rule.permission === permission && rule.resource === resource,
+      rule => rule.permission === permission && rule.resource === resource
     );
 
     if (!matchingRule) {
@@ -620,9 +620,10 @@ export function hasPermission(
       granted: true,
       conditions: matchingRule.conditions,
     };
-  } catch (_error) {
+  } catch (err) {
+    const error = err instanceof Error ? err : new Error('Unknown error');
     securityLogger.error('Permission check failed', {
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error.message,
       userRole,
       permission,
       resource,
@@ -711,10 +712,10 @@ export function getRolePermissions(userRole: UserRole): PermissionRule[] {
 export function hasAnyPermission(
   userRole: UserRole,
   permissions: Array<{ permission: Permission; resource: Resource }>,
-  context?: PermissionContext,
+  context?: PermissionContext
 ): boolean {
   return permissions.some(
-    ({ permission, resource }) => hasPermission(userRole, permission, resource, context).granted,
+    ({ permission, resource }) => hasPermission(userRole, permission, resource, context).granted
   );
 }
 
@@ -722,7 +723,7 @@ export function hasAnyPermission(
 export function canAccessResource(
   userRole: UserRole,
   resource: Resource,
-  context?: PermissionContext,
+  context?: PermissionContext
 ): PermissionResult {
   // Find any permission rule for this resource
   const rolePermissions = ROLE_PERMISSIONS[userRole];
@@ -774,7 +775,7 @@ export function canAccessPlayerData(
   userRole: UserRole,
   userId: string,
   targetPlayerId: string,
-  permission: Permission = Permission.VIEW_PLAYERS,
+  permission: Permission = Permission.VIEW_PLAYERS
 ): boolean {
   const context: PermissionContext = {
     userId,

@@ -78,7 +78,7 @@ class SyncService {
         ? 'https://sync.astralturf.com'
         : 'http://localhost:3001';
 
-    this.socket = io(syncServerUrl, {
+    this.socket = (io as (url: string, opts?: unknown) => Socket)(syncServerUrl, {
       auth: {
         token: authToken,
         userId: userId,
@@ -228,13 +228,13 @@ class SyncService {
 
       this.socket.emit('request_full_sync', { deviceId: this.deviceId });
 
-      this.socket.once('full_sync_response', async data => {
+      (this.socket as any).once('full_sync_response', async (data: any) => {
         try {
           const decryptedData = await decrypt(data.state);
           const state = JSON.parse(decryptedData);
           resolve(state);
         } catch (_error) {
-          reject(error);
+          reject(_error);
         }
       });
 
@@ -337,10 +337,10 @@ class SyncService {
     }
 
     // Handle incoming state updates from other devices
-    this.socket.on('state_update', async (data: SyncEvent) => {
+    this.socket.on('state_update', (async (data: SyncEvent) => {
       try {
-        const decryptedPayload = await decrypt(data.payload);
-        const payload = JSON.parse(decryptedPayload);
+        const decryptedPayload = await decrypt(data.payload as string);
+        const payload = JSON.parse(decryptedPayload) as { action: Action };
 
         if (this.onStateUpdateCallback && data.deviceId !== this.deviceId) {
           this.onStateUpdateCallback(payload.action);
@@ -348,18 +348,18 @@ class SyncService {
       } catch (_error) {
         console.error('❌ Failed to process incoming state update:', _error);
       }
-    });
+    }) as (...args: unknown[]) => void);
 
     // Handle sync conflicts
-    this.socket.on('sync_conflict', (conflict: SyncConflict) => {
+    this.socket.on('sync_conflict', ((conflict: SyncConflict) => {
       this.conflictQueue.push(conflict);
       if (this.onConflictCallback) {
         this.onConflictCallback(conflict);
       }
-    });
+    }) as (...args: unknown[]) => void);
 
     // Handle device connections/disconnections
-    this.socket.on('device_update', (devices: DeviceInfo[]) => {
+    this.socket.on('device_update', ((devices: DeviceInfo[]) => {
       this.connectedDevices.clear();
       devices.forEach(device => {
         this.connectedDevices.set(device.id, device);
@@ -368,7 +368,7 @@ class SyncService {
       if (this.onDeviceUpdateCallback) {
         this.onDeviceUpdateCallback(devices);
       }
-    });
+    }) as (...args: unknown[]) => void);
 
     // Handle reconnection
     this.socket.on('reconnect', () => {
@@ -430,26 +430,31 @@ class SyncService {
     switch (action.type) {
       case 'UPDATE_PLAYER':
       case 'ADD_PLAYER':
-        return { tactics: { players: state.tactics.players } };
+        return {
+          tactics: { ...state.tactics, players: state.tactics.players },
+        } as Partial<RootState>;
 
       case 'SET_ACTIVE_FORMATION':
       case 'ASSIGN_PLAYER_TO_SLOT':
         return {
           tactics: {
+            ...state.tactics,
             activeFormationIds: state.tactics.activeFormationIds,
             formations: state.tactics.formations,
           },
-        };
+        } as Partial<RootState>;
 
       case 'SET_TEAM_TACTIC':
-        return { tactics: { teamTactics: state.tactics.teamTactics } };
+        return {
+          tactics: { ...state.tactics, teamTactics: state.tactics.teamTactics },
+        } as Partial<RootState>;
 
       default:
         return {};
     }
   }
 
-  private mergeConflictData(localData: unknown, remoteData: unknown): unknown {
+  private mergeConflictData(localData: any, remoteData: any): unknown {
     // Smart merge strategy - prioritize most recent changes
     const merged = { ...localData };
 
