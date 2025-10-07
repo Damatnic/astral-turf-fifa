@@ -640,6 +640,83 @@ const ModernField: React.FC<ModernFieldProps> = ({
                         }}
                       />
                     )}
+
+                    {/* Enhanced snap target - pulsing rings */}
+                    {isSnapTarget && (
+                      <>
+                        <motion.div
+                          className="absolute inset-0 rounded-full border-2 border-green-400/60"
+                          animate={{
+                            scale: [1, 1.5, 1],
+                            opacity: [0.6, 0, 0.6],
+                          }}
+                          transition={{
+                            duration: 1.5,
+                            repeat: Infinity,
+                            ease: 'easeOut',
+                          }}
+                          style={{
+                            transform: 'translate(-50%, -50%)',
+                            left: '50%',
+                            top: '50%',
+                          }}
+                        />
+                        <motion.div
+                          className="absolute inset-0 rounded-full"
+                          animate={{
+                            boxShadow: [
+                              '0 0 20px rgba(34, 197, 94, 0.3)',
+                              '0 0 40px rgba(34, 197, 94, 0.6)',
+                              '0 0 20px rgba(34, 197, 94, 0.3)',
+                            ],
+                          }}
+                          transition={{
+                            duration: 1.5,
+                            repeat: Infinity,
+                            ease: 'easeInOut',
+                          }}
+                          style={{
+                            transform: 'translate(-50%, -50%)',
+                            left: '50%',
+                            top: '50%',
+                          }}
+                        />
+                      </>
+                    )}
+
+                    {/* Available slot indicator when dragging */}
+                    {isEmpty && isDragging && !isSnapTarget && (
+                      <motion.div
+                        className="absolute inset-0"
+                        animate={{
+                          scale: [1, 1.05, 1],
+                        }}
+                        transition={{
+                          duration: 2,
+                          repeat: Infinity,
+                          ease: 'easeInOut',
+                        }}
+                        style={{
+                          transform: 'translate(-50%, -50%)',
+                          left: '50%',
+                          top: '50%',
+                        }}
+                      >
+                        <div className="w-full h-full rounded-full border border-blue-400/40 border-dashed" />
+                      </motion.div>
+                    )}
+
+                    {/* Occupied slot warning */}
+                    {isOccupied && isDragging && (
+                      <motion.div
+                        className="absolute -top-8 left-1/2 -translate-x-1/2 bg-red-500/90 text-white text-xs px-2 py-1 rounded whitespace-nowrap"
+                        initial={{ opacity: 0, y: 5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 5 }}
+                      >
+                        Swap
+                      </motion.div>
+                    )}
                   </motion.div>
                 );
               })}
