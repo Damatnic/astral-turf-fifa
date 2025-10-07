@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, lazy, Suspense, useState, type ComponentType } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import { useUIContext, useTacticsContext, useResponsive, useResponsiveModal } from '../hooks';
 import { useAuthContext } from '../hooks/useAuthContext';
-import { Header } from './ui/Header';
 import UnifiedNavigation from './navigation/UnifiedNavigation';
 import NotificationContainer from './ui/NotificationContainer';
 import PrintableLineup from './export/PrintableLineup';
@@ -67,7 +66,6 @@ interface LayoutProps {
  * Provides header, main content area, modals, and global functionality
  */
 const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const location = useLocation();
   const { uiState, dispatch } = useUIContext();
   const { tacticsState } = useTacticsContext();
   const { authState } = useAuthContext();
@@ -188,7 +186,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <>
           {/* Desktop/Tablet Header Navigation */}
           {!isMobile && (
-            <header className="flex-shrink-0 z-40 relative backdrop-blur-xl border-b shadow-lg bg-secondary-900/80 border-secondary-700/50">
+            <header className="flex-shrink-0 z-50 relative backdrop-blur-xl border-b shadow-lg bg-secondary-900/95 border-secondary-700/50">
               <div className="absolute inset-0 bg-gradient-to-r from-primary-500/5 via-transparent to-accent-500/5" />
               
               <div className="relative z-10 px-6 py-3">
@@ -217,7 +215,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
           {/* Mobile Header with Hamburger */}
           {isMobile && (
-            <header className="flex-shrink-0 z-40 relative backdrop-blur-xl border-b shadow-lg bg-secondary-900/80 border-secondary-700/50">
+            <header className="flex-shrink-0 z-50 relative backdrop-blur-xl border-b shadow-lg bg-secondary-900/95 border-secondary-700/50">
               <div className="absolute inset-0 bg-gradient-to-r from-primary-500/5 via-transparent to-accent-500/5" />
               
               <div className="relative z-10 px-4 py-3">
@@ -290,10 +288,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     </div>
 
                     {/* Navigation */}
-                    <UnifiedNavigation 
-                      variant="mobile" 
-                      showSearch={true} 
-                      onClose={() => setMobileMenuOpen(false)} 
+                    <UnifiedNavigation
+                      variant="mobile"
+                      showSearch={true}
+                      onClose={() => setMobileMenuOpen(false)}
                     />
                   </div>
                 </motion.div>
@@ -380,7 +378,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       )}
 
       {/* Enhanced Notification System */}
-      <div className="fixed top-0 right-0 z-90 p-4">
+      <div className="fixed top-0 right-0 z-[70] p-4">
         <NotificationContainer />
       </div>
 

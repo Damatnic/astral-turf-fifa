@@ -44,6 +44,7 @@ const AdvancedAnalyticsPage = lazy(() => import('./src/pages/AdvancedAnalyticsPa
 const MyPlayerRankingPage = lazy(() => import('./src/pages/MyPlayerRankingPage'));
 const ChallengeHubPage = lazy(() => import('./src/pages/ChallengeHubPage'));
 const CoachChallengeManagerPage = lazy(() => import('./src/pages/CoachChallengeManagerPage'));
+const PlayerCardPage = lazy(() => import('./src/pages/PlayerCardPage'));
 
 const AppContent: React.FC = () => {
   const { authState } = useAuthContext();
@@ -284,6 +285,14 @@ const AppContent: React.FC = () => {
                     element={
                       <PageTransition>
                         <PlayerProfilePage />
+                      </PageTransition>
+                    }
+                  />
+                  <Route
+                    path="player-card"
+                    element={
+                      <PageTransition>
+                        <PlayerCardPage />
                       </PageTransition>
                     }
                   />

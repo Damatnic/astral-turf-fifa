@@ -5,14 +5,15 @@
  * including CSP injection, security headers, and real-time threat monitoring.
  */
 
+/* eslint-disable no-undef */
 import React, { createContext, useContext, useEffect, useCallback, ReactNode } from 'react';
 import { securityLogger, SecurityEventType } from '../../security/logging';
 import {
   initializeSecurityMonitoring,
   monitorSecurityEvent,
   getActiveSecurityIncidents,
+  type SecurityIncident,
 } from '../../security/monitoring';
-import type { SecurityIncident } from '../../security/monitoring';
 import { initializeCSPMonitoring, cspUtils } from '../../security/csp';
 import { ENVIRONMENT_CONFIG } from '../../security/config';
 import { sanitizeUserInput } from '../../security/sanitization';
@@ -45,18 +46,6 @@ interface SecurityProviderProps {
 }
 
 export function SecurityProvider({ children }: SecurityProviderProps) {
-  useEffect(() => {
-    initializeSecuritySystems();
-    setupSecurityMonitoring();
-    injectSecurityHeaders();
-    setupGlobalErrorHandling();
-    setupCSPViolationHandling();
-
-    return () => {
-      cleanupSecuritySystems();
-    };
-  }, []);
-
   const initializeSecuritySystems = useCallback(() => {
     try {
       // Initialize security monitoring
@@ -78,7 +67,7 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
     // Monitor performance for potential DoS attacks
     if ('PerformanceObserver' in window) {
       try {
-        const observer = new PerformanceObserver(list => {
+        const observer = new (window as Window & typeof globalThis).PerformanceObserver((list: PerformanceObserverEntryList) => {
           const entries = list.getEntries();
           entries.forEach(entry => {
             // Monitor for unusually slow operations
@@ -103,8 +92,8 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
     }
 
     // Monitor for suspicious URL changes
-    const originalPushState = history.pushState;
-    history.pushState = function (state, title, url) {
+    const originalPushState = window.history.pushState;
+    window.history.pushState = function (state, title, url) {
       if (url && typeof url === 'string') {
         const sanitizedUrl = sanitizeUserInput(url);
         if (sanitizedUrl !== url) {
@@ -146,23 +135,25 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
 
   const setupGlobalErrorHandling = useCallback(() => {
     // Global unhandled error handler
-    const handleError = (event: ErrorEvent) => {
-      const error = event.error || new Error(event.message);
+    const handleError = (event: Event) => {
+      const errorEvent = event as ErrorEvent;
+      const error = errorEvent.error || new Error(errorEvent.message);
 
       securityLogger.logSecurityEvent(SecurityEventType.SYSTEM_ERROR, 'Unhandled global error', {
         metadata: {
           message: sanitizeUserInput(error.message || ''),
-          filename: event.filename,
-          lineno: event.lineno,
-          colno: event.colno,
+          filename: errorEvent.filename,
+          lineno: errorEvent.lineno,
+          colno: errorEvent.colno,
           stack: ENVIRONMENT_CONFIG.isDevelopment ? error.stack : '[REDACTED]',
         },
       });
     };
 
     // Global unhandled promise rejection handler
-    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
-      const reason = event.reason instanceof Error ? event.reason : new Error(String(event.reason));
+    const handleUnhandledRejection = (event: Event) => {
+      const promiseEvent = event as PromiseRejectionEvent;
+      const reason = promiseEvent.reason instanceof Error ? promiseEvent.reason : new Error(String(promiseEvent.reason));
 
       securityLogger.logSecurityEvent(
         SecurityEventType.SYSTEM_ERROR,
@@ -187,8 +178,19 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
   }, []);
 
   const setupCSPViolationHandling = useCallback(() => {
+    // Whitelist for known safe violations in development
+    const devWhitelist = [
+      'va.vercel-scripts.com',
+      'r2cdn.perplexity.ai',
+    ];
+
     // Listen for CSP violations
     document.addEventListener('securitypolicyviolation', event => {
+      // Skip whitelisted violations in development
+      if (ENVIRONMENT_CONFIG.isDevelopment && devWhitelist.some(domain => event.blockedURI.includes(domain))) {
+        return;
+      }
+
       const violation = {
         'csp-report': {
           'blocked-uri': event.blockedURI,
@@ -219,6 +221,25 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
     securityLogger.info('Security systems cleanup initiated');
     // Cleanup will be handled by individual system destructors
   }, []);
+
+  useEffect(() => {
+    initializeSecuritySystems();
+    setupSecurityMonitoring();
+    injectSecurityHeaders();
+    setupGlobalErrorHandling();
+    setupCSPViolationHandling();
+
+    return () => {
+      cleanupSecuritySystems();
+    };
+  }, [
+    initializeSecuritySystems,
+    setupSecurityMonitoring,
+    injectSecurityHeaders,
+    setupGlobalErrorHandling,
+    setupCSPViolationHandling,
+    cleanupSecuritySystems,
+  ]);
 
   const reportSecurityEvent = useCallback((eventType: SecurityEventType, details: unknown) => {
     try {

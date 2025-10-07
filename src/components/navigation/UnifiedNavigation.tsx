@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
-import { useResponsive } from '../../hooks';
 
 // Navigation item interface
 interface NavItem {
@@ -42,6 +41,18 @@ const SITE_NAVIGATION: NavItem[] = [
       { id: 'medical', label: 'Medical Center', path: '/medical-center', icon: '⚕️', description: 'Player health & injuries' },
       { id: 'mentoring', label: 'Mentoring', path: '/mentoring', icon: '🎓', description: 'Player development' },
       { id: 'rankings', label: 'Player Rankings', path: '/player-ranking', icon: '📊', description: 'Performance rankings' },
+    ]
+  },
+  {
+    id: 'player',
+    label: 'Player',
+    icon: '⚽',
+    description: 'Your player profile',
+    children: [
+      { id: 'player-card', label: 'Player Card', path: '/player-card', icon: '🎴', description: 'View your player card' },
+      { id: 'player-challenges', label: 'My Challenges', path: '/skill-challenges', icon: '🏅', description: 'Personal challenges' },
+      { id: 'player-stats', label: 'Statistics', path: '/player-ranking', icon: '📊', description: 'Your performance stats' },
+      { id: 'player-achievements', label: 'Achievements', path: '/challenge-hub', icon: '🏆', description: 'Awards & milestones' },
     ]
   },
   {
@@ -135,7 +146,6 @@ export const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isMobile } = useResponsive();
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -229,7 +239,7 @@ export const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({
                 </button>
                 
                 {/* Dropdown menu */}
-                <div className="absolute left-0 mt-2 w-64 bg-secondary-800 rounded-lg shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 border border-secondary-700">
+                <div className="absolute left-0 mt-2 w-64 bg-secondary-900 backdrop-blur-xl rounded-lg shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[60] border border-secondary-700">
                   <div className="p-2">
                     {item.description && (
                       <div className="px-3 py-2 text-xs text-secondary-400 border-b border-secondary-700 mb-2">
