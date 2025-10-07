@@ -406,7 +406,19 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
   }, []);
 
   const handlePlayerMove = useThrottleCallback(
-    async (playerId: string, position: { x: number; y: number }) => {
+    async (playerId: string, position: { x: number; y: number }, targetPlayerId?: string) => {
+      // If there's a targetPlayerId, instantly swap without confirmation
+      if (targetPlayerId && targetPlayerId !== playerId) {
+        tacticsDispatch({
+          type: 'SWAP_PLAYERS',
+          payload: {
+            sourcePlayerId: playerId,
+            targetPlayerId: targetPlayerId,
+          },
+        });
+        return;
+      }
+
       // Immediate visual feedback for sub-16ms response
       startTransition(() => {
         batchedUpdates.current.push(() => {

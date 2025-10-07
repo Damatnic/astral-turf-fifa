@@ -348,23 +348,18 @@ export function useTacticsBoard(): TacticsBoardState & TacticsBoardActions {
       try {
         // If slot is occupied, handle swap or replacement
         if (slot.playerId && slot.playerId !== playerId) {
-          // Show confirmation for swap
+          // Auto-swap instantly without confirmation dialog
           const draggedPlayer = players?.find(p => p?.id === playerId);
           const occupyingPlayer = players?.find(p => p?.id === slot.playerId);
 
-          if (draggedPlayer?.name && occupyingPlayer?.name) {
-            const shouldSwap = window.confirm(
-              `Swap ${draggedPlayer.name} with ${occupyingPlayer.name}?`,
-            );
-
-            if (shouldSwap) {
-              dispatch({
-                type: 'SWAP_PLAYERS',
-                payload: { sourcePlayerId: playerId, targetPlayerId: slot.playerId },
-              });
-            }
+          if (draggedPlayer && occupyingPlayer) {
+            // Instant swap - no confirmation needed
+            dispatch({
+              type: 'SWAP_PLAYERS',
+              payload: { sourcePlayerId: playerId, targetPlayerId: slot.playerId },
+            });
           } else {
-            // // console.warn('handleSlotDrop: Cannot find player names for swap confirmation');
+            // // console.warn('handleSlotDrop: Cannot find players for swap');
           }
         } else {
           // Assign player to empty slot
