@@ -14,7 +14,7 @@ import {
   Check,
   AlertCircle,
   Image as ImageIcon,
-  Loader
+  Loader,
 } from 'lucide-react';
 import { EvidenceType, ChallengeSubmission, ChallengeRequirement } from '../../types/challenge';
 
@@ -31,7 +31,7 @@ export const EvidenceSubmission: React.FC<EvidenceSubmissionProps> = ({
   challengeTitle,
   requirements,
   onSubmit,
-  onCancel
+  onCancel,
 }) => {
   const [evidenceType, setEvidenceType] = useState<EvidenceType>('photo');
   const [files, setFiles] = useState<File[]>([]);
@@ -40,24 +40,24 @@ export const EvidenceSubmission: React.FC<EvidenceSubmissionProps> = ({
   const [metricValue, setMetricValue] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
-  
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Handle file selection
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);
-    
+
     // Validate file types
     const validTypes: Record<EvidenceType, string[]> = {
       photo: ['image/jpeg', 'image/png', 'image/webp', 'image/heic'],
       video: ['video/mp4', 'video/quicktime', 'video/webm'],
       stats: ['application/pdf', 'image/jpeg', 'image/png'],
       tracking: ['application/gpx', 'application/json'],
-      manual: []
+      manual: [],
     };
 
     const invalidFiles = selectedFiles.filter(
-      file => !validTypes[evidenceType].includes(file.type)
+      file => !validTypes[evidenceType].includes(file.type),
     );
 
     if (invalidFiles.length > 0) {
@@ -85,15 +85,15 @@ export const EvidenceSubmission: React.FC<EvidenceSubmissionProps> = ({
   const handleSubmit = async () => {
     // Validation
     const newErrors: string[] = [];
-    
+
     if (files.length === 0 && evidenceType !== 'manual') {
       newErrors.push('Please upload at least one file');
     }
-    
+
     if (!description.trim()) {
       newErrors.push('Please provide a description');
     }
-    
+
     if (!selectedRequirement) {
       newErrors.push('Please select which requirement this evidence is for');
     }
@@ -111,7 +111,7 @@ export const EvidenceSubmission: React.FC<EvidenceSubmissionProps> = ({
     }
 
     setIsSubmitting(true);
-    
+
     try {
       // Create submission object
       const submission: Partial<ChallengeSubmission> = {
@@ -124,21 +124,21 @@ export const EvidenceSubmission: React.FC<EvidenceSubmissionProps> = ({
         metadata: {
           fileCount: files.length,
           fileNames: files.map(f => f.name),
-          fileSizes: files.map(f => f.size)
+          fileSizes: files.map(f => f.size),
         },
         status: 'pending',
-        submittedAt: new Date()
+        submittedAt: new Date(),
       };
 
       await onSubmit(submission);
-      
+
       // Reset form
       setFiles([]);
       setDescription('');
       setSelectedRequirement('');
       setMetricValue('');
       setErrors([]);
-      
+
     } catch (error) {
       setErrors(['Failed to submit evidence. Please try again.']);
     } finally {
@@ -210,7 +210,7 @@ export const EvidenceSubmission: React.FC<EvidenceSubmissionProps> = ({
               {[
                 { type: 'photo' as EvidenceType, icon: Camera, label: 'Photo' },
                 { type: 'video' as EvidenceType, icon: Video, label: 'Video' },
-                { type: 'stats' as EvidenceType, icon: FileText, label: 'Stats/PDF' }
+                { type: 'stats' as EvidenceType, icon: FileText, label: 'Stats/PDF' },
               ].map(({ type, icon: Icon, label }) => (
                 <button
                   key={type}

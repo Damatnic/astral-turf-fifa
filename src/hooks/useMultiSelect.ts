@@ -244,7 +244,7 @@ export function useMultiSelect(options: UseMultiSelectOptions): UseMultiSelectRe
         return newSelection;
       });
     },
-    [maxSelectionCount, onSelectionChange]
+    [maxSelectionCount, onSelectionChange],
   );
 
   /**
@@ -267,7 +267,7 @@ export function useMultiSelect(options: UseMultiSelectOptions): UseMultiSelectRe
         return newSelection;
       });
     },
-    [maxSelectionCount, onSelectionChange]
+    [maxSelectionCount, onSelectionChange],
   );
 
   /**
@@ -297,7 +297,7 @@ export function useMultiSelect(options: UseMultiSelectOptions): UseMultiSelectRe
     (id: string) => {
       selectItem(id, 'toggle');
     },
-    [selectItem]
+    [selectItem],
   );
 
   /**
@@ -319,7 +319,7 @@ export function useMultiSelect(options: UseMultiSelectOptions): UseMultiSelectRe
         endY: position.y,
       });
     },
-    [enableRectangleSelection]
+    [enableRectangleSelection],
   );
 
   /**
@@ -353,7 +353,7 @@ export function useMultiSelect(options: UseMultiSelectOptions): UseMultiSelectRe
 
       selectMultiple(itemsInRectangle.map(item => item.id));
     },
-    [isSelecting, items, selectMultiple]
+    [isSelecting, items, selectMultiple],
   );
 
   /**
@@ -379,7 +379,7 @@ export function useMultiSelect(options: UseMultiSelectOptions): UseMultiSelectRe
         onGroupMove(selectedIds, offset);
       }
     },
-    [selectedIds, onGroupMove]
+    [selectedIds, onGroupMove],
   );
 
   /**
@@ -400,7 +400,7 @@ export function useMultiSelect(options: UseMultiSelectOptions): UseMultiSelectRe
         onGroupRotate(selectedIds, angle, center);
       }
     },
-    [selectedIds, selectionCenter, onGroupRotate]
+    [selectedIds, selectionCenter, onGroupRotate],
   );
 
   /**
@@ -431,7 +431,7 @@ export function useMultiSelect(options: UseMultiSelectOptions): UseMultiSelectRe
         onBatchUpdate(updates);
       }
     },
-    [selectedIds, selectedItems, selectionCenter, onBatchUpdate]
+    [selectedIds, selectedItems, selectionCenter, onBatchUpdate],
   );
 
   /**
@@ -472,7 +472,7 @@ export function useMultiSelect(options: UseMultiSelectOptions): UseMultiSelectRe
         onBatchUpdate(updates);
       }
     },
-    [selectedIds, selectedItems, selectionBounds, onBatchUpdate]
+    [selectedIds, selectedItems, selectionBounds, onBatchUpdate],
   );
 
   /**
@@ -506,7 +506,7 @@ export function useMultiSelect(options: UseMultiSelectOptions): UseMultiSelectRe
         onBatchUpdate(updates);
       }
     },
-    [selectedIds, selectedItems, selectionBounds, onBatchUpdate]
+    [selectedIds, selectedItems, selectionBounds, onBatchUpdate],
   );
 
   /**
@@ -540,7 +540,7 @@ export function useMultiSelect(options: UseMultiSelectOptions): UseMultiSelectRe
         onBatchUpdate(updates);
       }
     },
-    [selectedIds, selectedItems, selectionCenter, onBatchUpdate]
+    [selectedIds, selectedItems, selectionCenter, onBatchUpdate],
   );
 
   /**
@@ -564,7 +564,7 @@ export function useMultiSelect(options: UseMultiSelectOptions): UseMultiSelectRe
         onBatchUpdate(updates);
       }
     },
-    [items, onBatchUpdate]
+    [items, onBatchUpdate],
   );
 
   /**
@@ -586,7 +586,7 @@ export function useMultiSelect(options: UseMultiSelectOptions): UseMultiSelectRe
         onBatchUpdate(batchUpdates);
       }
     },
-    [selectedIds, onBatchUpdate]
+    [selectedIds, onBatchUpdate],
   );
 
   return {

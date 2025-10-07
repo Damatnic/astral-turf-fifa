@@ -12,7 +12,7 @@ const addInboxItem = (
   type: InboxItem['type'],
   title: string,
   content: string,
-  payload?: any
+  payload?: any,
 ) => {
   draft.inbox.unshift({
     id: `inbox_${Date.now()}_${Math.random()}`,
@@ -50,7 +50,7 @@ export const franchiseReducer = (draft: FranchiseState, action: Action): Franchi
         draft,
         'objective',
         `New Season: ${draft.season.year}`,
-        'A new season has begun. Check your board objectives and prepare your squad!'
+        'A new season has begun. Check your board objectives and prepare your squad!',
       );
       break;
     }
@@ -60,7 +60,7 @@ export const franchiseReducer = (draft: FranchiseState, action: Action): Franchi
         action.payload.type,
         action.payload.title,
         action.payload.content,
-        action.payload.payload
+        action.payload.payload,
       );
       break;
 
@@ -86,14 +86,14 @@ export const franchiseReducer = (draft: FranchiseState, action: Action): Franchi
           draft,
           'finance',
           `New Staff Hired`,
-          `${action.payload.staff.name} has been hired as the new ${action.payload.type}.`
+          `${action.payload.staff.name} has been hired as the new ${action.payload.type}.`,
         );
       } else {
         addInboxItem(
           draft,
           'finance',
           `Hiring Failed`,
-          `Insufficient funds to hire ${action.payload.staff.name}.`
+          `Insufficient funds to hire ${action.payload.staff.name}.`,
         );
       }
       break;
@@ -111,7 +111,7 @@ export const franchiseReducer = (draft: FranchiseState, action: Action): Franchi
           draft,
           'finance',
           `${facility} Upgraded`,
-          `The ${facility} has been upgraded to level ${draft.stadium[team][facility]}.`
+          `The ${facility} has been upgraded to level ${draft.stadium[team][facility]}.`,
         );
       }
       break;
@@ -125,7 +125,7 @@ export const franchiseReducer = (draft: FranchiseState, action: Action): Franchi
         draft,
         'finance',
         `New Sponsorship Deal`,
-        `A new deal has been signed with ${deal.name}.`
+        `A new deal has been signed with ${deal.name}.`,
       );
       break;
     }
@@ -249,7 +249,7 @@ export const franchiseReducer = (draft: FranchiseState, action: Action): Franchi
         draft,
         'mentoring',
         'New Mentoring Group',
-        'A new mentoring group has been established.'
+        'A new mentoring group has been established.',
       );
       break;
     }
@@ -268,13 +268,13 @@ export const franchiseReducer = (draft: FranchiseState, action: Action): Franchi
         });
       }
       draft.mentoringGroups[team] = draft.mentoringGroups[team].filter(
-        g => g.mentorId !== mentorId
+        g => g.mentorId !== mentorId,
       );
       addInboxItem(
         draft,
         'mentoring',
         'Mentoring Group Dissolved',
-        'A mentoring group has been dissolved.'
+        'A mentoring group has been dissolved.',
       );
       break;
     }

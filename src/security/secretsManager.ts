@@ -138,7 +138,7 @@ export function createSecret(
     expiresAt?: string;
     classification?: DataClassification;
   } = {},
-  context: SecretAccessContext
+  context: SecretAccessContext,
 ): string {
   try {
     const secretId = generateUUID();
@@ -416,7 +416,7 @@ function scheduleSecretRotation(secretId: string): void {
 export function rotateSecret(
   secretId: string,
   context: SecretAccessContext,
-  newValue?: string
+  newValue?: string,
 ): RotationResult {
   try {
     const secret = secretStore.get(secretId);

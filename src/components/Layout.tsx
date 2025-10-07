@@ -172,7 +172,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         // Responsive layout variants
         isMobile && 'mobile-layout',
         isTablet && 'tablet-layout',
-        !isMobile && !isTablet && 'desktop-layout'
+        !isMobile && !isTablet && 'desktop-layout',
       )}
     >
       {/* Modern Header - Hide on mobile (MobileAppLayout provides its own header) */}
@@ -188,7 +188,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           'flex-grow flex relative z-10',
           'bg-gradient-to-b from-secondary-950/50 via-transparent to-secondary-950/50',
           isMobile ? 'flex-col' : 'flex-row',
-          'overflow-hidden'
+          'overflow-hidden',
         )}
       >
         {/* Background Pattern */}
@@ -213,7 +213,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 'bg-black/60 backdrop-blur-sm',
                 'flex items-center justify-center',
                 'animate-fade-in',
-                isMobile ? 'mobile-p-3' : 'p-6'
+                isMobile ? 'mobile-p-3' : 'p-6',
               )}
             >
               <div
@@ -221,7 +221,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   'card-elevated',
                   isMobile ? 'w-full max-h-[90vh]' : 'max-w-md',
                   'flex flex-col items-center justify-center p-8',
-                  'animate-scale-in'
+                  'animate-scale-in',
                 )}
               >
                 {/* Modern Loading Spinner */}
@@ -241,13 +241,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               'animate-fade-in',
               shouldUseFullScreenModal && 'mobile-modal',
               activeModal && 'open',
-              isMobile && 'mobile-safe-area'
+              isMobile && 'mobile-safe-area',
             )}
           >
             <div
               className={cn(
                 'flex items-center justify-center min-h-full',
-                isMobile ? 'p-3' : 'p-6'
+                isMobile ? 'p-3' : 'p-6',
               )}
             >
               <div className="animate-scale-in">

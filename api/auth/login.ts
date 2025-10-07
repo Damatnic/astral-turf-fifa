@@ -113,6 +113,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
+    // Check if user has a password hash
+    if (!user.passwordHash) {
+      return res.status(401).json({
+        error: 'Invalid credentials',
+        message: 'Invalid email or password',
+      });
+    }
+
     // Verify password
     const isValidPassword = await bcrypt.compare(password, user.passwordHash);
 
@@ -167,13 +175,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         sessionType: rememberMe ? 'persistent' : 'session',
       },
       jwtSecret,
-      { expiresIn: tokenExpiry }
+      { expiresIn: tokenExpiry },
     );
 
     // Create user session
     const sessionExpiry = new Date();
     sessionExpiry.setTime(
-      sessionExpiry.getTime() + (rememberMe ? 30 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000)
+      sessionExpiry.getTime() + (rememberMe ? 30 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000),
     );
 
     const session = await prisma.userSession.create({

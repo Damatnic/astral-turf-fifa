@@ -190,7 +190,7 @@ class IntegrationManager {
         'integration_manager',
         'connection' as const,
         'All services initialized successfully',
-        'info'
+        'info',
       );
 
       // // // // console.log('✅ Integration Manager initialized successfully');
@@ -199,7 +199,7 @@ class IntegrationManager {
         'integration_manager',
         'error',
         `Initialization failed: ${(_error as any).message}`,
-        'critical'
+        'critical',
       );
       throw _error;
     }
@@ -285,7 +285,7 @@ class IntegrationManager {
         'integration_manager',
         'config_change',
         'Configuration updated successfully',
-        'info'
+        'info',
       );
       // // // // console.log('⚙️ Integration configuration updated');
     } catch (_error: any) {
@@ -294,7 +294,7 @@ class IntegrationManager {
         'integration_manager',
         'error',
         `Configuration update failed: ${(_error as any).message}`,
-        'error'
+        'error',
       );
       throw _error;
     }
@@ -304,7 +304,7 @@ class IntegrationManager {
    * Test connection to specific integration
    */
   async testConnection(
-    serviceName: string
+    serviceName: string,
   ): Promise<{ success: boolean; message: string; responseTime: number }> {
     const startTime = Date.now();
 
@@ -409,7 +409,7 @@ class IntegrationManager {
         serviceName,
         'error',
         `Manual sync failed: ${(_error as any).message}`,
-        'error'
+        'error',
       );
       throw _error;
     }
@@ -888,7 +888,7 @@ class IntegrationManager {
       () => {
         this.checkServiceHealth();
       },
-      5 * 60 * 1000
+      5 * 60 * 1000,
     );
 
     // Update metrics every minute
@@ -901,7 +901,7 @@ class IntegrationManager {
       () => {
         this.cleanEventLog();
       },
-      60 * 60 * 1000
+      60 * 60 * 1000,
     );
   }
 
@@ -1004,7 +1004,7 @@ class IntegrationManager {
     service: string,
     type: IntegrationEvent['type'],
     data: any,
-    severity: IntegrationEvent['severity']
+    severity: IntegrationEvent['severity'],
   ): void {
     const event: IntegrationEvent = {
       id: `event_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -1065,7 +1065,7 @@ class IntegrationManager {
           }
         }
       },
-      60 * 60 * 1000
+      60 * 60 * 1000,
     );
   }
 
@@ -1113,7 +1113,7 @@ class IntegrationManager {
 
   private async applyConfigurationChanges(
     oldConfig: IntegrationConfig,
-    newConfig: IntegrationConfig
+    newConfig: IntegrationConfig,
   ): Promise<void> {
     // Apply configuration changes to running services
     // // // // console.log('⚙️ Applying configuration changes');

@@ -164,7 +164,7 @@ export const createMockPlayers = (count: number, overrides?: Partial<Player>): P
       ...overrides,
       name: `${overrides?.name || 'Test Player'} ${index + 1}`,
       jerseyNumber: (overrides?.jerseyNumber || 1) + index,
-    })
+    }),
   );
 };
 
@@ -318,7 +318,7 @@ export const createMockStartingXI = (formation: string = '4-4-2'): Player[] => {
       name: 'Test Goalkeeper',
       jerseyNumber: 1,
       position: { x: 50, y: 10 },
-    })
+    }),
   );
 
   // Formation-based positioning
@@ -331,7 +331,7 @@ export const createMockStartingXI = (formation: string = '4-4-2'): Player[] => {
         name: `Defender ${i + 1}`,
         jerseyNumber: i + 2,
         position: { x: 20 + (i * 60) / (defenders - 1 || 1), y: 25 },
-      })
+      }),
     );
   }
 
@@ -342,7 +342,7 @@ export const createMockStartingXI = (formation: string = '4-4-2'): Player[] => {
         name: `Midfielder ${i + 1}`,
         jerseyNumber: i + defenders + 2,
         position: { x: 20 + (i * 60) / (midfielders - 1 || 1), y: 50 },
-      })
+      }),
     );
   }
 
@@ -353,7 +353,7 @@ export const createMockStartingXI = (formation: string = '4-4-2'): Player[] => {
         name: `Forward ${i + 1}`,
         jerseyNumber: i + defenders + midfielders + 2,
         position: { x: 30 + (i * 40) / (forwards - 1 || 1), y: 75 },
-      })
+      }),
     );
   }
 

@@ -80,7 +80,7 @@ function generatePreferredRoles(role: PositionRole): string[] {
  */
 export const generateTacticalFormation = (
   formationType: '4-4-2' | '4-3-3' | '3-5-2' | '5-3-2' = '4-4-2',
-  overrides: Partial<Formation> = {}
+  overrides: Partial<Formation> = {},
 ): Formation => {
   const formationConfigs = {
     '4-4-2': [
@@ -221,7 +221,7 @@ export const generateTacticalFormation = (
           role: roleConfig.role,
           defaultPosition: roleConfig.positions[i] || { x: 50, y: 50 },
           preferredRoles: generatePreferredRoles(roleConfig.role),
-        })
+        }),
       );
       slotIndex++;
     }
@@ -414,7 +414,7 @@ function getRandomRoleId(role: PositionRole): string {
  * Generate chemistry visualization data for testing
  */
 export const generateChemistryData = (
-  players: Player[]
+  players: Player[],
 ): Array<{
   player1Id: string;
   player2Id: string;
@@ -441,7 +441,7 @@ export const generateChemistryData = (
       const baseChemistry = faker.number.int({ min: 40, max: 70 });
       const chemistryScore = Math.min(
         100,
-        baseChemistry + nationalityBonus + teamBonus + ageCompatibility + positionCompatibility
+        baseChemistry + nationalityBonus + teamBonus + ageCompatibility + positionCompatibility,
       );
 
       const factors = [
@@ -531,7 +531,7 @@ export const generatePerformanceTestData = {
   // Medium dataset for integration tests
   medium: () => ({
     players: Array.from({ length: 25 }, () =>
-      generatePlayerForConflict(faker.helpers.arrayElement(['GK', 'DF', 'MF', 'FW']))
+      generatePlayerForConflict(faker.helpers.arrayElement(['GK', 'DF', 'MF', 'FW'])),
     ),
     formations: Array.from({ length: 5 }, () => generateTacticalFormation()),
     drawings: generateTacticalAnnotations(20),
@@ -541,7 +541,7 @@ export const generatePerformanceTestData = {
   // Large dataset for performance stress testing
   large: () => ({
     players: Array.from({ length: 100 }, () =>
-      generatePlayerForConflict(faker.helpers.arrayElement(['GK', 'DF', 'MF', 'FW']))
+      generatePlayerForConflict(faker.helpers.arrayElement(['GK', 'DF', 'MF', 'FW'])),
     ),
     formations: Array.from({ length: 20 }, () => generateTacticalFormation()),
     drawings: generateTacticalAnnotations(100),

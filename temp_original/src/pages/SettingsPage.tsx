@@ -81,7 +81,7 @@ const SettingsPage: React.FC = () => {
                           </div>
                         </div>
                       </button>
-                    )
+                    ),
                   )}
                 </div>
               </div>

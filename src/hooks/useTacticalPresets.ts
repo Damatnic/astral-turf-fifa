@@ -69,7 +69,7 @@ interface UseTacticalPresetsReturn {
  * Hook for managing tactical presets library
  */
 export function useTacticalPresets(
-  options: UseTacticalPresetsOptions = {}
+  options: UseTacticalPresetsOptions = {},
 ): UseTacticalPresetsReturn {
   const { autoSync = false, syncInterval = 60000 } = options;
 
@@ -139,7 +139,7 @@ export function useTacticalPresets(
         p =>
           p.metadata.name.toLowerCase().includes(term) ||
           p.metadata.description?.toLowerCase().includes(term) ||
-          p.metadata.tags?.some(tag => tag.toLowerCase().includes(term))
+          p.metadata.tags?.some(tag => tag.toLowerCase().includes(term)),
       );
     }
 
@@ -159,7 +159,7 @@ export function useTacticalPresets(
           import('../types/presets').PresetMetadata,
           'id' | 'createdAt' | 'updatedAt' | 'version'
         >;
-      }
+      },
     ): Promise<TacticalPreset> => {
       const now = Date.now();
       const newPreset: TacticalPreset = {
@@ -186,7 +186,7 @@ export function useTacticalPresets(
 
       return newPreset;
     },
-    [generateId]
+    [generateId],
   );
 
   // Update preset
@@ -205,7 +205,7 @@ export function useTacticalPresets(
                 version: p.metadata.version + 1,
               },
             }
-          : p
+          : p,
       ),
     }));
 
@@ -232,7 +232,7 @@ export function useTacticalPresets(
         pendingChanges: prev.pendingChanges + 1,
       }));
     },
-    [selectedPreset]
+    [selectedPreset],
   );
 
   // Duplicate preset
@@ -264,7 +264,7 @@ export function useTacticalPresets(
 
       return duplicate;
     },
-    [library.presets, generateId]
+    [library.presets, generateId],
   );
 
   // Select preset
@@ -288,7 +288,7 @@ export function useTacticalPresets(
         });
       }
     },
-    [library.presets, updatePreset]
+    [library.presets, updatePreset],
   );
 
   // Set filter
@@ -306,7 +306,7 @@ export function useTacticalPresets(
     (searchTerm: string) => {
       setFilter({ searchTerm });
     },
-    [setFilter]
+    [setFilter],
   );
 
   // Filter by category
@@ -314,7 +314,7 @@ export function useTacticalPresets(
     (category: PresetCategory) => {
       setFilter({ category });
     },
-    [setFilter]
+    [setFilter],
   );
 
   // Filter by formation
@@ -322,7 +322,7 @@ export function useTacticalPresets(
     (formation: string) => {
       setFilter({ formation });
     },
-    [setFilter]
+    [setFilter],
   );
 
   // Export preset
@@ -339,7 +339,7 @@ export function useTacticalPresets(
         presets: [preset],
       };
     },
-    [library.presets]
+    [library.presets],
   );
 
   // Export all presets
@@ -371,7 +371,7 @@ export function useTacticalPresets(
 
       return importedPresets.length;
     },
-    [generateId]
+    [generateId],
   );
 
   // Export to file
@@ -390,7 +390,7 @@ export function useTacticalPresets(
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
     },
-    [exportPreset, exportAllPresets]
+    [exportPreset, exportAllPresets],
   );
 
   // Import from file
@@ -417,7 +417,7 @@ export function useTacticalPresets(
         reader.readAsText(file);
       });
     },
-    [importPresets]
+    [importPresets],
   );
 
   // Sync to cloud (placeholder - implement with actual cloud service)
@@ -480,7 +480,7 @@ export function useTacticalPresets(
     (id: string) => {
       return library.presets.find(p => p.metadata.id === id);
     },
-    [library.presets]
+    [library.presets],
   );
 
   // Get presets by category
@@ -488,7 +488,7 @@ export function useTacticalPresets(
     (category: PresetCategory) => {
       return library.presets.filter(p => p.metadata.category === category);
     },
-    [library.presets]
+    [library.presets],
   );
 
   // Get preset statistics

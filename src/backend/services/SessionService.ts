@@ -38,7 +38,7 @@ export class SessionService {
    */
   async getUserSessions(
     userId: string,
-    currentSessionId?: string
+    currentSessionId?: string,
   ): Promise<{
     success: boolean;
     sessions?: SessionInfo[];
@@ -61,7 +61,7 @@ export class SessionService {
          FROM user_sessions
          WHERE user_id = $1 AND is_active = true AND expires_at > NOW()
          ORDER BY last_activity_at DESC`,
-        [userId]
+        [userId],
       );
 
       const sessions: SessionInfo[] = result.rows.map(row => {
@@ -106,7 +106,7 @@ export class SessionService {
   async revokeSession(
     sessionId: string,
     userId: string,
-    currentSessionId?: string
+    currentSessionId?: string,
   ): Promise<{
     success: boolean;
     message: string;
@@ -127,7 +127,7 @@ export class SessionService {
          SET is_active = false, updated_at = NOW()
          WHERE id = $1 AND user_id = $2 AND is_active = true
          RETURNING id`,
-        [sessionId, userId]
+        [sessionId, userId],
       );
 
       if (result.rowCount === 0) {
@@ -161,7 +161,7 @@ export class SessionService {
    */
   async revokeAllSessions(
     userId: string,
-    currentSessionId: string
+    currentSessionId: string,
   ): Promise<{
     success: boolean;
     message: string;
@@ -174,7 +174,7 @@ export class SessionService {
          SET is_active = false, updated_at = NOW()
          WHERE user_id = $1 AND id != $2 AND is_active = true
          RETURNING id`,
-        [userId, currentSessionId]
+        [userId, currentSessionId],
       );
 
       const revokedCount = result.rowCount || 0;
@@ -204,7 +204,7 @@ export class SessionService {
    */
   async getSessionById(
     sessionId: string,
-    userId: string
+    userId: string,
   ): Promise<{
     success: boolean;
     session?: SessionInfo;
@@ -224,7 +224,7 @@ export class SessionService {
           device_fingerprint
          FROM user_sessions
          WHERE id = $1 AND user_id = $2`,
-        [sessionId, userId]
+        [sessionId, userId],
       );
 
       if (result.rows.length === 0) {
@@ -278,7 +278,7 @@ export class SessionService {
       const result = await phoenixPool.query(
         `DELETE FROM user_sessions
          WHERE expires_at < NOW() OR (is_active = false AND updated_at < NOW() - INTERVAL '7 days')
-         RETURNING id`
+         RETURNING id`,
       );
 
       return {
@@ -298,7 +298,7 @@ export class SessionService {
    */
   async updateSessionActivity(
     sessionId: string,
-    ipAddress: string
+    ipAddress: string,
   ): Promise<{
     success: boolean;
     error?: string;
@@ -308,7 +308,7 @@ export class SessionService {
         `UPDATE user_sessions
          SET last_activity_at = NOW(), ip_address = $1, updated_at = NOW()
          WHERE id = $2 AND is_active = true`,
-        [ipAddress, sessionId]
+        [ipAddress, sessionId],
       );
 
       return { success: true };
@@ -358,7 +358,7 @@ export class SessionService {
           this.formatDeviceInfo(deviceInfo),
           data.deviceFingerprint || this.generateDeviceFingerprint(data.userAgent, data.ipAddress),
           expiresAt,
-        ]
+        ],
       );
 
       return {
@@ -386,7 +386,7 @@ export class SessionService {
         `SELECT user_id, expires_at, is_active
          FROM user_sessions
          WHERE id = $1`,
-        [sessionId]
+        [sessionId],
       );
 
       if (result.rows.length === 0) {
@@ -426,26 +426,26 @@ export class SessionService {
 
     // Detect browser
     let browser = 'Unknown';
-    if (ua.includes('chrome') && !ua.includes('edg')) browser = 'Chrome';
-    else if (ua.includes('safari') && !ua.includes('chrome')) browser = 'Safari';
-    else if (ua.includes('firefox')) browser = 'Firefox';
-    else if (ua.includes('edg')) browser = 'Edge';
-    else if (ua.includes('opera')) browser = 'Opera';
+    if (ua.includes('chrome') && !ua.includes('edg')) {browser = 'Chrome';}
+    else if (ua.includes('safari') && !ua.includes('chrome')) {browser = 'Safari';}
+    else if (ua.includes('firefox')) {browser = 'Firefox';}
+    else if (ua.includes('edg')) {browser = 'Edge';}
+    else if (ua.includes('opera')) {browser = 'Opera';}
 
     // Detect OS
     let os = 'Unknown';
-    if (ua.includes('windows')) os = 'Windows';
-    else if (ua.includes('mac os')) os = 'macOS';
-    else if (ua.includes('linux')) os = 'Linux';
-    else if (ua.includes('android')) os = 'Android';
-    else if (ua.includes('ios') || ua.includes('iphone') || ua.includes('ipad')) os = 'iOS';
+    if (ua.includes('windows')) {os = 'Windows';}
+    else if (ua.includes('mac os')) {os = 'macOS';}
+    else if (ua.includes('linux')) {os = 'Linux';}
+    else if (ua.includes('android')) {os = 'Android';}
+    else if (ua.includes('ios') || ua.includes('iphone') || ua.includes('ipad')) {os = 'iOS';}
 
     // Detect device type
     let deviceType: 'desktop' | 'mobile' | 'tablet' | 'unknown' = 'unknown';
-    if (ua.includes('mobile')) deviceType = 'mobile';
-    else if (ua.includes('tablet') || ua.includes('ipad')) deviceType = 'tablet';
+    if (ua.includes('mobile')) {deviceType = 'mobile';}
+    else if (ua.includes('tablet') || ua.includes('ipad')) {deviceType = 'tablet';}
     else if (ua.includes('windows') || ua.includes('mac os') || ua.includes('linux'))
-      deviceType = 'desktop';
+      {deviceType = 'desktop';}
 
     return { browser, os, deviceType };
   }
@@ -480,7 +480,7 @@ export class SessionService {
    * This is a placeholder - integrate with a GeoIP service in production
    */
   private async getLocationFromIP(
-    ipAddress: string
+    ipAddress: string,
   ): Promise<{ city?: string; region?: string; country?: string } | undefined> {
     // TODO: Integrate with GeoIP service (MaxMind, IP2Location, etc.)
     // For now, return undefined or mock data for localhost
@@ -502,7 +502,7 @@ export class SessionService {
   private async logSecurityEvent(
     userId: string,
     eventType: string,
-    metadata: Record<string, unknown>
+    metadata: Record<string, unknown>,
   ): Promise<void> {
     try {
       await phoenixPool.query(
@@ -521,7 +521,7 @@ export class SessionService {
           JSON.stringify(metadata),
           eventType,
           userId,
-        ]
+        ],
       );
     } catch (error) {
       // Silently fail - logging shouldn't break the main flow

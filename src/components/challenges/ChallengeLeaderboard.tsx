@@ -98,7 +98,7 @@ const ChallengeLeaderboard: React.FC<ChallengeLeaderboardProps> = ({
               >
                 <div
                   className={`p-4 cursor-pointer hover:bg-gray-700/50 transition-colors bg-gradient-to-r ${getRankColor(
-                    rank
+                    rank,
                   )} ${rank <= 3 ? 'border-l-4' : ''}`}
                   onClick={() => {
                     setExpandedPlayerId(isExpanded ? null : entry.playerId);

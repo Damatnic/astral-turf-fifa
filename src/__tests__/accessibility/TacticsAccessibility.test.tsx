@@ -171,7 +171,7 @@ describe('Tactics Board Accessibility Tests', () => {
 
       // Tab through interface
       const interactiveElements = ['button', 'input', '[tabindex="0"]', 'select', 'textarea'].join(
-        ', '
+        ', ',
       );
 
       const focusableElements = document.querySelectorAll(interactiveElements);

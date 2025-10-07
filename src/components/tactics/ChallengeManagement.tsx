@@ -336,7 +336,7 @@ const ChallengeManagement: React.FC<ChallengeManagementProps> = ({
         color: 'bg-red-500',
       },
     ],
-    [completedChallenges]
+    [completedChallenges],
   );
 
   // Filter challenges based on selections
@@ -367,7 +367,7 @@ const ChallengeManagement: React.FC<ChallengeManagementProps> = ({
       setChallengeTimer(challenge.duration * 60); // Convert to seconds
       onChallengeStart(challenge.id);
     },
-    [onChallengeStart]
+    [onChallengeStart],
   );
 
   const completeChallenge = useCallback(
@@ -379,7 +379,7 @@ const ChallengeManagement: React.FC<ChallengeManagementProps> = ({
         setCurrentObjectives([]);
       }
     },
-    [activeChallenge, onChallengeComplete]
+    [activeChallenge, onChallengeComplete],
   );
 
   const getDifficultyColor = (difficulty: string) => {
@@ -565,7 +565,7 @@ const ChallengeManagement: React.FC<ChallengeManagementProps> = ({
                             {Array.from({ length: getDifficultyStars(challenge.difficulty) }).map(
                               (_, i) => (
                                 <Star key={i} className="w-3 h-3 text-yellow-400 fill-current" />
-                              )
+                              ),
                             )}
                           </div>
                         </div>

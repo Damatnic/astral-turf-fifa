@@ -146,7 +146,7 @@ const ModernField: React.FC<ModernFieldProps> = ({
         }
 
         const distance = Math.sqrt(
-          Math.pow(slot.position.x - x, 2) + Math.pow(slot.position.y - y, 2)
+          Math.pow(slot.position.x - x, 2) + Math.pow(slot.position.y - y, 2),
         );
 
         // Only snap to empty slots or slots with different players (for swapping)
@@ -170,7 +170,7 @@ const ModernField: React.FC<ModernFieldProps> = ({
 
       return { x, y, isSnapping: false };
     },
-    [positioningMode, formation?.slots, dragState.playerId]
+    [positioningMode, formation?.slots, dragState.playerId],
   );
 
   // Convert screen coordinates to field percentage
@@ -201,7 +201,7 @@ const ModernField: React.FC<ModernFieldProps> = ({
       // Enable grid during drag
       setShowGrid(true);
     },
-    [setIsDragging, onPlayerSelect]
+    [setIsDragging, onPlayerSelect],
   );
 
   // Ultra-optimized drag handler with enhanced snapping
@@ -264,7 +264,7 @@ const ModernField: React.FC<ModernFieldProps> = ({
         }
       });
     },
-    [dragState.playerId, validatePosition, findNearestSnapPoint, isMobile]
+    [dragState.playerId, validatePosition, findNearestSnapPoint, isMobile],
   );
 
   // Enhanced drag end handler with smart snapping and conflict detection
@@ -298,7 +298,7 @@ const ModernField: React.FC<ModernFieldProps> = ({
               p.id !== dragState.playerId &&
               p.position &&
               Math.abs(p.position.x - x) < collisionRadius &&
-              Math.abs(p.position.y - y) < collisionRadius
+              Math.abs(p.position.y - y) < collisionRadius,
           );
 
           if (collidingPlayer) {
@@ -327,7 +327,7 @@ const ModernField: React.FC<ModernFieldProps> = ({
         isValid: true,
       });
     },
-    [dragState, validatePosition, onPlayerMove, setIsDragging, isMobile, positioningMode, players]
+    [dragState, validatePosition, onPlayerMove, setIsDragging, isMobile, positioningMode, players],
   );
 
   /**
@@ -370,7 +370,7 @@ const ModernField: React.FC<ModernFieldProps> = ({
         navigator.vibrate([25, 25, 100]); // Quick snap + long success
       }
     },
-    [onPlayerMove, findNearestSnapPoint, isMobile]
+    [onPlayerMove, findNearestSnapPoint, isMobile],
   );
 
   // Touch-friendly field tap handler
@@ -394,7 +394,7 @@ const ModernField: React.FC<ModernFieldProps> = ({
         }
       }
     },
-    [isDragging, screenToFieldPosition, selectedPlayer, validatePosition, onPlayerMove, isMobile]
+    [isDragging, screenToFieldPosition, selectedPlayer, validatePosition, onPlayerMove, isMobile],
   );
 
   // Simple formation slots access
@@ -470,7 +470,7 @@ const ModernField: React.FC<ModernFieldProps> = ({
           }}
           isDraggable={!isLowPower}
           isHighlightedByAI={false}
-        />
+        />,
       );
 
       return acc;
@@ -524,7 +524,7 @@ const ModernField: React.FC<ModernFieldProps> = ({
             willChange: isDragging ? 'transform' : 'auto', // GPU optimization hint
             transform: 'translateZ(0)', // Force GPU acceleration
           }),
-          [viewMode, isLowPower, isDragging]
+          [viewMode, isLowPower, isDragging],
         )}
       >
         {/* Stadium Lighting - Conditionally rendered for performance */}

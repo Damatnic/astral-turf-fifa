@@ -46,7 +46,7 @@ const MatchSimulatorPopup: React.FC = () => {
         chemistry,
         relationships,
         mentoringGroups,
-        onUpdate
+        onUpdate,
       );
 
       await sleep(90 * 50 + 500); // Wait for simulation to finish
@@ -63,10 +63,10 @@ const MatchSimulatorPopup: React.FC = () => {
   const handleClose = () => dispatch({ type: 'CLOSE_MODAL' });
 
   const homeScore = simulationTimeline.filter(
-    e => 'type' in e && e.type === 'Goal' && e.team === 'home'
+    e => 'type' in e && e.type === 'Goal' && e.team === 'home',
   ).length;
   const awayScore = simulationTimeline.filter(
-    e => 'type' in e && e.type === 'Goal' && e.team === 'away'
+    e => 'type' in e && e.type === 'Goal' && e.team === 'away',
   ).length;
   const lastEvent = simulationTimeline[simulationTimeline.length - 1];
   const minute = lastEvent ? lastEvent.minute : 0;

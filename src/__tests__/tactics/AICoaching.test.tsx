@@ -9,7 +9,7 @@ vi.mock('../../services/openAiService', () => ({
     generateContent: vi
       .fn()
       .mockResolvedValue(
-        '{"recommendations": [{"title": "Test Recommendation", "description": "Test description", "reasoning": "Test reasoning", "priority": "high", "confidence": 85, "impact": "significant"}]}'
+        '{"recommendations": [{"title": "Test Recommendation", "description": "Test description", "reasoning": "Test reasoning", "priority": "high", "confidence": 85, "impact": "significant"}]}',
       ),
   },
 }));
@@ -101,7 +101,7 @@ describe('AI Coaching Service', () => {
     it('should generate comprehensive coaching recommendations', async () => {
       const recommendations = await aiCoachingService.generateCoachingRecommendations(
         mockFormation,
-        mockPlayers
+        mockPlayers,
       );
 
       expect(recommendations).toBeDefined();
@@ -112,21 +112,21 @@ describe('AI Coaching Service', () => {
     it('should include different types of recommendations', async () => {
       const recommendations = await aiCoachingService.generateCoachingRecommendations(
         mockFormation,
-        mockPlayers
+        mockPlayers,
       );
 
       const types = recommendations.map(r => r.type);
 
       // Should have a variety of recommendation types
       expect(types.some(t => ['formation', 'player', 'tactical', 'strategy'].includes(t))).toBe(
-        true
+        true,
       );
     });
 
     it('should prioritize recommendations correctly', async () => {
       const recommendations = await aiCoachingService.generateCoachingRecommendations(
         mockFormation,
-        mockPlayers
+        mockPlayers,
       );
 
       // Should be sorted by priority (critical > high > medium > low)
@@ -136,7 +136,7 @@ describe('AI Coaching Service', () => {
 
         const priorityOrder = { critical: 4, high: 3, medium: 2, low: 1 };
         expect(priorityOrder[current.priority]).toBeGreaterThanOrEqual(
-          priorityOrder[next.priority]
+          priorityOrder[next.priority],
         );
       }
     });
@@ -144,7 +144,7 @@ describe('AI Coaching Service', () => {
     it('should include confidence scores', async () => {
       const recommendations = await aiCoachingService.generateCoachingRecommendations(
         mockFormation,
-        mockPlayers
+        mockPlayers,
       );
 
       recommendations.forEach(recommendation => {
@@ -157,13 +157,13 @@ describe('AI Coaching Service', () => {
     it('should include impact assessments', async () => {
       const recommendations = await aiCoachingService.generateCoachingRecommendations(
         mockFormation,
-        mockPlayers
+        mockPlayers,
       );
 
       recommendations.forEach(recommendation => {
         expect(recommendation.impact).toBeDefined();
         expect(['game-changing', 'significant', 'moderate', 'minor']).toContain(
-          recommendation.impact
+          recommendation.impact,
         );
       });
     });
@@ -185,14 +185,14 @@ describe('AI Coaching Service', () => {
 
       const recommendations = await aiCoachingService.generateCoachingRecommendations(
         imbalancedFormation,
-        mockPlayers.slice(0, 4)
+        mockPlayers.slice(0, 4),
       );
 
       // Should include recommendations about balance
       const balanceRecommendations = recommendations.filter(
         r =>
           r.title.toLowerCase().includes('balance') ||
-          r.description.toLowerCase().includes('balance')
+          r.description.toLowerCase().includes('balance'),
       );
 
       expect(balanceRecommendations.length).toBeGreaterThan(0);
@@ -213,7 +213,7 @@ describe('AI Coaching Service', () => {
 
       const recommendations = await aiCoachingService.generateCoachingRecommendations(
         spreadFormation,
-        mockPlayers.slice(0, 4)
+        mockPlayers.slice(0, 4),
       );
 
       // Should include recommendations about compactness
@@ -221,7 +221,7 @@ describe('AI Coaching Service', () => {
         r =>
           r.title.toLowerCase().includes('compact') ||
           r.description.toLowerCase().includes('compact') ||
-          r.description.toLowerCase().includes('spread')
+          r.description.toLowerCase().includes('spread'),
       );
 
       expect(compactnessRecommendations.length).toBeGreaterThan(0);
@@ -242,7 +242,7 @@ describe('AI Coaching Service', () => {
 
       const recommendations = await aiCoachingService.generateCoachingRecommendations(
         narrowFormation,
-        mockPlayers.slice(0, 4)
+        mockPlayers.slice(0, 4),
       );
 
       // Should include recommendations about width
@@ -250,7 +250,7 @@ describe('AI Coaching Service', () => {
         r =>
           r.title.toLowerCase().includes('width') ||
           r.description.toLowerCase().includes('width') ||
-          r.description.toLowerCase().includes('narrow')
+          r.description.toLowerCase().includes('narrow'),
       );
 
       expect(widthRecommendations.length).toBeGreaterThan(0);
@@ -281,12 +281,12 @@ describe('AI Coaching Service', () => {
 
       const recommendations = await aiCoachingService.generateCoachingRecommendations(
         wrongPositionFormation,
-        wrongPositionPlayers
+        wrongPositionPlayers,
       );
 
       // Should include player positioning recommendations
       const positioningRecommendations = recommendations.filter(
-        r => r.type === 'player' || r.description.toLowerCase().includes('position')
+        r => r.type === 'player' || r.description.toLowerCase().includes('position'),
       );
 
       expect(positioningRecommendations.length).toBeGreaterThan(0);
@@ -304,7 +304,7 @@ describe('AI Coaching Service', () => {
       const recommendations = await aiCoachingService.generateCoachingRecommendations(
         mockFormation,
         mockPlayers,
-        lateGameContext
+        lateGameContext,
       );
 
       // Should include attacking recommendations when losing late
@@ -312,7 +312,7 @@ describe('AI Coaching Service', () => {
         r =>
           r.description.toLowerCase().includes('attack') ||
           r.description.toLowerCase().includes('forward') ||
-          r.description.toLowerCase().includes('urgent')
+          r.description.toLowerCase().includes('urgent'),
       );
 
       expect(attackingRecommendations.length).toBeGreaterThan(0);
@@ -328,7 +328,7 @@ describe('AI Coaching Service', () => {
       const recommendations = await aiCoachingService.generateCoachingRecommendations(
         mockFormation,
         mockPlayers,
-        winningContext
+        winningContext,
       );
 
       // Should include defensive recommendations when winning
@@ -336,7 +336,7 @@ describe('AI Coaching Service', () => {
         r =>
           r.description.toLowerCase().includes('defensive') ||
           r.description.toLowerCase().includes('protect') ||
-          r.description.toLowerCase().includes('lead')
+          r.description.toLowerCase().includes('lead'),
       );
 
       expect(defensiveRecommendations.length).toBeGreaterThan(0);
@@ -390,7 +390,7 @@ describe('AI Coaching Service', () => {
     it('should handle missing formation gracefully', async () => {
       const recommendations = await aiCoachingService.generateCoachingRecommendations(
         undefined as any,
-        mockPlayers
+        mockPlayers,
       );
 
       // Should return fallback recommendations
@@ -401,7 +401,7 @@ describe('AI Coaching Service', () => {
     it('should handle empty player list', async () => {
       const recommendations = await aiCoachingService.generateCoachingRecommendations(
         mockFormation,
-        []
+        [],
       );
 
       // Should return fallback recommendations
@@ -413,7 +413,7 @@ describe('AI Coaching Service', () => {
       // AI service errors should be handled gracefully with fallback
       const recommendations = await aiCoachingService.generateCoachingRecommendations(
         mockFormation,
-        mockPlayers
+        mockPlayers,
       );
 
       // Should still return recommendations (fallback)

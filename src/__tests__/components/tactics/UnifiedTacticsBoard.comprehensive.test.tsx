@@ -213,14 +213,14 @@ describe('UnifiedTacticsBoard - Comprehensive Test Suite', () => {
           const field = container.querySelector('[role="main"]');
           expect(field).toBeInTheDocument();
         },
-        { timeout: 3000 }
+        { timeout: 3000 },
       );
     });
 
     it('should apply custom className when provided', () => {
       const customClass = 'custom-tactics-board';
       const { container } = renderWithProviders(
-        <UnifiedTacticsBoard {...mockProps} className={customClass} />
+        <UnifiedTacticsBoard {...mockProps} className={customClass} />,
       );
 
       const board = container.querySelector('[role="application"]');
@@ -242,7 +242,7 @@ describe('UnifiedTacticsBoard - Comprehensive Test Suite', () => {
         () => {
           expect(screen.queryByText(/no formation loaded/i)).not.toBeInTheDocument();
         },
-        { timeout: 3000 }
+        { timeout: 3000 },
       );
     });
   });

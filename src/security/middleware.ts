@@ -143,7 +143,7 @@ export function detectAndBlockXSS(input: string, context: string = 'unknown'): s
           input: input.substring(0, 100) + (input.length > 100 ? '...' : ''),
           patterns: XSS_PATTERNS.filter(p => p.test(input)).map(p => p.toString()),
         },
-      }
+      },
     );
 
     // Return sanitized version
@@ -276,7 +276,7 @@ export function detectAndBlockSQLInjection(input: string, fieldName: string = 'u
           input: input.substring(0, 100) + (input.length > 100 ? '...' : ''),
           patterns: SQL_INJECTION_PATTERNS.filter(p => p.test(input)).map(p => p.toString()),
         },
-      }
+      },
     );
 
     // Return sanitized version (escape special characters)
@@ -308,7 +308,7 @@ export interface SanitizedRequest {
 
 export function sanitizeRequest(
   request: any,
-  options: SecurityMiddlewareOptions = DEFAULT_SECURITY_OPTIONS
+  options: SecurityMiddlewareOptions = DEFAULT_SECURITY_OPTIONS,
 ): SanitizedRequest {
   const securityFlags: string[] = [];
 
@@ -352,7 +352,7 @@ export function sanitizeRequest(
           url: request.url || 'unknown',
           method: request.method || 'unknown',
         },
-      }
+      },
     );
   }
 
@@ -363,7 +363,7 @@ function sanitizeObject(
   obj: any,
   options: SecurityMiddlewareOptions,
   context: string,
-  flags: string[]
+  flags: string[],
 ): any {
   if (!obj || typeof obj !== 'object') {
     return obj;
@@ -478,7 +478,7 @@ export function createRateLimiter(options: Partial<RateLimitOptions> = {}) {
             windowMs: opts.windowMs,
             url: request.url || 'unknown',
           },
-        }
+        },
       );
 
       if (opts.onLimitReached) {
@@ -515,7 +515,7 @@ export function createSecurityMiddleware(options: Partial<SecurityMiddlewareOpti
         securityLogger.logSecurityEvent(
           SecurityEventType.SUSPICIOUS_ACTIVITY,
           'Request size limit exceeded',
-          { metadata: { requestId, size: JSON.stringify(request.body).length } }
+          { metadata: { requestId, size: JSON.stringify(request.body).length } },
         );
         throw new Error('Request too large');
       }

@@ -60,7 +60,7 @@ describe('Public Pages - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <LandingPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument();
@@ -71,7 +71,7 @@ describe('Public Pages - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <LandingPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       expect(screen.getByRole('link', { name: /login/i })).toBeInTheDocument();
@@ -82,7 +82,7 @@ describe('Public Pages - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <LandingPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       expect(screen.getByText(/tactical planning/i)).toBeInTheDocument();
@@ -93,7 +93,7 @@ describe('Public Pages - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <LandingPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       // Should adapt to different screen sizes
@@ -109,7 +109,7 @@ describe('Public Pages - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <LoginPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       expect(screen.getByRole('textbox', { name: /email/i })).toBeInTheDocument();
@@ -123,7 +123,7 @@ describe('Public Pages - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <LoginPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       await user.type(screen.getByRole('textbox', { name: /email/i }), 'test@example.com');
@@ -142,7 +142,7 @@ describe('Public Pages - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <LoginPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       // Submit without filling fields
@@ -157,7 +157,7 @@ describe('Public Pages - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <LoginPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       expect(screen.getByRole('link', { name: /sign up/i })).toBeInTheDocument();
@@ -171,7 +171,7 @@ describe('Public Pages - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <SignupPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       expect(screen.getByRole('textbox', { name: /name/i })).toBeInTheDocument();
@@ -186,7 +186,7 @@ describe('Public Pages - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <SignupPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       await user.type(screen.getByRole('textbox', { name: /name/i }), 'Test User');
@@ -206,7 +206,7 @@ describe('Public Pages - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <SignupPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       await user.type(screen.getByLabelText(/password/i), '123');
@@ -242,7 +242,7 @@ describe('Protected Pages - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <DashboardPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument();
@@ -253,7 +253,7 @@ describe('Protected Pages - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <DashboardPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       expect(screen.getByText(/team/i)).toBeInTheDocument();
@@ -264,7 +264,7 @@ describe('Protected Pages - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <DashboardPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       expect(screen.getByText(/recent/i)).toBeInTheDocument();
@@ -274,7 +274,7 @@ describe('Protected Pages - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <DashboardPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       expect(screen.getByRole('link', { name: /tactics/i })).toBeInTheDocument();
@@ -289,7 +289,7 @@ describe('Protected Pages - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <TacticsBoardPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       expect(screen.getByRole('main')).toBeInTheDocument();
@@ -300,7 +300,7 @@ describe('Protected Pages - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <TacticsBoardPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       expect(screen.getByRole('combobox', { name: /formation/i })).toBeInTheDocument();
@@ -310,7 +310,7 @@ describe('Protected Pages - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <TacticsBoardPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       const players = screen.getAllByRole('button', { name: /player/i });
@@ -321,7 +321,7 @@ describe('Protected Pages - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <TacticsBoardPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       expect(screen.getByRole('button', { name: /save/i })).toBeInTheDocument();
@@ -336,7 +336,7 @@ describe('Protected Pages - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <AnalyticsPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument();
@@ -347,7 +347,7 @@ describe('Protected Pages - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <AnalyticsPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       expect(screen.getByText(/performance/i)).toBeInTheDocument();
@@ -358,7 +358,7 @@ describe('Protected Pages - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <AnalyticsPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       expect(screen.getByRole('combobox', { name: /period/i })).toBeInTheDocument();
@@ -369,14 +369,14 @@ describe('Protected Pages - ZENITH Test Suite', () => {
     ZenithTestUtils.createPageTest(
       'AdvancedAnalyticsPage',
       AdvancedAnalyticsPage,
-      '/advanced-analytics'
+      '/advanced-analytics',
     );
 
     it('should display advanced charts', () => {
       render(
         <ZenithTestWrapper>
           <AdvancedAnalyticsPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       expect(screen.getByText(/advanced analytics/i)).toBeInTheDocument();
@@ -386,7 +386,7 @@ describe('Protected Pages - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <AdvancedAnalyticsPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       expect(screen.getByText(/heat map/i)).toBeInTheDocument();
@@ -402,7 +402,7 @@ describe('Protected Pages - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <FinancesPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       expect(screen.getByText(/finances/i)).toBeInTheDocument();
@@ -417,7 +417,7 @@ describe('Protected Pages - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <TransfersPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       expect(screen.getByText(/transfers/i)).toBeInTheDocument();
@@ -432,7 +432,7 @@ describe('Protected Pages - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <TrainingPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       expect(screen.getByText(/training/i)).toBeInTheDocument();
@@ -447,7 +447,7 @@ describe('Protected Pages - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <InboxPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       expect(screen.getByText(/inbox/i)).toBeInTheDocument();
@@ -462,7 +462,7 @@ describe('Protected Pages - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <SettingsPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       expect(screen.getByText(/settings/i)).toBeInTheDocument();
@@ -475,7 +475,7 @@ describe('Protected Pages - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <SettingsPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       const toggleSetting = screen.getByRole('switch');
@@ -494,7 +494,7 @@ describe('Protected Pages - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <YouthAcademyPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       expect(screen.getByText(/youth academy/i)).toBeInTheDocument();
@@ -508,7 +508,7 @@ describe('Protected Pages - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <StaffPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       expect(screen.getByText(/staff/i)).toBeInTheDocument();
@@ -522,7 +522,7 @@ describe('Protected Pages - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <StadiumPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       expect(screen.getByText(/stadium/i)).toBeInTheDocument();
@@ -536,7 +536,7 @@ describe('Protected Pages - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <SponsorshipsPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       expect(screen.getByText(/sponsorships/i)).toBeInTheDocument();
@@ -551,7 +551,7 @@ describe('Protected Pages - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <LeagueTablePage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       expect(screen.getByText(/league table/i)).toBeInTheDocument();
@@ -565,7 +565,7 @@ describe('Protected Pages - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <NewsFeedPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       expect(screen.getByText(/news/i)).toBeInTheDocument();
@@ -579,7 +579,7 @@ describe('Protected Pages - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <PlayerProfilePage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       expect(screen.getByText(/player/i)).toBeInTheDocument();
@@ -603,7 +603,7 @@ describe('Page Navigation Tests - ZENITH Standards', () => {
     render(
       <ZenithTestWrapper>
         <DashboardPage />
-      </ZenithTestWrapper>
+      </ZenithTestWrapper>,
     );
 
     // Test history navigation
@@ -614,7 +614,7 @@ describe('Page Navigation Tests - ZENITH Standards', () => {
     render(
       <ZenithTestWrapper>
         <AnalyticsPage />
-      </ZenithTestWrapper>
+      </ZenithTestWrapper>,
     );
 
     // URL should reflect current page
@@ -625,7 +625,7 @@ describe('Page Navigation Tests - ZENITH Standards', () => {
     render(
       <ZenithTestWrapper>
         <PlayerProfilePage />
-      </ZenithTestWrapper>
+      </ZenithTestWrapper>,
     );
 
     // Should handle dynamic routes
@@ -651,7 +651,7 @@ describe('Page Performance Tests - ZENITH Standards', () => {
         const { unmount } = render(
           <ZenithTestWrapper>
             <Component />
-          </ZenithTestWrapper>
+          </ZenithTestWrapper>,
         );
 
         await waitFor(() => {
@@ -674,12 +674,12 @@ describe('Page Performance Tests - ZENITH Standards', () => {
           render(
             <ZenithTestWrapper>
               <Component />
-            </ZenithTestWrapper>
+            </ZenithTestWrapper>,
           );
         },
         () => {
           cleanup();
-        }
+        },
       );
 
       expect(Math.abs(memoryLeak)).toBeLessThan(500000); // 500KB threshold
@@ -703,7 +703,7 @@ describe('Page SEO and Accessibility Tests - ZENITH AAA Standards', () => {
       render(
         <ZenithTestWrapper>
           <Component />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       const headings = screen.getAllByRole('heading');
@@ -721,7 +721,7 @@ describe('Page SEO and Accessibility Tests - ZENITH AAA Standards', () => {
       const { container } = render(
         <ZenithTestWrapper>
           <Component />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       const isAccessible = await ZenithTestUtils.checkAccessibility(container);
@@ -736,7 +736,7 @@ describe('Page SEO and Accessibility Tests - ZENITH AAA Standards', () => {
       render(
         <ZenithTestWrapper>
           <Component />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       // Should have main content

@@ -276,7 +276,7 @@ class WebGLRenderer {
       gl.bufferData(
         gl.ARRAY_BUFFER,
         this.vertexData.subarray(0, this.vertexCount * 2),
-        gl.DYNAMIC_DRAW
+        gl.DYNAMIC_DRAW,
       );
 
       const positionAttrib = gl.getAttribLocation(program, 'a_position');
@@ -288,7 +288,7 @@ class WebGLRenderer {
       gl.bufferData(
         gl.ARRAY_BUFFER,
         this.colorData.subarray(0, this.vertexCount * 4),
-        gl.DYNAMIC_DRAW
+        gl.DYNAMIC_DRAW,
       );
 
       const colorAttrib = gl.getAttribLocation(program, 'a_color');
@@ -499,7 +499,7 @@ export const CanvasRenderer: React.FC<CanvasRendererProps> = ({
         renderWith2D(contextRef.current.ctx, time, qualityScale);
       }
     },
-    [isVisible, renderMode, renderBatches, viewportScale, cameraPosition]
+    [isVisible, renderMode, renderBatches, viewportScale, cameraPosition],
   );
 
   const renderWithWebGL = useCallback(
@@ -561,7 +561,7 @@ export const CanvasRenderer: React.FC<CanvasRendererProps> = ({
               color.r,
               color.g,
               color.b,
-              color.a
+              color.a,
             );
           }
         }
@@ -569,7 +569,7 @@ export const CanvasRenderer: React.FC<CanvasRendererProps> = ({
 
       rendererRef.current.render(projectionMatrix, viewMatrix, time / 1000);
     },
-    [renderBatches, viewportScale, cameraPosition, width, height, getLOD]
+    [renderBatches, viewportScale, cameraPosition, width, height, getLOD],
   );
 
   const renderWith2D = useCallback(
@@ -629,7 +629,7 @@ export const CanvasRenderer: React.FC<CanvasRendererProps> = ({
 
       ctx.restore();
     },
-    [renderBatches, viewportScale, cameraPosition, width, height, getLOD]
+    [renderBatches, viewportScale, cameraPosition, width, height, getLOD],
   );
 
   // Animation loop
@@ -658,7 +658,7 @@ export const CanvasRenderer: React.FC<CanvasRendererProps> = ({
       // Find clicked player
       for (const player of players) {
         const distance = Math.sqrt(
-          Math.pow(player.position.x - worldX, 2) + Math.pow(player.position.y - worldY, 2)
+          Math.pow(player.position.x - worldX, 2) + Math.pow(player.position.y - worldY, 2),
         );
 
         if (distance < 5) {
@@ -667,7 +667,7 @@ export const CanvasRenderer: React.FC<CanvasRendererProps> = ({
         }
       }
     },
-    [players, cameraPosition, viewportScale, width, height, onPlayerClick]
+    [players, cameraPosition, viewportScale, width, height, onPlayerClick],
   );
 
   return (

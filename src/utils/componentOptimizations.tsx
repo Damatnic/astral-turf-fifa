@@ -20,7 +20,7 @@ import { shallowEqual } from './performanceOptimizations';
 // Ultra-fast component memoization with custom comparison
 export function createOptimizedMemo<P extends object>(
   Component: ComponentType<P>,
-  customCompare?: (prev: P, next: P) => boolean
+  customCompare?: (prev: P, next: P) => boolean,
 ): ComponentType<P> {
   return memo(
     Component,
@@ -42,7 +42,7 @@ export function createOptimizedMemo<P extends object>(
         }
 
         return true;
-      })
+      }),
   ) as unknown as ComponentType<P>;
 }
 
@@ -50,7 +50,7 @@ export function createOptimizedMemo<P extends object>(
 export function useOptimizedMemo<T>(
   factory: () => T,
   deps: React.DependencyList,
-  isEqual?: (a: T, b: T) => boolean
+  isEqual?: (a: T, b: T) => boolean,
 ): T {
   const ref = useRef<{ deps: React.DependencyList; value: T } | undefined>();
 
@@ -79,7 +79,7 @@ export function useStableCallback<T extends (...args: any[]) => any>(callback: T
     ((...args: Parameters<T>) => {
       return ref.current(...args);
     }) as T,
-    []
+    [],
   );
 }
 
@@ -184,7 +184,7 @@ const globalEventCache = new EventHandlerCache();
 export function useOptimizedEventHandler<T extends (...args: any[]) => void>(
   key: string,
   factory: () => T,
-  deps: React.DependencyList
+  deps: React.DependencyList,
 ): T {
   return useMemo(() => {
     const handlerKey = `${key}_${deps.join('_')}`;
@@ -243,7 +243,7 @@ export function withPerformanceOptimizations<P extends object>(
     customCompare?: (prev: P, next: P) => boolean;
     enableVirtualization?: boolean;
     batchUpdates?: boolean;
-  } = {}
+  } = {},
 ) {
   const {
     memoize = true,
@@ -272,7 +272,7 @@ export function withPerformanceOptimizations<P extends object>(
 // Intersection observer for viewport optimization
 export function useIntersectionOptimization(
   ref: RefObject<Element>,
-  options: IntersectionObserverInit = {}
+  options: IntersectionObserverInit = {},
 ) {
   const [isIntersecting, setIsIntersecting] = useState(false);
   const [hasIntersected, setHasIntersected] = useState(false);
@@ -294,7 +294,7 @@ export function useIntersectionOptimization(
         threshold: 0.1,
         rootMargin: '100px',
         ...options,
-      }
+      },
     );
 
     observer.observe(element);
@@ -423,7 +423,7 @@ export function useOptimizedForm<T extends Record<string, any>>(initialValues: T
 // Component performance profiler
 export function withPerformanceProfiler<P extends object>(
   Component: ComponentType<P>,
-  componentName: string
+  componentName: string,
 ) {
   return React.forwardRef<any, P>((props, ref) => {
     const renderStartTime = useRef<number>(0);
@@ -440,7 +440,7 @@ export function withPerformanceProfiler<P extends object>(
       if (renderTime > 16) {
         // Longer than 1 frame
         console.warn(
-          `🐌 Slow render detected in ${componentName}: ${renderTime.toFixed(2)}ms (render #${renderCount.current})`
+          `🐌 Slow render detected in ${componentName}: ${renderTime.toFixed(2)}ms (render #${renderCount.current})`,
         );
       }
 

@@ -63,7 +63,7 @@ class AICoachingService {
       score?: { home: number; away: number };
       gameState?: string;
       opposition?: Formation;
-    }
+    },
   ): Promise<CoachingRecommendation[]> {
     try {
       const recommendations: CoachingRecommendation[] = [];
@@ -80,7 +80,7 @@ class AICoachingService {
       const tacticalRecommendations = await this.generateTacticalAdvice(
         formation,
         players,
-        context
+        context,
       );
       recommendations.push(...tacticalRecommendations);
 
@@ -108,7 +108,7 @@ class AICoachingService {
    */
   private async analyzeFormationStructure(
     formation: Formation,
-    players: Player[]
+    players: Player[],
   ): Promise<CoachingRecommendation[]> {
     const recommendations: CoachingRecommendation[] = [];
 
@@ -120,7 +120,7 @@ class AICoachingService {
 
     // Filter out null/undefined positions and ensure valid coordinates
     const validPositions = positions.filter(
-      (pos: any) => pos && typeof pos.x === 'number' && typeof pos.y === 'number'
+      (pos: any) => pos && typeof pos.x === 'number' && typeof pos.y === 'number',
     );
 
     if (validPositions.length === 0) {
@@ -207,7 +207,7 @@ class AICoachingService {
    */
   private async analyzePlayerPositioning(
     formation: Formation,
-    players: Player[]
+    players: Player[],
   ): Promise<CoachingRecommendation[]> {
     const recommendations: CoachingRecommendation[] = [];
 
@@ -256,7 +256,7 @@ class AICoachingService {
   private async generateTacticalAdvice(
     formation: Formation,
     players: Player[],
-    context?: any
+    context?: any,
   ): Promise<CoachingRecommendation[]> {
     const recommendations: CoachingRecommendation[] = [];
 
@@ -314,7 +314,7 @@ class AICoachingService {
   private async getAIRecommendations(
     formation: Formation,
     players: Player[],
-    context?: any
+    context?: any,
   ): Promise<CoachingRecommendation[]> {
     try {
       // Create a basic formation analysis if not available
@@ -383,7 +383,7 @@ Provide 2-3 specific, actionable coaching recommendations in JSON format:
   private analyzePlayerPosition(
     player: Player,
     position: { x: number; y: number },
-    _formation: Formation
+    _formation: Formation,
   ): PlayerAnalysis {
     // Simplified analysis - in a real app, this would use comprehensive player attributes
     const baseScore = player.currentPotential || 70;
@@ -461,7 +461,7 @@ Provide 2-3 specific, actionable coaching recommendations in JSON format:
    */
   private generateAlternativePositions(
     player: Player,
-    currentPosition: { x: number; y: number }
+    currentPosition: { x: number; y: number },
   ): Array<{
     position: string;
     suitability: number;
@@ -495,7 +495,7 @@ Provide 2-3 specific, actionable coaching recommendations in JSON format:
    */
   private getFallbackRecommendations(
     _formation: Formation,
-    _players: Player[]
+    _players: Player[],
   ): CoachingRecommendation[] {
     return [
       {

@@ -44,7 +44,7 @@ describe('Tactical Board - Smoke Tests', () => {
           const elements = container.querySelectorAll('*');
           expect(elements.length).toBeGreaterThan(0);
         },
-        { timeout: 5000 }
+        { timeout: 5000 },
       );
     } catch (error) {
       // Log the error for debugging but don't fail the test

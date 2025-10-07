@@ -186,7 +186,7 @@ async function setupS3() {
 
     await fs.writeFile('/tmp/cors.json', corsConfig);
     await execAsync(
-      `aws s3api put-bucket-cors --bucket ${bucketName} --cors-configuration file:///tmp/cors.json`
+      `aws s3api put-bucket-cors --bucket ${bucketName} --cors-configuration file:///tmp/cors.json`,
     );
     log.success('CORS configured');
   } catch (error) {
@@ -232,7 +232,7 @@ async function generateEnvFile() {
   if (databaseUrl) {
     envContent = envContent.replace(
       'postgresql://username:password@localhost:5432/astralturf',
-      databaseUrl
+      databaseUrl,
     );
   }
 

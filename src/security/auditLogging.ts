@@ -274,9 +274,9 @@ class AuditLoggingService {
             winston.format.timestamp(),
             winston.format.printf(({ timestamp, level, message, ...meta }) => {
               return `${timestamp} [${level}]: ${message} ${Object.keys(meta).length ? JSON.stringify(meta, null, 2) : ''}`;
-            })
+            }),
           ),
-        })
+        }),
       );
     }
 
@@ -289,7 +289,7 @@ class AuditLoggingService {
           maxSize: this.config.storage.local.maxFileSize,
           maxFiles: this.config.storage.local.maxFiles,
           format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
-        })
+        }),
       );
 
       // Separate file for security events
@@ -301,7 +301,7 @@ class AuditLoggingService {
           maxFiles: this.config.storage.local.maxFiles,
           level: 'warn',
           format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
-        })
+        }),
       );
 
       // Separate file for compliance events
@@ -327,9 +327,9 @@ class AuditLoggingService {
                 return JSON.stringify(info);
               }
               return '';
-            })
+            }),
           ),
-        })
+        }),
       );
     }
 
@@ -407,7 +407,7 @@ class AuditLoggingService {
       sessionId?: string;
       method?: string;
       reason?: string;
-    }
+    },
   ): string {
     return this.logEvent({
       eventType: AuditEventType.AUTHENTICATION,
@@ -444,7 +444,7 @@ class AuditLoggingService {
       classification?: string;
       ipAddress?: string;
       reason?: string;
-    }
+    },
   ): string {
     return this.logEvent({
       eventType: AuditEventType.DATA_ACCESS,
@@ -485,7 +485,7 @@ class AuditLoggingService {
       userAgent?: string;
       payload?: string;
       mitigationApplied?: string;
-    }
+    },
   ): string {
     const severity = this.mapThreatLevelToSeverity(details.threatLevel || 'medium');
 
@@ -520,7 +520,7 @@ class AuditLoggingService {
       previousValue?: unknown;
       newValue?: unknown;
       ipAddress?: string;
-    }
+    },
   ): string {
     return this.logEvent({
       eventType: AuditEventType.SYSTEM_CHANGE,
@@ -630,7 +630,7 @@ class AuditLoggingService {
   async generateComplianceReport(
     title: string,
     startDate: string,
-    endDate: string
+    endDate: string,
   ): Promise<AuditReport> {
     const query: AuditQuery = { startDate, endDate };
     const { events } = await this.queryEvents(query);
@@ -662,15 +662,15 @@ class AuditLoggingService {
           e =>
             e.eventType === AuditEventType.SECURITY_EVENT ||
             e.severity === AuditSeverity.HIGH ||
-            e.severity === AuditSeverity.CRITICAL
+            e.severity === AuditSeverity.CRITICAL,
         ),
         failedLogins: events.filter(e => e.action === 'auth_login' && e.outcome === 'failure')
           .length,
         privilegeEscalations: events.filter(
-          e => e.action.includes('privilege') || e.action.includes('admin')
+          e => e.action.includes('privilege') || e.action.includes('admin'),
         ).length,
         dataBreachIndicators: events.filter(
-          e => e.tags.includes('data_breach') || e.severity === AuditSeverity.CRITICAL
+          e => e.tags.includes('data_breach') || e.severity === AuditSeverity.CRITICAL,
         ).length,
         anomalousPatterns: this.detectAnomalousPatterns(events),
       },
@@ -753,7 +753,7 @@ class AuditLoggingService {
         .filter(e => e.eventType === AuditEventType.SECURITY_EVENT)
         .slice(0, 20),
       alertsTriggered: recentEvents.filter(
-        e => e.severity === AuditSeverity.CRITICAL || e.severity === AuditSeverity.HIGH
+        e => e.severity === AuditSeverity.CRITICAL || e.severity === AuditSeverity.HIGH,
       ).length,
     };
   }
@@ -850,7 +850,7 @@ class AuditLoggingService {
     // Check failure rate threshold
     const totalRequests = recentEvents.filter(
       e =>
-        e.eventType === AuditEventType.AUTHENTICATION || e.eventType === AuditEventType.DATA_ACCESS
+        e.eventType === AuditEventType.AUTHENTICATION || e.eventType === AuditEventType.DATA_ACCESS,
     );
     const failures = totalRequests.filter(e => e.outcome === 'failure');
     const failureRate = failures.length / totalRequests.length;
@@ -869,7 +869,7 @@ class AuditLoggingService {
       e =>
         e.eventType === AuditEventType.SECURITY_EVENT ||
         e.severity === AuditSeverity.HIGH ||
-        e.severity === AuditSeverity.CRITICAL
+        e.severity === AuditSeverity.CRITICAL,
     );
     if (suspiciousEvents.length >= this.config.alerting.thresholds.suspiciousActivity) {
       this.sendAlert('Suspicious activity threshold exceeded', {
@@ -899,7 +899,7 @@ class AuditLoggingService {
 
   private countByField<T extends Record<string, any>>(
     items: T[],
-    field: keyof T
+    field: keyof T,
   ): Record<string, number> {
     return items.reduce(
       (acc, item) => {
@@ -907,7 +907,7 @@ class AuditLoggingService {
         acc[value] = (acc[value] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<string, number>,
     );
   }
 
@@ -919,7 +919,7 @@ class AuditLoggingService {
           acc[e.resource!] = (acc[e.resource!] || 0) + 1;
           return acc;
         },
-        {} as Record<string, number>
+        {} as Record<string, number>,
       );
 
     return Object.entries(resourceCounts)
@@ -936,7 +936,7 @@ class AuditLoggingService {
           acc[e.userId!] = (acc[e.userId!] || 0) + 1;
           return acc;
         },
-        {} as Record<string, number>
+        {} as Record<string, number>,
       );
 
     return Object.entries(userCounts)
@@ -954,7 +954,7 @@ class AuditLoggingService {
           acc[country] = (acc[country] || 0) + 1;
           return acc;
         },
-        {} as Record<string, number>
+        {} as Record<string, number>,
       );
   }
 
@@ -993,7 +993,7 @@ class AuditLoggingService {
       e =>
         e.action.includes('admin') ||
         e.action.includes('privilege') ||
-        e.tags.includes('privilege_escalation')
+        e.tags.includes('privilege_escalation'),
     );
     if (privilegeEvents.length > 0) {
       patterns.push('Privilege escalation attempts detected');
@@ -1009,13 +1009,13 @@ class AuditLoggingService {
 
     if (failures.length / events.length > 0.1) {
       recommendations.push(
-        'High failure rate detected - review authentication and authorization policies'
+        'High failure rate detected - review authentication and authorization policies',
       );
     }
 
     if (securityEvents.length > 0) {
       recommendations.push(
-        'Security events detected - review security monitoring and incident response procedures'
+        'Security events detected - review security monitoring and incident response procedures',
       );
     }
 
@@ -1030,7 +1030,7 @@ class AuditLoggingService {
     });
     if (nightTimeEvents.length > events.length * 0.3) {
       recommendations.push(
-        'High after-hours activity - review access controls and monitoring policies'
+        'High after-hours activity - review access controls and monitoring policies',
       );
     }
 
@@ -1062,7 +1062,7 @@ class AuditLoggingService {
               ? `"${value.replace(/"/g, '""')}"`
               : String(value || '');
           })
-          .join(',')
+          .join(','),
       ),
     ];
 
@@ -1140,7 +1140,7 @@ class AuditLoggingService {
 
         this.eventBuffer = this.eventBuffer.filter(e => new Date(e.timestamp).getTime() > cutoff);
       },
-      24 * 60 * 60 * 1000
+      24 * 60 * 60 * 1000,
     ); // Daily cleanup
   }
 
@@ -1259,27 +1259,27 @@ export const auditLogger = new AuditLoggingService();
 export const logAuthentication = (
   action: 'login' | 'logout' | 'signup' | 'password_reset' | 'mfa_challenge',
   outcome: 'success' | 'failure',
-  details: any
+  details: any,
 ) => auditLogger.logAuthentication(action, outcome, details);
 
 export const logDataAccess = (
   resource: string,
   action: 'read' | 'write' | 'delete' | 'export' | 'import',
   outcome: 'success' | 'failure',
-  details: any
+  details: any,
 ) => auditLogger.logDataAccess(resource, action, outcome, details);
 
 export const logSecurityEvent = (
   eventType: 'attack_detected' | 'vulnerability_found' | 'policy_violation' | 'suspicious_activity',
   description: string,
-  details: any
+  details: any,
 ) => auditLogger.logSecurityEvent(eventType, description, details);
 
 export const logSystemChange = (
   component: string,
   action: 'create' | 'update' | 'delete' | 'configure',
   outcome: 'success' | 'failure',
-  details: any
+  details: any,
 ) => auditLogger.logSystemChange(component, action, outcome, details);
 
 export const queryAuditEvents = (query: AuditQuery) => auditLogger.queryEvents(query);

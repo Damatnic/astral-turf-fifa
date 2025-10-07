@@ -645,7 +645,7 @@ export const useFocusManagement = () => {
     }
 
     const focusableElements = container.querySelectorAll(
-      'a[href], button, textarea, input[type="text"], input[type="radio"], input[type="checkbox"], select'
+      'a[href], button, textarea, input[type="text"], input[type="radio"], input[type="checkbox"], select',
     );
     const firstElement = focusableElements[0] as HTMLElement;
     const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
@@ -685,7 +685,7 @@ export const useFocusManagement = () => {
 export const useKeyboardNavigation = (
   onEnter?: () => void,
   onEscape?: () => void,
-  onArrowKeys?: (direction: 'up' | 'down' | 'left' | 'right') => void
+  onArrowKeys?: (direction: 'up' | 'down' | 'left' | 'right') => void,
 ) => {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     switch (e.key) {

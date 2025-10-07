@@ -278,7 +278,7 @@ const StadiumPage: React.FC = () => {
                       </svg>
                       {benefit}
                     </div>
-                  )
+                  ),
                 )}
               </div>
             </div>
@@ -386,7 +386,7 @@ const StadiumPage: React.FC = () => {
                       </svg>
                       {benefit}
                     </div>
-                  )
+                  ),
                 )}
               </div>
             </div>

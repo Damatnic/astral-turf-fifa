@@ -285,7 +285,7 @@ describe('PlayerDisplaySettings - Comprehensive Test Suite', () => {
 
     it('should update preview when settings change', async () => {
       const { rerender } = renderWithProviders(
-        <PlayerDisplaySettings {...mockProps} config={testConfig} />
+        <PlayerDisplaySettings {...mockProps} config={testConfig} />,
       );
 
       const modifiedConfig = {

@@ -22,7 +22,7 @@ export const cleanStateForSaving = (state: RootState): object | undefined => {
             acc[p.id] = p.position;
             return acc;
           },
-          {} as Record<string, { x: number; y: number }>
+          {} as Record<string, { x: number; y: number }>,
         );
         activeStep.drawings = draft.tactics.drawings;
       }
@@ -143,7 +143,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         const stateToSave = cleanStateForSaving(state);
         localStorage.setItem(
           `astralTurfSave_${state.ui.activeSaveSlotId}`,
-          JSON.stringify(stateToSave)
+          JSON.stringify(stateToSave),
         );
 
         const slots = JSON.parse(localStorage.getItem('astralTurfSaveSlots') || '{}');

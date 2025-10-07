@@ -127,7 +127,7 @@ class ErrorTrackingService {
   async trackError(
     error: Error | string,
     context: ErrorContext = {},
-    severity: 'low' | 'medium' | 'high' | 'critical' = 'medium'
+    severity: 'low' | 'medium' | 'high' | 'critical' = 'medium',
   ): Promise<string> {
     try {
       const errorMessage = typeof error === 'string' ? error : error.message;
@@ -205,12 +205,12 @@ class ErrorTrackingService {
   async trackSecurityIncident(
     incident: string,
     context: ErrorContext,
-    severity: 'low' | 'medium' | 'high' | 'critical' = 'high'
+    severity: 'low' | 'medium' | 'high' | 'critical' = 'high',
   ): Promise<string> {
     const errorId = await this.trackError(
       new Error(`Security Incident: ${incident}`),
       { ...context, component: 'security' },
-      severity
+      severity,
     );
 
     // Log as security event
@@ -252,7 +252,7 @@ class ErrorTrackingService {
   getStatistics(timeRangeHours = 24): ErrorStatistics {
     const cutoffTime = new Date(Date.now() - timeRangeHours * 60 * 60 * 1000);
     const recentErrors = Array.from(this.errors.values()).filter(
-      error => error.lastOccurrence > cutoffTime
+      error => error.lastOccurrence > cutoffTime,
     );
 
     const errorsByType: Record<string, number> = {};
@@ -504,7 +504,7 @@ class ErrorTrackingService {
   private async executeAlertAction(
     action: AlertAction,
     rule: AlertRule,
-    error: TrackedError
+    error: TrackedError,
   ): Promise<void> {
     switch (action.type) {
       case 'log':
@@ -552,7 +552,7 @@ class ErrorTrackingService {
   private async saveAlertToDatabase(
     rule: AlertRule,
     error: TrackedError,
-    action: AlertAction
+    action: AlertAction,
   ): Promise<void> {
     try {
       const db = databaseService.getClient();
@@ -716,7 +716,7 @@ class ErrorTrackingService {
       () => {
         this.cleanupOldErrors();
       },
-      60 * 60 * 1000
+      60 * 60 * 1000,
     ); // Run every hour
   }
 
@@ -802,7 +802,7 @@ export function setupGlobalErrorHandler(): void {
     errorTrackingService.trackError(
       new Error(`Unhandled Promise Rejection: ${reason}`),
       { component: 'global', metadata: { promise: promise.toString() } },
-      'critical'
+      'critical',
     );
   });
 

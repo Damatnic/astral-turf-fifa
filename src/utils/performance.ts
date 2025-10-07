@@ -372,7 +372,7 @@ class PerformanceMonitor {
 
   private updateMetric<K extends keyof PerformanceMetrics>(
     key: K,
-    value: PerformanceMetrics[K]
+    value: PerformanceMetrics[K],
   ): void {
     if (!this.optimizationsEnabled) {
       return;
@@ -388,7 +388,7 @@ class PerformanceMonitor {
   private pushMetricSample(
     key: 'inputLatency' | 'renderTime' | 'scrollLatency',
     value: number,
-    maxSamples: number
+    maxSamples: number,
   ): void {
     if (!this.optimizationsEnabled) {
       return;
@@ -498,7 +498,7 @@ class PerformanceMonitor {
         this.updateMetric('resourceCount', count);
         const totalSize = resourceEntries.reduce(
           (sum, entry) => sum + (entry.transferSize ?? 0),
-          0
+          0,
         );
         this.updateMetric('resourceSize', totalSize);
       }
@@ -586,7 +586,7 @@ function getFunctionLabel(fn: (...args: unknown[]) => unknown): string {
 export function debounce<Fn extends (...args: unknown[]) => unknown>(
   fn: Fn,
   delay = 0,
-  options: DebounceOptions = {}
+  options: DebounceOptions = {},
 ): DebouncedFunction<Fn> {
   let timeoutId: ReturnType<typeof setTimeout> | null = null;
   let maxTimeoutId: ReturnType<typeof setTimeout> | null = null;
@@ -624,7 +624,7 @@ export function debounce<Fn extends (...args: unknown[]) => unknown>(
 
     result = performanceMonitor.measureInteraction(
       label,
-      () => fn.apply(call.context, call.args) as ReturnType<Fn>
+      () => fn.apply(call.context, call.args) as ReturnType<Fn>,
     );
 
     return result;
@@ -756,7 +756,7 @@ export function debounce<Fn extends (...args: unknown[]) => unknown>(
 export function throttle<Fn extends (...args: unknown[]) => unknown>(
   fn: Fn,
   limit: number,
-  options: ThrottleOptions = {}
+  options: ThrottleOptions = {},
 ): ThrottledFunction<Fn> {
   const { leading = true, trailing = true } = options;
   const label = `throttled-${getFunctionLabel(fn)}`;
@@ -776,7 +776,7 @@ export function throttle<Fn extends (...args: unknown[]) => unknown>(
   const invoke = (call: PendingCall<Fn>): ReturnType<Fn> | undefined => {
     result = performanceMonitor.measureInteraction(
       label,
-      () => fn.apply(call.context, call.args) as ReturnType<Fn>
+      () => fn.apply(call.context, call.args) as ReturnType<Fn>,
     );
     return result;
   };
@@ -828,7 +828,7 @@ export function throttle<Fn extends (...args: unknown[]) => unknown>(
 // Memoization with performance tracking
 export function memoize<Fn extends (...args: unknown[]) => unknown>(
   fn: Fn,
-  getKey?: (...args: Parameters<Fn>) => string
+  getKey?: (...args: Parameters<Fn>) => string,
 ): MemoizedFunction<Fn> {
   const cache = new Map<string, ReturnType<Fn>>();
 
@@ -1022,13 +1022,13 @@ export function useDebounce<T>(value: T, delay: number): T {
 export function useVirtualScroll(
   itemHeight: number,
   items: unknown[],
-  containerRef: React.RefObject<HTMLElement>
+  containerRef: React.RefObject<HTMLElement>,
 ) {
   const [containerHeight, setContainerHeight] = React.useState(0);
 
   const virtualScrollManager = React.useMemo(
     () => new VirtualScrollManager(itemHeight, containerHeight, items.length),
-    [itemHeight, containerHeight, items.length]
+    [itemHeight, containerHeight, items.length],
   );
 
   React.useEffect(() => {

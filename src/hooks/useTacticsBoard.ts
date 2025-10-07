@@ -128,7 +128,7 @@ export function useTacticsBoard(): TacticsBoardState & TacticsBoardActions {
 
       return true;
     },
-    [players, formations, activeFormationIds]
+    [players, formations, activeFormationIds],
   );
 
   const getValidDropZones = useCallback(
@@ -189,7 +189,7 @@ export function useTacticsBoard(): TacticsBoardState & TacticsBoardActions {
 
       return validZones;
     },
-    [players, formations, activeFormationIds, validateDrop]
+    [players, formations, activeFormationIds, validateDrop],
   );
 
   const startDrag = useCallback(
@@ -268,7 +268,7 @@ export function useTacticsBoard(): TacticsBoardState & TacticsBoardActions {
         console.error('Failed to start drag operation:', _error);
       }
     },
-    [drawingTool, getValidDropZones]
+    [drawingTool, getValidDropZones],
   );
 
   const endDrag = useCallback(() => {
@@ -304,7 +304,7 @@ export function useTacticsBoard(): TacticsBoardState & TacticsBoardActions {
         dragOverSlot: slotId,
       }));
     },
-    [validateDrop]
+    [validateDrop],
   );
 
   const handleSlotDragLeave = useCallback(() => {
@@ -354,7 +354,7 @@ export function useTacticsBoard(): TacticsBoardState & TacticsBoardActions {
 
           if (draggedPlayer?.name && occupyingPlayer?.name) {
             const shouldSwap = window.confirm(
-              `Swap ${draggedPlayer.name} with ${occupyingPlayer.name}?`
+              `Swap ${draggedPlayer.name} with ${occupyingPlayer.name}?`,
             );
 
             if (shouldSwap) {
@@ -379,7 +379,7 @@ export function useTacticsBoard(): TacticsBoardState & TacticsBoardActions {
         endDrag();
       }
     },
-    [validateDrop, players, dispatch, endDrag]
+    [validateDrop, players, dispatch, endDrag],
   );
 
   const handleFieldDrop = useCallback(
@@ -429,11 +429,11 @@ export function useTacticsBoard(): TacticsBoardState & TacticsBoardActions {
 
       const x = Math.max(
         5,
-        Math.min(95, ((event.clientX - fieldRect.left) / fieldRect.width) * 100)
+        Math.min(95, ((event.clientX - fieldRect.left) / fieldRect.width) * 100),
       );
       const y = Math.max(
         5,
-        Math.min(95, ((event.clientY - fieldRect.top) / fieldRect.height) * 100)
+        Math.min(95, ((event.clientY - fieldRect.top) / fieldRect.height) * 100),
       );
 
       if (isNaN(x) || isNaN(y)) {
@@ -453,7 +453,7 @@ export function useTacticsBoard(): TacticsBoardState & TacticsBoardActions {
         endDrag();
       }
     },
-    [validateDrop, positioningMode, dispatch, endDrag]
+    [validateDrop, positioningMode, dispatch, endDrag],
   );
 
   return {

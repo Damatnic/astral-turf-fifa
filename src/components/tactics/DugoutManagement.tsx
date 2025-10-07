@@ -72,7 +72,7 @@ const DugoutManagement: React.FC<DugoutManagementProps> = ({
   const [selectedPlayerOut, setSelectedPlayerOut] = useState<string | null>(null);
   const [selectedPlayerIn, setSelectedPlayerIn] = useState<string | null>(null);
   const [substitutionFilter, setSubstitutionFilter] = useState<'all' | 'urgent' | 'suggested'>(
-    'all'
+    'all',
   );
 
   // Get field players and bench players
@@ -81,7 +81,7 @@ const DugoutManagement: React.FC<DugoutManagementProps> = ({
     const bench = players.filter(
       p =>
         !formation?.slots?.some(slot => slot.playerId === p.id) &&
-        p.availability.status === 'Available'
+        p.availability.status === 'Available',
     );
     return { fieldPlayers: field, benchPlayers: bench };
   }, [players, formation]);
@@ -181,7 +181,7 @@ const DugoutManagement: React.FC<DugoutManagementProps> = ({
         confidence: 90,
       },
     ],
-    []
+    [],
   );
 
   // Filter substitution candidates
@@ -595,7 +595,7 @@ const DugoutManagement: React.FC<DugoutManagementProps> = ({
                             >
                               {instruction}
                             </button>
-                          )
+                          ),
                         )}
                       </div>
                     </div>

@@ -319,7 +319,7 @@ export const GridOverlay: React.FC<GridOverlayProps> = ({
               r="1.5"
               fill={color}
             />
-          ))
+          )),
         )}
       </svg>
     </motion.div>

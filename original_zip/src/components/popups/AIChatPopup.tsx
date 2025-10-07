@@ -43,7 +43,7 @@ const AIChatPopup: React.FC = () => {
         [...chatHistory, userMessage],
         onFieldPlayers,
         formation,
-        settings.aiPersonality
+        settings.aiPersonality,
       );
 
       const aiResponse: ChatMessage = {

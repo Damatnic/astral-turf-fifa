@@ -167,7 +167,7 @@ describe('NotificationService', () => {
         expect.objectContaining({
           actions,
           data: { meetingId: '123' },
-        })
+        }),
       );
     });
 
@@ -184,7 +184,7 @@ describe('NotificationService', () => {
         expect.objectContaining({
           image: '/shared-photo.jpg',
           icon: '/camera-icon.png',
-        })
+        }),
       );
     });
 
@@ -192,7 +192,7 @@ describe('NotificationService', () => {
       const progressNotification = await (notificationService as any).showProgress(
         'File Upload',
         'Uploading document.pdf',
-        0
+        0,
       );
 
       expect(progressNotification).toBeDefined();
@@ -212,7 +212,7 @@ describe('NotificationService', () => {
       const notification = await (notificationService as any).showProgress(
         'Upload',
         'Uploading...',
-        0
+        0,
       );
 
       notification.updateProgress(50);
@@ -231,7 +231,7 @@ describe('NotificationService', () => {
     it('should show success notification', async () => {
       await (notificationService as any).showSuccess(
         'Operation Completed',
-        'Your file has been saved successfully'
+        'Your file has been saved successfully',
       );
 
       expect(Notification).toHaveBeenCalledWith(
@@ -239,7 +239,7 @@ describe('NotificationService', () => {
         expect.objectContaining({
           body: 'Your file has been saved successfully',
           icon: expect.stringContaining('success'),
-        })
+        }),
       );
     });
 
@@ -252,7 +252,7 @@ describe('NotificationService', () => {
           body: 'Failed to save file',
           icon: expect.stringContaining('error'),
           requireInteraction: true,
-        })
+        }),
       );
     });
 
@@ -264,7 +264,7 @@ describe('NotificationService', () => {
         expect.objectContaining({
           body: 'Disk space is running low',
           icon: expect.stringContaining('warning'),
-        })
+        }),
       );
     });
 
@@ -276,7 +276,7 @@ describe('NotificationService', () => {
         expect.objectContaining({
           body: 'A new version is available',
           icon: expect.stringContaining('info'),
-        })
+        }),
       );
     });
   });
@@ -306,7 +306,7 @@ describe('NotificationService', () => {
         'Reminder',
         expect.objectContaining({
           body: 'Scheduled reminder',
-        })
+        }),
       );
     });
 
@@ -412,7 +412,7 @@ describe('NotificationService', () => {
         expect.objectContaining({
           body: 'Updated message',
           tag: 'replaceable',
-        })
+        }),
       );
     });
   });
@@ -598,7 +598,7 @@ describe('NotificationService', () => {
       // Simulate click
       const notification = (Notification as any).mock.results[0].value;
       const clickCallback = notification.addEventListener.mock.calls.find(
-        call => call[0] === 'click'
+        call => call[0] === 'click',
       )?.[1];
 
       if (clickCallback) {

@@ -30,7 +30,7 @@ const PlayerCard: React.FC<{
   const roleInfo = PLAYER_ROLES.find(role => role.id === player.roleId);
   const averageAttribute = Math.round(
     Object.values(player.attributes).reduce((sum, value) => sum + value, 0) /
-      Object.keys(player.attributes).length
+      Object.keys(player.attributes).length,
   );
 
   return (

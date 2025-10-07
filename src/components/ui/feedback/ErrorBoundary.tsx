@@ -118,7 +118,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
         <div
           className={cn(
             'min-h-screen bg-secondary-950 flex items-center justify-center p-4',
-            className
+            className,
           )}
         >
           <Card className="max-w-2xl w-full">
@@ -239,7 +239,7 @@ export const useErrorHandler = () => {
 // Higher-order component for wrapping components with error boundary
 export const withErrorBoundary = <P extends object>(
   Component: React.ComponentType<P>,
-  errorBoundaryProps?: Omit<ErrorBoundaryProps, 'children'>
+  errorBoundaryProps?: Omit<ErrorBoundaryProps, 'children'>,
 ) => {
   const WrappedComponent = (props: P) => (
     <ErrorBoundary {...errorBoundaryProps}>

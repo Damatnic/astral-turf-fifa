@@ -225,7 +225,7 @@ export function verifyTOTP(token: string, secret: string, windowSize: number = 1
 export function generateTOTPQRCode(
   secret: string,
   accountName: string,
-  issuer: string = 'Astral Turf'
+  issuer: string = 'Astral Turf',
 ): string {
   const normalizedSecret = normalizeBase32(secret).replace(/=+$/, '');
   const label = encodeURIComponent(`${issuer}:${accountName}`);
@@ -276,7 +276,7 @@ export function createMFAChallenge(
   method: MFAMethod,
   type: MFAChallengeType,
   ipAddress: string,
-  userAgent: string
+  userAgent: string,
 ): MFAChallenge {
   const challenge: MFAChallenge = {
     id: generateUUID(),
@@ -312,7 +312,7 @@ export function createMFAChallenge(
         type,
         expiresAt: challenge.expiresAt,
       },
-    }
+    },
   );
 
   return challenge;
@@ -341,7 +341,7 @@ export function verifyMFAChallenge(
   challengeId: string,
   code: string,
   userSecret?: string,
-  userBackupCodes?: string[]
+  userBackupCodes?: string[],
 ): MFAVerificationResult {
   const challenge = getMFAChallenge(challengeId);
 
@@ -354,7 +354,7 @@ export function verifyMFAChallenge(
           challengeId,
           reason: 'invalid_challenge',
         },
-      }
+      },
     );
     return {
       success: false,
@@ -376,7 +376,7 @@ export function verifyMFAChallenge(
           attempts: challenge.attempts,
           maxAttempts: challenge.maxAttempts,
         },
-      }
+      },
     );
 
     return {
@@ -425,7 +425,7 @@ export function verifyMFAChallenge(
                 challengeId,
                 backupCodesRemaining,
               },
-            }
+            },
           );
         }
       }
@@ -447,7 +447,7 @@ export function verifyMFAChallenge(
           attempts: challenge.attempts,
           backupCodesRemaining,
         },
-      }
+      },
     );
 
     return {
@@ -468,7 +468,7 @@ export function verifyMFAChallenge(
           attempts: challenge.attempts,
           remainingAttempts: challenge.maxAttempts - challenge.attempts,
         },
-      }
+      },
     );
 
     return {
@@ -543,7 +543,7 @@ export function setupTOTPMFA(userId: string, accountName: string): MFASetupResul
           accountName,
           backupCodesIssued: backupCodes.length,
         },
-      }
+      },
     );
 
     return {
@@ -563,7 +563,7 @@ export function setupTOTPMFA(userId: string, accountName: string): MFASetupResul
           accountName,
           error: error instanceof Error ? error.message : 'Unknown error',
         },
-      }
+      },
     );
 
     return { success: false };
@@ -582,7 +582,7 @@ export function verifyTOTPSetup(secret: string, token: string): boolean {
         success: isValid,
         tokenPreview: token.substring(0, 2) + '****',
       },
-    }
+    },
   );
 
   return isValid;
@@ -625,7 +625,7 @@ function normalizeMFAConfig(config: unknown): {
 
   if (Array.isArray(data.backupCodes)) {
     normalized.backupCodes = data.backupCodes.filter(
-      (value): value is string => typeof value === 'string'
+      (value): value is string => typeof value === 'string',
     );
   }
 

@@ -27,7 +27,7 @@ export interface ExportResult {
  */
 export const exportPlayerCard = async (
   element: HTMLElement,
-  options: Partial<CardExportOptions> = {}
+  options: Partial<CardExportOptions> = {},
 ): Promise<ExportResult> => {
   try {
     const {
@@ -69,7 +69,7 @@ export const exportPlayerCard = async (
     // Calculate scaling to fit card
     const scale = Math.min(
       (width * 0.8) / canvas.width,
-      (height * 0.8) / canvas.height
+      (height * 0.8) / canvas.height,
     );
     const scaledWidth = canvas.width * scale;
     const scaledHeight = canvas.height * scale;
@@ -95,7 +95,7 @@ export const exportPlayerCard = async (
       finalCanvas.toBlob(
         (b) => resolve(b),
         format === 'png' ? 'image/png' : 'image/jpeg',
-        quality
+        quality,
       );
     });
 
@@ -105,7 +105,7 @@ export const exportPlayerCard = async (
 
     const dataUrl = finalCanvas.toDataURL(
       format === 'png' ? 'image/png' : 'image/jpeg',
-      quality
+      quality,
     );
 
     return {
@@ -127,7 +127,7 @@ export const exportPlayerCard = async (
  */
 export const downloadCardImage = (
   dataUrl: string,
-  filename: string = 'player-card.png'
+  filename: string = 'player-card.png',
 ): void => {
   const link = document.createElement('a');
   link.href = dataUrl;
@@ -143,7 +143,7 @@ export const downloadCardImage = (
 export const shareCardImage = async (
   blob: Blob,
   player: Player,
-  profile: PlayerRankingProfile
+  profile: PlayerRankingProfile,
 ): Promise<boolean> => {
   if (!navigator.share) {
     console.warn('Web Share API not supported');
@@ -198,7 +198,7 @@ export const copyCardToClipboard = async (blob: Blob): Promise<boolean> => {
 export const generateCardFilename = (
   player: Player,
   profile: PlayerRankingProfile,
-  rarity: CardRarity
+  rarity: CardRarity,
 ): string => {
   const sanitizedName = player.name.replace(/[^a-z0-9]/gi, '-').toLowerCase();
   const timestamp = new Date().toISOString().split('T')[0];
@@ -210,7 +210,7 @@ export const generateCardFilename = (
  */
 export const batchExportCards = async (
   elements: HTMLElement[],
-  options: Partial<CardExportOptions> = {}
+  options: Partial<CardExportOptions> = {},
 ): Promise<ExportResult[]> => {
   const results: ExportResult[] = [];
 
@@ -229,7 +229,7 @@ export const batchExportCards = async (
  */
 export const exportSocialCard = async (
   element: HTMLElement,
-  options: Partial<CardExportOptions> = {}
+  options: Partial<CardExportOptions> = {},
 ): Promise<ExportResult> => {
   // Social media optimal dimensions
   const socialDimensions = {

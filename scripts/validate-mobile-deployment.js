@@ -113,11 +113,11 @@ function checkMobileFeatures() {
     if (fs.existsSync(check.path)) {
       const content = fs.readFileSync(check.path, 'utf8');
       const hasRequiredFeatures = check.required.every(feature =>
-        content.toLowerCase().includes(feature.toLowerCase())
+        content.toLowerCase().includes(feature.toLowerCase()),
       );
 
       const foundFeatures = check.required.filter(feature =>
-        content.toLowerCase().includes(feature.toLowerCase())
+        content.toLowerCase().includes(feature.toLowerCase()),
       ).length;
 
       const status = hasRequiredFeatures ? '✅' : foundFeatures > 0 ? '⚠️' : '❌';
@@ -167,7 +167,7 @@ function checkPWAConfig() {
 
     Object.entries(features).forEach(([feature, exists]) => {
       console.log(
-        `    ${exists ? '✅' : '❌'} ${feature.charAt(0).toUpperCase() + feature.slice(1)}`
+        `    ${exists ? '✅' : '❌'} ${feature.charAt(0).toUpperCase() + feature.slice(1)}`,
       );
     });
   } else {

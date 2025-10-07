@@ -135,7 +135,7 @@ test.describe('🎯 Tactical Board Workflows - E2E Tests', () => {
 
       // Verify all positions are filled
       const assignedSlots = page.locator(
-        '[data-testid="formation-slot"][data-player-assigned="true"]'
+        '[data-testid="formation-slot"][data-player-assigned="true"]',
       );
       await expect(assignedSlots).toHaveCount(11);
 
@@ -270,7 +270,7 @@ test.describe('🎯 Tactical Board Workflows - E2E Tests', () => {
       // Verify play is loaded
       await expect(page.locator('[data-testid="drawing-shape-arrow"]')).toBeVisible();
       await expect(page.locator('[data-testid="current-play-name"]')).toContainText(
-        'Wing Attack Play'
+        'Wing Attack Play',
       );
     });
   });
@@ -488,7 +488,7 @@ test.describe('🎯 Tactical Board Workflows - E2E Tests', () => {
 
       // Verify formation is loaded
       await expect(page.locator('[data-testid="current-formation-name"]')).toContainText(
-        'Imported 4-4-2'
+        'Imported 4-4-2',
       );
       await expect(page.locator('[data-testid="drawing-shape-arrow"]')).toBeVisible();
     });
@@ -610,7 +610,7 @@ test.describe('🎯 Tactical Board Workflows - E2E Tests', () => {
           await expect(page.locator('[data-testid="mobile-layout"]')).toBeVisible();
           await expect(page.locator('[data-testid="sidebar"]')).toHaveAttribute(
             'data-collapsed',
-            'true'
+            'true',
           );
         } else {
           // Desktop/tablet layout
@@ -633,7 +633,7 @@ test.describe('🎯 Tactical Board Workflows - E2E Tests', () => {
       await page.keyboard.press('Tab');
       await expect(page.locator(':focus')).toHaveAttribute(
         'data-testid',
-        'formation-templates-button'
+        'formation-templates-button',
       );
 
       await page.keyboard.press('Tab');
@@ -695,7 +695,7 @@ test.describe('🎯 Tactical Board Workflows - E2E Tests', () => {
       // Check main application role
       await expect(page.locator('[data-testid="unified-tactics-board"]')).toHaveAttribute(
         'role',
-        'application'
+        'application',
       );
 
       // Check field has proper grid role
@@ -715,7 +715,7 @@ test.describe('🎯 Tactical Board Workflows - E2E Tests', () => {
       // Check drawing tools have proper labels
       await page.click('[data-testid="drawing-tools-toggle"]');
       await expect(page.locator('[data-testid="drawing-tool-arrow"]')).toHaveAttribute(
-        'aria-label'
+        'aria-label',
       );
     });
 

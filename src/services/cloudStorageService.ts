@@ -504,7 +504,7 @@ class CloudStorageService {
     action: string,
     success: boolean,
     dataSize: number,
-    error?: string
+    error?: string,
   ): Promise<void> {
     const log: SyncLog = {
       id: uuidv4(),

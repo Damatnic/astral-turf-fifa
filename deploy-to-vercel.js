@@ -66,7 +66,7 @@ function deployToVercel() {
 
         fs.writeFileSync(
           path.join(__dirname, 'deployment-info.json'),
-          JSON.stringify(deploymentInfo, null, 2)
+          JSON.stringify(deploymentInfo, null, 2),
         );
 
         console.log('📝 Deployment info saved to deployment-info.json');

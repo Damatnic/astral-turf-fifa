@@ -125,7 +125,7 @@ describe('ChemistryVisualization Performance Tests', () => {
     // Attribute compatibility
     const attributeCompatibility = calculateAttributeCompatibility(
       player1.attributes,
-      player2.attributes
+      player2.attributes,
     );
     chemistry += attributeCompatibility;
 
@@ -160,7 +160,7 @@ describe('ChemistryVisualization Performance Tests', () => {
 
   const calculateAttributeCompatibility = (
     attr1: Player['attributes'],
-    attr2: Player['attributes']
+    attr2: Player['attributes'],
   ): number => {
     // Mock attribute compatibility calculation
     let compatibility = 0;
@@ -198,7 +198,7 @@ describe('ChemistryVisualization Performance Tests', () => {
   };
 
   const calculateTeamChemistry = (
-    players: Player[]
+    players: Player[],
   ): Array<{
     player1Id: string;
     player2Id: string;
@@ -244,7 +244,7 @@ describe('ChemistryVisualization Performance Tests', () => {
 
       expect(metrics.calculationTime).toBeLessThan(PERFORMANCE_THRESHOLDS.maxTotalCalculationTime);
       expect(metrics.calculationTime / metrics.playerPairsProcessed).toBeLessThan(
-        PERFORMANCE_THRESHOLDS.maxCalculationTimePerPair
+        PERFORMANCE_THRESHOLDS.maxCalculationTimePerPair,
       );
       expect(chemistryData).toHaveLength(55); // 11 choose 2 = 55 pairs
     });
@@ -281,10 +281,10 @@ describe('ChemistryVisualization Performance Tests', () => {
       const metrics = endPerformanceMonitoring(players.length);
 
       expect(metrics.calculationTime).toBeLessThan(
-        PERFORMANCE_THRESHOLDS.maxTotalCalculationTime * 5
+        PERFORMANCE_THRESHOLDS.maxTotalCalculationTime * 5,
       );
       expect(metrics.calculationTime / metrics.playerPairsProcessed).toBeLessThan(
-        PERFORMANCE_THRESHOLDS.maxCalculationTimePerPair * 2
+        PERFORMANCE_THRESHOLDS.maxCalculationTimePerPair * 2,
       );
       expect(chemistryData).toHaveLength(300); // 25 choose 2 = 300 pairs
     });
@@ -329,7 +329,7 @@ describe('ChemistryVisualization Performance Tests', () => {
       // Large datasets may take longer but should remain manageable
       expect(metrics.calculationTime).toBeLessThan(5000); // 5 seconds max
       expect(metrics.calculationTime / metrics.playerPairsProcessed).toBeLessThan(
-        PERFORMANCE_THRESHOLDS.maxCalculationTimePerPair * 5
+        PERFORMANCE_THRESHOLDS.maxCalculationTimePerPair * 5,
       );
       expect(chemistryData).toHaveLength(4950); // 100 choose 2 = 4950 pairs
     });
@@ -627,7 +627,7 @@ describe('ChemistryVisualization Performance Tests', () => {
       // Validate overall performance
       expect(summary.passedTests).toBeGreaterThanOrEqual(summary.totalTests * 0.75); // 75% pass rate
       expect(summary.averagePerformanceScore).toBeLessThan(
-        PERFORMANCE_THRESHOLDS.maxCalculationTimePerPair * 2
+        PERFORMANCE_THRESHOLDS.maxCalculationTimePerPair * 2,
       );
       expect(summary.scalabilityFactor).toBeLessThan(100); // Should scale reasonably
     });

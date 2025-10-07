@@ -203,7 +203,7 @@ const PlayerToken: React.FC<PlayerTokenProps> = memo(
         </p>
       </div>
     );
-  }
+  },
 );
 
 export default PlayerToken;

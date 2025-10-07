@@ -38,7 +38,7 @@ export class RBACService {
   async assignRole(
     userId: string,
     role: string,
-    assignedBy: string
+    assignedBy: string,
   ): Promise<{
     success: boolean;
     message: string;
@@ -49,7 +49,7 @@ export class RBACService {
       // Verify the assigner has admin permissions
       const assigner = await phoenixPool.query(
         'SELECT role FROM users WHERE id = $1',
-        [assignedBy]
+        [assignedBy],
       );
 
       if (assigner.rows.length === 0 || assigner.rows[0].role !== 'admin') {
@@ -62,7 +62,7 @@ export class RBACService {
       // Verify the role exists
       const roleExists = await phoenixPool.query(
         'SELECT id, permissions FROM roles WHERE name = $1',
-        [role]
+        [role],
       );
 
       if (roleExists.rows.length === 0) {
@@ -80,7 +80,7 @@ export class RBACService {
          SET role = $1, permissions = $2, updated_at = NOW()
          WHERE id = $3
          RETURNING id, role, permissions`,
-        [role, JSON.stringify(permissions), userId]
+        [role, JSON.stringify(permissions), userId],
       );
 
       if (result.rowCount === 0) {
@@ -95,7 +95,7 @@ export class RBACService {
         `UPDATE user_sessions
          SET is_active = false
          WHERE user_id = $1`,
-        [userId]
+        [userId],
       );
 
       // Log role change
@@ -125,7 +125,7 @@ export class RBACService {
   async grantPermission(
     userId: string,
     permission: string,
-    grantedBy: string
+    grantedBy: string,
   ): Promise<{
     success: boolean;
     message: string;
@@ -136,7 +136,7 @@ export class RBACService {
       // Verify the granter has admin permissions
       const granter = await phoenixPool.query(
         'SELECT role FROM users WHERE id = $1',
-        [grantedBy]
+        [grantedBy],
       );
 
       if (granter.rows.length === 0 || granter.rows[0].role !== 'admin') {
@@ -149,7 +149,7 @@ export class RBACService {
       // Get current user permissions
       const user = await phoenixPool.query(
         'SELECT permissions FROM users WHERE id = $1',
-        [userId]
+        [userId],
       );
 
       if (user.rows.length === 0) {
@@ -176,7 +176,7 @@ export class RBACService {
         `UPDATE users
          SET permissions = $1, updated_at = NOW()
          WHERE id = $2`,
-        [JSON.stringify(updatedPermissions), userId]
+        [JSON.stringify(updatedPermissions), userId],
       );
 
       // Log permission grant
@@ -202,7 +202,7 @@ export class RBACService {
   async revokePermission(
     userId: string,
     permission: string,
-    revokedBy: string
+    revokedBy: string,
   ): Promise<{
     success: boolean;
     message: string;
@@ -213,7 +213,7 @@ export class RBACService {
       // Verify the revoker has admin permissions
       const revoker = await phoenixPool.query(
         'SELECT role FROM users WHERE id = $1',
-        [revokedBy]
+        [revokedBy],
       );
 
       if (revoker.rows.length === 0 || revoker.rows[0].role !== 'admin') {
@@ -226,7 +226,7 @@ export class RBACService {
       // Get current user permissions
       const user = await phoenixPool.query(
         'SELECT permissions FROM users WHERE id = $1',
-        [userId]
+        [userId],
       );
 
       if (user.rows.length === 0) {
@@ -253,7 +253,7 @@ export class RBACService {
         `UPDATE users
          SET permissions = $1, updated_at = NOW()
          WHERE id = $2`,
-        [JSON.stringify(updatedPermissions), userId]
+        [JSON.stringify(updatedPermissions), userId],
       );
 
       // Log permission revocation
@@ -285,7 +285,7 @@ export class RBACService {
       const result = await phoenixPool.query(
         `SELECT id, name, description, permissions, priority, is_system
          FROM roles
-         ORDER BY priority DESC, name ASC`
+         ORDER BY priority DESC, name ASC`,
       );
 
       const roles: Role[] = result.rows.map(row => ({
@@ -321,7 +321,7 @@ export class RBACService {
       const result = await phoenixPool.query(
         `SELECT id, name, description, resource, action
          FROM permissions
-         ORDER BY resource ASC, action ASC`
+         ORDER BY resource ASC, action ASC`,
       );
 
       const permissions: Permission[] = result.rows.map(row => ({
@@ -356,7 +356,7 @@ export class RBACService {
     try {
       const result = await phoenixPool.query(
         'SELECT role, permissions FROM users WHERE id = $1',
-        [userId]
+        [userId],
       );
 
       if (result.rows.length === 0) {
@@ -428,7 +428,7 @@ export class RBACService {
       // Verify creator has admin permissions
       const creator = await phoenixPool.query(
         'SELECT role FROM users WHERE id = $1',
-        [data.createdBy]
+        [data.createdBy],
       );
 
       if (creator.rows.length === 0 || creator.rows[0].role !== 'admin') {
@@ -441,7 +441,7 @@ export class RBACService {
       // Check if role name already exists
       const existing = await phoenixPool.query(
         'SELECT id FROM roles WHERE name = $1',
-        [data.name]
+        [data.name],
       );
 
       if (existing.rows.length > 0) {
@@ -456,7 +456,7 @@ export class RBACService {
         `INSERT INTO roles (name, description, permissions, priority, is_system)
          VALUES ($1, $2, $3, $4, false)
          RETURNING id, name, description, permissions, priority, is_system`,
-        [data.name, data.description, JSON.stringify(data.permissions), data.priority || 0]
+        [data.name, data.description, JSON.stringify(data.permissions), data.priority || 0],
       );
 
       const role: Role = {
@@ -473,7 +473,7 @@ export class RBACService {
         data.createdBy,
         data.name,
         data.createdBy,
-        'ROLE_CREATED'
+        'ROLE_CREATED',
       );
 
       return {
@@ -494,7 +494,7 @@ export class RBACService {
    */
   async deleteRole(
     roleId: string,
-    deletedBy: string
+    deletedBy: string,
   ): Promise<{
     success: boolean;
     message: string;
@@ -504,7 +504,7 @@ export class RBACService {
       // Verify deleter has admin permissions
       const deleter = await phoenixPool.query(
         'SELECT role FROM users WHERE id = $1',
-        [deletedBy]
+        [deletedBy],
       );
 
       if (deleter.rows.length === 0 || deleter.rows[0].role !== 'admin') {
@@ -517,7 +517,7 @@ export class RBACService {
       // Check if role is a system role
       const role = await phoenixPool.query(
         'SELECT name, is_system FROM roles WHERE id = $1',
-        [roleId]
+        [roleId],
       );
 
       if (role.rows.length === 0) {
@@ -537,7 +537,7 @@ export class RBACService {
       // Check if any users have this role
       const usersWithRole = await phoenixPool.query(
         'SELECT COUNT(*) as count FROM users WHERE role = $1',
-        [role.rows[0].name]
+        [role.rows[0].name],
       );
 
       if (parseInt(usersWithRole.rows[0].count) > 0) {
@@ -555,7 +555,7 @@ export class RBACService {
         deletedBy,
         role.rows[0].name,
         deletedBy,
-        'ROLE_DELETED'
+        'ROLE_DELETED',
       );
 
       return {
@@ -580,7 +580,7 @@ export class RBACService {
     userId: string,
     role: string,
     performedBy: string,
-    eventType: string
+    eventType: string,
   ): Promise<void> {
     try {
       await phoenixPool.query(
@@ -599,7 +599,7 @@ export class RBACService {
           JSON.stringify({ userId, role, performedBy }),
           eventType,
           userId,
-        ]
+        ],
       );
     } catch {
       // Silently fail - logging shouldn't break the main flow
@@ -613,7 +613,7 @@ export class RBACService {
     userId: string,
     permission: string,
     performedBy: string,
-    eventType: string
+    eventType: string,
   ): Promise<void> {
     try {
       await phoenixPool.query(
@@ -632,7 +632,7 @@ export class RBACService {
           JSON.stringify({ userId, permission, performedBy }),
           eventType,
           userId,
-        ]
+        ],
       );
     } catch {
       // Silently fail - logging shouldn't break the main flow

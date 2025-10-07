@@ -17,7 +17,7 @@ export const RemoteCursors: React.FC<RemoteCursorsProps> = ({ users, currentUser
     <div className="absolute inset-0 pointer-events-none z-50">
       <AnimatePresence>
         {otherUsers.map(
-          user => user.cursor && <RemoteCursor key={user.id} user={user} position={user.cursor} />
+          user => user.cursor && <RemoteCursor key={user.id} user={user} position={user.cursor} />,
         )}
       </AnimatePresence>
     </div>

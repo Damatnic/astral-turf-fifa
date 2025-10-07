@@ -51,7 +51,7 @@ const MatchSimulationPage: React.FC = () => {
     return franchiseState.season.fixtures.filter(
       fixture =>
         fixture.week >= franchiseState.gameWeek &&
-        (fixture.homeTeam === 'Astral FC' || fixture.awayTeam === 'Astral FC')
+        (fixture.homeTeam === 'Astral FC' || fixture.awayTeam === 'Astral FC'),
     );
   }, [franchiseState.season.fixtures, franchiseState.gameWeek]);
 
@@ -122,7 +122,7 @@ const MatchSimulationPage: React.FC = () => {
   const generateEventDescription = (
     eventType: string,
     playerName: string,
-    minute: number
+    minute: number,
   ): string => {
     const descriptions = {
       goal: [
@@ -188,7 +188,7 @@ const MatchSimulationPage: React.FC = () => {
         {
           importance: 'medium',
           venue: 'home',
-        } as any
+        } as any,
       );
       setMatchStrategy(strategy);
     } catch (error) {

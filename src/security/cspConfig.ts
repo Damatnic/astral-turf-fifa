@@ -39,11 +39,19 @@ export const GUARDIAN_CSP_CONFIG: CSPConfig = {
         "'self'",
         "'unsafe-inline'", // Required for React development
         "'unsafe-eval'", // Required for development tools
+        'localhost:*',
+        '127.0.0.1:*',
+        'ws://localhost:*',
+        'wss://localhost:*',
+        'https://apis.google.com',
+        'https://www.google.com',
         'https://vercel.live',
         'https://cdn.jsdelivr.net',
         'https://unpkg.com',
         'https://www.google-analytics.com',
         'https://www.googletagmanager.com',
+        'https://va.vercel-scripts.com',
+        'https://vercel-scripts.com',
       ],
       description: 'Script execution policy',
     },
@@ -74,7 +82,7 @@ export const GUARDIAN_CSP_CONFIG: CSPConfig = {
 
     {
       directive: 'font-src',
-      sources: ["'self'", 'data:', 'https://fonts.gstatic.com', 'https://cdn.jsdelivr.net'],
+      sources: ["'self'", 'data:', 'https://fonts.gstatic.com', 'https://cdn.jsdelivr.net', 'https://r2cdn.perplexity.ai'],
       description: 'Font loading policy',
     },
 
@@ -309,7 +317,7 @@ export interface SecurityHeaders {
 export const GUARDIAN_SECURITY_HEADERS: SecurityHeaders = {
   // Content Security Policy
   'Content-Security-Policy': generateCSPHeader(
-    process.env.NODE_ENV === 'production' ? PRODUCTION_CSP_CONFIG : GUARDIAN_CSP_CONFIG
+    process.env.NODE_ENV === 'production' ? PRODUCTION_CSP_CONFIG : GUARDIAN_CSP_CONFIG,
   ),
 
   // Prevent MIME type sniffing
@@ -342,7 +350,6 @@ export const GUARDIAN_SECURITY_HEADERS: SecurityHeaders = {
     'usb=()',
     'magnetometer=()',
     'gyroscope=()',
-    'speaker=(self)',
     'fullscreen=(self)',
   ].join(', '),
 

@@ -61,7 +61,7 @@ describe('Tactics Board Components - ZENITH Test Suite', () => {
       'UnifiedTacticsBoard',
       UnifiedTacticsBoard,
       defaultProps,
-      variants
+      variants,
     );
 
     it('should handle formation changes correctly', async () => {
@@ -71,7 +71,7 @@ describe('Tactics Board Components - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <UnifiedTacticsBoard {...defaultProps} onSaveFormation={onSaveFormation} />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       // Should have formation controls
@@ -89,7 +89,7 @@ describe('Tactics Board Components - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <UnifiedTacticsBoard {...defaultProps} />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       // Should have draggable players
@@ -113,7 +113,7 @@ describe('Tactics Board Components - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <UnifiedTacticsBoard {...defaultProps} onSimulateMatch={onSimulateMatch} />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       // Find and click simulate button
@@ -130,7 +130,7 @@ describe('Tactics Board Components - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <UnifiedTacticsBoard {...defaultProps} onExportFormation={onExportFormation} />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       // Find and click export button
@@ -154,7 +154,7 @@ describe('Tactics Board Components - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <ModernField {...(defaultProps as any)} />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       // Should have field container
@@ -166,7 +166,7 @@ describe('Tactics Board Components - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <ModernField {...(defaultProps as any)} />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       // Should have correct number of players
@@ -195,7 +195,7 @@ describe('Tactics Board Components - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <PlayerToken {...defaultProps} />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       expect(screen.getByText('Test Player')).toBeInTheDocument();
@@ -209,7 +209,7 @@ describe('Tactics Board Components - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <PlayerToken {...defaultProps} onSelect={onSelect} />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       const player = screen.getByRole('button');
@@ -224,7 +224,7 @@ describe('Tactics Board Components - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <PlayerToken {...(defaultProps as any)} onMove={onMove} />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       const player = screen.getByRole('button');
@@ -256,7 +256,7 @@ describe('Tactics Board Components - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <QuickActionsPanel {...(defaultProps as any)} />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       expect(screen.getByRole('button', { name: /formation/i })).toBeInTheDocument();
@@ -270,7 +270,7 @@ describe('Tactics Board Components - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <QuickActionsPanel {...(defaultProps as any)} onFormationChange={onFormationChange} />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       const formationButton = screen.getByRole('button', { name: /formation/i });
@@ -311,7 +311,7 @@ describe('UI Components - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <Button onClick={onClick}>Click me</Button>
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       await user.click(screen.getByRole('button'));
@@ -327,7 +327,7 @@ describe('UI Components - ZENITH Test Suite', () => {
           <Button onClick={onClick} disabled>
             Click me
           </Button>
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       await user.click(screen.getByRole('button'));
@@ -338,7 +338,7 @@ describe('UI Components - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <Button {...({ loading: true } as any)}>Loading</Button>
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       expect(screen.getByRole('progressbar')).toBeInTheDocument();
@@ -362,7 +362,7 @@ describe('UI Components - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <Card>Test content</Card>
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       expect(screen.getByText('Test content')).toBeInTheDocument();
@@ -377,7 +377,7 @@ describe('UI Components - ZENITH Test Suite', () => {
           <Card {...({ interactive: true } as any)} onClick={onClick}>
             Interactive card
           </Card>
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       await user.click(screen.getByRole('button'));
@@ -404,7 +404,7 @@ describe('UI Components - ZENITH Test Suite', () => {
           <Dialog {...({ isOpen: true } as any)} onClose={onClose} title="Test">
             Content
           </Dialog>
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       const closeButton = screen.getByRole('button', { name: /close/i });
@@ -422,7 +422,7 @@ describe('UI Components - ZENITH Test Suite', () => {
           <Dialog {...({ isOpen: true } as any)} onClose={onClose} title="Test">
             Content
           </Dialog>
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       await user.keyboard('{Escape}');
@@ -436,7 +436,7 @@ describe('UI Components - ZENITH Test Suite', () => {
             <input placeholder="First input" />
             <input placeholder="Second input" />
           </Dialog>
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       const dialog = screen.getByRole('dialog');
@@ -465,7 +465,7 @@ describe('UI Components - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <Input onChange={onChange} placeholder="Test input" />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       const input = screen.getByRole('textbox');
@@ -479,7 +479,7 @@ describe('UI Components - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <Input error="Required field" />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       expect(screen.getByText('Required field')).toBeInTheDocument();
@@ -502,7 +502,7 @@ describe('UI Components - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <Switch checked={false} onChange={onChange} />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       const switchElement = screen.getByRole('switch');
@@ -524,7 +524,7 @@ describe('UI Components - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <Progress value={75} max={100} />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       const progress = screen.getByRole('progressbar');
@@ -556,7 +556,7 @@ describe('Analytics Components - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <AdvancedMetricsRadar {...(defaultProps as any)} />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       // Should have canvas for chart
@@ -568,7 +568,7 @@ describe('Analytics Components - ZENITH Test Suite', () => {
       const { rerender } = render(
         <ZenithTestWrapper>
           <AdvancedMetricsRadar {...(defaultProps as any)} />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       const newData = { ...defaultProps.data, speed: 95 };
@@ -576,7 +576,7 @@ describe('Analytics Components - ZENITH Test Suite', () => {
       rerender(
         <ZenithTestWrapper>
           <AdvancedMetricsRadar {...({ data: newData } as any)} />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       // Should not crash on data update
@@ -598,7 +598,7 @@ describe('Route Protection Components - ZENITH Test Suite', () => {
       render(
         <ZenithTestWrapper>
           <ProtectedRoute />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       // Should handle authentication check
@@ -628,7 +628,7 @@ describe('Component Performance Tests - ZENITH Standards', () => {
         const { unmount } = render(
           <ZenithTestWrapper>
             <Component {...props} />
-          </ZenithTestWrapper>
+          </ZenithTestWrapper>,
         );
         unmount();
       });
@@ -650,12 +650,12 @@ describe('Component Performance Tests - ZENITH Standards', () => {
           render(
             <ZenithTestWrapper>
               <Component {...props} />
-            </ZenithTestWrapper>
+            </ZenithTestWrapper>,
           );
         },
         () => {
           cleanup();
-        }
+        },
       );
 
       expect(Math.abs(memoryLeak)).toBeLessThan(100000); // 100KB threshold
@@ -679,7 +679,7 @@ describe('Component Accessibility Tests - ZENITH AAA Standards', () => {
       const { container } = render(
         <ZenithTestWrapper>
           <Component {...props} />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       const isAccessible = await ZenithTestUtils.checkAccessibility(container);

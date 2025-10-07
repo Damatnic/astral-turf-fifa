@@ -232,7 +232,7 @@ export const usePWA = () => {
         }
       }
     },
-    [state.supportsBadging]
+    [state.supportsBadging],
   );
 
   // Share functionality
@@ -249,7 +249,7 @@ export const usePWA = () => {
       }
       return false;
     },
-    [state.supportsShare]
+    [state.supportsShare],
   );
 
   // Wake lock management
@@ -745,7 +745,7 @@ export const clearAppCache = async (): Promise<void> => {
           });
         }
         return Promise.resolve();
-      })
+      }),
     );
 
     console.log('App cache cleared successfully');

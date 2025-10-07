@@ -172,7 +172,7 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
             reason: sanitizeUserInput(reason.message || ''),
             stack: ENVIRONMENT_CONFIG.isDevelopment ? reason.stack : '[REDACTED]',
           },
-        }
+        },
       );
     };
 
@@ -274,7 +274,7 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
         metadata: violation.metadata,
       });
     },
-    [reportSecurityEvent]
+    [reportSecurityEvent],
   );
 
   const contextValue: SecurityContextType = {
@@ -307,7 +307,7 @@ export function useSecurityReporting() {
         source: 'component',
       });
     },
-    [reportSecurityEvent]
+    [reportSecurityEvent],
   );
 
   const reportUnauthorizedAccess = useCallback(
@@ -318,7 +318,7 @@ export function useSecurityReporting() {
         source: 'component',
       });
     },
-    [reportSecurityEvent]
+    [reportSecurityEvent],
   );
 
   const reportInputThreat = useCallback(
@@ -330,7 +330,7 @@ export function useSecurityReporting() {
         source: 'component',
       });
     },
-    [reportSecurityEvent]
+    [reportSecurityEvent],
   );
 
   return {

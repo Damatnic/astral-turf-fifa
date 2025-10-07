@@ -53,7 +53,7 @@ const InboxPage: React.FC = () => {
     inboxId: string,
     playerId: string,
     fee: number,
-    wageContribution: number
+    wageContribution: number,
   ) => {
     dispatch({ type: 'ACCEPT_LOAN_OFFER', payload: { inboxId, playerId, fee, wageContribution } });
     uiDispatch({
@@ -323,14 +323,14 @@ const InboxPage: React.FC = () => {
                             handleAcceptTransferOffer(
                               selectedItem.id,
                               selectedItem.payload!.offer!.playerId,
-                              selectedItem.payload!.offer!.value
+                              selectedItem.payload!.offer!.value,
                             );
                           } else {
                             handleAcceptLoanOffer(
                               selectedItem.id,
                               selectedItem.payload!.offer!.playerId,
                               selectedItem.payload!.offer!.value,
-                              selectedItem.payload!.offer!.wageContribution || 0
+                              selectedItem.payload!.offer!.wageContribution || 0,
                             );
                           }
                         }}

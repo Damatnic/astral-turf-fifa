@@ -487,7 +487,7 @@ describe('Tactical Board Accessibility - Comprehensive Test Suite', () => {
         button =>
           button.textContent?.toLowerCase().includes('settings') ||
           button.textContent?.toLowerCase().includes('templates') ||
-          button.textContent?.toLowerCase().includes('options')
+          button.textContent?.toLowerCase().includes('options'),
       );
 
       if (modalTrigger) {
@@ -498,7 +498,7 @@ describe('Tactical Board Accessibility - Comprehensive Test Suite', () => {
         if (modal) {
           // Tab should cycle within modal
           const focusableElements = modal.querySelectorAll(
-            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
           );
 
           if (focusableElements.length > 1) {

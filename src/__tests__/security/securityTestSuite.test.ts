@@ -196,7 +196,7 @@ describe('Guardian Security Test Suite', () => {
         sensitiveData,
         'confidential',
         'user123',
-        context
+        context,
       );
 
       expect(encrypted.data).toBeTruthy();
@@ -555,7 +555,7 @@ describe('Guardian Security Test Suite', () => {
       const report = await auditLogger.generateComplianceReport(
         'Annual Security Report',
         startDate,
-        endDate
+        endDate,
       );
 
       expect(report.id).toBeTruthy();

@@ -21,7 +21,7 @@ async function checkA11y(
     detailedReport?: boolean;
     disableRules?: string[];
     runOnly?: string[];
-  }
+  },
 ) {
   const axeBuilder = new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
@@ -31,7 +31,7 @@ async function checkA11y(
           acc[rule] = { enabled: false };
           return acc;
         },
-        {} as Record<string, { enabled: boolean }>
+        {} as Record<string, { enabled: boolean }>,
       ),
     });
 

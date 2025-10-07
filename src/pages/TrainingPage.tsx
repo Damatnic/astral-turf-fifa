@@ -171,7 +171,7 @@ const TrainingPage: React.FC = () => {
 
       const morningMainDrill =
         Object.values(mockDrills).find(
-          d => d.category === morningMainCategory && d.intensity === recommendedIntensity
+          d => d.category === morningMainCategory && d.intensity === recommendedIntensity,
         ) || Object.values(mockDrills).find(d => d.category === morningMainCategory);
 
       if (morningMainDrill) {
@@ -236,7 +236,7 @@ const TrainingPage: React.FC = () => {
                 : 'technical';
 
         const afternoonMainDrill = Object.values(mockDrills).find(
-          d => d.category === afternoonMainCategory
+          d => d.category === afternoonMainCategory,
         );
 
         if (afternoonMainDrill) {
@@ -297,7 +297,7 @@ const TrainingPage: React.FC = () => {
           `Team Morale: ${averageMorale.toFixed(1)}%\n` +
           `Recommended Intensity: ${recommendedIntensity}\n` +
           `Focus Areas: ${topWeaknesses.join(', ')}\n\n` +
-          `${recommendedDrills.length} drills have been scheduled.`
+          `${recommendedDrills.length} drills have been scheduled.`,
       );
     } catch (error) {
       // eslint-disable-next-line no-console
@@ -348,7 +348,7 @@ const TrainingPage: React.FC = () => {
       // Check if there are any drills scheduled
       if (scheduledDrills.length === 0) {
         window.alert(
-          'No drills scheduled for this day. Please add drills before simulating training.'
+          'No drills scheduled for this day. Please add drills before simulating training.',
         );
         return;
       }
@@ -358,19 +358,19 @@ const TrainingPage: React.FC = () => {
         // Calculate total fatigue effect from all drills
         const totalFatigueEffect = scheduledDrills.reduce(
           (sum, drill) => sum + drill.fatigueEffect,
-          0
+          0,
         );
 
         // Calculate total morale effect from all drills
         const totalMoraleEffect = scheduledDrills.reduce(
           (sum, drill) => sum + drill.moraleEffect,
-          0
+          0,
         );
 
         // Calculate total injury risk (cumulative but capped)
         const totalInjuryRisk = Math.min(
           scheduledDrills.reduce((max, drill) => Math.max(max, drill.injuryRisk), 0),
-          0.15
+          0.15,
         ); // Cap at 15%
 
         // Simulate injury (simple random check)
@@ -415,13 +415,13 @@ const TrainingPage: React.FC = () => {
         if (attributeGains.dribbling) {
           updatedPlayer.dribbling = Math.min(
             99,
-            (player.dribbling ?? 70) + attributeGains.dribbling
+            (player.dribbling ?? 70) + attributeGains.dribbling,
           );
         }
         if (attributeGains.defending) {
           updatedPlayer.defending = Math.min(
             99,
-            (player.defending ?? 70) + attributeGains.defending
+            (player.defending ?? 70) + attributeGains.defending,
           );
         }
         if (attributeGains.physical || attributeGains.stamina) {
@@ -484,7 +484,7 @@ const TrainingPage: React.FC = () => {
       const totalFatigue = scheduledDrills.reduce((sum, drill) => sum + drill.fatigueEffect, 0);
       const totalMorale = scheduledDrills.reduce((sum, drill) => sum + drill.moraleEffect, 0);
       const injuredPlayers = updatedPlayers.filter(
-        p => p.availability.status === 'Minor Injury' || p.availability.status === 'Major Injury'
+        p => p.availability.status === 'Minor Injury' || p.availability.status === 'Major Injury',
       );
 
       // Count attribute improvements
@@ -573,7 +573,7 @@ const TrainingPage: React.FC = () => {
 
       // Calculate overall rating
       const overallRating = Math.round(
-        Object.values(attributes).reduce((sum, val) => sum + val, 0) / 6
+        Object.values(attributes).reduce((sum, val) => sum + val, 0) / 6,
       );
 
       // Identify weaknesses (attributes below overall rating)
@@ -672,7 +672,7 @@ const TrainingPage: React.FC = () => {
             'Game situation practice',
           ],
           expectedGain: '+0.3-0.8',
-        }
+        },
       );
 
       // Week 4-6: Secondary weakness improvement
@@ -703,7 +703,7 @@ const TrainingPage: React.FC = () => {
             'Match simulation',
           ],
           expectedGain: '+0.3-0.8',
-        }
+        },
       );
 
       // Week 7-9: Strength maintenance and tactical awareness
@@ -740,7 +740,7 @@ const TrainingPage: React.FC = () => {
             'Leadership',
           ],
           expectedGain: '+0.2-0.5',
-        }
+        },
       );
 
       // Week 10-12: Integration and match preparation
@@ -772,7 +772,7 @@ const TrainingPage: React.FC = () => {
             'Maintenance plan',
           ],
           expectedGain: '+0.1-0.3',
-        }
+        },
       );
 
       // Calculate total expected improvement
@@ -814,7 +814,7 @@ ${strengths
   .slice(0, 3)
   .map(
     (s, i) =>
-      `${i + 1}. ${s.attribute.charAt(0).toUpperCase() + s.attribute.slice(1)}: ${s.value}/99`
+      `${i + 1}. ${s.attribute.charAt(0).toUpperCase() + s.attribute.slice(1)}: ${s.value}/99`,
   )
   .join('\n')}
 
@@ -824,7 +824,7 @@ ${
     .slice(0, 3)
     .map(
       (w, i) =>
-        `${i + 1}. ${w.attribute.charAt(0).toUpperCase() + w.attribute.slice(1)}: ${w.value}/99 (Gap: -${w.gap})`
+        `${i + 1}. ${w.attribute.charAt(0).toUpperCase() + w.attribute.slice(1)}: ${w.value}/99 (Gap: -${w.gap})`,
     )
     .join('\n') || 'No significant weaknesses identified'
 }
@@ -905,7 +905,7 @@ ${primaryFocus}
   const handleSetSessionDrill = (
     session: 'morning' | 'afternoon',
     sessionPart: 'warmup' | 'main' | 'cooldown',
-    drillId: string | null
+    drillId: string | null,
   ) => {
     dispatch({
       type: 'SET_SESSION_DRILL',
@@ -1096,7 +1096,7 @@ ${primaryFocus}
                                 (part === 'warmup' && drill.category === 'warmup') ||
                                 (part === 'cooldown' && drill.category === 'cooldown') ||
                                 (part === 'main' &&
-                                  !['warmup', 'cooldown'].includes(drill.category))
+                                  !['warmup', 'cooldown'].includes(drill.category)),
                             )
                             .map(drill => (
                               <option key={drill.id} value={drill.id}>
@@ -1151,7 +1151,7 @@ ${primaryFocus}
                                 (part === 'warmup' && drill.category === 'warmup') ||
                                 (part === 'cooldown' && drill.category === 'cooldown') ||
                                 (part === 'main' &&
-                                  !['warmup', 'cooldown'].includes(drill.category))
+                                  !['warmup', 'cooldown'].includes(drill.category)),
                             )
                             .map(drill => (
                               <option key={drill.id} value={drill.id}>
@@ -1355,8 +1355,8 @@ ${primaryFocus}
                         sum +
                         Object.values(p.attributeDevelopmentProgress).reduce((a, b) => a + b, 0) /
                           Object.keys(p.attributeDevelopmentProgress).length,
-                      0
-                    ) / players.length
+                      0,
+                    ) / players.length,
                   )}
                   %
                 </div>

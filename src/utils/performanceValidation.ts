@@ -163,7 +163,7 @@ export class CoreWebVitalsMonitor {
     window.addEventListener('load', () => {
       setTimeout(() => {
         const navigation = performance.getEntriesByType(
-          'navigation'
+          'navigation',
         )[0] as PerformanceNavigationTiming;
 
         if (navigation) {
@@ -202,7 +202,7 @@ export class CoreWebVitalsMonitor {
   private recordMetric(
     name: string,
     value: number,
-    thresholds: { good: number; needsImprovement: number }
+    thresholds: { good: number; needsImprovement: number },
   ) {
     const rating =
       value <= thresholds.good
@@ -225,21 +225,21 @@ export class CoreWebVitalsMonitor {
     window.dispatchEvent(
       new CustomEvent('catalyst:performance-metric', {
         detail: metric,
-      })
+      }),
     );
 
     // Log warnings for poor performance
     if (rating === 'poor') {
       console.warn(
-        `🚨 Performance Alert: ${name.toUpperCase()} is poor (${value.toFixed(2)} > ${thresholds.needsImprovement})`
+        `🚨 Performance Alert: ${name.toUpperCase()} is poor (${value.toFixed(2)} > ${thresholds.needsImprovement})`,
       );
     } else if (rating === 'needs-improvement') {
       console.warn(
-        `⚠️ Performance Warning: ${name.toUpperCase()} needs improvement (${value.toFixed(2)} > ${thresholds.good})`
+        `⚠️ Performance Warning: ${name.toUpperCase()} needs improvement (${value.toFixed(2)} > ${thresholds.good})`,
       );
     } else {
       console.log(
-        `✅ Performance Good: ${name.toUpperCase()} is excellent (${value.toFixed(2)} ≤ ${thresholds.good})`
+        `✅ Performance Good: ${name.toUpperCase()} is excellent (${value.toFixed(2)} ≤ ${thresholds.good})`,
       );
     }
 
@@ -267,7 +267,7 @@ export class CoreWebVitalsMonitor {
         const emoji =
           metric.rating === 'good' ? '✅' : metric.rating === 'needs-improvement' ? '⚠️' : '🚨';
         console.log(
-          `${emoji} ${key.toUpperCase()}: ${metric.value.toFixed(2)}ms (${metric.rating})`
+          `${emoji} ${key.toUpperCase()}: ${metric.value.toFixed(2)}ms (${metric.rating})`,
         );
       }
     });
@@ -278,7 +278,7 @@ export class CoreWebVitalsMonitor {
     window.dispatchEvent(
       new CustomEvent('catalyst:performance-report', {
         detail: { metrics, score },
-      })
+      }),
     );
   }
 
@@ -427,7 +427,7 @@ export class RealUserMonitoring {
           timestamp: Date.now(),
         });
       },
-      { passive: true }
+      { passive: true },
     );
 
     // Track scroll events
@@ -443,7 +443,7 @@ export class RealUserMonitoring {
           });
         }, 100);
       },
-      { passive: true }
+      { passive: true },
     );
   }
 
@@ -482,7 +482,7 @@ export class RealUserMonitoring {
     window.dispatchEvent(
       new CustomEvent('catalyst:rum-event', {
         detail: event,
-      })
+      }),
     );
   }
 

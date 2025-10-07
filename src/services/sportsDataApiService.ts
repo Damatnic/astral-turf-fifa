@@ -401,7 +401,7 @@ class SportsDataApiService {
   async connectWearableDevice(
     deviceType: 'catapult' | 'stats_sports' | 'polar' | 'garmin',
     deviceId: string,
-    playerId: string
+    playerId: string,
   ): Promise<void> {
     try {
       const provider = this.getProvider(deviceType);
@@ -441,7 +441,7 @@ class SportsDataApiService {
   async getPerformanceData(
     playerId: string,
     startDate: string,
-    endDate: string
+    endDate: string,
   ): Promise<PerformanceMetrics[]> {
     const cacheKey = `performance_${playerId}_${startDate}_${endDate}`;
     const cached = this.getFromCache(cacheKey);
@@ -463,7 +463,7 @@ class SportsDataApiService {
           provider,
           playerId,
           startDate,
-          endDate
+          endDate,
         );
         performanceData.push(...data);
       }
@@ -538,7 +538,7 @@ class SportsDataApiService {
   async getPositionBenchmarks(
     position: string,
     league: string = 'all',
-    ageGroup: string = 'all'
+    ageGroup: string = 'all',
   ): Promise<BenchmarkData | null> {
     const cacheKey = `benchmark_${position}_${league}_${ageGroup}`;
     const cached = this.getFromCache(cacheKey);
@@ -610,7 +610,7 @@ class SportsDataApiService {
       const performanceData = await this.getPerformanceData(
         playerId,
         new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(), // Last 30 days
-        new Date().toISOString()
+        new Date().toISOString(),
       );
 
       // Analyze performance data for injury risk factors
@@ -719,7 +719,7 @@ class SportsDataApiService {
       error => {
         console.error(`API Error from ${provider.name}:`, error.message);
         return Promise.reject(error);
-      }
+      },
     );
 
     this.apiClients.set(provider.id, client);
@@ -802,7 +802,7 @@ class SportsDataApiService {
   private async connectCatapultDevice(
     provider: SportsDataProvider,
     deviceId: string,
-    playerId: string
+    playerId: string,
   ): Promise<void> {
     // // // // console.log(`🔗 Connecting Catapult device ${deviceId} for player ${playerId}`);
     // Catapult-specific connection logic
@@ -811,7 +811,7 @@ class SportsDataApiService {
   private async connectStatsSportsDevice(
     provider: SportsDataProvider,
     deviceId: string,
-    playerId: string
+    playerId: string,
   ): Promise<void> {
     // // // // console.log(`🔗 Connecting STATSports device ${deviceId} for player ${playerId}`);
     // STATSports-specific connection logic
@@ -820,7 +820,7 @@ class SportsDataApiService {
   private async connectPolarDevice(
     provider: SportsDataProvider,
     deviceId: string,
-    playerId: string
+    playerId: string,
   ): Promise<void> {
     // // // // console.log(`🔗 Connecting Polar device ${deviceId} for player ${playerId}`);
     // Polar-specific connection logic
@@ -829,7 +829,7 @@ class SportsDataApiService {
   private async connectGarminDevice(
     provider: SportsDataProvider,
     deviceId: string,
-    playerId: string
+    playerId: string,
   ): Promise<void> {
     // // // // console.log(`🔗 Connecting Garmin device ${deviceId} for player ${playerId}`);
     // Garmin-specific connection logic
@@ -839,7 +839,7 @@ class SportsDataApiService {
     _provider: SportsDataProvider,
     _playerId: string,
     _startDate: string,
-    _endDate: string
+    _endDate: string,
   ): Promise<PerformanceMetrics[]> {
     // Provider-specific performance data fetching
     return [];
@@ -848,7 +848,7 @@ class SportsDataApiService {
   private async calculateBenchmarks(
     position: string,
     league: string,
-    ageGroup: string
+    ageGroup: string,
   ): Promise<BenchmarkData> {
     // Calculate position benchmarks from aggregated data
     return {

@@ -63,7 +63,7 @@ class TacticalBoardPage {
   async substitutePlayer(benchPlayerName: string, fieldPlayerName: string) {
     // Drag from bench to field
     const benchPlayer = this.page.locator(
-      `[data-testid="positional-bench"] [aria-label*="${benchPlayerName}"]`
+      `[data-testid="positional-bench"] [aria-label*="${benchPlayerName}"]`,
     );
     const fieldPlayer = this.page.locator(`[role="main"] [aria-label*="${fieldPlayerName}"]`);
 
@@ -141,7 +141,7 @@ test.describe('Tactical Board - Complete User Workflows', () => {
       await tacticalBoard.dragPlayerToPosition(
         '[data-testid="player-token"]:first-child',
         300,
-        200
+        200,
       );
       await page.waitForTimeout(500);
 
@@ -189,7 +189,7 @@ test.describe('Tactical Board - Complete User Workflows', () => {
 
       // Step 2: Select a player from bench
       const benchPlayer = page.locator(
-        '[data-testid="positional-bench"] [data-testid*="player-card"]:first-child'
+        '[data-testid="positional-bench"] [data-testid*="player-card"]:first-child',
       );
       await expect(benchPlayer).toBeVisible();
 

@@ -156,7 +156,7 @@ async function checkBundleSize() {
 
     // Check if responsive components are reasonably sized
     const responsiveFiles = files.filter(
-      f => f.name.includes('Adaptive') || f.name.includes('Responsive') || f.name.includes('Touch')
+      f => f.name.includes('Adaptive') || f.name.includes('Responsive') || f.name.includes('Touch'),
     );
 
     if (responsiveFiles.length > 0) {
@@ -165,7 +165,7 @@ async function checkBundleSize() {
 
       if (responsiveSize > THRESHOLDS.bundleSize.responsive) {
         logWarning(
-          `Responsive components exceed threshold (${(THRESHOLDS.bundleSize.responsive / 1024).toFixed(2)} KB)`
+          `Responsive components exceed threshold (${(THRESHOLDS.bundleSize.responsive / 1024).toFixed(2)} KB)`,
         );
       } else {
         logSuccess(`Responsive components within threshold`);
@@ -174,7 +174,7 @@ async function checkBundleSize() {
 
     if (total > THRESHOLDS.bundleSize.total * 2) {
       logError(
-        `Bundle size exceeds threshold (${(THRESHOLDS.bundleSize.total / 1024).toFixed(2)} KB)`
+        `Bundle size exceeds threshold (${(THRESHOLDS.bundleSize.total / 1024).toFixed(2)} KB)`,
       );
       return { passed: false, total, threshold: THRESHOLDS.bundleSize.total };
     } else if (total > THRESHOLDS.bundleSize.total) {
@@ -247,7 +247,7 @@ async function checkResponsiveComponents() {
 
     const corePagesWithResponsive = Math.max(
       results.withResponsivePage,
-      results.withResponsiveGrid
+      results.withResponsiveGrid,
     );
 
     if (corePagesWithResponsive >= 7) {
@@ -317,7 +317,7 @@ async function runLighthouse() {
     });
 
     const allPassed = Object.entries(scores).every(
-      ([category, score]) => score >= THRESHOLDS.lighthouse[category]
+      ([category, score]) => score >= THRESHOLDS.lighthouse[category],
     );
 
     if (allPassed) {
@@ -358,7 +358,7 @@ async function generateReport(results) {
   Object.entries(results).forEach(([test, result]) => {
     const icon = result.passed ? '✅' : result.passed === false ? '❌' : '⏭️';
     console.log(
-      `${icon} ${test}: ${result.passed ? 'PASSED' : result.passed === false ? 'FAILED' : 'SKIPPED'}`
+      `${icon} ${test}: ${result.passed ? 'PASSED' : result.passed === false ? 'FAILED' : 'SKIPPED'}`,
     );
   });
 

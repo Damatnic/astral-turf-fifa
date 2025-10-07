@@ -51,7 +51,7 @@ const getTeamStrengths = (
   tacticalFamiliarity: number,
   chemistryMatrix: RootState['tactics']['chemistry'],
   relationships: RootState['franchise']['relationships'],
-  mentoringGroups: MentoringGroup[]
+  mentoringGroups: MentoringGroup[],
 ) => {
   if (players.length === 0) {
     return { attack: 0, defense: 0, midfield: 0, overallChemistry: 0 };
@@ -131,7 +131,7 @@ const getTeamStrengths = (
           otherPlayer,
           chemistryMatrix,
           relationships,
-          mentoringGroups
+          mentoringGroups,
         );
         chemistryLinks++;
       }
@@ -160,7 +160,7 @@ export const simulateMatch = (
   chemistry: RootState['tactics']['chemistry'],
   relationships: RootState['franchise']['relationships'],
   mentoring: RootState['franchise']['mentoringGroups'],
-  onUpdate: (event: MatchEvent | MatchCommentary) => void
+  onUpdate: (event: MatchEvent | MatchCommentary) => void,
 ): MatchResult => {
   const events: MatchEvent[] = [];
   const commentaryLog: MatchCommentary[] = [];
@@ -197,14 +197,14 @@ export const simulateMatch = (
       homeFamiliarity,
       chemistry,
       relationships,
-      mentoring.home
+      mentoring.home,
     );
     const awayStrengths = getTeamStrengths(
       simAwayPlayers,
       awayFamiliarity,
       chemistry,
       relationships,
-      mentoring.away
+      mentoring.away,
     );
 
     const homeTacticMods = {
@@ -252,7 +252,7 @@ export const simulateMatch = (
 
       if (Math.random() < goalProbability) {
         const scorers = attackers.filter(p =>
-          ['FW', 'MF'].includes(PLAYER_ROLES.find(r => r.id === p.roleId)!.category)
+          ['FW', 'MF'].includes(PLAYER_ROLES.find(r => r.id === p.roleId)!.category),
         );
         const scorer =
           scorers.length > 0 ? scorers[Math.floor(Math.random() * scorers.length)] : attackers[0];
@@ -260,7 +260,7 @@ export const simulateMatch = (
         const potentialAssisters = attackers.filter(
           p =>
             p.id !== scorer.id &&
-            ['MF', 'FW', 'DF'].includes(PLAYER_ROLES.find(r => r.id === p.roleId)!.category)
+            ['MF', 'FW', 'DF'].includes(PLAYER_ROLES.find(r => r.id === p.roleId)!.category),
         );
         if (potentialAssisters.length > 0 && Math.random() < 0.7) {
           assister = potentialAssisters[Math.floor(Math.random() * potentialAssisters.length)];
@@ -354,7 +354,7 @@ export const calculateMatchOutcome = (
   homeStrength: number,
   awayStrength: number,
   homeTactics: TeamTactics,
-  awayTactics: TeamTactics
+  awayTactics: TeamTactics,
 ): { homeWinProbability: number; drawProbability: number; awayWinProbability: number } => {
   const strengthDiff = homeStrength - awayStrength;
 
@@ -392,7 +392,7 @@ export const generateMatchPreview = (
   awayFamiliarity: number,
   chemistry: RootState['tactics']['chemistry'],
   relationships: RootState['franchise']['relationships'],
-  mentoring: RootState['franchise']['mentoringGroups']
+  mentoring: RootState['franchise']['mentoringGroups'],
 ): {
   homeStrengths: ReturnType<typeof getTeamStrengths>;
   awayStrengths: ReturnType<typeof getTeamStrengths>;
@@ -405,21 +405,21 @@ export const generateMatchPreview = (
     homeFamiliarity,
     chemistry,
     relationships,
-    mentoring.home
+    mentoring.home,
   );
   const awayStrengths = getTeamStrengths(
     awayPlayers,
     awayFamiliarity,
     chemistry,
     relationships,
-    mentoring.away
+    mentoring.away,
   );
 
   const outcome = calculateMatchOutcome(
     (homeStrengths.attack + homeStrengths.defense + homeStrengths.midfield) / 3,
     (awayStrengths.attack + awayStrengths.defense + awayStrengths.midfield) / 3,
     homeTactics,
-    awayTactics
+    awayTactics,
   );
 
   // Identify key players
@@ -464,13 +464,13 @@ export const generateMatchPreview = (
 
   if (homeTactics.mentality === 'very-attacking' && awayTactics.defensiveLine === 'deep') {
     tacticalMismatch.push(
-      "Home team's attacking mentality may struggle against away team's deep defense"
+      "Home team's attacking mentality may struggle against away team's deep defense",
     );
   }
 
   if (awayTactics.pressing === 'high' && homeTactics.mentality === 'very-attacking') {
     tacticalMismatch.push(
-      "Away team's high pressing could exploit home team's aggressive approach"
+      "Away team's high pressing could exploit home team's aggressive approach",
     );
   }
 

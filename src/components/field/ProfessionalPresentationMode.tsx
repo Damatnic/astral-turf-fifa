@@ -151,7 +151,7 @@ const SlideNavigation: React.FC<{
         </div>
       </div>
     );
-  }
+  },
 );
 
 // Presentation controls overlay
@@ -229,7 +229,7 @@ const PresentationControls: React.FC<{
         </div>
       </div>
     );
-  }
+  },
 );
 
 // Slide content overlay
@@ -445,7 +445,7 @@ const ProfessionalPresentationMode: React.FC = () => {
         case ' ':
           e.preventDefault();
           handleSlideChange(
-            Math.min(presentationState.slides.length - 1, presentationState.currentSlide + 1)
+            Math.min(presentationState.slides.length - 1, presentationState.currentSlide + 1),
           );
           break;
         case 'ArrowLeft':

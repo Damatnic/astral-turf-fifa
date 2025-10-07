@@ -155,7 +155,7 @@ const EnhancedPlayerRankingCard: React.FC<EnhancedPlayerRankingCardProps> = ({
         attrs.tackling +
         attrs.shooting +
         attrs.dribbling +
-        attrs.positioning) / 6
+        attrs.positioning) / 6,
     );
   }, [player.attributes]);
 

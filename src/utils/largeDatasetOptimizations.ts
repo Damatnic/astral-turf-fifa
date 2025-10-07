@@ -559,7 +559,7 @@ export class LargeDatasetManager<T extends { id: string }> {
 // React hooks for large dataset management
 export function useLargeDataset<T extends { id: string }>(
   initialData: T[] = [],
-  workerScript?: string
+  workerScript?: string,
 ) {
   const managerRef = useRef<LargeDatasetManager<T> | null>(null);
   const [stats, setStats] = useState({
@@ -598,7 +598,7 @@ export function useLargeDataset<T extends { id: string }>(
       managerRef.current?.set(item);
       setStats(managerRef.current?.getStats() || stats);
     },
-    [stats]
+    [stats],
   );
 
   const remove = useCallback(
@@ -606,7 +606,7 @@ export function useLargeDataset<T extends { id: string }>(
       managerRef.current?.delete(id);
       setStats(managerRef.current?.getStats() || stats);
     },
-    [stats]
+    [stats],
   );
 
   const get = useCallback((id: string) => {
@@ -629,7 +629,7 @@ export function useLargeDataset<T extends { id: string }>(
     (cellSize?: number, bounds?: { width: number; height: number }) => {
       managerRef.current?.enableSpatialIndex(cellSize, bounds);
     },
-    []
+    [],
   );
 
   // Cleanup on unmount

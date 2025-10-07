@@ -1,6 +1,6 @@
 /**
  * AI Training Intelligence Integration Example
- * 
+ *
  * This file demonstrates how to integrate the AI Training Optimization Intelligence System
  * into your TrainingPage component or any other part of the application.
  */

@@ -220,7 +220,7 @@ async function setEnvironmentVariables() {
     try {
       // Remove existing env var first (ignore errors)
       await runCommand('vercel', ['env', 'rm', key, 'production'], { stdio: 'pipe' }).catch(
-        () => {}
+        () => {},
       );
 
       // Add new env var
@@ -231,7 +231,7 @@ async function setEnvironmentVariables() {
 
       successCount++;
       process.stdout.write(
-        `\r${colors.blue}Setting environment variables... ${successCount}/${envCount}${colors.reset}`
+        `\r${colors.blue}Setting environment variables... ${successCount}/${envCount}${colors.reset}`,
       );
     } catch (error) {
       logWarning(`Failed to set ${key}: ${error.message}`);
@@ -304,7 +304,7 @@ async function main() {
    ASTRAL TURF VERCEL DEPLOYMENT
 🌟 ================================== 🌟
 `,
-    colors.blue
+    colors.blue,
   );
 
   try {
@@ -332,7 +332,7 @@ async function main() {
 
 📋 Vercel Dashboard: https://vercel.com/dashboard
 `,
-      colors.green
+      colors.green,
     );
   } catch (error) {
     logError(`Deployment failed: ${error.message}`);

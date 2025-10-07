@@ -72,7 +72,7 @@ const EnhancedTacticsToolbar: React.FC<EnhancedTacticsToolbarProps> = ({
   // Group actions by category
   const groupedActions = actions.reduce((acc, action) => {
     const category = action.category || 'tools';
-    if (!acc[category]) acc[category] = [];
+    if (!acc[category]) {acc[category] = [];}
     acc[category].push(action);
     return acc;
   }, {} as Record<string, ToolbarAction[]>);
@@ -102,9 +102,9 @@ const EnhancedTacticsToolbar: React.FC<EnhancedTacticsToolbarProps> = ({
   };
 
   const getStrengthColor = (strength: number) => {
-    if (strength >= 80) return 'text-green-500';
-    if (strength >= 60) return 'text-blue-500';
-    if (strength >= 40) return 'text-yellow-500';
+    if (strength >= 80) {return 'text-green-500';}
+    if (strength >= 60) {return 'text-blue-500';}
+    if (strength >= 40) {return 'text-yellow-500';}
     return 'text-red-500';
   };
 
@@ -232,7 +232,7 @@ const EnhancedTacticsToolbar: React.FC<EnhancedTacticsToolbarProps> = ({
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   {categories.map(category => {
                     const categoryActions = groupedActions[category.id] || [];
-                    if (categoryActions.length === 0) return null;
+                    if (categoryActions.length === 0) {return null;}
 
                     return (
                       <motion.div
@@ -323,7 +323,7 @@ const EnhancedTacticsToolbar: React.FC<EnhancedTacticsToolbarProps> = ({
                             <motion.button
                               whileHover={{ scale: 1.02 }}
                               onClick={() => setExpandedCategory(
-                                expandedCategory === category.id ? null : category.id
+                                expandedCategory === category.id ? null : category.id,
                               )}
                               className="w-full px-3 py-2 text-sm text-gray-400 hover:text-white transition-colors flex items-center justify-center gap-2"
                             >

@@ -5,8 +5,23 @@
  * Implements advanced caching, background sync, and mobile optimizations
  */
 
-// Import IDB for offline data management
-self.importScripts('https://unpkg.com/idb@7/build/umd.js');
+// Simple IndexedDB wrapper to replace external IDB dependency
+const idb = {
+  async openDB(name, version, options) {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open(name, version);
+      
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => resolve(request.result);
+      
+      request.onupgradeneeded = (event) => {
+        if (options?.upgrade) {
+          options.upgrade(event.target.result);
+        }
+      };
+    });
+  }
+};
 
 // Mobile-specific configuration
 const MOBILE_CONFIG = {
@@ -203,7 +218,7 @@ self.addEventListener('install', event => {
       })
       .catch(error => {
         console.error('[SW] Pre-caching failed:', error);
-      })
+      }),
   );
 });
 
@@ -221,7 +236,7 @@ self.addEventListener('activate', event => {
               console.log('[SW] Deleting old cache:', cacheName);
               return caches.delete(cacheName);
             }
-          })
+          }),
         );
       }),
 
@@ -238,9 +253,9 @@ self.addEventListener('activate', event => {
             CacheManager.cleanupCache(cacheName, config);
           });
         },
-        60 * 60 * 1000
+        60 * 60 * 1000,
       ); // Every hour
-    })
+    }),
   );
 });
 
@@ -851,7 +866,7 @@ async function handleClearCacheRequest(event, payload) {
     if (cacheType === 'all') {
       const cacheNames = await caches.keys();
       await Promise.all(
-        cacheNames.filter(name => name.startsWith(CACHE_VERSION)).map(name => caches.delete(name))
+        cacheNames.filter(name => name.startsWith(CACHE_VERSION)).map(name => caches.delete(name)),
       );
     } else {
       const cacheName = `${CACHE_VERSION}-${cacheType}`;
@@ -966,7 +981,7 @@ self.addEventListener('notificationclick', event => {
       // Open new window
       const urlToOpen = event.notification.data?.url || '/';
       return clients.openWindow(urlToOpen);
-    })
+    }),
   );
 });
 

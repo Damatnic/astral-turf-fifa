@@ -24,7 +24,7 @@ const AISubstitutionSuggestionPopup: React.FC = () => {
       const onFieldIds = getFormationPlayerIds(formation);
       const onFieldPlayers = players.filter(p => p && onFieldIds.has(p.id));
       const benchedPlayers = players.filter(
-        p => p && p.team === activeTeam && !onFieldIds.has(p.id)
+        p => p && p.team === activeTeam && !onFieldIds.has(p.id),
       );
 
       getAISubstitutionSuggestion(onFieldPlayers, benchedPlayers, settings.aiPersonality)
@@ -32,7 +32,7 @@ const AISubstitutionSuggestionPopup: React.FC = () => {
           (dispatch as (action: { type: string; payload?: unknown }) => void)({
             type: 'GET_AI_SUB_SUGGESTION_SUCCESS',
             payload: data,
-          })
+          }),
         )
         .catch(err => {
           console.error(err);

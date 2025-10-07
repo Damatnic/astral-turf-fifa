@@ -8,7 +8,7 @@ const NewsFeedPage: React.FC = () => {
   const [selectedFilter, setSelectedFilter] = useState<'all' | NewsItem['type']>('all');
 
   const filteredNews = newsFeed.filter(
-    item => selectedFilter === 'all' || item.type === selectedFilter
+    item => selectedFilter === 'all' || item.type === selectedFilter,
   );
 
   const getNewsIcon = (type: NewsItem['type']) => {

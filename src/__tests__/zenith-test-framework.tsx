@@ -74,7 +74,7 @@ export class ZenithComponentTester {
     componentName: string,
     Component: React.ComponentType<any>,
     defaultProps: any = {},
-    variants: Array<{ name: string; props: any }> = []
+    variants: Array<{ name: string; props: any }> = [],
   ) {
     this.componentName = componentName;
     this.Component = Component;
@@ -121,7 +121,7 @@ export class ZenithComponentTester {
         const { container } = render(
           <ZenithTestWrapper>
             <this.Component {...this.defaultProps} />
-          </ZenithTestWrapper>
+          </ZenithTestWrapper>,
         );
         expect(container).toBeInTheDocument();
       });
@@ -130,7 +130,7 @@ export class ZenithComponentTester {
         render(
           <ZenithTestWrapper>
             <this.Component {...this.defaultProps} />
-          </ZenithTestWrapper>
+          </ZenithTestWrapper>,
         );
 
         // Component should have proper semantic structure
@@ -143,7 +143,7 @@ export class ZenithComponentTester {
           render(
             <ZenithTestWrapper>
               <this.Component />
-            </ZenithTestWrapper>
+            </ZenithTestWrapper>,
           );
         }).not.toThrow();
       });
@@ -152,7 +152,7 @@ export class ZenithComponentTester {
         const { container } = render(
           <ZenithTestWrapper>
             <this.Component {...this.defaultProps} />
-          </ZenithTestWrapper>
+          </ZenithTestWrapper>,
         );
         expect(container.firstChild).toMatchSnapshot();
       });
@@ -166,7 +166,7 @@ export class ZenithComponentTester {
         render(
           <ZenithTestWrapper>
             <this.Component {...this.defaultProps} />
-          </ZenithTestWrapper>
+          </ZenithTestWrapper>,
         );
 
         // Test Tab navigation
@@ -189,7 +189,7 @@ export class ZenithComponentTester {
         render(
           <ZenithTestWrapper>
             <this.Component {...this.defaultProps} />
-          </ZenithTestWrapper>
+          </ZenithTestWrapper>,
         );
 
         if (this.isClickable()) {
@@ -204,7 +204,7 @@ export class ZenithComponentTester {
         render(
           <ZenithTestWrapper>
             <this.Component {...this.defaultProps} />
-          </ZenithTestWrapper>
+          </ZenithTestWrapper>,
         );
 
         if (this.isInteractive()) {
@@ -223,7 +223,7 @@ export class ZenithComponentTester {
         render(
           <ZenithTestWrapper>
             <this.Component {...this.defaultProps} />
-          </ZenithTestWrapper>
+          </ZenithTestWrapper>,
         );
 
         const element = screen.getByRole(this.inferRole());
@@ -242,7 +242,7 @@ export class ZenithComponentTester {
         render(
           <ZenithTestWrapper>
             <this.Component {...this.defaultProps} />
-          </ZenithTestWrapper>
+          </ZenithTestWrapper>,
         );
 
         // Should have accessible name
@@ -254,7 +254,7 @@ export class ZenithComponentTester {
         const { container } = render(
           <ZenithTestWrapper>
             <this.Component {...this.defaultProps} />
-          </ZenithTestWrapper>
+          </ZenithTestWrapper>,
         );
 
         // Check color contrast (simplified - real implementation would use axe-core)
@@ -268,7 +268,7 @@ export class ZenithComponentTester {
         render(
           <ZenithTestWrapper>
             <this.Component {...this.defaultProps} />
-          </ZenithTestWrapper>
+          </ZenithTestWrapper>,
         );
 
         // Should be focusable if interactive
@@ -288,7 +288,7 @@ export class ZenithComponentTester {
         render(
           <ZenithTestWrapper>
             <this.Component {...this.defaultProps} />
-          </ZenithTestWrapper>
+          </ZenithTestWrapper>,
         );
 
         const endTime = performance.now();
@@ -303,7 +303,7 @@ export class ZenithComponentTester {
         const { unmount } = render(
           <ZenithTestWrapper>
             <this.Component {...this.defaultProps} />
-          </ZenithTestWrapper>
+          </ZenithTestWrapper>,
         );
 
         unmount();
@@ -327,7 +327,7 @@ export class ZenithComponentTester {
         render(
           <ZenithTestWrapper>
             <this.Component {...largeProps} />
-          </ZenithTestWrapper>
+          </ZenithTestWrapper>,
         );
 
         const endTime = performance.now();
@@ -347,7 +347,7 @@ export class ZenithComponentTester {
           render(
             <ZenithTestWrapper>
               <this.Component {...invalidProps} />
-            </ZenithTestWrapper>
+            </ZenithTestWrapper>,
           );
         }).not.toThrow();
       });
@@ -361,7 +361,7 @@ export class ZenithComponentTester {
           render(
             <ZenithTestWrapper>
               <this.Component {...errorProps} />
-            </ZenithTestWrapper>
+            </ZenithTestWrapper>,
           );
         }).not.toThrow();
 
@@ -376,7 +376,7 @@ export class ZenithComponentTester {
         render(
           <ZenithTestWrapper>
             <this.Component {...this.defaultProps} />
-          </ZenithTestWrapper>
+          </ZenithTestWrapper>,
         );
 
         // Should not crash on network error
@@ -400,7 +400,7 @@ export class ZenithComponentTester {
           render(
             <ZenithTestWrapper>
               <this.Component {...this.defaultProps} {...variant.props} />
-            </ZenithTestWrapper>
+            </ZenithTestWrapper>,
           );
 
           // Should render without crashing
@@ -558,7 +558,7 @@ export class ZenithPageTester {
         render(
           <ZenithTestWrapper>
             <this.Page />
-          </ZenithTestWrapper>
+          </ZenithTestWrapper>,
         );
 
         // Should have main content area
@@ -574,7 +574,7 @@ export class ZenithPageTester {
         render(
           <ZenithTestWrapper>
             <this.Page />
-          </ZenithTestWrapper>
+          </ZenithTestWrapper>,
         );
 
         // Should have navigation if applicable
@@ -594,7 +594,7 @@ export class ZenithPageTester {
         render(
           <ZenithTestWrapper>
             <this.Page />
-          </ZenithTestWrapper>
+          </ZenithTestWrapper>,
         );
 
         // Test back button functionality
@@ -606,7 +606,7 @@ export class ZenithPageTester {
         render(
           <ZenithTestWrapper>
             <this.Page />
-          </ZenithTestWrapper>
+          </ZenithTestWrapper>,
         );
 
         // Should render correctly with any valid route
@@ -621,7 +621,7 @@ export class ZenithPageTester {
         render(
           <ZenithTestWrapper>
             <this.Page />
-          </ZenithTestWrapper>
+          </ZenithTestWrapper>,
         );
 
         // Should have page title
@@ -634,7 +634,7 @@ export class ZenithPageTester {
         render(
           <ZenithTestWrapper>
             <this.Page />
-          </ZenithTestWrapper>
+          </ZenithTestWrapper>,
         );
 
         // Should show loading indicator initially if applicable
@@ -651,7 +651,7 @@ export class ZenithPageTester {
         render(
           <ZenithTestWrapper>
             <this.Page />
-          </ZenithTestWrapper>
+          </ZenithTestWrapper>,
         );
 
         // Should not crash on error
@@ -668,7 +668,7 @@ export class ZenithPageTester {
         render(
           <ZenithTestWrapper>
             <this.Page />
-          </ZenithTestWrapper>
+          </ZenithTestWrapper>,
         );
 
         // Should set document title
@@ -685,7 +685,7 @@ export class ZenithPageTester {
         render(
           <ZenithTestWrapper>
             <this.Page />
-          </ZenithTestWrapper>
+          </ZenithTestWrapper>,
         );
 
         const headings = screen.getAllByRole('heading');
@@ -706,7 +706,7 @@ export class ZenithPageTester {
         render(
           <ZenithTestWrapper>
             <this.Page />
-          </ZenithTestWrapper>
+          </ZenithTestWrapper>,
         );
 
         await waitFor(() => {
@@ -827,7 +827,7 @@ export const ZenithTestUtils = {
     componentName: string,
     Component: React.ComponentType<any>,
     defaultProps: any = {},
-    variants: Array<{ name: string; props: any }> = []
+    variants: Array<{ name: string; props: any }> = [],
   ) => {
     const tester = new ZenithComponentTester(componentName, Component, defaultProps, variants);
     return tester.generateTestSuite();
@@ -900,7 +900,7 @@ export const ZenithTestUtils = {
   checkAccessibility: async (container: HTMLElement): Promise<boolean> => {
     // Simplified accessibility check
     const interactiveElements = container.querySelectorAll(
-      'button, input, select, textarea, a, [tabindex]'
+      'button, input, select, textarea, a, [tabindex]',
     );
 
     for (const element of interactiveElements) {

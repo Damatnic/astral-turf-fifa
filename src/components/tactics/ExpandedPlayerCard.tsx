@@ -300,7 +300,7 @@ export const ExpandedPlayerCard: React.FC<ExpandedPlayerCardProps> = ({
                       <span className="text-white ml-2">
                         {player.stats.passesAttempted > 0
                           ? Math.round(
-                              (player.stats.passesCompleted / player.stats.passesAttempted) * 100
+                              (player.stats.passesCompleted / player.stats.passesAttempted) * 100,
                             )
                           : 0}
                         %

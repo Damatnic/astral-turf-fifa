@@ -183,7 +183,7 @@ const createFormationSlot = (
   role: PositionRole,
   defaultPosition: { x: number; y: number },
   playerId: string | null,
-  preferredRoles?: string[]
+  preferredRoles?: string[],
 ): FormationSlot => ({
   id,
   role,
@@ -298,7 +298,7 @@ export const createTestData = {
           positioning: 74 + (index % 5),
           stamina: 80 + (index % 6),
         },
-      })
+      }),
     );
 
     const benchRoles: PositionRole[] = ['GK', 'DF', 'MF', 'FW'];
@@ -317,7 +317,7 @@ export const createTestData = {
                 : 'striker',
         position: { x: 5 + index * 3, y: 5 },
         stamina: 82 - index,
-      })
+      }),
     );
 
     const players = [...starters, ...bench];
@@ -326,7 +326,7 @@ export const createTestData = {
       id: 'test-formation-433',
       name: 'Test Formation 4-3-3',
       slots: slotDefinitions.map((slot, index) =>
-        createFormationSlot(slot.id, slot.role, slot.position, starters[index]?.id ?? null)
+        createFormationSlot(slot.id, slot.role, slot.position, starters[index]?.id ?? null),
       ),
     };
 
@@ -423,8 +423,8 @@ export const createTestData = {
           `perf-slot-${index + 1}`,
           roleCycle[index % roleCycle.length],
           { x: (index * 9) % 100, y: 15 + (index % 11) * 7 },
-          player.id
-        )
+          player.id,
+        ),
       );
 
     const formation: Formation = {
@@ -510,7 +510,7 @@ export const testUtils = {
   async simulatePlayerDrag(
     element: HTMLElement,
     from: { x: number; y: number },
-    to: { x: number; y: number }
+    to: { x: number; y: number },
   ): Promise<void> {
     const { fireEvent } = await import('@testing-library/react');
 

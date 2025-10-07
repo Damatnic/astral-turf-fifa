@@ -342,7 +342,7 @@ test.describe('Mobile Performance', () => {
         // Average of measurements
         const avgLatency = measurements.reduce((a, b) => a + b, 0) / measurements.length;
         console.log(
-          `Touch latency measurements: ${measurements.join(', ')}ms (avg: ${avgLatency.toFixed(1)}ms)`
+          `Touch latency measurements: ${measurements.join(', ')}ms (avg: ${avgLatency.toFixed(1)}ms)`,
         );
 
         // Touch response should be under 200ms on average (dev server is slower than production)

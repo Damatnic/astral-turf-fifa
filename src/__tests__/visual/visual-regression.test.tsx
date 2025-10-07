@@ -77,7 +77,7 @@ describe('Visual Regression Testing', () => {
           <Layout>
             <div data-testid="test-content">Test Content</div>
           </Layout>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       // Check for consistent gradient backgrounds
@@ -96,7 +96,7 @@ describe('Visual Regression Testing', () => {
           <Layout>
             <div>Desktop Content</div>
           </Layout>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       // Mobile layout
@@ -111,7 +111,7 @@ describe('Visual Regression Testing', () => {
           <Layout>
             <div>Mobile Content</div>
           </Layout>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       // Check layout differences
@@ -133,7 +133,7 @@ describe('Visual Regression Testing', () => {
             <button className="btn-primary">Test Button</button>
             <button className="btn-secondary">Secondary Button</button>
           </Layout>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       // Check for button elements (even if classes aren't applied, structure should be consistent)
@@ -149,7 +149,7 @@ describe('Visual Regression Testing', () => {
           <Layout>
             <div>Content with modal</div>
           </Layout>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       // Check for modal backdrop
@@ -165,7 +165,7 @@ describe('Visual Regression Testing', () => {
           <Layout>
             <div className="text-white bg-slate-900">Themed Content</div>
           </Layout>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       // Check for consistent dark theme application
@@ -182,7 +182,7 @@ describe('Visual Regression Testing', () => {
           <Layout>
             <div>Light themed content</div>
           </Layout>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       // Dark theme
@@ -193,7 +193,7 @@ describe('Visual Regression Testing', () => {
           <Layout>
             <div>Dark themed content</div>
           </Layout>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       const lightRoot = lightContainer.firstChild as HTMLElement;
@@ -211,12 +211,12 @@ describe('Visual Regression Testing', () => {
           <Layout>
             <div>Animated content</div>
           </Layout>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       // Check for transition classes
       const animatedElements = container.querySelectorAll(
-        '[class*="transition"], [class*="animate"]'
+        '[class*="transition"], [class*="animate"]',
       );
       expect(animatedElements.length).toBeGreaterThan(0);
     });

@@ -19,7 +19,7 @@ class MonteCarloSimulator {
   simulateMatch(
     homeTeam: TeamData,
     awayTeam: TeamData,
-    conditions: MatchConditions = {}
+    conditions: MatchConditions = {},
   ): MatchPrediction {
     const results: SimulationResult[] = [];
 
@@ -33,7 +33,7 @@ class MonteCarloSimulator {
   private runSingleSimulation(
     homeTeam: TeamData,
     awayTeam: TeamData,
-    conditions: MatchConditions
+    conditions: MatchConditions,
   ): SimulationResult {
     // Apply random variations to team strength
     const homeStrength = this.applyRandomVariation(homeTeam.overallStrength, 0.15);
@@ -67,7 +67,7 @@ class MonteCarloSimulator {
   private calculateWeatherImpact(
     weather: WeatherCondition | undefined,
     homeTeam: TeamData,
-    awayTeam: TeamData
+    awayTeam: TeamData,
   ): { home: number; away: number } {
     if (!weather) {
       return { home: 1.0, away: 1.0 };
@@ -208,7 +208,7 @@ class PlayerPerformancePredictor {
    */
   predictPlayerPerformance(
     player: Player,
-    matchContext: MatchContext
+    matchContext: MatchContext,
   ): PlayerPerformancePrediction {
     const basePerformance = this.calculateBasePerformance(player);
     const formAdjustment = this.calculateFormAdjustment(player);
@@ -498,7 +498,7 @@ class PlayerPerformancePredictor {
   private generatePositionReasoning(
     player: Player,
     recommendedPosition: string,
-    context: MatchContext
+    context: MatchContext,
   ): string {
     if (recommendedPosition === player.roleId) {
       return 'Player is optimally positioned for their strengths';
@@ -616,7 +616,7 @@ class TeamChemistryAnalyzer {
     // Attribute compatibility
     const attributeCompatibility = this.calculateAttributeCompatibility(
       player1.attributes,
-      player2.attributes
+      player2.attributes,
     );
     chemistry += attributeCompatibility * 0.3;
 
@@ -635,7 +635,7 @@ class TeamChemistryAnalyzer {
 
   private calculateAttributeCompatibility(
     attr1: PlayerAttributes,
-    attr2: PlayerAttributes
+    attr2: PlayerAttributes,
   ): number {
     // Players with complementary attributes work well together
     const speedDiff = Math.abs(attr1.speed - attr2.speed);
@@ -669,7 +669,7 @@ class TeamChemistryAnalyzer {
 
   private identifyChemistryBoosters(
     players: Player[],
-    pairChemistry: Record<string, Record<string, number>>
+    pairChemistry: Record<string, Record<string, number>>,
   ): ChemistryInfluencer[] {
     const boosters: ChemistryInfluencer[] = [];
 
@@ -692,7 +692,7 @@ class TeamChemistryAnalyzer {
 
   private identifyChemistryDisruptors(
     players: Player[],
-    pairChemistry: Record<string, Record<string, number>>
+    pairChemistry: Record<string, Record<string, number>>,
   ): ChemistryInfluencer[] {
     const disruptors: ChemistryInfluencer[] = [];
 
@@ -741,7 +741,7 @@ class TeamChemistryAnalyzer {
 
   private generateChemistryRecommendations(
     players: Player[],
-    pairChemistry: Record<string, Record<string, number>>
+    pairChemistry: Record<string, Record<string, number>>,
   ): string[] {
     const recommendations: string[] = [];
 
@@ -834,7 +834,7 @@ export class AIPredictiveAnalyticsService {
     homePlayers: Player[],
     awayFormation: Formation,
     awayPlayers: Player[],
-    conditions: MatchConditions = {}
+    conditions: MatchConditions = {},
   ): Promise<MatchPrediction> {
     const homeTeamData = this.buildTeamData(homeFormation, homePlayers);
     const awayTeamData = this.buildTeamData(awayFormation, awayPlayers);
@@ -847,7 +847,7 @@ export class AIPredictiveAnalyticsService {
    */
   async predictPlayerPerformance(
     player: Player,
-    matchContext: MatchContext
+    matchContext: MatchContext,
   ): Promise<PlayerPerformancePrediction> {
     return this.playerPerformancePredictor.predictPlayerPerformance(player, matchContext);
   }
@@ -865,13 +865,13 @@ export class AIPredictiveAnalyticsService {
   async analyzeTeamPerformance(
     formation: Formation,
     players: Player[],
-    matchContext: MatchContext
+    matchContext: MatchContext,
   ): Promise<TeamPerformanceAnalysis> {
     const teamData = this.buildTeamData(formation, players);
     const chemistryAnalysis = await this.analyzeTeamChemistry(players);
 
     const playerPredictions = await Promise.all(
-      players.map(player => this.predictPlayerPerformance(player, matchContext))
+      players.map(player => this.predictPlayerPerformance(player, matchContext)),
     );
 
     return {
@@ -929,7 +929,7 @@ export class AIPredictiveAnalyticsService {
         positioning: acc.positioning + player.attributes.positioning,
         stamina: acc.stamina + player.attributes.stamina,
       }),
-      { speed: 0, passing: 0, tackling: 0, shooting: 0, dribbling: 0, positioning: 0, stamina: 0 }
+      { speed: 0, passing: 0, tackling: 0, shooting: 0, dribbling: 0, positioning: 0, stamina: 0 },
     );
 
     return {
@@ -986,7 +986,7 @@ export class AIPredictiveAnalyticsService {
   private generateTeamInsights(
     teamData: TeamData,
     chemistry: TeamChemistryAnalysis,
-    playerPredictions: PlayerPerformancePrediction[]
+    playerPredictions: PlayerPerformancePrediction[],
   ): string[] {
     const insights: string[] = [];
 
@@ -1015,7 +1015,7 @@ export class AIPredictiveAnalyticsService {
 
   private generateTeamRecommendations(
     teamData: TeamData,
-    chemistry: TeamChemistryAnalysis
+    chemistry: TeamChemistryAnalysis,
   ): string[] {
     const recommendations: string[] = [];
 

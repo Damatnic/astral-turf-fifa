@@ -177,7 +177,7 @@ class PlayerSpatialIndex {
 
         for (const player of players) {
           const distance = Math.sqrt(
-            Math.pow(player.position.x - x, 2) + Math.pow(player.position.y - y, 2)
+            Math.pow(player.position.x - x, 2) + Math.pow(player.position.y - y, 2),
           );
 
           if (distance <= radius) {
@@ -268,7 +268,7 @@ class HungarianOptimizer {
 
   static optimizeAssignment(
     players: Player[],
-    slots: FormationSlot[]
+    slots: FormationSlot[],
   ): Array<{ playerId: string; slotId: string; score: number }> {
     if (players.length === 0 || slots.length === 0) {
       return [];
@@ -313,7 +313,7 @@ class HungarianOptimizer {
 export function autoAssignPlayersToFormation(
   players: Player[],
   formation: Formation,
-  team: 'home' | 'away'
+  team: 'home' | 'away',
 ): Formation {
   // Performance monitoring
   const startTime = performance.now();
@@ -387,7 +387,7 @@ export function autoAssignPlayersToFormation(
   if (executionTime > 50) {
     // Log slow assignments
     console.warn(
-      `[Performance] Slow formation assignment: ${executionTime.toFixed(2)}ms for ${teamPlayers.length} players`
+      `[Performance] Slow formation assignment: ${executionTime.toFixed(2)}ms for ${teamPlayers.length} players`,
     );
   }
 
@@ -405,7 +405,7 @@ export function smartPlayerSwap(
   targetSlotId: string,
   targetPlayerId: string,
   formation: Formation,
-  players: Player[]
+  players: Player[],
 ): {
   success: boolean;
   newFormation?: Formation;
@@ -504,7 +504,7 @@ export function smartPlayerSwap(
 export function updatePlayerPositionsFromFormation(
   players: Player[],
   formation: Formation,
-  team: 'home' | 'away'
+  team: 'home' | 'away',
 ): Player[] {
   return players.map(player => {
     if (player.team !== team) {
@@ -528,7 +528,7 @@ export function updatePlayerPositionsFromFormation(
  */
 export function getFormationAnalysis(
   formation: Formation,
-  players: Player[]
+  players: Player[],
 ): {
   totalScore: number;
   averageScore: number;

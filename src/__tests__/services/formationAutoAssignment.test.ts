@@ -496,7 +496,7 @@ describe('Formation Auto-Assignment System', () => {
         'cb-1-slot', // Target: defender slot
         'cb-1', // Target player: defender
         mockFormation,
-        mockPlayers
+        mockPlayers,
       );
 
       expect(result.success).toBe(true);
@@ -524,7 +524,7 @@ describe('Formation Auto-Assignment System', () => {
         'cb-2-slot',
         'cb-2',
         mockFormation,
-        playersWithSecondDefender
+        playersWithSecondDefender,
       );
 
       expect(result.success).toBe(true);
@@ -539,7 +539,7 @@ describe('Formation Auto-Assignment System', () => {
         'cb-1-slot', // Target defender slot
         'cb-1', // Current defender
         mockFormation,
-        mockPlayers
+        mockPlayers,
       );
 
       expect(result.success).toBe(true);
@@ -564,7 +564,7 @@ describe('Formation Auto-Assignment System', () => {
         'cb-2-slot', // Empty slot
         '', // No target player
         mockFormation,
-        mockPlayers
+        mockPlayers,
       );
 
       expect(result.success).toBe(false);
@@ -652,7 +652,7 @@ describe('Formation Auto-Assignment System', () => {
 
       // Should have recommendations for injured player
       const injuredPlayerRecommendations = result.recommendations.filter(r =>
-        r.issue.includes('Injured Player')
+        r.issue.includes('Injured Player'),
       );
 
       expect(injuredPlayerRecommendations.length).toBeGreaterThan(0);
@@ -676,7 +676,7 @@ describe('Formation Auto-Assignment System', () => {
       const result = getFormationAnalysis(formationWithEmpty, mockPlayers);
 
       const emptySlotRecommendation = result.recommendations.find(
-        r => r.slotId === 'empty-slot' && r.issue.includes('No player assigned')
+        r => r.slotId === 'empty-slot' && r.issue.includes('No player assigned'),
       );
 
       expect(emptySlotRecommendation).toBeDefined();
@@ -686,7 +686,7 @@ describe('Formation Auto-Assignment System', () => {
       const result = getFormationAnalysis(mockFormation, mockPlayers);
 
       const expectedAverage = Math.round(
-        result.positionScores.reduce((sum, ps) => sum + ps.score, 0) / result.positionScores.length
+        result.positionScores.reduce((sum, ps) => sum + ps.score, 0) / result.positionScores.length,
       );
 
       expect(result.averageScore).toBe(expectedAverage);

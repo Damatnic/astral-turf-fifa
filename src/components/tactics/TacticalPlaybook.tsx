@@ -174,7 +174,7 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
     // Apply search filter
     if (searchTerm) {
       filtered = filtered.filter(formation =>
-        formation.name.toLowerCase().includes(searchTerm.toLowerCase())
+        formation.name.toLowerCase().includes(searchTerm.toLowerCase()),
       );
     }
 

@@ -87,7 +87,7 @@ class LoggingService {
         winston.format.json(),
         winston.format.metadata({
           fillExcept: ['message', 'level', 'timestamp'],
-        })
+        }),
       );
 
       const consoleFormat = winston.format.combine(
@@ -96,7 +96,7 @@ class LoggingService {
         winston.format.printf(({ level, message, timestamp, ...meta }) => {
           const metaStr = Object.keys(meta).length ? JSON.stringify(meta, null, 2) : '';
           return `${timestamp} [${level}]: ${message} ${metaStr}`;
-        })
+        }),
       );
 
       // Main application logger
@@ -305,7 +305,7 @@ class LoggingService {
 
       // Store critical logs in database for long-term storage
       const criticalLogs = logsToFlush.filter(
-        (log: any) => log.level === 'error' || log.securityEventType || log.metadata?.critical
+        (log: any) => log.level === 'error' || log.securityEventType || log.metadata?.critical,
       );
 
       if (criticalLogs.length > 0) {
@@ -421,7 +421,7 @@ class LoggingService {
   logSecurityEvent(
     eventType: SecurityEventType,
     message: string,
-    context: Partial<SecurityLogContext> = {}
+    context: Partial<SecurityLogContext> = {},
   ): void {
     if (!this.initialized) {
       return;
@@ -470,7 +470,7 @@ class LoggingService {
   logPerformanceMetric(
     operation: string,
     duration: number,
-    context: Partial<LogContext> = {}
+    context: Partial<LogContext> = {},
   ): void {
     if (!this.initialized) {
       return;
@@ -502,7 +502,7 @@ class LoggingService {
     url: string,
     statusCode: number,
     duration: number,
-    context: Partial<LogContext> = {}
+    context: Partial<LogContext> = {},
   ): void {
     if (!this.initialized) {
       return;
@@ -538,7 +538,7 @@ class LoggingService {
   async getRecentLogs(
     level?: LogLevel,
     limit: number = 100,
-    offset: number = 0
+    offset: number = 0,
   ): Promise<unknown[]> {
     try {
       // Try Redis first for recent logs
@@ -582,7 +582,7 @@ class LoggingService {
   async getSecurityEvents(
     eventType?: SecurityEventType,
     severity?: 'low' | 'medium' | 'high' | 'critical',
-    limit: number = 50
+    limit: number = 50,
   ): Promise<unknown[]> {
     try {
       const db = databaseService.getClient();
@@ -634,8 +634,8 @@ class LoggingService {
               } catch (error) {
                 reject(error);
               }
-            })
-        )
+            }),
+        ),
       );
 
       this.initialized = false;
@@ -694,7 +694,7 @@ export const log = {
   security: (
     eventType: SecurityEventType,
     message: string,
-    context?: Partial<SecurityLogContext>
+    context?: Partial<SecurityLogContext>,
   ) => loggingService.logSecurityEvent(eventType, message, context),
   audit: (message: string, context: LogContext) => loggingService.logAuditEvent(message, context),
   performance: (operation: string, duration: number, context?: Partial<LogContext>) =>
@@ -704,7 +704,7 @@ export const log = {
     url: string,
     statusCode: number,
     duration: number,
-    context?: Partial<LogContext>
+    context?: Partial<LogContext>,
   ) => loggingService.logHttpRequest(method, url, statusCode, duration, context),
 };
 

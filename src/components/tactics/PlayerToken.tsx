@@ -2,6 +2,9 @@ import React, { useRef, memo, useState, useCallback, useEffect, useMemo } from '
 import * as FramerMotion from 'framer-motion';
 
 const motion = (FramerMotion as typeof import('framer-motion')).motion;
+const useAnimationControls = 'useAnimationControls' in FramerMotion
+  ? (FramerMotion as typeof import('framer-motion')).useAnimationControls
+  : undefined;
 const RawAnimatePresence = 'AnimatePresence' in FramerMotion
   ? (FramerMotion as typeof import('framer-motion')).AnimatePresence
   : undefined;
@@ -335,7 +338,7 @@ const PlayerToken: React.FC<PlayerTokenProps> = memo(
     [],
   );
 
-    const controls = useMemo(
+    const controls = useAnimationControls ? useAnimationControls() : useMemo(
       () => ({
         start: async (_animation: unknown) => {},
       }),
@@ -465,11 +468,14 @@ const PlayerToken: React.FC<PlayerTokenProps> = memo(
      * Enhanced drag start with animations
      */
     const handleDragStart = useCallback(
-      (event: React.DragEvent<HTMLDivElement>) => {
+      (event: React.DragEvent<HTMLButtonElement>) => {
         if (!isDraggable) {
           event.preventDefault();
           return;
         }
+
+        // Allow click events to work by adding slight delay
+        event.stopPropagation();
 
         const dataTransfer = event.dataTransfer;
         if (dataTransfer) {
@@ -538,7 +544,7 @@ const PlayerToken: React.FC<PlayerTokenProps> = memo(
      * Enhanced drag end with smooth return animation
      */
     const handleDragEnd = useCallback(
-      (event: React.DragEvent<HTMLDivElement>) => {
+      (event: React.DragEvent<HTMLButtonElement>) => {
         if (!performanceMode) {
           controls.start({
             scale: 1,
@@ -582,10 +588,58 @@ const PlayerToken: React.FC<PlayerTokenProps> = memo(
     /**
      * Enhanced player selection with animation feedback
      */
-    const handleSelect = useCallback(
-      (event: React.MouseEvent) => {
+    // Track mouse interactions for proper click/drag handling
+    const [isMouseDown, setIsMouseDown] = useState(false);
+    const [dragTimer, setDragTimer] = useState<NodeJS.Timeout | null>(null);
+
+    const handleMouseDown = useCallback((event: React.MouseEvent) => {
+      setIsMouseDown(true);
+
+      // Clear any existing timer
+      if (dragTimer) {
+        clearTimeout(dragTimer);
+        setDragTimer(null);
+      }
+
+      // Set a timer to distinguish between click and drag
+      const timer = setTimeout(() => {
+        setIsMouseDown(false);
+      }, 200); // 200ms threshold
+
+      setDragTimer(timer);
+    }, [dragTimer]);
+
+    const handleMouseUp = useCallback((event: React.MouseEvent) => {
+      if (isMouseDown && dragTimer) {
+        // This was a quick click, not a drag
+        clearTimeout(dragTimer);
+        setDragTimer(null);
+        setIsMouseDown(false);
+
+        event.preventDefault();
         event.stopPropagation();
         triggerSelection();
+      }
+    }, [isMouseDown, dragTimer, triggerSelection]);
+
+    // Cleanup timer on unmount
+    useEffect(() => {
+      return () => {
+        if (dragTimer) {
+          clearTimeout(dragTimer);
+        }
+      };
+    }, [dragTimer]);
+
+    const handleSelect = useCallback(
+      (event: React.MouseEvent) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        // Ensure click works even with draggable
+        if (event.detail === 1) { // Single click only
+          triggerSelection();
+        }
       },
       [triggerSelection],
     );
@@ -743,9 +797,7 @@ const PlayerToken: React.FC<PlayerTokenProps> = memo(
                   transition: { type: 'spring', stiffness: 600, damping: 25 },
                 }
           }
-          draggable={isDraggable}
-          onDragStartCapture={handleDragStart}
-          onDragEndCapture={handleDragEnd}
+          draggable={false}
           className={`
             absolute select-none group rounded-full border-2 transition-colors duration-150 ease-out
             ${isDraggable ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'}
@@ -775,7 +827,12 @@ const PlayerToken: React.FC<PlayerTokenProps> = memo(
             aria-describedby={isTooltipVisible ? tooltipId : undefined}
             tabIndex={0}
             type="button"
+            draggable={isDraggable}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
             onClick={handleSelect}
+            onMouseDown={handleMouseDown}
+            onMouseUp={handleMouseUp}
             onContextMenu={handleContextMenu}
             onDoubleClick={handleDoubleClick}
             onKeyDown={handleKeyDown}

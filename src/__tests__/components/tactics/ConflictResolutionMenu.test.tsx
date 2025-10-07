@@ -28,14 +28,14 @@ vi.mock('framer-motion', () => ({
         <div ref={ref} onClick={onClick} className={className} style={style} {...props}>
           {children}
         </div>
-      )
+      ),
     ),
     button: React.forwardRef<HTMLButtonElement, any>(
       ({ children, onClick, className, ...props }, ref) => (
         <button ref={ref} onClick={onClick} className={className} {...props}>
           {children}
         </button>
-      )
+      ),
     ),
   },
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
@@ -203,7 +203,7 @@ describe('ConflictResolutionMenu Integration Tests', () => {
 
       expect(screen.getByText('Position Conflict')).toBeInTheDocument();
       expect(
-        screen.getByText(/Mohamed Salah wants to move to Sadio Mané's position/)
+        screen.getByText(/Mohamed Salah wants to move to Sadio Mané's position/),
       ).toBeInTheDocument();
     });
 
@@ -236,7 +236,7 @@ describe('ConflictResolutionMenu Integration Tests', () => {
       const { container } = render(<ConflictResolutionMenu {...defaultProps} />);
 
       const playerAvatars = container.querySelectorAll(
-        'div[style*="background-color: rgb(255, 0, 0)"]'
+        'div[style*="background-color: rgb(255, 0, 0)"]',
       );
       expect(playerAvatars).toHaveLength(2); // Both players should have red background
     });
@@ -360,7 +360,7 @@ describe('ConflictResolutionMenu Integration Tests', () => {
 
       // Position near edge
       const { container } = render(
-        <ConflictResolutionMenu {...defaultProps} position={{ x: 700, y: 500 }} />
+        <ConflictResolutionMenu {...defaultProps} position={{ x: 700, y: 500 }} />,
       );
 
       await waitFor(() => {
@@ -375,7 +375,7 @@ describe('ConflictResolutionMenu Integration Tests', () => {
 
     it('should handle negative position values', async () => {
       const { container } = render(
-        <ConflictResolutionMenu {...defaultProps} position={{ x: -50, y: -50 }} />
+        <ConflictResolutionMenu {...defaultProps} position={{ x: -50, y: -50 }} />,
       );
 
       await waitFor(() => {
@@ -386,7 +386,7 @@ describe('ConflictResolutionMenu Integration Tests', () => {
 
     it('should reposition when position prop changes', async () => {
       const { rerender } = render(
-        <ConflictResolutionMenu {...defaultProps} position={{ x: 100, y: 100 }} />
+        <ConflictResolutionMenu {...defaultProps} position={{ x: 100, y: 100 }} />,
       );
 
       // Change position
@@ -407,7 +407,7 @@ describe('ConflictResolutionMenu Integration Tests', () => {
 
       // Trigger resize handling by changing position
       const { rerender } = render(
-        <ConflictResolutionMenu {...defaultProps} position={{ x: 350, y: 250 }} />
+        <ConflictResolutionMenu {...defaultProps} position={{ x: 350, y: 250 }} />,
       );
 
       await waitFor(() => {
@@ -463,7 +463,7 @@ describe('ConflictResolutionMenu Integration Tests', () => {
   describe('Alternative Slots Handling', () => {
     it('should dynamically show alternative option based on available slots', () => {
       const { rerender } = render(
-        <ConflictResolutionMenu {...defaultProps} alternativeSlots={[]} />
+        <ConflictResolutionMenu {...defaultProps} alternativeSlots={[]} />,
       );
 
       expect(screen.queryByText('Find Alternative')).not.toBeInTheDocument();
@@ -507,7 +507,7 @@ describe('ConflictResolutionMenu Integration Tests', () => {
       const playerWithInvalidColor = { ...mockSourcePlayer, teamColor: '' };
 
       const { container } = render(
-        <ConflictResolutionMenu {...defaultProps} sourcePlayer={playerWithInvalidColor} />
+        <ConflictResolutionMenu {...defaultProps} sourcePlayer={playerWithInvalidColor} />,
       );
 
       const avatar = container.querySelector('div[style*="background-color: "]');
@@ -524,7 +524,7 @@ describe('ConflictResolutionMenu Integration Tests', () => {
       const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       render(
-        <ConflictResolutionMenu {...defaultProps} onResolve={null as any} onClose={null as any} />
+        <ConflictResolutionMenu {...defaultProps} onResolve={null as any} onClose={null as any} />,
       );
 
       expect(screen.getByText('Position Conflict')).toBeInTheDocument();
@@ -585,7 +585,7 @@ describe('ConflictResolutionMenu Integration Tests', () => {
       // User sees conflict
       expect(screen.getByText('Position Conflict')).toBeInTheDocument();
       expect(
-        screen.getByText(/Mohamed Salah wants to move to Sadio Mané's position/)
+        screen.getByText(/Mohamed Salah wants to move to Sadio Mané's position/),
       ).toBeInTheDocument();
 
       // User selects swap option
@@ -624,7 +624,7 @@ describe('ConflictResolutionMenu Integration Tests', () => {
       const onCloseHandler = vi.fn();
 
       const { container } = render(
-        <ConflictResolutionMenu {...defaultProps} onClose={onCloseHandler} />
+        <ConflictResolutionMenu {...defaultProps} onClose={onCloseHandler} />,
       );
 
       // User clicks outside menu

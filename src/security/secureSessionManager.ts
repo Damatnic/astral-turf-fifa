@@ -168,7 +168,7 @@ export class GuardianSecureSessionManager {
       // Step 3: Device fingerprint analysis
       const deviceAnalysis = await this.analyzeDeviceFingerprint(
         request.deviceFingerprint,
-        request.email
+        request.email,
       );
 
       if (!deviceAnalysis.trusted) {
@@ -242,7 +242,7 @@ export class GuardianSecureSessionManager {
         request,
         securityLevel,
         riskScore,
-        securityFlags
+        securityFlags,
       );
 
       // Step 11: Generate tokens
@@ -403,7 +403,7 @@ export class GuardianSecureSessionManager {
    */
   async terminateAllUserSessions(userId: string): Promise<void> {
     const userSessions = Array.from(this.sessions.values()).filter(
-      session => session.userId === userId
+      session => session.userId === userId,
     );
 
     for (const session of userSessions) {
@@ -436,7 +436,7 @@ export class GuardianSecureSessionManager {
     request: AuthenticationRequest,
     securityLevel: SessionSecurityLevel,
     riskScore: number,
-    flags: SessionFlag[]
+    flags: SessionFlag[],
   ): Promise<SecureSession> {
     const sessionId = generateSecureToken(32);
     const now = new Date();
@@ -500,7 +500,7 @@ export class GuardianSecureSessionManager {
 
     const refreshToken = encryptData(
       JSON.stringify(refreshTokenPayload),
-      DataClassification.RESTRICTED
+      DataClassification.RESTRICTED,
     );
 
     return {
@@ -534,7 +534,7 @@ export class GuardianSecureSessionManager {
   private calculateRiskScore(
     request: AuthenticationRequest,
     flags: SessionFlag[],
-    user: any
+    user: any,
   ): number {
     let score = 0;
 
@@ -573,7 +573,7 @@ export class GuardianSecureSessionManager {
    */
   private async analyzeDeviceFingerprint(
     fingerprint: string,
-    email: string
+    email: string,
   ): Promise<{ trusted: boolean; isNew: boolean }> {
     const existing = this.deviceFingerprints.get(fingerprint);
 
@@ -592,7 +592,7 @@ export class GuardianSecureSessionManager {
    */
   private async analyzeGeolocation(
     location: GeoLocation | undefined,
-    email: string
+    email: string,
   ): Promise<{ suspicious: boolean; reason?: string }> {
     if (!location) {
       return { suspicious: false };
@@ -627,7 +627,7 @@ export class GuardianSecureSessionManager {
   private shouldRequireMFA(
     user: any,
     flags: SessionFlag[],
-    request: AuthenticationRequest
+    request: AuthenticationRequest,
   ): boolean {
     // Require MFA for suspicious activities or high-privilege users
     return (
@@ -660,7 +660,7 @@ export class GuardianSecureSessionManager {
   private async updateDeviceFingerprint(
     fingerprint: string,
     userId: string,
-    request: AuthenticationRequest
+    request: AuthenticationRequest,
   ): Promise<void> {
     const existing = this.deviceFingerprints.get(fingerprint);
 

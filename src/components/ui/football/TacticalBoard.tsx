@@ -71,7 +71,7 @@ export const TacticalBoard = forwardRef<HTMLDivElement, TacticalBoardProps>(
       readonly = false,
       ...props
     },
-    ref
+    ref,
   ) => {
     const boardRef = useRef<HTMLDivElement>(null);
     const [draggedPlayer, setDraggedPlayer] = useState<string | null>(null);
@@ -102,7 +102,7 @@ export const TacticalBoard = forwardRef<HTMLDivElement, TacticalBoardProps>(
           y: e.clientY - playerRect.top - playerRect.height / 2,
         });
       },
-      [readonly, mode]
+      [readonly, mode],
     );
 
     // Handle mouse move during drag
@@ -122,7 +122,7 @@ export const TacticalBoard = forwardRef<HTMLDivElement, TacticalBoardProps>(
 
         setMousePosition({ x: constrainedX, y: constrainedY });
       },
-      [draggedPlayer, dragOffset]
+      [draggedPlayer, dragOffset],
     );
 
     // Handle drag end
@@ -160,7 +160,7 @@ export const TacticalBoard = forwardRef<HTMLDivElement, TacticalBoardProps>(
           onPlayerSelect?.(playerId);
         }
       },
-      [mode, readonly, isCreatingLine, lineStart, onLineCreate, onPlayerSelect]
+      [mode, readonly, isCreatingLine, lineStart, onLineCreate, onPlayerSelect],
     );
 
     // Setup mouse event listeners
@@ -303,7 +303,7 @@ export const TacticalBoard = forwardRef<HTMLDivElement, TacticalBoardProps>(
             y2={FIELD_HEIGHT}
             stroke="rgba(255, 255, 255, 0.1)"
             strokeWidth="1"
-          />
+          />,
         );
       }
 
@@ -317,7 +317,7 @@ export const TacticalBoard = forwardRef<HTMLDivElement, TacticalBoardProps>(
             y2={i}
             stroke="rgba(255, 255, 255, 0.1)"
             strokeWidth="1"
-          />
+          />,
         );
       }
 
@@ -433,7 +433,7 @@ export const TacticalBoard = forwardRef<HTMLDivElement, TacticalBoardProps>(
           'relative bg-gradient-to-b from-green-600 to-green-700 rounded-lg overflow-hidden',
           'border-2 border-white/20 shadow-2xl',
           !readonly && 'cursor-crosshair',
-          className
+          className,
         )}
         style={{
           aspectRatio: FIELD_RATIO,
@@ -485,7 +485,7 @@ export const TacticalBoard = forwardRef<HTMLDivElement, TacticalBoardProps>(
               className={cn(
                 'absolute transform -translate-x-1/2 -translate-y-1/2',
                 isDragging && 'z-50 scale-110 shadow-2xl',
-                player.isSelected && 'ring-2 ring-primary-400 ring-offset-2 ring-offset-transparent'
+                player.isSelected && 'ring-2 ring-primary-400 ring-offset-2 ring-offset-transparent',
               )}
               style={{
                 left: `${position.x}%`,
@@ -519,7 +519,7 @@ export const TacticalBoard = forwardRef<HTMLDivElement, TacticalBoardProps>(
         )}
       </div>
     );
-  }
+  },
 );
 
 TacticalBoard.displayName = 'TacticalBoard';
@@ -589,7 +589,7 @@ const PlayerToken: React.FC<PlayerTokenProps> = ({
         'relative group animate-fade-in-scale',
         !readonly && 'cursor-grab active:cursor-grabbing',
         isDragging && 'cursor-grabbing',
-        className
+        className,
       )}
       {...props}
     >
@@ -603,7 +603,7 @@ const PlayerToken: React.FC<PlayerTokenProps> = ({
           colors.border,
           colors.text,
           player.isSelected && 'scale-110',
-          isDragging && 'scale-125 shadow-2xl'
+          isDragging && 'scale-125 shadow-2xl',
         )}
       >
         {/* Captain indicator */}
@@ -621,7 +621,7 @@ const PlayerToken: React.FC<PlayerTokenProps> = ({
           <div
             className={cn(
               'absolute -bottom-1 -right-1 w-3 h-3 rounded-full border border-white',
-              availabilityIndicator[player.availability]
+              availabilityIndicator[player.availability],
             )}
           />
         )}
@@ -635,7 +635,7 @@ const PlayerToken: React.FC<PlayerTokenProps> = ({
             'bg-black/60 backdrop-blur-sm rounded px-2 py-1',
             'opacity-0 group-hover:opacity-100 transition-opacity duration-200',
             'whitespace-nowrap text-xs font-medium text-white',
-            'pointer-events-none z-10'
+            'pointer-events-none z-10',
           )}
         >
           {player.name}

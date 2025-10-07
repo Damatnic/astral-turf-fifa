@@ -358,7 +358,7 @@ export function sanitizePlayerData(playerData: unknown): unknown {
       (message: Record<string, any>) => ({
         ...message,
         text: typeof message.text === 'string' ? sanitizeHtml(message.text, 'basic') : message.text,
-      })
+      }),
     );
   }
 

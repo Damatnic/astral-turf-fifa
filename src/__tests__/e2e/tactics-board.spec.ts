@@ -38,7 +38,7 @@ test.describe('Tactics Board E2E Tests', () => {
     // Look for formation controls
     const formationSelector = page
       .locator(
-        '[data-testid*="formation"], select:has(option[value*="4-4-2"]), button:has-text("4-4-2")'
+        '[data-testid*="formation"], select:has(option[value*="4-4-2"]), button:has-text("4-4-2")',
       )
       .first();
 
@@ -64,7 +64,7 @@ test.describe('Tactics Board E2E Tests', () => {
 
     // Look for player elements on the field
     const playerElements = page.locator(
-      '[data-testid*="player"], .player-token, .player, [class*="player"]'
+      '[data-testid*="player"], .player-token, .player, [class*="player"]',
     );
 
     const playerCount = await playerElements.count();
@@ -107,7 +107,7 @@ test.describe('Tactics Board E2E Tests', () => {
 
       // Look for drawing tools
       const drawingTools = page.locator(
-        'button:has-text("Draw"), button:has-text("Line"), [data-testid*="tool"]'
+        'button:has-text("Draw"), button:has-text("Line"), [data-testid*="tool"]',
       );
 
       const toolCount = await drawingTools.count();
@@ -156,7 +156,7 @@ test.describe('Tactics Board E2E Tests', () => {
     // Look for team selection controls
     const teamSelector = page
       .locator(
-        '[data-testid*="team"], button:has-text("Home"), button:has-text("Away"), .team-toggle'
+        '[data-testid*="team"], button:has-text("Home"), button:has-text("Away"), .team-toggle',
       )
       .first();
 
@@ -210,7 +210,7 @@ test.describe('Tactics Board E2E Tests', () => {
   test('should handle modal interactions', async ({ page }) => {
     // Look for buttons that might open modals
     const modalButtons = page.locator(
-      'button:has-text("Edit"), button:has-text("Settings"), button:has-text("Chat")'
+      'button:has-text("Edit"), button:has-text("Settings"), button:has-text("Chat")',
     );
 
     const buttonCount = await modalButtons.count();

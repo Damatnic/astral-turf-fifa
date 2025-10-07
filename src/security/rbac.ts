@@ -570,12 +570,12 @@ export function hasPermission(
   userRole: UserRole,
   permission: Permission,
   resource: Resource,
-  context?: PermissionContext
+  context?: PermissionContext,
 ): PermissionResult {
   try {
     const rolePermissions = ROLE_PERMISSIONS[userRole];
     const matchingRule = rolePermissions.find(
-      rule => rule.permission === permission && rule.resource === resource
+      rule => rule.permission === permission && rule.resource === resource,
     );
 
     if (!matchingRule) {
@@ -712,10 +712,10 @@ export function getRolePermissions(userRole: UserRole): PermissionRule[] {
 export function hasAnyPermission(
   userRole: UserRole,
   permissions: Array<{ permission: Permission; resource: Resource }>,
-  context?: PermissionContext
+  context?: PermissionContext,
 ): boolean {
   return permissions.some(
-    ({ permission, resource }) => hasPermission(userRole, permission, resource, context).granted
+    ({ permission, resource }) => hasPermission(userRole, permission, resource, context).granted,
   );
 }
 
@@ -723,7 +723,7 @@ export function hasAnyPermission(
 export function canAccessResource(
   userRole: UserRole,
   resource: Resource,
-  context?: PermissionContext
+  context?: PermissionContext,
 ): PermissionResult {
   // Find any permission rule for this resource
   const rolePermissions = ROLE_PERMISSIONS[userRole];
@@ -775,7 +775,7 @@ export function canAccessPlayerData(
   userRole: UserRole,
   userId: string,
   targetPlayerId: string,
-  permission: Permission = Permission.VIEW_PLAYERS
+  permission: Permission = Permission.VIEW_PLAYERS,
 ): boolean {
   const context: PermissionContext = {
     userId,

@@ -42,7 +42,7 @@ export const authReducer = (draft: AuthState, action: Action): AuthState | void 
       break;
     case 'UPDATE_FAMILY_ASSOCIATION':
       const index = draft.familyAssociations.findIndex(
-        assoc => assoc.id === (action.payload as any).id
+        assoc => assoc.id === (action.payload as any).id,
       );
       if (index !== -1) {
         draft.familyAssociations[index] = action.payload as any;
@@ -50,7 +50,7 @@ export const authReducer = (draft: AuthState, action: Action): AuthState | void 
       break;
     case 'REMOVE_FAMILY_ASSOCIATION':
       draft.familyAssociations = draft.familyAssociations.filter(
-        assoc => assoc.id !== action.payload
+        assoc => assoc.id !== action.payload,
       );
       break;
     case 'LOAD_FAMILY_ASSOCIATIONS':

@@ -51,7 +51,7 @@ export const KeyboardShortcutsPanel: React.FC<KeyboardShortcutsPanelProps> = ({
       shortcut =>
         shortcut.description.toLowerCase().includes(query) ||
         shortcut.key.toLowerCase().includes(query) ||
-        formatShortcut(shortcut).toLowerCase().includes(query)
+        formatShortcut(shortcut).toLowerCase().includes(query),
     );
   }, [searchQuery]);
 

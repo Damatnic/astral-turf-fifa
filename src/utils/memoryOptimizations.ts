@@ -108,7 +108,7 @@ const dispatchMemoryEvent = (type: string, detail: MemoryEventDetail) => {
 const emitMemoryEvent = (
   severity: MemoryEventSeverity,
   message: string,
-  context: Record<string, unknown> = {}
+  context: Record<string, unknown> = {},
 ) => {
   dispatchMemoryEvent(`catalyst:memory-${severity}`, {
     message,
@@ -438,7 +438,7 @@ export class MemoryMonitor {
     perf?.measure?.(
       'memory-gentle-cleanup',
       'memory-gentle-cleanup-start',
-      'memory-gentle-cleanup-end'
+      'memory-gentle-cleanup-end',
     );
   }
 
@@ -469,7 +469,7 @@ export class MemoryMonitor {
     perf?.measure?.(
       'memory-aggressive-cleanup',
       'memory-aggressive-cleanup-start',
-      'memory-aggressive-cleanup-end'
+      'memory-aggressive-cleanup-end',
     );
   }
 
@@ -510,7 +510,7 @@ export class MemoryMonitor {
     perf?.measure?.(
       'memory-emergency-cleanup',
       'memory-emergency-cleanup-start',
-      'memory-emergency-cleanup-end'
+      'memory-emergency-cleanup-end',
     );
   }
 
@@ -998,7 +998,7 @@ export function useObjectPool<T>(factory: () => T, reset: (obj: T) => void, maxS
 }
 
 export function useMemoryPressureResponder(
-  handlers: Partial<Record<MemoryPressureLevel, () => void>>
+  handlers: Partial<Record<MemoryPressureLevel, () => void>>,
 ) {
   const handlersRef = useRef(handlers);
 

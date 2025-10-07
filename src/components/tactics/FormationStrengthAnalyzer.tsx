@@ -93,8 +93,8 @@ const FormationStrengthAnalyzer: React.FC<FormationStrengthAnalyzerProps> = ({
     }
 
     // Calculate metrics
-    const assignedPlayers = players.filter(p => 
-      formation.slots.some(s => s.playerId === p.id)
+    const assignedPlayers = players.filter(p =>
+      formation.slots.some(s => s.playerId === p.id),
     );
 
     const avgAttributes = assignedPlayers.reduce((acc, player) => {
@@ -123,7 +123,7 @@ const FormationStrengthAnalyzer: React.FC<FormationStrengthAnalyzerProps> = ({
        balance * 0.2 +
        chemistry * 0.15 +
        coverageScore * 0.15) *
-      (errors.filter(e => e.severity === 'error').length === 0 ? 1 : 0.5)
+      (errors.filter(e => e.severity === 'error').length === 0 ? 1 : 0.5),
     );
 
     return {
@@ -164,7 +164,7 @@ const FormationStrengthAnalyzer: React.FC<FormationStrengthAnalyzerProps> = ({
     const variance = Math.abs(zones.defensive - idealCoverage) +
                     Math.abs(zones.midfield - idealCoverage) +
                     Math.abs(zones.attacking - idealCoverage);
-    
+
     return Math.max(0, 100 - (variance * 5));
   };
 

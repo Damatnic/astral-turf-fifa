@@ -78,7 +78,7 @@ const SettingsPage: React.FC = () => {
                         </div>
                       </div>
                     </button>
-                  )
+                  ),
                 )}
               </ResponsiveGrid>
             </div>

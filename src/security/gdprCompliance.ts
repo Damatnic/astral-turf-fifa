@@ -295,7 +295,7 @@ class GDPRComplianceService {
    * Register personal data collection
    */
   registerPersonalData(
-    data: Omit<PersonalDataItem, 'id' | 'collectedAt' | 'lastModified'>
+    data: Omit<PersonalDataItem, 'id' | 'collectedAt' | 'lastModified'>,
   ): string {
     const id = this.generateId('pd');
     const personalDataItem: PersonalDataItem = {
@@ -378,7 +378,7 @@ class GDPRComplianceService {
    * Submit data subject request
    */
   submitDataSubjectRequest(
-    request: Omit<DataSubjectRequest, 'id' | 'submittedAt' | 'status'>
+    request: Omit<DataSubjectRequest, 'id' | 'submittedAt' | 'status'>,
   ): string {
     const dsrRequest: DataSubjectRequest = {
       ...request,
@@ -577,7 +577,7 @@ class GDPRComplianceService {
    */
   private async handlePortabilityRequest(request: DataSubjectRequest): Promise<DSRResponse> {
     const personalData = this.getPersonalDataBySubject(request.dataSubjectId).filter(
-      item => item.legalBasis === LegalBasis.CONSENT || item.legalBasis === LegalBasis.CONTRACT
+      item => item.legalBasis === LegalBasis.CONSENT || item.legalBasis === LegalBasis.CONTRACT,
     );
 
     if (personalData.length === 0) {
@@ -649,7 +649,7 @@ class GDPRComplianceService {
   generateComplianceReport(startDate: string, endDate: string): GDPRComplianceReport {
     const period = { startDate, endDate };
     const personalDataItems = Array.from(this.personalDataRegistry.values()).filter(
-      item => item.collectedAt >= startDate && item.collectedAt <= endDate
+      item => item.collectedAt >= startDate && item.collectedAt <= endDate,
     );
 
     const allConsents = Array.from(this.consentRecords.values())
@@ -657,11 +657,11 @@ class GDPRComplianceService {
       .filter(consent => consent.givenAt >= startDate && consent.givenAt <= endDate);
 
     const dsrRequestsInPeriod = Array.from(this.dsrRequests.values()).filter(
-      request => request.submittedAt >= startDate && request.submittedAt <= endDate
+      request => request.submittedAt >= startDate && request.submittedAt <= endDate,
     );
 
     const dataBreachesInPeriod = Array.from(this.dataBreaches.values()).filter(
-      breach => breach.discoveredAt >= startDate && breach.discoveredAt <= endDate
+      breach => breach.discoveredAt >= startDate && breach.discoveredAt <= endDate,
     );
 
     const report: GDPRComplianceReport = {
@@ -703,13 +703,13 @@ class GDPRComplianceService {
       },
       riskAssessment: {
         highRiskProcessing: Array.from(this.processingActivities.values()).filter(
-          activity => activity.riskAssessment.riskLevel === 'high'
+          activity => activity.riskAssessment.riskLevel === 'high',
         ).length,
         dpiaRequired: Array.from(this.processingActivities.values()).filter(
-          activity => activity.riskAssessment.dpiaRequired
+          activity => activity.riskAssessment.dpiaRequired,
         ).length,
         dpiaCompleted: Array.from(this.processingActivities.values()).filter(
-          activity => activity.riskAssessment.dpiaCompletedAt
+          activity => activity.riskAssessment.dpiaCompletedAt,
         ).length,
         overdueDPIAs: this.calculateOverdueDPIAs(),
       },
@@ -752,7 +752,7 @@ class GDPRComplianceService {
       try {
         const collectedDate = new Date(item.collectedAt);
         const retentionEndDate = new Date(
-          collectedDate.getTime() + item.retentionPeriod * 24 * 60 * 60 * 1000
+          collectedDate.getTime() + item.retentionPeriod * 24 * 60 * 60 * 1000,
         );
 
         if (now > retentionEndDate) {
@@ -852,14 +852,14 @@ class GDPRComplianceService {
   private handleConsentWithdrawal(
     dataSubjectId: string,
     consent: ConsentRecord,
-    reason?: string
+    reason?: string,
   ): void {
     // Find and handle data that was processed based on this consent
     const affectedData = Array.from(this.personalDataRegistry.values()).filter(
       item =>
         item.dataSubjectId === dataSubjectId &&
         item.legalBasis === LegalBasis.CONSENT &&
-        item.consentRecord?.id === consent.id
+        item.consentRecord?.id === consent.id,
     );
 
     for (const item of affectedData) {
@@ -890,7 +890,7 @@ class GDPRComplianceService {
 
   private getPersonalDataBySubject(dataSubjectId: string): PersonalDataItem[] {
     return Array.from(this.personalDataRegistry.values()).filter(
-      item => item.dataSubjectId === dataSubjectId
+      item => item.dataSubjectId === dataSubjectId,
     );
   }
 
@@ -953,7 +953,7 @@ class GDPRComplianceService {
     // Find all third-party sharing for this data subject
     const personalData = this.getPersonalDataBySubject(dataSubjectId);
     const thirdParties = new Set(
-      personalData.flatMap(item => item.thirdPartySharing).map(sharing => sharing.recipientName)
+      personalData.flatMap(item => item.thirdPartySharing).map(sharing => sharing.recipientName),
     );
 
     for (const thirdParty of thirdParties) {
@@ -1028,7 +1028,7 @@ class GDPRComplianceService {
     score -= Math.min(overdueDPIAs * 5, 20);
 
     const pendingDSRs = Array.from(this.dsrRequests.values()).filter(
-      request => request.status === DSRStatus.IN_PROGRESS
+      request => request.status === DSRStatus.IN_PROGRESS,
     );
     score -= Math.min(pendingDSRs.length * 2, 10);
 
@@ -1041,7 +1041,7 @@ class GDPRComplianceService {
       activity =>
         activity.riskAssessment.dpiaRequired &&
         !activity.riskAssessment.dpiaCompletedAt &&
-        new Date(activity.nextReview) < now
+        new Date(activity.nextReview) < now,
     ).length;
   }
 
@@ -1088,7 +1088,7 @@ class GDPRComplianceService {
     const complianceScore = this.calculateComplianceScore();
     if (complianceScore < 80) {
       recommendations.push(
-        'Overall compliance score is below target - review and address identified gaps'
+        'Overall compliance score is below target - review and address identified gaps',
       );
     }
 
@@ -1098,11 +1098,11 @@ class GDPRComplianceService {
     }
 
     const pendingDSRs = Array.from(this.dsrRequests.values()).filter(
-      request => request.status === DSRStatus.IN_PROGRESS
+      request => request.status === DSRStatus.IN_PROGRESS,
     );
     if (pendingDSRs.length > 0) {
       recommendations.push(
-        `Process ${pendingDSRs.length} pending data subject requests within legal timeframes`
+        `Process ${pendingDSRs.length} pending data subject requests within legal timeframes`,
       );
     }
 
@@ -1136,7 +1136,7 @@ class GDPRComplianceService {
 
   private groupByField<T extends Record<string, any>>(
     items: T[],
-    field: keyof T
+    field: keyof T,
   ): Record<string, number> {
     return items.reduce(
       (acc, item) => {
@@ -1144,7 +1144,7 @@ class GDPRComplianceService {
         acc[value] = (acc[value] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<string, number>,
     );
   }
 
@@ -1155,7 +1155,7 @@ class GDPRComplianceService {
         acc[key] = (acc[key] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<string, number>,
     );
   }
 
@@ -1242,7 +1242,7 @@ export const gdprCompliance = new GDPRComplianceService({
 
 // Export convenience functions
 export const registerPersonalData = (
-  data: Omit<PersonalDataItem, 'id' | 'collectedAt' | 'lastModified'>
+  data: Omit<PersonalDataItem, 'id' | 'collectedAt' | 'lastModified'>,
 ) => gdprCompliance.registerPersonalData(data);
 
 export const recordConsent = (consent: Omit<ConsentRecord, 'id' | 'givenAt'>) =>
@@ -1252,7 +1252,7 @@ export const withdrawConsent = (dataSubjectId: string, consentId: string, reason
   gdprCompliance.withdrawConsent(dataSubjectId, consentId, reason);
 
 export const submitDataSubjectRequest = (
-  request: Omit<DataSubjectRequest, 'id' | 'submittedAt' | 'status'>
+  request: Omit<DataSubjectRequest, 'id' | 'submittedAt' | 'status'>,
 ) => gdprCompliance.submitDataSubjectRequest(request);
 
 export const reportDataBreach = (breach: Omit<DataBreachIncident, 'id' | 'discoveredAt'>) =>

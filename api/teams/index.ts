@@ -76,7 +76,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           // In demo mode, log but don't fail
           console.log(
             'JWT verification failed, allowing demo access:',
-            (jwtError as Error).message
+            (jwtError as Error).message,
           );
         }
       } else {

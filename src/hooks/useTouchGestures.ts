@@ -54,7 +54,7 @@ const defaultConfig: GestureConfig = {
  */
 export const useSwipeGesture = (
   onSwipe: (gesture: SwipeGesture) => void,
-  config: Partial<GestureConfig> = {}
+  config: Partial<GestureConfig> = {},
 ) => {
   const mergedConfig = { ...defaultConfig, ...config };
   const touchStart = useRef<TouchPoint | null>(null);
@@ -140,7 +140,7 @@ export const useSwipeGesture = (
       touchEnd.current = null;
       isSwiping.current = false;
     },
-    [onSwipe, mergedConfig]
+    [onSwipe, mergedConfig],
   );
 
   return {
@@ -155,7 +155,7 @@ export const useSwipeGesture = (
  */
 export const usePinchGesture = (
   onPinch: (gesture: PinchGesture) => void,
-  config: Partial<GestureConfig> = {}
+  config: Partial<GestureConfig> = {},
 ) => {
   const mergedConfig = { ...defaultConfig, ...config };
   const initialDistance = useRef<number | null>(null);
@@ -201,7 +201,7 @@ export const usePinchGesture = (
         }
       }
     },
-    [onPinch, mergedConfig]
+    [onPinch, mergedConfig],
   );
 
   const handleTouchEnd = useCallback((event: React.TouchEvent) => {
@@ -227,7 +227,7 @@ export const useTapGesture = (
     onDoubleTap?: (gesture: TapGesture) => void;
     onLongPress?: (gesture: TapGesture) => void;
   },
-  config: Partial<GestureConfig> = {}
+  config: Partial<GestureConfig> = {},
 ) => {
   const mergedConfig = { ...defaultConfig, ...config };
   const tapStart = useRef<TouchPoint | null>(null);
@@ -263,7 +263,7 @@ export const useTapGesture = (
         }, mergedConfig.longPressDelay);
       }
     },
-    [callbacks, mergedConfig]
+    [callbacks, mergedConfig],
   );
 
   const handleTouchMove = useCallback((event: React.TouchEvent) => {
@@ -328,7 +328,7 @@ export const useTapGesture = (
 
       tapStart.current = null;
     },
-    [callbacks, mergedConfig]
+    [callbacks, mergedConfig],
   );
 
   return {
@@ -357,7 +357,7 @@ export const useGestures = (callbacks: {
       onDoubleTap: callbacks.onDoubleTap,
       onLongPress: callbacks.onLongPress,
     },
-    callbacks.config
+    callbacks.config,
   );
 
   return {
@@ -383,7 +383,7 @@ export const useGestures = (callbacks: {
  * Hook that automatically attaches gesture handlers to a ref element
  */
 export const useGestureElement = <T extends HTMLElement = HTMLDivElement>(
-  callbacks: Parameters<typeof useGestures>[0]
+  callbacks: Parameters<typeof useGestures>[0],
 ) => {
   const elementRef = useRef<T>(null);
   const gestureHandlers = useGestures(callbacks);

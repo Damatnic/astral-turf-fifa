@@ -17,40 +17,40 @@ export interface Challenge {
   type: ChallengeType;
   difficulty: ChallengeDifficulty;
   status: ChallengeStatus;
-  
+
   // Participants
   createdBy: string; // User/Coach ID
   assignedTo: string[]; // Player/Team IDs
   teamId?: string;
-  
+
   // Requirements
   requirements: ChallengeRequirement[];
   evidenceTypes: EvidenceType[];
   minimumEvidence: number;
-  
+
   // Points & Rewards
   points: number;
   bonusPoints?: number;
   xpReward: number;
   achievements?: string[]; // Achievement IDs
-  
+
   // Timeline
   startDate: Date;
   endDate: Date;
   duration?: number; // In days
-  
+
   // Progress
   participants: ChallengeParticipant[];
   completionRate: number;
   totalSubmissions: number;
-  
+
   // Metadata
   tags: string[];
   category?: string;
   isPublic: boolean;
   isTemplate: boolean;
   templateId?: string;
-  
+
   createdAt: Date;
   updatedAt: Date;
 }
@@ -73,17 +73,17 @@ export interface ChallengeParticipant {
   userName: string;
   userAvatar?: string;
   role: 'player' | 'coach' | 'team';
-  
+
   // Progress
   progress: number; // 0-100%
   completedRequirements: string[]; // Requirement IDs
   submissions: ChallengeSubmission[];
-  
+
   // Stats
   pointsEarned: number;
   rank?: number;
   completedAt?: Date;
-  
+
   // Status
   isActive: boolean;
   joinedAt: Date;
@@ -94,25 +94,25 @@ export interface ChallengeSubmission {
   id: string;
   challengeId: string;
   userId: string;
-  
+
   // Evidence
   evidenceType: EvidenceType;
   evidenceUrls: string[]; // Photos, videos, documents
   description: string;
   metadata?: Record<string, any>; // Stats, GPS data, etc.
-  
+
   // Review
   status: EvidenceStatus;
   reviewedBy?: string;
   reviewedAt?: Date;
   reviewNotes?: string;
   score?: number;
-  
+
   // Data
   requirementId?: string;
   value?: number;
   unit?: string;
-  
+
   submittedAt: Date;
   updatedAt: Date;
 }
@@ -123,22 +123,22 @@ export interface Achievement {
   description: string;
   icon: string;
   tier: AchievementTier;
-  
+
   // Requirements
   requirements: AchievementRequirement[];
   category: string;
-  
+
   // Rewards
   points: number;
   xp: number;
   badge?: string;
   title?: string; // Player title/badge
-  
+
   // Progress
   isSecret: boolean;
   isRepeatable: boolean;
   unlockedBy: number; // Count of users who unlocked
-  
+
   // Metadata
   order: number;
   createdAt: Date;
@@ -154,14 +154,14 @@ export interface AchievementRequirement {
 export interface UserAchievement {
   userId: string;
   achievementId: string;
-  
+
   progress: number; // 0-100%
   isUnlocked: boolean;
   unlockedAt?: Date;
-  
+
   currentValue: number;
   targetValue: number;
-  
+
   metadata?: Record<string, any>;
 }
 
@@ -169,20 +169,20 @@ export interface Leaderboard {
   id: string;
   name: string;
   type: 'challenge' | 'team' | 'global' | 'category';
-  
+
   // Scope
   challengeId?: string;
   teamId?: string;
   category?: string;
-  
+
   // Timeframe
   timeframe: 'daily' | 'weekly' | 'monthly' | 'season' | 'allTime';
   startDate?: Date;
   endDate?: Date;
-  
+
   // Entries
   entries: LeaderboardEntry[];
-  
+
   // Metadata
   lastUpdated: Date;
   totalParticipants: number;
@@ -196,20 +196,20 @@ export interface LeaderboardEntry {
   userName: string;
   userAvatar?: string;
   teamName?: string;
-  
+
   // Score
   score: number;
   points: number;
-  
+
   // Stats
   challengesCompleted: number;
   achievements: number;
   streak?: number;
-  
+
   // Change indicators
   rankChange?: 'up' | 'down' | 'same' | 'new';
   scoreChange?: number;
-  
+
   updatedAt: Date;
 }
 
@@ -220,21 +220,21 @@ export interface ChallengeTemplate {
   category: string;
   difficulty: ChallengeDifficulty;
   type: ChallengeType;
-  
+
   // Template data
   requirements: Omit<ChallengeRequirement, 'id'>[];
   defaultDuration: number; // Days
   defaultPoints: number;
   defaultXP: number;
-  
+
   // Customization
   isCustomizable: boolean;
   requiredFields: string[];
-  
+
   // Usage
   usageCount: number;
   rating?: number;
-  
+
   createdBy: string;
   isPublic: boolean;
   createdAt: Date;

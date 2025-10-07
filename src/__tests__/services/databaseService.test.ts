@@ -260,7 +260,7 @@ describe('DatabaseService', () => {
       ];
 
       await expect((databaseService as any).transaction(operations)).rejects.toThrow(
-        'Transaction failed'
+        'Transaction failed',
       );
     });
   });
@@ -333,7 +333,7 @@ describe('DatabaseService', () => {
       (databaseService as any).findById.mockRejectedValue(new Error('Database connection lost'));
 
       await expect((databaseService as any).findById('users', '1')).rejects.toThrow(
-        'Database connection lost'
+        'Database connection lost',
       );
     });
 
@@ -348,7 +348,7 @@ describe('DatabaseService', () => {
       (databaseService as any).create.mockRejectedValue(constraintError);
 
       await expect(
-        (databaseService as any).create('users', { email: 'duplicate@example.com' })
+        (databaseService as any).create('users', { email: 'duplicate@example.com' }),
       ).rejects.toThrow('Unique constraint violation');
     });
   });

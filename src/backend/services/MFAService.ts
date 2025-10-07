@@ -55,7 +55,7 @@ export class MFAService {
       // Check if MFA is already enabled
       const existing = await phoenixPool.query(
         'SELECT mfa_enabled FROM users WHERE id = $1',
-        [userId]
+        [userId],
       );
 
       if (existing.rows.length === 0) {
@@ -87,7 +87,7 @@ export class MFAService {
          VALUES ($1, $2, $3, NOW(), NOW() + INTERVAL '15 minutes')
          ON CONFLICT (user_id) 
          DO UPDATE SET secret = $2, backup_codes = $3, created_at = NOW(), expires_at = NOW() + INTERVAL '15 minutes'`,
-        [userId, secret, JSON.stringify(hashedBackupCodes)]
+        [userId, secret, JSON.stringify(hashedBackupCodes)],
       );
 
       // Generate QR code URL
@@ -118,7 +118,7 @@ export class MFAService {
    */
   async verifyMFASetup(
     userId: string,
-    code: string
+    code: string,
   ): Promise<{
     success: boolean;
     message: string;
@@ -130,7 +130,7 @@ export class MFAService {
         `SELECT secret, backup_codes, expires_at 
          FROM mfa_setups 
          WHERE user_id = $1`,
-        [userId]
+        [userId],
       );
 
       if (setup.rows.length === 0) {
@@ -171,7 +171,7 @@ export class MFAService {
              mfa_backup_codes = $2,
              updated_at = NOW()
          WHERE id = $3`,
-        [secret, backup_codes, userId]
+        [secret, backup_codes, userId],
       );
 
       // Remove pending setup
@@ -198,7 +198,7 @@ export class MFAService {
    */
   async verifyMFACode(
     userId: string,
-    code: string
+    code: string,
   ): Promise<MFAVerificationResult> {
     try {
       // Check rate limiting
@@ -217,7 +217,7 @@ export class MFAService {
         `SELECT mfa_enabled, mfa_secret, mfa_backup_codes 
          FROM users 
          WHERE id = $1`,
-        [userId]
+        [userId],
       );
 
       if (user.rows.length === 0) {
@@ -253,7 +253,7 @@ export class MFAService {
       // Try to verify as backup code
       const backupCodes = JSON.parse(mfa_backup_codes || '[]');
       const backupCodeIndex = backupCodes.findIndex((hashedCode: string) =>
-        this.verifyBackupCode(code, hashedCode)
+        this.verifyBackupCode(code, hashedCode),
       );
 
       if (backupCodeIndex !== -1) {
@@ -264,7 +264,7 @@ export class MFAService {
           `UPDATE users 
            SET mfa_backup_codes = $1, updated_at = NOW() 
            WHERE id = $2`,
-          [JSON.stringify(backupCodes), userId]
+          [JSON.stringify(backupCodes), userId],
         );
 
         this.resetRateLimit(userId);
@@ -299,7 +299,7 @@ export class MFAService {
    */
   async disableMFA(
     userId: string,
-    password: string
+    password: string,
   ): Promise<{
     success: boolean;
     message: string;
@@ -317,7 +317,7 @@ export class MFAService {
              updated_at = NOW()
          WHERE id = $1 AND mfa_enabled = true
          RETURNING id`,
-        [userId]
+        [userId],
       );
 
       if (result.rowCount === 0) {
@@ -357,7 +357,7 @@ export class MFAService {
         `SELECT mfa_enabled, mfa_backup_codes 
          FROM users 
          WHERE id = $1`,
-        [userId]
+        [userId],
       );
 
       if (result.rows.length === 0) {
@@ -397,7 +397,7 @@ export class MFAService {
       // Check if MFA is enabled
       const user = await phoenixPool.query(
         'SELECT mfa_enabled FROM users WHERE id = $1',
-        [userId]
+        [userId],
       );
 
       if (user.rows.length === 0) {
@@ -423,7 +423,7 @@ export class MFAService {
         `UPDATE users 
          SET mfa_backup_codes = $1, updated_at = NOW() 
          WHERE id = $2`,
-        [JSON.stringify(hashedBackupCodes), userId]
+        [JSON.stringify(hashedBackupCodes), userId],
       );
 
       return {
@@ -578,7 +578,7 @@ export class MFAService {
 
     for (let i = 0; i < encoded.length; i++) {
       const idx = base32Chars.indexOf(encoded[i].toUpperCase());
-      if (idx === -1) continue;
+      if (idx === -1) {continue;}
 
       value = (value << 5) | idx;
       bits += 5;

@@ -456,7 +456,7 @@ class HealthService {
    */
   private processCheckResult(
     result: PromiseSettledResult<ComponentHealth>,
-    checkName: string
+    checkName: string,
   ): ComponentHealth {
     if (result.status === 'fulfilled') {
       return result.value;
@@ -473,7 +473,7 @@ class HealthService {
    * Determine overall status from individual check statuses
    */
   private determineOverallStatus(
-    statuses: Array<'healthy' | 'degraded' | 'unhealthy'>
+    statuses: Array<'healthy' | 'degraded' | 'unhealthy'>,
   ): 'healthy' | 'degraded' | 'unhealthy' {
     if (statuses.includes('unhealthy')) {
       return 'unhealthy';

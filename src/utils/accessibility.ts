@@ -319,7 +319,7 @@ export class ScreenReader {
 // Accessibility Testing Utilities
 export class AccessibilityTester {
   static async runBasicTests(
-    container: HTMLElement = document.body
+    container: HTMLElement = document.body,
   ): Promise<AccessibilityIssue[]> {
     const issues: AccessibilityIssue[] = [];
 
@@ -475,7 +475,7 @@ export function useKeyboardNavigation(type: 'menu' | 'grid', options?: { columns
         KeyboardNavigation.handleGridNavigation(event.nativeEvent, items, options.columns);
       }
     },
-    [type, options?.columns]
+    [type, options?.columns],
   );
 
   return { onKeyDown: handleKeyDown };

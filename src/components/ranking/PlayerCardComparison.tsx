@@ -32,12 +32,12 @@ const PlayerCardComparison: React.FC<PlayerCardComparisonProps> = ({
   // Calculate attribute comparisons
   const attributeComparisons = useMemo(() => {
     const attributes = ['speed', 'passing', 'shooting', 'dribbling', 'tackling', 'positioning'] as const;
-    
+
     return attributes.map((attr) => {
       const values = limitedPlayers.map((p) => p.player.attributes[attr]);
       const max = Math.max(...values);
       const min = Math.min(...values);
-      
+
       return {
         name: attr.charAt(0).toUpperCase() + attr.slice(1),
         values: values.map((value, idx) => ({
@@ -60,7 +60,7 @@ const PlayerCardComparison: React.FC<PlayerCardComparisonProps> = ({
           attrs.tackling +
           attrs.shooting +
           attrs.dribbling +
-          attrs.positioning) / 6
+          attrs.positioning) / 6,
       );
       return { overall, index: idx };
     });

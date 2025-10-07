@@ -354,7 +354,7 @@ test.describe('Tactical Board Complete Workflows', () => {
         // Add comment from second user
         await secondTactics.addComment(
           { x: 400, y: 300 },
-          'Agreed, we should push the wingers higher'
+          'Agreed, we should push the wingers higher',
         );
 
         // Verify comment appears on first user's screen

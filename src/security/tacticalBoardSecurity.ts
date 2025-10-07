@@ -144,7 +144,7 @@ export class GuardianTacticalSecurity {
   async encryptTacticalFormation(
     formation: TacticalFormation,
     userId: string,
-    context: { ipAddress?: string; userAgent?: string } = {}
+    context: { ipAddress?: string; userAgent?: string } = {},
   ): Promise<SecureTacticalData> {
     try {
       // Validate formation data
@@ -163,7 +163,7 @@ export class GuardianTacticalSecurity {
           operation: 'encrypt',
           dataType: 'tactical_formation',
           classification,
-        }
+        },
       );
 
       // Generate integrity hash
@@ -197,7 +197,7 @@ export class GuardianTacticalSecurity {
         {
           userId,
           metadata: auditEntry.details,
-        }
+        },
       );
 
       return {
@@ -226,14 +226,14 @@ export class GuardianTacticalSecurity {
     secureTacticalData: SecureTacticalData,
     userId: string,
     requestedAction: string = 'view',
-    context: { ipAddress?: string; userAgent?: string } = {}
+    context: { ipAddress?: string; userAgent?: string } = {},
   ): Promise<TacticalFormation> {
     try {
       // Check access permissions
       const hasAccess = await this.validateTacticalAccess(
         secureTacticalData,
         userId,
-        requestedAction
+        requestedAction,
       );
 
       if (!hasAccess) {
@@ -261,7 +261,7 @@ export class GuardianTacticalSecurity {
           {
             userId,
             metadata: auditEntry.details,
-          }
+          },
         );
 
         throw new Error('Access denied: Insufficient permissions for tactical data');
@@ -328,7 +328,7 @@ export class GuardianTacticalSecurity {
     fromUserId: string,
     toUserId: string,
     permissions: TacticalPermission[],
-    expiresAt?: string
+    expiresAt?: string,
   ): Promise<SecureTacticalData> {
     try {
       // Validate sharing permissions
@@ -390,7 +390,7 @@ export class GuardianTacticalSecurity {
   private async validateTacticalAccess(
     secureTacticalData: SecureTacticalData,
     userId: string,
-    action: string
+    action: string,
   ): Promise<boolean> {
     // Find user's access control entry
     const userAccess = secureTacticalData.accessControlList.find(entry => entry.userId === userId);
@@ -406,7 +406,7 @@ export class GuardianTacticalSecurity {
 
     // Check if user has the required permission
     const hasPermission = userAccess.permissions.some(
-      permission => permission.action === action || permission.action === ('admin' as any)
+      permission => permission.action === action || permission.action === ('admin' as any),
     );
 
     return hasPermission;
@@ -432,7 +432,7 @@ export class GuardianTacticalSecurity {
    */
   private async createAccessControlList(
     formation: TacticalFormation,
-    creatorUserId: string
+    creatorUserId: string,
   ): Promise<AccessControlEntry[]> {
     // Creator gets full permissions
     const creatorEntry: AccessControlEntry = {
@@ -503,7 +503,7 @@ export class GuardianTacticalSecurity {
    */
   sanitizeFormationForExport(
     formation: TacticalFormation,
-    exportLevel: 'public' | 'team' | 'coach' = 'team'
+    exportLevel: 'public' | 'team' | 'coach' = 'team',
   ): Partial<TacticalFormation> {
     const sanitized: Partial<TacticalFormation> = {
       id: formation.id,
@@ -536,7 +536,7 @@ export class GuardianTacticalSecurity {
     importData: any,
     userId: string,
     teamId: string,
-    context: { ipAddress?: string; userAgent?: string } = {}
+    context: { ipAddress?: string; userAgent?: string } = {},
   ): Promise<SecureTacticalData> {
     try {
       // Validate and sanitize import data

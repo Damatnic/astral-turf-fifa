@@ -384,7 +384,7 @@ export class QueryCache extends UltraFastCache<string, any> {
 
   memoize<Args extends any[], Return>(
     fn: (...args: Args) => Return,
-    keyGenerator?: (...args: Args) => string
+    keyGenerator?: (...args: Args) => string,
   ): (...args: Args) => Return {
     return (...args: Args): Return => {
       const key = keyGenerator ? keyGenerator(...args) : JSON.stringify(args);
@@ -428,7 +428,7 @@ export function useCachedPlayer(playerId: string | undefined) {
 export function useCachedQuery<T>(
   queryFn: () => T,
   deps: React.DependencyList,
-  cacheKey: string
+  cacheKey: string,
 ): T {
   return useMemo(() => {
     const cached = queryCache.get(cacheKey);

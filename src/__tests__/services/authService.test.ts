@@ -367,7 +367,7 @@ describe('AuthService', () => {
 
     it('should reject update for non-existent user', async () => {
       await expect(authService.updateUserProfile('nonexistent', {})).rejects.toThrow(
-        'User not found'
+        'User not found',
       );
     });
 
@@ -380,7 +380,7 @@ describe('AuthService', () => {
 
       expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
         'authUser',
-        expect.stringContaining('"firstName":"Updated"')
+        expect.stringContaining('"firstName":"Updated"'),
       );
     });
   });
@@ -392,7 +392,7 @@ describe('AuthService', () => {
 
     it('should reject password reset for non-existent user', async () => {
       await expect(authService.requestPasswordReset('nonexistent@example.com')).rejects.toThrow(
-        'User not found'
+        'User not found',
       );
     });
   });
@@ -400,13 +400,13 @@ describe('AuthService', () => {
   describe('resetPassword', () => {
     it('should successfully reset password with valid token and password', async () => {
       await expect(
-        authService.resetPassword('valid-token', 'newpassword123')
+        authService.resetPassword('valid-token', 'newpassword123'),
       ).resolves.toBeUndefined();
     });
 
     it('should reject password reset with short password', async () => {
       await expect(authService.resetPassword('valid-token', '123')).rejects.toThrow(
-        'Password must be at least 8 characters long'
+        'Password must be at least 8 characters long',
       );
     });
   });
@@ -425,7 +425,7 @@ describe('AuthService', () => {
 
     it('should reject association with non-existent player', async () => {
       await expect(
-        authService.createFamilyAssociation('family1', 'nonexistent', 'father')
+        authService.createFamilyAssociation('family1', 'nonexistent', 'father'),
       ).rejects.toThrow('Player not found');
     });
 
@@ -456,7 +456,7 @@ describe('AuthService', () => {
 
     it('should reject update for non-existent user', async () => {
       await expect(authService.updateNotificationSettings('nonexistent', {})).rejects.toThrow(
-        'User not found'
+        'User not found',
       );
     });
   });
@@ -520,7 +520,7 @@ describe('AuthService', () => {
 
     it('should reject approval for non-existent association', async () => {
       await expect(authService.approveFamilyAssociation('nonexistent')).rejects.toThrow(
-        'Association not found'
+        'Association not found',
       );
     });
   });

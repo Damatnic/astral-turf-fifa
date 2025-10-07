@@ -416,7 +416,7 @@ const AITacticalAnalyzer: React.FC = () => {
 
       const aiResponse = await openAiService.generateTacticalAnalysis(
         homeFormation,
-        players.filter(p => p.team === 'home')
+        players.filter(p => p.team === 'home'),
       );
 
       // Parse AI response and create structured analysis
@@ -560,7 +560,7 @@ const AITacticalAnalyzer: React.FC = () => {
         },
       });
     },
-    [dispatch]
+    [dispatch],
   );
 
   // Auto-analyze when formation changes

@@ -14,7 +14,7 @@ const addInboxItem = (
   type: InboxItem['type'],
   title: string,
   content: string,
-  payload?: InboxItem['payload']
+  payload?: InboxItem['payload'],
 ) => {
   draft.inbox.unshift({
     id: `inbox_${Date.now()}_${Math.random()}`,
@@ -52,7 +52,7 @@ export const franchiseReducer = (draft: FranchiseState, action: Action): Franchi
         draft,
         'objective',
         `New Season: ${draft.season.year}`,
-        'A new season has begun. Check your board objectives and prepare your squad!'
+        'A new season has begun. Check your board objectives and prepare your squad!',
       );
       break;
     }
@@ -69,7 +69,7 @@ export const franchiseReducer = (draft: FranchiseState, action: Action): Franchi
           action.payload.type as InboxItem['type'],
           action.payload.title as string,
           action.payload.content as string,
-          'payload' in action.payload ? (action.payload.payload as InboxItem['payload']) : undefined
+          'payload' in action.payload ? (action.payload.payload as InboxItem['payload']) : undefined,
         );
       }
       break;
@@ -98,14 +98,14 @@ export const franchiseReducer = (draft: FranchiseState, action: Action): Franchi
           draft,
           'finance',
           `New Staff Hired`,
-          `${staff.name} has been hired as the new ${action.payload.type}.`
+          `${staff.name} has been hired as the new ${action.payload.type}.`,
         );
       } else {
         addInboxItem(
           draft,
           'finance',
           `Hiring Failed`,
-          `Insufficient funds to hire ${staff.name}.`
+          `Insufficient funds to hire ${staff.name}.`,
         );
       }
       break;
@@ -123,7 +123,7 @@ export const franchiseReducer = (draft: FranchiseState, action: Action): Franchi
           draft,
           'finance',
           `${facility} Upgraded`,
-          `The ${facility} has been upgraded to level ${stadium[facility]}.`
+          `The ${facility} has been upgraded to level ${stadium[facility]}.`,
         );
       }
       break;
@@ -138,7 +138,7 @@ export const franchiseReducer = (draft: FranchiseState, action: Action): Franchi
         draft,
         'finance',
         `New Sponsorship Deal`,
-        `A new deal has been signed with ${sponsorDeal.name}.`
+        `A new deal has been signed with ${sponsorDeal.name}.`,
       );
       break;
     }
@@ -290,7 +290,7 @@ export const franchiseReducer = (draft: FranchiseState, action: Action): Franchi
         draft,
         'mentoring',
         'New Mentoring Group',
-        'A new mentoring group has been established.'
+        'A new mentoring group has been established.',
       );
       break;
     }
@@ -309,13 +309,13 @@ export const franchiseReducer = (draft: FranchiseState, action: Action): Franchi
         });
       }
       draft.mentoringGroups[team] = draft.mentoringGroups[team].filter(
-        g => g.mentorId !== mentorId
+        g => g.mentorId !== mentorId,
       );
       addInboxItem(
         draft,
         'mentoring',
         'Mentoring Group Dissolved',
-        'A mentoring group has been dissolved.'
+        'A mentoring group has been dissolved.',
       );
       break;
     }

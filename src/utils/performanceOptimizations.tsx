@@ -134,7 +134,7 @@ export function useAnimationFrame(callback: (time: number) => void) {
       previousTimeRef.current = time;
       requestRef.current = requestAnimationFrame(animate);
     },
-    [callback]
+    [callback],
   );
 
   useLayoutEffect(() => {
@@ -190,7 +190,7 @@ class FastMemoCache<K, V> {
 export function useFastMemo<T>(
   factory: () => T,
   deps: React.DependencyList,
-  isEqual: (a: T, b: T) => boolean = Object.is
+  isEqual: (a: T, b: T) => boolean = Object.is,
 ): T {
   const ref = useRef<{ deps: React.DependencyList; value: T } | undefined>();
 
@@ -207,7 +207,7 @@ export function useFastMemo<T>(
 // Debounced callback for performance-critical operations
 export function useDebounceCallback<T extends (...args: any[]) => any>(
   callback: T,
-  delay: number
+  delay: number,
 ): T {
   const timeoutRef = useRef<NodeJS.Timeout>();
 
@@ -221,14 +221,14 @@ export function useDebounceCallback<T extends (...args: any[]) => any>(
         callback(...args);
       }, delay);
     },
-    [callback, delay]
+    [callback, delay],
   ) as T;
 }
 
 // Throttled callback for high-frequency events
 export function useThrottleCallback<T extends (...args: any[]) => any>(
   callback: T,
-  delay: number
+  delay: number,
 ): T {
   const lastCallRef = useRef<number>(0);
   const timeoutRef = useRef<NodeJS.Timeout>();
@@ -252,7 +252,7 @@ export function useThrottleCallback<T extends (...args: any[]) => any>(
         }, delay - timeSinceLastCall);
       }
     },
-    [callback, delay]
+    [callback, delay],
   ) as T;
 }
 
@@ -373,8 +373,8 @@ export function preloadImages(urls: string[]): Promise<void[]> {
           img.onload = () => resolve();
           img.onerror = reject;
           img.src = url;
-        })
-    )
+        }),
+    ),
   );
 }
 
@@ -403,7 +403,7 @@ export function createWebWorker(fn: (...args: any[]) => any) {
     }
   `,
     ],
-    { type: 'application/javascript' }
+    { type: 'application/javascript' },
   );
 
   const worker = new Worker(URL.createObjectURL(blob));
@@ -471,7 +471,7 @@ interface LazyComponentOptions {
 
 export function createLazyComponent<T = {}>(
   importFn: () => Promise<{ default: ComponentType<T> }>,
-  options: LazyComponentOptions = {}
+  options: LazyComponentOptions = {},
 ) {
   const {
     preload = false,
@@ -488,7 +488,7 @@ export function createLazyComponent<T = {}>(
       importPromise = Promise.race([
         importFn(),
         new Promise<{ default: ComponentType<T> }>((_, reject) =>
-          setTimeout(() => reject(new Error('Load timeout')), timeout)
+          setTimeout(() => reject(new Error('Load timeout')), timeout),
         ),
       ]);
     }
@@ -584,7 +584,7 @@ export class AdvancedMemoryManager {
         window.dispatchEvent(
           new CustomEvent('catalyst:memory', {
             detail: { usedMemory, totalMemory: memory.totalJSHeapSize },
-          })
+          }),
         );
       }
     }, 5000); // Check every 5 seconds
@@ -599,7 +599,7 @@ export class AdvancedMemoryManager {
             window.dispatchEvent(
               new CustomEvent('catalyst:long-task', {
                 detail: { duration: entry.duration, name: entry.name },
-              })
+              }),
             );
           }
         }
@@ -751,7 +751,7 @@ export class CoreWebVitalsMonitor {
     // Navigation Timing
     window.addEventListener('load', () => {
       const navigation = performance.getEntriesByType(
-        'navigation'
+        'navigation',
       )[0] as PerformanceNavigationTiming;
       this.recordMetric('TTFB', navigation.responseStart);
       this.recordMetric('DOMContentLoaded', navigation.domContentLoadedEventStart);
@@ -765,19 +765,19 @@ export class CoreWebVitalsMonitor {
     // Check against thresholds
     if (name === 'LCP' && value > PERFORMANCE_THRESHOLDS.LCP_TARGET) {
       console.warn(
-        `🚨 Catalyst: LCP exceeds target (${value.toFixed(2)}ms > ${PERFORMANCE_THRESHOLDS.LCP_TARGET}ms)`
+        `🚨 Catalyst: LCP exceeds target (${value.toFixed(2)}ms > ${PERFORMANCE_THRESHOLDS.LCP_TARGET}ms)`,
       );
     }
 
     if (name === 'FID' && value > PERFORMANCE_THRESHOLDS.FID_TARGET) {
       console.warn(
-        `🚨 Catalyst: FID exceeds target (${value.toFixed(2)}ms > ${PERFORMANCE_THRESHOLDS.FID_TARGET}ms)`
+        `🚨 Catalyst: FID exceeds target (${value.toFixed(2)}ms > ${PERFORMANCE_THRESHOLDS.FID_TARGET}ms)`,
       );
     }
 
     if (name === 'CLS' && value > PERFORMANCE_THRESHOLDS.CLS_TARGET) {
       console.warn(
-        `🚨 Catalyst: CLS exceeds target (${value.toFixed(3)} > ${PERFORMANCE_THRESHOLDS.CLS_TARGET})`
+        `🚨 Catalyst: CLS exceeds target (${value.toFixed(3)} > ${PERFORMANCE_THRESHOLDS.CLS_TARGET})`,
       );
     }
 
@@ -785,7 +785,7 @@ export class CoreWebVitalsMonitor {
     window.dispatchEvent(
       new CustomEvent('catalyst:metric', {
         detail: { name, value, timestamp: Date.now() },
-      })
+      }),
     );
   }
 
@@ -963,7 +963,7 @@ export function useNetworkAwarePerformance() {
       enableCaching: true,
       compressionLevel: networkInfo.saveData ? 'high' : 'medium',
     }),
-    [networkInfo]
+    [networkInfo],
   );
 
   return {
@@ -985,7 +985,7 @@ export function initializeCatalystPerformance() {
   window.addEventListener('catalyst:metric', ((event: CustomEvent) => {
     const { name, value } = event.detail;
     console.log(
-      `📊 Catalyst Metric: ${name} = ${value.toFixed(2)}${name.includes('Time') || name.includes('LCP') || name.includes('FID') ? 'ms' : ''}`
+      `📊 Catalyst Metric: ${name} = ${value.toFixed(2)}${name.includes('Time') || name.includes('LCP') || name.includes('FID') ? 'ms' : ''}`,
     );
   }) as EventListener);
 
@@ -1005,7 +1005,7 @@ export function initializeCatalystPerformance() {
       console.log('Core Web Vitals:', metrics);
       if (memory) {
         console.log(
-          `Memory: ${(memory.usedJSHeapSize / 1024 / 1024).toFixed(2)}MB / ${(memory.totalJSHeapSize / 1024 / 1024).toFixed(2)}MB`
+          `Memory: ${(memory.usedJSHeapSize / 1024 / 1024).toFixed(2)}MB / ${(memory.totalJSHeapSize / 1024 / 1024).toFixed(2)}MB`,
         );
       }
       console.groupEnd();

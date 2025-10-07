@@ -166,7 +166,7 @@ export const useTouchGestures = (
     onSwipe?: (event: TouchEvent, direction: string, velocity: number) => void;
     onPinch?: (event: TouchEvent, scale: number) => void;
     onDrag?: (event: TouchEvent, delta: { x: number; y: number }) => void;
-  }
+  },
 ) => {
   const touchState = useRef({
     startTime: 0,
@@ -204,7 +204,7 @@ export const useTouchGestures = (
         const touch2 = e.touches[1];
         const distance = Math.sqrt(
           Math.pow(touch2.clientX - touch1.clientX, 2) +
-            Math.pow(touch2.clientY - touch1.clientY, 2)
+            Math.pow(touch2.clientY - touch1.clientY, 2),
         );
         touchState.current.initialDistance = distance;
       }
@@ -232,7 +232,7 @@ export const useTouchGestures = (
       const deltaY = currentPosition.y - touchState.current.lastPosition.y;
       const totalDistance = Math.sqrt(
         Math.pow(currentPosition.x - touchState.current.startPosition.x, 2) +
-          Math.pow(currentPosition.y - touchState.current.startPosition.y, 2)
+          Math.pow(currentPosition.y - touchState.current.startPosition.y, 2),
       );
 
       // Cancel long press if moved too much
@@ -253,7 +253,7 @@ export const useTouchGestures = (
         const touch2 = e.touches[1];
         const distance = Math.sqrt(
           Math.pow(touch2.clientX - touch1.clientX, 2) +
-            Math.pow(touch2.clientY - touch1.clientY, 2)
+            Math.pow(touch2.clientY - touch1.clientY, 2),
         );
 
         if (touchState.current.initialDistance > 0) {
@@ -434,19 +434,19 @@ export const useMobileViewport = () => {
       const computedStyle = getComputedStyle(document.documentElement);
       const safeAreaTop = parseInt(
         computedStyle.getPropertyValue('env(safe-area-inset-top)') || '0',
-        10
+        10,
       );
       const safeAreaBottom = parseInt(
         computedStyle.getPropertyValue('env(safe-area-inset-bottom)') || '0',
-        10
+        10,
       );
       const safeAreaLeft = parseInt(
         computedStyle.getPropertyValue('env(safe-area-inset-left)') || '0',
-        10
+        10,
       );
       const safeAreaRight = parseInt(
         computedStyle.getPropertyValue('env(safe-area-inset-right)') || '0',
-        10
+        10,
       );
 
       setViewport({

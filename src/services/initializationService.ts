@@ -77,7 +77,7 @@ class InitializationService {
         }
         await performanceService.initialize();
       },
-      services
+      services,
     );
 
     // Skip server-side initialization on client
@@ -106,7 +106,7 @@ class InitializationService {
             initializeSecurityMonitoring();
             initSecurityMonitoring();
           },
-          services
+          services,
         );
       }
 
@@ -117,7 +117,7 @@ class InitializationService {
           async () => {
             await initializeDatabase();
           },
-          services
+          services,
         );
       }
 
@@ -133,7 +133,7 @@ class InitializationService {
               // Don't throw error - Redis is optional
             }
           },
-          services
+          services,
         );
       }
 
@@ -144,7 +144,7 @@ class InitializationService {
           async () => {
             healthService.initialize();
           },
-          services
+          services,
         );
       }
 
@@ -158,7 +158,7 @@ class InitializationService {
           }
           await backupService.initialize();
         },
-        services
+        services,
       );
 
       // 5. Validate all services are healthy
@@ -210,7 +210,7 @@ class InitializationService {
   private async initializeService(
     name: string,
     initFunction: () => Promise<void> | void,
-    services: InitializationResult['services']
+    services: InitializationResult['services'],
   ): Promise<void> {
     const startTime = Date.now();
 

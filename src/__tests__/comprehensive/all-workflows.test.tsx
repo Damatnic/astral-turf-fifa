@@ -42,12 +42,12 @@ describe('Authentication Workflows - ZENITH Integration Tests', () => {
           render(
             <ZenithTestWrapper>
               <LoginPage />
-            </ZenithTestWrapper>
+            </ZenithTestWrapper>,
           );
         },
         () => {
           expect(screen.getByRole('heading', { name: /sign in/i })).toBeInTheDocument();
-        }
+        },
       )
       .addStep(
         'Fill login form',
@@ -59,7 +59,7 @@ describe('Authentication Workflows - ZENITH Integration Tests', () => {
         () => {
           expect(screen.getByRole('textbox', { name: /email/i })).toHaveValue('test@example.com');
           expect(screen.getByLabelText(/password/i)).toHaveValue('password123');
-        }
+        },
       )
       .addStep(
         'Submit login form',
@@ -70,7 +70,7 @@ describe('Authentication Workflows - ZENITH Integration Tests', () => {
         () => {
           // Should show loading or redirect
           expect(screen.queryByRole('button', { name: /sign in/i })).toBeInTheDocument();
-        }
+        },
       );
 
     loginWorkflow.generateIntegrationTestSuite();
@@ -92,7 +92,7 @@ describe('Authentication Workflows - ZENITH Integration Tests', () => {
       render(
         <ZenithTestWrapper>
           <App />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       // Should start at landing page or login
@@ -148,13 +148,13 @@ describe('Tactical Planning Workflows - ZENITH Integration Tests', () => {
           render(
             <ZenithTestWrapper>
               <TacticsBoardPage />
-            </ZenithTestWrapper>
+            </ZenithTestWrapper>,
           );
         },
         () => {
           expect(screen.getByRole('main')).toBeInTheDocument();
           expect(screen.getByText(/tactics/i)).toBeInTheDocument();
-        }
+        },
       )
       .addStep(
         'Select formation',
@@ -166,7 +166,7 @@ describe('Tactical Planning Workflows - ZENITH Integration Tests', () => {
         () => {
           const formationSelect = screen.getByRole('combobox', { name: /formation/i });
           expect(formationSelect).toHaveValue('4-3-3');
-        }
+        },
       )
       .addStep(
         'Arrange players',
@@ -183,7 +183,7 @@ describe('Tactical Planning Workflows - ZENITH Integration Tests', () => {
           // Players should be positioned
           const players = screen.getAllByRole('button', { name: /player/i });
           expect(players.length).toBe(11);
-        }
+        },
       )
       .addStep(
         'Save formation',
@@ -195,7 +195,7 @@ describe('Tactical Planning Workflows - ZENITH Integration Tests', () => {
         () => {
           // Should show save confirmation
           expect(screen.queryByRole('alert')).toBeInTheDocument();
-        }
+        },
       );
 
     formationWorkflow.generateIntegrationTestSuite();
@@ -213,7 +213,7 @@ describe('Tactical Planning Workflows - ZENITH Integration Tests', () => {
             onAnalyticsView={vi.fn()}
             onExportFormation={vi.fn()}
           />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       // 1. Set formation
@@ -250,7 +250,7 @@ describe('Tactical Planning Workflows - ZENITH Integration Tests', () => {
             onAnalyticsView={vi.fn()}
             onExportFormation={onExportFormation}
           />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       // Export formation
@@ -297,12 +297,12 @@ describe('Analytics Workflows - ZENITH Integration Tests', () => {
           render(
             <ZenithTestWrapper>
               <AnalyticsPage />
-            </ZenithTestWrapper>
+            </ZenithTestWrapper>,
           );
         },
         () => {
           expect(screen.getByText(/analytics/i)).toBeInTheDocument();
-        }
+        },
       )
       .addStep(
         'Select time period',
@@ -314,7 +314,7 @@ describe('Analytics Workflows - ZENITH Integration Tests', () => {
         () => {
           const periodSelect = screen.getByRole('combobox', { name: /period/i });
           expect(periodSelect).toHaveValue('last-month');
-        }
+        },
       )
       .addStep(
         'View detailed metrics',
@@ -325,7 +325,7 @@ describe('Analytics Workflows - ZENITH Integration Tests', () => {
         },
         () => {
           expect(screen.getByText(/detailed/i)).toBeInTheDocument();
-        }
+        },
       )
       .addStep(
         'Export analytics report',
@@ -337,7 +337,7 @@ describe('Analytics Workflows - ZENITH Integration Tests', () => {
         () => {
           // Should trigger download or show export options
           expect(screen.queryByRole('dialog')).toBeInTheDocument();
-        }
+        },
       );
 
     analyticsWorkflow.generateIntegrationTestSuite();
@@ -351,14 +351,14 @@ describe('Analytics Workflows - ZENITH Integration Tests', () => {
       const { rerender } = render(
         <ZenithTestWrapper>
           <DashboardPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       // Navigate to analytics
       rerender(
         <ZenithTestWrapper>
           <AnalyticsPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       // Should show analytics data
@@ -368,7 +368,7 @@ describe('Analytics Workflows - ZENITH Integration Tests', () => {
       rerender(
         <ZenithTestWrapper>
           <DashboardPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       // Should show dashboard
@@ -378,7 +378,7 @@ describe('Analytics Workflows - ZENITH Integration Tests', () => {
       rerender(
         <ZenithTestWrapper>
           <AnalyticsPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       // State should be preserved
@@ -420,7 +420,7 @@ describe('Data Management Workflows - ZENITH Integration Tests', () => {
             onAnalyticsView={vi.fn()}
             onExportFormation={vi.fn()}
           />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       // Should load saved data
@@ -441,7 +441,7 @@ describe('Data Management Workflows - ZENITH Integration Tests', () => {
       render(
         <ZenithTestWrapper>
           <AnalyticsPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       // Simulate real-time data update
@@ -483,7 +483,7 @@ describe('Error Handling Workflows - ZENITH Integration Tests', () => {
       render(
         <ZenithTestWrapper>
           <AnalyticsPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       // Should show error state
@@ -518,7 +518,7 @@ describe('Error Handling Workflows - ZENITH Integration Tests', () => {
       render(
         <ZenithTestWrapper>
           <DashboardPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       // Should not crash and should show default state
@@ -542,7 +542,7 @@ describe('Error Handling Workflows - ZENITH Integration Tests', () => {
           <div>
             <ThrowError />
           </div>
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       // Should show error boundary
@@ -579,7 +579,7 @@ describe('Performance Workflows - ZENITH Integration Tests', () => {
             onAnalyticsView={vi.fn()}
             onExportFormation={vi.fn()}
           />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       const endTime = performance.now();
@@ -605,7 +605,7 @@ describe('Performance Workflows - ZENITH Integration Tests', () => {
             onAnalyticsView={vi.fn()}
             onExportFormation={vi.fn()}
           />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       // Trigger multiple operations simultaneously
@@ -642,7 +642,7 @@ describe('Accessibility Workflows - ZENITH Integration Tests', () => {
       render(
         <ZenithTestWrapper>
           <DashboardPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       // Navigate through all interactive elements
@@ -671,7 +671,7 @@ describe('Accessibility Workflows - ZENITH Integration Tests', () => {
       render(
         <ZenithTestWrapper>
           <TacticsBoardPage />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       // Should have proper landmarks

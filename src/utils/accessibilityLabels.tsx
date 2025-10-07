@@ -315,7 +315,7 @@ export const accessibilityHelpers = {
     elementType: string,
     primaryInfo: string,
     secondaryInfo?: string,
-    interactionHint?: string
+    interactionHint?: string,
   ): string => {
     let label = `${elementType}: ${primaryInfo}`;
     if (secondaryInfo) {
@@ -366,7 +366,7 @@ export const accessibilityHelpers = {
   tableAccessibility: (
     caption: string,
     headers: string[],
-    rowCount: number
+    rowCount: number,
   ): {
     caption: string;
     summary: string;
@@ -460,7 +460,7 @@ export const generateSkipLinks = () => [
  * Comprehensive accessibility validation
  */
 export const validateAccessibility = (
-  element: HTMLElement
+  element: HTMLElement,
 ): {
   passed: boolean;
   issues: string[];

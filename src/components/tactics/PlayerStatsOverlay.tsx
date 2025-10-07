@@ -74,7 +74,7 @@ const PlayerStatsOverlay: React.FC<PlayerStatsOverlayProps> = ({
           const performance = Math.min(100, currentPotential + Math.random() * 10);
           const positioning = Math.max(
             0,
-            100 - Math.abs(safePosition.x - 50) - Math.abs(safePosition.y - 50)
+            100 - Math.abs(safePosition.x - 50) - Math.abs(safePosition.y - 50),
           );
           const playerPositionStr = typeof player.position === 'string' ? player.position : '';
           const influence = performance * (playerPositionStr.includes('M') ? 1.2 : 1.0);

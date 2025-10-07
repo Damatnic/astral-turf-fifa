@@ -123,7 +123,7 @@ console.log(`\n📈 Overall Results:`);
 console.log(`   Total Passed: ${totalPassed}`);
 console.log(`   Total Failed: ${totalFailed}`);
 console.log(
-  `   Success Rate: ${totalFailed === 0 ? '100%' : ((totalPassed / (totalPassed + totalFailed)) * 100).toFixed(1) + '%'}`
+  `   Success Rate: ${totalFailed === 0 ? '100%' : ((totalPassed / (totalPassed + totalFailed)) * 100).toFixed(1) + '%'}`,
 );
 
 console.log(`\n📋 Individual Test Results:`);
@@ -145,7 +145,7 @@ if (totalFailed > 0) {
 }
 
 const criticalTestsFailed = testResults.filter(
-  r => r.status !== 'PASS' && testCommands.find(t => t.name === r.name)?.critical
+  r => r.status !== 'PASS' && testCommands.find(t => t.name === r.name)?.critical,
 );
 if (criticalTestsFailed.length > 0) {
   criticalIssues.push('Critical tests failed');

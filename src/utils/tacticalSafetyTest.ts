@@ -112,14 +112,14 @@ export function runTacticalSafetyTests() {
   runTest('isValidFormationSlot accepts valid slot', () => isValidFormationSlot(validSlot));
   runTest(
     'isValidFormationSlot rejects invalid slot position',
-    () => !isValidFormationSlot(invalidSlot1)
+    () => !isValidFormationSlot(invalidSlot1),
   );
   runTest('isValidFormationSlot rejects null slot', () => !isValidFormationSlot(invalidSlot2));
 
   runTest('isValidFormation accepts valid formation', () => isValidFormation(validFormation));
   runTest(
     'isValidFormation rejects formation with null slots',
-    () => !isValidFormation(invalidFormation1)
+    () => !isValidFormation(invalidFormation1),
   );
   runTest('isValidFormation rejects null formation', () => !isValidFormation(invalidFormation2));
 
@@ -182,7 +182,7 @@ export function runTacticalSafetyTests() {
         throw new Error('test');
       },
       99,
-      'test'
+      'test',
     );
     return result === 99;
   });
@@ -230,7 +230,7 @@ export function runTacticalSafetyTests() {
   console.log(`✅ Passed: ${testResults.passed}`);
   console.log(`❌ Failed: ${testResults.failed}`);
   console.log(
-    `📈 Success Rate: ${((testResults.passed / (testResults.passed + testResults.failed)) * 100).toFixed(1)}%`
+    `📈 Success Rate: ${((testResults.passed / (testResults.passed + testResults.failed)) * 100).toFixed(1)}%`,
   );
 
   if (testResults.failed > 0) {

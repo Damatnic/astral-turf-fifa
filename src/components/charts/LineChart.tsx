@@ -29,7 +29,7 @@ const LineChart: React.FC<LineChartProps> = ({
 
     // Filter out invalid data points and ensure valid coordinates
     const validData = data.filter(
-      d => d && typeof d.x === 'number' && typeof d.y === 'number' && !isNaN(d.x) && !isNaN(d.y)
+      d => d && typeof d.x === 'number' && typeof d.y === 'number' && !isNaN(d.x) && !isNaN(d.y),
     );
 
     if (validData.length === 0) {
@@ -71,7 +71,7 @@ const LineChart: React.FC<LineChartProps> = ({
 
     // Filter out invalid data points and ensure valid coordinates
     const validData = data.filter(
-      d => d && typeof d.x === 'number' && typeof d.y === 'number' && !isNaN(d.x) && !isNaN(d.y)
+      d => d && typeof d.x === 'number' && typeof d.y === 'number' && !isNaN(d.x) && !isNaN(d.y),
     );
 
     if (validData.length === 0) {
@@ -96,7 +96,7 @@ const LineChart: React.FC<LineChartProps> = ({
 
     // Filter out invalid data points and ensure valid coordinates
     const validData = data.filter(
-      d => d && typeof d.x === 'number' && typeof d.y === 'number' && !isNaN(d.x) && !isNaN(d.y)
+      d => d && typeof d.x === 'number' && typeof d.y === 'number' && !isNaN(d.x) && !isNaN(d.y),
     );
 
     if (validData.length === 0) {
@@ -111,7 +111,7 @@ const LineChart: React.FC<LineChartProps> = ({
   // Generate accessible description
   const ariaDescription = useMemo(
     () => generateLineChartDescription(data, xAxisLabel, yAxisLabel, title),
-    [data, xAxisLabel, yAxisLabel, title]
+    [data, xAxisLabel, yAxisLabel, title],
   );
 
   if (!data || data.length < 2) {

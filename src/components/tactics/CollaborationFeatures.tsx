@@ -211,7 +211,7 @@ const CollaborationFeatures: React.FC<CollaborationFeaturesProps> = ({
       visibility: 'team',
       version: 1,
     }),
-    [currentUser, liveMode]
+    [currentUser, liveMode],
   );
 
   const currentSession = session || mockSession;
@@ -515,7 +515,7 @@ const CollaborationFeatures: React.FC<CollaborationFeaturesProps> = ({
                 <div ref={chatRef} className="flex-1 overflow-y-auto p-6 space-y-4">
                   {currentSession.comments.map(comment => {
                     const author = currentSession.collaborators.find(
-                      c => c.id === comment.authorId
+                      c => c.id === comment.authorId,
                     );
                     return (
                       <motion.div
@@ -559,7 +559,7 @@ const CollaborationFeatures: React.FC<CollaborationFeaturesProps> = ({
                           <div className="space-y-2 ml-4 border-l-2 border-slate-600 pl-4">
                             {comment.replies.map(reply => {
                               const replyAuthor = currentSession.collaborators.find(
-                                c => c.id === reply.authorId
+                                c => c.id === reply.authorId,
                               );
                               return (
                                 <div key={reply.id} className="text-sm">

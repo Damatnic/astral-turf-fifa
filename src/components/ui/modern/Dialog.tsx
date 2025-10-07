@@ -56,7 +56,7 @@ export const DialogContent = forwardRef<HTMLDivElement, DialogContentProps>(
       closeOnEscapeKey = true,
       ...props
     },
-    ref
+    ref,
   ) => {
     const context = React.useContext(DialogContext);
     const [mounted, setMounted] = useState(false);
@@ -121,7 +121,7 @@ export const DialogContent = forwardRef<HTMLDivElement, DialogContentProps>(
             'mx-4 my-8',
             dialogSizes[size],
             position === 'center' && 'max-h-[calc(100vh-4rem)]',
-            className
+            className,
           )}
           role="dialog"
           aria-modal="true"
@@ -137,7 +137,7 @@ export const DialogContent = forwardRef<HTMLDivElement, DialogContentProps>(
                 'flex items-center justify-center',
                 'text-secondary-400 hover:text-white',
                 'transition-all duration-200',
-                'focus:outline-none focus:ring-2 focus:ring-primary-500/50'
+                'focus:outline-none focus:ring-2 focus:ring-primary-500/50',
               )}
               aria-label="Close dialog"
             >
@@ -155,9 +155,9 @@ export const DialogContent = forwardRef<HTMLDivElement, DialogContentProps>(
           {children}
         </div>
       </div>,
-      document.body
+      document.body,
     );
-  }
+  },
 );
 
 DialogContent.displayName = 'DialogContent';
@@ -167,7 +167,7 @@ export const DialogHeader = forwardRef<HTMLDivElement, DialogHeaderProps>(
     <div ref={ref} className={cn('flex flex-col space-y-1.5 p-6 pb-4', className)} {...props}>
       {children}
     </div>
-  )
+  ),
 );
 
 DialogHeader.displayName = 'DialogHeader';
@@ -177,7 +177,7 @@ export const DialogBody = forwardRef<HTMLDivElement, DialogBodyProps>(
     <div ref={ref} className={cn('px-6 py-2 overflow-y-auto', className)} {...props}>
       {children}
     </div>
-  )
+  ),
 );
 
 DialogBody.displayName = 'DialogBody';
@@ -188,13 +188,13 @@ export const DialogFooter = forwardRef<HTMLDivElement, DialogFooterProps>(
       ref={ref}
       className={cn(
         'flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 p-6 pt-4',
-        className
+        className,
       )}
       {...props}
     >
       {children}
     </div>
-  )
+  ),
 );
 
 DialogFooter.displayName = 'DialogFooter';
@@ -208,7 +208,7 @@ export const DialogTitle = forwardRef<HTMLHeadingElement, React.HTMLAttributes<H
     >
       {children}
     </h2>
-  )
+  ),
 );
 
 DialogTitle.displayName = 'DialogTitle';

@@ -46,7 +46,7 @@ const calculateStaggerDelay = (
   index: number,
   total: number,
   baseDelay: number,
-  order: TransitionConfig['order']
+  order: TransitionConfig['order'],
 ): number => {
   switch (order) {
     case 'sequential':
@@ -85,7 +85,7 @@ export const useFormationTransition = (config: TransitionConfig = {}) => {
   const mergedConfig = useMemo(() => ({ ...DEFAULT_CONFIG, ...config }), [config]);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [activeTransitions, setActiveTransitions] = useState<Map<string, PlayerTransition>>(
-    new Map()
+    new Map(),
   );
   const transitionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -96,7 +96,7 @@ export const useFormationTransition = (config: TransitionConfig = {}) => {
     (
       players: Player[],
       newPositions: Map<string, { x: number; y: number }>,
-      customConfig?: TransitionConfig
+      customConfig?: TransitionConfig,
     ) => {
       const config = { ...mergedConfig, ...customConfig };
 
@@ -120,7 +120,7 @@ export const useFormationTransition = (config: TransitionConfig = {}) => {
             index,
             orderedPlayers.length,
             config.staggerDelay,
-            config.order
+            config.order,
           );
 
           transitions.set(player.id, {
@@ -153,7 +153,7 @@ export const useFormationTransition = (config: TransitionConfig = {}) => {
 
       return transitions;
     },
-    [mergedConfig]
+    [mergedConfig],
   );
 
   /**
@@ -175,7 +175,7 @@ export const useFormationTransition = (config: TransitionConfig = {}) => {
     (playerId: string): PlayerTransition | null => {
       return activeTransitions.get(playerId) ?? null;
     },
-    [activeTransitions]
+    [activeTransitions],
   );
 
   /**
@@ -185,7 +185,7 @@ export const useFormationTransition = (config: TransitionConfig = {}) => {
     (playerId: string): boolean => {
       return activeTransitions.has(playerId);
     },
-    [activeTransitions]
+    [activeTransitions],
   );
 
   return {

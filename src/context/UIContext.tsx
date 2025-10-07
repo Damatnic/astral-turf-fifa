@@ -115,7 +115,7 @@ export const UIProvider: React.FC<UIProviderProps> = ({ children, initialState }
   const [uiState, dispatch] = useReducer(
     uiReducer as unknown as React.Reducer<UIState, Action>,
     INITIAL_STATE.ui,
-    baseState => ({ ...baseState, ...initialState })
+    baseState => ({ ...baseState, ...initialState }),
   );
   const isLoading = false;
   const error: string | null = null;
@@ -222,7 +222,7 @@ export const UIProvider: React.FC<UIProviderProps> = ({ children, initialState }
     (filter: keyof TransferMarketFilters, value: unknown) => {
       dispatch({ type: 'SET_TRANSFER_MARKET_FILTER', payload: { filter, value } } as any);
     },
-    []
+    [],
   );
 
   // AI settings

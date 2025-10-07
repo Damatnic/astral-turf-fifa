@@ -9,7 +9,7 @@ const InternationalManagementPage: React.FC = () => {
 
   const teamPlayers = tacticsState.players.filter(p => p.team === selectedTeam);
   const internationalPlayers = teamPlayers.filter(
-    p => p.availability.status === 'International Duty' || Math.random() > 0.7 // Mock: some players are eligible for international duty
+    p => p.availability.status === 'International Duty' || Math.random() > 0.7, // Mock: some players are eligible for international duty
   );
 
   // Mock international competitions

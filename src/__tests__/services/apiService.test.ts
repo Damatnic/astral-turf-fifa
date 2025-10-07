@@ -43,7 +43,7 @@ describe('ApiService', () => {
           headers: expect.objectContaining({
             'Content-Type': 'application/json',
           }),
-        })
+        }),
       );
       expect(result).toEqual(mockData);
     });
@@ -72,7 +72,7 @@ describe('ApiService', () => {
             'Content-Type': 'application/json',
             Authorization: 'Bearer token123',
           }),
-        })
+        }),
       );
     });
   });
@@ -93,7 +93,7 @@ describe('ApiService', () => {
             'Content-Type': 'application/json',
           }),
           body: JSON.stringify(postData),
-        })
+        }),
       );
       expect(result).toEqual(responseData);
     });
@@ -114,7 +114,7 @@ describe('ApiService', () => {
           method: 'POST',
           body: formData,
           // Should NOT include Content-Type header for FormData
-        })
+        }),
       );
     });
   });
@@ -135,7 +135,7 @@ describe('ApiService', () => {
             'Content-Type': 'application/json',
           }),
           body: JSON.stringify(updateData),
-        })
+        }),
       );
       expect(result).toEqual(responseData);
     });
@@ -154,7 +154,7 @@ describe('ApiService', () => {
         expect.objectContaining({
           method: 'PATCH',
           body: JSON.stringify(patchData),
-        })
+        }),
       );
       expect(result).toEqual(responseData);
     });
@@ -170,7 +170,7 @@ describe('ApiService', () => {
         '/users/1',
         expect.objectContaining({
           method: 'DELETE',
-        })
+        }),
       );
       expect(result).toEqual({ success: true });
     });
@@ -245,7 +245,7 @@ describe('ApiService', () => {
           headers: expect.objectContaining({
             Authorization: 'Bearer interceptor-token',
           }),
-        })
+        }),
       );
     });
   });
@@ -296,7 +296,7 @@ describe('ApiService', () => {
       (fetch as any).mockRejectedValue(new Error('Persistent error'));
 
       await expect((apiService as any).get('/data', { retries: 2 })).rejects.toThrow(
-        'Persistent error'
+        'Persistent error',
       );
       expect(fetch).toHaveBeenCalledTimes(3); // Initial + 2 retries
     });

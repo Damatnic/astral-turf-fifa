@@ -47,7 +47,7 @@ describe('Minimal Error Boundary Test', () => {
     // Check retry button exists by role (text is split across nodes: "Retry (", "3", " left)")
     const retryButton = screen.getByRole('button', { name: /retry/i });
     expect(retryButton).toBeInTheDocument();
-    
+
     // Verify retry button text contains expected parts
     expect(retryButton.textContent).toContain('Retry');
     expect(retryButton.textContent).toContain('left');

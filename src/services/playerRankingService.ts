@@ -405,7 +405,7 @@ class PlayerRankingService {
     difficulty: ChallengeDifficulty,
     xpReward: number,
     attributePointReward?: number,
-    badgeReward?: string
+    badgeReward?: string,
   ) {
     const profile = this.getProfile(playerId);
 
@@ -449,7 +449,7 @@ class PlayerRankingService {
 
     // Update weekly goals
     const challengeGoal = profile.weeklyProgress.weeklyGoals.find(
-      g => g.id === 'weekly-challenges'
+      g => g.id === 'weekly-challenges',
     );
     if (challengeGoal && !challengeGoal.completed) {
       challengeGoal.current++;
@@ -494,7 +494,7 @@ class PlayerRankingService {
 
     if (lastCompletion) {
       const daysSinceLastCompletion = Math.floor(
-        (now.getTime() - lastCompletion.getTime()) / (24 * 60 * 60 * 1000)
+        (now.getTime() - lastCompletion.getTime()) / (24 * 60 * 60 * 1000),
       );
 
       if (daysSinceLastCompletion === 1) {
@@ -534,7 +534,7 @@ class PlayerRankingService {
 
     // Add to daily activity
     let todayActivity = profile.weeklyProgress.dailyActivity.find(
-      d => new Date(d.date).toDateString() === today
+      d => new Date(d.date).toDateString() === today,
     );
 
     if (!todayActivity) {
@@ -630,7 +630,7 @@ class PlayerRankingService {
   spendAttributePoints(
     playerId: string,
     attribute: keyof PlayerAttributes,
-    points: number
+    points: number,
   ): boolean {
     const profile = this.getProfile(playerId);
 
@@ -654,7 +654,7 @@ class PlayerRankingService {
   // Get leaderboard
   getLeaderboard(
     playerIds: string[],
-    sortBy: 'total' | 'weekly' | 'monthly' = 'total'
+    sortBy: 'total' | 'weekly' | 'monthly' = 'total',
   ): LeaderboardEntry[] {
     const entries: LeaderboardEntry[] = playerIds.map(playerId => {
       const profile = this.getProfile(playerId);
@@ -777,13 +777,13 @@ class PlayerRankingService {
 
     // Prioritize favorite category
     const favoriteCategory = availableChallenges.filter(
-      c => c.category === profile.totalStats.favoriteCategory
+      c => c.category === profile.totalStats.favoriteCategory,
     );
     recommendations.push(...favoriteCategory.slice(0, 2).map(c => c.id));
 
     // Add variety from other categories
     const otherCategories = availableChallenges.filter(
-      c => c.category !== profile.totalStats.favoriteCategory
+      c => c.category !== profile.totalStats.favoriteCategory,
     );
     recommendations.push(...otherCategories.slice(0, 2).map(c => c.id));
 

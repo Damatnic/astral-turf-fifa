@@ -111,7 +111,7 @@ describe('Enhanced Player Token', () => {
           onDragEnd={onDragEnd}
           showNameAlways={true}
         />
-      </TestWrapper>
+      </TestWrapper>,
     );
 
     // Check if player name is displayed
@@ -131,7 +131,7 @@ describe('Enhanced Player Token', () => {
           isSelected={false}
           onSelect={onSelect}
         />
-      </TestWrapper>
+      </TestWrapper>,
     );
 
     const playerToken = screen.getByRole('button', { name: /lionel messi/i });
@@ -149,7 +149,7 @@ describe('Enhanced Player Token', () => {
           isSelected={true}
           onSelect={vi.fn()}
         />
-      </TestWrapper>
+      </TestWrapper>,
     );
 
     // Check for selection indicators
@@ -169,7 +169,7 @@ describe('Enhanced Player Token', () => {
           isSelected={false}
           onSelect={onSelect}
         />
-      </TestWrapper>
+      </TestWrapper>,
     );
 
     const playerToken = screen.getByRole('button', { name: /lionel messi/i });
@@ -194,7 +194,7 @@ describe('Enhanced Player Token', () => {
           onDragEnd={onDragEnd}
           isDraggable={true}
         />
-      </TestWrapper>
+      </TestWrapper>,
     );
 
     const playerToken = screen.getByRole('button', { name: /lionel messi/i });
@@ -238,7 +238,7 @@ describe('Enhanced Drawing Canvas', () => {
           onAddDrawing={vi.fn()}
           gestureEnabled={true}
         />
-      </TestWrapper>
+      </TestWrapper>,
     );
 
     // Check for SVG canvas
@@ -259,7 +259,7 @@ describe('Enhanced Drawing Canvas', () => {
           onAddDrawing={onAddDrawing}
           gestureEnabled={true}
         />
-      </TestWrapper>
+      </TestWrapper>,
     );
 
     const canvas = screen.getByRole('img', { hidden: true });
@@ -286,7 +286,7 @@ describe('Enhanced Drawing Canvas', () => {
           drawings={[]}
           onAddDrawing={onAddDrawing}
         />
-      </TestWrapper>
+      </TestWrapper>,
     );
 
     const canvas = screen.getByRole('img', { hidden: true });
@@ -326,7 +326,7 @@ describe('Enhanced Drawing Canvas', () => {
           onAddDrawing={vi.fn()}
           onDeleteDrawing={onDeleteDrawing}
         />
-      </TestWrapper>
+      </TestWrapper>,
     );
 
     // Should show selection controls when shapes are selected
@@ -348,7 +348,7 @@ describe('Enhanced Formation Templates', () => {
     render(
       <TestWrapper>
         <FormationTemplates onSelect={onSelect} onClose={onClose} />
-      </TestWrapper>
+      </TestWrapper>,
     );
 
     expect(screen.getByText('Formation Templates')).toBeInTheDocument();
@@ -363,7 +363,7 @@ describe('Enhanced Formation Templates', () => {
     render(
       <TestWrapper>
         <FormationTemplates onSelect={onSelect} onClose={onClose} />
-      </TestWrapper>
+      </TestWrapper>,
     );
 
     const searchInput = screen.getByPlaceholderText('Search formations...');
@@ -380,7 +380,7 @@ describe('Enhanced Formation Templates', () => {
     render(
       <TestWrapper>
         <FormationTemplates onSelect={onSelect} onClose={onClose} />
-      </TestWrapper>
+      </TestWrapper>,
     );
 
     // Find and click a formation
@@ -399,7 +399,7 @@ describe('Enhanced Formation Templates', () => {
     render(
       <TestWrapper>
         <FormationTemplates onSelect={onSelect} onClose={onClose} />
-      </TestWrapper>
+      </TestWrapper>,
     );
 
     // Click on attacking category
@@ -418,7 +418,7 @@ describe('Enhanced Formation Templates', () => {
     render(
       <TestWrapper>
         <FormationTemplates onSelect={onSelect} onClose={onClose} />
-      </TestWrapper>
+      </TestWrapper>,
     );
 
     await user.keyboard('{Escape}');
@@ -454,7 +454,7 @@ describe('Accessibility Features', () => {
           onSelect={vi.fn()}
           performanceMode={true}
         />
-      </TestWrapper>
+      </TestWrapper>,
     );
 
     // Should render without animations
@@ -485,7 +485,7 @@ describe('Accessibility Features', () => {
           isSelected={false}
           onSelect={vi.fn()}
         />
-      </TestWrapper>
+      </TestWrapper>,
     );
 
     expect(screen.getByText('Lionel Messi')).toBeInTheDocument();
@@ -505,7 +505,7 @@ describe('Accessibility Features', () => {
           drawings={[]}
           onAddDrawing={onAddDrawing}
         />
-      </TestWrapper>
+      </TestWrapper>,
     );
 
     // Test keyboard shortcuts (simulated through document)
@@ -528,7 +528,7 @@ describe('Theme Integration', () => {
           isSelected={false}
           onSelect={vi.fn()}
         />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
 
     expect(screen.getByText('Lionel Messi')).toBeInTheDocument();
@@ -543,7 +543,7 @@ describe('Theme Integration', () => {
           isSelected={false}
           onSelect={vi.fn()}
         />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
 
     expect(screen.getByText('Lionel Messi')).toBeInTheDocument();
@@ -573,7 +573,7 @@ describe('Theme Integration', () => {
           isSelected={false}
           onSelect={vi.fn()}
         />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
 
     expect(screen.getByText('Lionel Messi')).toBeInTheDocument();
@@ -604,7 +604,7 @@ describe('Performance Optimizations', () => {
             />
           ))}
         </div>
-      </TestWrapper>
+      </TestWrapper>,
     );
 
     expect(screen.getByText('Player 0')).toBeInTheDocument();
@@ -620,7 +620,7 @@ describe('Performance Optimizations', () => {
           onSelect={vi.fn()}
           performanceMode={true}
         />
-      </TestWrapper>
+      </TestWrapper>,
     );
 
     expect(screen.getByText('Lionel Messi')).toBeInTheDocument();

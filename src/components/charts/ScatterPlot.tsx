@@ -24,7 +24,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
 }) => {
   const padding = useMemo(() => ({ top: 20, right: 20, bottom: 50, left: 50 }), []);
   const [tooltip, setTooltip] = useState<{ x: number; y: number; point: ScatterPoint } | null>(
-    null
+    null,
   );
 
   const { xScale, yScale, points } = useMemo(() => {
@@ -34,7 +34,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
 
     // Filter out invalid data points and ensure valid coordinates
     const validData = data.filter(
-      d => d && typeof d.x === 'number' && typeof d.y === 'number' && !isNaN(d.x) && !isNaN(d.y)
+      d => d && typeof d.x === 'number' && typeof d.y === 'number' && !isNaN(d.x) && !isNaN(d.y),
     );
 
     if (validData.length === 0) {
@@ -67,7 +67,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
 
     // Filter out invalid data points and ensure valid coordinates
     const validData = data.filter(
-      d => d && typeof d.x === 'number' && typeof d.y === 'number' && !isNaN(d.x) && !isNaN(d.y)
+      d => d && typeof d.x === 'number' && typeof d.y === 'number' && !isNaN(d.x) && !isNaN(d.y),
     );
 
     if (validData.length === 0) {

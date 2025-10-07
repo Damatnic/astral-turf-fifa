@@ -13,7 +13,7 @@ const MedicalCenterPage: React.FC = () => {
 
   // Filter players by medical status
   const injuredPlayers = teamPlayers.filter(
-    p => p.availability.status === 'Minor Injury' || p.availability.status === 'Major Injury'
+    p => p.availability.status === 'Minor Injury' || p.availability.status === 'Major Injury',
   );
 
   const lowFitnessPlayers = teamPlayers.filter(p => p.stamina < 70);
@@ -146,13 +146,13 @@ const MedicalCenterPage: React.FC = () => {
     const highRiskPlayers = teamPlayers.filter(p => p.injuryRisk > 60).length;
 
     const averageFitness = Math.round(
-      teamPlayers.reduce((sum, p) => sum + p.stamina, 0) / totalPlayers
+      teamPlayers.reduce((sum, p) => sum + p.stamina, 0) / totalPlayers,
     );
     const averageFatigue = Math.round(
-      teamPlayers.reduce((sum, p) => sum + p.fatigue, 0) / totalPlayers
+      teamPlayers.reduce((sum, p) => sum + p.fatigue, 0) / totalPlayers,
     );
     const averageRisk = Math.round(
-      teamPlayers.reduce((sum, p) => sum + p.injuryRisk, 0) / totalPlayers
+      teamPlayers.reduce((sum, p) => sum + p.injuryRisk, 0) / totalPlayers,
     );
 
     return {

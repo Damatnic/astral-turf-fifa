@@ -79,7 +79,7 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
         y: Math.max(0, Math.min(100, y)),
       };
     },
-    [fieldRef]
+    [fieldRef],
   );
 
   /**
@@ -101,7 +101,7 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
         y: Math.max(0, Math.min(100, y)),
       };
     },
-    [screenToField]
+    [screenToField],
   );
 
   /**
@@ -146,7 +146,7 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
 
       return path;
     },
-    []
+    [],
   );
 
   /**
@@ -228,7 +228,7 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
       cursorControls,
       isMobile,
       isTablet,
-    ]
+    ],
   );
 
   // Find shape at specific point for selection
@@ -239,7 +239,7 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
         if (shape.tool === 'text' && shape.points.length > 0) {
           const textPoint = shape.points[0];
           const distance = Math.sqrt(
-            Math.pow(point.x - textPoint.x, 2) + Math.pow(point.y - textPoint.y, 2)
+            Math.pow(point.x - textPoint.x, 2) + Math.pow(point.y - textPoint.y, 2),
           );
           if (distance < 2) {
             return shape;
@@ -249,7 +249,7 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
       }
       return null;
     },
-    [drawings]
+    [drawings],
   );
 
   /**
@@ -279,7 +279,7 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
       const lastPoint = currentShape.points[currentShape.points.length - 1];
       const timeDiff = now - ((lastPoint as any).timestamp || currentShape.timestamp);
       const distance = Math.sqrt(
-        Math.pow(point.x - lastPoint.x, 2) + Math.pow(point.y - lastPoint.y, 2)
+        Math.pow(point.x - lastPoint.x, 2) + Math.pow(point.y - lastPoint.y, 2),
       );
 
       const updatedPoints = [...currentShape.points];
@@ -309,7 +309,7 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
         points: updatedPoints,
       });
     },
-    [isDrawing, currentShape, svgToField, drawingTool, findShapeAtPoint]
+    [isDrawing, currentShape, svgToField, drawingTool, findShapeAtPoint],
   );
 
   /**
@@ -392,7 +392,7 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
         setTextInput(null);
       }
     },
-    [handleTextSubmit]
+    [handleTextSubmit],
   );
 
   // Touch event handlers for gesture support
@@ -436,7 +436,7 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
 
       handleMouseDown(mouseEvent);
     },
-    [disabled, gestureEnabled, screenToField, getTouchPressure, handleMouseDown]
+    [disabled, gestureEnabled, screenToField, getTouchPressure, handleMouseDown],
   );
 
   const handleTouchMove = useCallback(
@@ -470,7 +470,7 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
               velocity,
               pressure: getTouchPressure(touch as any as Touch),
             }
-          : null
+          : null,
       );
 
       // Convert to mouse event equivalent
@@ -492,7 +492,7 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
       screenToField,
       getTouchPressure,
       handleMouseMove,
-    ]
+    ],
   );
 
   const handleTouchEnd = useCallback(
@@ -508,7 +508,7 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
 
       handleMouseUp();
     },
-    [disabled, gestureEnabled, handleMouseUp]
+    [disabled, gestureEnabled, handleMouseUp],
   );
 
   /**
@@ -548,7 +548,7 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
         }
       }
     },
-    [drawingTool, selectedShapes, onDeleteDrawing, isMobile, isTablet]
+    [drawingTool, selectedShapes, onDeleteDrawing, isMobile, isTablet],
   );
 
   /**
@@ -784,7 +784,7 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
         </motion.g>
       );
     },
-    [drawingTool, handleShapeClick, selectedShapes, hoveredShape, generateSmoothPath]
+    [drawingTool, handleShapeClick, selectedShapes, hoveredShape, generateSmoothPath],
   );
 
   // Enhanced cursor with visual feedback

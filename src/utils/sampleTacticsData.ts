@@ -483,7 +483,7 @@ const formationSlots: Array<FormationSlot & { roleId: string }> = STARTER_CONFIG
     defaultPosition,
     playerId: id,
     roleId,
-  })
+  }),
 );
 
 export const SAMPLE_FORMATION_433: Formation = {

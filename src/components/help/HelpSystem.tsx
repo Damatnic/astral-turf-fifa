@@ -613,7 +613,7 @@ export const HelpSystem: React.FC = () => {
         }));
       },
     }),
-    []
+    [],
   );
 
   // Keyboard shortcuts
@@ -754,7 +754,7 @@ export const HelpSystem: React.FC = () => {
                               .map(word => word.charAt(0).toUpperCase() + word.slice(1))
                               .join(' ')}
                           </button>
-                        )
+                        ),
                       )}
                     </div>
 

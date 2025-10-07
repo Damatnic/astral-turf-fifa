@@ -44,7 +44,7 @@ export interface PlayerDevelopmentPlan {
   age: number;
   developmentStage: 'emerging' | 'developing' | 'prime' | 'experienced' | 'veteran';
   priority: 'high' | 'medium' | 'low';
-  
+
   // Strategic assessment
   strengths: Array<{ attribute: string; value: number; rating: string }>;
   weaknesses: Array<{ attribute: string; value: number; gap: number }>;
@@ -53,7 +53,7 @@ export interface PlayerDevelopmentPlan {
     alternative: string[];
     reasoning: string;
   };
-  
+
   // Weekly development plan
   weeklyPlan: {
     monday: TrainingFocusDay;
@@ -64,7 +64,7 @@ export interface PlayerDevelopmentPlan {
     saturday: TrainingFocusDay;
     sunday: TrainingFocusDay;
   };
-  
+
   // Long-term projections
   twelveWeekProjection: {
     estimatedAttributeGains: {
@@ -82,7 +82,7 @@ export interface PlayerDevelopmentPlan {
       description: string;
     }>;
   };
-  
+
   // Recommendations
   recommendations: string[];
   riskFactors: string[];
@@ -147,10 +147,10 @@ export interface TeamTrainingAnalysis {
   injuryRisk: number;
   fatiguLevel: number;
   developmentProgress: number;
-  
+
   teamStrengths: string[];
   teamWeaknesses: string[];
-  
+
   recommendedIntensity: {
     monday: 'low' | 'medium' | 'high';
     tuesday: 'low' | 'medium' | 'high';
@@ -160,7 +160,7 @@ export interface TeamTrainingAnalysis {
     saturday: 'low' | 'medium' | 'high';
     sunday: 'low' | 'medium' | 'high';
   };
-  
+
   suggestedFocus: Array<{
     day: keyof WeeklySchedule;
     focus: string;
@@ -189,7 +189,7 @@ export class AITrainingSimulator {
     const coachBonus = (coachQuality - 50) / 100; // -0.5 to +0.5
     const facilityBonus = (facilityLevel / 5) * 0.2; // 0 to 0.2
     const totalMultiplier = 1 + ageFactor + potentialFactor + coachBonus + facilityBonus;
-    
+
     // Initialize changes
     const attributeChanges = {
       pace: 0,
@@ -199,69 +199,69 @@ export class AITrainingSimulator {
       defending: 0,
       physical: 0,
     };
-    
+
     let totalFatigue = 0;
     let totalMorale = 0;
     let totalInjuryRisk = 0;
     const insights: string[] = [];
-    
+
     // Process each drill
     drills.forEach(drill => {
       // Calculate attribute gains
       const intensityMultiplier = drill.intensity === 'high' ? 1.5 : drill.intensity === 'medium' ? 1.0 : 0.5;
       const baseGain = 0.15 * intensityMultiplier * totalMultiplier;
-      
+
       // Primary attributes
       drill.primaryAttributes.forEach(attr => {
         const randomVariation = 0.8 + Math.random() * 0.4; // 0.8-1.2
         const gain = baseGain * randomVariation;
-        
+
         const key = attr as keyof typeof attributeChanges;
         if (key in attributeChanges) {
           attributeChanges[key] += gain;
         }
       });
-      
+
       // Secondary attributes (half effectiveness)
       drill.secondaryAttributes.forEach(attr => {
         const randomVariation = 0.8 + Math.random() * 0.4;
         const gain = (baseGain * 0.5) * randomVariation;
-        
+
         const key = attr as keyof typeof attributeChanges;
         if (key in attributeChanges) {
           attributeChanges[key] += gain;
         }
       });
-      
+
       // Accumulate effects
       totalFatigue += drill.fatigueEffect;
       totalMorale += drill.moraleEffect;
       totalInjuryRisk = Math.max(totalInjuryRisk, drill.injuryRisk);
     });
-    
+
     // Check for injury
     const injuryOccurred = Math.random() < totalInjuryRisk;
     let injuryDetails: AITrainingSimulationResult['injuryDetails'];
-    
+
     if (injuryOccurred) {
       const isMajor = Math.random() < 0.2; // 20% chance of major injury
       const affectedAttributes = Object.keys(attributeChanges).filter(
         attr => attributeChanges[attr as keyof typeof attributeChanges] > 0,
       );
-      
+
       injuryDetails = {
         type: isMajor ? 'Major Injury' : 'Minor Injury',
         estimatedRecovery: isMajor ? 21 + Math.floor(Math.random() * 14) : 7 + Math.floor(Math.random() * 7),
         affectedAttribute: affectedAttributes[Math.floor(Math.random() * affectedAttributes.length)] || 'physical',
       };
-      
+
       insights.push(`⚠️ Injury occurred during training: ${injuryDetails.type}`);
     }
-    
+
     // Calculate performance rating
     const attributeGainTotal = Object.values(attributeChanges).reduce((sum, val) => sum + val, 0);
     const performanceRating = Math.min(100, Math.max(0, 50 + (attributeGainTotal * 10) - (totalFatigue * 2) + (totalMorale * 5)));
-    
+
     // Generate insights
     if (attributeGainTotal > 1.0) {
       insights.push('✨ Excellent training session! Significant attribute improvements.');
@@ -270,17 +270,17 @@ export class AITrainingSimulator {
     } else if (attributeGainTotal < 0.2) {
       insights.push('⚠️ Limited progress - consider increasing training intensity or changing drills.');
     }
-    
+
     if (totalFatigue > 40) {
       insights.push('⚠️ High fatigue accumulation - rest recommended soon.');
     }
-    
+
     if (totalMorale > 2) {
       insights.push('😊 Training boosted player morale significantly.');
     } else if (totalMorale < -1) {
       insights.push('😟 Training had negative impact on morale - review training approach.');
     }
-    
+
     return {
       playerId: player.id,
       playerName: player.name,
@@ -293,7 +293,7 @@ export class AITrainingSimulator {
       insights,
     };
   }
-  
+
   private static calculateAgeFactor(age: number): number {
     // Peak development at 19-23
     if (age < 18) {
@@ -310,12 +310,12 @@ export class AITrainingSimulator {
     }
     return -0.2; // Declining
   }
-  
+
   private static calculatePotentialFactor(player: Player): number {
     const current = this.calculateOverall(player);
     const potential = player.currentPotential;
     const gap = potential - current;
-    
+
     if (gap > 20) {
       return 0.3;
     }
@@ -327,7 +327,7 @@ export class AITrainingSimulator {
     }
     return 0;
   }
-  
+
   private static calculateOverall(player: Player): number {
     return Math.round(
       ((player.pace ?? 70) +
@@ -335,7 +335,7 @@ export class AITrainingSimulator {
         (player.passing ?? 70) +
         (player.dribbling ?? 70) +
         (player.defending ?? 70) +
-        (player.physical ?? 70)) / 6
+        (player.physical ?? 70)) / 6,
     );
   }
 }
@@ -349,30 +349,30 @@ export class PlayerDevelopmentPlanGenerator {
   static generatePlan(
     player: Player,
     targetRole?: string,
-    timeframe: number = 12 // weeks
+    timeframe: number = 12, // weeks
   ): PlayerDevelopmentPlan {
     const currentRating = this.calculateOverall(player);
     const potentialRating = player.currentPotential;
     const developmentStage = this.determineDevelopmentStage(player.age, currentRating, potentialRating);
     const priority = this.determinePriority(player.age, currentRating, potentialRating);
-    
+
     // Analyze strengths and weaknesses
     const { strengths, weaknesses } = this.analyzeAttributes(player, currentRating);
-    
+
     // Role recommendation
     const roleRecommendation = this.recommendRole(player, targetRole);
-    
+
     // Generate weekly plan
     const weeklyPlan = this.generateWeeklyPlan(player, weaknesses, strengths, developmentStage);
-    
+
     // Project 12-week development
     const twelveWeekProjection = this.projectDevelopment(player, weeklyPlan, timeframe);
-    
+
     // Generate recommendations
     const recommendations = this.generateRecommendations(player, weaknesses, developmentStage);
     const riskFactors = this.identifyRiskFactors(player);
     const estimatedTimeToReachPotential = this.estimateTimeToReachPotential(player);
-    
+
     return {
       playerId: player.id,
       playerName: player.name,
@@ -391,7 +391,7 @@ export class PlayerDevelopmentPlanGenerator {
       estimatedTimeToReachPotential,
     };
   }
-  
+
   private static calculateOverall(player: Player): number {
     return Math.round(
       ((player.pace ?? 70) +
@@ -399,14 +399,14 @@ export class PlayerDevelopmentPlanGenerator {
         (player.passing ?? 70) +
         (player.dribbling ?? 70) +
         (player.defending ?? 70) +
-        (player.physical ?? 70)) / 6
+        (player.physical ?? 70)) / 6,
     );
   }
-  
+
   private static determineDevelopmentStage(
     age: number,
     current: number,
-    potential: number
+    potential: number,
   ): PlayerDevelopmentPlan['developmentStage'] {
     if (age < 20) {
       return 'emerging';
@@ -422,10 +422,10 @@ export class PlayerDevelopmentPlanGenerator {
     }
     return 'veteran';
   }
-  
+
   private static determinePriority(age: number, current: number, potential: number): 'high' | 'medium' | 'low' {
     const gap = potential - current;
-    
+
     if (age < 23 && gap > 10) {
       return 'high'; // Young player with high potential
     }
@@ -437,7 +437,7 @@ export class PlayerDevelopmentPlanGenerator {
     }
     return 'low';
   }
-  
+
   private static analyzeAttributes(player: Player, overallRating: number) {
     const attributes = {
       pace: player.pace ?? 70,
@@ -447,10 +447,10 @@ export class PlayerDevelopmentPlanGenerator {
       defending: player.defending ?? 70,
       physical: player.physical ?? 70,
     };
-    
+
     const strengths: PlayerDevelopmentPlan['strengths'] = [];
     const weaknesses: PlayerDevelopmentPlan['weaknesses'] = [];
-    
+
     Object.entries(attributes).forEach(([attr, value]) => {
       if (value >= overallRating + 5) {
         strengths.push({
@@ -466,13 +466,13 @@ export class PlayerDevelopmentPlanGenerator {
         });
       }
     });
-    
+
     // Sort by gap (largest first)
     weaknesses.sort((a, b) => b.gap - a.gap);
-    
+
     return { strengths, weaknesses };
   }
-  
+
   private static recommendRole(player: Player, targetRole?: string) {
     // Simplified role recommendation based on attributes
     const attributes = {
@@ -483,11 +483,11 @@ export class PlayerDevelopmentPlanGenerator {
       defending: player.defending ?? 70,
       physical: player.physical ?? 70,
     };
-    
+
     let primary = targetRole || 'cm';
     const alternative: string[] = [];
     let reasoning = '';
-    
+
     // Attacking players
     if (attributes.shooting > 75 && attributes.dribbling > 70) {
       primary = 'st';
@@ -512,24 +512,24 @@ export class PlayerDevelopmentPlanGenerator {
       alternative.push('cdm', 'cam');
       reasoning = 'Balanced attributes allow flexibility in central midfield roles.';
     }
-    
+
     return { primary, alternative, reasoning };
   }
-  
+
   private static generateWeeklyPlan(
     player: Player,
     weaknesses: PlayerDevelopmentPlan['weaknesses'],
     strengths: PlayerDevelopmentPlan['strengths'],
-    stage: PlayerDevelopmentPlan['developmentStage']
+    stage: PlayerDevelopmentPlan['developmentStage'],
   ): PlayerDevelopmentPlan['weeklyPlan'] {
     // Base intensity on development stage
-    const baseIntensity: 'low' | 'medium' | 'high' = 
+    const baseIntensity: 'low' | 'medium' | 'high' =
       stage === 'emerging' || stage === 'developing' ? 'high' :
       stage === 'prime' ? 'medium' : 'low';
-    
+
     // Get top 3 weaknesses to focus on
     const focusAttributes = weaknesses.slice(0, 3).map(w => w.attribute);
-    
+
     return {
       monday: {
         focus: 'physical',
@@ -589,11 +589,11 @@ export class PlayerDevelopmentPlanGenerator {
       },
     };
   }
-  
+
   private static projectDevelopment(
     player: Player,
     weeklyPlan: PlayerDevelopmentPlan['weeklyPlan'],
-    weeks: number
+    weeks: number,
   ): PlayerDevelopmentPlan['twelveWeekProjection'] {
     // Calculate weekly gains based on plan
     const weeklyGains = {
@@ -604,11 +604,11 @@ export class PlayerDevelopmentPlanGenerator {
       defending: 0,
       physical: 0,
     };
-    
+
     // Analyze weekly plan to estimate gains
     Object.values(weeklyPlan).forEach(day => {
       const dayMultiplier = day.intensity === 'high' ? 0.03 : day.intensity === 'medium' ? 0.02 : 0.01;
-      
+
       day.primaryAttributes.forEach(attr => {
         const key = attr as keyof typeof weeklyGains;
         if (key in weeklyGains) {
@@ -616,7 +616,7 @@ export class PlayerDevelopmentPlanGenerator {
         }
       });
     });
-    
+
     // Project over time period
     const estimatedAttributeGains = {
       pace: weeklyGains.pace * weeks,
@@ -626,9 +626,9 @@ export class PlayerDevelopmentPlanGenerator {
       defending: weeklyGains.defending * weeks,
       physical: weeklyGains.physical * weeks,
     };
-    
+
     const estimatedOverallGain = Object.values(estimatedAttributeGains).reduce((sum, val) => sum + val, 0) / 6;
-    
+
     // Define milestones
     const milestones = [
       {
@@ -652,21 +652,21 @@ export class PlayerDevelopmentPlanGenerator {
         description: `Complete ${weeks}-week development cycle with estimated ${estimatedOverallGain.toFixed(1)} overall gain`,
       },
     ];
-    
+
     return {
       estimatedAttributeGains,
       estimatedOverallGain,
       milestones,
     };
   }
-  
+
   private static generateRecommendations(
     player: Player,
     weaknesses: PlayerDevelopmentPlan['weaknesses'],
-    stage: PlayerDevelopmentPlan['developmentStage']
+    stage: PlayerDevelopmentPlan['developmentStage'],
   ): string[] {
     const recommendations: string[] = [];
-    
+
     // Age-specific recommendations
     if (player.age < 20) {
       recommendations.push('🌟 Focus on technical skills and tactical awareness - foundation building is crucial at this age');
@@ -675,17 +675,17 @@ export class PlayerDevelopmentPlanGenerator {
       recommendations.push('💪 Emphasis on injury prevention and recovery is essential');
       recommendations.push('🧠 Leverage experience to improve tactical intelligence and leadership');
     }
-    
+
     // Weakness-based recommendations
     if (weaknesses.length > 0) {
       const topWeakness = weaknesses[0];
       recommendations.push(`🎯 Priority focus: ${topWeakness.attribute} (${topWeakness.gap.toFixed(1)} points below average)`);
     }
-    
+
     if (weaknesses.length >= 3) {
       recommendations.push('⚠️ Multiple weak areas detected - consider gradual, focused improvement rather than trying to address all at once');
     }
-    
+
     // Development stage recommendations
     if (stage === 'emerging') {
       recommendations.push('🚀 High development potential - invest heavily in training');
@@ -694,62 +694,62 @@ export class PlayerDevelopmentPlanGenerator {
     } else if (stage === 'veteran') {
       recommendations.push('🎓 Consider transition to mentoring role for young players');
     }
-    
+
     return recommendations;
   }
-  
+
   private static identifyRiskFactors(player: Player): string[] {
     const risks: string[] = [];
-    
+
     if (player.age > 30) {
       risks.push('Age-related decline risk increases after 30');
     }
-    
+
     if (player.injuryRisk && player.injuryRisk > 50) {
       risks.push('High injury risk - may limit training effectiveness');
     }
-    
+
     if (player.fatigue && player.fatigue > 70) {
       risks.push('Current fatigue levels may reduce training gains');
     }
-    
+
     if (player.morale === 'Poor' || player.morale === 'Very Poor') {
       risks.push('Low morale can significantly impact development progress');
     }
-    
+
     const current = this.calculateOverall(player);
     const potential = player.currentPotential;
     if (potential - current < 3) {
       risks.push('Limited growth potential - focus on maintaining current level');
     }
-    
+
     return risks;
   }
-  
+
   private static estimateTimeToReachPotential(player: Player): string {
     const current = this.calculateOverall(player);
     const potential = player.currentPotential;
     const gap = potential - current;
-    
+
     if (gap < 1) {
       return 'Already at potential';
     }
-    
+
     // Rough calculation: 0.3 points per week on average with focused training
     const weeksNeeded = Math.ceil(gap / 0.3);
     const months = Math.ceil(weeksNeeded / 4);
-    
+
     if (months < 12) {
       return `${months} months`;
     }
-    
+
     const years = Math.floor(months / 12);
     const remainingMonths = months % 12;
-    
+
     if (remainingMonths === 0) {
       return `${years} year${years > 1 ? 's' : ''}`;
     }
-    
+
     return `${years} year${years > 1 ? 's' : ''} ${remainingMonths} months`;
   }
 }
@@ -763,30 +763,30 @@ export class TacticalPatternAnalyzer {
   static analyzeFormation(
     formation: Formation,
     players: Player[],
-    matchHistory?: any[]
+    matchHistory?: any[],
   ): TacticalPatternRecognition {
     const formationId = formation.id;
     const formationName = formation.name;
-    
+
     // Identify common patterns
     const commonPatterns = this.identifyPatterns(formation, players);
-    
+
     // Analyze player movement
     const playerMovementPatterns = this.analyzePlayerMovement(formation, players);
-    
+
     // Identify weaknesses and strengths
     const { tacticalWeaknesses, tacticalStrengths } = this.analyzeTacticalBalance(formation, players);
-    
+
     // Recommend counter formations
     const counterFormations = this.getCounterFormations(formationName);
-    
+
     // Generate recommendations
     const recommendations = this.generateTacticalRecommendations(
       formation,
       players,
-      tacticalWeaknesses
+      tacticalWeaknesses,
     );
-    
+
     return {
       formationId,
       formationName,
@@ -798,10 +798,10 @@ export class TacticalPatternAnalyzer {
       recommendations,
     };
   }
-  
+
   private static identifyPatterns(formation: Formation, players: Player[]) {
     const patterns: TacticalPatternRecognition['commonPatterns'] = [];
-    
+
     // Pattern 1: Width vs Narrow
     const averageWidth = this.calculateAverageWidth(formation);
     if (averageWidth > 0.7) {
@@ -819,7 +819,7 @@ export class TacticalPatternAnalyzer {
         description: 'Compact shape in central areas, focusing on control through the middle',
       });
     }
-    
+
     // Pattern 2: High Press vs Deep Block
     const averageDefensiveHeight = this.calculateDefensiveHeight(formation);
     if (averageDefensiveHeight > 0.6) {
@@ -837,10 +837,10 @@ export class TacticalPatternAnalyzer {
         description: 'Defensive setup prioritizing solidity over ball recovery',
       });
     }
-    
+
     // Pattern 3: Attacking Overload
     const attackingPlayers = players.filter(p =>
-      p.roleId.includes('st') || p.roleId.includes('cf') || p.roleId.includes('w')
+      p.roleId.includes('st') || p.roleId.includes('cf') || p.roleId.includes('w'),
     );
     if (attackingPlayers.length >= 3) {
       patterns.push({
@@ -850,14 +850,14 @@ export class TacticalPatternAnalyzer {
         description: 'Multiple attacking threats create numerical superiority in final third',
       });
     }
-    
+
     return patterns;
   }
-  
+
   private static analyzePlayerMovement(formation: Formation, players: Player[]) {
     return players.map(player => {
       const role = player.roleId;
-      
+
       // Determine movement type based on role
       let movementType: 'static' | 'dynamic' | 'fluid' = 'static';
       if (role.includes('w') || role.includes('am') || role.includes('ss')) {
@@ -865,13 +865,13 @@ export class TacticalPatternAnalyzer {
       } else if (role.includes('m') || role.includes('fb')) {
         movementType = 'dynamic';
       }
-      
+
       // Define heatmap zones
       const heatmapZones = this.getHeatmapZones(role, player.position);
-      
+
       // Find interaction partners (nearby players)
       const interactionPartners = this.findInteractionPartners(player, players);
-      
+
       return {
         playerId: player.id,
         playerName: player.name,
@@ -882,11 +882,11 @@ export class TacticalPatternAnalyzer {
       };
     });
   }
-  
+
   private static analyzeTacticalBalance(formation: Formation, players: Player[]) {
     const tacticalWeaknesses: string[] = [];
     const tacticalStrengths: string[] = [];
-    
+
     // Check defensive coverage
     const defenders = players.filter(p => p.roleId.includes('b') || p.roleId.includes('dm'));
     if (defenders.length < 4) {
@@ -894,7 +894,7 @@ export class TacticalPatternAnalyzer {
     } else if (defenders.length >= 5) {
       tacticalStrengths.push('Strong defensive foundation with good coverage');
     }
-    
+
     // Check midfield control
     const midfielders = players.filter(p => p.roleId.includes('m') && !p.roleId.includes('st'));
     if (midfielders.length >= 3) {
@@ -902,20 +902,20 @@ export class TacticalPatternAnalyzer {
     } else if (midfielders.length < 2) {
       tacticalWeaknesses.push('Midfield easily overrun - may struggle to control possession');
     }
-    
+
     // Check attacking threats
     const attackers = players.filter(p =>
-      p.roleId.includes('st') || p.roleId.includes('cf') || p.roleId.includes('w')
+      p.roleId.includes('st') || p.roleId.includes('cf') || p.roleId.includes('w'),
     );
     if (attackers.length >= 3) {
       tacticalStrengths.push('Multiple attacking options create unpredictability');
     } else if (attackers.length < 2) {
       tacticalWeaknesses.push('Isolated attackers - limited offensive options');
     }
-    
+
     return { tacticalWeaknesses, tacticalStrengths };
   }
-  
+
   private static getCounterFormations(formationName: string): string[] {
     const counterMap: Record<string, string[]> = {
       '4-4-2': ['4-2-3-1', '4-3-3', '3-5-2'],
@@ -924,17 +924,17 @@ export class TacticalPatternAnalyzer {
       '3-5-2': ['4-3-3', '4-2-3-1', '4-4-2'],
       '5-3-2': ['4-3-3', '3-5-2', '4-2-3-1'],
     };
-    
+
     return counterMap[formationName] || ['4-4-2', '4-3-3'];
   }
-  
+
   private static generateTacticalRecommendations(
     formation: Formation,
     players: Player[],
-    weaknesses: string[]
+    weaknesses: string[],
   ): string[] {
     const recommendations: string[] = [];
-    
+
     weaknesses.forEach(weakness => {
       if (weakness.includes('defensive coverage')) {
         recommendations.push('Consider adding defensive midfielder or moving to back 5');
@@ -946,28 +946,28 @@ export class TacticalPatternAnalyzer {
         recommendations.push('Add attacking midfielder or winger for more offensive threat');
       }
     });
-    
+
     if (recommendations.length === 0) {
       recommendations.push('Formation is well-balanced - maintain current tactical approach');
     }
-    
+
     return recommendations;
   }
-  
+
   // Helper methods
   private static calculateAverageWidth(formation: Formation): number {
     // Simplified calculation
     return 0.6; // Placeholder
   }
-  
+
   private static calculateDefensiveHeight(formation: Formation): number {
     // Simplified calculation
     return 0.5; // Placeholder
   }
-  
+
   private static getHeatmapZones(role: string, position: { x: number; y: number }): string[] {
     const zones: string[] = [];
-    
+
     // Simplified zone mapping
     if (position.y < 0.33) {
       zones.push('defensive-third');
@@ -976,7 +976,7 @@ export class TacticalPatternAnalyzer {
     } else {
       zones.push('attacking-third');
     }
-    
+
     if (position.x < 0.33) {
       zones.push('left-channel');
     } else if (position.x < 0.66) {
@@ -984,10 +984,10 @@ export class TacticalPatternAnalyzer {
     } else {
       zones.push('right-channel');
     }
-    
+
     return zones;
   }
-  
+
   private static findInteractionPartners(player: Player, allPlayers: Player[]): string[] {
     // Find players within ~0.2 distance
     return allPlayers
@@ -1011,14 +1011,14 @@ export class TacticalPatternAnalyzer {
  */
 export class AutomatedSuggestionsEngine {
   private static suggestionId = 0;
-  
+
   static generateTrainingSuggestions(
     team: Player[],
     schedule: WeeklySchedule,
-    coachQuality: number
+    coachQuality: number,
   ): AutomatedSuggestion[] {
     const suggestions: AutomatedSuggestion[] = [];
-    
+
     // Analyze team fitness
     const avgFitness = team.reduce((sum, p) => sum + p.stamina, 0) / team.length;
     if (avgFitness < 60) {
@@ -1045,7 +1045,7 @@ export class AutomatedSuggestionsEngine {
         suggestedImplementation: 'Implement immediately before next match',
       });
     }
-    
+
     // Check for injured players
     const injuredCount = team.filter(p => p.availability.status !== 'Available').length;
     if (injuredCount >= team.length * 0.2) {
@@ -1072,20 +1072,20 @@ export class AutomatedSuggestionsEngine {
         suggestedImplementation: 'Gradual implementation over next week',
       });
     }
-    
+
     return suggestions;
   }
-  
+
   static generateFormationSuggestions(
     currentFormation: Formation,
     players: Player[],
-    opponent?: { formation: string; style: string }
+    opponent?: { formation: string; style: string },
   ): AutomatedSuggestion[] {
     const suggestions: AutomatedSuggestion[] = [];
-    
+
     // Analyze formation effectiveness
     const analysis = TacticalPatternAnalyzer.analyzeFormation(currentFormation, players);
-    
+
     if (analysis.tacticalWeaknesses.length > 0) {
       suggestions.push({
         id: `suggestion_${this.suggestionId++}`,
@@ -1106,19 +1106,19 @@ export class AutomatedSuggestionsEngine {
         suggestedImplementation: 'Test in training before match implementation',
       });
     }
-    
+
     return suggestions;
   }
-  
+
   static generateDevelopmentSuggestions(
     players: Player[],
-    priorityPlayers?: string[]
+    priorityPlayers?: string[],
   ): AutomatedSuggestion[] {
     const suggestions: AutomatedSuggestion[] = [];
-    
+
     // Find high-potential young players
     const youngTalents = players.filter(p => p.age < 23 && (p.currentPotential - this.calculateOverall(p)) > 10);
-    
+
     if (youngTalents.length > 0) {
       suggestions.push({
         id: `suggestion_${this.suggestionId++}`,
@@ -1144,10 +1144,10 @@ export class AutomatedSuggestionsEngine {
         suggestedImplementation: 'Start development plans this week',
       });
     }
-    
+
     return suggestions;
   }
-  
+
   private static calculateOverall(player: Player): number {
     return Math.round(
       ((player.pace ?? 70) +
@@ -1155,7 +1155,7 @@ export class AutomatedSuggestionsEngine {
         (player.passing ?? 70) +
         (player.dribbling ?? 70) +
         (player.defending ?? 70) +
-        (player.physical ?? 70)) / 6
+        (player.physical ?? 70)) / 6,
     );
   }
 }
@@ -1168,23 +1168,23 @@ export class AutomatedSuggestionsEngine {
 export class TeamTrainingAnalyzer {
   static analyzeTeam(team: Player[], schedule: WeeklySchedule): TeamTrainingAnalysis {
     const teamId = team[0]?.team || 'home';
-    
+
     // Calculate team metrics
     const overallFitness = team.reduce((sum, p) => sum + p.stamina, 0) / team.length;
     const overallMorale = this.calculateTeamMorale(team);
     const injuryRisk = team.reduce((sum, p) => sum + (p.injuryRisk || 0), 0) / team.length;
     const fatigueLevel = team.reduce((sum, p) => sum + (p.fatigue || 0), 0) / team.length;
     const developmentProgress = this.calculateDevelopmentProgress(team);
-    
+
     // Identify strengths and weaknesses
     const { teamStrengths, teamWeaknesses } = this.analyzeTeamAttributes(team);
-    
+
     // Recommend intensity levels
     const recommendedIntensity = this.recommendIntensityLevels(overallFitness, fatigueLevel, injuryRisk);
-    
+
     // Suggest training focus
     const suggestedFocus = this.suggestTrainingFocus(teamWeaknesses, schedule);
-    
+
     return {
       teamId,
       overallFitness,
@@ -1198,7 +1198,7 @@ export class TeamTrainingAnalyzer {
       suggestedFocus,
     };
   }
-  
+
   private static calculateTeamMorale(team: Player[]): number {
     const moraleValues: Record<string, number> = {
       'Excellent': 90,
@@ -1207,10 +1207,10 @@ export class TeamTrainingAnalyzer {
       'Poor': 40,
       'Very Poor': 20,
     };
-    
+
     return team.reduce((sum, p) => sum + (moraleValues[p.morale] || 60), 0) / team.length;
   }
-  
+
   private static calculateDevelopmentProgress(team: Player[]): number {
     // Calculate average progress towards potential
     const avgProgress = team.reduce((sum, p) => {
@@ -1219,10 +1219,10 @@ export class TeamTrainingAnalyzer {
       const progress = (current / potential) * 100;
       return sum + progress;
     }, 0) / team.length;
-    
+
     return avgProgress;
   }
-  
+
   private static analyzeTeamAttributes(team: Player[]) {
     const avgAttributes = {
       pace: team.reduce((sum, p) => sum + (p.pace ?? 70), 0) / team.length,
@@ -1232,12 +1232,12 @@ export class TeamTrainingAnalyzer {
       defending: team.reduce((sum, p) => sum + (p.defending ?? 70), 0) / team.length,
       physical: team.reduce((sum, p) => sum + (p.physical ?? 70), 0) / team.length,
     };
-    
+
     const overall = Object.values(avgAttributes).reduce((sum, val) => sum + val, 0) / 6;
-    
+
     const teamStrengths: string[] = [];
     const teamWeaknesses: string[] = [];
-    
+
     Object.entries(avgAttributes).forEach(([attr, value]) => {
       if (value >= overall + 5) {
         teamStrengths.push(`${attr.charAt(0).toUpperCase() + attr.slice(1)} (${value.toFixed(1)})`);
@@ -1245,18 +1245,18 @@ export class TeamTrainingAnalyzer {
         teamWeaknesses.push(`${attr.charAt(0).toUpperCase() + attr.slice(1)} (${value.toFixed(1)})`);
       }
     });
-    
+
     return { teamStrengths, teamWeaknesses };
   }
-  
+
   private static recommendIntensityLevels(
     fitness: number,
     fatigue: number,
-    injuryRisk: number
+    injuryRisk: number,
   ): TeamTrainingAnalysis['recommendedIntensity'] {
-    const baseIntensity = fitness > 75 && fatigue < 40 && injuryRisk < 30 ? 'high' : 
+    const baseIntensity = fitness > 75 && fatigue < 40 && injuryRisk < 30 ? 'high' :
                          fitness > 55 && fatigue < 60 && injuryRisk < 50 ? 'medium' : 'low';
-    
+
     return {
       monday: baseIntensity,
       tuesday: baseIntensity,
@@ -1267,13 +1267,13 @@ export class TeamTrainingAnalyzer {
       sunday: 'low', // Recovery day
     };
   }
-  
+
   private static suggestTrainingFocus(
     weaknesses: string[],
-    schedule: WeeklySchedule
+    schedule: WeeklySchedule,
   ): TeamTrainingAnalysis['suggestedFocus'] {
     const days: Array<keyof WeeklySchedule> = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-    
+
     return days.map((day, index) => {
       if (day === 'saturday' || day === 'sunday') {
         return {
@@ -1282,10 +1282,10 @@ export class TeamTrainingAnalyzer {
           reasoning: day === 'saturday' ? 'Focus on tactical preparation for match' : 'Allow players to recover from match',
         };
       }
-      
+
       const weaknessIndex = index % weaknesses.length;
       const weakness = weaknesses[weaknessIndex] || 'General fitness';
-      
+
       return {
         day,
         focus: weakness,
@@ -1293,7 +1293,7 @@ export class TeamTrainingAnalyzer {
       };
     });
   }
-  
+
   private static calculateOverall(player: Player): number {
     return Math.round(
       ((player.pace ?? 70) +
@@ -1301,7 +1301,7 @@ export class TeamTrainingAnalyzer {
         (player.passing ?? 70) +
         (player.dribbling ?? 70) +
         (player.defending ?? 70) +
-        (player.physical ?? 70)) / 6
+        (player.physical ?? 70)) / 6,
     );
   }
 }
@@ -1311,18 +1311,18 @@ export class TeamTrainingAnalyzer {
 export const AITrainingIntelligence = {
   // Training Simulation
   simulatePlayerTraining: AITrainingSimulator.simulatePlayerTraining.bind(AITrainingSimulator),
-  
+
   // Development Planning
   generateDevelopmentPlan: PlayerDevelopmentPlanGenerator.generatePlan.bind(PlayerDevelopmentPlanGenerator),
-  
+
   // Pattern Recognition
   analyzeTacticalPatterns: TacticalPatternAnalyzer.analyzeFormation.bind(TacticalPatternAnalyzer),
-  
+
   // Automated Suggestions
   generateTrainingSuggestions: AutomatedSuggestionsEngine.generateTrainingSuggestions.bind(AutomatedSuggestionsEngine),
   generateFormationSuggestions: AutomatedSuggestionsEngine.generateFormationSuggestions.bind(AutomatedSuggestionsEngine),
   generateDevelopmentSuggestions: AutomatedSuggestionsEngine.generateDevelopmentSuggestions.bind(AutomatedSuggestionsEngine),
-  
+
   // Team Analysis
   analyzeTeam: TeamTrainingAnalyzer.analyzeTeam.bind(TeamTrainingAnalyzer),
 };

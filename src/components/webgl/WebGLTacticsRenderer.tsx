@@ -228,7 +228,7 @@ export const WebGLTacticsRenderer: React.FC<WebGLTacticsRendererProps> = ({
     const particleProgram = createShaderProgram(
       gl,
       vertexShaderSource,
-      particleFragmentShaderSource
+      particleFragmentShaderSource,
     );
 
     setShaderPrograms({
@@ -248,7 +248,7 @@ export const WebGLTacticsRenderer: React.FC<WebGLTacticsRendererProps> = ({
   const createShader = (
     gl: WebGLRenderingContext,
     type: number,
-    source: string
+    source: string,
   ): WebGLShader | null => {
     const shader = gl.createShader(type);
     if (!shader) {
@@ -270,7 +270,7 @@ export const WebGLTacticsRenderer: React.FC<WebGLTacticsRendererProps> = ({
   const createShaderProgram = (
     gl: WebGLRenderingContext,
     vertexSource: string,
-    fragmentSource: string
+    fragmentSource: string,
   ): WebGLProgram | null => {
     const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexSource);
     const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentSource);
@@ -358,13 +358,13 @@ export const WebGLTacticsRenderer: React.FC<WebGLTacticsRendererProps> = ({
         animationFrameRef.current = requestAnimationFrame(render);
       }
     },
-    [isRunning, shaderPrograms, settings.particleCount, players]
+    [isRunning, shaderPrograms, settings.particleCount, players],
   );
 
   const renderField = (
     gl: WebGLRenderingContext,
     program: WebGLProgram,
-    timestamp: number
+    timestamp: number,
   ): number => {
     gl.useProgram(program);
 

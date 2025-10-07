@@ -148,7 +148,7 @@ describe('ZENITH Tactical Board Performance Tests', () => {
           lines={lines as any}
           onPlayerMove={mockOnPlayerMove}
           onPlayerSelect={mockOnPlayerSelect}
-        />
+        />,
       );
 
       const renderTime = endMeasurement();
@@ -169,7 +169,7 @@ describe('ZENITH Tactical Board Performance Tests', () => {
           lines={lines.slice(0, 15) as any} // Reasonable number of lines
           onPlayerMove={mockOnPlayerMove}
           onPlayerSelect={mockOnPlayerSelect}
-        />
+        />,
       );
 
       const renderTime = endMeasurement();
@@ -187,7 +187,7 @@ describe('ZENITH Tactical Board Performance Tests', () => {
           players={players as any}
           onPlayerMove={mockOnPlayerMove}
           onPlayerSelect={mockOnPlayerSelect}
-        />
+        />,
       );
 
       // Perform 100 re-renders with slight position changes
@@ -207,7 +207,7 @@ describe('ZENITH Tactical Board Performance Tests', () => {
             players={updatedPlayers as any}
             onPlayerMove={mockOnPlayerMove}
             onPlayerSelect={mockOnPlayerSelect}
-          />
+          />,
         );
 
         endMeasurement();
@@ -231,7 +231,7 @@ describe('ZENITH Tactical Board Performance Tests', () => {
           onPlayerMove={mockOnPlayerMove}
           onPlayerSelect={mockOnPlayerSelect}
           mode="edit"
-        />
+        />,
       );
 
       // Simulate rapid drag operations
@@ -252,7 +252,7 @@ describe('ZENITH Tactical Board Performance Tests', () => {
               new MouseEvent('mousemove', {
                 clientX: 150 + i,
                 clientY: 150 + i,
-              })
+              }),
             );
 
             fireEvent(document, new MouseEvent('mouseup'));
@@ -275,7 +275,7 @@ describe('ZENITH Tactical Board Performance Tests', () => {
           onPlayerMove={mockOnPlayerMove}
           onPlayerSelect={mockOnPlayerSelect}
           mode="tactics"
-        />
+        />,
       );
 
       // Simulate rapid line creation
@@ -309,7 +309,7 @@ describe('ZENITH Tactical Board Performance Tests', () => {
             players={players as any}
             onPlayerMove={mockOnPlayerMove}
             onPlayerSelect={mockOnPlayerSelect}
-          />
+          />,
         );
         unmount();
       }
@@ -337,7 +337,7 @@ describe('ZENITH Tactical Board Performance Tests', () => {
           onPlayerMove={mockOnPlayerMove}
           onPlayerSelect={mockOnPlayerSelect}
           mode="edit"
-        />
+        />,
       );
 
       const addCallCount = addEventListenerSpy.mock.calls.length;
@@ -366,7 +366,7 @@ describe('ZENITH Tactical Board Performance Tests', () => {
           players={visiblePlayers as any}
           onPlayerMove={mockOnPlayerMove}
           onPlayerSelect={mockOnPlayerSelect}
-        />
+        />,
       );
 
       const renderTime = endMeasurement();
@@ -388,7 +388,7 @@ describe('ZENITH Tactical Board Performance Tests', () => {
           lines={visibleLines as any}
           onPlayerMove={mockOnPlayerMove}
           onPlayerSelect={mockOnPlayerSelect}
-        />
+        />,
       );
 
       const renderTime = endMeasurement();
@@ -408,7 +408,7 @@ describe('ZENITH Tactical Board Performance Tests', () => {
           onPlayerMove={mockOnPlayerMove}
           onPlayerSelect={mockOnPlayerSelect}
           mode="edit"
-        />
+        />,
       );
 
       // Test animation frame rate during interactions
@@ -472,7 +472,7 @@ describe('ZENITH Tactical Board Performance Tests', () => {
             players={players as any}
             onPlayerMove={mockOnPlayerMove}
             onPlayerSelect={mockOnPlayerSelect}
-          />
+          />,
         );
 
         const renderTime = endMeasurement();
@@ -493,7 +493,7 @@ describe('ZENITH Tactical Board Performance Tests', () => {
           onPlayerMove={mockOnPlayerMove}
           onPlayerSelect={mockOnPlayerSelect}
           mode="edit"
-        />
+        />,
       );
 
       // Extreme stress test: 500 rapid interactions
@@ -545,7 +545,7 @@ describe('ZENITH Tactical Board Performance Tests', () => {
             players={players as any}
             onPlayerMove={mockOnPlayerMove}
             onPlayerSelect={mockOnPlayerSelect}
-          />
+          />,
         );
 
         unmount();
@@ -579,7 +579,7 @@ describe('ZENITH Tactical Board Performance Tests', () => {
               lines={scenario.lines as any}
               onPlayerMove={mockOnPlayerMove}
               onPlayerSelect={mockOnPlayerSelect}
-            />
+            />,
           );
 
           unmount();
@@ -607,7 +607,7 @@ describe('ZENITH Tactical Board Performance Tests', () => {
             players={players as any}
             onPlayerMove={mockOnPlayerMove}
             onPlayerSelect={mockOnPlayerSelect}
-          />
+          />,
         );
 
         unmount();

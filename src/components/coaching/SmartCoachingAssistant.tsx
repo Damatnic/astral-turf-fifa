@@ -84,7 +84,7 @@ export const SmartCoachingAssistant: React.FC<SmartCoachingAssistantProps> = ({
       // Generate AI-powered recommendations
       const formationAnalysis = await openAiService.getFormationAnalysis(
         currentFormation,
-        availablePlayers
+        availablePlayers,
       );
 
       // Create formation recommendations

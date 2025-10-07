@@ -21,7 +21,7 @@ export const cleanStateForSaving = (state: RootState): object => {
             acc[p.id] = p.position;
             return acc;
           },
-          {} as Record<string, { x: number; y: number }>
+          {} as Record<string, { x: number; y: number }>,
         );
         activeStep.drawings = draft.tactics.drawings;
       }
@@ -101,7 +101,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           dispatch({ type: 'LOAD_STATE', payload: savedState as RootState });
         } else {
           console.warn(
-            `Saved state version (${savedState.version}) does not match app version (${APP_VERSION}). Discarding saved state.`
+            `Saved state version (${savedState.version}) does not match app version (${APP_VERSION}). Discarding saved state.`,
           );
           localStorage.removeItem('astralTurfActiveState');
         }
@@ -141,7 +141,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         const stateToSave = cleanStateForSaving(state);
         localStorage.setItem(
           `astralTurfSave_${state.ui.activeSaveSlotId}`,
-          JSON.stringify(stateToSave)
+          JSON.stringify(stateToSave),
         );
 
         const slots = JSON.parse(localStorage.getItem('astralTurfSaveSlots') || '{}');

@@ -13,7 +13,7 @@ const chromeLauncher = require('chrome-launcher');
 
 // Performance budgets
 const budgets = JSON.parse(
-  fs.readFileSync(path.join(__dirname, '../performance-budgets.json'), 'utf8')
+  fs.readFileSync(path.join(__dirname, '../performance-budgets.json'), 'utf8'),
 );
 
 class CatalystPerformanceChecker {
@@ -57,7 +57,7 @@ class CatalystPerformanceChecker {
       await this.generateReport();
 
       console.log(
-        this.exitCode === 0 ? '✅ All performance checks passed!' : '❌ Performance checks failed!'
+        this.exitCode === 0 ? '✅ All performance checks passed!' : '❌ Performance checks failed!',
       );
     } catch (error) {
       console.error('❌ Performance check failed:', error);
@@ -166,20 +166,20 @@ class CatalystPerformanceChecker {
               metric
                 .replace('largest-contentful-paint', 'lcp')
                 .replace('first-input-delay', 'fid')
-                .replace('cumulative-layout-shift', 'cls')
+                .replace('cumulative-layout-shift', 'cls'),
           );
 
           if (budget) {
             if (data.value <= budget.budget) {
               console.log(
-                `  ✅ ${metric}: ${data.value}${data.unit} (budget: ${budget.budget}${data.unit})`
+                `  ✅ ${metric}: ${data.value}${data.unit} (budget: ${budget.budget}${data.unit})`,
               );
             } else {
               console.log(
-                `  ❌ ${metric}: ${data.value}${data.unit} (budget: ${budget.budget}${data.unit})`
+                `  ❌ ${metric}: ${data.value}${data.unit} (budget: ${budget.budget}${data.unit})`,
               );
               this.errors.push(
-                `${metric} (${data.value}${data.unit}) exceeds budget (${budget.budget}${data.unit})`
+                `${metric} (${data.value}${data.unit}) exceeds budget (${budget.budget}${data.unit})`,
               );
               this.exitCode = 1;
             }
@@ -257,7 +257,7 @@ class CatalystPerformanceChecker {
     } else {
       console.log(`  ❌ JavaScript: ${jsKB}KB (budget: ${scriptBudget.budget}KB)`);
       this.errors.push(
-        `JavaScript bundle size (${jsKB}KB) exceeds budget (${scriptBudget.budget}KB)`
+        `JavaScript bundle size (${jsKB}KB) exceeds budget (${scriptBudget.budget}KB)`,
       );
       this.exitCode = 1;
     }
@@ -364,7 +364,7 @@ class CatalystPerformanceChecker {
         console.log(`  ✅ Error rate within threshold`);
       } else {
         console.log(
-          `  ❌ Error rate (${(errorRate * 100).toFixed(2)}%) exceeds threshold (${(alertThresholds.errorRate * 100).toFixed(2)}%)`
+          `  ❌ Error rate (${(errorRate * 100).toFixed(2)}%) exceeds threshold (${(alertThresholds.errorRate * 100).toFixed(2)}%)`,
         );
         this.errors.push(`Error rate too high`);
         this.exitCode = 1;
@@ -374,7 +374,7 @@ class CatalystPerformanceChecker {
         console.log(`  ✅ P95 response time within threshold`);
       } else {
         console.log(
-          `  ❌ P95 response time (${p95ResponseTime.toFixed(2)}ms) exceeds threshold (${alertThresholds.p95ResponseTime}ms)`
+          `  ❌ P95 response time (${p95ResponseTime.toFixed(2)}ms) exceeds threshold (${alertThresholds.p95ResponseTime}ms)`,
         );
         this.errors.push(`P95 response time too high`);
         this.exitCode = 1;

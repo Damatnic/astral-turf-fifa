@@ -29,7 +29,7 @@ class NeuralNetwork {
       .map(() =>
         Array(cols)
           .fill(0)
-          .map(() => (Math.random() - 0.5) * 2)
+          .map(() => (Math.random() - 0.5) * 2),
       );
   }
 
@@ -105,7 +105,7 @@ class ChemistryEngine {
     const ageCompatibility = this.calculateAgeCompatibility(player1.age, player2.age);
     const nationalitySynergy = this.calculateNationalitySynergy(
       player1.nationality,
-      player2.nationality
+      player2.nationality,
     );
 
     // Weighted combination
@@ -119,7 +119,7 @@ class ChemistryEngine {
 
   private static calculateAttributeSynergy(
     attr1: PlayerAttributes,
-    attr2: PlayerAttributes
+    attr2: PlayerAttributes,
   ): number {
     // Calculate how well attributes complement each other
     const balanceScore = Math.abs(attr1.speed - attr2.speed) < 20 ? 0.8 : 0.5;
@@ -417,7 +417,7 @@ class FormationAnalyzer {
         dribbling: 0,
         positioning: 0,
         stamina: 0,
-      }
+      },
     );
 
     return {
@@ -517,7 +517,7 @@ class AutoAssignmentEngine {
   private findBestPlayerForSlot(
     slot: FormationSlot,
     players: Player[],
-    usedPlayers: Set<string>
+    usedPlayers: Set<string>,
   ): Player | null {
     const candidates = players.filter(p => !usedPlayers.has(p.id));
 
@@ -594,7 +594,7 @@ class AutoAssignmentEngine {
   private calculatePositionFit(player: Player, slot: FormationSlot): number {
     const distance = Math.sqrt(
       Math.pow(player.position.x - slot.defaultPosition.x, 2) +
-        Math.pow(player.position.y - slot.defaultPosition.y, 2)
+        Math.pow(player.position.y - slot.defaultPosition.y, 2),
     );
 
     // Normalize distance (assuming field coordinates are 0-100)
@@ -608,7 +608,7 @@ class AutoAssignmentEngine {
   private calculateConfidenceLevel(
     slot: FormationSlot,
     player: Player,
-    allPlayers: Player[]
+    allPlayers: Player[],
   ): number {
     const playerScore = this.calculatePlayerSlotScore(player, slot);
     const otherScores = allPlayers
@@ -680,7 +680,7 @@ class TacticalPatternEngine {
   analyzeTacticalPatterns(
     formation: Formation,
     players: Player[],
-    oppositionData?: any
+    oppositionData?: any,
   ): TacticalAnalysis {
     const patterns = this.identifyTacticalPatterns(formation, players);
     const vulnerabilities = this.identifyVulnerabilities(formation, players);
@@ -695,7 +695,7 @@ class TacticalPatternEngine {
       recommendations: this.generateTacticalRecommendations(
         patterns,
         vulnerabilities,
-        opportunities
+        opportunities,
       ),
     };
   }
@@ -730,7 +730,7 @@ class TacticalPatternEngine {
         count[slot.role] = (count[slot.role] || 0) + 1;
         return count;
       },
-      {} as Record<PositionRole, number>
+      {} as Record<PositionRole, number>,
     );
 
     return {
@@ -749,7 +749,7 @@ class TacticalPatternEngine {
         shooting: sum.shooting + player.attributes.shooting,
         dribbling: sum.dribbling + player.attributes.dribbling,
       }),
-      { speed: 0, passing: 0, tackling: 0, shooting: 0, dribbling: 0 }
+      { speed: 0, passing: 0, tackling: 0, shooting: 0, dribbling: 0 },
     );
 
     Object.keys(avgAttributes).forEach(key => {
@@ -856,7 +856,7 @@ class TacticalPatternEngine {
 
   private identifyVulnerabilities(
     formation: Formation,
-    players: Player[]
+    players: Player[],
   ): TacticalVulnerability[] {
     const vulnerabilities: TacticalVulnerability[] = [];
 
@@ -909,7 +909,7 @@ class TacticalPatternEngine {
       for (let j = i + 1; j < positions.length; j++) {
         const distance = Math.sqrt(
           Math.pow(positions[i].x - positions[j].x, 2) +
-            Math.pow(positions[i].y - positions[j].y, 2)
+            Math.pow(positions[i].y - positions[j].y, 2),
         );
         totalDistance += distance;
         pairs++;
@@ -970,7 +970,7 @@ class TacticalPatternEngine {
         positioning: acc.positioning + player.attributes.positioning,
         stamina: acc.stamina + player.attributes.stamina,
       }),
-      { speed: 0, passing: 0, tackling: 0, shooting: 0, dribbling: 0, positioning: 0, stamina: 0 }
+      { speed: 0, passing: 0, tackling: 0, shooting: 0, dribbling: 0, positioning: 0, stamina: 0 },
     );
 
     return {
@@ -1026,7 +1026,7 @@ class TacticalPatternEngine {
   private generateCounterStrategies(
     formation: Formation,
     players: Player[],
-    oppositionData?: any
+    oppositionData?: any,
   ): CounterStrategy[] {
     // This would analyze opposition and suggest counter-strategies
     return [
@@ -1046,7 +1046,7 @@ class TacticalPatternEngine {
   private generateTacticalRecommendations(
     patterns: TacticalPattern[],
     vulnerabilities: TacticalVulnerability[],
-    opportunities: TacticalOpportunity[]
+    opportunities: TacticalOpportunity[],
   ): string[] {
     const recommendations: string[] = [];
 
@@ -1183,7 +1183,7 @@ export class AIFootballIntelligenceService {
    */
   async optimizePlayerAssignments(
     formation: Formation,
-    players: Player[]
+    players: Player[],
   ): Promise<OptimizedAssignment> {
     return this.autoAssignmentEngine.optimizePlayerAssignment(formation, players);
   }
@@ -1194,7 +1194,7 @@ export class AIFootballIntelligenceService {
   async analyzeTacticalPatterns(
     formation: Formation,
     players: Player[],
-    oppositionData?: any
+    oppositionData?: any,
   ): Promise<TacticalAnalysis> {
     return this.tacticalPatternEngine.analyzeTacticalPatterns(formation, players, oppositionData);
   }
@@ -1213,7 +1213,7 @@ export class AIFootballIntelligenceService {
     formation: Formation,
     players: Player[],
     oppositionFormation?: Formation,
-    oppositionPlayers?: Player[]
+    oppositionPlayers?: Player[],
   ): Promise<EffectivenessPrediction> {
     const analysis = await this.analyzeFormation(formation, players);
     const tacticalAnalysis = await this.analyzeTacticalPatterns(formation, players);
@@ -1224,7 +1224,7 @@ export class AIFootballIntelligenceService {
     if (oppositionFormation && oppositionPlayers) {
       const oppositionAnalysis = await this.analyzeFormation(
         oppositionFormation,
-        oppositionPlayers
+        oppositionPlayers,
       );
       effectivenessScore = this.calculateMatchupEffectiveness(analysis, oppositionAnalysis);
     }
@@ -1242,7 +1242,7 @@ export class AIFootballIntelligenceService {
 
   private calculateMatchupEffectiveness(
     ourAnalysis: FormationAnalysis,
-    oppositionAnalysis: FormationAnalysis
+    oppositionAnalysis: FormationAnalysis,
   ): number {
     // Simple matchup calculation - would be more sophisticated in production
     const ourStrength = ourAnalysis.overallRating;
@@ -1256,7 +1256,7 @@ export class AIFootballIntelligenceService {
 
   private calculateStyleMatchupBenefit(
     ourAnalysis: FormationAnalysis,
-    oppositionAnalysis: FormationAnalysis
+    oppositionAnalysis: FormationAnalysis,
   ): number {
     // Simplified style matchup calculation
     if (ourAnalysis.attackingStrength > 0.8 && oppositionAnalysis.defensiveStrength < 0.6) {
@@ -1272,7 +1272,7 @@ export class AIFootballIntelligenceService {
 
   private calculatePredictionConfidence(
     analysis: FormationAnalysis,
-    tacticalAnalysis: TacticalAnalysis
+    tacticalAnalysis: TacticalAnalysis,
   ): number {
     // Higher confidence for well-balanced teams with clear patterns
     const balanceConfidence = analysis.balanceScore;
@@ -1286,7 +1286,7 @@ export class AIFootballIntelligenceService {
 
   private identifyKeyEffectivenessFactors(
     analysis: FormationAnalysis,
-    tacticalAnalysis: TacticalAnalysis
+    tacticalAnalysis: TacticalAnalysis,
   ): string[] {
     const factors: string[] = [];
 

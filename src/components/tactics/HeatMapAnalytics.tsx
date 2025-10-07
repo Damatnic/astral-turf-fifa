@@ -83,7 +83,7 @@ const HeatMapAnalytics: React.FC<HeatMapAnalyticsProps> = ({
           // Calculate distance from zone center
           const zoneCenter = { x: x + width / 2, y: y + height / 2 };
           const distance = Math.sqrt(
-            Math.pow(playerX - zoneCenter.x, 2) + Math.pow(playerY - zoneCenter.y, 2)
+            Math.pow(playerX - zoneCenter.x, 2) + Math.pow(playerY - zoneCenter.y, 2),
           );
 
           // Players have influence based on their role and proximity
@@ -146,7 +146,7 @@ const HeatMapAnalytics: React.FC<HeatMapAnalyticsProps> = ({
 
           // Calculate heat based on player's natural position and movement patterns
           const distance = Math.sqrt(
-            Math.pow(playerPos.x - zoneCenter.x, 2) + Math.pow(playerPos.y - zoneCenter.y, 2)
+            Math.pow(playerPos.x - zoneCenter.x, 2) + Math.pow(playerPos.y - zoneCenter.y, 2),
           );
 
           const intensity = getPlayerZoneIntensity(player, zoneCenter, distance);
@@ -197,7 +197,7 @@ const HeatMapAnalytics: React.FC<HeatMapAnalyticsProps> = ({
       const blue = Math.floor(255 * (1 - intensity));
       return `rgba(${red}, 50, ${blue}, ${alpha})`;
     },
-    [heatMapFilter]
+    [heatMapFilter],
   );
 
   const getZonesToRender = useCallback(() => {
@@ -460,7 +460,7 @@ function getRoleZoneMultiplier(roleId: string, zoneCenter: { x: number; y: numbe
 function getPlayerZoneIntensity(
   player: Player,
   zoneCenter: { x: number; y: number },
-  distance: number
+  distance: number,
 ): number {
   const baseIntensity = Math.max(0, 1 - distance / 30);
   const roleMultiplier = getRoleZoneMultiplier(player.roleId, zoneCenter);

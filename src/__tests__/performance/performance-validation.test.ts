@@ -114,7 +114,7 @@ describe('Catalyst Performance Benchmarks', () => {
       }
 
       console.log(
-        `✅ Complexity scaling test: ${sizes.map((size, i) => `${size}: ${times[i].toFixed(2)}ms`).join(', ')}`
+        `✅ Complexity scaling test: ${sizes.map((size, i) => `${size}: ${times[i].toFixed(2)}ms`).join(', ')}`,
       );
     });
   });
@@ -164,7 +164,7 @@ describe('Catalyst Performance Benchmarks', () => {
       expect(retrievedItems.every(item => item !== undefined)).toBe(true);
 
       console.log(
-        `✅ Cache operations: store ${cacheDuration.toFixed(2)}ms, retrieve ${retrieveDuration.toFixed(2)}ms`
+        `✅ Cache operations: store ${cacheDuration.toFixed(2)}ms, retrieve ${retrieveDuration.toFixed(2)}ms`,
       );
     });
 
@@ -237,7 +237,7 @@ describe('Catalyst Performance Benchmarks', () => {
       console.log(
         `✅ Bundle sizes: ${Object.entries(componentSizes)
           .map(([name, size]) => `${name}: ${(size / 1024).toFixed(1)}KB`)
-          .join(', ')}`
+          .join(', ')}`,
       );
       console.log(`✅ Total critical path: ${(totalSize / 1024).toFixed(1)}KB`);
     });

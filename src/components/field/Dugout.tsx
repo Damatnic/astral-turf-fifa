@@ -53,7 +53,7 @@ const DugoutSection: React.FC<DugoutSectionProps> = ({
                 showRole={true}
                 interactive={true}
               />
-            )
+            ),
         )}
       </div>
     </div>
@@ -77,7 +77,7 @@ const Dugout: React.FC = () => {
           Object.keys(step.playerPositions).filter(pId => {
             const position = step.playerPositions?.[pId];
             return position && position.x > -1;
-          })
+          }),
         );
       }
     }
@@ -105,10 +105,10 @@ const Dugout: React.FC = () => {
   }, [activeFormationIds, formations, activePlaybookItemId, activeStepIndex, playbook]);
 
   const homeBenched = (players ?? []).filter(
-    p => p?.team === 'home' && !playersOnFieldIds.has(p?.id)
+    p => p?.team === 'home' && !playersOnFieldIds.has(p?.id),
   );
   const awayBenched = (players ?? []).filter(
-    p => p?.team === 'away' && !playersOnFieldIds.has(p?.id)
+    p => p?.team === 'away' && !playersOnFieldIds.has(p?.id),
   );
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>, team: 'home' | 'away') => {

@@ -192,7 +192,7 @@ class CollaborationService {
       userName: string;
       role: 'owner' | 'editor' | 'viewer';
       socketId?: string;
-    }
+    },
   ): Promise<CollaborationSession | null> {
     try {
       const session = await this.getSession(sessionId);
@@ -281,7 +281,7 @@ class CollaborationService {
   async updateParticipantCursor(
     sessionId: string,
     userId: string,
-    cursor: { x: number; y: number }
+    cursor: { x: number; y: number },
   ): Promise<void> {
     try {
       const session = await this.getSession(sessionId);
@@ -477,7 +477,7 @@ class CollaborationService {
     conflictId: string,
     sessionId: string,
     resolution: 'accept' | 'reject' | 'merge',
-    resolvedBy: string
+    resolvedBy: string,
   ): Promise<void> {
     try {
       const record = await this.db.appState.findFirst({

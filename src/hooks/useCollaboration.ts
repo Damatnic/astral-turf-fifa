@@ -309,7 +309,7 @@ export function useCollaboration(options: UseCollaborationOptions): UseCollabora
         timestamp: Date.now(),
       });
     },
-    [userId, sessionId, status.isConnected]
+    [userId, sessionId, status.isConnected],
   );
 
   // Send player move
@@ -328,7 +328,7 @@ export function useCollaboration(options: UseCollaborationOptions): UseCollabora
 
       wsRef.current.emit('player-move', event);
     },
-    [userId, status.isConnected]
+    [userId, status.isConnected],
   );
 
   // Send player update
@@ -347,7 +347,7 @@ export function useCollaboration(options: UseCollaborationOptions): UseCollabora
 
       wsRef.current.emit('player-update', event);
     },
-    [userId, status.isConnected]
+    [userId, status.isConnected],
   );
 
   // Send chat message
@@ -367,7 +367,7 @@ export function useCollaboration(options: UseCollaborationOptions): UseCollabora
 
       wsRef.current.emit('chat-message', chatMessage);
     },
-    [userId, userName, status.isConnected]
+    [userId, userName, status.isConnected],
   );
 
   // Invite user
@@ -383,7 +383,7 @@ export function useCollaboration(options: UseCollaborationOptions): UseCollabora
         invitedBy: userId,
       });
     },
-    [sessionId, userId, status.isConnected]
+    [sessionId, userId, status.isConnected],
   );
 
   // Kick user
@@ -399,7 +399,7 @@ export function useCollaboration(options: UseCollaborationOptions): UseCollabora
         kickedBy: userId,
       });
     },
-    [sessionId, userId, status.isConnected, session]
+    [sessionId, userId, status.isConnected, session],
   );
 
   // Event subscription helpers

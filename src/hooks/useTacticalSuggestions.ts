@@ -49,7 +49,7 @@ interface UseTacticalSuggestionsReturn {
  * ```
  */
 export function useTacticalSuggestions(
-  options: UseTacticalSuggestionsOptions
+  options: UseTacticalSuggestionsOptions,
 ): UseTacticalSuggestionsReturn {
   const { formation, players, gameContext, autoRefreshInterval = 30000, enabled = true } = options;
 
@@ -70,12 +70,12 @@ export function useTacticalSuggestions(
       const recommendations = await aiCoachingService.generateCoachingRecommendations(
         formation,
         players,
-        gameContext
+        gameContext,
       );
 
       // Filter out dismissed suggestions
       const filteredRecommendations = recommendations.filter(
-        rec => !dismissedSuggestions.has(rec.id)
+        rec => !dismissedSuggestions.has(rec.id),
       );
 
       setSuggestions(filteredRecommendations);

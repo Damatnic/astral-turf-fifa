@@ -39,7 +39,7 @@ export const PerformanceChart = forwardRef<HTMLDivElement, PerformanceChartProps
       onDataPointHover,
       ...props
     },
-    ref
+    ref,
   ) => {
     const chartData = useMemo(() => {
       if (!data.length) {
@@ -80,7 +80,7 @@ export const PerformanceChart = forwardRef<HTMLDivElement, PerformanceChartProps
             stroke="rgba(var(--secondary-600), 0.3)"
             strokeWidth="1"
             strokeDasharray="2,2"
-          />
+          />,
         );
       }
 
@@ -97,7 +97,7 @@ export const PerformanceChart = forwardRef<HTMLDivElement, PerformanceChartProps
             stroke="rgba(var(--secondary-600), 0.3)"
             strokeWidth="1"
             strokeDasharray="2,2"
-          />
+          />,
         );
       }
 
@@ -164,7 +164,7 @@ export const PerformanceChart = forwardRef<HTMLDivElement, PerformanceChartProps
               className={cn(
                 'transition-all duration-200',
                 interactive && 'cursor-pointer hover:r-6 hover:stroke-primary-400',
-                animated && 'animate-scale-in'
+                animated && 'animate-scale-in',
               )}
               style={{
                 animationDelay: animated ? `${index * 100}ms` : '0ms',
@@ -200,7 +200,7 @@ export const PerformanceChart = forwardRef<HTMLDivElement, PerformanceChartProps
                   className={cn(
                     'transition-all duration-300',
                     interactive && 'cursor-pointer hover:opacity-80',
-                    animated && 'animate-slide-up-fade-in'
+                    animated && 'animate-slide-up-fade-in',
                   )}
                   style={{
                     animationDelay: animated ? `${index * 100}ms` : '0ms',
@@ -307,7 +307,7 @@ export const PerformanceChart = forwardRef<HTMLDivElement, PerformanceChartProps
                 className={cn(
                   'transition-all duration-200',
                   interactive && 'cursor-pointer hover:r-5',
-                  animated && 'animate-scale-in'
+                  animated && 'animate-scale-in',
                 )}
                 style={{
                   animationDelay: animated ? `${index * 100}ms` : '0ms',
@@ -394,7 +394,7 @@ export const PerformanceChart = forwardRef<HTMLDivElement, PerformanceChartProps
         )}
       </div>
     );
-  }
+  },
 );
 
 PerformanceChart.displayName = 'PerformanceChart';

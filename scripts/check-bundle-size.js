@@ -89,7 +89,7 @@ class BundleAnalyzer {
       await fs.access(this.distPath);
     } catch (error) {
       throw new Error(
-        `Distribution directory not found: ${this.distPath}. Run 'npm run build' first.`
+        `Distribution directory not found: ${this.distPath}. Run 'npm run build' first.`,
       );
     }
   }
@@ -233,7 +233,7 @@ class BundleAnalyzer {
     try {
       await fs.writeFile(
         path.join(this.reportPath, 'bundle-size-report.json'),
-        JSON.stringify(report, null, 2)
+        JSON.stringify(report, null, 2),
       );
 
       // Generate human-readable report
@@ -312,7 +312,7 @@ ${this.getRecommendations().join('\n')}
     if (this.metrics.totalSize > SIZE_LIMITS.total * 0.8) {
       recommendations.push('🔍 Consider implementing code splitting to reduce bundle size');
       recommendations.push(
-        '📦 Analyze dependencies with `npm run analyze` to identify large packages'
+        '📦 Analyze dependencies with `npm run analyze` to identify large packages',
       );
     }
 
@@ -342,7 +342,7 @@ ${this.getRecommendations().join('\n')}
     try {
       await fs.writeFile(
         path.join(this.reportPath, 'optimization-recommendations.md'),
-        `# Bundle Optimization Recommendations\n\n${recommendations.map(r => `- ${r}`).join('\n')}\n`
+        `# Bundle Optimization Recommendations\n\n${recommendations.map(r => `- ${r}`).join('\n')}\n`,
       );
     } catch (error) {
       console.warn('⚠️ Could not write recommendations:', error.message);

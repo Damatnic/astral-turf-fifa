@@ -96,7 +96,7 @@ class CSRFProtectionService {
     sessionId: string,
     userId?: string,
     requestPath?: string,
-    origin?: string
+    origin?: string,
   ): CSRFToken {
     const tokenId = this.generateSecureToken();
     const now = Date.now();
@@ -146,7 +146,7 @@ class CSRFProtectionService {
       ipAddress?: string;
       userId?: string;
       headers?: Record<string, string>;
-    }
+    },
   ): CSRFValidationResult {
     try {
       // Check if path should be skipped
@@ -484,7 +484,7 @@ class CSRFProtectionService {
         acc[v.type] = (acc[v.type] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<string, number>,
     );
 
     const violationsBySeverity = recentViolations.reduce(
@@ -492,7 +492,7 @@ class CSRFProtectionService {
         acc[v.severity] = (acc[v.severity] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<string, number>,
     );
 
     const pathCounts = recentViolations.reduce(
@@ -500,7 +500,7 @@ class CSRFProtectionService {
         acc[v.requestPath] = (acc[v.requestPath] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<string, number>,
     );
 
     const ipCounts = recentViolations.reduce(
@@ -510,7 +510,7 @@ class CSRFProtectionService {
         }
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<string, number>,
     );
 
     const topPaths = Object.entries(pathCounts)
@@ -544,7 +544,7 @@ class CSRFProtectionService {
 
   private shouldSkipPath(path: string): boolean {
     return this.config.skipPaths.some(
-      skipPath => path.startsWith(skipPath) || new RegExp(skipPath).test(path)
+      skipPath => path.startsWith(skipPath) || new RegExp(skipPath).test(path),
     );
   }
 
@@ -682,7 +682,7 @@ export const validateCSRFToken = (
     ipAddress?: string;
     userId?: string;
     headers?: Record<string, string>;
-  }
+  },
 ) => csrfProtection.validateToken(token, request);
 
 export const getCSRFMiddleware = () => csrfProtection.getMiddleware();

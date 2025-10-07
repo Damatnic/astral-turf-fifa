@@ -100,7 +100,7 @@ export class ScreenReaderManager {
     const ensureAnnouncer = (
       id: string,
       ariaLive: 'polite' | 'assertive',
-      extraAttributes: Record<string, string> = {}
+      extraAttributes: Record<string, string> = {},
     ) => {
       let element = doc.getElementById(id) as HTMLElement | null;
       if (!element) {
@@ -149,7 +149,7 @@ export class ScreenReaderManager {
   say(
     message: string,
     type: AnnouncementType = 'polite',
-    priority: 'low' | 'medium' | 'high' = 'medium'
+    priority: 'low' | 'medium' | 'high' = 'medium',
   ): void {
     this.announce({ message, type, priority });
   }
@@ -595,7 +595,7 @@ export class MobileAccessibilityManager {
 
     // Announce new position
     this.screenReader.say(
-      `Player moved ${direction} to position ${Math.round(newX)}, ${Math.round(newY)}`
+      `Player moved ${direction} to position ${Math.round(newX)}, ${Math.round(newY)}`,
     );
   }
 
@@ -727,7 +727,7 @@ export class MobileAccessibilityManager {
 
     this.screenReader.say(
       `High contrast ${this.config.enableHighContrast ? 'enabled' : 'disabled'}`,
-      'assertive'
+      'assertive',
     );
   }
 
@@ -759,7 +759,7 @@ export class MobileAccessibilityManager {
 
     this.screenReader.say(
       `Voice announcements ${this.config.enableVoiceAnnouncements ? 'enabled' : 'disabled'}`,
-      'assertive'
+      'assertive',
     );
   }
 
@@ -812,11 +812,11 @@ export const useScreenReader = () => {
     (
       message: string,
       type: AnnouncementType = 'polite',
-      priority: 'low' | 'medium' | 'high' = 'medium'
+      priority: 'low' | 'medium' | 'high' = 'medium',
     ) => {
       screenReader.current.say(message, type, priority);
     },
-    []
+    [],
   );
 
   const announceTacticalAction = useCallback((action: string, details?: string) => {
@@ -831,7 +831,7 @@ export const useScreenReader = () => {
     (playerName: string, action: string, position?: string) => {
       screenReader.current.announcePlayerAction(playerName, action, position);
     },
-    []
+    [],
   );
 
   return {
@@ -848,7 +848,7 @@ export const useScreenReader = () => {
 export const useAccessibilityConfig = () => {
   const accessibilityManager = useRef(MobileAccessibilityManager.getInstance());
   const [config, setConfig] = useState<AccessibilityConfig>(
-    accessibilityManager.current.getConfig()
+    accessibilityManager.current.getConfig(),
   );
 
   const updateConfig = useCallback((updates: Partial<AccessibilityConfig>) => {
@@ -868,7 +868,7 @@ export const useAccessibilityConfig = () => {
 export const useFocusManagement = () => {
   const trapFocus = useCallback((container: HTMLElement) => {
     const focusableElements = container.querySelectorAll(
-      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
     ) as NodeListOf<HTMLElement>;
 
     if (focusableElements.length === 0) {
@@ -947,7 +947,7 @@ export const useTouchAccessibility = () => {
 
       return label;
     },
-    []
+    [],
   );
 
   return {
@@ -1066,7 +1066,7 @@ export const getContrastRatio = (foreground: string, background: string): number
 export const ensureContrastCompliance = (
   foreground: string,
   background: string,
-  level: 'AA' | 'AAA' = 'AA'
+  level: 'AA' | 'AAA' = 'AA',
 ): boolean => {
   const ratio = getContrastRatio(foreground, background);
   const requirement = level === 'AA' ? CONTRAST_RATIOS.AA_NORMAL : CONTRAST_RATIOS.AAA_NORMAL;

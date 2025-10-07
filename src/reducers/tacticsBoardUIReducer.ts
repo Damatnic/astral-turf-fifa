@@ -42,6 +42,7 @@ export interface UIState {
     keyboardShortcuts: boolean;
     history: boolean;
     quickStart: boolean;
+    playerInstructions: boolean;
   };
 
   // Display Overlays
@@ -59,6 +60,10 @@ export interface UIState {
     isDragging: boolean;
     isPresenting: boolean;
     positioningMode: PositioningMode;
+    swapMode: {
+      enabled: boolean;
+      sourcePlayerId: string | null;
+    };
   };
 
   // Conflict Resolution
@@ -111,6 +116,8 @@ export type UIAction =
   | { type: 'SET_PRESENTING'; payload: boolean }
   | { type: 'SET_POSITIONING_MODE'; payload: PositioningMode }
   | { type: 'TOGGLE_POSITIONING_MODE' }
+  | { type: 'SET_SWAP_MODE'; payload: { enabled: boolean; playerId: string } }
+  | { type: 'COMPLETE_SWAP' }
 
   // Conflict Resolution
   | { type: 'SHOW_CONFLICT_MENU'; payload: ConflictData }
@@ -156,6 +163,7 @@ export const getInitialUIState = (isMobile: boolean = false): UIState => ({
     keyboardShortcuts: false,
     history: false,
     quickStart: false,
+    playerInstructions: false,
   },
 
   display: {
@@ -171,6 +179,10 @@ export const getInitialUIState = (isMobile: boolean = false): UIState => ({
     isDragging: false,
     isPresenting: false,
     positioningMode: 'snap',
+    swapMode: {
+      enabled: false,
+      sourcePlayerId: null,
+    },
   },
 
   conflict: {
@@ -296,6 +308,7 @@ export const uiReducer = (state: UIState, action: UIAction): UIState => {
           keyboardShortcuts: false,
           history: false,
           quickStart: false,
+          playerInstructions: false,
         },
       };
 
@@ -373,6 +386,30 @@ export const uiReducer = (state: UIState, action: UIAction): UIState => {
         interaction: {
           ...state.interaction,
           positioningMode: state.interaction.positioningMode === 'snap' ? 'free' : 'snap',
+        },
+      };
+
+    case 'SET_SWAP_MODE':
+      return {
+        ...state,
+        interaction: {
+          ...state.interaction,
+          swapMode: {
+            enabled: action.payload.enabled,
+            sourcePlayerId: action.payload.playerId,
+          },
+        },
+      };
+
+    case 'COMPLETE_SWAP':
+      return {
+        ...state,
+        interaction: {
+          ...state.interaction,
+          swapMode: {
+            enabled: false,
+            sourcePlayerId: null,
+          },
         },
       };
 

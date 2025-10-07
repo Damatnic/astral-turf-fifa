@@ -964,7 +964,7 @@ Check our [GitHub repository](https://github.com/astral-turf/examples) for compl
       }
       if (filters.dateRange) {
         results = results.filter(
-          a => a.timestamp >= filters.dateRange!.start && a.timestamp <= filters.dateRange!.end
+          a => a.timestamp >= filters.dateRange!.start && a.timestamp <= filters.dateRange!.end,
         );
       }
     }

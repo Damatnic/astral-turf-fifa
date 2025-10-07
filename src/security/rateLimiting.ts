@@ -294,7 +294,7 @@ export class RateLimitingEngine {
   private checkRule(
     request: any,
     config: RateLimitConfig,
-    rule: RateLimitRule
+    rule: RateLimitRule,
   ): RateLimitHit | null {
     const key = this.generateKey(request, config);
     const now = Date.now();
@@ -371,7 +371,7 @@ export class RateLimitingEngine {
   private checkTokenBucket(
     request: any,
     config: RateLimitConfig,
-    key: string
+    key: string,
   ): RateLimitHit | null {
     const store = this.getStore(config.id);
     const now = Date.now();
@@ -407,7 +407,7 @@ export class RateLimitingEngine {
         blocked: true,
         threatLevel: this.calculateThreatLevel(
           config.maxRequests - entry.tokens,
-          config.maxRequests
+          config.maxRequests,
         ),
         userAgent: request.userAgent,
         ipAddress: request.ip,
@@ -429,7 +429,7 @@ export class RateLimitingEngine {
   private checkSlidingWindow(
     request: any,
     config: RateLimitConfig,
-    key: string
+    key: string,
   ): RateLimitHit | null {
     const store = this.getStore(config.id);
     const now = Date.now();
@@ -471,7 +471,7 @@ export class RateLimitingEngine {
   private checkFixedWindow(
     request: any,
     config: RateLimitConfig,
-    key: string
+    key: string,
   ): RateLimitHit | null {
     const store = this.getStore(config.id);
     const now = Date.now();
@@ -512,7 +512,7 @@ export class RateLimitingEngine {
   private checkLeakyBucket(
     request: any,
     config: RateLimitConfig,
-    key: string
+    key: string,
   ): RateLimitHit | null {
     const store = this.getStore(config.id);
     const now = Date.now();
@@ -670,14 +670,14 @@ export class RateLimitingEngine {
       'IP address blocked due to abuse',
       {
         metadata: { ipAddress, durationMs, reason: 'rate_limiting' },
-      }
+      },
     );
   }
 
   public challengeIP(
     ipAddress: string,
     challengeType: 'captcha' | 'js_challenge' | 'proof_of_work',
-    durationMs: number
+    durationMs: number,
   ): void {
     const challenge: ChallengeInfo = {
       type: challengeType,
@@ -699,7 +699,7 @@ export class RateLimitingEngine {
       'Challenge issued to IP address',
       {
         metadata: { ipAddress, challengeType, durationMs },
-      }
+      },
     );
   }
 
@@ -789,7 +789,7 @@ setInterval(
   () => {
     rateLimitingEngine.cleanup();
   },
-  5 * 60 * 1000
+  5 * 60 * 1000,
 );
 
 // Export utilities
@@ -802,7 +802,7 @@ export const rateLimitUtils = {
   challengeIP: (
     ipAddress: string,
     type: 'captcha' | 'js_challenge' | 'proof_of_work',
-    duration: number
+    duration: number,
   ) => rateLimitingEngine.challengeIP(ipAddress, type, duration),
   solveChallenge: (ipAddress: string) => rateLimitingEngine.solveChallenge(ipAddress),
   getStats: () => rateLimitingEngine.getStats(),

@@ -76,19 +76,19 @@ export const useResponsive = (): ResponsiveState => {
     const computedStyle = getComputedStyle(document.documentElement);
     const safeAreaTop = parseInt(
       computedStyle.getPropertyValue('env(safe-area-inset-top)') || '0',
-      10
+      10,
     );
     const safeAreaBottom = parseInt(
       computedStyle.getPropertyValue('env(safe-area-inset-bottom)') || '0',
-      10
+      10,
     );
     const safeAreaLeft = parseInt(
       computedStyle.getPropertyValue('env(safe-area-inset-left)') || '0',
-      10
+      10,
     );
     const safeAreaRight = parseInt(
       computedStyle.getPropertyValue('env(safe-area-inset-right)') || '0',
-      10
+      10,
     );
 
     return {
@@ -127,19 +127,19 @@ export const useResponsive = (): ResponsiveState => {
       const computedStyle = getComputedStyle(document.documentElement);
       const safeAreaTop = parseInt(
         computedStyle.getPropertyValue('env(safe-area-inset-top)') || '0',
-        10
+        10,
       );
       const safeAreaBottom = parseInt(
         computedStyle.getPropertyValue('env(safe-area-inset-bottom)') || '0',
-        10
+        10,
       );
       const safeAreaLeft = parseInt(
         computedStyle.getPropertyValue('env(safe-area-inset-left)') || '0',
-        10
+        10,
       );
       const safeAreaRight = parseInt(
         computedStyle.getPropertyValue('env(safe-area-inset-right)') || '0',
-        10
+        10,
       );
 
       setResponsiveState({
@@ -301,6 +301,6 @@ export const useMobileOptimizations = () => {
         xl: isMobile ? '1.5rem' : '2rem',
       },
     }),
-    [isMobile, isTablet, isTouchDevice, prefersReducedMotion, isHighDPI]
+    [isMobile, isTablet, isTouchDevice, prefersReducedMotion, isHighDPI],
   );
 };

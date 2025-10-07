@@ -121,19 +121,19 @@ const PlayerEditPopup: React.FC = () => {
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setPlayerData(prev =>
       prev
         ? { ...prev, [name]: name === 'age' || name === 'jerseyNumber' ? parseInt(value) : value }
-        : null
+        : null,
     );
   };
 
   const handleAttributeChange = (attr: keyof PlayerAttributes, value: number) => {
     setPlayerData(prev =>
-      prev ? { ...prev, attributes: { ...prev.attributes, [attr]: value } } : null
+      prev ? { ...prev, attributes: { ...prev.attributes, [attr]: value } } : null,
     );
   };
 
@@ -321,7 +321,7 @@ const PlayerEditPopup: React.FC = () => {
                     onChange={e =>
                       handleInstructionChange(
                         instr.name.toLowerCase().replace(/ /g, '_'),
-                        e.target.value
+                        e.target.value,
                       )
                     }
                     className="w-full p-2 bg-gray-700 rounded text-sm"

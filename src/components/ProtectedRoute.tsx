@@ -32,7 +32,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       user: authState.user,
       familyAssociations: authState.familyAssociations || [],
     }),
-    [authState.isAuthenticated, authState.user, authState.familyAssociations]
+    [authState.isAuthenticated, authState.user, authState.familyAssociations],
   );
 
   // Allow auth context to initialize - only run once
@@ -70,7 +70,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const { canAccess, fallbackPath: configFallback } = canAccessRoute(
     location.pathname,
     user.role,
-    requiredPermissions || []
+    requiredPermissions || [],
   );
 
   if (!canAccess) {

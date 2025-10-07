@@ -66,7 +66,7 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(
       id,
       ...props
     },
-    ref
+    ref,
   ) => {
     const switchId = id || `switch-${Math.random().toString(36).substr(2, 9)}`;
     const sizeConfig = switchSizes[size];
@@ -86,7 +86,7 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(
           htmlFor={switchId}
           className={cn(
             'relative inline-flex cursor-pointer items-center',
-            disabled && 'cursor-not-allowed opacity-50'
+            disabled && 'cursor-not-allowed opacity-50',
           )}
         >
           <div
@@ -96,7 +96,7 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(
               sizeConfig.track,
               variantConfig.track,
               variantConfig.focus,
-              disabled && 'cursor-not-allowed'
+              disabled && 'cursor-not-allowed',
             )}
           >
             <div
@@ -104,7 +104,7 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(
                 'absolute left-0.5 top-0.5 rounded-full shadow-md transition-transform duration-200',
                 'peer-checked:translate-x-full rtl:peer-checked:-translate-x-full',
                 sizeConfig.thumb,
-                variantConfig.thumb
+                variantConfig.thumb,
               )}
             />
           </div>
@@ -121,7 +121,7 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(
         <div
           className={cn(
             'flex items-center gap-3',
-            labelPosition === 'left' && 'flex-row-reverse justify-end'
+            labelPosition === 'left' && 'flex-row-reverse justify-end',
           )}
         >
           {content}
@@ -130,7 +130,7 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(
               htmlFor={switchId}
               className={cn(
                 'text-sm font-medium text-white cursor-pointer',
-                disabled && 'cursor-not-allowed opacity-50'
+                disabled && 'cursor-not-allowed opacity-50',
               )}
             >
               {label}
@@ -141,7 +141,7 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(
         {error && <p className="text-sm text-error-400 ml-0">{error}</p>}
       </div>
     );
-  }
+  },
 );
 
 Switch.displayName = 'Switch';

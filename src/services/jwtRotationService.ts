@@ -188,7 +188,7 @@ class JWTRotationService {
         {
           severity: 'critical',
           metadata: { reason },
-        }
+        },
       );
 
       // Clear all existing keys
@@ -215,7 +215,7 @@ class JWTRotationService {
             newKeyId: this.currentKey.id,
             reason,
           },
-        }
+        },
       );
     } catch (_error) {
       log.error('Emergency JWT key revocation failed', {
@@ -451,7 +451,7 @@ class JWTRotationService {
             current: this.currentKey,
             previous: this.previousKeys,
           },
-          { ttl: 3600 }
+          { ttl: 3600 },
         ); // Cache for 1 hour
 
         log.debug('Cached JWT keys in Redis');

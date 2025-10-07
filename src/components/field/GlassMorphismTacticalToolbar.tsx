@@ -121,7 +121,7 @@ const GlassToolButton: React.FC<{
         )}
       </div>
     );
-  }
+  },
 );
 
 // Modern color picker with glass morphism
@@ -205,7 +205,7 @@ const GlassFormationSelector: React.FC = React.memo(() => {
         payload: { team, formationId },
       });
     },
-    [dispatch]
+    [dispatch],
   );
 
   return (
@@ -283,7 +283,7 @@ const GlassMorphismTacticalToolbar: React.FC = () => {
 
   const [isExpanded, setIsExpanded] = useState(!isMobile);
   const [activeSection, setActiveSection] = useState<'tools' | 'animation' | 'view' | 'formation'>(
-    'tools'
+    'tools',
   );
 
   // Keyboard shortcuts
@@ -335,14 +335,14 @@ const GlassMorphismTacticalToolbar: React.FC = () => {
         dispatch({ type: 'SET_DRAWING_TOOL', payload: tool });
       }
     },
-    [dispatch]
+    [dispatch],
   );
 
   const setColor = useCallback(
     (color: string) => {
       dispatch({ type: 'SET_DRAWING_COLOR', payload: color });
     },
-    [dispatch]
+    [dispatch],
   );
 
   const undo = useCallback(() => {

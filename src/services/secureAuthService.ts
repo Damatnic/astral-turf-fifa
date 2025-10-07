@@ -156,7 +156,7 @@ class SecureAuthenticationService {
   async login(
     email: string,
     password: string,
-    context: LoginContext
+    context: LoginContext,
   ): Promise<SecureLoginResponse> {
     const startTime = Date.now();
 
@@ -181,7 +181,7 @@ class SecureAuthenticationService {
           context.ipAddress || '',
           context.userAgent || '',
           false,
-          'Invalid input'
+          'Invalid input',
         );
         throw new Error('Invalid email or password format');
       }
@@ -197,7 +197,7 @@ class SecureAuthenticationService {
           context.ipAddress || '',
           context.userAgent || '',
           false,
-          'User not found'
+          'User not found',
         );
         monitorSecurityEvent(SecurityEventType.LOGIN_FAILURE, {
           email: sanitizedEmail,
@@ -214,7 +214,7 @@ class SecureAuthenticationService {
           context.ipAddress || '',
           context.userAgent || '',
           false,
-          'Account locked'
+          'Account locked',
         );
         securityLogger.logSecurityEvent(
           SecurityEventType.UNAUTHORIZED_ACCESS,
@@ -223,7 +223,7 @@ class SecureAuthenticationService {
             userId: user.id,
             ipAddress: context.ipAddress,
             userAgent: context.userAgent,
-          }
+          },
         );
         throw new Error('Account is temporarily locked. Please try again later.');
       }
@@ -249,7 +249,7 @@ class SecureAuthenticationService {
           context.ipAddress || '',
           context.userAgent || '',
           false,
-          'Invalid password'
+          'Invalid password',
         );
 
         if (user.failedLoginAttempts >= 5) {
@@ -267,7 +267,7 @@ class SecureAuthenticationService {
         user,
         context.deviceInfo || 'Unknown Device',
         context.ipAddress || 'Unknown IP',
-        context.userAgent || 'Unknown Browser'
+        context.userAgent || 'Unknown Browser',
       );
 
       // Generate JWT tokens
@@ -354,7 +354,7 @@ class SecureAuthenticationService {
           {
             email: sanitizedData.email,
             ipAddress: context.ipAddress,
-          }
+          },
         );
         throw new Error('User with this email already exists');
       }
@@ -427,7 +427,7 @@ class SecureAuthenticationService {
           role: secureUser.role,
           ipAddress: context.ipAddress,
           userAgent: context.userAgent,
-        }
+        },
       );
 
       // Automatically log in the new user
@@ -552,7 +552,7 @@ class SecureAuthenticationService {
   async changePassword(
     userId: string,
     passwordData: PasswordChangeData,
-    context: LoginContext
+    context: LoginContext,
   ): Promise<void> {
     try {
       const user = users.get(userId);
@@ -569,13 +569,13 @@ class SecureAuthenticationService {
       // Verify current password
       const isCurrentPasswordValid = await verifyPassword(
         passwordData.currentPassword,
-        user.passwordHash
+        user.passwordHash,
       );
       if (!isCurrentPasswordValid) {
         securityLogger.logSecurityEvent(
           SecurityEventType.UNAUTHORIZED_ACCESS,
           'Invalid current password during password change',
-          { userId, ipAddress: context.ipAddress }
+          { userId, ipAddress: context.ipAddress },
         );
         throw new Error('Current password is incorrect');
       }
@@ -589,7 +589,7 @@ class SecureAuthenticationService {
       // Check password history
       const wasUsedBefore = await isPasswordPreviouslyUsed(
         passwordData.newPassword,
-        user.passwordHistory
+        user.passwordHistory,
       );
       if (wasUsedBefore) {
         throw new Error('Cannot reuse a previously used password');
@@ -621,7 +621,7 @@ class SecureAuthenticationService {
           userId,
           ipAddress: context.ipAddress,
           sessionsTerminated: user.activeSessions.length,
-        }
+        },
       );
     } catch (_error) {
       securityLogger.error('Password change failed', {
@@ -671,7 +671,7 @@ class SecureAuthenticationService {
     permission: Permission,
     resource: Resource,
     context: LoginContext,
-    targetUserId?: string
+    targetUserId?: string,
   ): Promise<boolean> {
     try {
       const payload = verifyToken(token);
@@ -703,7 +703,7 @@ class SecureAuthenticationService {
         payloadData.role!,
         permission,
         resource,
-        permissionContext
+        permissionContext,
       );
 
       securityLogger.logPermissionCheck(
@@ -711,7 +711,7 @@ class SecureAuthenticationService {
         (payload as any).userId,
         resource,
         permission,
-        hasPermissionResult.reason
+        hasPermissionResult.reason,
       );
 
       return hasPermissionResult.granted;

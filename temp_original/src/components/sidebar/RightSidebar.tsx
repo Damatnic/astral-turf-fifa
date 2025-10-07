@@ -172,7 +172,7 @@ const AIInsights: React.FC = () => {
         teamTactics.home,
         teamTactics.away,
         settings.aiPersonality,
-        staff.home.coach
+        staff.home.coach,
       );
       dispatch({ type: 'GENERATE_AI_INSIGHT_SUCCESS', payload: insight });
     } catch (error) {
@@ -379,7 +379,7 @@ export const RightSidebar: React.FC = () => {
   const { selectedPlayerId, activeTeamContext } = uiState;
   const { players } = tacticsState;
   const [activeTab, setActiveTab] = useState<'details' | 'ai' | 'tactics' | 'kit' | 'chemistry'>(
-    'details'
+    'details',
   );
 
   const selectedPlayer = players.find(p => p.id === selectedPlayerId);

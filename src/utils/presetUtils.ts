@@ -89,7 +89,7 @@ export function boardStateToPreset(
   formation: string,
   players: Array<{ id: string; position: { x: number; y: number }; role?: string }>,
   tacticalInstructions?: import('../types/presets').TacticalInstructions,
-  tags?: string[]
+  tags?: string[],
 ): Omit<TacticalPreset, 'metadata'> & {
   metadata: Omit<
     import('../types/presets').PresetMetadata,
@@ -119,7 +119,7 @@ export function boardStateToPreset(
  */
 export function applyPresetToBoard(
   preset: TacticalPreset,
-  onUpdatePlayer: (id: string, position: { x: number; y: number }, role?: string) => void
+  onUpdatePlayer: (id: string, position: { x: number; y: number }, role?: string) => void,
 ): void {
   preset.players.forEach(player => {
     onUpdatePlayer(player.id, player.position, player.role);

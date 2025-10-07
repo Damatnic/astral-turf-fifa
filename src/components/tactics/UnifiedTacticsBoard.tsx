@@ -4,7 +4,6 @@ import React, {
   useRef,
   useEffect,
   useMemo,
-  memo,
   lazy,
   Suspense,
   startTransition,
@@ -13,13 +12,11 @@ import React, {
 } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTacticsContext, useUIContext, useResponsive } from '../../hooks';
-import { useFormationHistory, createHistorySnapshot } from '../../hooks/useFormationHistory';
-import type { HistoryState } from '../../hooks/useFormationHistory';
+import { useFormationHistory, createHistorySnapshot, type HistoryState } from '../../hooks/useFormationHistory';
 import {
   useTheme,
   useAccessibility,
   useMotionSafe,
-  useKeyboardNavigation,
 } from '../../context/ThemeContext';
 import { useMobileCapabilities, useMobileViewport } from '../../utils/mobileOptimizations';
 import { useOfflineStorage, STORES } from '../../services/offlineStorageManager';
@@ -31,17 +28,14 @@ import { ConflictResolutionMenu } from './ConflictResolutionMenu';
 import { ExpandedPlayerCard } from './ExpandedPlayerCard';
 import ChemistryVisualization from './ChemistryVisualization';
 import UnifiedFloatingToolbar from './UnifiedFloatingToolbar';
-import PlayerDisplaySettings, { PlayerDisplayConfig } from './PlayerDisplaySettings';
 import DrawingCanvas from './DrawingCanvas';
 import AITacticalIntelligence from './AITacticalIntelligence';
-import PositionalBench from './PositionalBench';
 import { HistoryTimeline } from './HistoryTimeline';
 import { KeyboardShortcutsPanel } from './KeyboardShortcutsPanel';
 import QuickStartTemplates from './QuickStartTemplates';
-import type { DrawingShape, DrawingTool } from '../../types';
-import { type Player, type Formation, type Team, type PlayerAttributes } from '../../types';
+import type { DrawingShape, DrawingTool, Player, Formation, Team, PlayerAttributes } from '../../types';
 import { type TacticalPreset } from '../../types/presets';
-import { initializeSampleData, getBenchPlayers } from '../../utils/sampleTacticsData';
+import { initializeSampleData } from '../../utils/sampleTacticsData';
 import { uiReducer, getInitialUIState } from '../../reducers/tacticsBoardUIReducer';
 
 // Mobile optimization components (lazy-loaded for code splitting)
@@ -63,18 +57,9 @@ import {
   useThrottleCallback,
   PerformanceMonitor,
   useBatteryAwarePerformance,
-  useVirtualization,
-  createWebWorker,
 } from '../../utils/performanceOptimizations';
-// Removed optimized lazy loading to fix reference errors
-import {
-  useCachedFormation,
-  formationCache,
-  playerCache,
-  useCachedQuery,
-} from '../../utils/cachingOptimizations';
-import { useOptimizedRaf } from '../../utils/animationOptimizations';
-import { useVirtualList, useIntersectionObserver } from '../../utils/virtualizationOptimizations';
+import { useCachedQuery } from '../../utils/cachingOptimizations';
+import { useIntersectionObserver } from '../../utils/virtualizationOptimizations';
 import { FormationWebWorker } from '../../workers/formationCalculationWorker';
 
 // Type definitions for PWA
@@ -83,6 +68,7 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }
 
+declare const Window: any;
 interface WindowWithGtag extends Window {
   gtag?: (event: string, action: string, params: Record<string, string>) => void;
 }
@@ -98,7 +84,6 @@ import {
   Users,
   Zap,
   Brain,
-  Settings,
   Maximize2,
   Minimize2,
   Play,
@@ -111,7 +96,6 @@ import {
   Trophy,
   Archive,
   Heart,
-  Pen,
   Keyboard,
   History,
   Sparkles,
@@ -131,8 +115,6 @@ interface UnifiedTacticsBoardProps {
   onExportFormation?: (formation: Formation) => void;
 }
 
-type ViewMode = 'standard' | 'fullscreen' | 'presentation';
-
 const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
   className,
   onSimulateMatch,
@@ -142,7 +124,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
 }) => {
   const { tacticsState, dispatch: tacticsDispatch } = useTacticsContext();
   const { uiState: contextUIState } = useUIContext();
-  const { isMobile, isTablet, isTouchDevice, prefersReducedMotion } = useResponsive();
+  const { isMobile, isTablet, prefersReducedMotion } = useResponsive();
 
   // Initialize UI state with useReducer (consolidates 30+ useState hooks)
   const [boardUIState, uiDispatch] = useReducer(uiReducer, getInitialUIState(isMobile));
@@ -159,14 +141,14 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
   const currentFormation = useCachedQuery(
     () => (activeFormationId ? tacticsState?.formations?.[activeFormationId] : undefined),
     [activeFormationId, tacticsState?.formations],
-    `formation-${activeFormationId}`
+    `formation-${activeFormationId}`,
   );
 
   // Virtualized players access for large datasets
   const currentPlayers = useCachedQuery(
     () => tacticsState?.players || [],
     [tacticsState?.players],
-    'current-players'
+    'current-players',
   );
   // Mobile optimizations (inline implementation to avoid hook issues)
   const mobileOptimizations = useMemo(
@@ -178,7 +160,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
       enableVirtualization: isMobile,
       enableLazyLoading: true,
     }),
-    [isMobile, prefersReducedMotion]
+    [isMobile, prefersReducedMotion],
   );
   const mobileCapabilities = useMobileCapabilities();
   const mobileViewport = useMobileViewport();
@@ -223,7 +205,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
           {
             event_category: 'PWA',
             event_label: outcome === 'accepted' ? 'Install Accepted' : 'Install Dismissed',
-          }
+          },
         );
       }
 
@@ -236,26 +218,16 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
   const { isLowPower, getOptimizedConfig } = useBatteryAwarePerformance();
 
   // Theme and accessibility
-  const { theme, isDark } = useTheme();
-  const { reducedMotion, highContrast, shouldAnimate } = useAccessibility();
-  const motionSafe = useMotionSafe();
+  useTheme();
+  useAccessibility();
+  useMotionSafe();
 
   // Performance monitoring
   const performanceMonitor = useRef(PerformanceMonitor.getInstance());
-  const renderStartTime = useRef(Date.now());
-  const componentMountTime = useRef(Date.now());
 
   // Track render performance with detailed metrics
   useEffect(() => {
     const endRender = performanceMonitor.current.startRender();
-
-    // Track component lifecycle metrics
-    const mountTime = Date.now() - componentMountTime.current;
-    if (mountTime > 100) {
-      // Log slow mounts
-      console.warn(`[Performance] Slow component mount: ${mountTime}ms`);
-    }
-
     return endRender;
   });
 
@@ -303,18 +275,9 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
     }
   }, [currentPlayers.length, currentFormation, tacticsDispatch]);
 
-  // Calculate bench players
-  const benchPlayers = useMemo(() => {
-    if (currentFormation) {
-      return getBenchPlayers(currentPlayers, currentFormation);
-    }
-    return [];
-  }, [currentPlayers, currentFormation]);
-
   // Extract display flags for easier access
   const isGridVisible = display.grid;
   const isFormationStrengthVisible = display.formationStrength;
-  const showAIIntelligence = panels.aiIntelligence;
   const isAIMinimized = aiMinimized;
 
   // Undo/Redo History System
@@ -344,7 +307,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
         tacticsDispatch({ type: 'SET_PLAYERS', payload: state.players });
         tacticsDispatch({ type: 'UPDATE_STATE', payload: { drawings: state.drawings } } as any);
       },
-    }
+    },
   );
 
   // Push state to history whenever tactical changes occur
@@ -354,16 +317,15 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
         createHistorySnapshot(
           currentFormation || null,
           currentPlayers,
-          tacticsState?.drawings || []
-        )
+          tacticsState?.drawings || [],
+        ),
       );
     }
-  }, [currentFormation, currentPlayers, tacticsState?.drawings]);
+  }, [currentFormation, currentPlayers, tacticsState?.drawings, historySystem]);
 
   // Performance optimizations
   const fieldRef = useRef<HTMLDivElement>(null);
   const animationFrameRef = useRef<number | null>(null);
-  const lastUpdateTime = useRef(Date.now());
   const batchedUpdates = useRef<Array<() => void>>([]);
 
   // Performance-aware configuration with mobile optimizations
@@ -389,14 +351,14 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
   const playerCount = useFastMemo(
     () => currentPlayers.length,
     [currentPlayers],
-    (a, b) => a === b
+    (a, b) => a === b,
   );
 
   // Enable virtualization for large player sets
   const shouldVirtualize = playerCount > 50;
 
   // Intersection observer for viewport optimizations
-  const [containerRef, isIntersecting] = useIntersectionObserver({
+  const [, isIntersecting] = useIntersectionObserver({
     threshold: 0.1,
     rootMargin: '50px',
   });
@@ -426,7 +388,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
             navigator.vibrate(10);
           }
         },
-        { passive: true }
+        { passive: true },
       );
     }
   }, [isMobile, mobileCapabilities.hasHapticFeedback]);
@@ -443,7 +405,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
     if (isMobile && tacticsState?.activeFormationIds?.home && tacticsState?.formations) {
       const activeFormationId = tacticsState.activeFormationIds.home;
       const activeFormation = tacticsState.formations[activeFormationId];
-      
+
       if (activeFormation) {
         const formationId = activeFormation.id || `formation-${Date.now()}`;
         saveOffline(STORES.FORMATIONS, formationId, activeFormation, isOnline).catch(
@@ -516,7 +478,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
         });
       }
     },
-    8
+    8,
   ); // Increased to 120fps for ultra-responsive feel
 
   // Simple formation change handler
@@ -527,17 +489,17 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
         payload: formation,
       });
     },
-    [tacticsDispatch]
+    [tacticsDispatch],
   );
 
   // Player selection handler
   const handlePlayerSelect = useCallback((player: Player, position?: { x: number; y: number }) => {
     uiDispatch({ type: 'SELECT_PLAYER', payload: player });
 
-    // Show expanded card if position provided (for right-click/long-press)
-    if (position) {
-      uiDispatch({ type: 'SHOW_EXPANDED_CARD', payload: position });
-    }
+    // Show expanded card for all player selections
+    // Use provided position or default to center of player
+    const cardPosition = position || { x: 50, y: 50 }; // Default to center if no position
+    uiDispatch({ type: 'SHOW_EXPANDED_CARD', payload: cardPosition });
   }, []);
 
   // Enhanced player move with conflict resolution
@@ -564,7 +526,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
       // No conflict - proceed with normal move
       handlePlayerMove(playerId, position);
     },
-    16
+    16,
   );
 
   // Conflict resolution handler
@@ -599,8 +561,6 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
 
         case 'find_alternative':
           // This would trigger alternative position finding logic
-          // For now, we'll just show a message
-          console.log('Finding alternative position for', targetPlayer.name);
           break;
 
         case 'cancel':
@@ -611,7 +571,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
 
       uiDispatch({ type: 'HIDE_CONFLICT_MENU' });
     },
-    [conflictData, tacticsDispatch, handlePlayerMove]
+    [conflictData, tacticsDispatch, handlePlayerMove],
   );
 
   // Player action handler (from expanded card)
@@ -623,8 +583,8 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
 
       switch (action) {
         case 'swap':
-          // Enter swap mode - could set a flag and change cursor
-          console.log('Entering swap mode for', selectedPlayer.name);
+          // Enter swap mode - set flag and enable swap cursor
+          uiDispatch({ type: 'SET_SWAP_MODE', payload: { playerId: selectedPlayer.id, enabled: true } });
           break;
 
         case 'bench':
@@ -635,8 +595,8 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
           break;
 
         case 'instructions':
-          // Open tactical instructions
-          console.log('Opening instructions for', selectedPlayer.name);
+          // Open tactical instructions panel
+          uiDispatch({ type: 'OPEN_PANEL', payload: 'playerInstructions' });
           break;
 
         case 'stats':
@@ -647,7 +607,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
 
       uiDispatch({ type: 'HIDE_EXPANDED_CARD' });
     },
-    [selectedPlayer, tacticsDispatch]
+    [selectedPlayer, tacticsDispatch],
   );
 
   // Drawing state from UI context
@@ -660,21 +620,21 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
         tacticsDispatch({ type: 'SET_DRAWING_TOOL', payload: tool });
       }
     },
-    [tacticsDispatch]
+    [tacticsDispatch],
   );
 
   const handleColorChange = useCallback(
     (color: string) => {
       tacticsDispatch({ type: 'SET_DRAWING_COLOR', payload: color });
     },
-    [tacticsDispatch]
+    [tacticsDispatch],
   );
 
   const handleAddDrawing = useCallback(
     (shape: DrawingShape) => {
       tacticsDispatch({ type: 'ADD_DRAWING', payload: shape });
     },
-    [tacticsDispatch]
+    [tacticsDispatch],
   );
 
   const handleUndoDrawing = useCallback(() => {
@@ -707,30 +667,25 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
   // Dugout management handlers
   const handleSubstitution = useCallback((playerOut: string, playerIn: string) => {
     // Handle substitution logic here
-    console.log(`Substituting ${playerOut} with ${playerIn}`);
     // You could dispatch to tactics context or call a prop function
   }, []);
 
-  const handleTacticalChange = useCallback((adjustment: any) => {
+  const handleTacticalChange = useCallback((adjustment: unknown) => {
     // Handle tactical adjustment
-    console.log('Tactical adjustment:', adjustment);
     // You could dispatch to tactics context or call a prop function
   }, []);
 
   const handlePlayerInstruction = useCallback((playerId: string, instruction: string) => {
     // Handle individual player instruction
-    console.log(`Player ${playerId} instruction: ${instruction}`);
     // You could dispatch to tactics context or call a prop function
   }, []);
 
   // Challenge management handlers
   const handleChallengeStart = useCallback((challengeId: string) => {
-    console.log(`Starting challenge: ${challengeId}`);
     // You could dispatch to tactics context or call a prop function
   }, []);
 
   const handleChallengeComplete = useCallback((challengeId: string, score: number) => {
-    console.log(`Challenge ${challengeId} completed with score: ${score}`);
     // You could dispatch to tactics context or call a prop function
   }, []);
 
@@ -799,7 +754,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
         });
       });
     },
-    [tacticsDispatch]
+    [tacticsDispatch],
   );
 
   const handleTacticalSuggestion = useCallback(
@@ -815,7 +770,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
         },
       });
     },
-    [tacticsDispatch]
+    [tacticsDispatch],
   );
 
   const handleDrawingSuggestion = useCallback(
@@ -835,7 +790,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
         payload: drawingShape,
       });
     },
-    [tacticsDispatch]
+    [tacticsDispatch],
   );
 
   // View mode handlers
@@ -872,7 +827,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
       const newPlayers: Player[] = preset.players.map((presetPlayer, index) => {
         // Find existing player to assign or create placeholder
         const existingPlayer = currentPlayers.find(
-          p => !currentFormation?.slots.some(s => s.playerId === p.id)
+          p => !currentFormation?.slots.some(s => s.playerId === p.id),
         );
 
         if (existingPlayer) {
@@ -884,8 +839,18 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
           };
         }
 
-        // Create new placeholder player
+        // Create new placeholder player with proper type casting
         const playerNumber = index + 1;
+        const attributes: PlayerAttributes = {
+          speed: presetPlayer.attributes?.speed ?? 70,
+          passing: presetPlayer.attributes?.passing ?? 72,
+          tackling: presetPlayer.attributes?.tackling ?? 68,
+          shooting: presetPlayer.attributes?.shooting ?? 65,
+          dribbling: presetPlayer.attributes?.dribbling ?? 70,
+          positioning: presetPlayer.attributes?.positioning ?? 72,
+          stamina: presetPlayer.attributes?.stamina ?? 85,
+        };
+
         return {
           id: `preset-player-${preset.metadata.id}-${index}`,
           name: `Player ${playerNumber}`,
@@ -898,15 +863,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
           instructions: presetPlayer.instructions?.reduce((acc, inst) => ({ ...acc, [inst]: true }), {}) || {},
           team: 'home' as Team,
           teamColor: '#1f2937',
-          attributes: presetPlayer.attributes || {
-            speed: 70,
-            passing: 72,
-            tackling: 68,
-            shooting: 65,
-            dribbling: 70,
-            positioning: 72,
-            stamina: 85,
-          },
+          attributes,
           position: presetPlayer.position,
           availability: { status: 'Available' as const },
           morale: 'Good' as const,
@@ -982,12 +939,11 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
         };
 
         tacticsDispatch({
-          type: 'UPDATE_STATE',
+          type: 'SET_TEAM_TACTIC',
           payload: {
-            teamTactics: {
-              home: tacticalSettings as any,
-              away: tacticalSettings as any,
-            },
+            team: 'home',
+            tactic: 'mentality',
+            value: tacticalSettings.mentality,
           },
         });
       }
@@ -1000,15 +956,12 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
 
       tacticsDispatch({
         type: 'SET_FORMATION',
-        payload: {
-          id: newFormation.id,
-          formation: newFormation,
-        },
+        payload: newFormation,
       });
 
       // Save to history
-      historySystem.saveSnapshot(
-        createHistorySnapshot(newFormation, newPlayers, `Applied preset: ${preset.metadata.name}`)
+      historySystem.pushState(
+        createHistorySnapshot(newFormation, newPlayers, tacticsState?.drawings || []),
       );
 
       // Show success notification
@@ -1024,11 +977,11 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
       // Close the panel
       uiDispatch({ type: 'CLOSE_PANEL', payload: 'quickStart' });
     },
-    [currentPlayers, currentFormation, tacticsDispatch, historySystem]
+    [currentPlayers, currentFormation, tacticsDispatch, historySystem],
   );
 
   // Helper function to map tactical instruction values
-  const mapTacticalValue = (value?: string): any => {
+  const mapTacticalValue = (value?: string): string => {
     const mapping: Record<string, string> = {
       slow: 'defensive',
       medium: 'balanced',
@@ -1042,7 +995,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
   // Formation validation function
   const validateFormation = (
     formation: Formation,
-    players: Player[]
+    players: Player[],
   ): { isValid: boolean; errors: string[]; warnings: string[] } => {
     const errors: string[] = [];
     const warnings: string[] = [];
@@ -1055,7 +1008,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
 
     // Check for goalkeeper
     const hasGoalkeeper = formation.slots.some(
-      s => s.role === 'GK' || s.roleId === 'goalkeeper'
+      s => s.role === 'GK' || s.roleId === 'goalkeeper',
     );
     if (!hasGoalkeeper) {
       errors.push('Formation must include a goalkeeper');
@@ -1080,14 +1033,14 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
 
     // Warnings for formation quality
     const defenderCount = formation.slots.filter(
-      s => s.role === 'DF' || s.roleId?.includes('back')
+      s => s.role === 'DF' || s.roleId?.includes('back'),
     ).length;
     if (defenderCount < 3) {
       warnings.push('Formation has fewer than 3 defenders - may be vulnerable defensively');
     }
 
     const midfielderCount = formation.slots.filter(
-      s => s.role === 'MF' || s.roleId?.includes('midfield')
+      s => s.role === 'MF' || s.roleId?.includes('midfield'),
     ).length;
     if (midfielderCount < 2) {
       warnings.push('Formation has fewer than 2 midfielders - may struggle with possession');
@@ -1267,7 +1220,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
       enterFullscreen,
       exitFullscreen,
       uiDispatch,
-    ]
+    ],
   );
 
   // Layout calculations
@@ -1345,6 +1298,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
         <AnimatePresence mode="wait">
           {showLeftSidebar && (
             <motion.div
+              key="left-sidebar"
               initial={optimizedConfig.enableAnimations ? { x: -320, opacity: 0 } : false}
               animate={
                 optimizedConfig.enableAnimations ? { x: 0, opacity: 1 } : { x: 0, opacity: 1 }
@@ -1449,6 +1403,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
         <AnimatePresence mode="wait">
           {showRightSidebar && (
             <motion.div
+              key="right-sidebar"
               initial={optimizedConfig.enableAnimations ? { x: 320, opacity: 0 } : false}
               animate={
                 optimizedConfig.enableAnimations ? { x: 0, opacity: 1 } : { x: 0, opacity: 1 }
@@ -1476,6 +1431,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
       <AnimatePresence>
         {panels.formationTemplates && (
           <Suspense
+            key="formation-templates"
             fallback={
               <div
                 className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center"
@@ -1498,6 +1454,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
 
         {panels.aiAssistant && (
           <Suspense
+            key="ai-assistant"
             fallback={
               <div
                 className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center"
@@ -1524,6 +1481,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
 
         {panels.tacticalPlaybook && (
           <Suspense
+            key="tactical-playbook"
             fallback={
               <div
                 className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center"
@@ -1549,6 +1507,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
 
         {panels.analytics && (
           <Suspense
+            key="analytics"
             fallback={
               <div
                 className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center"
@@ -1575,7 +1534,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
         )}
 
         {panels.aiAnalysis && (
-          <div className="fixed top-20 right-4 z-25 bg-gray-900/95 backdrop-blur-sm border border-gray-700 rounded-lg max-w-md">
+          <div key="ai-analysis" className="fixed top-20 right-4 z-25 bg-gray-900/95 backdrop-blur-sm border border-gray-700 rounded-lg max-w-md">
             <div className="flex items-center justify-between p-3 border-b border-gray-700">
               <div className="flex items-center space-x-2">
                 <Brain className="w-4 h-4 text-blue-400" />
@@ -1620,6 +1579,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
 
         {panels.dugout && (
           <DugoutManagement
+            key="dugout"
             players={currentPlayers}
             formation={currentFormation}
             currentMinute={45} // This could come from match state
@@ -1635,6 +1595,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
 
         {panels.challenges && (
           <ChallengeManagement
+            key="challenges"
             players={currentPlayers}
             formations={tacticsState?.formations || {}}
             completedChallenges={[]} // This would come from state
@@ -1647,6 +1608,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
 
         {panels.collaboration && (
           <CollaborationFeatures
+            key="collaboration"
             formation={currentFormation}
             players={currentPlayers}
             currentUser={{ id: 'user-1', name: 'Head Coach', role: 'coach' }} // This would come from auth state
@@ -1662,6 +1624,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
 
         {panels.exportImport && (
           <EnhancedExportImport
+            key="export-import"
             formations={tacticsState?.formations || {}}
             playbook={tacticsState?.playbook || {}}
             players={currentPlayers}
@@ -1676,6 +1639,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
 
         {/* Quick Start Templates Panel */}
         <QuickStartTemplates
+          key="quick-start"
           isOpen={panels.quickStart}
           onClose={() => uiDispatch({ type: 'CLOSE_PANEL', payload: 'quickStart' })}
           onApplyPreset={handleApplyPreset}
@@ -1684,13 +1648,14 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
 
         {/* Keyboard Shortcuts Panel */}
         <KeyboardShortcutsPanel
+          key="keyboard-shortcuts"
           isOpen={panels.keyboardShortcuts}
           onClose={() => uiDispatch({ type: 'CLOSE_PANEL', payload: 'keyboardShortcuts' })}
         />
 
         {/* History Timeline Panel */}
         {panels.history && (
-          <div className="fixed top-20 right-4 z-40 w-96">
+          <div key="history" className="fixed top-20 right-4 z-40 w-96">
             <HistoryTimeline
               timeline={historySystem.timeline}
               currentIndex={historySystem.currentIndex}
@@ -1707,6 +1672,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
         {/* AI Tactical Intelligence */}
         {panels.aiIntelligence && (
           <motion.div
+            key="ai-intelligence"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}

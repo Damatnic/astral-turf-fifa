@@ -181,7 +181,7 @@ describe('Catalyst Performance Test Suite', () => {
             onAnalyticsView={() => {}}
             onExportFormation={() => {}}
           />
-        </AppProvider>
+        </AppProvider>,
       );
 
       // Wait for initial render
@@ -193,7 +193,7 @@ describe('Catalyst Performance Test Suite', () => {
 
       expect(duration).toBeLessThan(PERFORMANCE_THRESHOLDS.LCP_TARGET);
       console.log(
-        `✅ LCP simulation: ${duration.toFixed(2)}ms (target: <${PERFORMANCE_THRESHOLDS.LCP_TARGET}ms)`
+        `✅ LCP simulation: ${duration.toFixed(2)}ms (target: <${PERFORMANCE_THRESHOLDS.LCP_TARGET}ms)`,
       );
     });
 
@@ -208,7 +208,7 @@ describe('Catalyst Performance Test Suite', () => {
             onAnalyticsView={() => {}}
             onExportFormation={() => {}}
           />
-        </AppProvider>
+        </AppProvider>,
       );
 
       // Find an interactive element
@@ -224,7 +224,7 @@ describe('Catalyst Performance Test Suite', () => {
 
       expect(duration).toBeLessThan(PERFORMANCE_THRESHOLDS.FID_TARGET);
       console.log(
-        `✅ FID simulation: ${duration.toFixed(2)}ms (target: <${PERFORMANCE_THRESHOLDS.FID_TARGET}ms)`
+        `✅ FID simulation: ${duration.toFixed(2)}ms (target: <${PERFORMANCE_THRESHOLDS.FID_TARGET}ms)`,
       );
     });
 
@@ -237,7 +237,7 @@ describe('Catalyst Performance Test Suite', () => {
             onAnalyticsView={() => {}}
             onExportFormation={() => {}}
           />
-        </AppProvider>
+        </AppProvider>,
       );
 
       // Simulate layout changes by re-rendering with different props
@@ -253,7 +253,7 @@ describe('Catalyst Performance Test Suite', () => {
               onExportFormation={() => {}}
               key={i}
             />
-          </AppProvider>
+          </AppProvider>,
         );
 
         // Small delay to simulate real interactions
@@ -267,7 +267,7 @@ describe('Catalyst Performance Test Suite', () => {
 
       expect(simulatedCLS).toBeLessThan(PERFORMANCE_THRESHOLDS.CLS_TARGET);
       console.log(
-        `✅ CLS simulation: ${simulatedCLS.toFixed(3)} (target: <${PERFORMANCE_THRESHOLDS.CLS_TARGET})`
+        `✅ CLS simulation: ${simulatedCLS.toFixed(3)} (target: <${PERFORMANCE_THRESHOLDS.CLS_TARGET})`,
       );
     });
   });
@@ -284,7 +284,7 @@ describe('Catalyst Performance Test Suite', () => {
             onAnalyticsView={() => {}}
             onExportFormation={() => {}}
           />
-        </AppProvider>
+        </AppProvider>,
       );
 
       // Simulate heavy operations
@@ -300,7 +300,7 @@ describe('Catalyst Performance Test Suite', () => {
 
       expect(currentMemory).toBeLessThan(PERFORMANCE_THRESHOLDS.MEMORY_WARNING);
       console.log(
-        `✅ Memory usage: ${(currentMemory / 1024 / 1024).toFixed(2)}MB (threshold: ${(PERFORMANCE_THRESHOLDS.MEMORY_WARNING / 1024 / 1024).toFixed(2)}MB)`
+        `✅ Memory usage: ${(currentMemory / 1024 / 1024).toFixed(2)}MB (threshold: ${(PERFORMANCE_THRESHOLDS.MEMORY_WARNING / 1024 / 1024).toFixed(2)}MB)`,
       );
     });
 
@@ -334,7 +334,7 @@ describe('Catalyst Performance Test Suite', () => {
       // Memory should not have increased significantly
       expect(memoryDelta).toBeLessThan(10 * 1024 * 1024); // Less than 10MB increase
       console.log(
-        `✅ Memory cleanup: ${(memoryDelta / 1024 / 1024).toFixed(2)}MB delta after cleanup`
+        `✅ Memory cleanup: ${(memoryDelta / 1024 / 1024).toFixed(2)}MB delta after cleanup`,
       );
     });
   });
@@ -423,7 +423,7 @@ describe('Catalyst Performance Test Suite', () => {
             onAnalyticsView={() => {}}
             onExportFormation={() => {}}
           />
-        </AppProvider>
+        </AppProvider>,
       );
 
       const tacticalBoard = await screen.findByRole('main');
@@ -466,7 +466,7 @@ describe('Catalyst Performance Test Suite', () => {
             onAnalyticsView={() => {}}
             onExportFormation={() => {}}
           />
-        </AppProvider>
+        </AppProvider>,
       );
 
       await waitFor(() => {
@@ -493,7 +493,7 @@ describe('Catalyst Performance Test Suite', () => {
           ok: true,
           status: 200,
           json: () => Promise.resolve(mockData),
-        } as Response)
+        } as Response),
       );
 
       performanceTester.startMeasurement('api-request');
@@ -506,7 +506,7 @@ describe('Catalyst Performance Test Suite', () => {
       expect(duration).toBeLessThan(PERFORMANCE_THRESHOLDS.API_RESPONSE_TARGET);
 
       console.log(
-        `✅ API request time: ${duration.toFixed(2)}ms (target: <${PERFORMANCE_THRESHOLDS.API_RESPONSE_TARGET}ms)`
+        `✅ API request time: ${duration.toFixed(2)}ms (target: <${PERFORMANCE_THRESHOLDS.API_RESPONSE_TARGET}ms)`,
       );
     });
 
@@ -518,7 +518,7 @@ describe('Catalyst Performance Test Suite', () => {
           ok: true,
           status: 200,
           json: () => Promise.resolve(mockData),
-        } as Response)
+        } as Response),
       );
 
       performanceTester.startMeasurement('concurrent-requests');
@@ -566,7 +566,7 @@ describe('Catalyst Performance Test Suite', () => {
       expect(totalSize).toBeLessThan(500000); // 500KB total
 
       console.log(
-        `✅ Critical path size: ${(criticalPathSize / 1024).toFixed(1)}KB (target: <${(PERFORMANCE_THRESHOLDS.MAIN_BUNDLE_TARGET / 1024).toFixed(1)}KB)`
+        `✅ Critical path size: ${(criticalPathSize / 1024).toFixed(1)}KB (target: <${(PERFORMANCE_THRESHOLDS.MAIN_BUNDLE_TARGET / 1024).toFixed(1)}KB)`,
       );
       console.log(`✅ Total bundle size: ${(totalSize / 1024).toFixed(1)}KB`);
     });

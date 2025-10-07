@@ -433,7 +433,7 @@ class SecurityHeadersService {
         acc[v.violatedDirective] = (acc[v.violatedDirective] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<string, number>,
     );
 
     const violationsByUri = recentViolations.reduce(
@@ -441,7 +441,7 @@ class SecurityHeadersService {
         acc[v.blockedUri] = (acc[v.blockedUri] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<string, number>,
     );
 
     const violationsByUserAgent = recentViolations.reduce(
@@ -450,7 +450,7 @@ class SecurityHeadersService {
         acc[browser] = (acc[browser] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<string, number>,
     );
 
     // Generate trend data
@@ -645,7 +645,7 @@ class SecurityHeadersService {
     ];
 
     return suspiciousPatterns.some(
-      pattern => pattern.test(violation.blockedUri) || pattern.test(violation.sourceFile || '')
+      pattern => pattern.test(violation.blockedUri) || pattern.test(violation.sourceFile || ''),
     );
   }
 
@@ -684,7 +684,7 @@ class SecurityHeadersService {
 
   private generateTrendData(
     violations: SecurityViolationReport[],
-    timeframe: '1h' | '24h' | '7d' | '30d'
+    timeframe: '1h' | '24h' | '7d' | '30d',
   ): Array<{ date: string; count: number }> {
     const trends: Array<{ date: string; count: number }> = [];
     const now = new Date();
@@ -755,7 +755,7 @@ export const securityHeaders = new SecurityHeadersService(
   ((typeof process !== 'undefined' && process.env.NODE_ENV) || 'production') as
     | 'development'
     | 'production'
-    | 'test'
+    | 'test',
 );
 
 // Export convenience functions

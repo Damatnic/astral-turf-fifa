@@ -52,7 +52,7 @@ const CoachDashboard: React.FC = () => {
   const { players } = tacticsState;
 
   const nextFixture = season.fixtures.find(
-    f => f.week === gameWeek && (f.homeTeam === 'Astral FC' || f.awayTeam === 'Astral FC')
+    f => f.week === gameWeek && (f.homeTeam === 'Astral FC' || f.awayTeam === 'Astral FC'),
   );
   const unreadMessages = inbox.filter(i => !i.isRead).length;
   const injuredPlayers = players.filter(p => p.availability.status.includes('Injury')).length;

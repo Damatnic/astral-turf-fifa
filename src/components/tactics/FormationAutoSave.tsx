@@ -113,7 +113,7 @@ const FormationAutoSave: React.FC<FormationAutoSaveProps> = ({
         setIsOpen(false);
       }
     },
-    [onLoadFormation, onNotification]
+    [onLoadFormation, onNotification],
   );
 
   // Handle delete save
@@ -124,7 +124,7 @@ const FormationAutoSave: React.FC<FormationAutoSaveProps> = ({
         loadSaveData();
       }
     },
-    [onNotification, loadSaveData]
+    [onNotification, loadSaveData],
   );
 
   // Handle create template
@@ -138,7 +138,7 @@ const FormationAutoSave: React.FC<FormationAutoSaveProps> = ({
       currentFormation,
       currentPlayers,
       templateName.trim(),
-      templateDescription.trim()
+      templateDescription.trim(),
     );
 
     if (template) {
@@ -165,7 +165,7 @@ const FormationAutoSave: React.FC<FormationAutoSaveProps> = ({
       formationManager.updateAutoSaveOptions(updatedOptions);
       onNotification('Auto-save settings updated', 'success');
     },
-    [autoSaveOptions, onNotification]
+    [autoSaveOptions, onNotification],
   );
 
   // Handle export
@@ -183,7 +183,7 @@ const FormationAutoSave: React.FC<FormationAutoSaveProps> = ({
         onNotification('Formation exported!', 'success');
       }
     },
-    [onNotification]
+    [onNotification],
   );
 
   // Handle import
@@ -208,7 +208,7 @@ const FormationAutoSave: React.FC<FormationAutoSaveProps> = ({
       };
       reader.readAsText(file);
     },
-    [onNotification, loadSaveData]
+    [onNotification, loadSaveData],
   );
 
   // Format time ago

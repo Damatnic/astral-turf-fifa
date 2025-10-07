@@ -71,7 +71,7 @@ export function KeyboardShortcutsHelp({
           shortcut =>
             shortcut.description.toLowerCase().includes(query) ||
             formatShortcut(shortcut).toLowerCase().includes(query) ||
-            category.name.toLowerCase().includes(query)
+            category.name.toLowerCase().includes(query),
         ),
       }))
       .filter(category => category.shortcuts.length > 0);

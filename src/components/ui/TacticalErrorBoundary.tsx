@@ -174,7 +174,7 @@ export class TacticalErrorBoundary extends Component<Props, State> {
 export function withTacticalErrorBoundary<P extends object>(
   Component: React.ComponentType<P>,
   context?: string,
-  fallback?: ReactNode
+  fallback?: ReactNode,
 ) {
   return function WrappedComponent(props: P) {
     return (
@@ -192,7 +192,7 @@ export function useSafeTacticalCalculation<T>(
   calculation: () => T,
   fallback: T,
   dependencies: React.DependencyList,
-  context?: string
+  context?: string,
 ): T {
   return React.useMemo(() => {
     try {

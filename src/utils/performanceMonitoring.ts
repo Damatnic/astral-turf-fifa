@@ -149,7 +149,7 @@ export class CatalystPerformanceMonitor {
         connection: 'unknown',
         platform: navigator.platform,
         isMobile: /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-          navigator.userAgent
+          navigator.userAgent,
         ),
       },
     };
@@ -498,7 +498,7 @@ export class CatalystPerformanceMonitor {
     const customPositions = formation.slots.filter(
       slot =>
         slot.defaultPosition.x !== Math.round(slot.defaultPosition.x) ||
-        slot.defaultPosition.y !== Math.round(slot.defaultPosition.y)
+        slot.defaultPosition.y !== Math.round(slot.defaultPosition.y),
     );
     complexity += customPositions.length * 20;
 

@@ -15,7 +15,7 @@ function lazyRetry<T extends ComponentType<any>>(
   componentImport: () => Promise<{ default: T }>,
   name: string,
   retries = 3,
-  interval = 1000
+  interval = 1000,
 ): React.LazyExoticComponent<T> {
   return lazy(() => {
     return new Promise<{ default: T }>((resolve, reject) => {
@@ -34,7 +34,7 @@ function lazyRetry<T extends ComponentType<any>>(
               () => {
                 attemptImport(retriesLeft - 1);
               },
-              interval * (retries - retriesLeft + 1)
+              interval * (retries - retriesLeft + 1),
             ); // Exponential backoff
           });
       };
@@ -68,12 +68,12 @@ export const DashboardPage = lazyRetry(() => import('../pages/DashboardPage'), '
 
 export const TacticsBoardPage = lazyRetry(
   () => import('../pages/TacticsBoardPage'),
-  'TacticsBoardPage'
+  'TacticsBoardPage',
 );
 
 export const OppositionAnalysisPage = lazyRetry(
   () => import('../pages/OppositionAnalysisPage'),
-  'OppositionAnalysisPage'
+  'OppositionAnalysisPage',
 );
 
 // ============================================================================
@@ -84,7 +84,7 @@ export const AnalyticsPage = lazyRetry(() => import('../pages/AnalyticsPage'), '
 
 export const AdvancedAnalyticsPage = lazyRetry(
   () => import('../pages/AdvancedAnalyticsPage'),
-  'AdvancedAnalyticsPage'
+  'AdvancedAnalyticsPage',
 );
 
 // ============================================================================
@@ -93,12 +93,12 @@ export const AdvancedAnalyticsPage = lazyRetry(
 
 export const PlayerProfilePage = lazyRetry(
   () => import('../pages/PlayerProfilePage'),
-  'PlayerProfilePage'
+  'PlayerProfilePage',
 );
 
 export const MyPlayerRankingPage = lazyRetry(
   () => import('../pages/MyPlayerRankingPage'),
-  'MyPlayerRankingPage'
+  'MyPlayerRankingPage',
 );
 
 export const TransfersPage = lazyRetry(() => import('../pages/TransfersPage'), 'TransfersPage');
@@ -111,14 +111,14 @@ export const TrainingPage = lazyRetry(() => import('../pages/TrainingPage'), 'Tr
 
 export const YouthAcademyPage = lazyRetry(
   () => import('../pages/YouthAcademyPage'),
-  'YouthAcademyPage'
+  'YouthAcademyPage',
 );
 
 export const MentoringPage = lazyRetry(() => import('../pages/MentoringPage'), 'MentoringPage');
 
 export const SkillChallengesPage = lazyRetry(
   () => import('../pages/SkillChallengesPage'),
-  'SkillChallengesPage'
+  'SkillChallengesPage',
 );
 
 // ============================================================================
@@ -133,7 +133,7 @@ export const StadiumPage = lazyRetry(() => import('../pages/StadiumPage'), 'Stad
 
 export const SponsorshipsPage = lazyRetry(
   () => import('../pages/SponsorshipsPage'),
-  'SponsorshipsPage'
+  'SponsorshipsPage',
 );
 
 // ============================================================================
@@ -144,7 +144,7 @@ export const InboxPage = lazyRetry(() => import('../pages/InboxPage'), 'InboxPag
 
 export const PressConferencePage = lazyRetry(
   () => import('../pages/PressConferencePage'),
-  'PressConferencePage'
+  'PressConferencePage',
 );
 
 export const NewsFeedPage = lazyRetry(() => import('../pages/NewsFeedPage'), 'NewsFeedPage');
@@ -155,22 +155,22 @@ export const NewsFeedPage = lazyRetry(() => import('../pages/NewsFeedPage'), 'Ne
 
 export const LeagueTablePage = lazyRetry(
   () => import('../pages/LeagueTablePage'),
-  'LeagueTablePage'
+  'LeagueTablePage',
 );
 
 export const BoardObjectivesPage = lazyRetry(
   () => import('../pages/BoardObjectivesPage'),
-  'BoardObjectivesPage'
+  'BoardObjectivesPage',
 );
 
 export const JobSecurityPage = lazyRetry(
   () => import('../pages/JobSecurityPage'),
-  'JobSecurityPage'
+  'JobSecurityPage',
 );
 
 export const ClubHistoryPage = lazyRetry(
   () => import('../pages/ClubHistoryPage'),
-  'ClubHistoryPage'
+  'ClubHistoryPage',
 );
 
 // ============================================================================
@@ -179,7 +179,7 @@ export const ClubHistoryPage = lazyRetry(
 
 export const MedicalCenterPage = lazyRetry(
   () => import('../pages/MedicalCenterPage'),
-  'MedicalCenterPage'
+  'MedicalCenterPage',
 );
 
 // ============================================================================
@@ -188,17 +188,17 @@ export const MedicalCenterPage = lazyRetry(
 
 export const InternationalManagementPage = lazyRetry(
   () => import('../pages/InternationalManagementPage'),
-  'InternationalManagementPage'
+  'InternationalManagementPage',
 );
 
 export const ChallengeHubPage = lazyRetry(
   () => import('../pages/ChallengeHubPage'),
-  'ChallengeHubPage'
+  'ChallengeHubPage',
 );
 
 export const CoachChallengeManagerPage = lazyRetry(
   () => import('../pages/CoachChallengeManagerPage'),
-  'CoachChallengeManagerPage'
+  'CoachChallengeManagerPage',
 );
 
 // ============================================================================

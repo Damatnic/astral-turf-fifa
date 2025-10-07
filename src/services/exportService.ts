@@ -84,7 +84,7 @@ class ExportService {
         chart?: ChartData;
         pageBreak?: boolean;
       }>;
-    }
+    },
   ): Promise<Buffer> {
     try {
       // For production, this would use PDFKit
@@ -116,7 +116,7 @@ class ExportService {
       name: string;
       data: TableData;
       charts?: ChartData[];
-    }>
+    }>,
   ): Promise<Buffer> {
     try {
       const workbook = new ExcelJS.Workbook();
@@ -324,7 +324,7 @@ class ExportService {
         chart?: ChartData;
         pageBreak?: boolean;
       }>;
-    }
+    },
   ): string {
     const orientation = options.orientation || 'portrait';
     const size = options.size || 'A4';

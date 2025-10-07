@@ -148,7 +148,7 @@ class DataProtectionService {
     data: unknown,
     classification: DataClassification,
     userId: string,
-    context: { ipAddress: string; userAgent: string }
+    context: { ipAddress: string; userAgent: string },
   ): Promise<EncryptedData> {
     try {
       const config = DATA_PROTECTION_CONFIGS[classification];
@@ -222,7 +222,7 @@ class DataProtectionService {
   async decryptData(
     encryptedData: EncryptedData,
     userId: string,
-    context: { ipAddress: string; userAgent: string }
+    context: { ipAddress: string; userAgent: string },
   ): Promise<unknown> {
     try {
       const config = DATA_PROTECTION_CONFIGS[encryptedData.classification];
@@ -246,7 +246,7 @@ class DataProtectionService {
           encryptedData.data,
           config,
           key,
-          encryptedData.iv
+          encryptedData.iv,
         );
       }
 
@@ -337,7 +337,7 @@ class DataProtectionService {
     if (typeof data !== 'object' || data === null) {
       return this.applyStringMask(
         String(data),
-        masks[0] || { field: 'default', strategy: 'partial' }
+        masks[0] || { field: 'default', strategy: 'partial' },
       );
     }
 
@@ -418,7 +418,7 @@ class DataProtectionService {
     format: 'json' | 'csv' | 'xml',
     classification: DataClassification,
     userId: string,
-    context: { ipAddress: string; userAgent: string }
+    context: { ipAddress: string; userAgent: string },
   ): Promise<{ content: string; checksum: string }> {
     // Apply data masking for export
     const piiResult = this.detectPII(data);
@@ -579,12 +579,12 @@ class DataProtectionService {
     data: string,
     config: EncryptionConfig,
     key: string,
-    iv: string
+    iv: string,
   ): Promise<string> {
     const decipher = crypto.createDecipheriv(
       'aes-256-gcm',
       Buffer.from(key, 'hex'),
-      Buffer.from(iv, 'hex')
+      Buffer.from(iv, 'hex'),
     );
 
     let decrypted = decipher.update(data, 'hex', 'utf8');
@@ -596,7 +596,7 @@ class DataProtectionService {
   private async multiLayerDecrypt(
     data: string,
     config: EncryptionConfig,
-    key: string
+    key: string,
   ): Promise<string> {
     // Reverse Layer 2: XOR decryption
     const xorKey = crypto.randomBytes(32);
@@ -636,7 +636,7 @@ class DataProtectionService {
     obj: Record<string, unknown>,
     prefix: string,
     detectedTypes: string[],
-    locations: Array<{ field: string; value: string; type: string; confidence: number }>
+    locations: Array<{ field: string; value: string; type: string; confidence: number }>,
   ): void {
     Object.entries(obj).forEach(([key, value]) => {
       const fieldPath = prefix ? `${prefix}.${key}` : key;
@@ -666,7 +666,7 @@ class DataProtectionService {
           value as Record<string, unknown>,
           fieldPath,
           detectedTypes,
-          locations
+          locations,
         );
       }
     });
@@ -737,7 +737,7 @@ class DataProtectionService {
             const value = (row as Record<string, unknown>)[header];
             return typeof value === 'string' ? `"${value}"` : String(value);
           })
-          .join(',')
+          .join(','),
       ),
     ];
 
@@ -788,13 +788,13 @@ export const encryptSensitiveData = (
   data: unknown,
   classification: DataClassification,
   userId: string,
-  context: { ipAddress: string; userAgent: string }
+  context: { ipAddress: string; userAgent: string },
 ) => dataProtection.encryptData(data, classification, userId, context);
 
 export const decryptSensitiveData = (
   encryptedData: EncryptedData,
   userId: string,
-  context: { ipAddress: string; userAgent: string }
+  context: { ipAddress: string; userAgent: string },
 ) => dataProtection.decryptData(encryptedData, userId, context);
 
 export const detectPersonalData = (data: unknown) => dataProtection.detectPII(data);
@@ -816,7 +816,7 @@ export const exportSecureData = (
   format: 'json' | 'csv' | 'xml',
   classification: DataClassification,
   userId: string,
-  context: { ipAddress: string; userAgent: string }
+  context: { ipAddress: string; userAgent: string },
 ) => dataProtection.exportData(data, format, classification, userId, context);
 
 export const getDataAuditLogs = (filters?: {

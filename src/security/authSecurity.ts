@@ -245,7 +245,7 @@ class AuthenticationSecurity {
 
     if (password.length < SECURITY_CONFIG.PASSWORD.MIN_LENGTH) {
       errors.push(
-        `Password must be at least ${SECURITY_CONFIG.PASSWORD.MIN_LENGTH} characters long`
+        `Password must be at least ${SECURITY_CONFIG.PASSWORD.MIN_LENGTH} characters long`,
       );
     }
 
@@ -352,7 +352,7 @@ class AuthenticationSecurity {
    */
   async verifyToken(
     token: string,
-    context: SecurityContext
+    context: SecurityContext,
   ): Promise<{ valid: boolean; payload?: any; error?: string }> {
     try {
       const { payload } = await jwtVerify(token, this.jwtSecret, {
@@ -381,7 +381,7 @@ class AuthenticationSecurity {
         this.updateSessionActivity(
           payload.sub as string,
           payload.sessionId as string,
-          context.timestamp
+          context.timestamp,
         );
       }
 
@@ -399,7 +399,7 @@ class AuthenticationSecurity {
    */
   generateMFAChallenge(
     user: User,
-    type: 'totp' | 'sms' | 'email' | 'backup' = 'totp'
+    type: 'totp' | 'sms' | 'email' | 'backup' = 'totp',
   ): MFAChallenge {
     const challengeId = this.generateChallengeId();
 
@@ -417,7 +417,7 @@ class AuthenticationSecurity {
   async verifyMFACode(
     challengeId: string,
     code: string,
-    userId: string
+    userId: string,
   ): Promise<{ valid: boolean; error?: string }> {
     // Implement TOTP verification, SMS code verification, etc.
     // This is a simplified implementation
@@ -511,7 +511,7 @@ class AuthenticationSecurity {
     const recentEvents = this.securityEvents.filter(event => new Date(event.timestamp) >= cutoff);
 
     const loginAttempts = recentEvents.filter(
-      e => e.type === 'login_success' || e.type === 'login_failure'
+      e => e.type === 'login_success' || e.type === 'login_failure',
     ).length;
     const successfulLogins = recentEvents.filter(e => e.type === 'login_success').length;
     const failedLogins = recentEvents.filter(e => e.type === 'login_failure').length;
@@ -589,7 +589,7 @@ class AuthenticationSecurity {
       event =>
         event.userId === userId &&
         event.context.ipAddress === ipAddress &&
-        new Date(event.timestamp) > new Date(Date.now() - 60 * 60 * 1000) // Last hour
+        new Date(event.timestamp) > new Date(Date.now() - 60 * 60 * 1000), // Last hour
     );
 
     return recentEvents.filter(e => e.type === 'login_failure').length > 3;
@@ -628,7 +628,7 @@ class AuthenticationSecurity {
     if (userSessions.length >= SECURITY_CONFIG.SESSION.MAX_CONCURRENT_SESSIONS) {
       // Remove oldest session
       const oldestSession = userSessions.sort(
-        (a, b) => new Date(a.lastActive).getTime() - new Date(b.lastActive).getTime()
+        (a, b) => new Date(a.lastActive).getTime() - new Date(b.lastActive).getTime(),
       )[0];
       oldestSession.isActive = false;
     }
@@ -758,7 +758,7 @@ export class GuardianZeroTrustAuth extends AuthenticationSecurity {
       deviceFingerprint?: string;
       biometricData?: string;
     },
-    context: SecurityContext
+    context: SecurityContext,
   ): Promise<{
     success: boolean;
     tokens?: AuthTokens;
@@ -871,7 +871,7 @@ export class GuardianZeroTrustAuth extends AuthenticationSecurity {
 
   private determineAuthAction(
     riskScore: number,
-    trustLevel: string
+    trustLevel: string,
   ): 'allow' | 'mfa' | 'step_up' | 'block' {
     if (riskScore >= 0.9) {
       return 'block';
@@ -892,7 +892,7 @@ export class GuardianZeroTrustAuth extends AuthenticationSecurity {
 
   private async assessDeviceTrust(
     fingerprint?: string,
-    userId?: string
+    userId?: string,
   ): Promise<{ trusted: boolean; score: number }> {
     // Simplified device trust assessment
     return { trusted: true, score: 0.8 };
@@ -902,7 +902,7 @@ export class GuardianZeroTrustAuth extends AuthenticationSecurity {
     userId: string,
     type: string,
     context: SecurityContext,
-    result: any
+    result: any,
   ): Promise<void> {
     this.logSecurityEvent({
       type: 'suspicious_activity',
@@ -920,7 +920,7 @@ export class GuardianZeroTrustAuth extends AuthenticationSecurity {
 class BehaviorAnalyzer {
   async analyzeLoginBehavior(
     userId: string,
-    context: SecurityContext
+    context: SecurityContext,
   ): Promise<{ anomalous: boolean; score: number; factors: string[] }> {
     const factors: string[] = [];
     let anomalyScore = 0;
@@ -959,7 +959,7 @@ class RiskAssessmentEngine {
   async assessAuthenticationRisk(
     user: any,
     context: SecurityContext,
-    additionalData: any
+    additionalData: any,
   ): Promise<{ score: number; flags: string[]; details: any }> {
     const flags: string[] = [];
     let riskScore = 0;
@@ -1013,14 +1013,14 @@ class RiskAssessmentEngine {
   }
 
   private async checkIPReputation(
-    ipAddress: string
+    ipAddress: string,
   ): Promise<{ malicious: boolean; score: number; source: string }> {
     // Simplified IP reputation check
     return { malicious: false, score: 0.1, source: 'guardian_intel' };
   }
 
   private async analyzeDeviceFingerprint(
-    fingerprint: string
+    fingerprint: string,
   ): Promise<{ suspicious: boolean; score: number; reasons: string[] }> {
     // Simplified device fingerprint analysis
     return { suspicious: false, score: 0.1, reasons: [] };
@@ -1028,7 +1028,7 @@ class RiskAssessmentEngine {
 
   private async verifyBiometrics(
     userId: string,
-    biometricData: string
+    biometricData: string,
   ): Promise<{ verified: boolean; confidence: number }> {
     // Simplified biometric verification
     return { verified: true, confidence: 0.95 };
@@ -1036,7 +1036,7 @@ class RiskAssessmentEngine {
 
   private async checkLoginVelocity(
     userId: string,
-    ipAddress: string
+    ipAddress: string,
   ): Promise<{ excessive: boolean; count: number; timeWindow: number }> {
     // Simplified velocity check
     return { excessive: false, count: 1, timeWindow: 300000 };
@@ -1052,7 +1052,7 @@ class SessionMonitor {
   async startMonitoring(
     userId: string,
     context: SecurityContext,
-    trustLevel: string
+    trustLevel: string,
   ): Promise<void> {
     const sessionId = crypto.randomUUID();
     const metrics: SessionMetrics = {

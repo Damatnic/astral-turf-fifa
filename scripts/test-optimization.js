@@ -109,7 +109,7 @@ class ZenithTestAnalyzer {
       try {
         const files = await this.findFiles(
           path.join(rootDir, 'src'),
-          /\.(test|spec)\.(ts|tsx|js|jsx)$/
+          /\.(test|spec)\.(ts|tsx|js|jsx)$/,
         );
         this.stats.testFiles.push(...files);
       } catch (error) {
@@ -123,7 +123,7 @@ class ZenithTestAnalyzer {
     const componentFiles = await this.findFiles(
       path.join(rootDir, 'src', 'components'),
       /\.(ts|tsx|js|jsx)$/,
-      /\.(test|spec)\./
+      /\.(test|spec)\./,
     );
     this.stats.totalComponents = componentFiles.length;
 
@@ -211,13 +211,13 @@ class ZenithTestAnalyzer {
       this.stats.performanceData = this.processPerformanceData(perfData);
 
       console.log(
-        `   Average Test Duration: ${this.formatDuration(this.stats.performanceData.averageDuration)}`
+        `   Average Test Duration: ${this.formatDuration(this.stats.performanceData.averageDuration)}`,
       );
       console.log(
-        `   Slowest Test: ${this.formatDuration(this.stats.performanceData.slowestTest)}`
+        `   Slowest Test: ${this.formatDuration(this.stats.performanceData.slowestTest)}`,
       );
       console.log(
-        `   Total Suite Time: ${this.formatDuration(this.stats.performanceData.totalTime)}`
+        `   Total Suite Time: ${this.formatDuration(this.stats.performanceData.totalTime)}`,
       );
     } catch (error) {
       console.log(`   ${colors.yellow}⚠️  Performance data not available${colors.reset}`);
@@ -246,13 +246,13 @@ class ZenithTestAnalyzer {
     };
 
     console.log(
-      `   Test-to-Component Ratio: ${colors.green}${qualityMetrics.testToComponentRatio.toFixed(2)}${colors.reset}`
+      `   Test-to-Component Ratio: ${colors.green}${qualityMetrics.testToComponentRatio.toFixed(2)}${colors.reset}`,
     );
     console.log(`   Integration Tests: ${this.formatBoolean(qualityMetrics.hasIntegrationTests)}`);
     console.log(`   E2E Tests: ${this.formatBoolean(qualityMetrics.hasE2ETests)}`);
     console.log(`   Performance Tests: ${this.formatBoolean(qualityMetrics.hasPerformanceTests)}`);
     console.log(
-      `   Accessibility Tests: ${this.formatBoolean(qualityMetrics.hasAccessibilityTests)}`
+      `   Accessibility Tests: ${this.formatBoolean(qualityMetrics.hasAccessibilityTests)}`,
     );
     console.log(`   Mocking Strategy: ${this.formatBoolean(qualityMetrics.hasMockingStrategy)}`);
 
@@ -350,7 +350,7 @@ class ZenithTestAnalyzer {
     }
 
     console.log(
-      `   Generated ${colors.green}${this.stats.recommendations.length}${colors.reset} recommendations`
+      `   Generated ${colors.green}${this.stats.recommendations.length}${colors.reset} recommendations`,
     );
   }
 
@@ -403,23 +403,23 @@ class ZenithTestAnalyzer {
     console.log(`\n${colors.bright}🎯 OVERALL QUALITY SCORE${colors.reset}`);
     console.log(this.createProgressBar(this.stats.qualityScore, 100, 50));
     console.log(
-      `   ${this.formatQualityScore(this.stats.qualityScore)}% ${this.getQualityRating(this.stats.qualityScore)}`
+      `   ${this.formatQualityScore(this.stats.qualityScore)}% ${this.getQualityRating(this.stats.qualityScore)}`,
     );
 
     // Coverage Summary
     if (this.stats.coverageData) {
       console.log(`\n${colors.bright}📊 COVERAGE SUMMARY${colors.reset}`);
       console.log(
-        `   Lines:      ${this.createProgressBar(this.stats.coverageData.lines.pct, 100, 30)} ${this.formatCoverage(this.stats.coverageData.lines.pct)}%`
+        `   Lines:      ${this.createProgressBar(this.stats.coverageData.lines.pct, 100, 30)} ${this.formatCoverage(this.stats.coverageData.lines.pct)}%`,
       );
       console.log(
-        `   Branches:   ${this.createProgressBar(this.stats.coverageData.branches.pct, 100, 30)} ${this.formatCoverage(this.stats.coverageData.branches.pct)}%`
+        `   Branches:   ${this.createProgressBar(this.stats.coverageData.branches.pct, 100, 30)} ${this.formatCoverage(this.stats.coverageData.branches.pct)}%`,
       );
       console.log(
-        `   Functions:  ${this.createProgressBar(this.stats.coverageData.functions.pct, 100, 30)} ${this.formatCoverage(this.stats.coverageData.functions.pct)}%`
+        `   Functions:  ${this.createProgressBar(this.stats.coverageData.functions.pct, 100, 30)} ${this.formatCoverage(this.stats.coverageData.functions.pct)}%`,
       );
       console.log(
-        `   Statements: ${this.createProgressBar(this.stats.coverageData.statements.pct, 100, 30)} ${this.formatCoverage(this.stats.coverageData.statements.pct)}%`
+        `   Statements: ${this.createProgressBar(this.stats.coverageData.statements.pct, 100, 30)} ${this.formatCoverage(this.stats.coverageData.statements.pct)}%`,
       );
     }
 
@@ -427,13 +427,13 @@ class ZenithTestAnalyzer {
     if (this.stats.mutationData) {
       console.log(`\n${colors.bright}🧬 MUTATION TESTING SUMMARY${colors.reset}`);
       console.log(
-        `   Mutation Score: ${this.createProgressBar(this.stats.mutationData.mutationScore, 100, 30)} ${this.formatMutationScore(this.stats.mutationData.mutationScore)}%`
+        `   Mutation Score: ${this.createProgressBar(this.stats.mutationData.mutationScore, 100, 30)} ${this.formatMutationScore(this.stats.mutationData.mutationScore)}%`,
       );
       console.log(
-        `   Killed Mutants: ${colors.green}${this.stats.mutationData.killed}${colors.reset}`
+        `   Killed Mutants: ${colors.green}${this.stats.mutationData.killed}${colors.reset}`,
       );
       console.log(
-        `   Survived Mutants: ${colors.red}${this.stats.mutationData.survived}${colors.reset}`
+        `   Survived Mutants: ${colors.red}${this.stats.mutationData.survived}${colors.reset}`,
       );
     }
 
@@ -442,12 +442,12 @@ class ZenithTestAnalyzer {
     console.log(`   Total Test Files: ${colors.green}${this.stats.totalTests}${colors.reset}`);
     console.log(`   Total Components: ${colors.green}${this.stats.totalComponents}${colors.reset}`);
     console.log(
-      `   Test-to-Component Ratio: ${colors.green}${this.stats.qualityMetrics.testToComponentRatio.toFixed(2)}${colors.reset}`
+      `   Test-to-Component Ratio: ${colors.green}${this.stats.qualityMetrics.testToComponentRatio.toFixed(2)}${colors.reset}`,
     );
 
     if (this.stats.performanceData.totalTime) {
       console.log(
-        `   Total Suite Time: ${this.formatDuration(this.stats.performanceData.totalTime)}`
+        `   Total Suite Time: ${this.formatDuration(this.stats.performanceData.totalTime)}`,
       );
     }
 
@@ -455,14 +455,14 @@ class ZenithTestAnalyzer {
     console.log(`\n${colors.bright}🎯 TEST TYPES COVERAGE${colors.reset}`);
     console.log(`   Unit Tests: ${this.formatBoolean(true)} (Complete)`);
     console.log(
-      `   Integration Tests: ${this.formatBoolean(this.stats.qualityMetrics.hasIntegrationTests)}`
+      `   Integration Tests: ${this.formatBoolean(this.stats.qualityMetrics.hasIntegrationTests)}`,
     );
     console.log(`   E2E Tests: ${this.formatBoolean(this.stats.qualityMetrics.hasE2ETests)}`);
     console.log(
-      `   Performance Tests: ${this.formatBoolean(this.stats.qualityMetrics.hasPerformanceTests)}`
+      `   Performance Tests: ${this.formatBoolean(this.stats.qualityMetrics.hasPerformanceTests)}`,
     );
     console.log(
-      `   Accessibility Tests: ${this.formatBoolean(this.stats.qualityMetrics.hasAccessibilityTests)}`
+      `   Accessibility Tests: ${this.formatBoolean(this.stats.qualityMetrics.hasAccessibilityTests)}`,
     );
     console.log(`   Visual Regression Tests: ${this.formatBoolean(false)} (Recommended)`);
   }
@@ -494,12 +494,12 @@ class ZenithTestAnalyzer {
       }
 
       console.log(
-        `\n${colors.bright}${this.getPriorityIcon(priority)} ${priority.toUpperCase()} PRIORITY${colors.reset}`
+        `\n${colors.bright}${this.getPriorityIcon(priority)} ${priority.toUpperCase()} PRIORITY${colors.reset}`,
       );
 
       recommendations.forEach((rec, index) => {
         console.log(
-          `\n   ${index + 1}. ${colors.bright}[${rec.category}]${colors.reset} ${rec.message}`
+          `\n   ${index + 1}. ${colors.bright}[${rec.category}]${colors.reset} ${rec.message}`,
         );
 
         if (rec.actionItems && rec.actionItems.length > 0) {
@@ -513,7 +513,7 @@ class ZenithTestAnalyzer {
 
     // Quick wins section
     const quickWins = this.stats.recommendations.filter(
-      rec => rec.priority === 'high' || rec.priority === 'critical'
+      rec => rec.priority === 'high' || rec.priority === 'critical',
     );
 
     if (quickWins.length > 0) {
@@ -554,7 +554,7 @@ class ZenithTestAnalyzer {
   async checkForIntegrationTests() {
     const integrationFiles = await this.findFiles(
       path.join(rootDir, 'src', '__tests__'),
-      /integration.*\.(test|spec)\./
+      /integration.*\.(test|spec)\./,
     );
     return integrationFiles.length > 0;
   }
@@ -562,7 +562,7 @@ class ZenithTestAnalyzer {
   async checkForE2ETests() {
     const e2eFiles = await this.findFiles(
       path.join(rootDir, 'src', '__tests__'),
-      /e2e.*\.(test|spec)\./
+      /e2e.*\.(test|spec)\./,
     );
     return e2eFiles.length > 0;
   }
@@ -570,7 +570,7 @@ class ZenithTestAnalyzer {
   async checkForPerformanceTests() {
     const perfFiles = await this.findFiles(
       path.join(rootDir, 'src', '__tests__'),
-      /performance.*\.(test|spec)\./
+      /performance.*\.(test|spec)\./,
     );
     return perfFiles.length > 0;
   }
@@ -578,7 +578,7 @@ class ZenithTestAnalyzer {
   async checkForAccessibilityTests() {
     const a11yFiles = await this.findFiles(
       path.join(rootDir, 'src', '__tests__'),
-      /accessibility.*\.(test|spec)\./
+      /accessibility.*\.(test|spec)\./,
     );
     return a11yFiles.length > 0;
   }
@@ -587,7 +587,7 @@ class ZenithTestAnalyzer {
     try {
       const mockFiles = await this.findFiles(
         path.join(rootDir, 'src', '__tests__'),
-        /mock.*\.(ts|js)/
+        /mock.*\.(ts|js)/,
       );
       return mockFiles.length > 0;
     } catch {
@@ -746,7 +746,7 @@ class ZenithCLI {
 
     console.log(`\n${colors.bright}QUICK SUMMARY${colors.reset}`);
     console.log(
-      `Quality Score: ${this.analyzer.formatQualityScore(this.analyzer.stats.qualityScore)}%`
+      `Quality Score: ${this.analyzer.formatQualityScore(this.analyzer.stats.qualityScore)}%`,
     );
     console.log(`Test Files: ${colors.green}${this.analyzer.stats.totalTests}${colors.reset}`);
     console.log(`Components: ${colors.green}${this.analyzer.stats.totalComponents}${colors.reset}`);
@@ -772,16 +772,16 @@ class ZenithCLI {
       const coverage = this.analyzer.stats.coverageData;
       console.log(`\n${colors.bright}COVERAGE REPORT${colors.reset}`);
       console.log(
-        `Lines:      ${coverage.lines.pct}% (${coverage.lines.covered}/${coverage.lines.total})`
+        `Lines:      ${coverage.lines.pct}% (${coverage.lines.covered}/${coverage.lines.total})`,
       );
       console.log(
-        `Branches:   ${coverage.branches.pct}% (${coverage.branches.covered}/${coverage.branches.total})`
+        `Branches:   ${coverage.branches.pct}% (${coverage.branches.covered}/${coverage.branches.total})`,
       );
       console.log(
-        `Functions:  ${coverage.functions.pct}% (${coverage.functions.covered}/${coverage.functions.total})`
+        `Functions:  ${coverage.functions.pct}% (${coverage.functions.covered}/${coverage.functions.total})`,
       );
       console.log(
-        `Statements: ${coverage.statements.pct}% (${coverage.statements.covered}/${coverage.statements.total})`
+        `Statements: ${coverage.statements.pct}% (${coverage.statements.covered}/${coverage.statements.total})`,
       );
     }
   }

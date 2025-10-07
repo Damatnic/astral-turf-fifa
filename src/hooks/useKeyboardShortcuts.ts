@@ -178,7 +178,7 @@ export function useKeyboardShortcuts(
   options?: {
     enabled?: boolean;
     scope?: string; // Component scope for cleanup
-  }
+  },
 ) {
   const { enabled = true, scope = 'component' } = options || {};
   const store = useKeyboardShortcutsStore();
@@ -379,7 +379,7 @@ export const tacticalBoardShortcuts: Record<string, KeyboardShortcut> = {
     action: () => {
       // Implemented by TacticalBoard component
       const saveButton = document.querySelector(
-        '[data-save-formation]'
+        '[data-save-formation]',
       ) as HTMLButtonElement | null;
       saveButton?.click();
     },
@@ -410,7 +410,7 @@ export const tacticalBoardShortcuts: Record<string, KeyboardShortcut> = {
     category: 'tactical-board',
     action: () => {
       const cycleButton = document.querySelector(
-        '[data-cycle-formation]'
+        '[data-cycle-formation]',
       ) as HTMLButtonElement | null;
       cycleButton?.click();
     },
@@ -422,7 +422,7 @@ export const tacticalBoardShortcuts: Record<string, KeyboardShortcut> = {
     category: 'tactical-board',
     action: () => {
       const analyzeButton = document.querySelector(
-        '[data-analyze-formation]'
+        '[data-analyze-formation]',
       ) as HTMLButtonElement | null;
       analyzeButton?.click();
     },
@@ -442,7 +442,7 @@ export const formShortcuts: Record<string, KeyboardShortcut> = {
       const form = (event.target as HTMLElement).closest('form');
       if (form) {
         const submitButton = form.querySelector(
-          'button[type="submit"]'
+          'button[type="submit"]',
         ) as HTMLButtonElement | null;
         submitButton?.click();
       }
@@ -456,7 +456,7 @@ export const formShortcuts: Record<string, KeyboardShortcut> = {
       const form = (event.target as HTMLElement).closest('form');
       if (form) {
         const resetButton = form.querySelector(
-          '[data-reset], button[type="reset"]'
+          '[data-reset], button[type="reset"]',
         ) as HTMLButtonElement | null;
         resetButton?.click();
       }

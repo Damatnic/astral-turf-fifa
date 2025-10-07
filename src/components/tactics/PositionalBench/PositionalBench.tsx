@@ -157,18 +157,27 @@ const ensurePositionToString = (player: Player): void => {
     }
   }
 
-  Object.defineProperty(positionObject, 'toString', {
-    value: () => desired,
-    configurable: true,
-    enumerable: false,
-  });
+  // Skip if object is not extensible (frozen/sealed)
+  if (!Object.isExtensible(positionObject)) {
+    return;
+  }
 
-  Object.defineProperty(positionObject, SENTINEL_KEY, {
-    value: desired,
-    configurable: true,
-    enumerable: false,
-    writable: true,
-  });
+  try {
+    Object.defineProperty(positionObject, 'toString', {
+      value: () => desired,
+      configurable: true,
+      enumerable: false,
+    });
+
+    Object.defineProperty(positionObject, SENTINEL_KEY, {
+      value: desired,
+      configurable: true,
+      enumerable: false,
+      writable: true,
+    });
+  } catch {
+    // Object is frozen or sealed, skip modification
+  }
 };
 
 const getGroupIcon = (group: string) => {
@@ -260,7 +269,14 @@ const PositionalBench: React.FC<PositionalBenchProps> = ({
   const isMobileLayout = typeof window !== 'undefined' && window.innerWidth <= 600;
 
   const preparedPlayers = useMemo(() => {
-    players.forEach(ensurePositionToString);
+    // Safely ensure position toString without modifying frozen objects
+    players.forEach(player => {
+      try {
+        ensurePositionToString(player);
+      } catch {
+        // Skip frozen/sealed objects
+      }
+    });
 
     let filtered = players.filter(player => matchesPositionFilter(player, positionFilter));
 

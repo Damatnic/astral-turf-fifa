@@ -234,7 +234,7 @@ export class GuardianComplianceFramework {
     lawfulness: ProcessingLawfulness,
     details: Record<string, unknown> = {},
     framework: ComplianceFramework = ComplianceFramework.GDPR,
-    context?: { ipAddress?: string; userAgent?: string }
+    context?: { ipAddress?: string; userAgent?: string },
   ): Promise<void> {
     const auditEntry: ComplianceAuditEntry = {
       id: crypto.randomUUID(),
@@ -284,7 +284,7 @@ export class GuardianComplianceFramework {
     consentGiven: boolean,
     ipAddress: string,
     userAgent: string,
-    consentVersion: string = '1.0'
+    consentVersion: string = '1.0',
   ): Promise<ConsentRecord> {
     const consentRecord: ConsentRecord = {
       id: crypto.randomUUID(),
@@ -321,7 +321,7 @@ export class GuardianComplianceFramework {
   async withdrawConsent(
     consentId: string,
     userId: string,
-    reason?: string
+    reason?: string,
   ): Promise<{ success: boolean; error?: string }> {
     const consentRecord = this.consentRecords.get(consentId);
 
@@ -357,7 +357,7 @@ export class GuardianComplianceFramework {
   async handleDataSubjectRequest(
     userId: string,
     requestType: DataSubjectRights,
-    verificationMethod: 'email' | 'phone' | 'document' | 'biometric' = 'email'
+    verificationMethod: 'email' | 'phone' | 'document' | 'biometric' = 'email',
   ): Promise<DataSubjectRequest> {
     const request: DataSubjectRequest = {
       id: crypto.randomUUID(),
@@ -391,7 +391,7 @@ export class GuardianComplianceFramework {
           requestType,
           verificationMethod,
         },
-      }
+      },
     );
 
     // Auto-start verification process
@@ -404,7 +404,7 @@ export class GuardianComplianceFramework {
    * Process data access request (Right to Access)
    */
   async processAccessRequest(
-    requestId: string
+    requestId: string,
   ): Promise<{ success: boolean; data?: unknown; error?: string }> {
     const request = this.dataSubjectRequests.get(requestId);
 
@@ -439,7 +439,7 @@ export class GuardianComplianceFramework {
             dataSize: JSON.stringify(userData).length,
             processedAt: request.processedAt,
           },
-        }
+        },
       );
 
       return { success: true, data: encryptedData };
@@ -507,13 +507,13 @@ export class GuardianComplianceFramework {
   async generateComplianceReport(
     framework: ComplianceFramework,
     startDate: Date,
-    endDate: Date
+    endDate: Date,
   ): Promise<ComplianceReport> {
     const auditEntries = Array.from(this.auditLog.values()).filter(
       entry =>
         entry.framework === framework &&
         new Date(entry.timestamp) >= startDate &&
-        new Date(entry.timestamp) <= endDate
+        new Date(entry.timestamp) <= endDate,
     );
 
     const report: ComplianceReport = {
@@ -615,7 +615,7 @@ export class GuardianComplianceFramework {
         acc[entry.dataCategory] = (acc[entry.dataCategory] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<string, number>,
     );
   }
 
@@ -628,7 +628,7 @@ export class GuardianComplianceFramework {
         acc[entry.lawfulness] = (acc[entry.lawfulness] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<string, number>,
     );
   }
 
@@ -642,18 +642,18 @@ export class GuardianComplianceFramework {
     const highRiskEntries = entries.filter(
       entry =>
         entry.dataCategory === DataCategory.MEDICAL_DATA ||
-        entry.dataCategory === DataCategory.FINANCIAL_DATA
+        entry.dataCategory === DataCategory.FINANCIAL_DATA,
     );
 
     if (highRiskEntries.length > 100) {
       recommendations.push(
-        'Consider implementing additional controls for high-risk data processing'
+        'Consider implementing additional controls for high-risk data processing',
       );
     }
 
     // Check encryption usage
     const unencryptedEntries = entries.filter(
-      entry => this.requiresEncryption(entry.dataCategory) && !entry.encryption
+      entry => this.requiresEncryption(entry.dataCategory) && !entry.encryption,
     );
 
     if (unencryptedEntries.length > 0) {
@@ -667,7 +667,7 @@ export class GuardianComplianceFramework {
    * Get compliance requirements for request type
    */
   private async getComplianceRequirements(
-    requestType: DataSubjectRights
+    requestType: DataSubjectRights,
   ): Promise<ComplianceRequirement[]> {
     const baseRequirements: ComplianceRequirement[] = [
       {

@@ -169,7 +169,7 @@ class DatabaseService {
       maxWait?: number;
       timeout?: number;
       isolationLevel?: Prisma.TransactionIsolationLevel;
-    }
+    },
   ): Promise<T> {
     try {
       const result = await this.prisma.$transaction(operations, {
@@ -186,7 +186,7 @@ class DatabaseService {
             transactionType: 'bulk_operation',
             isolationLevel: options?.isolationLevel || 'default',
           },
-        }
+        },
       );
 
       return result;

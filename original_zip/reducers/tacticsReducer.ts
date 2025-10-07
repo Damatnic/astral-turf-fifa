@@ -168,12 +168,12 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
           let playerToAssign = benchedPlayers.find(
             p =>
               PLAYER_ROLES.find(r => r.id === p.roleId)?.category === slot.role &&
-              !newFormation.slots.some(s => s.playerId === p.id)
+              !newFormation.slots.some(s => s.playerId === p.id),
           );
           if (!playerToAssign) {
             // If no specific role match, take any benched player
             playerToAssign = benchedPlayers.find(
-              p => !newFormation.slots.some(s => s.playerId === p.id)
+              p => !newFormation.slots.some(s => s.playerId === p.id),
             );
           }
           if (playerToAssign) {
@@ -269,7 +269,7 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
         const currentMoraleIndex = moraleOrder.indexOf(player.morale);
         const newMoraleIndex = Math.max(
           0,
-          Math.min(moraleOrder.length - 1, currentMoraleIndex + moraleEffect)
+          Math.min(moraleOrder.length - 1, currentMoraleIndex + moraleEffect),
         );
         player.morale = moraleOrder[newMoraleIndex];
       }
@@ -328,7 +328,7 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
       const player = draft.players.find(p => p.id === action.payload.playerId);
       if (player) {
         player.contract.clauses = player.contract.clauses.filter(
-          c => c.id !== action.payload.clauseId
+          c => c.id !== action.payload.clauseId,
         );
       }
       break;

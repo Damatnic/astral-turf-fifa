@@ -25,13 +25,13 @@ vi.mock('../../../utils/sampleTacticsData', () => ({
     const grouped = {
       Goalkeepers: players.filter(p => p.roleId?.includes('gk')),
       Defenders: players.filter(
-        p => p.roleId?.includes('cb') || p.roleId?.includes('fb') || p.roleId?.includes('wb')
+        p => p.roleId?.includes('cb') || p.roleId?.includes('fb') || p.roleId?.includes('wb'),
       ),
       Midfielders: players.filter(
-        p => p.roleId?.includes('cm') || p.roleId?.includes('dm') || p.roleId?.includes('am')
+        p => p.roleId?.includes('cm') || p.roleId?.includes('dm') || p.roleId?.includes('am'),
       ),
       Forwards: players.filter(
-        p => p.roleId?.includes('cf') || p.roleId?.includes('w') || p.roleId?.includes('st')
+        p => p.roleId?.includes('cf') || p.roleId?.includes('w') || p.roleId?.includes('st'),
       ),
     };
     return grouped;
@@ -68,19 +68,19 @@ describe('PositionalBench Component', () => {
       (p, i) => ({
         ...p,
         roleId: i % 2 === 0 ? 'cb' : 'fb',
-      })
+      }),
     );
     const midfielders = Array.from({ length: 5 }, () => generatePlayerForConflict('MF')).map(
       (p, i) => ({
         ...p,
         roleId: ['cm', 'dm', 'am'][i % 3],
-      })
+      }),
     );
     const forwards = Array.from({ length: 4 }, () => generatePlayerForConflict('FW')).map(
       (p, i) => ({
         ...p,
         roleId: i % 2 === 0 ? 'w' : 'cf',
-      })
+      }),
     );
 
     mockPlayers = [...goalkeepers, ...defenders, ...midfielders, ...forwards];
@@ -233,7 +233,7 @@ describe('PositionalBench Component', () => {
       expect(mockProps.onPlayerSelect).toHaveBeenCalledWith(
         expect.objectContaining({
           roleId: 'gk',
-        })
+        }),
       );
     });
 
@@ -334,7 +334,7 @@ describe('PositionalBench Component', () => {
       expect(mockProps.onPlayerDragStart).toHaveBeenCalledWith(
         expect.objectContaining({
           roleId: 'gk',
-        })
+        }),
       );
     });
 
@@ -532,7 +532,7 @@ describe('PositionalBench Component', () => {
       expect(goalkeeperHeader).toHaveAttribute('aria-expanded', 'true');
       expect(goalkeeperHeader).toHaveAttribute(
         'aria-controls',
-        expect.stringContaining('goalkeepers')
+        expect.stringContaining('goalkeepers'),
       );
     });
 
@@ -636,7 +636,7 @@ describe('PositionalBench Component', () => {
           {...mockProps}
           onPlayerSelect={undefined as any}
           onPlayerDragStart={undefined as any}
-        />
+        />,
       );
 
       const goalkeeperHeader = screen.getByRole('button', { name: /goalkeepers/i });

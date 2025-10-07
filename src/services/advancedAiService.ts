@@ -173,7 +173,7 @@ function formatPlayerHistory(player: Player): string {
 export const generatePlayerDevelopmentPrediction = async (
   player: Player,
   trainingSchedule: WeeklySchedule,
-  personality: AIPersonality = 'balanced'
+  personality: AIPersonality = 'balanced',
 ): Promise<PlayerDevelopmentPrediction> => {
   if (!aiInstance) {
     throw new Error('AI is offline.');
@@ -261,7 +261,7 @@ export const generateFormationEffectivenessAnalysis = async (
   formation: Formation,
   players: Player[],
   opponentFormations: string[],
-  personality: AIPersonality = 'balanced'
+  personality: AIPersonality = 'balanced',
 ): Promise<FormationEffectivenessAnalysis> => {
   if (!aiInstance) {
     throw new Error('AI is offline.');
@@ -275,7 +275,7 @@ FORMATION: ${formation.name}
 FORMATION SLOTS: ${formation.slots
     .map(
       slot =>
-        `${slot.role} (${slot.defaultPosition.x}, ${slot.defaultPosition.y})${slot.playerId ? ` - ${players.find(p => p.id === slot.playerId)?.name}` : ' - Empty'}`
+        `${slot.role} (${slot.defaultPosition.x}, ${slot.defaultPosition.y})${slot.playerId ? ` - ${players.find(p => p.id === slot.playerId)?.name}` : ' - Empty'}`,
     )
     .join('\n')}
 
@@ -352,7 +352,7 @@ export const generateMatchPrediction = async (
     weather?: string;
     importance: 'low' | 'medium' | 'high';
   },
-  personality: AIPersonality = 'balanced'
+  personality: AIPersonality = 'balanced',
 ): Promise<MatchPrediction> => {
   if (!aiInstance) {
     throw new Error('AI is offline.');
@@ -436,7 +436,7 @@ export const generateTacticalHeatMap = async (
   player: Player,
   recentMatches: MatchResult[],
   formation: Formation,
-  personality: AIPersonality = 'balanced'
+  personality: AIPersonality = 'balanced',
 ): Promise<TacticalHeatMap> => {
   if (!aiInstance) {
     throw new Error('AI is offline.');
@@ -525,7 +525,7 @@ positioning frequency, and areas of influence on the field.`;
 export const generateAdvancedPlayerMetrics = async (
   player: Player,
   recentMatches: MatchResult[],
-  personality: AIPersonality = 'balanced'
+  personality: AIPersonality = 'balanced',
 ): Promise<PlayerPerformanceMetrics> => {
   if (!aiInstance) {
     throw new Error('AI is offline.');

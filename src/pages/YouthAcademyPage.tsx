@@ -60,10 +60,10 @@ const YouthAcademyPage: React.FC = () => {
     const totalProspects = prospects.length;
     const highPotential = prospects.filter((p: any) => calculateOverallPotential(p) >= 75).length;
     const readyForSeniorTeam = prospects.filter(
-      (p: any) => p.age >= 18 && calculateOverallPotential(p) >= 60
+      (p: any) => p.age >= 18 && calculateOverallPotential(p) >= 60,
     ).length;
     const graduatesThisSeason = prospects.filter(
-      (p: any) => p.developmentStage === 'ready_for_senior'
+      (p: any) => p.developmentStage === 'ready_for_senior',
     ).length;
 
     // Development success rate

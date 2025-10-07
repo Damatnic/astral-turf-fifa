@@ -139,7 +139,7 @@ describe('MobilePlayerToken Component', () => {
     rerender(
       <ThemeProvider>
         <MobilePlayerToken {...defaultProps} player={defender} />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
     expect(screen.getByRole('button')).toHaveClass('bg-blue-500');
   });
@@ -176,7 +176,7 @@ describe('MobilePlayerToken Component', () => {
     };
 
     const mockUseTouchGestures = vi.mocked(
-      require('../../utils/mobileOptimizations').useTouchGestures
+      require('../../utils/mobileOptimizations').useTouchGestures,
     );
     mockUseTouchGestures.mockImplementation((_ref: unknown, callbacks: any) => {
       Object.assign(touchCallbacks, callbacks);
@@ -261,7 +261,7 @@ describe('MobileTacticalField Component', () => {
     };
 
     const mockUseTouchGestures = vi.mocked(
-      require('../../utils/mobileOptimizations').useTouchGestures
+      require('../../utils/mobileOptimizations').useTouchGestures,
     );
     mockUseTouchGestures.mockImplementation((_ref: unknown, callbacks: any) => {
       Object.assign(touchCallbacks, callbacks);
@@ -346,7 +346,7 @@ describe('MobileNavigation Component', () => {
     await userEvent.click(dashboardItem);
 
     expect(onNavigate).toHaveBeenCalledWith(
-      expect.objectContaining({ id: 'home', label: 'Dashboard' })
+      expect.objectContaining({ id: 'home', label: 'Dashboard' }),
     );
   });
 
@@ -375,7 +375,7 @@ describe('MobileNavigation Component', () => {
 
   it('should show notification and user profile buttons', () => {
     renderWithTheme(
-      <MobileNavigation {...defaultProps} showNotifications={true} showUserProfile={true} />
+      <MobileNavigation {...defaultProps} showNotifications={true} showUserProfile={true} />,
     );
 
     expect(screen.getByLabelText('Notifications')).toBeInTheDocument();
@@ -407,7 +407,7 @@ describe('MobileNavigation Component', () => {
     };
 
     const mockUseTouchGestures = vi.mocked(
-      require('../../utils/mobileOptimizations').useTouchGestures
+      require('../../utils/mobileOptimizations').useTouchGestures,
     );
     mockUseTouchGestures.mockImplementation((_ref: unknown, callbacks: any) => {
       Object.assign(touchCallbacks, callbacks);

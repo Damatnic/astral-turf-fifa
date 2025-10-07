@@ -204,7 +204,7 @@ class PerformanceService {
     // Time to First Byte
     if (this.isClient && 'performance' in window && 'getEntriesByType' in performance) {
       const navigationEntries = performance.getEntriesByType(
-        'navigation'
+        'navigation',
       ) as PerformanceNavigationTiming[];
 
       if (navigationEntries.length > 0) {
@@ -230,7 +230,7 @@ class PerformanceService {
     window.addEventListener('load', () => {
       setTimeout(() => {
         const navigation = performance.getEntriesByType(
-          'navigation'
+          'navigation',
         )[0] as PerformanceNavigationTiming;
 
         if (navigation) {

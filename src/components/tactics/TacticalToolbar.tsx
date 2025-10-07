@@ -204,7 +204,7 @@ const TacticalToolbar: React.FC<TacticalToolbarProps> = ({
           break;
       }
     },
-    [onToolChange, onGridToggle, onUndoDrawing]
+    [onToolChange, onGridToggle, onUndoDrawing],
   );
 
   useEffect(() => {

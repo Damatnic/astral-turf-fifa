@@ -172,7 +172,7 @@ const AdvancedMetricsRadar: React.FC<AdvancedMetricsRadarProps> = ({
     data: RadarDataPoint[],
     w: number,
     h: number,
-    isComparison: boolean = false
+    isComparison: boolean = false,
   ) => {
     const centerX = w / 2;
     const centerY = h / 2;

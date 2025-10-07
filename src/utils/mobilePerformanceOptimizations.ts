@@ -78,7 +78,7 @@ const dispatchWindowEvent = <T>(type: string, detail: T): void => {
 
 const emitMobilePerformanceWarning = (
   warning: 'battery' | 'memory' | 'general',
-  payload: Record<string, unknown> = {}
+  payload: Record<string, unknown> = {},
 ): void => {
   dispatchWindowEvent('catalyst:mobile-performance-warning', {
     type: warning,
@@ -352,7 +352,7 @@ export class MobileTouchHandler {
     }
 
     const distance = Math.sqrt(
-      Math.pow(touch2.clientX - touch1.clientX, 2) + Math.pow(touch2.clientY - touch1.clientY, 2)
+      Math.pow(touch2.clientX - touch1.clientX, 2) + Math.pow(touch2.clientY - touch1.clientY, 2),
     );
 
     // Store initial distance for scaling calculation
@@ -692,7 +692,7 @@ export class MobilePerformanceMonitor {
 // React hooks for mobile optimizations
 export function useMobileCapabilities() {
   const [capabilities, setCapabilities] = useState<DeviceCapabilities>(() =>
-    detectMobileCapabilities()
+    detectMobileCapabilities(),
   );
 
   useEffect(() => {
@@ -774,7 +774,7 @@ export function useMobileTouch(elementRef: RefObject<HTMLElement>) {
         touchHandlerRef.current.on(gestureType, callback);
       }
     },
-    []
+    [],
   );
 
   return { gestures, onGesture };

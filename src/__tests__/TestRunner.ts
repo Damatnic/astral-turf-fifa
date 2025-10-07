@@ -426,7 +426,7 @@ export class ZenithTestRunner {
 
     console.log(`\n📅 Generated: ${report.timestamp}`);
     console.log(
-      `🎖️  Overall Status: ${this.getStatusEmoji(report.overallStatus)} ${report.overallStatus}`
+      `🎖️  Overall Status: ${this.getStatusEmoji(report.overallStatus)} ${report.overallStatus}`,
     );
 
     console.log('\n📊 COVERAGE SUMMARY');
@@ -442,13 +442,13 @@ export class ZenithTestRunner {
     console.log('\n⚡ PERFORMANCE BENCHMARKS');
     console.log('─'.repeat(50));
     console.log(
-      `Render Performance: ${this.getBenchmarkEmoji(report.performanceBenchmarks.renderPerformance)} ${report.performanceBenchmarks.renderPerformance}`
+      `Render Performance: ${this.getBenchmarkEmoji(report.performanceBenchmarks.renderPerformance)} ${report.performanceBenchmarks.renderPerformance}`,
     );
     console.log(
-      `Memory Efficiency:  ${this.getBenchmarkEmoji(report.performanceBenchmarks.memoryEfficiency)} ${report.performanceBenchmarks.memoryEfficiency}`
+      `Memory Efficiency:  ${this.getBenchmarkEmoji(report.performanceBenchmarks.memoryEfficiency)} ${report.performanceBenchmarks.memoryEfficiency}`,
     );
     console.log(
-      `Error Recovery:     ${this.getBenchmarkEmoji(report.performanceBenchmarks.errorRecovery)} ${report.performanceBenchmarks.errorRecovery}`
+      `Error Recovery:     ${this.getBenchmarkEmoji(report.performanceBenchmarks.errorRecovery)} ${report.performanceBenchmarks.errorRecovery}`,
     );
 
     console.log('\n✅ PRODUCTION CHECKLIST');

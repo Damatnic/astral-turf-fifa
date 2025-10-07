@@ -119,7 +119,7 @@ describe('rootReducer', () => {
       expect(newState.ui.theme).toBe('light');
       // Should preserve initial state structure
       expect(newState.ui).toEqual(
-        expect.objectContaining({ ...initialState.ui, ...loadStatePayload.ui })
+        expect.objectContaining({ ...initialState.ui, ...loadStatePayload.ui }),
       );
     });
 

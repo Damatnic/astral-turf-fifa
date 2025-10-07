@@ -116,11 +116,11 @@ class BundleAnalyzer {
       if (file.type === 'JavaScript') {
         if (sizeKB > THRESHOLDS.JS_CHUNK_ERROR) {
           this.results.errors.push(
-            `JavaScript chunk too large: ${file.name} (${sizeKB.toFixed(1)}KB)`
+            `JavaScript chunk too large: ${file.name} (${sizeKB.toFixed(1)}KB)`,
           );
         } else if (sizeKB > THRESHOLDS.JS_CHUNK_WARNING) {
           this.results.warnings.push(
-            `Large JavaScript chunk: ${file.name} (${sizeKB.toFixed(1)}KB)`
+            `Large JavaScript chunk: ${file.name} (${sizeKB.toFixed(1)}KB)`,
           );
         }
       }
@@ -153,7 +153,7 @@ class BundleAnalyzer {
 
     if (parseFloat(jsPercentage) > 80) {
       this.results.recommendations.push(
-        'JavaScript represents a large portion of the bundle - consider tree shaking'
+        'JavaScript represents a large portion of the bundle - consider tree shaking',
       );
     }
 
@@ -180,7 +180,7 @@ class BundleAnalyzer {
     console.log(`   Total Size: ${this.formatSize(this.results.totalSize)}`);
     console.log(`   Gzipped Size: ${this.formatSize(this.results.gzippedSize)}`);
     console.log(
-      `   Compression Ratio: ${(((this.results.totalSize - this.results.gzippedSize) / this.results.totalSize) * 100).toFixed(1)}%`
+      `   Compression Ratio: ${(((this.results.totalSize - this.results.gzippedSize) / this.results.totalSize) * 100).toFixed(1)}%`,
     );
     console.log(`   Number of Files: ${this.results.files.length}\n`);
 
@@ -191,7 +191,7 @@ class BundleAnalyzer {
       const gzippedStr = this.formatSize(file.gzippedSize);
       console.log(`   ${index + 1}. ${file.name} (${file.type})`);
       console.log(
-        `      Size: ${sizeStr} | Gzipped: ${gzippedStr} | Compression: ${file.compressionRatio}%`
+        `      Size: ${sizeStr} | Gzipped: ${gzippedStr} | Compression: ${file.compressionRatio}%`,
       );
     });
     console.log();
@@ -201,7 +201,7 @@ class BundleAnalyzer {
     console.log('📊 File Type Breakdown:');
     Object.entries(typeStats).forEach(([type, stats]) => {
       console.log(
-        `   ${type}: ${stats.count} files, ${this.formatSize(stats.size)} (${stats.percentage}%)`
+        `   ${type}: ${stats.count} files, ${this.formatSize(stats.size)} (${stats.percentage}%)`,
       );
     });
     console.log();

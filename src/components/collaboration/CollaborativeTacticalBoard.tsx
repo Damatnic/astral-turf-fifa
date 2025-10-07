@@ -72,7 +72,7 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
   });
 
   const [selectedTool, setSelectedTool] = useState<'select' | 'arrow' | 'zone' | 'comment'>(
-    'select'
+    'select',
   );
   const [_isDrawing, _setIsDrawing] = useState(false);
   const [_currentDrawing, _setCurrentDrawing] = useState<DrawingShape | null>(null);
@@ -230,12 +230,12 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
         ctx.moveTo(end.x, end.y);
         ctx.lineTo(
           end.x - headLen * Math.cos(angle - Math.PI / 6),
-          end.y - headLen * Math.sin(angle - Math.PI / 6)
+          end.y - headLen * Math.sin(angle - Math.PI / 6),
         );
         ctx.moveTo(end.x, end.y);
         ctx.lineTo(
           end.x - headLen * Math.cos(angle + Math.PI / 6),
-          end.y - headLen * Math.sin(angle + Math.PI / 6)
+          end.y - headLen * Math.sin(angle + Math.PI / 6),
         );
         ctx.stroke();
       }
@@ -342,7 +342,7 @@ const CollaborativeTacticalBoard: React.FC<CollaborativeTacticalBoardProps> = ({
       ctx.fillText(
         `${comment.userName} - ${new Date(comment.timestamp).toLocaleTimeString()}`,
         x + 5,
-        y + bubbleHeight - 5
+        y + bubbleHeight - 5,
       );
 
       // Comment indicator dot

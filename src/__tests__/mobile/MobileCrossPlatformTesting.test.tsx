@@ -36,7 +36,7 @@ const mockScreenOrientation = {
 class DeviceSimulator {
   static simulateDevice(
     deviceType: 'mobile' | 'tablet' | 'desktop',
-    platform: 'ios' | 'android' | 'desktop' = 'android'
+    platform: 'ios' | 'android' | 'desktop' = 'android',
   ) {
     const configs = {
       mobile: {
@@ -248,7 +248,7 @@ class TouchSimulator {
     element: HTMLElement,
     start: { x: number; y: number },
     end: { x: number; y: number },
-    duration: number = 300
+    duration: number = 300,
   ) {
     const touchStart = this.createTouchEvent('touchstart', [start]);
     const touchMove = this.createTouchEvent('touchmove', [end]);
@@ -572,7 +572,7 @@ describe('Cross-Platform Mobile Testing', () => {
           onDragStart={vi.fn()}
           onDragEnd={vi.fn()}
           fieldBounds={new DOMRect(0, 0, 800, 600)}
-        />
+        />,
       );
 
       const playerToken = screen.getByRole('button');
@@ -698,7 +698,7 @@ describe('Cross-Platform Mobile Testing', () => {
           onDragStart={vi.fn()}
           onDragEnd={vi.fn()}
           fieldBounds={new DOMRect(0, 0, 800, 600)}
-        />
+        />,
       );
 
       const playerToken = screen.getByRole('button');
@@ -729,7 +729,7 @@ describe('Cross-Platform Mobile Testing', () => {
           onDragStart={vi.fn()}
           onDragEnd={vi.fn()}
           fieldBounds={new DOMRect(0, 0, 800, 600)}
-        />
+        />,
       );
 
       const playerToken = screen.getByRole('button');
@@ -780,7 +780,7 @@ describe('Cross-Platform Mobile Testing', () => {
           onDragStart={vi.fn()}
           onDragEnd={vi.fn()}
           fieldBounds={new DOMRect(0, 0, 800, 600)}
-        />
+        />,
       );
 
       const playerToken = screen.getByRole('button');
@@ -791,7 +791,7 @@ describe('Cross-Platform Mobile Testing', () => {
           playerToken,
           { x: 100 + i, y: 100 },
           { x: 110 + i, y: 100 },
-          10
+          10,
         );
       }
 

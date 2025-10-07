@@ -334,7 +334,7 @@ describe('Touch Gesture Recognition', () => {
       expect(touchCallbacks.onSwipe).toHaveBeenCalledWith(
         expect.any(TouchEvent),
         'right',
-        expect.any(Number)
+        expect.any(Number),
       );
     }, 100);
   });
@@ -361,7 +361,7 @@ describe('Touch Gesture Recognition', () => {
 
     expect(touchCallbacks.onPinch).toHaveBeenCalledWith(
       expect.any(TouchEvent),
-      expect.any(Number) // Scale factor
+      expect.any(Number), // Scale factor
     );
   });
 
@@ -443,7 +443,7 @@ describe('Mobile Error Handling', () => {
     });
 
     const longError = new Error(
-      'This is a very long error message that should be truncated for mobile devices to provide better user experience'
+      'This is a very long error message that should be truncated for mobile devices to provide better user experience',
     );
     const shortMessage = result.current.showMobileError(longError, 'test');
 

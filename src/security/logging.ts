@@ -403,7 +403,7 @@ class SecurityLogger {
     level: LogLevel,
     eventType: SecurityEventType,
     message: string,
-    metadata?: SecurityEventMetadata
+    metadata?: SecurityEventMetadata,
   ): SecurityLogEntry {
     return {
       id: this.generateId(),
@@ -469,7 +469,7 @@ class SecurityLogger {
       LogLevel.DEBUG,
       SecurityEventType.SYSTEM_ERROR,
       message,
-      metadata
+      metadata,
     );
     logStore.add(entry);
   }
@@ -484,7 +484,7 @@ class SecurityLogger {
       LogLevel.WARN,
       SecurityEventType.SUSPICIOUS_LOGIN_PATTERN,
       message,
-      metadata
+      metadata,
     );
     logStore.add(entry);
   }
@@ -494,7 +494,7 @@ class SecurityLogger {
       LogLevel.ERROR,
       SecurityEventType.SYSTEM_ERROR,
       message,
-      metadata
+      metadata,
     );
     entry.stackTrace = new Error().stack;
     logStore.add(entry);
@@ -505,7 +505,7 @@ class SecurityLogger {
       LogLevel.CRITICAL,
       SecurityEventType.SECURITY_POLICY_VIOLATION,
       message,
-      metadata
+      metadata,
     );
     entry.stackTrace = new Error().stack;
     logStore.add(entry);
@@ -515,7 +515,7 @@ class SecurityLogger {
   logSecurityEvent(
     eventType: SecurityEventType,
     message: string,
-    context?: SecurityEventContext
+    context?: SecurityEventContext,
   ): void {
     const level = this.getLogLevelForEvent(eventType);
     const entry = this.createEntry(level, eventType, message, context?.metadata);
@@ -555,12 +555,12 @@ class SecurityLogger {
     userId: string,
     ipAddress: string,
     userAgent: string,
-    reason?: string
+    reason?: string,
   ): void {
     this.logSecurityEvent(
       success ? SecurityEventType.LOGIN_SUCCESS : SecurityEventType.LOGIN_FAILURE,
       success ? 'User login successful' : `User login failed: ${reason}`,
-      { userId, ipAddress, userAgent, metadata: { reason } }
+      { userId, ipAddress, userAgent, metadata: { reason } },
     );
   }
 
@@ -573,18 +573,18 @@ class SecurityLogger {
     userId: string,
     resource: string,
     action: string,
-    reason?: string
+    reason?: string,
   ): void {
     this.logSecurityEvent(
       granted ? SecurityEventType.PERMISSION_GRANTED : SecurityEventType.PERMISSION_DENIED,
       granted ? 'Permission granted' : `Permission denied: ${reason}`,
-      { userId, resource, action, metadata: { reason } }
+      { userId, resource, action, metadata: { reason } },
     );
   }
 
   logSuspiciousActivity(
     type: 'brute_force' | 'rate_limit' | 'invalid_token' | 'pattern',
-    details: SecurityEventMetadata
+    details: SecurityEventMetadata,
   ): void {
     const eventType = {
       brute_force: SecurityEventType.BRUTE_FORCE_ATTEMPT,
@@ -601,7 +601,7 @@ class SecurityLogger {
   logInputThreat(
     type: 'xss' | 'sql_injection' | 'malicious',
     input: string,
-    userId?: string
+    userId?: string,
   ): void {
     const eventType = {
       xss: SecurityEventType.XSS_ATTEMPT,
@@ -622,13 +622,13 @@ class SecurityLogger {
     this.logSecurityEvent(
       sensitive ? SecurityEventType.SENSITIVE_DATA_ACCESS : SecurityEventType.DATA_ACCESS,
       `Data access: ${action} on ${resource}`,
-      { userId, resource, action }
+      { userId, resource, action },
     );
   }
 
   logAiSecurityEvent(
     type: 'prompt_injection' | 'response_filtered' | 'rate_limited',
-    details: SecurityEventMetadata
+    details: SecurityEventMetadata,
   ): void {
     const eventType = {
       prompt_injection: SecurityEventType.AI_PROMPT_INJECTION,
@@ -784,7 +784,7 @@ export function createSecurityIncident(
   title: string,
   description: string,
   source: string,
-  metadata: IncidentCreationMetadata = {}
+  metadata: IncidentCreationMetadata = {},
 ): string {
   const incidentId = generateIncidentUUID();
   const now = new Date().toISOString();
@@ -860,7 +860,7 @@ function determineRequiredNotifications(type: IncidentType, severity: IncidentSe
 // Calculate notification deadline
 function calculateNotificationDeadline(
   type: IncidentType,
-  severity: IncidentSeverity
+  severity: IncidentSeverity,
 ): string | undefined {
   if (type === IncidentType.DATA_BREACH) {
     // GDPR requires notification within 72 hours
@@ -885,7 +885,7 @@ function triggerAutomatedResponse(incident: SecurityIncident): void {
         'Automatically enabled enhanced DDoS protection',
         'system',
         'high',
-        true
+        true,
       );
       break;
 
@@ -897,7 +897,7 @@ function triggerAutomatedResponse(incident: SecurityIncident): void {
         'Automatically enabled strict input validation',
         'system',
         'medium',
-        true
+        true,
       );
       break;
 
@@ -908,7 +908,7 @@ function triggerAutomatedResponse(incident: SecurityIncident): void {
         'Automatically enabled enhanced account lockout policies',
         'system',
         'medium',
-        true
+        true,
       );
       break;
   }
@@ -921,7 +921,7 @@ export function addIncidentMitigation(
   description: string,
   performedBy: string,
   effectiveness: 'low' | 'medium' | 'high',
-  automated: boolean = false
+  automated: boolean = false,
 ): void {
   const incident = securityIncidents.get(incidentId);
   if (!incident) {
@@ -958,7 +958,7 @@ export function addIncidentMitigation(
 export function updateIncidentStatus(
   incidentId: string,
   status: SecurityIncident['status'],
-  assignedTo?: string
+  assignedTo?: string,
 ): void {
   const incident = securityIncidents.get(incidentId);
   if (!incident) {
@@ -1009,12 +1009,12 @@ function updateIncidentMetrics(): void {
   incidentMetrics.totalIncidents = incidents.length;
   incidentMetrics.openIncidents = incidents.filter(i => i.status === 'open').length;
   incidentMetrics.criticalIncidents = incidents.filter(
-    i => i.severity === IncidentSeverity.CRITICAL
+    i => i.severity === IncidentSeverity.CRITICAL,
   ).length;
 
   if (incidents.length > 0) {
     const latestIncident = incidents.sort(
-      (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+      (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
     )[0];
     incidentMetrics.lastIncident = latestIncident.timestamp;
   }
@@ -1041,7 +1041,7 @@ export function getSecurityIncidents(filter?: {
   }
 
   return incidents.sort(
-    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
   );
 }
 
@@ -1060,7 +1060,7 @@ type CriticalEventContext = SecurityEventContext & {
 export function logCriticalSecurityEvent(
   type: SecurityEventType,
   message: string,
-  context: CriticalEventContext = {}
+  context: CriticalEventContext = {},
 ): void {
   // Log the event normally
   securityLogger.logSecurityEvent(type, message, context);
@@ -1080,7 +1080,7 @@ export function logCriticalSecurityEvent(
       {
         eventType: type,
         ...context,
-      }
+      },
     );
   }
 }
@@ -1139,7 +1139,7 @@ export function initializeSecurityMonitoring(): void {
         {
           logEntry: entry,
           riskScore: entry.riskScore,
-        }
+        },
       );
     }
   });

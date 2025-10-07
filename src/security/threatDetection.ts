@@ -263,7 +263,7 @@ export class GuardianThreatDetection {
           confidence,
           severity: threatLevel,
         })),
-        confidence
+        confidence,
       );
     }
 
@@ -310,7 +310,7 @@ export class GuardianThreatDetection {
           confidence,
           severity: threatLevel,
         })),
-        confidence
+        confidence,
       );
     }
 
@@ -345,7 +345,7 @@ export class GuardianThreatDetection {
             severity: threatLevel,
           },
         ],
-        confidence
+        confidence,
       );
     }
 
@@ -414,7 +414,7 @@ export class GuardianThreatDetection {
         context,
         'Anomalous user behavior detected',
         anomalies,
-        confidence
+        confidence,
       );
     }
 
@@ -479,7 +479,7 @@ export class GuardianThreatDetection {
         context,
         'Potential data exfiltration detected',
         indicators,
-        confidence
+        confidence,
       );
     }
 
@@ -506,7 +506,7 @@ export class GuardianThreatDetection {
         threatType: threat.threatType,
         threatLevel: threat.threatLevel,
         confidence: threat.confidence,
-      }
+      },
     );
 
     // Execute response actions
@@ -532,7 +532,7 @@ export class GuardianThreatDetection {
           sourceIP: threat.source.identifier,
           responseActions: threat.responseActions,
         },
-      }
+      },
     );
   }
 
@@ -586,7 +586,7 @@ export class GuardianThreatDetection {
     context: ThreatContext,
     description: string,
     indicators: ThreatIndicator[],
-    confidence: number
+    confidence: number,
   ): ThreatEvent {
     const responseActions = this.determineResponseActions(threatType, threatLevel);
 
@@ -622,7 +622,7 @@ export class GuardianThreatDetection {
    */
   private determineResponseActions(
     threatType: ThreatType,
-    threatLevel: ThreatLevel
+    threatLevel: ThreatLevel,
   ): ResponseAction[] {
     const actions: ResponseAction[] = [ResponseAction.LOG_ONLY];
 
@@ -816,7 +816,7 @@ export class GuardianThreatDetection {
    */
   public async getSecurityMetrics(startDate: Date, endDate: Date): Promise<SecurityMetrics> {
     const events = Array.from(this.threatEvents.values()).filter(
-      event => new Date(event.timestamp) >= startDate && new Date(event.timestamp) <= endDate
+      event => new Date(event.timestamp) >= startDate && new Date(event.timestamp) <= endDate,
     );
 
     const threatsByType = events.reduce(
@@ -824,7 +824,7 @@ export class GuardianThreatDetection {
         acc[event.threatType] = (acc[event.threatType] || 0) + 1;
         return acc;
       },
-      {} as Record<ThreatType, number>
+      {} as Record<ThreatType, number>,
     );
 
     const threatsByLevel = events.reduce(
@@ -832,7 +832,7 @@ export class GuardianThreatDetection {
         acc[event.threatLevel] = (acc[event.threatLevel] || 0) + 1;
         return acc;
       },
-      {} as Record<ThreatLevel, number>
+      {} as Record<ThreatLevel, number>,
     );
 
     return {

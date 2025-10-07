@@ -259,7 +259,7 @@ class WebhookService {
       teamId?: string;
       correlationId?: string;
       priority?: 'low' | 'normal' | 'high';
-    } = {}
+    } = {},
   ): Promise<void> {
     const event: WebhookEvent = {
       id: uuidv4(),
@@ -293,7 +293,7 @@ class WebhookService {
     path: string,
     headers: Record<string, string>,
     body: string,
-    signature?: string
+    signature?: string,
   ): Promise<{ success: boolean; message: string }> {
     try {
       // Find matching receiver
@@ -484,7 +484,7 @@ class WebhookService {
       endpoint =>
         endpoint.isActive &&
         endpoint.events.includes(event.type) &&
-        this.passesFilters(event, endpoint.filterRules || [])
+        this.passesFilters(event, endpoint.filterRules || []),
     );
 
     // Deliver to each matching endpoint
@@ -501,7 +501,7 @@ class WebhookService {
     const now = Date.now();
 
     const retriableDeliveries = Array.from(this.deliveries.values()).filter(
-      d => d.status === 'failed' && d.nextRetryAt && d.nextRetryAt <= now && d.retryCount < 5 // Max retry limit
+      d => d.status === 'failed' && d.nextRetryAt && d.nextRetryAt <= now && d.retryCount < 5, // Max retry limit
     );
 
     for (const delivery of retriableDeliveries) {
@@ -579,7 +579,7 @@ class WebhookService {
         const delay = Math.min(
           endpoint.retryPolicy.initialDelay *
             Math.pow(endpoint.retryPolicy.backoffMultiplier, delivery.retryCount),
-          endpoint.retryPolicy.maxDelay
+          endpoint.retryPolicy.maxDelay,
         );
         delivery.nextRetryAt = Date.now() + delay;
       }
@@ -592,7 +592,7 @@ class WebhookService {
 
       console.error(
         `❌ Webhook delivery failed: ${endpoint.name}`,
-        axiosError.message || 'Unknown error'
+        axiosError.message || 'Unknown error',
       );
     }
   }
@@ -670,7 +670,7 @@ class WebhookService {
           this.renameField(
             transformedEvent,
             String(transform.config.from),
-            String(transform.config.to)
+            String(transform.config.to),
           );
           break;
 
@@ -678,7 +678,7 @@ class WebhookService {
           this.setNestedValue(
             transformedEvent,
             String(transform.config.field),
-            transform.config.value
+            transform.config.value,
           );
           break;
 
@@ -689,7 +689,7 @@ class WebhookService {
         case 'format_value': {
           const currentValue = this.getNestedValue(
             transformedEvent,
-            String(transform.config.field)
+            String(transform.config.field),
           );
           const formattedValue = this.formatValue(currentValue, String(transform.config.format));
           this.setNestedValue(transformedEvent, String(transform.config.field), formattedValue);
@@ -758,7 +758,7 @@ class WebhookService {
 
   private validateEventStructure(
     event: unknown,
-    validation: WebhookReceiver['validation']
+    validation: WebhookReceiver['validation'],
   ): boolean {
     // Check required fields
     for (const field of validation.requiredFields) {
@@ -812,7 +812,7 @@ class WebhookService {
         }
         return curr[key];
       },
-      obj as Record<string, unknown>
+      obj as Record<string, unknown>,
     ) as Record<string, unknown>;
     target[lastKey] = value;
   }
@@ -860,7 +860,7 @@ class WebhookService {
         (config as any).metadata = { startTime: Date.now() };
         return config;
       },
-      error => Promise.reject(error)
+      error => Promise.reject(error),
     );
 
     // Response interceptor
@@ -874,7 +874,7 @@ class WebhookService {
         const duration = Date.now() - (error.config?.metadata?.startTime || Date.now());
         // // // // console.log(`📉 Webhook request failed after ${duration}ms`);
         return Promise.reject(error);
-      }
+      },
     );
   }
 

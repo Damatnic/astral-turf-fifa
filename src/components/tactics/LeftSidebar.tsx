@@ -362,7 +362,7 @@ export const LeftSidebar: React.FC = () => {
         payload: { formationId, team: 'home' },
       });
     },
-    [dispatch]
+    [dispatch],
   );
 
   const handlePlayerSelect = useCallback(
@@ -372,7 +372,7 @@ export const LeftSidebar: React.FC = () => {
         payload: playerId,
       });
     },
-    [dispatch]
+    [dispatch],
   );
 
   const handlePlayerDragStart = useCallback((e: React.DragEvent, playerId: string) => {
@@ -387,7 +387,7 @@ export const LeftSidebar: React.FC = () => {
         payload: { playerId, team },
       });
     },
-    [dispatch]
+    [dispatch],
   );
 
   const handleSuggestFormation = useCallback(async () => {
@@ -487,16 +487,16 @@ export const LeftSidebar: React.FC = () => {
               const playersByPosition = {
                 goalkeeper: filteredPlayers.filter(p => p.roleId?.includes('goalkeeper')),
                 defender: filteredPlayers.filter(
-                  p => p.roleId?.includes('back') || p.roleId?.includes('defender')
+                  p => p.roleId?.includes('back') || p.roleId?.includes('defender'),
                 ),
                 midfielder: filteredPlayers.filter(
-                  p => p.roleId?.includes('midfielder') || p.roleId?.includes('mid')
+                  p => p.roleId?.includes('midfielder') || p.roleId?.includes('mid'),
                 ),
                 forward: filteredPlayers.filter(
                   p =>
                     p.roleId?.includes('forward') ||
                     p.roleId?.includes('striker') ||
-                    p.roleId?.includes('winger')
+                    p.roleId?.includes('winger'),
                 ),
                 other: filteredPlayers.filter(
                   p =>
@@ -508,7 +508,7 @@ export const LeftSidebar: React.FC = () => {
                       !p.roleId.includes('mid') &&
                       !p.roleId.includes('forward') &&
                       !p.roleId.includes('striker') &&
-                      !p.roleId.includes('winger'))
+                      !p.roleId.includes('winger')),
                 ),
               };
 

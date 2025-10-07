@@ -62,7 +62,7 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [coachingRecommendations, setCoachingRecommendations] = useState<CoachingRecommendation[]>(
-    []
+    [],
   );
   const [chatMessages, setChatMessages] = useState<
     Array<{ id: string; type: 'user' | 'ai'; content: string }>
@@ -85,7 +85,7 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
         {
           gamePhase: 'mid',
           gameState: 'normal',
-        }
+        },
       );
 
       setCoachingRecommendations(recommendations);
@@ -227,7 +227,7 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
       }
       return Lightbulb;
     },
-    []
+    [],
   );
 
   // Suggestion priority colors

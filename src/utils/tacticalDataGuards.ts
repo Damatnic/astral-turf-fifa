@@ -89,7 +89,7 @@ export function getFormationSlots(formation: Formation | null | undefined): Form
  */
 export function getAssignedPlayers(
   formation: Formation | null | undefined,
-  players: Player[] | null | undefined
+  players: Player[] | null | undefined,
 ): Player[] {
   if (!isValidFormation(formation) || !Array.isArray(players)) {
     return [];
@@ -107,7 +107,7 @@ export function getAssignedPlayers(
 export function getUnassignedPlayers(
   formation: Formation | null | undefined,
   players: Player[] | null | undefined,
-  team?: string
+  team?: string,
 ): Player[] {
   if (!Array.isArray(players)) {
     return [];
@@ -134,7 +134,7 @@ export function getUnassignedPlayers(
  */
 export function findPlayerById(
   players: Player[] | null | undefined,
-  playerId: string | null | undefined
+  playerId: string | null | undefined,
 ): Player | null {
   if (!Array.isArray(players) || !playerId) {
     return null;
@@ -149,7 +149,7 @@ export function findPlayerById(
  */
 export function findSlotById(
   formation: Formation | null | undefined,
-  slotId: string | null | undefined
+  slotId: string | null | undefined,
 ): FormationSlot | null {
   if (!isValidFormation(formation) || !slotId) {
     return null;
@@ -164,7 +164,7 @@ export function findSlotById(
  */
 export function getPlayerPosition(
   player: Player | null | undefined,
-  fallback: Position = { x: 50, y: 50 }
+  fallback: Position = { x: 50, y: 50 },
 ): Position {
   if (!isValidPlayer(player)) {
     return fallback;
@@ -178,7 +178,7 @@ export function getPlayerPosition(
  */
 export function getSlotPosition(
   slot: FormationSlot | null | undefined,
-  fallback: Position = { x: 50, y: 50 }
+  fallback: Position = { x: 50, y: 50 },
 ): Position {
   if (!isValidFormationSlot(slot)) {
     return fallback;
@@ -219,7 +219,7 @@ export function getFormationPlayerIds(formation: Formation | null | undefined): 
 export function safeCalculation<T>(
   calculation: () => T,
   fallback: T,
-  context: string = 'calculation'
+  context: string = 'calculation',
 ): T {
   try {
     const result = calculation();

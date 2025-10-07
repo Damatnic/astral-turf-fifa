@@ -136,7 +136,7 @@ export const FormationSelector = forwardRef<HTMLDivElement, FormationSelectorPro
       onCreateCustom,
       ...props
     },
-    ref
+    ref,
   ) => {
     const [hoveredFormation, setHoveredFormation] = useState<string | null>(null);
 
@@ -230,7 +230,7 @@ export const FormationSelector = forwardRef<HTMLDivElement, FormationSelectorPro
                 'hover:scale-105 hover:shadow-md',
                 selectedFormation === formation.id
                   ? 'bg-primary-600 border-primary-500 text-white'
-                  : 'bg-secondary-700 border-secondary-600 text-secondary-300 hover:bg-secondary-600'
+                  : 'bg-secondary-700 border-secondary-600 text-secondary-300 hover:bg-secondary-600',
               )}
             >
               {formation.formation}
@@ -264,7 +264,7 @@ export const FormationSelector = forwardRef<HTMLDivElement, FormationSelectorPro
               variant={selectedFormation === formation.id ? 'elevated' : 'interactive'}
               className={cn(
                 'cursor-pointer transition-all duration-200',
-                selectedFormation === formation.id && 'ring-2 ring-primary-500/50'
+                selectedFormation === formation.id && 'ring-2 ring-primary-500/50',
               )}
               onClick={() => onFormationSelect(formation.id)}
               role="radio"
@@ -375,7 +375,7 @@ export const FormationSelector = forwardRef<HTMLDivElement, FormationSelectorPro
             className={cn(
               'cursor-pointer transition-all duration-200 group',
               selectedFormation === formation.id && 'ring-2 ring-primary-500/50',
-              'hover:scale-105'
+              'hover:scale-105',
             )}
             onClick={() => onFormationSelect(formation.id)}
             onMouseEnter={() => setHoveredFormation(formation.id)}
@@ -466,7 +466,7 @@ export const FormationSelector = forwardRef<HTMLDivElement, FormationSelectorPro
         )}
       </div>
     );
-  }
+  },
 );
 
 FormationSelector.displayName = 'FormationSelector';

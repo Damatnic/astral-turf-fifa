@@ -24,7 +24,7 @@ class ZenithE2EUtils {
   static async loginUser(
     page: Page,
     email: string = 'test@example.com',
-    password: string = 'password123'
+    password: string = 'password123',
   ) {
     await page.goto('/login');
     await page.fill('[data-testid="email-input"]', email);
@@ -187,7 +187,7 @@ test.describe('Tactical Planning User Journeys - ZENITH E2E Tests', () => {
 
     await page.mouse.move(
       playerBox!.x + playerBox!.width / 2,
-      playerBox!.y + playerBox!.height / 2
+      playerBox!.y + playerBox!.height / 2,
     );
     await page.mouse.down();
     await page.mouse.move(playerBox!.x + 100, playerBox!.y + 50);
@@ -520,7 +520,7 @@ test.describe('Performance User Journeys - ZENITH E2E Tests', () => {
 
     const performanceMetrics = await page.evaluate(() => {
       const navigation = performance.getEntriesByType(
-        'navigation'
+        'navigation',
       )[0] as PerformanceNavigationTiming;
       return {
         loadTime: navigation.loadEventEnd - navigation.loadEventStart,

@@ -86,7 +86,7 @@ const MyPlayerRankingPage: React.FC = () => {
 
   const handleAttributeSpend = (
     attribute: keyof typeof selectedPlayer.attributes,
-    points: number
+    points: number,
   ) => {
     spendAttributePoints(selectedPlayer.id, attribute, points);
     setShowAttributeSpend(false);
@@ -208,7 +208,7 @@ const MyPlayerRankingPage: React.FC = () => {
                 >
                   {tab}
                 </button>
-              )
+              ),
             )}
           </div>
         </div>
@@ -404,7 +404,7 @@ const MyPlayerRankingPage: React.FC = () => {
                           <p className="text-gray-400 text-sm mb-1 capitalize">{category}</p>
                           <p className="text-xl font-bold text-white">{count}</p>
                         </div>
-                      )
+                      ),
                     )}
                   </div>
                 </div>
@@ -417,7 +417,7 @@ const MyPlayerRankingPage: React.FC = () => {
                       ([difficulty, count]) => {
                         const total = Object.values(profile.totalStats.difficultyBreakdown).reduce(
                           (a, b) => a + b,
-                          0
+                          0,
                         );
                         const percentage = total > 0 ? (count / total) * 100 : 0;
 
@@ -445,7 +445,7 @@ const MyPlayerRankingPage: React.FC = () => {
                             </div>
                           </div>
                         );
-                      }
+                      },
                     )}
                   </div>
                 </div>

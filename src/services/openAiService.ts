@@ -47,7 +47,7 @@ const promptCache = new Map<string, string>();
 
 async function loadAndFormatPrompt(
   promptFile: string,
-  replacements: Record<string, string>
+  replacements: Record<string, string>,
 ): Promise<string> {
   let template = promptCache.get(promptFile);
   if (!template) {
@@ -172,7 +172,7 @@ async function callOpenAI(prompt: string, maxTokens: number = 1000): Promise<str
 
 export async function analyzeFormation(
   formation: Formation,
-  players: Player[]
+  players: Player[],
 ): Promise<AIInsight[]> {
   if (!openaiInstance) {
     return generateFallbackInsights();
@@ -187,7 +187,7 @@ export async function analyzeFormation(
           position: p.position,
           overall: (p as any).overall,
           skills: (p as any).skills,
-        }))
+        })),
       ),
     });
 
@@ -254,7 +254,7 @@ export async function comparePlayers(player1: Player, player2: Player): Promise<
 export async function suggestFormation(
   players: Player[],
   teamTactics: TeamTactics,
-  oppositionStyle?: string
+  oppositionStyle?: string,
 ): Promise<AISuggestedFormation> {
   if (!openaiInstance) {
     return generateFallbackFormation(players);
@@ -268,7 +268,7 @@ export async function suggestFormation(
           position: p.position,
           overall: (p as any).overall,
           skills: (p as any).skills,
-        }))
+        })),
       ),
       teamStyle: JSON.stringify(teamTactics),
       opposition: oppositionStyle || 'unknown',
@@ -357,7 +357,7 @@ export { callOpenAI as callAI, loadAndFormatPrompt };
 
 // Additional AI functions that may be used by other services
 export async function generateMatchAnalysis(
-  _matchResult: MatchResult
+  _matchResult: MatchResult,
 ): Promise<AIPostMatchAnalysis> {
   // Implementation for match analysis
   return {
@@ -389,7 +389,7 @@ export async function generateScoutReport(player: TransferPlayer): Promise<AISco
 
 export async function generateTeamTalk(
   context: string,
-  personality: AIPersonality
+  personality: AIPersonality,
 ): Promise<AITeamTalkResponse> {
   if (!openaiInstance) {
     return {
@@ -429,7 +429,7 @@ export async function generateTeamTalk(
 // Missing function implementations
 export async function generateTacticalAnalysis(
   formation: Formation,
-  players: Player[]
+  players: Player[],
 ): Promise<AIInsight[]> {
   return analyzeFormation(formation, players);
 }
@@ -437,14 +437,14 @@ export async function generateTacticalAnalysis(
 export async function generateFormationSuggestion(
   players: Player[],
   teamTactics: TeamTactics,
-  oppositionStyle?: string
+  oppositionStyle?: string,
 ): Promise<AISuggestedFormation> {
   return suggestFormation(players, teamTactics, oppositionStyle);
 }
 
 export async function getFormationAnalysis(
   formation: Formation,
-  players: Player[]
+  players: Player[],
 ): Promise<AIInsight[]> {
   return analyzeFormation(formation, players);
 }
@@ -455,7 +455,7 @@ export async function getPlayerComparison(player1: Player, player2: Player): Pro
 
 export async function optimizeFormation(
   players: Player[],
-  teamTactics: TeamTactics
+  teamTactics: TeamTactics,
 ): Promise<AISuggestedFormation> {
   return suggestFormation(players, teamTactics);
 }

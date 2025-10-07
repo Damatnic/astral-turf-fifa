@@ -345,7 +345,7 @@ describe('♿ Tactical Board Accessibility Tests', () => {
       if (modal) {
         // Focus should be trapped within modal
         const focusableElements = modal.querySelectorAll(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
         );
 
         expect(focusableElements.length).toBeGreaterThan(0);
@@ -453,7 +453,7 @@ describe('♿ Tactical Board Accessibility Tests', () => {
 
         // Should have visible focus indicator
         expect(
-          styles.outline !== 'none' || styles.boxShadow !== 'none' || styles.border !== 'none'
+          styles.outline !== 'none' || styles.boxShadow !== 'none' || styles.border !== 'none',
         ).toBe(true);
       }
     });
@@ -580,7 +580,7 @@ describe('♿ Tactical Board Accessibility Tests', () => {
         expect(
           abbr.hasAttribute('title') ||
             abbr.hasAttribute('aria-label') ||
-            abbr.closest('[aria-label]')
+            abbr.closest('[aria-label]'),
         ).toBe(true);
       }
     });

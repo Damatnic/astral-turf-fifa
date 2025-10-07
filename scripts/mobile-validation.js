@@ -422,7 +422,7 @@ class MobileValidationSuite {
       process.cwd(),
       'src',
       'utils',
-      'accessibilityLabels.ts'
+      'accessibilityLabels.ts',
     );
     const exists = fs.existsSync(accessibilityLabelsPath);
 
@@ -743,7 +743,7 @@ class MobileValidationSuite {
       'src',
       '__tests__',
       'mobile',
-      'MobileCrossPlatformTesting.test.tsx'
+      'MobileCrossPlatformTesting.test.tsx',
     );
     const exists = fs.existsSync(testPath);
 
@@ -776,7 +776,7 @@ class MobileValidationSuite {
       'src',
       '__tests__',
       'mobile',
-      'MobileCrossPlatformTesting.test.tsx'
+      'MobileCrossPlatformTesting.test.tsx',
     );
 
     if (!fs.existsSync(testPath)) {
@@ -836,7 +836,7 @@ class MobileValidationSuite {
       'src',
       '__tests__',
       'mobile',
-      'MobileCrossPlatformTesting.test.tsx'
+      'MobileCrossPlatformTesting.test.tsx',
     );
 
     if (!fs.existsSync(testPath)) {
@@ -947,7 +947,7 @@ class MobileValidationSuite {
 
     const overallPercentage = ((overallScore / totalChecks) * 100).toFixed(1);
     console.log(
-      `OVERALL MOBILE OPTIMIZATION SCORE: ${overallScore}/${totalChecks} (${overallPercentage}%)`
+      `OVERALL MOBILE OPTIMIZATION SCORE: ${overallScore}/${totalChecks} (${overallPercentage}%)`,
     );
 
     if (overallPercentage >= 90) {
@@ -993,7 +993,7 @@ class MobileValidationSuite {
     // Check for common issues and provide recommendations
     if (this.results.performance?.bundleSize?.status !== 'pass') {
       recommendations.push(
-        'Consider implementing code splitting and tree shaking to reduce bundle size'
+        'Consider implementing code splitting and tree shaking to reduce bundle size',
       );
     }
 
@@ -1015,7 +1015,7 @@ class MobileValidationSuite {
 
     if (recommendations.length === 0) {
       recommendations.push(
-        'Mobile optimization looks excellent! Consider monitoring performance metrics continuously.'
+        'Mobile optimization looks excellent! Consider monitoring performance metrics continuously.',
       );
     }
 

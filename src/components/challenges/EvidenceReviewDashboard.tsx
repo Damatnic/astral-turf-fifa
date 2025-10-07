@@ -82,7 +82,7 @@ export const EvidenceReviewDashboard: React.FC<EvidenceReviewDashboardProps> = (
     // Sort
     const sorted = [...filtered].sort((a, b) => {
       let comparison = 0;
-      
+
       switch (sortBy) {
         case 'date':
           comparison = new Date(a.submittedAt).getTime() - new Date(b.submittedAt).getTime();
@@ -97,7 +97,7 @@ export const EvidenceReviewDashboard: React.FC<EvidenceReviewDashboardProps> = (
           comparison = a.status.localeCompare(b.status);
           break;
       }
-      
+
       return sortDesc ? -comparison : comparison;
     });
 
@@ -408,7 +408,7 @@ export const EvidenceReviewDashboard: React.FC<EvidenceReviewDashboardProps> = (
             {filteredSubmissions.map((submission) => {
               const StatusIcon = getStatusIcon(submission.status);
               const EvidenceIcon = getEvidenceIcon(submission.evidenceType);
-              
+
               return (
                 <motion.div
                   key={submission.id}

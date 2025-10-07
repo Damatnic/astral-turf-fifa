@@ -61,7 +61,7 @@ export class SecurityErrorBoundary extends Component<Props, State> {
   static getDerivedStateFromError(error: Error): Partial<State> {
     const errorId = `error_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     const isSecurityRelated = SECURITY_ERROR_PATTERNS.some(
-      pattern => pattern.test(error.message) || pattern.test(error.name)
+      pattern => pattern.test(error.message) || pattern.test(error.name),
     );
 
     return {
@@ -101,7 +101,7 @@ export class SecurityErrorBoundary extends Component<Props, State> {
               stackTrace: sanitizedError.stack,
             }),
           },
-        }
+        },
       );
 
       // Call custom error handler if provided

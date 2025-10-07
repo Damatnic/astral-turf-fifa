@@ -180,7 +180,7 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
         fileSize: 3.1,
       },
     ],
-    []
+    [],
   );
 
   // Filter library items
@@ -252,7 +252,7 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
         setIsImporting(false);
       }
     },
-    [importOptions, onImport]
+    [importOptions, onImport],
   );
 
   const handleDrop = useCallback(
@@ -265,7 +265,7 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
         handleImport(files[0]);
       }
     },
-    [handleImport]
+    [handleImport],
   );
 
   const handleDragOver = useCallback((e: React.DragEvent) => {

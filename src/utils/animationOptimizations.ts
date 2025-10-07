@@ -382,7 +382,7 @@ export class AnimationCuller {
 export function usePerformanceAnimation(
   enabled: boolean,
   animationFn: () => void,
-  deps: React.DependencyList = []
+  deps: React.DependencyList = [],
 ) {
   const elementRef = useRef<HTMLElement>(null);
   const cullerRef = useRef<AnimationCuller | null>(null);

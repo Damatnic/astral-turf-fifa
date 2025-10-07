@@ -230,7 +230,7 @@ const PerformanceMonitorComponent: React.FC<{
 
       setSuggestions(newSuggestions);
     },
-    [onOptimize]
+    [onOptimize],
   );
 
   const startPerformanceRecording = useCallback(() => {

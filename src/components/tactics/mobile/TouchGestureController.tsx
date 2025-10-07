@@ -84,7 +84,7 @@ export const TouchGestureController: React.FC<TouchGestureControllerProps> = ({
         navigator.vibrate(duration);
       }
     },
-    [enableHaptics]
+    [enableHaptics],
   );
 
   // Calculate distance between two touches
@@ -144,7 +144,7 @@ export const TouchGestureController: React.FC<TouchGestureControllerProps> = ({
         lastTapTime.current = now;
       }
     },
-    [handlers, triggerHaptic]
+    [handlers, triggerHaptic],
   );
 
   // Handle pointer move
@@ -156,7 +156,7 @@ export const TouchGestureController: React.FC<TouchGestureControllerProps> = ({
       }
 
       const touchList = (event.nativeEvent as any).touches;
-      if (!touchList) return;
+      if (!touchList) {return;}
 
       // Update touch tracking
       for (let i = 0; i < touchList.length; i++) {
@@ -177,7 +177,7 @@ export const TouchGestureController: React.FC<TouchGestureControllerProps> = ({
           const initialDistance = useRef(distance);
           const newScale = Math.max(
             minScale,
-            Math.min(maxScale, distance / initialDistance.current)
+            Math.min(maxScale, distance / initialDistance.current),
           );
 
           if (Math.abs(newScale - gestureState.scale) > 0.01) {
@@ -234,7 +234,7 @@ export const TouchGestureController: React.FC<TouchGestureControllerProps> = ({
       rotation,
       x,
       y,
-    ]
+    ],
   );
 
   // Handle pointer up
@@ -291,7 +291,7 @@ export const TouchGestureController: React.FC<TouchGestureControllerProps> = ({
         panY: 0,
       });
     },
-    [handlers, triggerHaptic]
+    [handlers, triggerHaptic],
   );
 
   return (

@@ -245,7 +245,7 @@ class ZenithTestRunner {
 
       console.log(`✅ ${category.name} completed in ${(duration / 1000).toFixed(2)}s`);
       console.log(
-        `   Passed: ${result.passed}, Failed: ${result.failed}, Total: ${result.total}\n`
+        `   Passed: ${result.passed}, Failed: ${result.failed}, Total: ${result.total}\n`,
       );
 
       // Fail fast if configured and tests failed
@@ -290,7 +290,7 @@ class ZenithTestRunner {
         case 'integration':
           // Parse Vitest output
           const vitestMatch = stdout.match(
-            /Tests\s+(\d+)\s+passed.*?(\d+)\s+failed.*?(\d+)\s+total/i
+            /Tests\s+(\d+)\s+passed.*?(\d+)\s+failed.*?(\d+)\s+total/i,
           );
           if (vitestMatch) {
             result.passed = parseInt(vitestMatch[1]);
@@ -390,7 +390,7 @@ class ZenithTestRunner {
     // Generate JSON report
     await fs.writeFile(
       path.join(this.outputDir, 'zenith-report.json'),
-      JSON.stringify(finalResults, null, 2)
+      JSON.stringify(finalResults, null, 2),
     );
 
     // Generate JUnit XML for CI/CD
@@ -401,7 +401,7 @@ class ZenithTestRunner {
     const badgeData = this.generateBadgeData(finalResults);
     await fs.writeFile(
       path.join(this.outputDir, 'badges.json'),
-      JSON.stringify(badgeData, null, 2)
+      JSON.stringify(badgeData, null, 2),
     );
 
     console.log('✅ Reports generated\n');
@@ -424,26 +424,26 @@ class ZenithTestRunner {
     // Check coverage thresholds
     if (results.coverage.statements?.pct < ZENITH_CONFIG.coverage.statements) {
       failures.push(
-        `Statement coverage: ${results.coverage.statements?.pct}% (required: ${ZENITH_CONFIG.coverage.statements}%)`
+        `Statement coverage: ${results.coverage.statements?.pct}% (required: ${ZENITH_CONFIG.coverage.statements}%)`,
       );
     }
 
     if (results.coverage.branches?.pct < ZENITH_CONFIG.coverage.branches) {
       failures.push(
-        `Branch coverage: ${results.coverage.branches?.pct}% (required: ${ZENITH_CONFIG.coverage.branches}%)`
+        `Branch coverage: ${results.coverage.branches?.pct}% (required: ${ZENITH_CONFIG.coverage.branches}%)`,
       );
     }
 
     // Check performance thresholds
     if (results.performance.avgRenderTime > ZENITH_CONFIG.performance.renderTime) {
       failures.push(
-        `Render time: ${results.performance.avgRenderTime}ms (required: <${ZENITH_CONFIG.performance.renderTime}ms)`
+        `Render time: ${results.performance.avgRenderTime}ms (required: <${ZENITH_CONFIG.performance.renderTime}ms)`,
       );
     }
 
     if (results.performance.maxMemoryUsage > ZENITH_CONFIG.performance.memoryUsage) {
       failures.push(
-        `Memory usage: ${results.performance.maxMemoryUsage}MB (required: <${ZENITH_CONFIG.performance.memoryUsage}MB)`
+        `Memory usage: ${results.performance.maxMemoryUsage}MB (required: <${ZENITH_CONFIG.performance.memoryUsage}MB)`,
       );
     }
 
@@ -681,7 +681,7 @@ class ZenithTestRunner {
                         <div>Failed: <span class="${stats.failed > 0 ? 'error' : 'success'}">${stats.failed}</span></div>
                         <div>Duration: ${((stats.duration || 0) / 1000).toFixed(2)}s</div>
                     </div>
-                `
+                `,
                   )
                   .join('')}
             </div>
@@ -809,7 +809,7 @@ class ZenithTestRunner {
       ${stats.failed > 0 ? `<failure message="Test failures detected">${stats.error || 'Tests failed'}</failure>` : ''}
     </testcase>
   </testsuite>
-  `
+  `,
     )
     .join('')}
 </testsuites>`;
@@ -868,7 +868,7 @@ class ZenithTestRunner {
 
     await fs.writeFile(
       path.join(this.outputDir, 'failure-report.json'),
-      JSON.stringify(failureReport, null, 2)
+      JSON.stringify(failureReport, null, 2),
     );
   }
 
@@ -882,16 +882,16 @@ class ZenithTestRunner {
     console.log('🏆 ZENITH TEST SUITE FINAL SUMMARY');
     console.log('='.repeat(80));
     console.log(
-      `📊 Tests: ${results.summary.total} total, ${results.summary.passed} passed, ${results.summary.failed} failed`
+      `📊 Tests: ${results.summary.total} total, ${results.summary.passed} passed, ${results.summary.failed} failed`,
     );
     console.log(
-      `📈 Coverage: ${results.coverage.statements?.pct || 0}% statements, ${results.coverage.branches?.pct || 0}% branches`
+      `📈 Coverage: ${results.coverage.statements?.pct || 0}% statements, ${results.coverage.branches?.pct || 0}% branches`,
     );
     console.log(
-      `⚡ Performance: ${results.performance.avgRenderTime}ms avg render, ${results.performance.maxMemoryUsage}MB peak memory`
+      `⚡ Performance: ${results.performance.avgRenderTime}ms avg render, ${results.performance.maxMemoryUsage}MB peak memory`,
     );
     console.log(
-      `♿ Accessibility: ${results.accessibility.level} compliance, ${results.accessibility.violations} violations`
+      `♿ Accessibility: ${results.accessibility.level} compliance, ${results.accessibility.violations} violations`,
     );
     console.log(`🚪 Quality Gates: ${results.qualityGates.passed ? 'PASSED' : 'FAILED'}`);
     console.log(`⏱️ Duration: ${(results.summary.duration / 1000).toFixed(2)} seconds`);

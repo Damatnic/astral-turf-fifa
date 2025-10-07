@@ -124,7 +124,7 @@ describe('ZENITH Tactical Board Comprehensive Tests', () => {
           players={null as any as any}
           onPlayerMove={mockOnPlayerMove}
           onPlayerSelect={mockOnPlayerSelect}
-        />
+        />,
       );
 
       expect(container.firstChild).toBeInTheDocument();
@@ -137,7 +137,7 @@ describe('ZENITH Tactical Board Comprehensive Tests', () => {
           players={undefined as any as any}
           onPlayerMove={mockOnPlayerMove}
           onPlayerSelect={mockOnPlayerSelect}
-        />
+        />,
       );
 
       expect(container.firstChild).toBeInTheDocument();
@@ -157,7 +157,7 @@ describe('ZENITH Tactical Board Comprehensive Tests', () => {
           players={players as any}
           onPlayerMove={mockOnPlayerMove}
           onPlayerSelect={mockOnPlayerSelect}
-        />
+        />,
       );
 
       expect(await screen.findByText('Valid Player')).toBeInTheDocument();
@@ -181,7 +181,7 @@ describe('ZENITH Tactical Board Comprehensive Tests', () => {
               onPlayerMove={mockOnPlayerMove}
               onPlayerSelect={mockOnPlayerSelect}
             />
-          </TacticalErrorBoundary>
+          </TacticalErrorBoundary>,
         );
       }).not.toThrow();
     });
@@ -196,7 +196,7 @@ describe('ZENITH Tactical Board Comprehensive Tests', () => {
             onPlayerMove={mockOnPlayerMove}
             onPlayerSelect={mockOnPlayerSelect}
           />
-        </TacticalErrorBoundary>
+        </TacticalErrorBoundary>,
       );
 
       // Just verify component renders without crashing
@@ -229,7 +229,7 @@ describe('ZENITH Tactical Board Comprehensive Tests', () => {
               onPlayerMove={mockOnPlayerMove}
               onPlayerSelect={mockOnPlayerSelect}
             />
-          </TacticalErrorBoundary>
+          </TacticalErrorBoundary>,
         );
       }).not.toThrow();
     });
@@ -287,7 +287,7 @@ describe('ZENITH Tactical Board Comprehensive Tests', () => {
           onPlayerMove={mockOnPlayerMove}
           onPlayerSelect={mockOnPlayerSelect}
           mode="edit"
-        />
+        />,
       );
 
       // Find the player element
@@ -366,7 +366,7 @@ describe('ZENITH Tactical Board Comprehensive Tests', () => {
           id: `player-${i}`,
           name: `Player ${i}`,
           position: { x: Math.random() * 100, y: Math.random() * 100 },
-        })
+        }),
       );
 
       render(
@@ -375,7 +375,7 @@ describe('ZENITH Tactical Board Comprehensive Tests', () => {
           onPlayerMove={mockOnPlayerMove}
           onPlayerSelect={mockOnPlayerSelect}
           mode="tactics"
-        />
+        />,
       );
 
       // Simulate rapid line creation
@@ -408,7 +408,7 @@ describe('ZENITH Tactical Board Comprehensive Tests', () => {
             lines={linesWithInvalidCoords as any}
             onPlayerMove={mockOnPlayerMove}
             onPlayerSelect={mockOnPlayerSelect}
-          />
+          />,
         );
       }).not.toThrow();
     });
@@ -423,7 +423,7 @@ describe('ZENITH Tactical Board Comprehensive Tests', () => {
       const { container } = render(
         <TacticalErrorBoundary context="Test Error Boundary">
           <ThrowingComponent />
-        </TacticalErrorBoundary>
+        </TacticalErrorBoundary>,
       );
 
       expect(container).toBeInTheDocument();
@@ -442,7 +442,7 @@ describe('ZENITH Tactical Board Comprehensive Tests', () => {
       render(
         <TacticalErrorBoundary context="Retry Test">
           <UnstableComponent />
-        </TacticalErrorBoundary>
+        </TacticalErrorBoundary>,
       );
 
       expect(await screen.findByText(/Tactical Component Error/i)).toBeInTheDocument();
@@ -467,7 +467,7 @@ describe('ZENITH Tactical Board Comprehensive Tests', () => {
       render(
         <TacticalErrorBoundary context="Logging Test">
           <ThrowingComponent />
-        </TacticalErrorBoundary>
+        </TacticalErrorBoundary>,
       );
 
       await screen.findByText(/Tactical Component Error/i);
@@ -505,7 +505,7 @@ describe('ZENITH Tactical Board Comprehensive Tests', () => {
             lines={partialData.lines as any as any}
             onPlayerMove={mockOnPlayerMove}
             onPlayerSelect={mockOnPlayerSelect}
-          />
+          />,
         );
       }).not.toThrow();
     });
@@ -524,7 +524,7 @@ describe('ZENITH Tactical Board Comprehensive Tests', () => {
           onPlayerMove={mockOnPlayerMove}
           onPlayerSelect={mockOnPlayerSelect}
           mode="edit"
-        />
+        />,
       );
 
       const player1Element = (await screen.findByText('Player 1')).closest('[data-testid]')?.parentElement;
@@ -558,7 +558,7 @@ describe('ZENITH Tactical Board Comprehensive Tests', () => {
           onPlayerSelect={mockOnPlayerSelect}
           onLineCreate={mockOnLineCreate}
           mode="tactics"
-        />
+        />,
       );
 
       const player1 = await screen.findByText('Player 1');
@@ -587,7 +587,7 @@ describe('ZENITH Tactical Board Comprehensive Tests', () => {
           id: `player-${i}`,
           name: `Player ${i}`,
           position: { x: Math.random() * 100, y: Math.random() * 100 },
-        })
+        }),
       );
 
       const largeLines: TacticalLine[] = Array.from({ length: 500 }, (_, i) => ({
@@ -607,7 +607,7 @@ describe('ZENITH Tactical Board Comprehensive Tests', () => {
             lines={largeLines.slice(0, 10) as any} // Only render first 10 lines
             onPlayerMove={mockOnPlayerMove}
             onPlayerSelect={mockOnPlayerSelect}
-          />
+          />,
         );
       }).not.toThrow();
 
@@ -621,7 +621,7 @@ describe('ZENITH Tactical Board Comprehensive Tests', () => {
           players={[createValidPlayer()] as any}
           onPlayerMove={mockOnPlayerMove}
           onPlayerSelect={mockOnPlayerSelect}
-        />
+        />,
       );
 
       // Should unmount without errors
@@ -641,7 +641,7 @@ describe('ZENITH Tactical Board Comprehensive Tests', () => {
 
       // This would typically be used in animation components
       const validPoints = incompleteTrailPoints.filter(
-        point => point && typeof point.x === 'number' && typeof point.y === 'number'
+        point => point && typeof point.x === 'number' && typeof point.y === 'number',
       );
 
       expect(validPoints).toHaveLength(3);
@@ -660,7 +660,7 @@ describe('ZENITH Tactical Board Comprehensive Tests', () => {
             zoomLevel={0.1} // Extreme zoom out
             onPlayerMove={mockOnPlayerMove}
             onPlayerSelect={mockOnPlayerSelect}
-          />
+          />,
         );
       }).not.toThrow();
 
@@ -671,7 +671,7 @@ describe('ZENITH Tactical Board Comprehensive Tests', () => {
             zoomLevel={10} // Extreme zoom in
             onPlayerMove={mockOnPlayerMove}
             onPlayerSelect={mockOnPlayerSelect}
-          />
+          />,
         );
       }).not.toThrow();
     });
@@ -684,7 +684,7 @@ describe('ZENITH Tactical Board Comprehensive Tests', () => {
             fieldType={'invalid' as any}
             onPlayerMove={mockOnPlayerMove}
             onPlayerSelect={mockOnPlayerSelect}
-          />
+          />,
         );
       }).not.toThrow();
     });
@@ -700,7 +700,7 @@ describe('ZENITH Tactical Board Comprehensive Tests', () => {
             players={[playerWithNegativePosition] as any}
             onPlayerMove={mockOnPlayerMove}
             onPlayerSelect={mockOnPlayerSelect}
-          />
+          />,
         );
       }).not.toThrow();
     });
@@ -716,7 +716,7 @@ describe('ZENITH Tactical Board Comprehensive Tests', () => {
             players={[playerBeyondBoundaries] as any}
             onPlayerMove={mockOnPlayerMove}
             onPlayerSelect={mockOnPlayerSelect}
-          />
+          />,
         );
       }).not.toThrow();
     });
@@ -735,7 +735,7 @@ describe('ZENITH Tactical Board Comprehensive Tests', () => {
             players={[createValidPlayer({ id: `player-${i as any}` })]}
             onPlayerMove={mockOnPlayerMove}
             onPlayerSelect={mockOnPlayerSelect}
-          />
+          />,
         );
 
         unmount();
@@ -766,7 +766,7 @@ describe('ZENITH Tactical Board Comprehensive Tests', () => {
               onPlayerMove={mockOnPlayerMove}
               onPlayerSelect={mockOnPlayerSelect}
               {...(props as any)}
-            />
+            />,
           );
           unmount();
         }).not.toThrow();
@@ -779,12 +779,12 @@ describe('ZENITH Tactical Board Comprehensive Tests', () => {
           players={[createValidPlayer()] as any}
           onPlayerMove={mockOnPlayerMove}
           onPlayerSelect={mockOnPlayerSelect}
-        />
+        />,
       );
 
       // Wait for component to render
       await screen.findByText('Test Player');
-      
+
       // Check for proper ARIA attributes and semantic structure
       const tacticalBoard =
         screen.queryByRole('main') || document.querySelector('[role="application"]');

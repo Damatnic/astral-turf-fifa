@@ -8,7 +8,7 @@ import { useFastMemo } from './performanceOptimizations';
 
 // Intersection Observer hook for viewport optimizations
 export function useIntersectionObserver(
-  options: IntersectionObserverInit = {}
+  options: IntersectionObserverInit = {},
 ): [React.RefCallback<HTMLElement>, boolean] {
   const [isIntersecting, setIsIntersecting] = useState(false);
   const [element, setElement] = useState<HTMLElement | null>(null);
@@ -28,7 +28,7 @@ export function useIntersectionObserver(
         threshold: 0.1,
         rootMargin: '50px',
         ...options,
-      }
+      },
     );
 
     observerRef.current.observe(element);
@@ -47,7 +47,7 @@ export function useIntersectionObserver(
       }
       setElement(node);
     },
-    [element]
+    [element],
   );
 
   return [ref, isIntersecting];
@@ -97,7 +97,7 @@ export function useVirtualList<T>({
     const startIndex = Math.floor(scrollTop / effectiveItemHeight);
     const endIndex = Math.min(
       startIndex + Math.ceil(containerHeight / effectiveItemHeight) + overscan,
-      items.length
+      items.length,
     );
 
     return {
@@ -163,7 +163,7 @@ export function VirtualList<T>({
       handleScroll(e);
       onScroll?.(e.currentTarget.scrollTop);
     },
-    [handleScroll, onScroll]
+    [handleScroll, onScroll],
   );
 
   return (
@@ -229,7 +229,7 @@ export function useVirtualGrid<T>({
     const startColumn = Math.floor(scrollLeft / columnWidth);
     const endColumn = Math.min(
       startColumn + Math.ceil(width / columnWidth) + overscan,
-      columnCount
+      columnCount,
     );
 
     return {
@@ -335,13 +335,13 @@ export function useLevelOfDetail(
     highDetail: 100,
     mediumDetail: 300,
     lowDetail: 600,
-  }
+  },
 ) {
   return useCallback(
     (elementPosition: { x: number; y: number }) => {
       const distance = Math.sqrt(
         Math.pow(cameraPosition.x - elementPosition.x, 2) +
-          Math.pow(cameraPosition.y - elementPosition.y, 2)
+          Math.pow(cameraPosition.y - elementPosition.y, 2),
       );
 
       if (distance <= lodConfig.highDetail) {
@@ -355,7 +355,7 @@ export function useLevelOfDetail(
       }
       return 'hidden';
     },
-    [cameraPosition, lodConfig]
+    [cameraPosition, lodConfig],
   );
 }
 
@@ -375,7 +375,7 @@ export function useOcclusionCulling(viewportBounds: {
         elementBounds.y > viewportBounds.y + viewportBounds.height
       );
     },
-    [viewportBounds]
+    [viewportBounds],
   );
 }
 
@@ -427,7 +427,7 @@ export function useViewportLazyLoading<T>(
   items: T[],
   containerRef: React.RefObject<HTMLElement>,
   loadMore: () => void,
-  threshold = 200
+  threshold = 200,
 ) {
   const [loadedItems, setLoadedItems] = useState<T[]>([]);
   const loadingRef = useRef(false);

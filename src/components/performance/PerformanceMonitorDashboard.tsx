@@ -121,7 +121,7 @@ const PerformanceMonitorDashboard: React.FC = () => {
       if (LCP > PERFORMANCE_THRESHOLDS.LCP_TARGET) {
         score -= 20;
         issues.push(
-          `LCP is ${(LCP / 1000).toFixed(1)}s (target: <2.5s) - Optimize largest content element`
+          `LCP is ${(LCP / 1000).toFixed(1)}s (target: <2.5s) - Optimize largest content element`,
         );
       }
     }
@@ -130,7 +130,7 @@ const PerformanceMonitorDashboard: React.FC = () => {
       if (FID > PERFORMANCE_THRESHOLDS.FID_TARGET) {
         score -= 15;
         issues.push(
-          `FID is ${FID.toFixed(1)}ms (target: <100ms) - Reduce JavaScript execution time`
+          `FID is ${FID.toFixed(1)}ms (target: <100ms) - Reduce JavaScript execution time`,
         );
       }
     }
@@ -145,7 +145,7 @@ const PerformanceMonitorDashboard: React.FC = () => {
     if (memoryInfo && memoryInfo.usedJSHeapSize > PERFORMANCE_THRESHOLDS.MEMORY_WARNING) {
       score -= 10;
       issues.push(
-        `Memory usage is ${(memoryInfo.usedJSHeapSize / 1024 / 1024).toFixed(1)}MB (warning: >50MB)`
+        `Memory usage is ${(memoryInfo.usedJSHeapSize / 1024 / 1024).toFixed(1)}MB (warning: >50MB)`,
       );
     }
 

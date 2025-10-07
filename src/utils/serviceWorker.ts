@@ -199,7 +199,7 @@ class ServiceWorkerManager {
   // Retrieve data from IndexedDB
   async getOfflineData(
     storeName: string,
-    id?: string
+    id?: string,
   ): Promise<OfflineEntity | OfflineEntity[] | undefined> {
     if (!this.db) {
       await this.initIndexedDB();
@@ -304,7 +304,7 @@ sw.addEventListener('install', event => {
     Promise.all([
       caches.open(STATIC_CACHE).then(cache => cache.addAll(STATIC_ASSETS)),
       sw.skipWaiting(),
-    ])
+    ]),
   );
 });
 
@@ -316,13 +316,13 @@ sw.addEventListener('activate', event => {
       caches.keys().then(cacheNames => {
         const obsoleteCaches = cacheNames.filter(
           cacheName =>
-            cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE && cacheName !== API_CACHE
+            cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE && cacheName !== API_CACHE,
         );
 
         return Promise.all(obsoleteCaches.map(cacheName => caches.delete(cacheName)));
       }),
       sw.clients.claim(),
-    ])
+    ]),
   );
 });
 

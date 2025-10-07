@@ -209,7 +209,7 @@ export class TacticsErrorBoundary extends Component<Props, State> {
 export const withTacticsErrorBoundary = <P extends object>(
   WrappedComponent: React.ComponentType<P>,
   componentName?: string,
-  showDetails = false
+  showDetails = false,
 ) => {
   const WithErrorBoundaryComponent = (props: P) => (
     <TacticsErrorBoundary

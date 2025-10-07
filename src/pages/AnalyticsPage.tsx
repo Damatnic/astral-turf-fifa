@@ -37,7 +37,7 @@ const AnalyticsPage: React.FC = () => {
         acc.conceded += match.awayScore;
         return acc;
       },
-      { scored: 0, conceded: 0 }
+      { scored: 0, conceded: 0 },
     ) as { scored: number; conceded: number };
 
     return {

@@ -237,7 +237,7 @@ const FormationTemplates: React.FC<FormationTemplatesProps> = ({ onSelect, onClo
           },
         },
       ] as unknown as FormationTemplate[],
-    []
+    [],
   );
 
   // Category filters
@@ -287,7 +287,7 @@ const FormationTemplates: React.FC<FormationTemplatesProps> = ({ onSelect, onClo
       onSelect(template.formation);
       onClose();
     },
-    [onSelect, onClose]
+    [onSelect, onClose],
   );
 
   // Handle template detail view

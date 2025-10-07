@@ -112,7 +112,7 @@ describe('ZENITH Tactical Data Guards', () => {
         expect(
           isValidFormationSlot({
             defaultPosition: { x: 10, y: 50 },
-          })
+          }),
         ).toBe(false);
 
         // Invalid id type
@@ -120,7 +120,7 @@ describe('ZENITH Tactical Data Guards', () => {
           isValidFormationSlot({
             id: 123,
             defaultPosition: { x: 10, y: 50 },
-          })
+          }),
         ).toBe(false);
 
         // Missing defaultPosition
@@ -131,14 +131,14 @@ describe('ZENITH Tactical Data Guards', () => {
           isValidFormationSlot({
             id: 'slot-1',
             defaultPosition: { x: 'invalid', y: 50 },
-          })
+          }),
         ).toBe(false);
 
         expect(
           isValidFormationSlot({
             id: 'slot-1',
             defaultPosition: { x: 50, y: null },
-          })
+          }),
         ).toBe(false);
 
         // NaN coordinates
@@ -146,7 +146,7 @@ describe('ZENITH Tactical Data Guards', () => {
           isValidFormationSlot({
             id: 'slot-1',
             defaultPosition: { x: NaN, y: 50 },
-          })
+          }),
         ).toBe(false);
       });
     });
@@ -171,7 +171,7 @@ describe('ZENITH Tactical Data Guards', () => {
           isValidPlayer({
             name: 'Test',
             position: { x: 50, y: 50 },
-          })
+          }),
         ).toBe(false);
 
         // Invalid id type
@@ -180,7 +180,7 @@ describe('ZENITH Tactical Data Guards', () => {
             id: 123,
             name: 'Test',
             position: { x: 50, y: 50 },
-          })
+          }),
         ).toBe(false);
 
         // Missing name
@@ -188,7 +188,7 @@ describe('ZENITH Tactical Data Guards', () => {
           isValidPlayer({
             id: 'player-1',
             position: { x: 50, y: 50 },
-          })
+          }),
         ).toBe(false);
 
         // Invalid name type
@@ -197,7 +197,7 @@ describe('ZENITH Tactical Data Guards', () => {
             id: 'player-1',
             name: 123,
             position: { x: 50, y: 50 },
-          })
+          }),
         ).toBe(false);
 
         // Invalid position
@@ -206,7 +206,7 @@ describe('ZENITH Tactical Data Guards', () => {
             id: 'player-1',
             name: 'Test',
             position: null,
-          })
+          }),
         ).toBeFalsy();
 
         expect(
@@ -214,7 +214,7 @@ describe('ZENITH Tactical Data Guards', () => {
             id: 'player-1',
             name: 'Test',
             position: { x: 'invalid', y: 50 },
-          })
+          }),
         ).toBe(false);
       });
     });
@@ -322,7 +322,7 @@ describe('ZENITH Tactical Data Guards', () => {
         expect(getFormationSlots(undefined)).toEqual([]);
         expect(consoleSpy).toHaveBeenCalledWith(
           'Invalid formation provided to getFormationSlots:',
-          null
+          null,
         );
       });
 
@@ -564,7 +564,7 @@ describe('ZENITH Tactical Data Guards', () => {
         safeCalculation(calculation, 0, 'warning test');
 
         expect(consoleSpy).toHaveBeenCalledWith(
-          'warning test returned null/undefined, using fallback'
+          'warning test returned null/undefined, using fallback',
         );
       });
     });

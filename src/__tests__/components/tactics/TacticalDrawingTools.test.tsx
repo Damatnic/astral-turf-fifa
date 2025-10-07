@@ -40,7 +40,7 @@ vi.mock('framer-motion', () => ({
         <button ref={ref} onClick={onClick} className={className} {...props}>
           {children}
         </button>
-      )
+      ),
     ),
   },
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
@@ -148,7 +148,7 @@ describe('TacticalDrawingTools', () => {
 
     it('should render with initial shapes', () => {
       const { container } = render(
-        <TacticalDrawingTools {...defaultProps} initialShapes={mockInitialShapes} />
+        <TacticalDrawingTools {...defaultProps} initialShapes={mockInitialShapes} />,
       );
 
       const svg = container.querySelector('svg');
@@ -377,7 +377,7 @@ describe('TacticalDrawingTools', () => {
   describe('Shape Management', () => {
     it('should delete shapes with eraser tool', async () => {
       const { container } = render(
-        <TacticalDrawingTools {...defaultProps} initialShapes={mockInitialShapes} />
+        <TacticalDrawingTools {...defaultProps} initialShapes={mockInitialShapes} />,
       );
 
       // Select eraser tool
@@ -507,7 +507,7 @@ describe('TacticalDrawingTools', () => {
             points: expect.any(Array),
             color: expect.any(String),
           }),
-        ])
+        ]),
       );
     });
 
@@ -522,7 +522,7 @@ describe('TacticalDrawingTools', () => {
 
     it('should load initial shapes correctly', () => {
       const { container } = render(
-        <TacticalDrawingTools {...defaultProps} initialShapes={mockInitialShapes} />
+        <TacticalDrawingTools {...defaultProps} initialShapes={mockInitialShapes} />,
       );
 
       // Should render initial shapes
@@ -537,7 +537,7 @@ describe('TacticalDrawingTools', () => {
 
       const startTime = performance.now();
       const { container } = render(
-        <TacticalDrawingTools {...defaultProps} initialShapes={manyShapes as any} />
+        <TacticalDrawingTools {...defaultProps} initialShapes={manyShapes as any} />,
       );
       const endTime = performance.now();
 
@@ -657,7 +657,7 @@ describe('TacticalDrawingTools', () => {
       // Find close button (implementation may vary)
       const buttons = screen.getAllByRole('button');
       const closeButton = buttons.find(
-        btn => btn.textContent?.includes('×') || btn.getAttribute('aria-label')?.includes('close')
+        btn => btn.textContent?.includes('×') || btn.getAttribute('aria-label')?.includes('close'),
       );
 
       if (closeButton) {
@@ -686,7 +686,7 @@ describe('TacticalDrawingTools', () => {
 
       dimensions.forEach(dim => {
         const { unmount, container } = render(
-          <TacticalDrawingTools {...defaultProps} fieldDimensions={dim} />
+          <TacticalDrawingTools {...defaultProps} fieldDimensions={dim} />,
         );
 
         const svg = container.querySelector('svg');

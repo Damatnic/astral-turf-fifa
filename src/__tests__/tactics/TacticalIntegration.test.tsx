@@ -77,17 +77,17 @@ describe('Tactical Integration Service', () => {
       };
 
       vi.mocked((TacticalIntegrationService as any).analyzeFormation).mockResolvedValue(
-        mockAnalysis
+        mockAnalysis,
       );
 
       const result = await (TacticalIntegrationService as any).analyzeFormation(
         mockFormation,
-        mockPlayers
+        mockPlayers,
       );
 
       expect((TacticalIntegrationService as any).analyzeFormation).toHaveBeenCalledWith(
         mockFormation,
-        mockPlayers
+        mockPlayers,
       );
       expect(result).toEqual(mockAnalysis);
       expect((result as any).effectiveness).toBe(85);
@@ -136,7 +136,7 @@ describe('Tactical Integration Service', () => {
 
       expect(MockedService.calculatePlayerChemistry).toHaveBeenCalledWith(
         mockPlayers,
-        mockFormation
+        mockFormation,
       );
       expect((result as any).overall).toBe(85);
       expect((result as any).individual['1']).toBe(90);
@@ -323,7 +323,7 @@ describe('Tactical Integration Error Handling', () => {
     vi.mocked(MockedService.analyzeFormation).mockRejectedValue(new Error('Service unavailable'));
 
     await expect(MockedService.analyzeFormation({} as Formation, [])).rejects.toThrow(
-      'Service unavailable'
+      'Service unavailable',
     );
   });
 

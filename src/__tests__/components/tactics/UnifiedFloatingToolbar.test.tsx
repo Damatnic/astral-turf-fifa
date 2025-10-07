@@ -138,7 +138,7 @@ describe('UnifiedFloatingToolbar Component', () => {
         'left-1/2',
         'transform',
         '-translate-x-1/2',
-        'z-50'
+        'z-50',
       );
       expect(toolbar).toHaveClass('bg-slate-800/95', 'backdrop-blur-md');
     });
@@ -164,7 +164,7 @@ describe('UnifiedFloatingToolbar Component', () => {
 
     it('shows inactive state for hidden sidebars', () => {
       renderWithProviders(
-        <UnifiedFloatingToolbar {...mockProps} showLeftSidebar={false} showRightSidebar={false} />
+        <UnifiedFloatingToolbar {...mockProps} showLeftSidebar={false} showRightSidebar={false} />,
       );
 
       const leftToggle = screen.getByRole('button', { name: /toggle left sidebar/i });
@@ -199,7 +199,7 @@ describe('UnifiedFloatingToolbar Component', () => {
       renderWithProviders(<UnifiedFloatingToolbar {...mockProps} />);
 
       expect(
-        screen.getByText(`${assignedSlots}/${mockFormation.slots.length}`)
+        screen.getByText(`${assignedSlots}/${mockFormation.slots.length}`),
       ).toBeInTheDocument();
     });
   });
@@ -283,7 +283,7 @@ describe('UnifiedFloatingToolbar Component', () => {
           {...mockProps}
           isGridVisible={true}
           isFormationStrengthVisible={true}
-        />
+        />,
       );
 
       const gridButton = screen.getByRole('button', { name: /toggle grid/i });
@@ -424,7 +424,7 @@ describe('UnifiedFloatingToolbar Component', () => {
           {...mockProps}
           playerDisplayConfig={undefined}
           onPlayerDisplayConfigChange={undefined}
-        />
+        />,
       );
 
       expect(screen.queryByTestId('player-display-settings')).not.toBeInTheDocument();
@@ -435,7 +435,7 @@ describe('UnifiedFloatingToolbar Component', () => {
     it('shows selected player information when player is selected', () => {
       const selectedPlayer = mockPlayers[0];
       renderWithProviders(
-        <UnifiedFloatingToolbar {...mockProps} selectedPlayer={selectedPlayer} />
+        <UnifiedFloatingToolbar {...mockProps} selectedPlayer={selectedPlayer} />,
       );
 
       expect(screen.getByText(selectedPlayer.name)).toBeInTheDocument();
@@ -451,7 +451,7 @@ describe('UnifiedFloatingToolbar Component', () => {
     it('displays formatted role information for selected player', () => {
       const selectedPlayer = { ...mockPlayers[0], roleId: 'centre-midfielder' };
       renderWithProviders(
-        <UnifiedFloatingToolbar {...mockProps} selectedPlayer={selectedPlayer} />
+        <UnifiedFloatingToolbar {...mockProps} selectedPlayer={selectedPlayer} />,
       );
 
       expect(screen.getByText('CENTRE MIDFIELDER')).toBeInTheDocument();
@@ -661,7 +661,7 @@ describe('UnifiedFloatingToolbar Component', () => {
           {...mockProps}
           onToolChange={undefined as any}
           onGridToggle={undefined as any}
-        />
+        />,
       );
 
       const selectButton = screen.getByRole('button', { name: /select/i });

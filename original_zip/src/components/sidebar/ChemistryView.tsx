@@ -31,7 +31,7 @@ const ChemistryView: React.FC<ChemistryViewProps> = ({ team }) => {
           p2,
           chemistry,
           relationships,
-          mentoringGroups[team]
+          mentoringGroups[team],
         );
         const relationship = relationships[p1.id]?.[p2.id] || relationships[p2.id]?.[p1.id];
         pairs.push({ p1: p1.name, p2: p2.name, score, relationship });

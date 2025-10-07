@@ -1,6 +1,6 @@
 /**
  * Mobile-Optimized Webpack Configuration
- * 
+ *
  * This configuration targets a 30% bundle size reduction through:
  * 1. Code splitting for mobile-specific components
  * 2. Tree shaking and dead code elimination
@@ -20,7 +20,7 @@ module.exports = (env, argv) => {
 
   return {
     mode: isDevelopment ? 'development' : 'production',
-    
+
     entry: {
       main: './src/index.tsx',
       // Separate mobile bundle for code splitting
@@ -29,8 +29,8 @@ module.exports = (env, argv) => {
 
     output: {
       path: path.resolve(__dirname, 'dist'),
-      filename: isDevelopment 
-        ? '[name].bundle.js' 
+      filename: isDevelopment
+        ? '[name].bundle.js'
         : '[name].[contenthash:8].bundle.js',
       chunkFilename: isDevelopment
         ? '[name].chunk.js'
@@ -198,7 +198,7 @@ module.exports = (env, argv) => {
       // Environment variables
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify(
-          isDevelopment ? 'development' : 'production'
+          isDevelopment ? 'development' : 'production',
         ),
         'process.env.MOBILE_OPTIMIZED': JSON.stringify(true),
       }),

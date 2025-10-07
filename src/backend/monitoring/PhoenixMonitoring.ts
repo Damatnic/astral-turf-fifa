@@ -160,7 +160,7 @@ export class PhoenixMonitoring extends EventEmitter {
           winston.format.timestamp(),
           winston.format.printf(({ timestamp, level, message, ...meta }) => {
             return `${timestamp} [${level}]: ${message} ${Object.keys(meta).length ? JSON.stringify(meta) : ''}`;
-          })
+          }),
         ),
       }),
 
@@ -262,7 +262,7 @@ export class PhoenixMonitoring extends EventEmitter {
       () => {
         this.cleanupOldMetrics();
       },
-      60 * 60 * 1000
+      60 * 60 * 1000,
     );
 
     // Cleanup old traces every 15 minutes
@@ -270,7 +270,7 @@ export class PhoenixMonitoring extends EventEmitter {
       () => {
         this.cleanupOldTraces();
       },
-      15 * 60 * 1000
+      15 * 60 * 1000,
     );
 
     // Export metrics every minute
@@ -329,7 +329,7 @@ export class PhoenixMonitoring extends EventEmitter {
     name: string,
     value: number,
     tags: Record<string, string> = {},
-    type: MetricPoint['type'] = 'gauge'
+    type: MetricPoint['type'] = 'gauge',
   ): void {
     const metric: MetricPoint = {
       name,
@@ -443,7 +443,7 @@ export class PhoenixMonitoring extends EventEmitter {
     spanId: string,
     level: TraceLog['level'],
     message: string,
-    fields?: Record<string, any>
+    fields?: Record<string, any>,
   ): void {
     const span = this.activeSpans.get(spanId);
     if (span) {
@@ -461,7 +461,7 @@ export class PhoenixMonitoring extends EventEmitter {
   log(
     level: 'debug' | 'info' | 'warn' | 'error',
     message: string,
-    meta?: Record<string, any>
+    meta?: Record<string, any>,
   ): void {
     this.logger.log(level, message, {
       ...meta,
@@ -524,7 +524,7 @@ export class PhoenixMonitoring extends EventEmitter {
       status: HealthCheck['status'];
       message?: string;
       details?: Record<string, any>;
-    }>
+    }>,
   ): void {
     // Store health check function for periodic execution
     setInterval(async () => {
@@ -595,7 +595,7 @@ export class PhoenixMonitoring extends EventEmitter {
       description: string;
       runbook?: string;
       labels?: Record<string, string>;
-    }
+    },
   ): void {
     // Store alert configuration for evaluation
     this.alerts.set(id, {
@@ -658,7 +658,7 @@ export class PhoenixMonitoring extends EventEmitter {
     category: PerformanceBenchmark['category'],
     baseline: number,
     threshold: number,
-    unit: string
+    unit: string,
   ): void {
     const benchmark: PerformanceBenchmark = {
       id: uuidv4(),
@@ -739,7 +739,7 @@ export class PhoenixMonitoring extends EventEmitter {
     value: number,
     category: string,
     unit: string,
-    dimensions: Record<string, string> = {}
+    dimensions: Record<string, string> = {},
   ): void {
     if (!this.businessMetrics.has(name)) {
       this.businessMetrics.set(name, []);
@@ -805,7 +805,7 @@ export class PhoenixMonitoring extends EventEmitter {
     this.recordGauge('system_memory_free', systemMemory.free);
     this.recordGauge(
       'system_memory_usage',
-      (systemMemory.total - systemMemory.free) / systemMemory.total
+      (systemMemory.total - systemMemory.free) / systemMemory.total,
     );
 
     // Load average
@@ -1032,7 +1032,7 @@ export function instrumentationMiddleware(req: any, res: any, next: any): void {
     phoenixMonitoring.addTraceTag(span.spanId, 'http.status_code', res.statusCode.toString());
     phoenixMonitoring.finishTrace(
       span.spanId,
-      res.statusCode >= 400 ? new Error(`HTTP ${res.statusCode}`) : undefined
+      res.statusCode >= 400 ? new Error(`HTTP ${res.statusCode}`) : undefined,
     );
 
     // Record metrics

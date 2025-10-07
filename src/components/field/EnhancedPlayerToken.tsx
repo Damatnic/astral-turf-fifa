@@ -42,7 +42,7 @@ const AvailabilityIndicator: React.FC<{ availability: Player['availability'] }> 
         )}
       </div>
     );
-  }
+  },
 );
 
 // Player stats overlay with comprehensive validation
@@ -187,7 +187,7 @@ const EnhancedPlayerToken: React.FC<EnhancedPlayerTokenProps> = ({
         setIsDragging(false);
       }
     },
-    [isDraggable, player, startDrag]
+    [isDraggable, player, startDrag],
   );
 
   const handleDragEnd = useCallback(
@@ -205,7 +205,7 @@ const EnhancedPlayerToken: React.FC<EnhancedPlayerTokenProps> = ({
         // Failed to end drag
       }
     },
-    [endDrag]
+    [endDrag],
   );
 
   const handleClick = useCallback(
@@ -221,7 +221,7 @@ const EnhancedPlayerToken: React.FC<EnhancedPlayerTokenProps> = ({
         // Failed to select player
       }
     },
-    [interactive, dispatch, player?.id]
+    [interactive, dispatch, player?.id],
   );
 
   const handleDoubleClick = useCallback(
@@ -238,7 +238,7 @@ const EnhancedPlayerToken: React.FC<EnhancedPlayerTokenProps> = ({
         // Failed to open player modal
       }
     },
-    [interactive, dispatch, player?.id]
+    [interactive, dispatch, player?.id],
   );
 
   const handleMouseEnter = useCallback(
@@ -248,7 +248,7 @@ const EnhancedPlayerToken: React.FC<EnhancedPlayerTokenProps> = ({
         setIsHovered(true);
       }
     },
-    [showStats]
+    [showStats],
   );
 
   const handleMouseLeave = useCallback(() => {
@@ -261,7 +261,7 @@ const EnhancedPlayerToken: React.FC<EnhancedPlayerTokenProps> = ({
         setMousePosition({ x: e.clientX, y: e.clientY });
       }
     },
-    [showStats, isHovered]
+    [showStats, isHovered],
   );
 
   // Performance rating color

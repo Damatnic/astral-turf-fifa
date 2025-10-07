@@ -492,13 +492,13 @@ class ZenithTestRunner {
     const htmlReport = this.generateHTMLReport();
     await fs.writeFile(
       path.join(this.config.reporting.outputDir, 'zenith-report.html'),
-      htmlReport
+      htmlReport,
     );
 
     // Generate JSON report
     await fs.writeFile(
       path.join(this.config.reporting.outputDir, 'zenith-report.json'),
-      JSON.stringify(this.results, null, 2)
+      JSON.stringify(this.results, null, 2),
     );
 
     // Generate console summary
@@ -519,12 +519,12 @@ class ZenithTestRunner {
     if (this.config.qualityGates.failOnCoverageThreshold) {
       if (this.results.coverage.statements.pct < this.config.coverage.statements) {
         failures.push(
-          `Statement coverage ${this.results.coverage.statements.pct}% < ${this.config.coverage.statements}%`
+          `Statement coverage ${this.results.coverage.statements.pct}% < ${this.config.coverage.statements}%`,
         );
       }
       if (this.results.coverage.branches.pct < this.config.coverage.branches) {
         failures.push(
-          `Branch coverage ${this.results.coverage.branches.pct}% < ${this.config.coverage.branches}%`
+          `Branch coverage ${this.results.coverage.branches.pct}% < ${this.config.coverage.branches}%`,
         );
       }
     }
@@ -533,7 +533,7 @@ class ZenithTestRunner {
     if (this.config.qualityGates.failOnPerformanceThreshold) {
       if (this.results.performance.avgRenderTime > this.config.performance.renderTime) {
         failures.push(
-          `Render time ${this.results.performance.avgRenderTime}ms > ${this.config.performance.renderTime}ms`
+          `Render time ${this.results.performance.avgRenderTime}ms > ${this.config.performance.renderTime}ms`,
         );
       }
     }
@@ -666,7 +666,7 @@ class ZenithTestRunner {
                     <div>Failed: <span class="${stats.failed > 0 ? 'error' : 'success'}">${stats.failed}</span></div>
                     <div>Duration: ${(stats.duration / 1000).toFixed(2)}s</div>
                 </div>
-            `
+            `,
               )
               .join('')}
         </div>
@@ -744,14 +744,14 @@ class ZenithTestRunner {
     console.log('🏆 ZENITH TEST SUITE SUMMARY');
     console.log('='.repeat(80));
     console.log(
-      `📊 Tests: ${this.results.summary.total} total, ${this.results.summary.passed} passed, ${this.results.summary.failed} failed`
+      `📊 Tests: ${this.results.summary.total} total, ${this.results.summary.passed} passed, ${this.results.summary.failed} failed`,
     );
     console.log(
-      `📈 Coverage: ${this.results.coverage.statements.pct}% statements, ${this.results.coverage.branches.pct}% branches`
+      `📈 Coverage: ${this.results.coverage.statements.pct}% statements, ${this.results.coverage.branches.pct}% branches`,
     );
     console.log(`⚡ Performance: ${this.results.performance.avgRenderTime}ms avg render time`);
     console.log(
-      `♿ Accessibility: ${this.results.accessibility.level} compliance, ${this.results.accessibility.violations} violations`
+      `♿ Accessibility: ${this.results.accessibility.level} compliance, ${this.results.accessibility.violations} violations`,
     );
     console.log(`⏱️ Duration: ${(this.results.summary.duration / 1000).toFixed(2)}s`);
     console.log('='.repeat(80) + '\n');

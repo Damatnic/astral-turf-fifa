@@ -540,7 +540,7 @@ describe('SmartSidebar', () => {
 
     it('should virtualize long lists', () => {
       const manyPlayers = Array.from({ length: 1000 }, (_, i) =>
-        generatePlayer({ id: `player-${i}`, name: `Player ${i}` })
+        generatePlayer({ id: `player-${i}`, name: `Player ${i}` }),
       );
       const initialState = {
         tactics: {
@@ -691,7 +691,7 @@ describe('SmartSidebar', () => {
       renderWithProviders(
         <ErrorBoundary>
           <SmartSidebar {...mockProps} />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(screen.getByTestId('smart-sidebar')).toBeInTheDocument();

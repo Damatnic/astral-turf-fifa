@@ -179,7 +179,7 @@ describe('QuickActionsPanel', () => {
       renderWithProviders(<QuickActionsPanel {...mockProps} />);
 
       const panel = screen.getByTestId('quick-actions-panel');
-      
+
   const file = new window.File(['{"formation": "test"}'], 'formation.json', {
         type: 'application/json',
       });
@@ -334,7 +334,7 @@ describe('QuickActionsPanel', () => {
 
     it('should handle pause/resume simulation', async () => {
       const { rerender } = renderWithProviders(
-        <QuickActionsPanel {...mockProps} isSimulating={true} />
+        <QuickActionsPanel {...mockProps} isSimulating={true} />,
       );
 
       const pauseButton = screen.getByRole('button', { name: /pause simulation/i });
@@ -353,7 +353,7 @@ describe('QuickActionsPanel', () => {
 
     it('should show simulation progress', () => {
       renderWithProviders(
-        <QuickActionsPanel {...mockProps} isSimulating={true} simulationProgress={45} />
+        <QuickActionsPanel {...mockProps} isSimulating={true} simulationProgress={45} />,
       );
 
       expect(screen.getByText('45%')).toBeInTheDocument();
@@ -378,7 +378,7 @@ describe('QuickActionsPanel', () => {
       ];
 
       renderWithProviders(
-        <QuickActionsPanel {...mockProps} aiSuggestions={aiSuggestions} />
+        <QuickActionsPanel {...mockProps} aiSuggestions={aiSuggestions} />,
       );
 
       expect(screen.getByTestId('ai-suggestions')).toBeInTheDocument();
@@ -392,7 +392,7 @@ describe('QuickActionsPanel', () => {
       ];
 
       renderWithProviders(
-        <QuickActionsPanel {...mockProps} aiSuggestions={aiSuggestions} />
+        <QuickActionsPanel {...mockProps} aiSuggestions={aiSuggestions} />,
       );
 
       const applyButton = screen.getByRole('button', { name: /apply suggestion/i });
@@ -513,7 +513,7 @@ describe('QuickActionsPanel', () => {
 
     it('should memoize action buttons', () => {
       const memoSpy = vi.spyOn(React, 'memo');
-      
+
       renderWithProviders(<QuickActionsPanel {...mockProps} />);
 
       expect(memoSpy).toHaveBeenCalled();

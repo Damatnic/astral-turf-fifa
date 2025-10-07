@@ -13,7 +13,7 @@ const MedicalCenterPage: React.FC = () => {
 
   // Filter players by medical status
   const injuredPlayers = teamPlayers.filter(
-    p => p.availability.status === 'Minor Injury' || p.availability.status === 'Major Injury'
+    p => p.availability.status === 'Minor Injury' || p.availability.status === 'Major Injury',
   );
 
   const lowFitnessPlayers = teamPlayers.filter(p => p.stamina < 70);

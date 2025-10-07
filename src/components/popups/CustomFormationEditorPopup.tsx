@@ -29,7 +29,7 @@ const CustomFormationEditorPopup: React.FC = () => {
         role: 'MF' as PositionRole,
         defaultPosition: { x: -100, y: -100 },
         playerId: null,
-      }))
+      })),
   );
   const [formationName, setFormationName] = useState('');
   const fieldRef = useRef<HTMLDivElement>(null);
@@ -124,7 +124,7 @@ const CustomFormationEditorPopup: React.FC = () => {
                   onDragStart={e =>
                     e.dataTransfer.setData(
                       'application/json',
-                      JSON.stringify({ type: 'new_role', payload: role })
+                      JSON.stringify({ type: 'new_role', payload: role }),
                     )
                   }
                 />
@@ -147,7 +147,7 @@ const CustomFormationEditorPopup: React.FC = () => {
                   onDragStart={e =>
                     e.dataTransfer.setData(
                       'application/json',
-                      JSON.stringify({ type: 'move_slot', payload: { id: slot.id } })
+                      JSON.stringify({ type: 'move_slot', payload: { id: slot.id } }),
                     )
                   }
                   className="absolute -translate-x-1/2 -translate-y-1/2 p-2 bg-gray-800 rounded-full cursor-move border-2 border-teal-400"

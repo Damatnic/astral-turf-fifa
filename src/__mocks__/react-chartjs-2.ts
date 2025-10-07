@@ -22,42 +22,42 @@ const MockChart = React.forwardRef<HTMLDivElement, ChartProps>((props, ref) => {
 MockChart.displayName = 'MockChart';
 
 export const Line = React.forwardRef<HTMLDivElement, ChartProps>((props, ref) =>
-  React.createElement(MockChart, { ...props, type: 'line', ref })
+  React.createElement(MockChart, { ...props, type: 'line', ref }),
 );
 Line.displayName = 'Line';
 
 export const Bar = React.forwardRef<HTMLDivElement, ChartProps>((props, ref) =>
-  React.createElement(MockChart, { ...props, type: 'bar', ref })
+  React.createElement(MockChart, { ...props, type: 'bar', ref }),
 );
 Bar.displayName = 'Bar';
 
 export const Doughnut = React.forwardRef<HTMLDivElement, ChartProps>((props, ref) =>
-  React.createElement(MockChart, { ...props, type: 'doughnut', ref })
+  React.createElement(MockChart, { ...props, type: 'doughnut', ref }),
 );
 Doughnut.displayName = 'Doughnut';
 
 export const Radar = React.forwardRef<HTMLDivElement, ChartProps>((props, ref) =>
-  React.createElement(MockChart, { ...props, type: 'radar', ref })
+  React.createElement(MockChart, { ...props, type: 'radar', ref }),
 );
 Radar.displayName = 'Radar';
 
 export const Pie = React.forwardRef<HTMLDivElement, ChartProps>((props, ref) =>
-  React.createElement(MockChart, { ...props, type: 'pie', ref })
+  React.createElement(MockChart, { ...props, type: 'pie', ref }),
 );
 Pie.displayName = 'Pie';
 
 export const PolarArea = React.forwardRef<HTMLDivElement, ChartProps>((props, ref) =>
-  React.createElement(MockChart, { ...props, type: 'polarArea', ref })
+  React.createElement(MockChart, { ...props, type: 'polarArea', ref }),
 );
 PolarArea.displayName = 'PolarArea';
 
 export const Scatter = React.forwardRef<HTMLDivElement, ChartProps>((props, ref) =>
-  React.createElement(MockChart, { ...props, type: 'scatter', ref })
+  React.createElement(MockChart, { ...props, type: 'scatter', ref }),
 );
 Scatter.displayName = 'Scatter';
 
 export const Bubble = React.forwardRef<HTMLDivElement, ChartProps>((props, ref) =>
-  React.createElement(MockChart, { ...props, type: 'bubble', ref })
+  React.createElement(MockChart, { ...props, type: 'bubble', ref }),
 );
 Bubble.displayName = 'Bubble';
 

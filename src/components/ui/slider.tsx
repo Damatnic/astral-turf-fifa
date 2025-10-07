@@ -30,7 +30,7 @@ export const Slider: React.FC<SliderProps> = ({
         updateValue(e);
       }
     },
-    [isDragging]
+    [isDragging],
   );
 
   const handleMouseUp = useCallback(() => {
@@ -45,7 +45,7 @@ export const Slider: React.FC<SliderProps> = ({
       const steppedValue = Math.round(newValue / step) * step;
       onValueChange([Math.max(min, Math.min(max, steppedValue))]);
     },
-    [min, max, step, onValueChange]
+    [min, max, step, onValueChange],
   );
 
   React.useEffect(() => {

@@ -92,7 +92,7 @@ class HeatmapAnalytics {
     x: number,
     y: number,
     intensity: number = 1,
-    timestamp?: number
+    timestamp?: number,
   ): void {
     if (!this.positionHistory.has(playerId)) {
       this.positionHistory.set(playerId, []);
@@ -155,7 +155,7 @@ class HeatmapAnalytics {
       history.forEach(point => {
         const gridX = Math.floor((point.x / this.options.fieldWidth) * this.options.gridResolution);
         const gridY = Math.floor(
-          (point.y / this.options.fieldHeight) * this.options.gridResolution
+          (point.y / this.options.fieldHeight) * this.options.gridResolution,
         );
 
         if (
@@ -182,7 +182,7 @@ class HeatmapAnalytics {
   public analyzeMovementPatterns(
     playerId: string,
     playerName: string,
-    minFrequency: number = 2
+    minFrequency: number = 2,
   ): MovementPattern[] {
     const history = this.positionHistory.get(playerId) || [];
     if (history.length < 2) {
@@ -241,7 +241,7 @@ class HeatmapAnalytics {
    * Calculate influence zones for players
    */
   public calculateInfluenceZones(
-    playerPositions: Array<{ playerId: string; playerName: string; x: number; y: number }>
+    playerPositions: Array<{ playerId: string; playerName: string; x: number; y: number }>,
   ): InfluenceZone[] {
     return playerPositions.map(player => {
       const history = this.positionHistory.get(player.playerId) || [];
@@ -320,11 +320,11 @@ class HeatmapAnalytics {
    * Generate complete heatmap data
    */
   public generateCompleteHeatmap(
-    playerPositions: Array<{ playerId: string; playerName: string; x: number; y: number }>
+    playerPositions: Array<{ playerId: string; playerName: string; x: number; y: number }>,
   ): HeatmapData {
     const positions = this.generateTeamHeatmap();
     const movementPatterns = playerPositions.flatMap(player =>
-      this.analyzeMovementPatterns(player.playerId, player.playerName)
+      this.analyzeMovementPatterns(player.playerId, player.playerName),
     );
     const influenceZones = this.calculateInfluenceZones(playerPositions);
     const zoneCoverage = this.analyzeZoneCoverage();
@@ -496,7 +496,7 @@ class HeatmapAnalytics {
    */
   private isPointInZone(
     point: HeatmapPoint,
-    zone: { x1: number; y1: number; x2: number; y2: number }
+    zone: { x1: number; y1: number; x2: number; y2: number },
   ): boolean {
     return point.x >= zone.x1 && point.x <= zone.x2 && point.y >= zone.y1 && point.y <= zone.y2;
   }
@@ -515,11 +515,11 @@ export const useHeatmapAnalytics = () => {
     analyzeMovementPatterns: (playerId: string, playerName: string) =>
       heatmapAnalytics.analyzeMovementPatterns(playerId, playerName),
     calculateInfluenceZones: (
-      playerPositions: Array<{ playerId: string; playerName: string; x: number; y: number }>
+      playerPositions: Array<{ playerId: string; playerName: string; x: number; y: number }>,
     ) => heatmapAnalytics.calculateInfluenceZones(playerPositions),
     analyzeZoneCoverage: () => heatmapAnalytics.analyzeZoneCoverage(),
     generateCompleteHeatmap: (
-      playerPositions: Array<{ playerId: string; playerName: string; x: number; y: number }>
+      playerPositions: Array<{ playerId: string; playerName: string; x: number; y: number }>,
     ) => heatmapAnalytics.generateCompleteHeatmap(playerPositions),
     clearHistory: (playerId?: string) => heatmapAnalytics.clearHistory(playerId),
   };

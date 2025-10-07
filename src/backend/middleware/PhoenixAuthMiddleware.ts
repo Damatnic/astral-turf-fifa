@@ -162,7 +162,7 @@ export class PhoenixAuthMiddleware {
       () => {
         this.cleanupExpiredSessions();
       },
-      5 * 60 * 1000
+      5 * 60 * 1000,
     );
 
     // Clean up rate limit data every hour
@@ -170,7 +170,7 @@ export class PhoenixAuthMiddleware {
       () => {
         this.cleanupRateLimitData();
       },
-      60 * 60 * 1000
+      60 * 60 * 1000,
     );
 
     // Clean up security events older than 24 hours
@@ -178,7 +178,7 @@ export class PhoenixAuthMiddleware {
       () => {
         this.cleanupSecurityEvents();
       },
-      60 * 60 * 1000
+      60 * 60 * 1000,
     );
   }
 
@@ -188,7 +188,7 @@ export class PhoenixAuthMiddleware {
   authenticateJWT = async (
     req: AuthenticatedRequest,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ): Promise<void> => {
     try {
       const authHeader = req.headers.authorization;
@@ -266,7 +266,7 @@ export class PhoenixAuthMiddleware {
   authenticateAPIKey = async (
     req: AuthenticatedRequest,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ): Promise<void> => {
     try {
       const apiKey = req.headers['x-api-key'] as string;
@@ -657,7 +657,7 @@ export class PhoenixAuthMiddleware {
         SET last_activity_at = NOW(), ip_address = $1 
         WHERE id = $2
       `,
-        [ipAddress, sessionId]
+        [ipAddress, sessionId],
       );
 
       // Update in-memory session
@@ -679,7 +679,7 @@ export class PhoenixAuthMiddleware {
         SET last_used = NOW(), usage_count = usage_count + 1 
         WHERE id = $1
       `,
-        [apiKeyId]
+        [apiKeyId],
       );
     } catch (error) {
       console.error('Failed to update API key usage:', error);
@@ -689,7 +689,7 @@ export class PhoenixAuthMiddleware {
   private async checkResourceAccess(
     user: any,
     resourceType: string,
-    resourceId: string
+    resourceId: string,
   ): Promise<boolean> {
     // Admin users have access to everything
     if (user.role === 'admin') {
@@ -732,7 +732,7 @@ export class PhoenixAuthMiddleware {
         SELECT 1 FROM family_member_associations 
         WHERE family_member_id = $1 AND player_id = $2 AND approved_by_coach = true
       `,
-        [user.id, playerId]
+        [user.id, playerId],
       );
 
       return result.rows.length > 0;
@@ -755,7 +755,7 @@ export class PhoenixAuthMiddleware {
       LEFT JOIN teams t ON f.team_id = t.id 
       WHERE f.id = $1
     `,
-      [formationId]
+      [formationId],
     );
 
     if (result.rows.length === 0) {
@@ -781,7 +781,7 @@ export class PhoenixAuthMiddleware {
       LEFT JOIN players p ON p.team_id = t.id
       WHERE t.id = $1 AND (t.coach_id = $2 OR p.id = $2)
     `,
-      [teamId, user.id]
+      [teamId, user.id],
     );
 
     return result.rows.length > 0;
@@ -851,7 +851,7 @@ export class PhoenixAuthMiddleware {
           event.userAgent,
           JSON.stringify(event.metadata),
           event.type,
-        ]
+        ],
       );
     } catch (error) {
       console.error('Failed to persist security event to database:', error);
@@ -920,7 +920,7 @@ export class PhoenixAuthMiddleware {
    */
   getSecurityMetrics(): any {
     const recentEvents = this.securityEvents.filter(
-      event => event.timestamp.getTime() > Date.now() - 60 * 60 * 1000 // Last hour
+      event => event.timestamp.getTime() > Date.now() - 60 * 60 * 1000, // Last hour
     );
 
     const eventCounts = recentEvents.reduce(
@@ -928,7 +928,7 @@ export class PhoenixAuthMiddleware {
         counts[event.type] = (counts[event.type] || 0) + 1;
         return counts;
       },
-      {} as Record<string, number>
+      {} as Record<string, number>,
     );
 
     return {

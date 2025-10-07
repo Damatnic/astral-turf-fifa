@@ -70,7 +70,7 @@ export function useHaptic() {
  */
 export function withHaptic<T extends (...args: unknown[]) => unknown>(
   handler: T,
-  type: HapticType = 'medium'
+  type: HapticType = 'medium',
 ): T {
   return ((...args: unknown[]) => {
     triggerHaptic(type);
@@ -83,7 +83,7 @@ export function withHaptic<T extends (...args: unknown[]) => unknown>(
  */
 export function hapticButton(
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void,
-  type: HapticType = 'medium'
+  type: HapticType = 'medium',
 ) {
   return {
     onClick: (e: React.MouseEvent<HTMLButtonElement>) => {

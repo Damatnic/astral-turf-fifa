@@ -250,7 +250,7 @@ const UnifiedFloatingToolbar: React.FC<UnifiedFloatingToolbarProps> = ({
           break;
       }
     },
-    [onToolChange, onGridToggle, onUndoDrawing]
+    [onToolChange, onGridToggle, onUndoDrawing],
   );
 
   useEffect(() => {

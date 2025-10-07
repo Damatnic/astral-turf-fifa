@@ -23,7 +23,7 @@ export const generateRandomPlayer = (
   roleId: string,
   team: 'home' | 'away',
   teamColor: string,
-  baseAttributes?: Partial<PlayerAttributes>
+  baseAttributes?: Partial<PlayerAttributes>,
 ): Player => {
   const attributes: PlayerAttributes = {
     speed: baseAttributes?.speed || Math.floor(Math.random() * 40) + 50,
@@ -360,7 +360,7 @@ export const generateTransferPlayers = (count: number): TransferPlayer[] => {
       nationality,
       roleId,
       'home',
-      '#FF0000'
+      '#FF0000',
     );
 
     const { position, teamColor, ...transferPlayer } = basePlayer;
@@ -378,7 +378,7 @@ export const generateTransferPlayers = (count: number): TransferPlayer[] => {
 export const simulateTrainingSession = (
   player: Player,
   drill: TrainingDrill,
-  facilityLevel: number = 1
+  facilityLevel: number = 1,
 ): {
   attributeGains: Partial<PlayerAttributes>;
   fatigueIncrease: number;

@@ -268,7 +268,7 @@ export class GuardianSecurityTesting {
                 {
                   allowedFields: ['password'],
                   sanitizeStrings: true,
-                }
+                },
               );
 
               // If weak password passes validation, it's a failure
@@ -443,7 +443,7 @@ export class GuardianSecurityTesting {
             }
           } catch (error) {
             issues.push(
-              `Encryption/decryption error: ${error instanceof Error ? error.message : 'Unknown error'}`
+              `Encryption/decryption error: ${error instanceof Error ? error.message : 'Unknown error'}`,
             );
           }
 
@@ -491,7 +491,7 @@ export class GuardianSecurityTesting {
               const result = await guardianSecureFileHandler.secureImport(
                 file,
                 'test-user',
-                'test-team'
+                'test-team',
               );
 
               if (result.success) {
@@ -551,14 +551,14 @@ export class GuardianSecurityTesting {
 
             // Check if appropriate threat types were detected
             const hasSQLInjectionThreat = threats.some(
-              t => t.threatType === ThreatType.SQL_INJECTION
+              t => t.threatType === ThreatType.SQL_INJECTION,
             );
             if (!hasSQLInjectionThreat) {
               issues.push('SQL injection threat not properly classified');
             }
           } catch (error) {
             issues.push(
-              `Threat detection error: ${error instanceof Error ? error.message : 'Unknown error'}`
+              `Threat detection error: ${error instanceof Error ? error.message : 'Unknown error'}`,
             );
           }
 
@@ -606,7 +606,7 @@ export class GuardianSecurityTesting {
 
             if (result.valid) {
               issues.push(
-                `Invalid formation data accepted: ${JSON.stringify(formation).substring(0, 100)}`
+                `Invalid formation data accepted: ${JSON.stringify(formation).substring(0, 100)}`,
               );
             }
           }
@@ -716,16 +716,16 @@ export class GuardianSecurityTesting {
 
     // Count issues by severity
     const criticalIssues = results.filter(
-      r => !r.passed && this.securityTests.get(r.testId)?.severity === TestSeverity.CRITICAL
+      r => !r.passed && this.securityTests.get(r.testId)?.severity === TestSeverity.CRITICAL,
     ).length;
     const highIssues = results.filter(
-      r => !r.passed && this.securityTests.get(r.testId)?.severity === TestSeverity.HIGH
+      r => !r.passed && this.securityTests.get(r.testId)?.severity === TestSeverity.HIGH,
     ).length;
     const mediumIssues = results.filter(
-      r => !r.passed && this.securityTests.get(r.testId)?.severity === TestSeverity.MEDIUM
+      r => !r.passed && this.securityTests.get(r.testId)?.severity === TestSeverity.MEDIUM,
     ).length;
     const lowIssues = results.filter(
-      r => !r.passed && this.securityTests.get(r.testId)?.severity === TestSeverity.LOW
+      r => !r.passed && this.securityTests.get(r.testId)?.severity === TestSeverity.LOW,
     ).length;
 
     // Calculate overall score (weighted by severity)
@@ -828,7 +828,7 @@ ${assessment.results
 - **Message:** ${r.message}
 - **Category:** ${this.securityTests.get(r.testId)?.category || 'Unknown'}
 ${r.recommendations?.length ? `- **Recommendations:** ${r.recommendations.join(', ')}` : ''}
-`
+`,
   )
   .join('\n')}
 

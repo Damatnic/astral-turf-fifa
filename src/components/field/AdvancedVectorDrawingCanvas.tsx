@@ -80,7 +80,7 @@ const SelectionHandles: React.FC<{
           strokeWidth="0.3"
           className="cursor-move"
           onMouseDown={e => handleMouseDown(e, 'move')}
-        />
+        />,
       );
     }
 
@@ -99,7 +99,7 @@ const SelectionHandles: React.FC<{
             strokeWidth="0.2"
             className="cursor-pointer"
             onMouseDown={e => handleMouseDown(e, 'resize')}
-          />
+          />,
         );
       });
     }
@@ -126,7 +126,7 @@ const SelectionHandles: React.FC<{
           strokeWidth="0.3"
           className="pointer-events-none"
         />
-      </g>
+      </g>,
     );
 
     return result;
@@ -489,7 +489,7 @@ const AdvancedVectorDrawingCanvas: React.FC<AdvancedVectorDrawingCanvasProps> = 
         y: Math.max(0, Math.min(100, relativeY)),
       };
     },
-    [fieldRef]
+    [fieldRef],
   );
 
   // Grid snapping functionality
@@ -505,7 +505,7 @@ const AdvancedVectorDrawingCanvas: React.FC<AdvancedVectorDrawingCanvasProps> = 
         y: Math.round(position.y / gridSize) * gridSize,
       };
     },
-    [drawingState.snapToGrid]
+    [drawingState.snapToGrid],
   );
 
   // Enhanced drawing handlers
@@ -549,7 +549,7 @@ const AdvancedVectorDrawingCanvas: React.FC<AdvancedVectorDrawingCanvasProps> = 
 
       setDrawingState(prev => ({ ...prev, currentDrawing: newDrawing }));
     },
-    [drawingTool, drawingColor, isPresentationMode, getFieldCoordinates, snapToGrid]
+    [drawingTool, drawingColor, isPresentationMode, getFieldCoordinates, snapToGrid],
   );
 
   const handleMouseMove = useCallback(
@@ -578,7 +578,7 @@ const AdvancedVectorDrawingCanvas: React.FC<AdvancedVectorDrawingCanvasProps> = 
           // Add smoothing for pen tool
           const lastPoint = updatedPoints[updatedPoints.length - 1];
           const distance = Math.sqrt(
-            Math.pow(snappedPoint.x - lastPoint.x, 2) + Math.pow(snappedPoint.y - lastPoint.y, 2)
+            Math.pow(snappedPoint.x - lastPoint.x, 2) + Math.pow(snappedPoint.y - lastPoint.y, 2),
           );
 
           // Only add point if it's far enough for smooth drawing
@@ -599,7 +599,7 @@ const AdvancedVectorDrawingCanvas: React.FC<AdvancedVectorDrawingCanvasProps> = 
       getFieldCoordinates,
       snapToGrid,
       drawingTool,
-    ]
+    ],
   );
 
   const handleMouseUp = useCallback(() => {
@@ -658,7 +658,7 @@ const AdvancedVectorDrawingCanvas: React.FC<AdvancedVectorDrawingCanvasProps> = 
         setTextInput(null);
       }
     },
-    [finalizeText]
+    [finalizeText],
   );
 
   // Shape selection and manipulation
@@ -677,7 +677,7 @@ const AdvancedVectorDrawingCanvas: React.FC<AdvancedVectorDrawingCanvasProps> = 
         payload: updatedShape,
       });
     },
-    [tacticsDispatch]
+    [tacticsDispatch],
   );
 
   const handleShapeDelete = useCallback(
@@ -688,7 +688,7 @@ const AdvancedVectorDrawingCanvas: React.FC<AdvancedVectorDrawingCanvasProps> = 
       });
       setDrawingState(prev => ({ ...prev, selectedShapeId: null }));
     },
-    [tacticsDispatch]
+    [tacticsDispatch],
   );
 
   // Render all arrow markers
@@ -699,7 +699,7 @@ const AdvancedVectorDrawingCanvas: React.FC<AdvancedVectorDrawingCanvasProps> = 
         drawingColor || '#ffffff',
       ]),
     ],
-    [drawings, drawingColor]
+    [drawings, drawingColor],
   );
 
   const eventHandlers =

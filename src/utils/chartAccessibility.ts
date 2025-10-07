@@ -16,7 +16,7 @@ interface DataPoint {
  */
 export function generateBarChartDescription(
   data: { label: string; value: number }[],
-  title?: string
+  title?: string,
 ): string {
   if (!data || data.length === 0) {
     return 'Empty bar chart with no data';
@@ -48,14 +48,14 @@ export function generateLineChartDescription(
   data: DataPoint[],
   xAxisLabel?: string,
   yAxisLabel?: string,
-  title?: string
+  title?: string,
 ): string {
   if (!data || data.length === 0) {
     return 'Empty line chart with no data';
   }
 
   const validData = data.filter(
-    d => d && typeof d.x === 'number' && typeof d.y === 'number' && !isNaN(d.x) && !isNaN(d.y)
+    d => d && typeof d.x === 'number' && typeof d.y === 'number' && !isNaN(d.x) && !isNaN(d.y),
   );
 
   if (validData.length === 0) {
@@ -104,7 +104,7 @@ export function generateRadarChartDescription(
     values: number[];
   }[],
   labels: string[],
-  title?: string
+  title?: string,
 ): string {
   if (!datasets || datasets.length === 0 || !labels || labels.length === 0) {
     return 'Empty radar chart with no data';
@@ -125,7 +125,7 @@ export function generateRadarChartDescription(
     const minIndex = dataset.values.indexOf(min);
 
     parts.push(
-      `${dataset.label}: average ${average}, highest in ${labels[maxIndex]} at ${max}, lowest in ${labels[minIndex]} at ${min}.`
+      `${dataset.label}: average ${average}, highest in ${labels[maxIndex]} at ${max}, lowest in ${labels[minIndex]} at ${min}.`,
     );
   });
 
@@ -137,7 +137,7 @@ export function generateRadarChartDescription(
  */
 export function generateChartTable(
   data: { label: string; value: number }[],
-  caption: string
+  caption: string,
 ): string {
   if (!data || data.length === 0) {
     return '';

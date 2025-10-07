@@ -82,7 +82,7 @@ describe('TacticalPlaybook Component', () => {
           onLoadFormation={mockOnLoadFormation}
           onClose={mockOnClose}
           isOpen={true}
-        />
+        />,
       );
 
       expect(screen.getByText('Tactical Playbook')).toBeInTheDocument();
@@ -98,7 +98,7 @@ describe('TacticalPlaybook Component', () => {
           onLoadFormation={mockOnLoadFormation}
           onClose={mockOnClose}
           isOpen={false}
-        />
+        />,
       );
 
       expect(screen.queryByText('Tactical Playbook')).not.toBeInTheDocument();
@@ -112,7 +112,7 @@ describe('TacticalPlaybook Component', () => {
           onLoadFormation={mockOnLoadFormation}
           onClose={mockOnClose}
           isOpen={true}
-        />
+        />,
       );
 
       expect(screen.getByText('No formations found')).toBeInTheDocument();
@@ -129,7 +129,7 @@ describe('TacticalPlaybook Component', () => {
           onLoadFormation={mockOnLoadFormation}
           onClose={mockOnClose}
           isOpen={true}
-        />
+        />,
       );
 
       fireEvent.click(screen.getByText('Save Current'));
@@ -148,7 +148,7 @@ describe('TacticalPlaybook Component', () => {
           onLoadFormation={mockOnLoadFormation}
           onClose={mockOnClose}
           isOpen={true}
-        />
+        />,
       );
 
       // Open save dialog
@@ -165,7 +165,7 @@ describe('TacticalPlaybook Component', () => {
       await waitFor(() => {
         expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
           'savedFormations',
-          expect.stringContaining('My Test Formation')
+          expect.stringContaining('My Test Formation'),
         );
       });
     });
@@ -178,7 +178,7 @@ describe('TacticalPlaybook Component', () => {
           onLoadFormation={mockOnLoadFormation}
           onClose={mockOnClose}
           isOpen={true}
-        />
+        />,
       );
 
       // Open save dialog
@@ -199,7 +199,7 @@ describe('TacticalPlaybook Component', () => {
           onLoadFormation={mockOnLoadFormation}
           onClose={mockOnClose}
           isOpen={true}
-        />
+        />,
       );
 
       const saveButton = screen.getByText('Save Current');
@@ -235,7 +235,7 @@ describe('TacticalPlaybook Component', () => {
           onLoadFormation={mockOnLoadFormation}
           onClose={mockOnClose}
           isOpen={true}
-        />
+        />,
       );
 
       expect(screen.getByText('Saved Formation 1')).toBeInTheDocument();
@@ -270,7 +270,7 @@ describe('TacticalPlaybook Component', () => {
           onLoadFormation={mockOnLoadFormation}
           onClose={mockOnClose}
           isOpen={true}
-        />
+        />,
       );
 
       fireEvent.click(screen.getByText('Load Formation'));
@@ -328,7 +328,7 @@ describe('TacticalPlaybook Component', () => {
           onLoadFormation={mockOnLoadFormation}
           onClose={mockOnClose}
           isOpen={true}
-        />
+        />,
       );
 
       // Find and click export button (download icon)
@@ -359,7 +359,7 @@ describe('TacticalPlaybook Component', () => {
           onLoadFormation={mockOnLoadFormation}
           onClose={mockOnClose}
           isOpen={true}
-        />
+        />,
       );
 
       // Mock file input creation
@@ -425,7 +425,7 @@ describe('TacticalPlaybook Component', () => {
           onLoadFormation={mockOnLoadFormation}
           onClose={mockOnClose}
           isOpen={true}
-        />
+        />,
       );
 
       const searchInput = screen.getByPlaceholderText('Search formations...');
@@ -485,7 +485,7 @@ describe('TacticalPlaybook Component', () => {
           onLoadFormation={mockOnLoadFormation}
           onClose={mockOnClose}
           isOpen={true}
-        />
+        />,
       );
 
       const filterSelect = screen.getByDisplayValue('All');
@@ -531,7 +531,7 @@ describe('TacticalPlaybook Component', () => {
           onLoadFormation={mockOnLoadFormation}
           onClose={mockOnClose}
           isOpen={true}
-        />
+        />,
       );
 
       // Find and click favorite button (star icon)
@@ -546,7 +546,7 @@ describe('TacticalPlaybook Component', () => {
 
         expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
           'favoriteFormations',
-          expect.stringContaining('saved-1')
+          expect.stringContaining('saved-1'),
         );
       }
     });
@@ -580,7 +580,7 @@ describe('TacticalPlaybook Component', () => {
           onLoadFormation={mockOnLoadFormation}
           onClose={mockOnClose}
           isOpen={true}
-        />
+        />,
       );
 
       // Find and click delete button (trash icon)
@@ -607,7 +607,7 @@ describe('TacticalPlaybook Component', () => {
           onLoadFormation={mockOnLoadFormation}
           onClose={mockOnClose}
           isOpen={true}
-        />
+        />,
       );
 
       const closeButton = screen.getByRole('button', { name: /close/i });
@@ -624,7 +624,7 @@ describe('TacticalPlaybook Component', () => {
           onLoadFormation={mockOnLoadFormation}
           onClose={mockOnClose}
           isOpen={true}
-        />
+        />,
       );
 
       // Click on backdrop

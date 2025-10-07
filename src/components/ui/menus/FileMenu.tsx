@@ -262,7 +262,7 @@ export const FileMenu: React.FC = () => {
           form: p.form,
           notes: p.notes,
           traits: p.traits.join(','),
-        }))
+        })),
       );
 
       const filePath = await save({

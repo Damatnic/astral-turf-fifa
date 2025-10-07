@@ -188,7 +188,7 @@ export const createMockFormation = (overrides: Partial<Formation> = {}): Formati
 });
 
 export const createMockPlayerAttributes = (
-  overrides: Partial<PlayerAttributes> = {}
+  overrides: Partial<PlayerAttributes> = {},
 ): PlayerAttributes => ({
   speed: 80,
   passing: 85,
@@ -315,7 +315,7 @@ export const createMockPlayers = (count: number): Player[] => {
       id: `test-player-${index + 1}`,
       name: `Test Player ${index + 1}`,
       jerseyNumber: index + 1,
-    })
+    }),
   );
 };
 
@@ -325,7 +325,7 @@ export const createMockUsers = (count: number): User[] => {
       id: `test-user-${index + 1}`,
       email: `test${index + 1}@example.com`,
       firstName: `Test${index + 1}`,
-    })
+    }),
   );
 };
 
@@ -335,6 +335,6 @@ export const createMockFormations = (count: number): Formation[] => {
     createMockFormation({
       id: `test-formation-${index + 1}`,
       name: `Test Formation ${formationNames[index] || '4-4-2'}`,
-    })
+    }),
   );
 };

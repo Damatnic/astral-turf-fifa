@@ -402,7 +402,7 @@ const UltraModernPlayerToken: React.FC<UltraModernPlayerTokenProps> = ({
       setIsHovered(true);
       setMousePosition({ x: e.clientX, y: e.clientY });
     },
-    [interactive]
+    [interactive],
   );
 
   const handleMouseMove = useCallback(
@@ -412,7 +412,7 @@ const UltraModernPlayerToken: React.FC<UltraModernPlayerTokenProps> = ({
       }
       setMousePosition({ x: e.clientX, y: e.clientY });
     },
-    [isHovered]
+    [isHovered],
   );
 
   const handleMouseLeave = useCallback(() => {
@@ -427,7 +427,7 @@ const UltraModernPlayerToken: React.FC<UltraModernPlayerTokenProps> = ({
       setIsAnimating(true);
       startDrag(player, e);
     },
-    [interactive, startDrag, player]
+    [interactive, startDrag, player],
   );
 
   const handleDragEnd = useCallback(() => {
@@ -442,7 +442,7 @@ const UltraModernPlayerToken: React.FC<UltraModernPlayerTokenProps> = ({
       e.stopPropagation();
       // Handle player selection logic here
     },
-    [interactive]
+    [interactive],
   );
 
   const handleDoubleClick = useCallback(
@@ -453,7 +453,7 @@ const UltraModernPlayerToken: React.FC<UltraModernPlayerTokenProps> = ({
       e.stopPropagation();
       // Handle player info modal or quick actions
     },
-    [interactive]
+    [interactive],
   );
 
   // Player initials for display

@@ -103,7 +103,7 @@ const AITacticalIntelligence: React.FC<AITacticalIntelligenceProps> = ({
   // Check if we have sufficient data for analysis
   const hasRequiredData = useMemo(
     () => formation && teamPlayers.length > 0,
-    [formation, teamPlayers]
+    [formation, teamPlayers],
   );
 
   // Main analysis function
@@ -166,10 +166,10 @@ const AITacticalIntelligence: React.FC<AITacticalIntelligenceProps> = ({
         teamPlayers.map(async player => {
           const prediction = await aiPredictiveAnalytics.predictPlayerPerformance(
             player,
-            matchContext
+            matchContext,
           );
           playerPredictionsResult[player.id] = prediction;
-        })
+        }),
       );
 
       setPlayerPredictions(playerPredictionsResult);

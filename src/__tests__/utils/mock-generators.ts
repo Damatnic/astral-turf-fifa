@@ -30,7 +30,7 @@ faker.seed(123);
 
 // Base player attributes generator
 export const generatePlayerAttributes = (
-  overrides: Partial<PlayerAttributes> = {}
+  overrides: Partial<PlayerAttributes> = {},
 ): PlayerAttributes => ({
   speed: faker.number.int({ min: 40, max: 99 }),
   passing: faker.number.int({ min: 40, max: 99 }),
@@ -121,7 +121,7 @@ export const generatePlayersForFormation = (formation: string): Player[] => {
       position: position as any,
       number: index + 1,
       team: 'home',
-    } as any)
+    } as any),
   );
 };
 
@@ -191,7 +191,7 @@ export const generateChallenge = (overrides: Partial<Challenge> = {}): Challenge
     points: faker.number.int({ min: 10, max: 100 }),
     timeLimit: faker.number.int({ min: 300, max: 3600 }), // 5 minutes to 1 hour
     requirements: Array.from({ length: faker.number.int({ min: 1, max: 5 }) }, () =>
-      faker.lorem.sentence()
+      faker.lorem.sentence(),
     ),
     isCompleted: faker.datatype.boolean({ probability: 0.3 }),
     completedAt: faker.helpers.maybe(() => faker.date.past().toISOString()),
@@ -200,7 +200,7 @@ export const generateChallenge = (overrides: Partial<Challenge> = {}): Challenge
       points: faker.number.int({ min: 10, max: 100 }),
       badges: Array.from({ length: faker.number.int({ min: 0, max: 3 }) }, () => faker.word.noun()),
       unlocks: Array.from({ length: faker.number.int({ min: 0, max: 2 }) }, () =>
-        faker.lorem.words(2)
+        faker.lorem.words(2),
       ),
     },
     createdAt: faker.date.past().toISOString(),
@@ -250,7 +250,7 @@ export const generateAnimationStep = (overrides: Partial<AnimationStep> = {}): A
 
 // Collaboration session generator
 export const generateCollaborationSession = (
-  overrides: Partial<CollaborationSession> = {}
+  overrides: Partial<CollaborationSession> = {},
 ): CollaborationSession =>
   ({
     id: faker.string.uuid(),
@@ -343,7 +343,7 @@ export const generateAnalyticsData = (): AnalyticsData =>
 
 // Tactical instruction generator
 export const generateTacticalInstruction = (
-  overrides: Partial<TacticalInstruction> = {}
+  overrides: Partial<TacticalInstruction> = {},
 ): TacticalInstruction =>
   ({
     id: faker.string.uuid(),
@@ -352,7 +352,7 @@ export const generateTacticalInstruction = (
     description: faker.lorem.paragraph(),
     priority: faker.helpers.arrayElement(['low', 'medium', 'high', 'critical']),
     targetPlayers: Array.from({ length: faker.number.int({ min: 1, max: 5 }) }, () =>
-      faker.string.uuid()
+      faker.string.uuid(),
     ),
     duration: faker.number.int({ min: 5, max: 45 }), // in minutes
     isActive: faker.datatype.boolean({ probability: 0.6 }),
@@ -380,7 +380,7 @@ export const generateExportData = (formation: Formation, format: ExportFormat) =
       const csvData = (formation.players || [])
         .map(
           player =>
-            `"${player.name}","${player.position}",${player.number},${player.x},${player.y},"${player.team}"`
+            `"${player.name}","${player.position}",${player.number},${player.x},${player.y},"${player.team}"`,
         )
         .join('\n');
       return `${csvHeaders}\n${csvData}`;
@@ -402,7 +402,7 @@ export const generateExportData = (formation: Formation, format: ExportFormat) =
       <number>${player.number}</number>
       <coordinates x="${player.x}" y="${player.y}" />
       <team>${player.team}</team>
-    </player>`
+    </player>`,
       )
       .join('')}
   </players>
@@ -439,7 +439,7 @@ export const createTestDataSet = {
     players: Array.from({ length: 500 }, () => generatePlayer()),
     challenges: Array.from({ length: 100 }, () => generateChallenge()),
     heatMaps: Array.from({ length: 25 }, () =>
-      generateHeatMapData(generatePlayersForFormation('4-4-2'))
+      generateHeatMapData(generatePlayersForFormation('4-4-2')),
     ),
   }),
 

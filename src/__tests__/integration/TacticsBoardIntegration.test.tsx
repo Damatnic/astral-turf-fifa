@@ -125,7 +125,7 @@ describe('Tactics Board Integration Tests', () => {
         expect(mockProps.onSaveFormation).toHaveBeenCalledWith(
           expect.objectContaining({
             name: 'My Custom 4-4-2',
-          })
+          }),
         );
       });
     });
@@ -284,7 +284,7 @@ describe('Tactics Board Integration Tests', () => {
           expect.objectContaining({
             format: 'png',
             quality: 90,
-          })
+          }),
         );
       });
 

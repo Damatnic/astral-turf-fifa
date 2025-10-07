@@ -59,7 +59,7 @@ export const PressingZonesOverlay: React.FC<PressingZonesOverlayProps> = ({
 
         const distance = Math.sqrt(
           Math.pow(player.position.x - other.position.x, 2) +
-            Math.pow(player.position.y - other.position.y, 2)
+            Math.pow(player.position.y - other.position.y, 2),
         );
 
         if (distance < 100) {

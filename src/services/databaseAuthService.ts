@@ -73,7 +73,7 @@ class DatabaseAuthService {
    */
   async signup(
     signupData: DatabaseSignupData,
-    context: LoginContext
+    context: LoginContext,
   ): Promise<DatabaseLoginResponse> {
     const startTime = Date.now();
 
@@ -89,7 +89,7 @@ class DatabaseAuthService {
           {
             ipAddress: context.ipAddress,
             remaining: rateLimitResult.remaining,
-          }
+          },
         );
         throw new Error('Signup rate limit exceeded. Please try again later.');
       }
@@ -102,7 +102,7 @@ class DatabaseAuthService {
 
       const sanitizedData = validationResult.data;
       (sanitizedData as any).email = sanitizeUserInput(
-        (sanitizedData as any).email.toLowerCase().trim()
+        (sanitizedData as any).email.toLowerCase().trim(),
       );
 
       // Check if user already exists
@@ -117,7 +117,7 @@ class DatabaseAuthService {
           {
             email: (sanitizedData as any).email,
             ipAddress: context.ipAddress,
-          }
+          },
         );
         throw new Error('User with this email already exists');
       }
@@ -185,14 +185,14 @@ class DatabaseAuthService {
           role: result.role,
           ipAddress: context.ipAddress,
           userAgent: context.userAgent,
-        }
+        },
       );
 
       // Automatically log in the new user
       return await this.login(
         (sanitizedData as any).email,
         (sanitizedData as any).password,
-        context
+        context,
       );
     } catch (_error: any) {
       securityLogger.error('Database signup failed', {
@@ -213,7 +213,7 @@ class DatabaseAuthService {
   async login(
     email: string,
     password: string,
-    context: LoginContext
+    context: LoginContext,
   ): Promise<DatabaseLoginResponse> {
     const startTime = Date.now();
 
@@ -229,7 +229,7 @@ class DatabaseAuthService {
           {
             ipAddress: context.ipAddress,
             email: sanitizeUserInput(email),
-          }
+          },
         );
         throw new Error('Too many login attempts. Please try again later.');
       }
@@ -275,7 +275,7 @@ class DatabaseAuthService {
             userId: user.id,
             ipAddress: context.ipAddress,
             userAgent: context.userAgent,
-          }
+          },
         );
         throw new Error('Account is temporarily locked. Please try again later.');
       }
@@ -332,7 +332,7 @@ class DatabaseAuthService {
           ipAddress: session.ipAddress,
           userAgent: session.userAgent,
         },
-        { ttl: 24 * 60 * 60 }
+        { ttl: 24 * 60 * 60 },
       ); // 24 hours
 
       // Record successful login
@@ -451,7 +451,7 @@ class DatabaseAuthService {
               ipAddress: session.ipAddress,
               userAgent: session.userAgent,
             },
-            { ttl: 24 * 60 * 60 }
+            { ttl: 24 * 60 * 60 },
           );
         }
       }
@@ -540,7 +540,7 @@ class DatabaseAuthService {
     userId: string,
     currentPassword: string,
     newPassword: string,
-    context: LoginContext
+    context: LoginContext,
   ): Promise<void> {
     try {
       const user = await this.db.user.findUnique({
@@ -563,7 +563,7 @@ class DatabaseAuthService {
         securityLogger.logSecurityEvent(
           SecurityEventType.UNAUTHORIZED_ACCESS,
           'Invalid current password during password change',
-          { userId, ipAddress: context.ipAddress }
+          { userId, ipAddress: context.ipAddress },
         );
         throw new Error('Current password is incorrect');
       }
@@ -641,7 +641,7 @@ class DatabaseAuthService {
         {
           userId,
           ipAddress: context.ipAddress,
-        }
+        },
       );
     } catch (_error: any) {
       securityLogger.error('Password change failed', {
@@ -661,7 +661,7 @@ class DatabaseAuthService {
     email: string,
     context: LoginContext,
     reason: string,
-    userId?: string
+    userId?: string,
   ): Promise<void> {
     try {
       if (userId) {
@@ -703,7 +703,7 @@ class DatabaseAuthService {
       securityLogger.logSecurityEvent(
         SecurityEventType.ACCOUNT_LOCKED,
         'Account locked due to failed login attempts',
-        { userId }
+        { userId },
       );
     } catch (_error: any) {
       securityLogger.error('Failed to lock account', {
@@ -750,7 +750,7 @@ class DatabaseAuthService {
 
   private async generateSecurityNotices(
     user: PrismaUser & { sessions?: UserSession[] },
-    context: LoginContext
+    context: LoginContext,
   ): Promise<string[]> {
     const notices: string[] = [];
 

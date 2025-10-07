@@ -113,7 +113,7 @@ class FormationManagementService {
   public saveFormationVersion(
     formationData: any,
     isAutoSaved: boolean = false,
-    customName?: string
+    customName?: string,
   ): FormationSaveData {
     const saveData: FormationSaveData = {
       id: `formation_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -165,14 +165,14 @@ class FormationManagementService {
     }
 
     const excellentPositions = analysis.positionScores.filter(
-      (p: any) => p.fitness === 'excellent'
+      (p: any) => p.fitness === 'excellent',
     );
     if (excellentPositions.length >= 6) {
       strengths.push('Strong positional coverage');
     }
 
     const defensePositions = analysis.positionScores.filter(
-      (p: any) => p.role.includes('DF') || p.role.includes('GK')
+      (p: any) => p.role.includes('DF') || p.role.includes('GK'),
     );
     if (defensePositions.every((p: any) => p.fitness !== 'poor')) {
       strengths.push('Solid defensive foundation');
@@ -250,7 +250,7 @@ class FormationManagementService {
    */
   public getSaveHistory(): FormationSaveData[] {
     return [...this.saveHistory].sort(
-      (a, b) => new Date(b.savedAt).getTime() - new Date(a.savedAt).getTime()
+      (a, b) => new Date(b.savedAt).getTime() - new Date(a.savedAt).getTime(),
     );
   }
 
@@ -281,7 +281,7 @@ class FormationManagementService {
     formation: Formation,
     players: Player[],
     templateName: string,
-    description?: string
+    description?: string,
   ): FormationSaveData {
     const analysis = getFormationAnalysis(formation, players);
 
@@ -327,7 +327,7 @@ class FormationManagementService {
   public optimizeFormation(
     formation: Formation,
     players: Player[],
-    team: 'home' | 'away'
+    team: 'home' | 'away',
   ): {
     optimizedFormation: Formation;
     improvements: string[];
@@ -350,7 +350,7 @@ class FormationManagementService {
       improvements.push('All positions have suitable players assigned');
     } else {
       improvements.push(
-        `${analysis.recommendations.length} positions could benefit from player adjustments`
+        `${analysis.recommendations.length} positions could benefit from player adjustments`,
       );
     }
 
@@ -382,7 +382,7 @@ class FormationManagementService {
         exportVersion: '1.0',
       },
       null,
-      2
+      2,
     );
   }
 

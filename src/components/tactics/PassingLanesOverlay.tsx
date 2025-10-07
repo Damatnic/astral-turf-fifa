@@ -58,7 +58,7 @@ export const PassingLanesOverlay: React.FC<PassingLanesOverlayProps> = ({
         // Calculate distance between players
         const distance = Math.sqrt(
           Math.pow(from.position.x - to.position.x, 2) +
-            Math.pow(from.position.y - to.position.y, 2)
+            Math.pow(from.position.y - to.position.y, 2),
         );
 
         // Filter by distance constraints
@@ -139,13 +139,13 @@ export const PassingLanesOverlay: React.FC<PassingLanesOverlayProps> = ({
 
           // Check if all three players are within passing range
           const d12 = Math.sqrt(
-            Math.pow(p1.position.x - p2.position.x, 2) + Math.pow(p1.position.y - p2.position.y, 2)
+            Math.pow(p1.position.x - p2.position.x, 2) + Math.pow(p1.position.y - p2.position.y, 2),
           );
           const d23 = Math.sqrt(
-            Math.pow(p2.position.x - p3.position.x, 2) + Math.pow(p2.position.y - p3.position.y, 2)
+            Math.pow(p2.position.x - p3.position.x, 2) + Math.pow(p2.position.y - p3.position.y, 2),
           );
           const d31 = Math.sqrt(
-            Math.pow(p3.position.x - p1.position.x, 2) + Math.pow(p3.position.y - p1.position.y, 2)
+            Math.pow(p3.position.x - p1.position.x, 2) + Math.pow(p3.position.y - p1.position.y, 2),
           );
 
           const maxTriangleSide = 120;

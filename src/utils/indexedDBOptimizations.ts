@@ -31,7 +31,7 @@ class CompressionEngine {
   private static decoder = new TextDecoder();
 
   static async compress(
-    data: any
+    data: any,
   ): Promise<{ compressed: Uint8Array; originalSize: number; compressedSize: number }> {
     const jsonString = JSON.stringify(data);
     const originalSize = this.encoder.encode(jsonString).length;
@@ -214,7 +214,7 @@ export class AdvancedIndexedDB {
     dbName = 'AstralTurfCache',
     version = 3,
     compressionEnabled = true,
-    cacheSizeLimit = 100 * 1024 * 1024 // 100MB
+    cacheSizeLimit = 100 * 1024 * 1024, // 100MB
   ) {
     this.dbName = dbName;
     this.version = version;
@@ -291,7 +291,7 @@ export class AdvancedIndexedDB {
     key: string,
     data: DatabaseSchema[K]['data'],
     ttl = 24 * 60 * 60 * 1000, // 24 hours default
-    metadata?: Record<string, any>
+    metadata?: Record<string, any>,
   ): Promise<void> {
     if (!this.db) {
       await this.initialize();
@@ -317,7 +317,7 @@ export class AdvancedIndexedDB {
           finalData = Array.from(compressionResult.compressed);
           compressed = true;
           console.log(
-            `[IndexedDB] Compressed ${store}:${key} from ${compressionResult.originalSize} to ${compressionResult.compressedSize} bytes`
+            `[IndexedDB] Compressed ${store}:${key} from ${compressionResult.originalSize} to ${compressionResult.compressedSize} bytes`,
           );
         }
       } catch (error) {
@@ -356,7 +356,7 @@ export class AdvancedIndexedDB {
 
   async get<K extends StoreNames>(
     store: K,
-    key: string
+    key: string,
   ): Promise<DatabaseSchema[K]['data'] | null> {
     if (!this.db) {
       await this.initialize();
@@ -494,7 +494,7 @@ export class AdvancedIndexedDB {
     await this.updateCleanupTimestamp();
 
     console.log(
-      `[IndexedDB] Cleanup completed: ${deletedCount} items deleted, ${freedBytes} bytes freed`
+      `[IndexedDB] Cleanup completed: ${deletedCount} items deleted, ${freedBytes} bytes freed`,
     );
 
     return { deletedCount, freedBytes };
@@ -597,7 +597,7 @@ export class AdvancedIndexedDB {
     // Check if we need to trigger cleanup
     if (this.currentCacheSize > this.cacheSizeLimit) {
       console.warn(
-        `[IndexedDB] Cache size limit exceeded (${this.currentCacheSize} > ${this.cacheSizeLimit}), triggering cleanup`
+        `[IndexedDB] Cache size limit exceeded (${this.currentCacheSize} > ${this.cacheSizeLimit}), triggering cleanup`,
       );
       this.cleanup();
     }

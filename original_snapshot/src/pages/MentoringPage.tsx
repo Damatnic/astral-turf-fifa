@@ -15,12 +15,12 @@ const MentoringPage: React.FC = () => {
 
   // Potential mentors (experienced players)
   const potentialMentors = teamPlayers.filter(
-    p => p.age >= 28 && !mentoringGroups.some(group => group.mentorId === p.id)
+    p => p.age >= 28 && !mentoringGroups.some(group => group.mentorId === p.id),
   );
 
   // Potential mentees (younger players)
   const potentialMentees = teamPlayers.filter(
-    p => p.age <= 23 && !mentoringGroups.some(group => group.menteeIds.includes(p.id))
+    p => p.age <= 23 && !mentoringGroups.some(group => group.menteeIds.includes(p.id)),
   );
 
   const handleCreateGroup = () => {

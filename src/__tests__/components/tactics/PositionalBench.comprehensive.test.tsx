@@ -127,11 +127,11 @@ describe('PositionalBench - Comprehensive Test Suite', () => {
 
         if ((player as any).isAvailable) {
           expect(within(playerCard).getByTestId('availability-indicator')).toHaveClass(
-            /available|ready/
+            /available|ready/,
           );
         } else {
           expect(within(playerCard).getByTestId('availability-indicator')).toHaveClass(
-            /unavailable|injured/
+            /unavailable|injured/,
           );
         }
       });
@@ -234,7 +234,7 @@ describe('PositionalBench - Comprehensive Test Suite', () => {
       searchablePlayers[2].name = 'Mike Johnson';
 
       renderWithProviders(
-        <PositionalBench {...(mockProps as any)} players={searchablePlayers} searchable={true} />
+        <PositionalBench {...(mockProps as any)} players={searchablePlayers} searchable={true} />,
       );
 
       const searchInput = screen.getByPlaceholderText(/search players/i);
@@ -273,7 +273,7 @@ describe('PositionalBench - Comprehensive Test Suite', () => {
 
       const playerCards = screen.getAllByTestId(/player-card/);
       const playerNames = playerCards.map(
-        card => within(card).getByTestId('player-name').textContent
+        card => within(card).getByTestId('player-name').textContent,
       );
 
       // Names should be in alphabetical order
@@ -295,7 +295,7 @@ describe('PositionalBench - Comprehensive Test Suite', () => {
 
       const playerCards = screen.getAllByTestId(/player-card/);
       const jerseyNumbers = playerCards.map(card =>
-        parseInt(within(card).getByTestId('jersey-number').textContent || '0')
+        parseInt(within(card).getByTestId('jersey-number').textContent || '0'),
       );
 
       // Numbers should be in ascending order
@@ -392,7 +392,7 @@ describe('PositionalBench - Comprehensive Test Suite', () => {
       const largePlayerList = createTestData.performance(100).players;
 
       renderWithProviders(
-        <PositionalBench {...(mockProps as any)} players={largePlayerList} virtualized={true} />
+        <PositionalBench {...(mockProps as any)} players={largePlayerList} virtualized={true} />,
       );
 
       // Should only render visible players
@@ -413,7 +413,7 @@ describe('PositionalBench - Comprehensive Test Suite', () => {
         () => {
           expect(searchInput).toHaveValue('test');
         },
-        { timeout: 1000 }
+        { timeout: 1000 },
       );
     });
 

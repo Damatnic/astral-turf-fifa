@@ -24,7 +24,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
 }) => {
   const padding = { top: 20, right: 20, bottom: 50, left: 50 };
   const [tooltip, setTooltip] = useState<{ x: number; y: number; point: ScatterPoint } | null>(
-    null
+    null,
   );
 
   const { xScale, yScale, points } = useMemo(() => {

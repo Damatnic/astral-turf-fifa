@@ -24,10 +24,10 @@ const ChallengeCreator: React.FC<ChallengeCreatorProps> = ({
 }) => {
   const [title, setTitle] = useState(existingChallenge?.title || template?.name || '');
   const [description, setDescription] = useState(
-    existingChallenge?.description || template?.description || ''
+    existingChallenge?.description || template?.description || '',
   );
   const [category, setCategory] = useState(
-    existingChallenge?.category || template?.category || 'fitness'
+    existingChallenge?.category || template?.category || 'fitness',
   );
   const [difficulty, setDifficulty] = useState(existingChallenge?.difficulty || 'medium');
   const [xpReward, setXpReward] = useState(existingChallenge?.xpReward || 100);

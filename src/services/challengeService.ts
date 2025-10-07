@@ -366,7 +366,7 @@ class ChallengeService {
           c =>
             c.title.toLowerCase().includes(searchLower) ||
             c.description.toLowerCase().includes(searchLower) ||
-            c.tags?.some(tag => tag.toLowerCase().includes(searchLower))
+            c.tags?.some(tag => tag.toLowerCase().includes(searchLower)),
         );
       }
 
@@ -375,7 +375,7 @@ class ChallengeService {
         switch (filters.sortBy) {
           case 'newest':
             filtered.sort(
-              (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+              (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
             );
             break;
           case 'xp':
@@ -388,7 +388,7 @@ class ChallengeService {
           case 'expiring':
             filtered = filtered.filter(c => c.expiresAt);
             filtered.sort(
-              (a, b) => new Date(a.expiresAt!).getTime() - new Date(b.expiresAt!).getTime()
+              (a, b) => new Date(a.expiresAt!).getTime() - new Date(b.expiresAt!).getTime(),
             );
             break;
         }
@@ -435,7 +435,7 @@ class ChallengeService {
       // Check prerequisites
       if (challenge.prerequisiteChallengeIds?.length) {
         const hasPrereqs = challenge.prerequisiteChallengeIds.every(prereqId =>
-          playerProgress.some(p => p.challengeId === prereqId && p.status === 'completed')
+          playerProgress.some(p => p.challengeId === prereqId && p.status === 'completed'),
         );
         if (!hasPrereqs) {
           return false;
@@ -466,7 +466,7 @@ class ChallengeService {
 
     // Check if already active
     const existing = playerProgress.find(
-      p => p.challengeId === challengeId && p.status === 'active'
+      p => p.challengeId === challengeId && p.status === 'active',
     );
     if (existing) {
       return existing;
@@ -495,7 +495,7 @@ class ChallengeService {
         () => {
           this.expireChallenge(playerId, challengeId);
         },
-        challenge.timeLimit * 60 * 60 * 1000
+        challenge.timeLimit * 60 * 60 * 1000,
       );
 
       this.activeTimers.set(`${playerId}-${challengeId}`, timerId);
@@ -510,11 +510,11 @@ class ChallengeService {
     playerId: string,
     challengeId: string,
     requirementId: string,
-    value: number
+    value: number,
   ): ChallengeProgress | null {
     const playerProgress = this.progress.get(playerId) || [];
     const progress = playerProgress.find(
-      p => p.challengeId === challengeId && p.status === 'active'
+      p => p.challengeId === challengeId && p.status === 'active',
     );
 
     if (!progress) {
@@ -527,7 +527,7 @@ class ChallengeService {
     const challenge = this.challenges.get(challengeId);
     if (challenge) {
       const isComplete = challenge.requirements.every(
-        req => progress.currentProgress[req.id] >= req.target
+        req => progress.currentProgress[req.id] >= req.target,
       );
 
       if (isComplete && challenge.autoValidate) {
@@ -543,11 +543,11 @@ class ChallengeService {
   submitEvidence(
     playerId: string,
     challengeId: string,
-    evidence: Omit<EvidenceSubmission, 'id' | 'submittedAt'>
+    evidence: Omit<EvidenceSubmission, 'id' | 'submittedAt'>,
   ): boolean {
     const playerProgress = this.progress.get(playerId) || [];
     const progress = playerProgress.find(
-      p => p.challengeId === challengeId && p.status === 'active'
+      p => p.challengeId === challengeId && p.status === 'active',
     );
 
     if (!progress) {
@@ -575,7 +575,7 @@ class ChallengeService {
   completeChallenge(playerId: string, challengeId: string): boolean {
     const playerProgress = this.progress.get(playerId) || [];
     const progress = playerProgress.find(
-      p => p.challengeId === challengeId && p.status === 'active'
+      p => p.challengeId === challengeId && p.status === 'active',
     );
 
     if (!progress) {
@@ -600,7 +600,7 @@ class ChallengeService {
   private expireChallenge(playerId: string, challengeId: string) {
     const playerProgress = this.progress.get(playerId) || [];
     const progress = playerProgress.find(
-      p => p.challengeId === challengeId && p.status === 'active'
+      p => p.challengeId === challengeId && p.status === 'active',
     );
 
     if (progress) {
@@ -659,7 +659,7 @@ class ChallengeService {
     challengeId: string,
     approved: boolean,
     reviewerId: string,
-    notes?: string
+    notes?: string,
   ): boolean {
     const playerProgress = this.progress.get(playerId) || [];
     const progress = playerProgress.find(p => p.challengeId === challengeId);
@@ -694,7 +694,7 @@ class ChallengeService {
     baseXP: number,
     difficulty: ChallengeDifficulty,
     streakDays: number,
-    isTeamChallenge: boolean = false
+    isTeamChallenge: boolean = false,
   ): number {
     let totalXP = baseXP;
 
@@ -743,7 +743,7 @@ class ChallengeService {
   private generateRandomChallenge(
     category: ChallengeCategory,
     difficulty: ChallengeDifficulty,
-    frequency: 'daily' | 'weekly' | 'monthly'
+    frequency: 'daily' | 'weekly' | 'monthly',
   ): Challenge {
     const challengeData = {
       fitness: {

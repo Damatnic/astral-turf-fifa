@@ -197,7 +197,7 @@ describe('ZENITH Tactical Error Recovery Tests', () => {
       render(
         <TacticalErrorBoundary context="Test Error Boundary">
           <FailingComponent shouldFail={true} />
-        </TacticalErrorBoundary>
+        </TacticalErrorBoundary>,
       );
 
       expect(screen.getByText(/Tactical Component Error/i)).toBeInTheDocument();
@@ -209,7 +209,7 @@ describe('ZENITH Tactical Error Recovery Tests', () => {
       render(
         <TacticalErrorBoundary context="No Error Test">
           <FailingComponent shouldFail={false} />
-        </TacticalErrorBoundary>
+        </TacticalErrorBoundary>,
       );
 
       expect(screen.getByTestId('working-component')).toBeInTheDocument();
@@ -280,7 +280,7 @@ describe('ZENITH Tactical Error Recovery Tests', () => {
       // First retry attempt
       const retryButton1 = screen.getByRole('button', { name: /Retry.*3 left/i });
       await user.click(retryButton1);
-      
+
       await waitFor(() => {
         expect(screen.getByRole('button', { name: /Retry.*2 left/i })).toBeInTheDocument();
       });
@@ -288,7 +288,7 @@ describe('ZENITH Tactical Error Recovery Tests', () => {
       // Second retry attempt
       const retryButton2 = screen.getByRole('button', { name: /Retry.*2 left/i });
       await user.click(retryButton2);
-      
+
       await waitFor(() => {
         expect(screen.getByRole('button', { name: /Retry.*1 left/i })).toBeInTheDocument();
       });
@@ -347,7 +347,7 @@ describe('ZENITH Tactical Error Recovery Tests', () => {
       render(
         <TacticalErrorBoundary context="Logging Test">
           <ThrowingComponent />
-        </TacticalErrorBoundary>
+        </TacticalErrorBoundary>,
       );
 
       expect(consoleSpy).toHaveBeenCalledWith('Error:', testError);
@@ -362,7 +362,7 @@ describe('ZENITH Tactical Error Recovery Tests', () => {
             </TacticalErrorBoundary>
             <div data-testid="outer-content">Outer content should still render</div>
           </div>
-        </TacticalErrorBoundary>
+        </TacticalErrorBoundary>,
       );
 
       // Inner boundary should catch the error
@@ -561,14 +561,14 @@ describe('ZENITH Tactical Error Recovery Tests', () => {
       // First click should work (clickCount becomes 1, odd number, no error)
       const button = screen.getByTestId('failing-button');
       await user.click(button);
-      
+
       await waitFor(() => {
         expect(button).toHaveTextContent(/count: 1/);
       });
 
       // Second click should trigger render error (clickCount becomes 2, even number)
       await user.click(button);
-      
+
       await waitFor(() => {
         expect(screen.getByText(/Tactical Component Error/i)).toBeInTheDocument();
         expect(screen.queryByTestId('failing-button')).not.toBeInTheDocument();
@@ -602,7 +602,7 @@ describe('ZENITH Tactical Error Recovery Tests', () => {
         render(
           <TacticalErrorBoundary context="Memory Test">
             <MemoryIntensiveComponent />
-          </TacticalErrorBoundary>
+          </TacticalErrorBoundary>,
         );
       }).not.toThrow();
     });
@@ -670,7 +670,7 @@ describe('ZENITH Tactical Error Recovery Tests', () => {
       render(
         <TacticalErrorBoundary context="Error Reporting Test">
           <FailingComponent shouldFail={true} />
-        </TacticalErrorBoundary>
+        </TacticalErrorBoundary>,
       );
 
       // Should attempt to report error (mocked console.warn in this case)
@@ -734,7 +734,7 @@ describe('ZENITH Tactical Error Recovery Tests', () => {
         render(
           <TacticalErrorBoundary context="Tactical Board Integration">
             <UnifiedTacticsBoard />
-          </TacticalErrorBoundary>
+          </TacticalErrorBoundary>,
         );
       }).not.toThrow();
     });
@@ -762,7 +762,7 @@ describe('ZENITH Tactical Error Recovery Tests', () => {
         render(
           <TacticalErrorBoundary context="Data Corruption Test">
             <UnifiedTacticsBoard />
-          </TacticalErrorBoundary>
+          </TacticalErrorBoundary>,
         );
       }).not.toThrow();
     });

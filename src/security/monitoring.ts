@@ -116,7 +116,7 @@ class RateLimitManager {
             maxRequests,
             windowMs,
           },
-        }
+        },
       );
 
       return true; // Rate limited
@@ -190,7 +190,7 @@ class AnomalyDetector {
   detectAnomalies(
     userId: string,
     action: string,
-    metadata: SecurityEventMetadata
+    metadata: SecurityEventMetadata,
   ): SecurityIncident[] {
     const incidents: SecurityIncident[] = [];
     const baseline = this.getUserBehavior(userId);
@@ -210,7 +210,7 @@ class AnomalyDetector {
             sourceIp: ipAddress,
             userAgent,
             metadata: { hour, typicalHours: baseline.typicalLoginTimes },
-          })
+          }),
         );
       }
     }
@@ -227,7 +227,7 @@ class AnomalyDetector {
             sourceIp: ipAddress,
             userAgent,
             metadata: { newIp: ipAddress, knownIps: baseline.commonIpAddresses },
-          })
+          }),
         );
       }
     }
@@ -506,7 +506,7 @@ class SecurityMonitor {
         ThreatType.SUSPICIOUS_ACTIVITY,
         ThreatSeverity.HIGH,
         `Request from known bad IP: ${ipAddress}`,
-        metadata
+        metadata,
       );
       this.recordIncident(incident);
     }
@@ -523,7 +523,7 @@ class SecurityMonitor {
         const isLimited = this.rateLimit.checkRateLimit(
           key,
           RATE_LIMIT_CONFIG.LOGIN_ATTEMPTS.MAX_ATTEMPTS,
-          RATE_LIMIT_CONFIG.LOGIN_ATTEMPTS.WINDOW_MS
+          RATE_LIMIT_CONFIG.LOGIN_ATTEMPTS.WINDOW_MS,
         );
 
         if (isLimited) {
@@ -531,7 +531,7 @@ class SecurityMonitor {
             ThreatType.BRUTE_FORCE,
             ThreatSeverity.HIGH,
             `Login rate limit exceeded for IP: ${ipAddress}`,
-            metadata
+            metadata,
           );
           this.recordIncident(incident);
         }
@@ -542,7 +542,7 @@ class SecurityMonitor {
       const isApiLimited = this.rateLimit.checkRateLimit(
         apiKey,
         RATE_LIMIT_CONFIG.API_REQUESTS.MAX_REQUESTS,
-        RATE_LIMIT_CONFIG.API_REQUESTS.WINDOW_MS
+        RATE_LIMIT_CONFIG.API_REQUESTS.WINDOW_MS,
       );
 
       if (isApiLimited) {
@@ -550,7 +550,7 @@ class SecurityMonitor {
           ThreatType.DOS_ATTACK,
           ThreatSeverity.MEDIUM,
           `API rate limit exceeded for IP: ${ipAddress}`,
-          metadata
+          metadata,
         );
         this.recordIncident(incident);
       }
@@ -561,7 +561,7 @@ class SecurityMonitor {
     threatType: ThreatType,
     severity: ThreatSeverity,
     description: string,
-    metadata: SecurityEventMetadata
+    metadata: SecurityEventMetadata,
   ): SecurityIncident {
     const userId = typeof metadata.userId === 'string' ? metadata.userId : undefined;
     const sourceIp = typeof metadata.ipAddress === 'string' ? metadata.ipAddress : undefined;
@@ -613,7 +613,7 @@ class SecurityMonitor {
           severity: incident.severity,
           riskScore: incident.riskScore,
         },
-      }
+      },
     );
   }
 
@@ -667,7 +667,7 @@ export function resetRateLimit(key: string): void {
 // Security monitoring utilities
 export function monitorSecurityEvent(
   eventType: SecurityEventType,
-  metadata: SecurityEventMetadata
+  metadata: SecurityEventMetadata,
 ): void {
   securityMonitor.monitorEvent(eventType, metadata);
 }
@@ -687,7 +687,7 @@ export function initializeSecurityMonitoring(): void {
     () => {
       securityMonitor.cleanup();
     },
-    60 * 60 * 1000
+    60 * 60 * 1000,
   ); // Every hour
 
   securityLogger.info('Security monitoring system initialized', {

@@ -85,7 +85,7 @@ class PerformanceMonitor {
     if (process.env.NODE_ENV === 'development' && metric.duration > 1000) {
       console.warn(
         `Slow operation detected: ${metric.name} took ${metric.duration.toFixed(2)}ms`,
-        metric
+        metric,
       );
     }
   }
@@ -170,7 +170,7 @@ class PerformanceMonitor {
         timestamp: Date.now(),
       },
       null,
-      2
+      2,
     );
   }
 
@@ -278,7 +278,7 @@ if (process.env.NODE_ENV === 'production') {
       performanceMonitor.report();
       performanceMonitor.clear();
     },
-    5 * 60 * 1000
+    5 * 60 * 1000,
   );
 }
 
@@ -294,7 +294,7 @@ if (typeof window !== 'undefined') {
  */
 export function measureComponentRender<P extends object>(
   Component: React.ComponentType<P>,
-  displayName?: string
+  displayName?: string,
 ): React.ComponentType<P> {
   const name = displayName || Component.displayName || Component.name || 'Anonymous';
 

@@ -227,7 +227,7 @@ export function useDragAndDrop(options: UseDragAndDropOptions) {
 
       return pos;
     },
-    [grid, getDistance]
+    [grid, getDistance],
   );
 
   /**
@@ -257,7 +257,7 @@ export function useDragAndDrop(options: UseDragAndDropOptions) {
 
       return nearestSlot;
     },
-    [alignment, formationSlots, getDistance]
+    [alignment, formationSlots, getDistance],
   );
 
   /**
@@ -288,7 +288,7 @@ export function useDragAndDrop(options: UseDragAndDropOptions) {
 
       return nearestSnap;
     },
-    [alignment, tacticalZones, getDistance]
+    [alignment, tacticalZones, getDistance],
   );
 
   /**
@@ -331,7 +331,7 @@ export function useDragAndDrop(options: UseDragAndDropOptions) {
 
       return nearestAlignment;
     },
-    [alignment, otherPlayers]
+    [alignment, otherPlayers],
   );
 
   /**
@@ -356,7 +356,7 @@ export function useDragAndDrop(options: UseDragAndDropOptions) {
 
       return collidingPlayers;
     },
-    [collision, otherPlayers, getDistance]
+    [collision, otherPlayers, getDistance],
   );
 
   /**
@@ -373,7 +373,7 @@ export function useDragAndDrop(options: UseDragAndDropOptions) {
         y: Math.max(boundary.minY, Math.min(boundary.maxY, pos.y)),
       };
     },
-    [boundary]
+    [boundary],
   );
 
   /**
@@ -452,7 +452,7 @@ export function useDragAndDrop(options: UseDragAndDropOptions) {
       snapToGrid,
       detectCollisions,
       collision.preventOverlap,
-    ]
+    ],
   );
 
   /**
@@ -467,7 +467,7 @@ export function useDragAndDrop(options: UseDragAndDropOptions) {
         onDragStart(position);
       }
     },
-    [position, onDragStart]
+    [position, onDragStart],
   );
 
   /**
@@ -492,7 +492,7 @@ export function useDragAndDrop(options: UseDragAndDropOptions) {
         onDrag(result.finalPosition, result);
       }
     },
-    [position, calculateFinalPosition, onDrag]
+    [position, calculateFinalPosition, onDrag],
   );
 
   /**
@@ -523,7 +523,7 @@ export function useDragAndDrop(options: UseDragAndDropOptions) {
         onDragEnd(result);
       }
     },
-    [position, calculateFinalPosition, controls, onDragEnd]
+    [position, calculateFinalPosition, controls, onDragEnd],
   );
 
   /**

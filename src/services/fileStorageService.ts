@@ -168,7 +168,7 @@ class FileStorageService {
         this.config.defaultProvider,
         fileId,
         options,
-        checksum
+        checksum,
       );
 
       // Replicate to backup provider if failover enabled
@@ -423,7 +423,7 @@ class FileStorageService {
     provider: StorageProvider,
     fileId: string,
     options: UploadOptions,
-    checksum: string
+    checksum: string,
   ): Promise<Partial<UploadResult>> {
     switch (provider) {
       case 'azure_blob':
@@ -440,7 +440,7 @@ class FileStorageService {
   private async uploadToAzureBlob(
     fileId: string,
     options: UploadOptions,
-    _checksum: string
+    _checksum: string,
   ): Promise<Partial<UploadResult>> {
     // Mock Azure Blob Storage upload
     // In production, this would use @azure/storage-blob SDK
@@ -465,7 +465,7 @@ class FileStorageService {
   private async uploadToAWSS3(
     fileId: string,
     options: UploadOptions,
-    _checksum: string
+    _checksum: string,
   ): Promise<Partial<UploadResult>> {
     // Mock AWS S3 upload
     // In production, this would use @aws-sdk/client-s3
@@ -488,7 +488,7 @@ class FileStorageService {
   private async uploadToLocal(
     fileId: string,
     options: UploadOptions,
-    _checksum: string
+    _checksum: string,
   ): Promise<Partial<UploadResult>> {
     const basePath = this.config.local?.basePath || './storage/files';
     const category = options.category || 'other';
@@ -513,8 +513,8 @@ class FileStorageService {
           tags: options.tags,
         },
         null,
-        2
-      )
+        2,
+      ),
     );
 
     return {
@@ -526,7 +526,7 @@ class FileStorageService {
 
   private async downloadFromProvider(
     provider: StorageProvider,
-    options: DownloadOptions
+    options: DownloadOptions,
   ): Promise<DownloadResult> {
     switch (provider) {
       case 'azure_blob':
@@ -599,7 +599,7 @@ class FileStorageService {
 
   private async deleteFromProvider(
     provider: StorageProvider,
-    options: DeleteOptions
+    options: DeleteOptions,
   ): Promise<void> {
     switch (provider) {
       case 'azure_blob':
@@ -651,7 +651,7 @@ class FileStorageService {
 
   private async generateSignedUrl(
     provider: StorageProvider,
-    options: SignedUrlOptions
+    options: SignedUrlOptions,
   ): Promise<string> {
     switch (provider) {
       case 'azure_blob':
@@ -672,7 +672,7 @@ class FileStorageService {
         fileId: options.fileId,
         permissions: options.permissions,
         expiresAt: new Date(Date.now() + options.expiresIn * 1000).toISOString(),
-      })
+      }),
     ).toString('base64');
 
     return `/api/files/${options.fileId}/download?token=${sasToken}`;
@@ -695,7 +695,7 @@ class FileStorageService {
         fileId: options.fileId,
         permissions: options.permissions,
         expiresAt: new Date(Date.now() + options.expiresIn * 1000).toISOString(),
-      })
+      }),
     ).toString('base64');
 
     return `/api/files/${options.fileId}/download?token=${token}`;
@@ -735,7 +735,7 @@ class FileStorageService {
 
   private async getMetadataFromProvider(
     _provider: StorageProvider,
-    _fileId: string
+    _fileId: string,
   ): Promise<Record<string, string>> {
     // Mock metadata retrieval
     return {};
@@ -749,7 +749,7 @@ class FileStorageService {
     fileId: string,
     options: UploadOptions,
     checksum: string,
-    timestamp: Date
+    timestamp: Date,
   ): Promise<UploadResult> {
     // Try local storage as fallback
     const result = await this.uploadToLocal(fileId, options, checksum);
@@ -774,7 +774,7 @@ class FileStorageService {
   private async replicateToBackupProvider(
     _fileId: string,
     _options: UploadOptions,
-    _checksum: string
+    _checksum: string,
   ): Promise<void> {
     // Replicate to secondary provider for redundancy
     // Implementation depends on backup provider configuration

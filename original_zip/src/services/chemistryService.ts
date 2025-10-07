@@ -12,7 +12,7 @@ export const calculateChemistryScore = (
   playerB: Player,
   chemistryMatrix: RootState['tactics']['chemistry'],
   relationships: RootState['franchise']['relationships'],
-  mentoringGroups: MentoringGroup[]
+  mentoringGroups: MentoringGroup[],
 ): number => {
   let score = 0;
 
@@ -30,7 +30,7 @@ export const calculateChemistryScore = (
     group =>
       (group.mentorId === playerA.id && group.menteeIds.includes(playerB.id)) ||
       (group.mentorId === playerB.id && group.menteeIds.includes(playerA.id)) ||
-      (group.menteeIds.includes(playerA.id) && group.menteeIds.includes(playerB.id))
+      (group.menteeIds.includes(playerA.id) && group.menteeIds.includes(playerB.id)),
   );
   if (inSameGroup) {
     score += 15;
@@ -67,7 +67,7 @@ export const calculateChemistryScore = (
 export const calculateTeamChemistry = (
   players: Player[],
   formations: Record<string, Formation>,
-  activeFormationIds: { home: string; away: string }
+  activeFormationIds: { home: string; away: string },
 ): Record<string, Record<string, number>> => {
   const chemistry: Record<string, Record<string, number>> = {};
 
@@ -79,7 +79,7 @@ export const calculateTeamChemistry = (
         // Check if players are positioned close to each other
         const distance = Math.sqrt(
           Math.pow(playerA.position.x - playerB.position.x, 2) +
-            Math.pow(playerA.position.y - playerB.position.y, 2)
+            Math.pow(playerA.position.y - playerB.position.y, 2),
         );
 
         // Players build chemistry when they play close together
@@ -109,7 +109,7 @@ export const getPositionalLinks = (player: Player, formation: Formation): string
     if (slot.playerId && slot.playerId !== player.id) {
       const distance = Math.sqrt(
         Math.pow(slot.defaultPosition.x - playerPos.x, 2) +
-          Math.pow(slot.defaultPosition.y - playerPos.y, 2)
+          Math.pow(slot.defaultPosition.y - playerPos.y, 2),
       );
 
       // Consider positions within ~100 units as linked
@@ -127,7 +127,7 @@ export const calculateFormationChemistry = (
   formation: Formation,
   relationships: RootState['franchise']['relationships'],
   mentoringGroups: MentoringGroup[],
-  chemistryMatrix: Record<string, Record<string, number>>
+  chemistryMatrix: Record<string, Record<string, number>>,
 ): number => {
   let totalChemistry = 0;
   let links = 0;
@@ -145,7 +145,7 @@ export const calculateFormationChemistry = (
         playerB,
         chemistryMatrix,
         relationships,
-        mentoringGroups
+        mentoringGroups,
       );
 
       totalChemistry += chemistry;
@@ -160,7 +160,7 @@ export const suggestChemistryImprovements = (
   players: Player[],
   formation: Formation,
   relationships: RootState['franchise']['relationships'],
-  mentoringGroups: MentoringGroup[]
+  mentoringGroups: MentoringGroup[],
 ): string[] => {
   const suggestions: string[] = [];
 
@@ -173,19 +173,19 @@ export const suggestChemistryImprovements = (
 
   if (youngPlayers.length > 0 && leaders.length > 0) {
     suggestions.push(
-      `Consider creating mentoring groups with experienced leaders like ${leaders[0].name} to help develop young talent.`
+      `Consider creating mentoring groups with experienced leaders like ${leaders[0].name} to help develop young talent.`,
     );
   }
 
   // Suggest nationality-based groupings
   const nationalities = [...new Set(onFieldPlayers.map(p => p.nationality))];
   const largeSameNationalityGroups = nationalities.filter(
-    nat => onFieldPlayers.filter(p => p.nationality === nat).length >= 3
+    nat => onFieldPlayers.filter(p => p.nationality === nat).length >= 3,
   );
 
   if (largeSameNationalityGroups.length > 0) {
     suggestions.push(
-      `Players from ${largeSameNationalityGroups[0]} have natural chemistry - consider positioning them close together.`
+      `Players from ${largeSameNationalityGroups[0]} have natural chemistry - consider positioning them close together.`,
     );
   }
 
@@ -197,7 +197,7 @@ export const suggestChemistryImprovements = (
         const relationship = relationships[playerA.id]?.[playerB.id];
         if (relationship === 'rivalry') {
           rivalries.push(
-            `${playerA.name} and ${playerB.name} have a rivalry that may affect team chemistry.`
+            `${playerA.name} and ${playerB.name} have a rivalry that may affect team chemistry.`,
           );
         }
       }

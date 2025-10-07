@@ -62,12 +62,12 @@ const TacticalSuggestionsOverlay: React.FC<TacticalSuggestionsOverlayProps> = ({
       const recommendations = await aiCoachingService.generateCoachingRecommendations(
         formation,
         players,
-        gameContext
+        gameContext,
       );
 
       // Filter out dismissed suggestions
       const filteredRecommendations = recommendations.filter(
-        rec => !dismissedSuggestions.has(rec.id)
+        rec => !dismissedSuggestions.has(rec.id),
       );
 
       setSuggestions(filteredRecommendations);
@@ -374,7 +374,7 @@ const TacticalSuggestionsOverlay: React.FC<TacticalSuggestionsOverlayProps> = ({
                   Avg. Confidence:{' '}
                   <span className="text-white font-semibold">
                     {Math.round(
-                      suggestions.reduce((sum, s) => sum + s.confidence, 0) / suggestions.length
+                      suggestions.reduce((sum, s) => sum + s.confidence, 0) / suggestions.length,
                     )}
                     %
                   </span>

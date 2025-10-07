@@ -91,7 +91,7 @@ export class GuardianSecureFileHandler {
     file: File,
     userId: string,
     teamId: string,
-    options: Partial<SecureImportOptions> = {}
+    options: Partial<SecureImportOptions> = {},
   ): Promise<{ success: boolean; formation?: TacticalFormation; errors: string[] }> {
     const importOptions = {
       validateStructure: true,
@@ -220,7 +220,7 @@ export class GuardianSecureFileHandler {
   async secureExport(
     formation: TacticalFormation,
     userId: string,
-    options: SecureExportOptions
+    options: SecureExportOptions,
   ): Promise<{ success: boolean; data?: Blob; errors: string[] }> {
     const errors: string[] = [];
 
@@ -286,7 +286,7 @@ export class GuardianSecureFileHandler {
       if (options.passwordProtect && options.password) {
         const encryptedData = encryptData(
           JSON.stringify(secureExportData),
-          DataClassification.CONFIDENTIAL
+          DataClassification.CONFIDENTIAL,
         );
         finalData = JSON.stringify({
           encrypted: true,
@@ -339,7 +339,7 @@ export class GuardianSecureFileHandler {
   private async validateFile(
     file: File,
     userId: string,
-    options: Partial<SecureFileOptions> = {}
+    options: Partial<SecureFileOptions> = {},
   ): Promise<FileValidationResult> {
     const opts = { ...this.defaultOptions, ...options };
     const errors: string[] = [];
@@ -412,7 +412,7 @@ export class GuardianSecureFileHandler {
 
     if (metadata.scanResults.suspiciousPatterns.length > 0) {
       warnings.push(
-        `Suspicious patterns detected: ${metadata.scanResults.suspiciousPatterns.join(', ')}`
+        `Suspicious patterns detected: ${metadata.scanResults.suspiciousPatterns.join(', ')}`,
       );
     }
 
@@ -464,7 +464,7 @@ export class GuardianSecureFileHandler {
    */
   private async performSecurityScan(
     content: string,
-    fileName: string
+    fileName: string,
   ): Promise<SecurityScanResult> {
     const suspiciousPatterns: string[] = [];
     let riskLevel: 'low' | 'medium' | 'high' | 'critical' = 'low';
@@ -530,7 +530,7 @@ export class GuardianSecureFileHandler {
   private canExportFormation(
     formation: TacticalFormation,
     userId: string,
-    classification: TacticalClassification
+    classification: TacticalClassification,
   ): boolean {
     // Check if user is the creator or has appropriate permissions
     if (formation.createdBy === userId) {
@@ -556,7 +556,7 @@ export class GuardianSecureFileHandler {
    */
   private sanitizeFormationForExport(
     formation: TacticalFormation,
-    options: SecureExportOptions
+    options: SecureExportOptions,
   ): Partial<TacticalFormation> {
     const sanitized: Partial<TacticalFormation> = {
       id: formation.id,
@@ -616,7 +616,7 @@ export class GuardianSecureFileHandler {
    */
   private async generatePDFExport(
     formation: Partial<TacticalFormation>,
-    options: SecureExportOptions
+    options: SecureExportOptions,
   ): Promise<string> {
     // This would typically use a PDF library like jsPDF
     // For now, return a simple text representation
@@ -632,7 +632,7 @@ ${options.watermark ? `Watermark: ${options.watermark}` : ''}`;
    */
   private async generateImageExport(
     formation: Partial<TacticalFormation>,
-    options: SecureExportOptions
+    options: SecureExportOptions,
   ): Promise<string> {
     // Generate SVG representation
     return `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300">

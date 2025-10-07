@@ -141,7 +141,7 @@ export const PersonalizationProvider: React.FC<{ children: ReactNode }> = ({ chi
 
   const getPreferenceValue = <T extends keyof UserPreferences>(
     category: T,
-    key: keyof UserPreferences[T]
+    key: keyof UserPreferences[T],
   ) => {
     return preferences[category][key];
   };
@@ -489,7 +489,7 @@ export const AccessibilityPreferences: React.FC<AccessibilityPreferencesProps> =
 
   const handleAccessibilityChange = (
     key: keyof UserPreferences['accessibility'],
-    value: unknown
+    value: unknown,
   ) => {
     updatePreferences({
       accessibility: { ...preferences.accessibility, [key]: value },

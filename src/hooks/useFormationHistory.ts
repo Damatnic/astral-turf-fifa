@@ -154,7 +154,7 @@ export interface UseFormationHistoryReturn {
 
 export function useFormationHistory(
   initialState: Omit<HistoryState, 'timestamp'>,
-  options: UseFormationHistoryOptions = {}
+  options: UseFormationHistoryOptions = {},
 ): UseFormationHistoryReturn {
   const { enableKeyboardShortcuts = true, onUndo, onRedo } = options;
 
@@ -265,7 +265,7 @@ export function useFormationHistory(
 export function createHistorySnapshot(
   formation: Formation | null,
   players: Player[],
-  drawings: DrawingShape[]
+  drawings: DrawingShape[],
 ): Omit<HistoryState, 'timestamp'> {
   return {
     formation: formation ? { ...formation } : null,

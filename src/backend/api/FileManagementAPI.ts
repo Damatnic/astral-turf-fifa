@@ -318,7 +318,7 @@ export class FileManagementAPI {
     this.router.post(
       '/upload/:category',
       this.upload.array('files', 10),
-      this.handleCategorizedUpload.bind(this)
+      this.handleCategorizedUpload.bind(this),
     );
 
     // File management endpoints
@@ -372,7 +372,7 @@ export class FileManagementAPI {
       () => {
         this.cleanupExpiredShares();
       },
-      60 * 60 * 1000
+      60 * 60 * 1000,
     );
 
     // Generate usage analytics every 6 hours
@@ -380,7 +380,7 @@ export class FileManagementAPI {
       () => {
         this.generateUsageAnalytics();
       },
-      6 * 60 * 60 * 1000
+      6 * 60 * 60 * 1000,
     );
   }
 
@@ -438,7 +438,7 @@ export class FileManagementAPI {
               isPublic: isPublic === 'true',
               tags: Array.isArray(tags) ? tags : tags.split(','),
               description,
-            }
+            },
           );
 
           uploadResults.push({
@@ -548,7 +548,7 @@ export class FileManagementAPI {
         ORDER BY ${sortBy} ${String(sortOrder).toUpperCase()}
         LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
       `,
-        [...params, limit, offset]
+        [...params, limit, offset],
       );
 
       // Get total count
@@ -556,7 +556,7 @@ export class FileManagementAPI {
         `
         SELECT COUNT(*) as total FROM file_metadata f ${whereClause}
       `,
-        params
+        params,
       );
 
       const total = parseInt(countResult.rows[0].total);
@@ -598,7 +598,7 @@ export class FileManagementAPI {
         LEFT JOIN users u ON f.uploaded_by = u.id
         WHERE f.id = $1
       `,
-        [id]
+        [id],
       );
 
       if (result.rows.length === 0) {
@@ -627,7 +627,7 @@ export class FileManagementAPI {
         SET last_accessed = NOW() 
         WHERE id = $1
       `,
-        [id]
+        [id],
       );
 
       res.json({
@@ -685,7 +685,7 @@ export class FileManagementAPI {
           SET download_count = download_count + 1, last_accessed = NOW() 
           WHERE id = $1
         `,
-          [id]
+          [id],
         );
 
         // Log download
@@ -811,7 +811,7 @@ export class FileManagementAPI {
 
   private async validateFile(
     file: Express.Multer.File,
-    config: FileUploadConfig
+    config: FileUploadConfig,
   ): Promise<{ isValid: boolean; error?: string }> {
     // Check file size
     if (file.size > config.maxFileSize) {
@@ -858,7 +858,7 @@ export class FileManagementAPI {
       isPublic: boolean;
       tags: string[];
       description?: string;
-    }
+    },
   ): Promise<FileMetadata> {
     const fileId = uuidv4();
     const filename = this.generateSecureFilename(file.originalname, fileId);
@@ -942,7 +942,7 @@ export class FileManagementAPI {
   }
 
   private async performSecurityScan(
-    file: Express.Multer.File
+    file: Express.Multer.File,
   ): Promise<{ isSecure: boolean; reason?: string }> {
     // Check for embedded executables
     const buffer = file.buffer;
@@ -997,7 +997,7 @@ export class FileManagementAPI {
   }
 
   private async validateFileType(
-    file: Express.Multer.File
+    file: Express.Multer.File,
   ): Promise<{ isValid: boolean; error?: string }> {
     // Additional type-specific validations
     if (file.mimetype.startsWith('image/')) {
@@ -1012,7 +1012,7 @@ export class FileManagementAPI {
   }
 
   private async validateImageFile(
-    file: Express.Multer.File
+    file: Express.Multer.File,
   ): Promise<{ isValid: boolean; error?: string }> {
     try {
       const image = sharp(file.buffer);
@@ -1038,14 +1038,14 @@ export class FileManagementAPI {
   }
 
   private async validateVideoFile(
-    file: Express.Multer.File
+    file: Express.Multer.File,
   ): Promise<{ isValid: boolean; error?: string }> {
     // Would use ffmpeg or similar for video validation
     return { isValid: true };
   }
 
   private async validatePDFFile(
-    file: Express.Multer.File
+    file: Express.Multer.File,
   ): Promise<{ isValid: boolean; error?: string }> {
     // Basic PDF validation
     const buffer = file.buffer;
@@ -1095,7 +1095,7 @@ export class FileManagementAPI {
       category,
       String(year),
       month,
-      filename
+      filename,
     );
   }
 
@@ -1114,7 +1114,7 @@ export class FileManagementAPI {
 
   private async extractFileMetadata(
     file: Express.Multer.File,
-    filePath: string
+    filePath: string,
   ): Promise<ExtractedMetadata> {
     const metadata: ExtractedMetadata = {};
 
@@ -1166,7 +1166,7 @@ export class FileManagementAPI {
         metadata.downloadCount,
         metadata.storageProvider,
         JSON.stringify(metadata.extractedMetadata),
-      ]
+      ],
     );
   }
 
@@ -1269,7 +1269,7 @@ export class FileManagementAPI {
           log.userAgent,
           log.success,
           log.errorMessage,
-        ]
+        ],
       );
     } catch (error: any) {
       console.error('Failed to log file access:', error);
@@ -1308,7 +1308,7 @@ export class FileManagementAPI {
   private async processImage(
     fileId: string,
     metadata: FileMetadata,
-    config: FileUploadConfig
+    config: FileUploadConfig,
   ): Promise<void> {
     try {
       const filePath = metadata.path;
@@ -1341,7 +1341,7 @@ export class FileManagementAPI {
           SET thumbnail_url = $1 
           WHERE id = $2
         `,
-          [thumbnailPath, fileId]
+          [thumbnailPath, fileId],
         );
       }
     } catch (error: any) {
@@ -1580,7 +1580,7 @@ export class FileManagementAPI {
         `
         SELECT * FROM file_metadata WHERE id = $1
       `,
-        [id]
+        [id],
       );
 
       if (fileResult.rows.length === 0) {
@@ -1628,7 +1628,7 @@ export class FileManagementAPI {
           ORDER BY version DESC
           LIMIT 10
         `,
-          [id]
+          [id],
         );
 
         metadata.versionHistory = versionsResult.rows.map((v: any) => ({
@@ -1652,7 +1652,7 @@ export class FileManagementAPI {
           ORDER BY created_at DESC
           LIMIT 10
         `,
-          [id]
+          [id],
         );
 
         metadata.activeShares = sharesResult.rows.map((s: any) => ({
@@ -1678,7 +1678,7 @@ export class FileManagementAPI {
           ORDER BY timestamp DESC
           LIMIT 20
         `,
-          [id]
+          [id],
         );
 
         metadata.recentAccess = accessLogResult.rows;
@@ -1753,7 +1753,7 @@ export class FileManagementAPI {
         `
         SELECT * FROM file_metadata WHERE id = $1
       `,
-        [id]
+        [id],
       );
 
       if (fileResult.rows.length === 0) {
@@ -1774,7 +1774,7 @@ export class FileManagementAPI {
         `
         SELECT COUNT(*) FROM file_versions WHERE file_id = $1
       `,
-        [id]
+        [id],
       );
 
       const total = parseInt(countResult.rows[0].count);
@@ -1798,7 +1798,7 @@ export class FileManagementAPI {
         ORDER BY fv.version DESC
         LIMIT $2 OFFSET $3
       `,
-        [id, limit, offset]
+        [id, limit, offset],
       );
 
       const versions = versionsResult.rows.map((v: any, index: number) => {
@@ -1827,7 +1827,7 @@ export class FileManagementAPI {
 
             if (index < versionsResult.rows.length - 1) {
               const prevSnapshot = JSON.parse(
-                versionsResult.rows[index + 1].metadata_snapshot || '{}'
+                versionsResult.rows[index + 1].metadata_snapshot || '{}',
               );
               version.diff = this.calculateMetadataDiff(prevSnapshot, snapshot);
             }
@@ -1875,7 +1875,7 @@ export class FileManagementAPI {
         `
         SELECT * FROM file_metadata WHERE id = $1
       `,
-        [id]
+        [id],
       );
 
       if (fileResult.rows.length === 0) {
@@ -1979,7 +1979,7 @@ export class FileManagementAPI {
           changeSummary,
           changeType,
           JSON.stringify(metadataSnapshot),
-        ]
+        ],
       );
 
       // Update file's current version
@@ -1989,7 +1989,7 @@ export class FileManagementAPI {
         SET version = $1, last_modified = NOW()
         WHERE id = $2
       `,
-        [newVersion, id]
+        [newVersion, id],
       );
 
       // File versioning and backup implementation
@@ -2064,7 +2064,7 @@ export class FileManagementAPI {
         `
         SELECT * FROM file_metadata WHERE id = $1
       `,
-        [id]
+        [id],
       );
 
       if (fileResult.rows.length === 0) {
@@ -2092,7 +2092,7 @@ export class FileManagementAPI {
         SELECT * FROM file_versions 
         WHERE file_id = $1 AND version = $2
       `,
-        [id, targetVersion]
+        [id, targetVersion],
       );
 
       if (versionResult.rows.length === 0) {
@@ -2133,7 +2133,7 @@ export class FileManagementAPI {
             `Backup before restore to version ${targetVersion}`,
             'backup',
             JSON.stringify(backupMetadata),
-          ]
+          ],
         );
       }
 
@@ -2175,7 +2175,7 @@ export class FileManagementAPI {
           restoredMetadata.description || file.description,
           restoredMetadata.isPublic !== undefined ? restoredMetadata.isPublic : file.is_public,
           id,
-        ]
+        ],
       );
 
       // Restore file from version backup
@@ -2274,7 +2274,7 @@ export class FileManagementAPI {
             `
             SELECT * FROM file_metadata WHERE id = $1
           `,
-            [fileId]
+            [fileId],
           );
 
           if (fileResult.rows.length === 0) {
@@ -2319,7 +2319,7 @@ export class FileManagementAPI {
                 deleted_by = $2
               WHERE id = $1
             `,
-              [fileId, req.user?.id]
+              [fileId, req.user?.id],
             );
           }
 
@@ -2454,7 +2454,7 @@ export class FileManagementAPI {
             `
             SELECT * FROM file_metadata WHERE id = $1
           `,
-            [fileId]
+            [fileId],
           );
 
           if (fileResult.rows.length === 0) {
@@ -2478,7 +2478,7 @@ export class FileManagementAPI {
               SET category = $1, last_modified = NOW()
               WHERE id = $2
             `,
-              [targetCategory, fileId]
+              [targetCategory, fileId],
             );
 
             // Move physical file to category-specific folder in cloud storage
@@ -2509,7 +2509,7 @@ export class FileManagementAPI {
               FROM file_metadata
               WHERE id = $4
             `,
-              [newId, req.user?.id, targetCategory, fileId]
+              [newId, req.user?.id, targetCategory, fileId],
             );
 
             // Copy physical file in cloud storage for duplicate
@@ -2657,7 +2657,7 @@ export class FileManagementAPI {
             `
             SELECT * FROM file_metadata WHERE id = $1
           `,
-            [fileId]
+            [fileId],
           );
 
           if (fileResult.rows.length === 0) {
@@ -2700,7 +2700,7 @@ export class FileManagementAPI {
             SET tags = $1, last_modified = NOW()
             WHERE id = $2
           `,
-            [newTags, fileId]
+            [newTags, fileId],
           );
 
           // Log action
@@ -3486,7 +3486,7 @@ export class FileManagementAPI {
         `
       SELECT * FROM file_metadata WHERE id = $1
     `,
-        [id]
+        [id],
       );
 
       if (fileResult.rows.length === 0) {
@@ -3727,7 +3727,7 @@ export class FileManagementAPI {
         `
       SELECT * FROM file_metadata WHERE id = $1
     `,
-        [id]
+        [id],
       );
 
       if (fileResult.rows.length === 0) {
@@ -3834,7 +3834,7 @@ export class FileManagementAPI {
         WHERE id = $1
         RETURNING *
       `,
-          [id, req.user?.id || null]
+          [id, req.user?.id || null],
         );
 
         const deletedFile = result.rows[0];
@@ -3846,7 +3846,7 @@ export class FileManagementAPI {
         SET is_active = false 
         WHERE file_id = $1 AND is_active = true
       `,
-          [id]
+          [id],
         );
 
         // Log the soft deletion
@@ -3928,7 +3928,7 @@ export class FileManagementAPI {
         `
       SELECT * FROM file_metadata WHERE id = $1
     `,
-        [id]
+        [id],
       );
 
       if (fileResult.rows.length === 0) {
@@ -3989,7 +3989,7 @@ export class FileManagementAPI {
           errors.push('Maximum 50 allowed domains');
         } else if (
           !allowedDomains.every(
-            (domain: any) => typeof domain === 'string' && /^[\w.-]+\.[a-z]{2,}$/i.test(domain)
+            (domain: any) => typeof domain === 'string' && /^[\w.-]+\.[a-z]{2,}$/i.test(domain),
           )
         ) {
           errors.push('Each allowed domain must be a valid domain name');
@@ -4038,7 +4038,7 @@ export class FileManagementAPI {
           hashedPassword,
           allowedDomains ? JSON.stringify(allowedDomains) : null,
           requireAuth || false,
-        ]
+        ],
       );
 
       const share = shareResult.rows[0];
@@ -4148,7 +4148,7 @@ export class FileManagementAPI {
       LEFT JOIN users u ON fs.user_id = u.id
       WHERE fs.share_token = $1
     `,
-        [token]
+        [token],
       );
 
       if (shareResult.rows.length === 0) {
@@ -4177,7 +4177,7 @@ export class FileManagementAPI {
           `
         UPDATE file_shares SET is_active = false WHERE id = $1
       `,
-          [share.id]
+          [share.id],
         );
 
         res.status(403).json({
@@ -4207,7 +4207,7 @@ export class FileManagementAPI {
         if (allowedDomainsList.length > 0 && referer) {
           const refererDomain = new URL(referer).hostname;
           const isAllowed = allowedDomainsList.some(
-            (domain: string) => refererDomain === domain || refererDomain.endsWith('.' + domain)
+            (domain: string) => refererDomain === domain || refererDomain.endsWith('.' + domain),
           );
 
           if (!isAllowed) {
@@ -4300,7 +4300,7 @@ export class FileManagementAPI {
       JOIN file_metadata f ON fs.file_id = f.id
       WHERE fs.share_token = $1
     `,
-        [token]
+        [token],
       );
 
       if (shareResult.rows.length === 0) {
@@ -4328,7 +4328,7 @@ export class FileManagementAPI {
           `
         UPDATE file_shares SET is_active = false WHERE id = $1
       `,
-          [share.id]
+          [share.id],
         );
 
         res.status(403).json({
@@ -4385,7 +4385,7 @@ export class FileManagementAPI {
         if (allowedDomainsList.length > 0 && referer) {
           const refererDomain = new URL(referer).hostname;
           const isAllowed = allowedDomainsList.some(
-            (domain: string) => refererDomain === domain || refererDomain.endsWith('.' + domain)
+            (domain: string) => refererDomain === domain || refererDomain.endsWith('.' + domain),
           );
 
           if (!isAllowed) {
@@ -4417,7 +4417,7 @@ export class FileManagementAPI {
       SET download_count = download_count + 1, last_downloaded = NOW()
       WHERE id = $1
     `,
-        [share.id]
+        [share.id],
       );
 
       // Also update file metadata
@@ -4427,7 +4427,7 @@ export class FileManagementAPI {
       SET download_count = download_count + 1, last_accessed = NOW() 
       WHERE id = $1
     `,
-        [share.file_id]
+        [share.file_id],
       );
 
       // Log download

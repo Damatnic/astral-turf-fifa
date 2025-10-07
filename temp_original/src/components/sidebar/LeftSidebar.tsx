@@ -149,7 +149,7 @@ const PlayerListItem: React.FC<PlayerListItemProps> = React.memo(
         </div>
       </li>
     );
-  }
+  },
 );
 
 const CreatePlaybookItemForm: React.FC<{
@@ -229,7 +229,7 @@ export const LeftSidebar: React.FC = () => {
 
   const playersInContext = useMemo(
     () => players.filter(p => activeTeamContext === 'both' || p.team === activeTeamContext),
-    [players, activeTeamContext]
+    [players, activeTeamContext],
   );
 
   const sortedPlayers = useMemo(() => {
@@ -272,7 +272,7 @@ export const LeftSidebar: React.FC = () => {
       const step = item?.steps[activeStepIndex];
       if (step) {
         return new Set(
-          Object.keys(step.playerPositions).filter(pId => step.playerPositions[pId].x > -1)
+          Object.keys(step.playerPositions).filter(pId => step.playerPositions[pId].x > -1),
         );
       }
     }
@@ -300,11 +300,11 @@ export const LeftSidebar: React.FC = () => {
 
   const onFieldPlayers = useMemo(
     () => sortedPlayers.filter(p => playersOnFieldIds.has(p.id)),
-    [sortedPlayers, playersOnFieldIds]
+    [sortedPlayers, playersOnFieldIds],
   );
   const benchedPlayers = useMemo(
     () => sortedPlayers.filter(p => !playersOnFieldIds.has(p.id)),
-    [sortedPlayers, playersOnFieldIds]
+    [sortedPlayers, playersOnFieldIds],
   );
 
   const handleFormationChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -370,7 +370,7 @@ export const LeftSidebar: React.FC = () => {
       const playersForSuggestion = players.filter(p => p.team === activeTeam);
       const suggestion = await getAIFormationSuggestion(
         playersForSuggestion,
-        settings.aiPersonality
+        settings.aiPersonality,
       );
       uiDispatch({ type: 'SUGGEST_FORMATION_SUCCESS', payload: suggestion });
     } catch (error) {
@@ -396,7 +396,7 @@ export const LeftSidebar: React.FC = () => {
         (acc[item.category] = acc[item.category] || []).push(item);
         return acc;
       },
-      {} as Record<PlayCategory, PlaybookItem[]>
+      {} as Record<PlayCategory, PlaybookItem[]>,
     );
   }, [playbook]);
 

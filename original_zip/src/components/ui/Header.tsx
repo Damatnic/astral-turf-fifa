@@ -113,7 +113,7 @@ export const Header: React.FC = () => {
             onClick={() => {
               if (
                 confirm(
-                  'Are you sure you want to reset the current tactic board? This will reset player positions and drawings.'
+                  'Are you sure you want to reset the current tactic board? This will reset player positions and drawings.',
                 )
               ) {
                 dispatch({ type: 'SOFT_RESET_APP' });

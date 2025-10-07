@@ -653,14 +653,14 @@ export const useHapticFeedback = () => {
         return hapticManager.current.vibrate(pattern);
       }
     },
-    [capabilities.hasHapticFeedback]
+    [capabilities.hasHapticFeedback],
   );
 
   const tacticalFeedback = useCallback(
     (action: 'select' | 'move' | 'formation_change' | 'success' | 'error') => {
       return hapticManager.current.tacticalFeedback(action);
     },
-    []
+    [],
   );
 
   const adaptiveFeedback = useCallback(
@@ -672,7 +672,7 @@ export const useHapticFeedback = () => {
     }) => {
       return hapticManager.current.adaptiveFeedback(context);
     },
-    []
+    [],
   );
 
   return {

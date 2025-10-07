@@ -183,7 +183,7 @@ export function useAdvancedTacticsBoard(): AdvancedTacticsBoardState & AdvancedT
 
       return true;
     },
-    [players, formations, activeFormationIds]
+    [players, formations, activeFormationIds],
   );
 
   // Get magnetic snap position for smooth snapping
@@ -198,7 +198,7 @@ export function useAdvancedTacticsBoard(): AdvancedTacticsBoardState & AdvancedT
         }
 
         const distance = Math.sqrt(
-          Math.pow(position.x - slot.position.x, 2) + Math.pow(position.y - slot.position.y, 2)
+          Math.pow(position.x - slot.position.x, 2) + Math.pow(position.y - slot.position.y, 2),
         );
 
         if (distance < minDistance) {
@@ -209,7 +209,7 @@ export function useAdvancedTacticsBoard(): AdvancedTacticsBoardState & AdvancedT
 
       return snapPosition;
     },
-    []
+    [],
   );
 
   // Get valid drop zones with magnetic zones
@@ -267,7 +267,7 @@ export function useAdvancedTacticsBoard(): AdvancedTacticsBoardState & AdvancedT
 
       return { valid: validZones, magnetic: magneticZones };
     },
-    [players, formations, activeFormationIds, validateDrop]
+    [players, formations, activeFormationIds, validateDrop],
   );
 
   // Enhanced drag start with multi-touch support
@@ -365,7 +365,7 @@ export function useAdvancedTacticsBoard(): AdvancedTacticsBoardState & AdvancedT
         console.error('Failed to start drag operation:', error);
       }
     },
-    [drawingTool, getValidDropZones]
+    [drawingTool, getValidDropZones],
   );
 
   // Multi-select functionality
@@ -386,7 +386,7 @@ export function useAdvancedTacticsBoard(): AdvancedTacticsBoardState & AdvancedT
 
       const startPos = multiSelectStartRef.current;
       const distance = Math.sqrt(
-        Math.pow(currentPosition.x - startPos.x, 2) + Math.pow(currentPosition.y - startPos.y, 2)
+        Math.pow(currentPosition.x - startPos.x, 2) + Math.pow(currentPosition.y - startPos.y, 2),
       );
 
       if (distance > MULTI_SELECT_THRESHOLD) {
@@ -417,7 +417,7 @@ export function useAdvancedTacticsBoard(): AdvancedTacticsBoardState & AdvancedT
         }));
       }
     },
-    [players]
+    [players],
   );
 
   const endMultiSelect = useCallback(() => {
@@ -471,7 +471,7 @@ export function useAdvancedTacticsBoard(): AdvancedTacticsBoardState & AdvancedT
         navigator.vibrate(10);
       }
     },
-    [validateDrop]
+    [validateDrop],
   );
 
   const handleSlotDragLeave = useCallback(() => {
@@ -522,7 +522,7 @@ export function useAdvancedTacticsBoard(): AdvancedTacticsBoardState & AdvancedT
           // Multi-player assignment logic
           const availableSlots =
             formations?.[activeFormationIds?.[team]]?.slots?.filter(
-              s => !s.playerId && validateDrop(playerId, s.id)
+              s => !s.playerId && validateDrop(playerId, s.id),
             ) || [];
 
           boardState.multiSelectPlayers.forEach((pid, index) => {
@@ -543,7 +543,7 @@ export function useAdvancedTacticsBoard(): AdvancedTacticsBoardState & AdvancedT
 
             if (draggedPlayer?.name && occupyingPlayer?.name) {
               const shouldSwap = window.confirm(
-                `Swap ${draggedPlayer.name} with ${occupyingPlayer.name}?`
+                `Swap ${draggedPlayer.name} with ${occupyingPlayer.name}?`,
               );
 
               if (shouldSwap) {
@@ -574,7 +574,7 @@ export function useAdvancedTacticsBoard(): AdvancedTacticsBoardState & AdvancedT
       boardState.multiSelectPlayers,
       formations,
       activeFormationIds,
-    ]
+    ],
   );
 
   // Enhanced field drop with magnetic snapping
@@ -670,7 +670,7 @@ export function useAdvancedTacticsBoard(): AdvancedTacticsBoardState & AdvancedT
       formations,
       activeFormationIds,
       getMagneticSnapPosition,
-    ]
+    ],
   );
 
   // Multi-selection management

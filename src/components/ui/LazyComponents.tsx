@@ -18,7 +18,7 @@ interface LazyLoadOptions {
  */
 export function lazyLoad<T extends ComponentType<any>>(
   importFunc: () => Promise<{ default: T }>,
-  options: LazyLoadOptions = {}
+  options: LazyLoadOptions = {},
 ): React.LazyExoticComponent<T> {
   const {
     delay = 0,
@@ -40,7 +40,7 @@ export function lazyLoad<T extends ComponentType<any>>(
         }
 
         return moduleExports;
-      }
+      },
     );
   });
 }
@@ -237,7 +237,7 @@ export function LazyComponent({
  * Call this on user interaction (hover, click) to preload before navigation
  */
 export function preloadComponent<T extends ComponentType<any>>(
-  lazyComponent: React.LazyExoticComponent<T>
+  lazyComponent: React.LazyExoticComponent<T>,
 ): void {
   // Access the _payload to trigger the load
   const payload = (lazyComponent as any)._payload;
@@ -287,7 +287,7 @@ export function ProgressiveHydration({
         () => {
           setShouldRender(true);
         },
-        { timeout: delay + 1000 }
+        { timeout: delay + 1000 },
       );
       return () => cancelIdleCallback(handle);
     } else {

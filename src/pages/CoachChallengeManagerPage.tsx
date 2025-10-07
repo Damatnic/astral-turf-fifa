@@ -92,7 +92,7 @@ const CoachChallengeManagerPage: React.FC = () => {
     playerId: string,
     challengeId: string,
     approved: boolean,
-    notes?: string
+    notes?: string,
   ) => {
     dispatch({
       type: 'REVIEW_CHALLENGE',
@@ -129,7 +129,7 @@ const CoachChallengeManagerPage: React.FC = () => {
     tacticsState.players.forEach(player => {
       const progress = challengeService.getPlayerProgress(player.id);
       const activeCoachChallenges = progress.filter(
-        p => p.status === 'active' && coachChallenges.some(c => c.id === p.challengeId)
+        p => p.status === 'active' && coachChallenges.some(c => c.id === p.challengeId),
       );
       stats.activeAssignments += activeCoachChallenges.length;
     });
@@ -326,7 +326,7 @@ const CoachChallengeManagerPage: React.FC = () => {
                           </div>
                           <p className="text-sm text-gray-400">Create a {category} challenge</p>
                         </button>
-                      )
+                      ),
                     )}
                   </div>
                 </div>
@@ -501,7 +501,7 @@ const CoachChallengeManagerPage: React.FC = () => {
                           progress.playerId,
                           progress.challengeId,
                           false,
-                          notes
+                          notes,
                         )
                       }
                     />
@@ -627,7 +627,7 @@ const CoachChallengeManagerPage: React.FC = () => {
                     {tacticsState.players.map(player => {
                       const progress = challengeService.getPlayerProgress(player.id);
                       const coachProgress = progress.filter(p =>
-                        coachChallenges.some(c => c.id === p.challengeId)
+                        coachChallenges.some(c => c.id === p.challengeId),
                       );
                       const completed = coachProgress.filter(p => p.status === 'completed').length;
                       const active = coachProgress.filter(p => p.status === 'active').length;
@@ -675,11 +675,11 @@ const CoachChallengeManagerPage: React.FC = () => {
                       tacticsState.players.forEach(player => {
                         const progress = challengeService.getPlayerProgress(player.id);
                         const challengeProgress = progress.filter(
-                          p => p.challengeId === challenge.id
+                          p => p.challengeId === challenge.id,
                         );
                         attempts += challengeProgress.length;
                         completions += challengeProgress.filter(
-                          p => p.status === 'completed'
+                          p => p.status === 'completed',
                         ).length;
                       });
 

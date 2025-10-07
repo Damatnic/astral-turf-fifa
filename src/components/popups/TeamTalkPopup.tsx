@@ -16,10 +16,10 @@ const TeamTalkPopup: React.FC = () => {
     franchiseState.lastMatchResult === null &&
     uiState.simulationTimeline.some((e: any) => e.minute >= 45);
   const homeScore = uiState.simulationTimeline.filter(
-    (e: any) => 'type' in e && e.type === 'Goal' && e.team === 'home'
+    (e: any) => 'type' in e && e.type === 'Goal' && e.team === 'home',
   ).length;
   const awayScore = uiState.simulationTimeline.filter(
-    (e: any) => 'type' in e && e.type === 'Goal' && e.team === 'away'
+    (e: any) => 'type' in e && e.type === 'Goal' && e.team === 'away',
   ).length;
 
   useEffect(() => {
@@ -34,13 +34,13 @@ const TeamTalkPopup: React.FC = () => {
         opponentName,
         isHalftime,
         currentScore,
-        settings.aiPersonality
+        settings.aiPersonality,
       )
         .then(data =>
           (dispatch as (action: { type: string; payload?: unknown }) => void)({
             type: 'GET_TEAM_TALK_OPTIONS_SUCCESS',
             payload: data,
-          })
+          }),
         )
         .catch(err => {
           console.error(err);

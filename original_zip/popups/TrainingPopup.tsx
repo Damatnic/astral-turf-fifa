@@ -82,7 +82,7 @@ const TrainingPopup: React.FC = () => {
   const [selectedDay, setSelectedDay] = useState<keyof WeeklySchedule>('monday');
   const [selectedSession, setSelectedSession] = useState<'morning' | 'afternoon'>('morning');
   const [selectedDrillType, setSelectedDrillType] = useState<'warmup' | 'main' | 'cooldown'>(
-    'warmup'
+    'warmup',
   );
   const [selectedCategory, setSelectedCategory] = useState<TrainingDrillCategory>('attacking');
   const [weeklySchedule, setWeeklySchedule] = useState<WeeklySchedule>({
@@ -130,7 +130,7 @@ const TrainingPopup: React.FC = () => {
       ? drill.category === 'warmup'
       : selectedDrillType === 'cooldown'
         ? drill.category === 'cooldown'
-        : drill.category === selectedCategory
+        : drill.category === selectedCategory,
   );
 
   const handleDrillSelect = (drill: TrainingDrill) => {
@@ -467,7 +467,7 @@ const TrainingPopup: React.FC = () => {
                         onSelect={() => {}}
                         isSelected={false}
                       />
-                    )
+                    ),
                   )}
                 </div>
               </div>

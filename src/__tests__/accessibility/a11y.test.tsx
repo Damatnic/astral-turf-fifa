@@ -77,7 +77,7 @@ describe('Accessibility Testing', () => {
           <Layout>
             <div>Test Content</div>
           </Layout>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       // Check for semantic elements
@@ -96,7 +96,7 @@ describe('Accessibility Testing', () => {
             <h2>Section Title</h2>
             <h3>Subsection Title</h3>
           </Layout>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       const h1 = container.querySelector('h1');
@@ -118,7 +118,7 @@ describe('Accessibility Testing', () => {
             <button>Button 2</button>
             <input type="text" placeholder="Test input" />
           </Layout>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       const buttons = screen.getAllByRole('button');
@@ -140,7 +140,7 @@ describe('Accessibility Testing', () => {
           <Layout>
             <button>Focus Test</button>
           </Layout>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       const button = container.querySelector('button');
@@ -159,7 +159,7 @@ describe('Accessibility Testing', () => {
             <button aria-label="Close modal">×</button>
             <input type="text" aria-label="Search" />
           </Layout>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       const buttonWithLabel = screen.getByLabelText('Close modal');
@@ -180,7 +180,7 @@ describe('Accessibility Testing', () => {
               <p>Main content</p>
             </div>
           </Layout>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       const navigation = container.querySelector('[role="navigation"]');
@@ -203,7 +203,7 @@ describe('Accessibility Testing', () => {
               Success
             </div>
           </Layout>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       const errorMessage = screen.getByLabelText('Error message');
@@ -222,7 +222,7 @@ describe('Accessibility Testing', () => {
               <rect width="100" height="100" />
             </svg>
           </Layout>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       const image = container.querySelector('img');
@@ -245,7 +245,7 @@ describe('Accessibility Testing', () => {
             <button aria-describedby="button-help">Submit</button>
             <div id="button-help">Click to submit the form</div>
           </Layout>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       const button = screen.getByRole('button', { name: /submit/i });
@@ -266,7 +266,7 @@ describe('Accessibility Testing', () => {
               No alerts
             </div>
           </Layout>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       const politeRegion = container.querySelector('[aria-live="polite"]');
@@ -290,7 +290,7 @@ describe('Accessibility Testing', () => {
               </div>
             </form>
           </Layout>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       const emailInput = screen.getByLabelText('Email Address');
@@ -317,7 +317,7 @@ describe('Accessibility Testing', () => {
           <Layout>
             <button>Mobile Button</button>
           </Layout>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       const mobileLayout = container.firstChild as HTMLElement;
@@ -337,7 +337,7 @@ describe('Accessibility Testing', () => {
           <Layout>
             <button>Touch Button</button>
           </Layout>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       const button = screen.getByRole('button', { name: /touch button/i });

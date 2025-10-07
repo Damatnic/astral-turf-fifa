@@ -92,7 +92,7 @@ describe('Performance Testing', () => {
             <Layout>
               <div>Test Content</div>
             </Layout>
-          </BrowserRouter>
+          </BrowserRouter>,
         );
       });
 
@@ -122,7 +122,7 @@ describe('Performance Testing', () => {
           <Layout>
             <div>Initial Content</div>
           </Layout>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       const updateTime = await measurePerformance(() => {
@@ -131,7 +131,7 @@ describe('Performance Testing', () => {
             <Layout>
               <div>Updated Content</div>
             </Layout>
-          </BrowserRouter>
+          </BrowserRouter>,
         );
       });
 
@@ -147,7 +147,7 @@ describe('Performance Testing', () => {
           <Layout>
             <div>Test</div>
           </Layout>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       // Simulate multiple rerenders
@@ -160,7 +160,7 @@ describe('Performance Testing', () => {
             <Layout>
               <div key={i}>Test {i}</div>
             </Layout>
-          </BrowserRouter>
+          </BrowserRouter>,
         );
       }
 
@@ -184,7 +184,7 @@ describe('Performance Testing', () => {
           <Layout>
             <div>Test</div>
           </Layout>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       // Count initial event listeners (use custom tracking if needed)
@@ -208,7 +208,7 @@ describe('Performance Testing', () => {
             <Layout>
               <div className="animate-spin">Loading...</div>
             </Layout>
-          </BrowserRouter>
+          </BrowserRouter>,
         );
 
         await waitFor(() => {
@@ -236,7 +236,7 @@ describe('Performance Testing', () => {
           <Layout>
             <div className="transition-all duration-300">Animated content</div>
           </Layout>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       // Simulate multiple animation frames
@@ -263,7 +263,7 @@ describe('Performance Testing', () => {
       const LazyComponent = React.lazy(() =>
         Promise.resolve({
           default: () => React.createElement('div', null, 'Lazy Component'),
-        })
+        }),
       );
 
       expect(() => {
@@ -271,8 +271,8 @@ describe('Performance Testing', () => {
           React.createElement(
             React.Suspense,
             { fallback: React.createElement('div', null, 'Loading...') },
-            React.createElement(LazyComponent)
-          )
+            React.createElement(LazyComponent),
+          ),
         );
       }).not.toThrow();
     });
@@ -309,7 +309,7 @@ describe('Performance Testing', () => {
             <Layout>
               <div>Offline Content</div>
             </Layout>
-          </BrowserRouter>
+          </BrowserRouter>,
         );
       });
 
@@ -364,7 +364,7 @@ describe('Performance Testing', () => {
                 alt="Test"
               />
             </Layout>
-          </BrowserRouter>
+          </BrowserRouter>,
         );
       });
 
@@ -378,7 +378,7 @@ describe('Performance Testing', () => {
           <Layout>
             <div className="font-sans">Text with web font</div>
           </Layout>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       const textElement = container.querySelector('.font-sans');

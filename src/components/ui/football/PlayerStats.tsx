@@ -88,7 +88,7 @@ export const PlayerStats = forwardRef<HTMLDivElement, PlayerStatsProps>(
       onAttributeChange,
       ...props
     },
-    ref
+    ref,
   ) => {
     const groupedAttributes = player.attributes.reduce(
       (acc, attr) => {
@@ -98,7 +98,7 @@ export const PlayerStats = forwardRef<HTMLDivElement, PlayerStatsProps>(
         acc[attr.category].push(attr);
         return acc;
       },
-      {} as Record<string, PlayerAttribute[]>
+      {} as Record<string, PlayerAttribute[]>,
     );
 
     const getRatingColor = (rating: number) => {
@@ -260,7 +260,7 @@ export const PlayerStats = forwardRef<HTMLDivElement, PlayerStatsProps>(
                       <span
                         className={cn(
                           'text-sm',
-                          attr.important ? 'font-medium text-white' : 'text-secondary-400'
+                          attr.important ? 'font-medium text-white' : 'text-secondary-400',
                         )}
                       >
                         {attr.name}
@@ -450,7 +450,7 @@ export const PlayerStats = forwardRef<HTMLDivElement, PlayerStatsProps>(
         )}
       </div>
     );
-  }
+  },
 );
 
 PlayerStats.displayName = 'PlayerStats';

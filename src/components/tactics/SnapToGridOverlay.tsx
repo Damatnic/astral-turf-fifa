@@ -20,7 +20,7 @@ const SnapToGridOverlay: React.FC<SnapToGridOverlayProps> = ({
 }) => {
   // Generate grid lines
   const gridLines = useMemo(() => {
-    if (!isVisible || gridSize === 0) return { vertical: [], horizontal: [] };
+    if (!isVisible || gridSize === 0) {return { vertical: [], horizontal: [] };}
 
     const vertical: number[] = [];
     const horizontal: number[] = [];
@@ -52,7 +52,7 @@ const SnapToGridOverlay: React.FC<SnapToGridOverlayProps> = ({
     return [...snapPoints, ...tacticalZones];
   }, [snapPoints, tacticalZones]);
 
-  if (!isVisible) return null;
+  if (!isVisible) {return null;}
 
   return (
     <div className="absolute inset-0 pointer-events-none">
@@ -103,7 +103,7 @@ const SnapToGridOverlay: React.FC<SnapToGridOverlayProps> = ({
             strokeWidth="1"
             strokeDasharray="8 4"
           />
-          
+
           {/* Middle Third */}
           <rect
             x="0%"
@@ -115,7 +115,7 @@ const SnapToGridOverlay: React.FC<SnapToGridOverlayProps> = ({
             strokeWidth="1"
             strokeDasharray="8 4"
           />
-          
+
           {/* Attacking Third */}
           <rect
             x="0%"
@@ -131,7 +131,7 @@ const SnapToGridOverlay: React.FC<SnapToGridOverlayProps> = ({
 
         {/* Snap Points */}
         {allSnapPoints.map((point, index) => {
-          const isHighlighted = 
+          const isHighlighted =
             highlightedPoint &&
             Math.abs(highlightedPoint.x - point.x) < 3 &&
             Math.abs(highlightedPoint.y - point.y) < 3;
@@ -179,7 +179,7 @@ const SnapToGridOverlay: React.FC<SnapToGridOverlayProps> = ({
       {showLabels && (
         <div className="absolute inset-0">
           {allSnapPoints.filter(p => p.label).map((point, index) => {
-            const isHighlighted = 
+            const isHighlighted =
               highlightedPoint &&
               Math.abs(highlightedPoint.x - point.x) < 3 &&
               Math.abs(highlightedPoint.y - point.y) < 3;
@@ -188,9 +188,9 @@ const SnapToGridOverlay: React.FC<SnapToGridOverlayProps> = ({
               <motion.div
                 key={`label-${index}`}
                 initial={{ opacity: 0, scale: 0 }}
-                animate={{ 
-                  opacity: isHighlighted ? 1 : 0.5, 
-                  scale: isHighlighted ? 1.2 : 1 
+                animate={{
+                  opacity: isHighlighted ? 1 : 0.5,
+                  scale: isHighlighted ? 1.2 : 1,
                 }}
                 style={{
                   position: 'absolute',
@@ -202,8 +202,8 @@ const SnapToGridOverlay: React.FC<SnapToGridOverlayProps> = ({
               >
                 <div className={`
                   px-2 py-1 rounded-md text-xs font-bold
-                  ${isHighlighted 
-                    ? 'bg-blue-500 text-white shadow-lg' 
+                  ${isHighlighted
+                    ? 'bg-blue-500 text-white shadow-lg'
                     : 'bg-gray-800/80 text-gray-300'
                   }
                   transition-all duration-200
@@ -257,7 +257,7 @@ const SnapToGridOverlay: React.FC<SnapToGridOverlayProps> = ({
               className="absolute inset-0 rounded-full bg-blue-500"
               style={{ width: '40px', height: '40px', marginLeft: '-20px', marginTop: '-20px' }}
             />
-            
+
             {/* Center Dot */}
             <div className="relative w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-lg" />
           </div>

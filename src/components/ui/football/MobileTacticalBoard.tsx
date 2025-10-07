@@ -47,7 +47,7 @@ export const MobileTacticalBoard: React.FC<MobileTacticalBoardProps> = ({
         return Math.min(maxZoom, Math.max(minZoom, newZoom));
       });
     },
-    { pinchThreshold: 0.05 }
+    { pinchThreshold: 0.05 },
   );
 
   // Handle swipe and tap gestures
@@ -83,7 +83,7 @@ export const MobileTacticalBoard: React.FC<MobileTacticalBoardProps> = ({
         (containerRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
       }
     },
-    [gestureRef]
+    [gestureRef],
   );
 
   // Zoom controls for mobile

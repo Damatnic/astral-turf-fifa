@@ -79,13 +79,13 @@ const PlayerCardExport: React.FC<PlayerCardExportProps> = ({
 
       // Convert to base64
       const imageData = canvas.toDataURL('image/png');
-      
+
       // In a real app, upload to server and get URL
       // For now, create a shareable text with card info
       const shareText = `Check out my ${rarity} player card!\n\n${player.name}\nLevel ${profile.currentLevel} • ${profile.totalXP.toLocaleString()} XP\n${profile.totalStats.totalChallengesCompleted} Challenges Completed\n\n#AstralTurf #PlayerCard`;
-      
+
       setShareUrl(shareText);
-      
+
       // Try native share API if available
       if (navigator.share) {
         try {
@@ -93,7 +93,7 @@ const PlayerCardExport: React.FC<PlayerCardExportProps> = ({
           const response = await fetch(imageData);
           const blob = await response.blob();
           const fileData = new globalThis.File([blob], `${player.name}_Card.png`, { type: 'image/png' });
-          
+
           await navigator.share({
             title: `${player.name} - Player Card`,
             text: shareText,

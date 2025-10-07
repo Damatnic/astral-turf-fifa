@@ -34,7 +34,7 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({ fieldRef }) => {
   };
 
   const getSvgPointerPosition = (
-    e: ReactMouseEvent<SVGSVGElement>
+    e: ReactMouseEvent<SVGSVGElement>,
   ): { x: number; y: number } | null => {
     const svg = e.currentTarget;
     if (!svg) {
@@ -303,7 +303,7 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({ fieldRef }) => {
       (drawings ?? [])
         .map(d => d?.color)
         .filter(Boolean)
-        .concat(drawingColor ?? '#ffffff')
+        .concat(drawingColor ?? '#ffffff'),
     ),
   ];
   const eventsToHandle =

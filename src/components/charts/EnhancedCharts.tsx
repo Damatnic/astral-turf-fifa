@@ -33,7 +33,7 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  Filler
+  Filler,
 );
 
 // Chart animation variants
@@ -100,7 +100,7 @@ export const EnhancedLineChart: React.FC<EnhancedLineChartProps> = ({
       0,
       `${color}${Math.round(alpha * 255)
         .toString(16)
-        .padStart(2, '0')}`
+        .padStart(2, '0')}`,
     );
     gradient.addColorStop(1, `${color}00`);
     return gradient;

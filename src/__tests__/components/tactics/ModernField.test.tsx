@@ -118,7 +118,7 @@ describe('ModernField', () => {
       await user.click(playerToken);
 
       expect(mockProps.onPlayerSelect).toHaveBeenCalledWith(
-        expect.objectContaining({ id: 'player-1' })
+        expect.objectContaining({ id: 'player-1' }),
       );
     });
 
@@ -139,7 +139,7 @@ describe('ModernField', () => {
         expect.objectContaining({
           x: expect.any(Number),
           y: expect.any(Number),
-        })
+        }),
       );
     });
 
@@ -234,7 +234,7 @@ describe('ModernField', () => {
         expect.objectContaining({
           x: expect.any(Number),
           y: expect.any(Number),
-        })
+        }),
       );
     });
   });
@@ -445,7 +445,7 @@ describe('ModernField', () => {
       };
 
       expect(() =>
-        render(<ModernField {...mockProps} formation={invalidFormation} />)
+        render(<ModernField {...mockProps} formation={invalidFormation} />),
       ).not.toThrow();
     });
 

@@ -216,7 +216,7 @@ export const RealTimeCollaboration: React.FC<RealTimeCollaborationProps> = ({
 
   const toggleUserPermission = (
     userId: string,
-    permission: keyof CollaborationUser['permissions']
+    permission: keyof CollaborationUser['permissions'],
   ) => {
     if (session.owner !== currentUser.id) {
       return;
@@ -233,7 +233,7 @@ export const RealTimeCollaboration: React.FC<RealTimeCollaborationProps> = ({
                 [permission]: !user.permissions[permission],
               },
             }
-          : user
+          : user,
       ),
     }));
   };

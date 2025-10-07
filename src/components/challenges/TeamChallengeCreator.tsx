@@ -376,7 +376,7 @@ export const TeamChallengeCreator: React.FC<TeamChallengeCreatorProps> = ({
                   {availablePlayers.map((player) => {
                     const isSelected = selectedPlayers.has(player.id);
                     const isDisabled = !isSelected && selectedPlayers.size >= maxPlayers;
-                    
+
                     return (
                       <button
                         key={player.id}
@@ -399,7 +399,7 @@ export const TeamChallengeCreator: React.FC<TeamChallengeCreatorProps> = ({
                           }`}>
                             {player.jerseyNumber}
                           </div>
-                          
+
                           {/* Name */}
                           <div className="text-center">
                             <div className={`font-medium text-sm ${isSelected ? 'text-white' : 'text-gray-300'}`}>
@@ -475,7 +475,7 @@ export const TeamChallengeCreator: React.FC<TeamChallengeCreatorProps> = ({
                 {/* Add New Requirement */}
                 <div className="p-6 bg-gray-800/30 border-2 border-dashed border-gray-700 rounded-lg">
                   <h4 className="text-sm font-medium text-gray-300 mb-4">Add Requirement</h4>
-                  
+
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
@@ -491,7 +491,7 @@ export const TeamChallengeCreator: React.FC<TeamChallengeCreatorProps> = ({
                           <option value="submission">Submission</option>
                         </select>
                       </div>
-                      
+
                       <div>
                         <label className="block text-xs text-gray-400 mb-2">Optional?</label>
                         <label className="flex items-center gap-2 px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg cursor-pointer">
@@ -528,7 +528,7 @@ export const TeamChallengeCreator: React.FC<TeamChallengeCreatorProps> = ({
                           className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:border-blue-500 focus:outline-none"
                         />
                       </div>
-                      
+
                       <div>
                         <label className="block text-xs text-gray-400 mb-2">Unit</label>
                         <input

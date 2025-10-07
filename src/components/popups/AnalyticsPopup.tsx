@@ -64,7 +64,7 @@ const PlayerStatsRow: React.FC<{ player: Player; onViewDetails: (playerId: strin
       player.attributes.dribbling +
       player.attributes.positioning +
       player.attributes.stamina) /
-      7
+      7,
   );
 
   return (
@@ -131,10 +131,10 @@ const AnalyticsPopup: React.FC = () => {
     totalMatches:
       homeTeamPlayers.length > 0 ? Math.max(...homeTeamPlayers.map(p => p.stats.matchesPlayed)) : 0,
     averageAge: Math.round(
-      homeTeamPlayers.reduce((sum, p) => sum + p.age, 0) / homeTeamPlayers.length
+      homeTeamPlayers.reduce((sum, p) => sum + p.age, 0) / homeTeamPlayers.length,
     ),
     averageStamina: Math.round(
-      homeTeamPlayers.reduce((sum, p) => sum + p.stamina, 0) / homeTeamPlayers.length
+      homeTeamPlayers.reduce((sum, p) => sum + p.stamina, 0) / homeTeamPlayers.length,
     ),
     playersInGoodForm: homeTeamPlayers.filter(p => p.form === 'Excellent' || p.form === 'Good')
       .length,

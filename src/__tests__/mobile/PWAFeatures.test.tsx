@@ -202,7 +202,7 @@ describe('PWA Core Features', () => {
 
       act(() => {
         const updateFoundCallback = mockServiceWorkerRegistration.addEventListener.mock.calls.find(
-          call => call[0] === 'updatefound'
+          call => call[0] === 'updatefound',
         )?.[1];
 
         if (updateFoundCallback) {

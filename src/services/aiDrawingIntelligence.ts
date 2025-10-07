@@ -275,7 +275,7 @@ class TacticalPatternRecognizer {
   recognizePatterns(
     shapes: DrawingShape[],
     players: Player[],
-    formation: Formation
+    formation: Formation,
   ): TacticalRecognition {
     const recognizedPatterns: RecognizedPattern[] = [];
 
@@ -459,7 +459,7 @@ class TacticalPatternRecognizer {
 
   private recognizeCombinedPatterns(
     shapes: DrawingShape[],
-    players: Player[]
+    players: Player[],
   ): RecognizedPattern[] {
     const patterns: RecognizedPattern[] = [];
 
@@ -513,7 +513,7 @@ class TacticalPatternRecognizer {
   private generateSmartSuggestions(
     patterns: RecognizedPattern[],
     shapes: DrawingShape[],
-    players: Player[]
+    players: Player[],
   ): SmartSuggestion[] {
     const suggestions: SmartSuggestion[] = [];
 
@@ -566,7 +566,7 @@ class TacticalPatternRecognizer {
 
   private suggestImprovements(
     patterns: RecognizedPattern[],
-    shapes: DrawingShape[]
+    shapes: DrawingShape[],
   ): Improvement[] {
     const improvements: Improvement[] = [];
 
@@ -619,7 +619,7 @@ class TacticalPatternRecognizer {
       for (let j = i + 1; j < positions.length; j++) {
         const distance = Math.sqrt(
           Math.pow(positions[i].x - positions[j].x, 2) +
-            Math.pow(positions[i].y - positions[j].y, 2)
+            Math.pow(positions[i].y - positions[j].y, 2),
         );
         totalDistance += distance;
         pairs++;
@@ -793,7 +793,7 @@ class SmartAnnotationEngine {
   generateSmartAnnotations(
     shapes: DrawingShape[],
     players: Player[],
-    recognizedPatterns: RecognizedPattern[]
+    recognizedPatterns: RecognizedPattern[],
   ): SmartAnnotation[] {
     const annotations: SmartAnnotation[] = [];
 
@@ -974,7 +974,7 @@ class SmartAnnotationEngine {
 
     players.forEach(player => {
       const distance = Math.sqrt(
-        Math.pow(player.position.x - position.x, 2) + Math.pow(player.position.y - position.y, 2)
+        Math.pow(player.position.x - position.x, 2) + Math.pow(player.position.y - position.y, 2),
       );
 
       if (distance < minDistance && distance < 20) {
@@ -1080,18 +1080,18 @@ export class AIDrawingIntelligenceService {
   async analyzeDrawings(
     shapes: DrawingShape[],
     players: Player[],
-    formation: Formation
+    formation: Formation,
   ): Promise<DrawingAnalysis> {
     const geometricPatterns = this.geometricAnalyzer.analyzeGeometricPatterns(shapes);
     const tacticalRecognition = this.tacticalPatternRecognizer.recognizePatterns(
       shapes,
       players,
-      formation
+      formation,
     );
     const smartAnnotations = this.smartAnnotationEngine.generateSmartAnnotations(
       shapes,
       players,
-      tacticalRecognition.patterns
+      tacticalRecognition.patterns,
     );
 
     return {
@@ -1110,7 +1110,7 @@ export class AIDrawingIntelligenceService {
     currentShapes: DrawingShape[],
     players: Player[],
     formation: Formation,
-    tacticalObjective: TacticalObjective
+    tacticalObjective: TacticalObjective,
   ): Promise<DrawingSuggestion[]> {
     const suggestions: DrawingSuggestion[] = [];
 
@@ -1133,7 +1133,7 @@ export class AIDrawingIntelligenceService {
     suggestions.push(...playerSuggestions);
 
     return suggestions.sort(
-      (a, b) => this.getPriorityValue(b.priority) - this.getPriorityValue(a.priority)
+      (a, b) => this.getPriorityValue(b.priority) - this.getPriorityValue(a.priority),
     );
   }
 
@@ -1143,7 +1143,7 @@ export class AIDrawingIntelligenceService {
   async validateDrawings(
     shapes: DrawingShape[],
     players: Player[],
-    formation: Formation
+    formation: Formation,
   ): Promise<DrawingValidation> {
     const issues: ValidationIssue[] = [];
     const warnings: ValidationWarning[] = [];
@@ -1171,7 +1171,7 @@ export class AIDrawingIntelligenceService {
 
   private calculateOverallAnalysisScore(
     geometricPatterns: GeometricPattern[],
-    tacticalRecognition: TacticalRecognition
+    tacticalRecognition: TacticalRecognition,
   ): number {
     const geometricScore =
       geometricPatterns.reduce((sum, p) => sum + p.confidence, 0) / geometricPatterns.length || 0;
@@ -1182,7 +1182,7 @@ export class AIDrawingIntelligenceService {
 
   private generateOverallRecommendations(
     geometricPatterns: GeometricPattern[],
-    tacticalRecognition: TacticalRecognition
+    tacticalRecognition: TacticalRecognition,
   ): string[] {
     const recommendations: string[] = [];
 
@@ -1196,7 +1196,7 @@ export class AIDrawingIntelligenceService {
 
     if (tacticalRecognition.improvements.length > 0) {
       recommendations.push(
-        `Address ${tacticalRecognition.improvements.length} identified improvements`
+        `Address ${tacticalRecognition.improvements.length} identified improvements`,
       );
     }
 
@@ -1205,7 +1205,7 @@ export class AIDrawingIntelligenceService {
 
   private identifyMissingElements(
     shapes: DrawingShape[],
-    objective: TacticalObjective
+    objective: TacticalObjective,
   ): MissingElement[] {
     const missing: MissingElement[] = [];
 
@@ -1266,7 +1266,7 @@ export class AIDrawingIntelligenceService {
 
   private generatePlayerSpecificSuggestions(
     players: Player[],
-    currentShapes: DrawingShape[]
+    currentShapes: DrawingShape[],
   ): DrawingSuggestion[] {
     const suggestions: DrawingSuggestion[] = [];
 
@@ -1315,7 +1315,7 @@ export class AIDrawingIntelligenceService {
   private findTacticalInconsistencies(
     shapes: DrawingShape[],
     players: Player[],
-    formation: Formation
+    formation: Formation,
   ): ValidationIssue[] {
     const issues: ValidationIssue[] = [];
 
@@ -1341,7 +1341,7 @@ export class AIDrawingIntelligenceService {
 
   private findMissingCriticalElements(
     shapes: DrawingShape[],
-    formation: Formation
+    formation: Formation,
   ): ValidationWarning[] {
     const warnings: ValidationWarning[] = [];
 
@@ -1354,7 +1354,7 @@ export class AIDrawingIntelligenceService {
     }
 
     const hasDefensiveElements = shapes.some(
-      s => s.tool === 'zone' && this.calculateZoneCenter(s.points).y < 50
+      s => s.tool === 'zone' && this.calculateZoneCenter(s.points).y < 50,
     );
 
     if (!hasDefensiveElements) {
@@ -1384,7 +1384,7 @@ export class AIDrawingIntelligenceService {
 
   private calculateValidationScore(
     issues: ValidationIssue[],
-    warnings: ValidationWarning[]
+    warnings: ValidationWarning[],
   ): number {
     let score = 100;
 
@@ -1411,7 +1411,7 @@ export class AIDrawingIntelligenceService {
 
   private generateValidationSuggestions(
     issues: ValidationIssue[],
-    warnings: ValidationWarning[]
+    warnings: ValidationWarning[],
   ): string[] {
     const suggestions: string[] = [];
 
@@ -1436,7 +1436,7 @@ export class AIDrawingIntelligenceService {
 
     players.forEach(player => {
       const distance = Math.sqrt(
-        Math.pow(player.position.x - position.x, 2) + Math.pow(player.position.y - position.y, 2)
+        Math.pow(player.position.x - position.x, 2) + Math.pow(player.position.y - position.y, 2),
       );
 
       if (distance < minDistance && distance < 20) {

@@ -53,17 +53,17 @@ const PrintableLineup = forwardRef<HTMLDivElement, PrintableLineupProps>(
     }
 
     const homePlayerIds = new Set(
-      (homeFormation?.slots ?? []).map(s => s?.playerId).filter(Boolean)
+      (homeFormation?.slots ?? []).map(s => s?.playerId).filter(Boolean),
     );
     const awayPlayerIds = new Set(
-      (awayFormation?.slots ?? []).map(s => s?.playerId).filter(Boolean)
+      (awayFormation?.slots ?? []).map(s => s?.playerId).filter(Boolean),
     );
 
     const homeStarters = (players ?? []).filter(
-      p => p?.team === 'home' && homePlayerIds.has(p?.id)
+      p => p?.team === 'home' && homePlayerIds.has(p?.id),
     );
     const awayStarters = (players ?? []).filter(
-      p => p?.team === 'away' && awayPlayerIds.has(p?.id)
+      p => p?.team === 'away' && awayPlayerIds.has(p?.id),
     );
 
     const homeBench = (players ?? []).filter(p => p?.team === 'home' && !homePlayerIds.has(p?.id));
@@ -110,7 +110,7 @@ const PrintableLineup = forwardRef<HTMLDivElement, PrintableLineupProps>(
         </main>
       </div>
     );
-  }
+  },
 );
 
 export default PrintableLineup;

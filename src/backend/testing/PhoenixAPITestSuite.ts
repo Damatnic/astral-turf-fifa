@@ -229,12 +229,12 @@ export class PhoenixAPITestSuite {
         this.context.request.post('/api/auth/login').send({
           email: 'test@example.com',
           password: 'wrongpassword',
-        })
+        }),
       );
 
     const rateLimitResponses = await Promise.allSettled(promises);
     const rateLimitHit = rateLimitResponses.some(
-      result => result.status === 'fulfilled' && (result.value as any).status === 429
+      result => result.status === 'fulfilled' && (result.value as any).status === 429,
     );
 
     return {
@@ -1048,7 +1048,7 @@ export class PhoenixAPITestSuite {
   private async loadTestEndpoint(
     endpoint: string,
     totalRequests: number,
-    durationSeconds: number
+    durationSeconds: number,
   ): Promise<LoadTestResult> {
     const startTime = Date.now();
     const endTime = startTime + durationSeconds * 1000;
@@ -1227,12 +1227,12 @@ export class PhoenixAPITestSuite {
       .map(() =>
         this.context.request
           .get('/api/players')
-          .set('Authorization', `Bearer ${this.context.authToken}`)
+          .set('Authorization', `Bearer ${this.context.authToken}`),
       );
 
     const responses = await Promise.allSettled(promises);
     const rateLimitHit = responses.some(
-      result => result.status === 'fulfilled' && (result.value as any).status === 429
+      result => result.status === 'fulfilled' && (result.value as any).status === 429,
     );
 
     return {
@@ -1516,7 +1516,7 @@ export async function runPhoenixAPITests(): Promise<void> {
     console.log('====================');
     results.summary.loadTests.forEach(test => {
       console.log(
-        `${test.endpoint}: ${test.requestsPerSecond} RPS, ${test.errorRate * 100}% error rate`
+        `${test.endpoint}: ${test.requestsPerSecond} RPS, ${test.errorRate * 100}% error rate`,
       );
     });
 

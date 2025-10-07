@@ -109,7 +109,7 @@ const TacticalDrawingTools: React.FC<TacticalDrawingToolsProps> = ({
       setHistory(newHistory);
       setHistoryIndex(newHistory.length - 1);
     },
-    [history, historyIndex]
+    [history, historyIndex],
   );
 
   // Generate unique ID for shapes
@@ -142,7 +142,7 @@ const TacticalDrawingTools: React.FC<TacticalDrawingToolsProps> = ({
       setCurrentShape(newShape);
       setIsDrawing(true);
     },
-    [activeTool, screenToField, currentColor, strokeWidth, opacity]
+    [activeTool, screenToField, currentColor, strokeWidth, opacity],
   );
 
   // Continue drawing
@@ -162,7 +162,7 @@ const TacticalDrawingTools: React.FC<TacticalDrawingToolsProps> = ({
                 ...prev,
                 points: [...prev.points, point],
               }
-            : null
+            : null,
         );
       } else {
         // For shapes like rectangles, circles, arrows - update end point
@@ -172,11 +172,11 @@ const TacticalDrawingTools: React.FC<TacticalDrawingToolsProps> = ({
                 ...prev,
                 points: [prev.points[0], point],
               }
-            : null
+            : null,
         );
       }
     },
-    [isDrawing, currentShape, screenToField]
+    [isDrawing, currentShape, screenToField],
   );
 
   // Finish drawing
@@ -199,7 +199,7 @@ const TacticalDrawingTools: React.FC<TacticalDrawingToolsProps> = ({
         addToHistory(newShapes);
       }
     },
-    [activeTool, shapes, addToHistory]
+    [activeTool, shapes, addToHistory],
   );
 
   // Undo/Redo
@@ -346,7 +346,7 @@ const TacticalDrawingTools: React.FC<TacticalDrawingToolsProps> = ({
           const edge = shape.points[1];
           const radius = Math.sqrt(
             Math.pow(((edge.x - center.x) * fieldDimensions.width) / 100, 2) +
-              Math.pow(((edge.y - center.y) * fieldDimensions.height) / 100, 2)
+              Math.pow(((edge.y - center.y) * fieldDimensions.height) / 100, 2),
           );
 
           return (

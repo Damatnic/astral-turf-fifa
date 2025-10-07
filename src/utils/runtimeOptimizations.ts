@@ -143,7 +143,7 @@ const dispatchRuntimeEvent = (type: string, detail: RuntimeEventDetail) => {
 const emitRuntimeEvent = (
   severity: RuntimeEventSeverity,
   message: string,
-  context: Record<string, unknown> = {}
+  context: Record<string, unknown> = {},
 ) => {
   dispatchRuntimeEvent(`catalyst:runtime-${severity}`, {
     message,
@@ -595,7 +595,7 @@ export class OptimizedDragHandler {
   constructor(
     element: HTMLElement,
     onMove: (delta: { x: number; y: number }) => void,
-    onEnd: (position: { x: number; y: number }) => void
+    onEnd: (position: { x: number; y: number }) => void,
   ) {
     this.element = element;
     this.onMove = onMove;
@@ -829,7 +829,7 @@ export function useOptimizedInteraction() {
 
 export function useOptimizedDrag(
   onMove: (delta: { x: number; y: number }) => void,
-  onEnd: (position: { x: number; y: number }) => void
+  onEnd: (position: { x: number; y: number }) => void,
 ) {
   const elementRef = useRef<HTMLElement>(null);
   const dragHandlerRef = useRef<OptimizedDragHandler | null>(null);

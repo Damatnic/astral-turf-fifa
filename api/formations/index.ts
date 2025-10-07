@@ -59,7 +59,7 @@ const createFormationSchema = z.object({
         name: z.string(),
         number: z.number(),
         role: z.string(),
-      })
+      }),
     ),
     tactical: z
       .object({

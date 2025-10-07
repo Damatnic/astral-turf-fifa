@@ -169,7 +169,7 @@ const PresentationControls: React.FC<PresentationControlsProps> = ({
   // Settings handlers
   const updateSetting = <K extends keyof PresentationSettings>(
     key: K,
-    value: PresentationSettings[K]
+    value: PresentationSettings[K],
   ) => {
     setSettings(prev => ({ ...prev, [key]: value }));
   };
@@ -323,7 +323,7 @@ const PresentationControls: React.FC<PresentationControlsProps> = ({
                     <span>Progress</span>
                     <span>
                       {Math.round(
-                        (presentationState.currentSlide / presentationState.totalSlides) * 100
+                        (presentationState.currentSlide / presentationState.totalSlides) * 100,
                       )}
                       %
                     </span>

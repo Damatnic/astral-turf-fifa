@@ -81,7 +81,7 @@ class TestEnvironmentValidator {
     };
 
     const packageJson = JSON.parse(
-      await fs.readFile(path.join(this.projectRoot, 'package.json'), 'utf8')
+      await fs.readFile(path.join(this.projectRoot, 'package.json'), 'utf8'),
     );
 
     const allDeps = {
@@ -290,7 +290,7 @@ class TestEnvironmentValidator {
             f.endsWith('.test.ts') ||
             f.endsWith('.test.tsx') ||
             f.endsWith('.spec.ts') ||
-            f.endsWith('.spec.tsx')
+            f.endsWith('.spec.tsx'),
         );
 
         fileCount = testFiles.length;
@@ -314,7 +314,7 @@ class TestEnvironmentValidator {
 
     if (totalTestFiles < 10) {
       this.results.overall.issues.push(
-        'Insufficient test coverage - less than 10 test files found'
+        'Insufficient test coverage - less than 10 test files found',
       );
     }
   }
@@ -337,7 +337,7 @@ class TestEnvironmentValidator {
     };
 
     const packageJson = JSON.parse(
-      await fs.readFile(path.join(this.projectRoot, 'package.json'), 'utf8')
+      await fs.readFile(path.join(this.projectRoot, 'package.json'), 'utf8'),
     );
 
     const scripts = packageJson.scripts || {};
@@ -406,13 +406,13 @@ class TestEnvironmentValidator {
 
     // Count critical issues
     const criticalDepsMissing = this.results.dependencies.filter(
-      d => d.critical && d.status === 'MISSING'
+      d => d.critical && d.status === 'MISSING',
     ).length;
     const criticalConfigsMissing = this.results.configurations.filter(
-      c => c.critical && c.status !== 'VALID' && c.status !== 'EXISTS'
+      c => c.critical && c.status !== 'VALID' && c.status !== 'EXISTS',
     ).length;
     const criticalScriptsMissing = this.results.scripts.filter(
-      s => s.critical && s.status === 'MISSING'
+      s => s.critical && s.status === 'MISSING',
     ).length;
     const totalTestFiles = this.results.testFiles.reduce((sum, tf) => sum + tf.fileCount, 0);
 
@@ -468,7 +468,7 @@ class TestEnvironmentValidator {
     }
     if (score < 85) {
       this.results.overall.recommendations.push(
-        'Consider using the Zenith testing framework for comprehensive coverage'
+        'Consider using the Zenith testing framework for comprehensive coverage',
       );
     }
   }

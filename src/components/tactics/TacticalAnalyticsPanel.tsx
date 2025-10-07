@@ -60,7 +60,7 @@ const TacticalAnalyticsPanel: React.FC<TacticalAnalyticsPanelProps> = ({
 
     // Filter out null/undefined positions and ensure valid coordinates
     const validPositions = positions.filter(
-      (pos: any) => pos && typeof pos.x === 'number' && typeof pos.y === 'number'
+      (pos: any) => pos && typeof pos.x === 'number' && typeof pos.y === 'number',
     );
 
     if (validPositions.length === 0) {

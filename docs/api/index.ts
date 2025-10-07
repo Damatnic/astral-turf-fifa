@@ -37,7 +37,7 @@ export const ApiDocumentationSchema = z.object({
       required: z.boolean(),
       description: z.string(),
       example: z.any().optional(),
-    })
+    }),
   ),
   responseSchema: z.any(),
   examples: z.array(
@@ -46,14 +46,14 @@ export const ApiDocumentationSchema = z.object({
       description: z.string(),
       request: z.any(),
       response: z.any(),
-    })
+    }),
   ),
   errors: z.array(
     z.object({
       code: z.number(),
       message: z.string(),
       description: z.string(),
-    })
+    }),
   ),
 });
 
@@ -288,7 +288,7 @@ registry.register('formations.create', {
           y: z.number(),
           position: z.string(),
           playerId: z.string().optional(),
-        })
+        }),
       ),
       tactics: z.object({
         defensiveStyle: z.string(),
@@ -403,7 +403,7 @@ registry.register('ai.analyze', {
           confidence: z.number().min(0).max(1),
           actionable: z.boolean(),
           recommendations: z.array(z.string()).optional(),
-        })
+        }),
       ),
       overallRating: z.number().min(0).max(100),
       keyRecommendations: z.array(z.string()),
@@ -413,14 +413,14 @@ registry.register('ai.analyze', {
           description: z.string(),
           impact: z.enum(['low', 'medium', 'high']),
           difficulty: z.enum(['easy', 'medium', 'hard']),
-        })
+        }),
       ),
       playerHighlights: z.array(
         z.object({
           playerId: z.string(),
           insight: z.string(),
           rating: z.number().min(0).max(10),
-        })
+        }),
       ),
     }),
     processingTime: z.number(),
@@ -577,7 +577,7 @@ registry.register('match.simulate', {
           team: z.enum(['home', 'away']),
           player: z.string(),
           description: z.string(),
-        })
+        }),
       ),
       playerRatings: z.record(z.number().min(1).max(10)),
       tacticalNotes: z.array(z.string()),

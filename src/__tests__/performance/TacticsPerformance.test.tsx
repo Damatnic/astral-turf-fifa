@@ -112,7 +112,7 @@ describe('Tactics Board Performance Tests', () => {
           ...formation,
           players:
             formation.players?.map((player, index) =>
-              index === 0 ? { ...player, ...position } : player
+              index === 0 ? { ...player, ...position } : player,
             ) || [],
         };
 
@@ -415,7 +415,7 @@ describe('Tactics Board Performance Tests', () => {
 
     it('should handle sidebar filtering performance with large datasets', async () => {
       const manyPlayers = Array.from({ length: 1000 }, (_, i) =>
-        generatePlayer({ id: `player-${i}`, name: `Player ${i}` })
+        generatePlayer({ id: `player-${i}`, name: `Player ${i}` }),
       );
 
       const initialState = {

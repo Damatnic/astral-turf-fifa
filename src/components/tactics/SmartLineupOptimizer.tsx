@@ -49,8 +49,8 @@ const SmartLineupOptimizer: React.FC<SmartLineupOptimizerProps> = ({
         acc[player.id] = Math.max(100 - player.fatigue, 20); // Convert fatigue to fitness
         return acc;
       },
-      {} as Record<string, number>
-    )
+      {} as Record<string, number>,
+    ),
   );
 
   const optimizeLineup = async () => {
@@ -74,7 +74,7 @@ const SmartLineupOptimizer: React.FC<SmartLineupOptimizerProps> = ({
           // You could populate this with real data from your database
           playingStyle: 'Unknown',
         },
-        aiPersonality
+        aiPersonality,
       );
 
       // Step 2: Generate match strategy
@@ -91,7 +91,7 @@ const SmartLineupOptimizer: React.FC<SmartLineupOptimizerProps> = ({
           weather,
           playerFitness,
         },
-        aiPersonality
+        aiPersonality,
       );
 
       // Step 3: Find recommended formation
@@ -104,7 +104,7 @@ const SmartLineupOptimizer: React.FC<SmartLineupOptimizerProps> = ({
         availablePlayers,
         recommendedFormation,
         strategy,
-        oppositionReport
+        oppositionReport,
       );
 
       const result = {
@@ -140,7 +140,7 @@ const SmartLineupOptimizer: React.FC<SmartLineupOptimizerProps> = ({
     players: Player[],
     formation: Formation,
     strategy: MatchStrategyPlan,
-    opposition: OppositionAnalysisReport
+    opposition: OppositionAnalysisReport,
   ): Player[] => {
     const selectedPlayers: Player[] = [];
 
@@ -154,7 +154,7 @@ const SmartLineupOptimizer: React.FC<SmartLineupOptimizerProps> = ({
         acc[role].push(player);
         return acc;
       },
-      {} as Record<string, Player[]>
+      {} as Record<string, Player[]>,
     );
 
     // Sort each role by fitness, form, and rating
@@ -173,7 +173,7 @@ const SmartLineupOptimizer: React.FC<SmartLineupOptimizerProps> = ({
 
       // Find best available player for this position
       const selectedPlayer = availablePlayers.find(
-        player => !selectedPlayers.includes(player) && playerFitness[player.id] > 30 // Minimum fitness threshold
+        player => !selectedPlayers.includes(player) && playerFitness[player.id] > 30, // Minimum fitness threshold
       );
 
       if (selectedPlayer) {
@@ -203,7 +203,7 @@ const SmartLineupOptimizer: React.FC<SmartLineupOptimizerProps> = ({
   const calculatePlayerScore = (
     player: Player,
     strategy: MatchStrategyPlan,
-    opposition: OppositionAnalysisReport
+    opposition: OppositionAnalysisReport,
   ): number => {
     let score = player.currentPotential; // Base rating
 

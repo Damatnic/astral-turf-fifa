@@ -350,7 +350,7 @@ export class QualityMonitor {
 
     this.monitoringInterval = window.setInterval(
       () => this.runMonitoringCycle(),
-      this.config.monitoring.interval * 1000
+      this.config.monitoring.interval * 1000,
     );
 
     // Initial run
@@ -471,10 +471,10 @@ export class QualityMonitor {
     // Quick checks only
     const imagesWithoutAlt = document.querySelectorAll('img:not([alt])').length;
     const buttonsWithoutLabels = document.querySelectorAll(
-      'button:not([aria-label]):not([aria-labelledby])'
+      'button:not([aria-label]):not([aria-labelledby])',
     ).length;
     const inputsWithoutLabels = document.querySelectorAll(
-      'input:not([aria-label]):not([aria-labelledby])'
+      'input:not([aria-label]):not([aria-labelledby])',
     ).length;
 
     const totalViolations = imagesWithoutAlt + buttonsWithoutLabels + inputsWithoutLabels;
@@ -495,7 +495,7 @@ export class QualityMonitor {
   private static calculateOverallScore(
     interactions: { total: number; passed: number },
     accessibility: { score: number },
-    frameRate: number
+    frameRate: number,
   ): number {
     const interactionScore =
       interactions.total > 0 ? (interactions.passed / interactions.total) * 100 : 100;
@@ -598,7 +598,7 @@ export class TestRunner {
             name: 'All Buttons Have Labels',
             fn: async () => {
               const unlabeled = document.querySelectorAll(
-                'button:not([aria-label]):not([aria-labelledby])'
+                'button:not([aria-label]):not([aria-labelledby])',
               );
               return Array.from(unlabeled).every(btn => btn.textContent?.trim());
             },
@@ -613,7 +613,7 @@ export class TestRunner {
             name: 'Keyboard Navigation Works',
             fn: async () => {
               const focusable = document.querySelectorAll(
-                'a, button, input, textarea, select, [tabindex]:not([tabindex="-1"])'
+                'a, button, input, textarea, select, [tabindex]:not([tabindex="-1"])',
               );
               return focusable.length > 0;
             },

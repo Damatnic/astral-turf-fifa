@@ -75,7 +75,7 @@ const MobilePlayerToken: React.FC<MobilePlayerTokenProps> = ({
         y: Math.round(pos.y / gridSize) * gridSize,
       };
     },
-    [snapToGrid, gridSize]
+    [snapToGrid, gridSize],
   );
 
   // Enhanced touch gestures
@@ -113,7 +113,7 @@ const MobilePlayerToken: React.FC<MobilePlayerTokenProps> = ({
         // Reset touch count after delay
         setTimeout(() => setTouchCount(0), 400);
       },
-      [lastTapTime, touchCount, onSelect, player, capabilities.hasHapticFeedback]
+      [lastTapTime, touchCount, onSelect, player, capabilities.hasHapticFeedback],
     ),
 
     onLongPress: useCallback(
@@ -128,7 +128,7 @@ const MobilePlayerToken: React.FC<MobilePlayerTokenProps> = ({
 
         setTimeout(() => setIsLongPressing(false), 200);
       },
-      [onLongPress, player, capabilities.hasHapticFeedback]
+      [onLongPress, player, capabilities.hasHapticFeedback],
     ),
 
     onDrag: useCallback(
@@ -165,7 +165,7 @@ const MobilePlayerToken: React.FC<MobilePlayerTokenProps> = ({
         onMove,
         player.id,
         capabilities.hasHapticFeedback,
-      ]
+      ],
     ),
   });
 
@@ -186,7 +186,7 @@ const MobilePlayerToken: React.FC<MobilePlayerTokenProps> = ({
       const snappedPosition = snapPosition(constrainedPosition);
       onMove(player.id, snappedPosition);
     },
-    [position, fieldBounds, snapPosition, onMove, player.id]
+    [position, fieldBounds, snapPosition, onMove, player.id],
   );
 
   const handleDragEnd = useCallback(
@@ -198,7 +198,7 @@ const MobilePlayerToken: React.FC<MobilePlayerTokenProps> = ({
         navigator.vibrate(25);
       }
     },
-    [onDragEnd, capabilities.hasHapticFeedback]
+    [onDragEnd, capabilities.hasHapticFeedback],
   );
 
   // Get player position color based on role

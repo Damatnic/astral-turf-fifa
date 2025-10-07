@@ -36,7 +36,7 @@ describe('Site-Wide Navigation Validation - ZENITH Tests', () => {
           <AppProvider>
             <App />
           </AppProvider>
-        </MemoryRouter>
+        </MemoryRouter>,
       );
 
       // Test navigation to all major pages
@@ -70,7 +70,7 @@ describe('Site-Wide Navigation Validation - ZENITH Tests', () => {
           <AppProvider>
             <App />
           </AppProvider>
-        </BrowserRouter>
+        </BrowserRouter>,
       );
 
       // Navigate to tactics
@@ -110,7 +110,7 @@ describe('Site-Wide Navigation Validation - ZENITH Tests', () => {
           <AppProvider>
             <App />
           </AppProvider>
-        </MemoryRouter>
+        </MemoryRouter>,
       );
 
       // Should redirect to dashboard or show 404
@@ -125,7 +125,7 @@ describe('Site-Wide Navigation Validation - ZENITH Tests', () => {
           <AppProvider>
             <App />
           </AppProvider>
-        </MemoryRouter>
+        </MemoryRouter>,
       );
 
       // Set up formation on tactics page
@@ -154,7 +154,7 @@ describe('Site-Wide Navigation Validation - ZENITH Tests', () => {
       render(
         <ZenithTestWrapper>
           <App />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       // Test main navigation menu
@@ -187,7 +187,7 @@ describe('Site-Wide Navigation Validation - ZENITH Tests', () => {
       render(
         <ZenithTestWrapper>
           <App />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       // Open menu with keyboard
@@ -234,7 +234,7 @@ describe('Cross-Component Interaction Validation - ZENITH Tests', () => {
           <AppProvider>
             <App />
           </AppProvider>
-        </MemoryRouter>
+        </MemoryRouter>,
       );
 
       // Set up formation on tactics board
@@ -263,7 +263,7 @@ describe('Cross-Component Interaction Validation - ZENITH Tests', () => {
           <AppProvider>
             <App />
           </AppProvider>
-        </MemoryRouter>
+        </MemoryRouter>,
       );
 
       // Sign a new player
@@ -304,7 +304,7 @@ describe('Cross-Component Interaction Validation - ZENITH Tests', () => {
           <AppProvider>
             <App />
           </AppProvider>
-        </MemoryRouter>
+        </MemoryRouter>,
       );
 
       // Update data in one component
@@ -317,7 +317,7 @@ describe('Cross-Component Interaction Validation - ZENITH Tests', () => {
           <AppProvider>
             <App />
           </AppProvider>
-        </MemoryRouter>
+        </MemoryRouter>,
       );
 
       // Data should be synchronized
@@ -334,7 +334,7 @@ describe('Cross-Component Interaction Validation - ZENITH Tests', () => {
       render(
         <ZenithTestWrapper>
           <App />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       // Open first modal
@@ -368,7 +368,7 @@ describe('Cross-Component Interaction Validation - ZENITH Tests', () => {
       render(
         <ZenithTestWrapper>
           <App />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       // Open modal
@@ -414,7 +414,7 @@ describe('Feature Integration Validation - ZENITH Tests', () => {
           <AppProvider>
             <App />
           </AppProvider>
-        </MemoryRouter>
+        </MemoryRouter>,
       );
 
       // Create formation
@@ -450,7 +450,7 @@ describe('Feature Integration Validation - ZENITH Tests', () => {
           <AppProvider>
             <App />
           </AppProvider>
-        </MemoryRouter>
+        </MemoryRouter>,
       );
 
       // Select player
@@ -486,7 +486,7 @@ describe('Feature Integration Validation - ZENITH Tests', () => {
           <AppProvider>
             <App />
           </AppProvider>
-        </MemoryRouter>
+        </MemoryRouter>,
       );
 
       // Start live match
@@ -517,7 +517,7 @@ describe('Feature Integration Validation - ZENITH Tests', () => {
           <AppProvider>
             <App />
           </AppProvider>
-        </MemoryRouter>
+        </MemoryRouter>,
       );
 
       // Select time period
@@ -548,7 +548,7 @@ describe('Feature Integration Validation - ZENITH Tests', () => {
           <AppProvider>
             <App />
           </AppProvider>
-        </MemoryRouter>
+        </MemoryRouter>,
       );
 
       // Make a transfer
@@ -599,7 +599,7 @@ describe('Error Boundary and Recovery Validation - ZENITH Tests', () => {
       render(
         <ZenithTestWrapper>
           <BuggyComponent />
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       // Should show error boundary
@@ -626,7 +626,7 @@ describe('Error Boundary and Recovery Validation - ZENITH Tests', () => {
             <GoodComponent />
             <BuggyComponent />
           </div>
-        </ZenithTestWrapper>
+        </ZenithTestWrapper>,
       );
 
       // Good component should still work
@@ -651,7 +651,7 @@ describe('Error Boundary and Recovery Validation - ZENITH Tests', () => {
           <AppProvider>
             <App />
           </AppProvider>
-        </MemoryRouter>
+        </MemoryRouter>,
       );
 
       // Should show error state
@@ -709,7 +709,7 @@ describe('Site-Wide Performance Validation - ZENITH Tests', () => {
             <AppProvider>
               <App />
             </AppProvider>
-          </MemoryRouter>
+          </MemoryRouter>,
         );
 
         await waitFor(() => {
@@ -731,7 +731,7 @@ describe('Site-Wide Performance Validation - ZENITH Tests', () => {
           <AppProvider>
             <App />
           </AppProvider>
-        </MemoryRouter>
+        </MemoryRouter>,
       );
 
       // Perform multiple actions simultaneously
@@ -761,7 +761,7 @@ describe('Site-Wide Performance Validation - ZENITH Tests', () => {
             <AppProvider>
               <App />
             </AppProvider>
-          </MemoryRouter>
+          </MemoryRouter>,
         );
         cleanup();
 
@@ -770,7 +770,7 @@ describe('Site-Wide Performance Validation - ZENITH Tests', () => {
             <AppProvider>
               <App />
             </AppProvider>
-          </MemoryRouter>
+          </MemoryRouter>,
         );
         cleanup();
       }
@@ -808,7 +808,7 @@ describe('Site-Wide Accessibility Validation - ZENITH Tests', () => {
             <AppProvider>
               <App />
             </AppProvider>
-          </MemoryRouter>
+          </MemoryRouter>,
         );
 
         // Tab through all focusable elements
@@ -839,7 +839,7 @@ describe('Site-Wide Accessibility Validation - ZENITH Tests', () => {
           <AppProvider>
             <App />
           </AppProvider>
-        </MemoryRouter>
+        </MemoryRouter>,
       );
 
       // Focus on a navigation link
@@ -866,7 +866,7 @@ describe('Site-Wide Accessibility Validation - ZENITH Tests', () => {
             <AppProvider>
               <App />
             </AppProvider>
-          </MemoryRouter>
+          </MemoryRouter>,
         );
 
         // Check interactive elements have proper labels
@@ -902,7 +902,7 @@ describe('Site-Wide Accessibility Validation - ZENITH Tests', () => {
             <AppProvider>
               <App />
             </AppProvider>
-          </MemoryRouter>
+          </MemoryRouter>,
         );
 
         const headings = screen.getAllByRole('heading');

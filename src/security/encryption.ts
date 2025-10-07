@@ -110,7 +110,7 @@ export function encryptData(
   data: string,
   classification: DataClassification = DataClassification.INTERNAL,
   algorithm: EncryptionAlgorithm = EncryptionAlgorithm.AES_256_GCM,
-  context?: EncryptionContext
+  context?: EncryptionContext,
 ): EncryptedData {
   try {
     if (!data) {
@@ -165,7 +165,7 @@ export function encryptData(
       securityLogger.logSecurityEvent(
         SecurityEventType.DATA_MODIFICATION,
         'Data encrypted',
-        auditContext
+        auditContext,
       );
     }
 
@@ -233,7 +233,7 @@ export function decryptData(encryptedData: EncryptedData, context?: EncryptionCo
       securityLogger.logSecurityEvent(
         SecurityEventType.DATA_ACCESS,
         'Data decrypted',
-        auditContext
+        auditContext,
       );
     }
 
@@ -267,7 +267,7 @@ export function encryptPersonalInfo(personalInfo: unknown, userId?: string): Enc
     JSON.stringify(personalInfo),
     DataClassification.CONFIDENTIAL,
     EncryptionAlgorithm.AES_256_GCM,
-    context
+    context,
   );
 }
 
@@ -297,7 +297,7 @@ export function encryptMedicalData(medicalData: unknown, userId?: string): Encry
     JSON.stringify(medicalData),
     DataClassification.RESTRICTED,
     EncryptionAlgorithm.AES_256_GCM,
-    context
+    context,
   );
 }
 
@@ -327,7 +327,7 @@ export function encryptFinancialData(financialData: unknown, userId?: string): E
     JSON.stringify(financialData),
     DataClassification.CONFIDENTIAL,
     EncryptionAlgorithm.AES_256_GCM,
-    context
+    context,
   );
 }
 

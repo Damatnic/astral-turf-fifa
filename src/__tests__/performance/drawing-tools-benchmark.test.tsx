@@ -46,10 +46,10 @@ interface BenchmarkResult {
 vi.mock('framer-motion', () => ({
   motion: {
     div: React.forwardRef<HTMLDivElement, any>(({ children, ...props }, ref) =>
-      React.createElement('div', { ref, ...props }, children)
+      React.createElement('div', { ref, ...props }, children),
     ),
     button: React.forwardRef<HTMLButtonElement, any>(({ children, ...props }, ref) =>
-      React.createElement('button', { ref, ...props }, children)
+      React.createElement('button', { ref, ...props }, children),
     ),
   },
   AnimatePresence: ({ children }: { children: React.ReactNode }) => children,
@@ -135,7 +135,7 @@ describe('Drawing Tools Performance Benchmarks', () => {
 
   const measurePerformance = <T,>(
     operation: () => T,
-    operationName: string
+    operationName: string,
   ): { result: T; metrics: PerformanceMetrics } => {
     const startTime = performance.now();
     const startMemory = (performance as any).memory?.usedJSHeapSize || 0;
@@ -179,7 +179,7 @@ describe('Drawing Tools Performance Benchmarks', () => {
           <TacticalDrawingTools
             {...defaultProps}
             initialShapes={shapes as unknown as DrawingShape[]}
-          />
+          />,
         );
         return container;
       }, 'small-dataset-render');
@@ -196,7 +196,7 @@ describe('Drawing Tools Performance Benchmarks', () => {
           <TacticalDrawingTools
             {...defaultProps}
             initialShapes={shapes as unknown as DrawingShape[]}
-          />
+          />,
         );
         return container;
       }, 'medium-dataset-render');
@@ -214,7 +214,7 @@ describe('Drawing Tools Performance Benchmarks', () => {
           <TacticalDrawingTools
             {...defaultProps}
             initialShapes={shapes as unknown as DrawingShape[]}
-          />
+          />,
         );
         return container;
       }, 'large-dataset-render');
@@ -237,7 +237,7 @@ describe('Drawing Tools Performance Benchmarks', () => {
 
       const { metrics } = measurePerformance(() => {
         const { container } = render(
-          <TacticalDrawingTools {...defaultProps} initialShapes={complexShapes} />
+          <TacticalDrawingTools {...defaultProps} initialShapes={complexShapes} />,
         );
 
         // Simulate frame rendering
@@ -271,7 +271,7 @@ describe('Drawing Tools Performance Benchmarks', () => {
       metrics.shapesProcessed = 100;
 
       expect(metrics.operationTime / metrics.shapesProcessed).toBeLessThan(
-        performanceBaselines.maxOperationTime
+        performanceBaselines.maxOperationTime,
       );
     });
 
@@ -306,7 +306,7 @@ describe('Drawing Tools Performance Benchmarks', () => {
         <TacticalDrawingTools
           {...defaultProps}
           initialShapes={shapes as unknown as DrawingShape[]}
-        />
+        />,
       );
 
       const { metrics } = measurePerformance(() => {
@@ -630,7 +630,7 @@ describe('Drawing Tools Performance Benchmarks', () => {
         <TacticalDrawingTools
           {...defaultProps}
           initialShapes={largeShapeSet as unknown as DrawingShape[]}
-        />
+        />,
       );
 
       const { metrics } = measurePerformance(() => {
@@ -690,7 +690,7 @@ describe('Drawing Tools Performance Benchmarks', () => {
             <TacticalDrawingTools
               {...defaultProps}
               initialShapes={shapes as unknown as DrawingShape[]}
-            />
+            />,
           );
           return container;
         }, `regression-test-${size}`);
@@ -751,7 +751,7 @@ describe('Drawing Tools Performance Benchmarks', () => {
             <TacticalDrawingTools
               {...defaultProps}
               initialShapes={shapes as unknown as DrawingShape[]}
-            />
+            />,
           );
           return container;
         }, suite.name);

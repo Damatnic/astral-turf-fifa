@@ -190,7 +190,7 @@ export function validatePasswordStrength(password: string): { isValid: boolean; 
 
   if (PASSWORD_CONFIG.REQUIRE_SPECIAL_CHARS) {
     const specialCharsRegex = new RegExp(
-      `[${PASSWORD_CONFIG.SPECIAL_CHARS.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}]`
+      `[${PASSWORD_CONFIG.SPECIAL_CHARS.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}]`,
     );
     if (!specialCharsRegex.test(password)) {
       errors.push('Password must contain at least one special character');
@@ -230,10 +230,10 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
 // Check if password was used before
 export function isPasswordPreviouslyUsed(
   password: string,
-  passwordHistory: string[]
+  passwordHistory: string[],
 ): Promise<boolean> {
   return Promise.all(passwordHistory.map(hash => verifyPassword(password, hash))).then(results =>
-    results.some(Boolean)
+    results.some(Boolean),
   );
 }
 
@@ -245,7 +245,7 @@ export function isPasswordPreviouslyUsed(
 export async function generateTokenPair(
   user: SecureUser,
   sessionId: string,
-  options?: { rotateRefresh?: boolean }
+  options?: { rotateRefresh?: boolean },
 ): Promise<TokenPair> {
   const now = Math.floor(Date.now() / 1000);
   const jti = generateSecureToken(16); // Unique token ID for revocation
@@ -361,7 +361,7 @@ function generateSecureToken(length: number = 32): string {
 // Verify JWT token
 export async function verifyToken(
   token: string,
-  isRefreshToken = false
+  isRefreshToken = false,
 ): Promise<JWTPayload | null> {
   try {
     // Check if token is blacklisted
@@ -405,7 +405,7 @@ export async function verifyToken(
 // Enhanced refresh access token with automatic rotation
 export async function refreshAccessToken(
   refreshToken: string,
-  options?: { userAgent?: string; ipAddress?: string }
+  options?: { userAgent?: string; ipAddress?: string },
 ): Promise<TokenPair | null> {
   const payload = await verifyToken(refreshToken, true);
   if (!payload) {
@@ -547,7 +547,7 @@ export function createSession(
   user: SecureUser,
   deviceInfo: string,
   ipAddress: string,
-  userAgent: string
+  userAgent: string,
 ): SessionInfo {
   const sessionId = generateSecureToken(16);
 
@@ -599,7 +599,7 @@ export function terminateSession(userId: string, sessionId: string): void {
   const user = users.get(userId);
   if (user) {
     user.activeSessions = user.activeSessions.map(session =>
-      session.id === sessionId ? { ...session, isActive: false } : session
+      session.id === sessionId ? { ...session, isActive: false } : session,
     );
   }
 
@@ -639,7 +639,7 @@ export function recordLoginAttempt(
   ipAddress: string,
   userAgent: string,
   success: boolean,
-  failureReason?: string
+  failureReason?: string,
 ): void {
   const attempt: LoginAttempt = {
     email,
@@ -676,7 +676,7 @@ export function shouldLockAccount(email: string, ipAddress: string): boolean {
   // Count failed attempts in the last window
   const windowStart = Date.now() - 15 * 60 * 1000; // 15 minutes
   const recentFailures = attempts.filter(
-    a => !a.success && new Date(a.timestamp).getTime() > windowStart
+    a => !a.success && new Date(a.timestamp).getTime() > windowStart,
   );
 
   return recentFailures.length >= 5; // Max 5 failed attempts

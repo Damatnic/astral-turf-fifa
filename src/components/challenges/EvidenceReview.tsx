@@ -55,10 +55,10 @@ export const EvidenceReview: React.FC<EvidenceReviewProps> = ({
       rejected: { color: 'bg-red-500/20 border-red-500/30 text-red-400', icon: XCircle, label: 'Rejected' },
       requires_revision: { color: 'bg-orange-500/20 border-orange-500/30 text-orange-400', icon: AlertCircle, label: 'Needs Revision' },
     };
-    
+
     const config = configs[status];
     const Icon = config.icon;
-    
+
     return (
       <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-sm font-medium ${config.color}`}>
         <Icon className="w-4 h-4" />
@@ -81,7 +81,7 @@ export const EvidenceReview: React.FC<EvidenceReviewProps> = ({
 
   // Handle review submission
   const handleReviewSubmit = async () => {
-    if (!reviewAction) return;
+    if (!reviewAction) {return;}
 
     // Validation
     if ((reviewAction === 'reject' || reviewAction === 'revise') && !reviewNotes.trim()) {
@@ -99,7 +99,7 @@ export const EvidenceReview: React.FC<EvidenceReviewProps> = ({
       } else if (reviewAction === 'revise') {
         await onRequestRevision(submission.id, reviewNotes);
       }
-      
+
       onClose();
     } catch (error) {
       console.error('Review submission failed:', error);
@@ -371,7 +371,7 @@ export const EvidenceReview: React.FC<EvidenceReviewProps> = ({
               >
                 Close
               </button>
-              
+
               {submission.status === 'pending' && reviewAction && (
                 <button
                   onClick={handleReviewSubmit}

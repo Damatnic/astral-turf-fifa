@@ -84,7 +84,7 @@ export const createDataTransferMock = (initialData: Record<string, string> = {})
 export const createDragEvent = (
   type: string,
   dataTransfer?: ReturnType<typeof createDataTransferMock>,
-  options: Partial<DragEvent> = {}
+  options: Partial<DragEvent> = {},
 ): DragEvent => {
   const event = new Event(type, {
     bubbles: true,
@@ -115,7 +115,7 @@ export const createDragEvent = (
  * Simulate complete drag and drop sequence
  */
 export const simulateDragAndDrop = async (
-  scenario: DragDropTestScenario
+  scenario: DragDropTestScenario,
 ): Promise<{
   success: boolean;
   conflictDetected: boolean;
@@ -204,7 +204,7 @@ export const simulateDragAndDrop = async (
 export const simulateTouchDragAndDrop = async (
   sourceElement: HTMLElement,
   targetElement: HTMLElement,
-  scenario: TouchTestScenario
+  scenario: TouchTestScenario,
 ): Promise<{
   success: boolean;
   touchPath: Array<{ x: number; y: number; timestamp: number }>;
@@ -331,7 +331,7 @@ export const testPlayerDragWithConflict = async (
   slotElement: HTMLElement,
   player: Player,
   targetSlot: FormationSlot,
-  expectedConflict: boolean = false
+  expectedConflict: boolean = false,
 ): Promise<{
   dragCompleted: boolean;
   conflictMenuShown: boolean;
@@ -403,7 +403,7 @@ export const testPlayerDragWithConflict = async (
  */
 export const testSlotDropZones = async (
   slots: FormationSlot[],
-  draggedPlayer: Player
+  draggedPlayer: Player,
 ): Promise<
   Array<{
     slotId: string;
@@ -435,7 +435,7 @@ export const testSlotDropZones = async (
           playerId: draggedPlayer.id,
           dragType: 'player',
         }),
-      })
+      }),
     );
 
     act(() => {
@@ -475,7 +475,7 @@ export const testSlotDropZones = async (
 export const performanceDragTest = async (
   playerElements: HTMLElement[],
   slotElements: HTMLElement[],
-  iterations: number = 10
+  iterations: number = 10,
 ): Promise<{
   averageDragTime: number;
   maxDragTime: number;
@@ -550,7 +550,7 @@ export const testComplexDragScenario = async (
     targetSlots: FormationSlot[];
     expectedOutcome: 'success' | 'conflict' | 'error';
     description: string;
-  }>
+  }>,
 ): Promise<
   Array<{
     scenarioId: string;
@@ -577,10 +577,10 @@ export const testComplexDragScenario = async (
         }
 
         const playerElement = document.querySelector(
-          `[data-player-id="${player.id}"]`
+          `[data-player-id="${player.id}"]`,
         ) as HTMLElement;
         const slotElement = document.querySelector(
-          `[data-slot-id="${targetSlot.id}"]`
+          `[data-slot-id="${targetSlot.id}"]`,
         ) as HTMLElement;
 
         if (!playerElement || !slotElement) {
@@ -636,7 +636,7 @@ export const testComplexDragScenario = async (
  */
 export const waitForDragAnimation = async (
   element: HTMLElement,
-  maxWait: number = 1000
+  maxWait: number = 1000,
 ): Promise<boolean> => {
   const startTime = Date.now();
 

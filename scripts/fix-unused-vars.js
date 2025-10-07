@@ -22,7 +22,7 @@ function fixUnusedVariables(content) {
     /(\w+): ([^,)]+),?\s*\/\/ @typescript-eslint\/no-unused-vars/g,
     (_match, name, type) => {
       return `_${name}: ${type}`;
-    }
+    },
   );
 
   // Fix unused variables in catch blocks
@@ -68,11 +68,11 @@ function fixUnusedVariables(content) {
   // Fix undefined globals
   content = content.replace(
     /new WebSocket\(/g,
-    "typeof WebSocket !== 'undefined' ? new WebSocket("
+    "typeof WebSocket !== 'undefined' ? new WebSocket(",
   );
   content = content.replace(
     /new TextEncoder\(/g,
-    "typeof TextEncoder !== 'undefined' ? new TextEncoder("
+    "typeof TextEncoder !== 'undefined' ? new TextEncoder(",
   );
   content = content.replace(/crypto\./g, "typeof crypto !== 'undefined' ? crypto.");
 

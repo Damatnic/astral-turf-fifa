@@ -165,7 +165,7 @@ class SessionRecorder {
   public recordEvent(
     type: SessionEventType,
     category: EventCategory,
-    data: Record<string, any> = {}
+    data: Record<string, any> = {},
   ): SessionEvent {
     if (!this.isRecording) {
       return {} as SessionEvent;
@@ -238,7 +238,7 @@ class SessionRecorder {
    */
   public getEventsByTimeRange(startTime: number, endTime: number): SessionEvent[] {
     return this.getEvents().filter(
-      event => event.timestamp >= startTime && event.timestamp <= endTime
+      event => event.timestamp >= startTime && event.timestamp <= endTime,
     );
   }
 
@@ -331,7 +331,7 @@ class SessionRecorder {
         timeline: this.generateTimeline(),
       },
       null,
-      2
+      2,
     );
   }
 
@@ -459,7 +459,7 @@ export const useSessionRecorder = () => {
   const recordEvent = (
     type: SessionEventType,
     category: EventCategory,
-    data: Record<string, any> = {}
+    data: Record<string, any> = {},
   ) => {
     return sessionRecorder.recordEvent(type, category, data);
   };

@@ -186,7 +186,7 @@ export const validateFormationsObject = (formations: unknown): formations is For
  */
 export const validateActiveFormationIds = (
   activeFormationIds: unknown,
-  formations: FormationMap
+  formations: FormationMap,
 ): activeFormationIds is ActiveFormationIds => {
   if (!activeFormationIds || typeof activeFormationIds !== 'object') {
     // // console.warn('validateActiveFormationIds: Invalid activeFormationIds object');
@@ -305,7 +305,7 @@ export const safeGetFormation = (formations: unknown, formationId: string): Form
  */
 export const safeGetFormationSlot = (
   formation: Formation | null,
-  slotId: string
+  slotId: string,
 ): FormationSlot | null => {
   if (!isValidFormation(formation)) {
     return null;
@@ -323,7 +323,7 @@ export const validateDragDropOperation = (
   targetSlotId?: string,
   players?: unknown,
   formations?: unknown,
-  activeFormationIds?: unknown
+  activeFormationIds?: unknown,
 ): { isValid: boolean; reason?: string } => {
   // Validate player ID
   if (!playerId || typeof playerId !== 'string') {
@@ -419,7 +419,7 @@ export const devValidationLog = (
   component: string,
   validation: string,
   data: unknown,
-  isValid: boolean
+  isValid: boolean,
 ) => {
   if (import.meta.env.DEV) {
     const status = isValid ? '✅' : '❌';

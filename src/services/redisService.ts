@@ -340,7 +340,7 @@ class RedisService {
     identifier: string,
     maxRequests: number,
     windowSeconds: number,
-    prefix = 'rate_limit'
+    prefix = 'rate_limit',
   ): Promise<RateLimitResult> {
     if (!this.client) {
       throw new Error('Redis client not initialized');
@@ -383,7 +383,7 @@ class RedisService {
         windowStart.toString(),
         maxRequests.toString(),
         now.toString(),
-        windowSeconds.toString()
+        windowSeconds.toString(),
       )) as [number, number, number];
 
       const [allowed, remaining, totalRequests] = result;
@@ -408,7 +408,7 @@ class RedisService {
               windowSeconds,
               totalRequests,
             },
-          }
+          },
         );
       }
 

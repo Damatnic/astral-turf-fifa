@@ -398,7 +398,7 @@ class InputValidationService {
    */
   validateWithSchema(
     data: Record<string, unknown>,
-    schemaName: keyof typeof VALIDATION_SCHEMAS
+    schemaName: keyof typeof VALIDATION_SCHEMAS,
   ): BulkValidationResult {
     const schema = VALIDATION_SCHEMAS[schemaName] as unknown as FormValidationSchema;
     return this.validateForm(data, schema);
@@ -409,7 +409,7 @@ class InputValidationService {
    */
   sanitizeString(
     input: string,
-    context: 'html' | 'sql' | 'url' | 'filename' | 'general' = 'general'
+    context: 'html' | 'sql' | 'url' | 'filename' | 'general' = 'general',
   ): string {
     switch (context) {
       case 'html':
@@ -474,7 +474,7 @@ class InputValidationService {
       maxSize?: number;
       allowedExtensions?: string[];
       scanForMalware?: boolean;
-    } = {}
+    } = {},
   ): ValidationResult {
     const result: ValidationResult = {
       valid: true,
@@ -542,7 +542,7 @@ class InputValidationService {
         acc[r.riskLevel] = (acc[r.riskLevel] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<string, number>,
     );
 
     const threatCounts = results
@@ -552,7 +552,7 @@ class InputValidationService {
           acc[threat] = (acc[threat] || 0) + 1;
           return acc;
         },
-        {} as Record<string, number>
+        {} as Record<string, number>,
       );
 
     const commonThreats = Object.entries(threatCounts)
@@ -580,7 +580,7 @@ class InputValidationService {
   private performBasicValidation(
     value: unknown,
     config: ValidationConfig,
-    result: ValidationResult
+    result: ValidationResult,
   ): void {
     // Required field check
     if (config.required && (value === undefined || value === null || value === '')) {
@@ -751,7 +751,7 @@ class InputValidationService {
   private performCrossFieldValidation(
     data: Record<string, unknown>,
     schema: FormValidationSchema,
-    result: BulkValidationResult
+    result: BulkValidationResult,
   ): void {
     // Password confirmation validation
     if ('password' in data && 'confirmPassword' in data) {
@@ -787,7 +787,7 @@ class InputValidationService {
     // Additional assessment based on error patterns
     if (
       result.errors.some(
-        error => error.includes('length') || error.includes('format') || error.includes('required')
+        error => error.includes('length') || error.includes('format') || error.includes('required'),
       )
     ) {
       // Basic validation errors are low risk unless threats detected
@@ -878,12 +878,12 @@ export const validateForm = (data: Record<string, unknown>, schema: FormValidati
 
 export const validateWithPredefinedSchema = (
   data: Record<string, unknown>,
-  schemaName: keyof typeof VALIDATION_SCHEMAS
+  schemaName: keyof typeof VALIDATION_SCHEMAS,
 ) => inputValidation.validateWithSchema(data, schemaName);
 
 export const sanitizeInput = (
   input: string,
-  context: 'html' | 'sql' | 'url' | 'filename' | 'general' = 'general'
+  context: 'html' | 'sql' | 'url' | 'filename' | 'general' = 'general',
 ) => inputValidation.sanitizeString(input, context);
 
 export const validateJSONData = (data: unknown) => inputValidation.validateJSON(data);
@@ -895,7 +895,7 @@ export const validateFileUpload = (
     maxSize?: number;
     allowedExtensions?: string[];
     scanForMalware?: boolean;
-  }
+  },
 ) => inputValidation.validateFileUpload(file, options);
 
 export const getValidationStats = () => inputValidation.getValidationMetrics();

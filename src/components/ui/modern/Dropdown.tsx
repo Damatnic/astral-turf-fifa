@@ -178,7 +178,7 @@ export const DropdownContent = forwardRef<HTMLDivElement, DropdownContentProps>(
           'fixed z-50 min-w-[8rem] rounded-md border border-secondary-700/50',
           'bg-secondary-800/95 backdrop-blur-sm shadow-lg',
           'p-1 animate-fade-in-scale origin-top-left',
-          className
+          className,
         )}
         style={{
           top: position.top,
@@ -188,9 +188,9 @@ export const DropdownContent = forwardRef<HTMLDivElement, DropdownContentProps>(
       >
         {children}
       </div>,
-      document.body
+      document.body,
     );
-  }
+  },
 );
 
 DropdownContent.displayName = 'DropdownContent';
@@ -209,7 +209,7 @@ export const DropdownItem = forwardRef<HTMLDivElement, DropdownItemProps>(
       onClick,
       ...props
     },
-    ref
+    ref,
   ) => {
     const context = React.useContext(DropdownContext);
 
@@ -236,7 +236,7 @@ export const DropdownItem = forwardRef<HTMLDivElement, DropdownItemProps>(
           !disabled && destructive && 'hover:bg-error-600/20 text-error-400 hover:text-error-300',
           selected && 'bg-primary-600/20 text-primary-400',
           disabled && 'cursor-not-allowed opacity-50 text-secondary-500',
-          className
+          className,
         )}
         onClick={handleClick}
         role="menuitem"
@@ -262,7 +262,7 @@ export const DropdownItem = forwardRef<HTMLDivElement, DropdownItemProps>(
         )}
       </div>
     );
-  }
+  },
 );
 
 DropdownItem.displayName = 'DropdownItem';
@@ -275,7 +275,7 @@ export const DropdownSeparator = forwardRef<HTMLDivElement, React.HTMLAttributes
       role="separator"
       {...props}
     />
-  )
+  ),
 );
 
 DropdownSeparator.displayName = 'DropdownSeparator';
@@ -286,13 +286,13 @@ export const DropdownLabel = forwardRef<HTMLDivElement, React.HTMLAttributes<HTM
       ref={ref}
       className={cn(
         'px-2 py-1.5 text-xs font-semibold text-secondary-400 uppercase tracking-wider',
-        className
+        className,
       )}
       {...props}
     >
       {children}
     </div>
-  )
+  ),
 );
 
 DropdownLabel.displayName = 'DropdownLabel';

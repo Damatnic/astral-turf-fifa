@@ -129,7 +129,7 @@ function challengeReducer(state: ChallengeState, action: ChallengeAction): Chall
       return {
         ...state,
         notifications: state.notifications.map(n =>
-          n.id === action.payload ? { ...n, read: true } : n
+          n.id === action.payload ? { ...n, read: true } : n,
         ),
       };
 
@@ -142,7 +142,7 @@ function challengeReducer(state: ChallengeState, action: ChallengeAction): Chall
     case 'START_CHALLENGE': {
       const progress = challengeService.startChallenge(
         action.payload.playerId,
-        action.payload.challengeId
+        action.payload.challengeId,
       );
       if (progress) {
         const profile = playerRankingService.getProfile(action.payload.playerId);
@@ -199,7 +199,7 @@ function challengeReducer(state: ChallengeState, action: ChallengeAction): Chall
           challenge.difficulty,
           challenge.xpReward,
           challenge.attributePointReward,
-          challenge.badgeReward
+          challenge.badgeReward,
         );
 
         const profile = playerRankingService.getProfile(playerId);
@@ -340,7 +340,7 @@ function challengeReducer(state: ChallengeState, action: ChallengeAction): Chall
         challengeId,
         approved,
         reviewerId,
-        notes
+        notes,
       );
 
       if (success) {
@@ -368,7 +368,7 @@ function challengeReducer(state: ChallengeState, action: ChallengeAction): Chall
               challenge.difficulty,
               challenge.xpReward,
               challenge.attributePointReward,
-              challenge.badgeReward
+              challenge.badgeReward,
             );
           }
         }
@@ -479,7 +479,7 @@ export const ChallengeProvider: React.FC<ChallengeProviderProps> = ({ children }
     playerId: string,
     challengeId: string,
     requirementId: string,
-    value: number
+    value: number,
   ) => {
     dispatch({
       type: 'UPDATE_CHALLENGE_PROGRESS',
@@ -494,7 +494,7 @@ export const ChallengeProvider: React.FC<ChallengeProviderProps> = ({ children }
   const submitEvidence = (
     playerId: string,
     challengeId: string,
-    evidence: Omit<EvidenceSubmission, 'id' | 'submittedAt'>
+    evidence: Omit<EvidenceSubmission, 'id' | 'submittedAt'>,
   ) => {
     dispatch({ type: 'SUBMIT_EVIDENCE', payload: { playerId, challengeId, evidence } as any });
   };
@@ -502,7 +502,7 @@ export const ChallengeProvider: React.FC<ChallengeProviderProps> = ({ children }
   const spendAttributePoints = (
     playerId: string,
     attribute: keyof PlayerAttributes,
-    points: number
+    points: number,
   ) => {
     dispatch({ type: 'SPEND_ATTRIBUTE_POINTS', payload: { playerId, attribute, points } });
   };
@@ -513,7 +513,7 @@ export const ChallengeProvider: React.FC<ChallengeProviderProps> = ({ children }
 
   const updateLeaderboard = (
     playerIds: string[],
-    sortBy: 'total' | 'weekly' | 'monthly' = 'total'
+    sortBy: 'total' | 'weekly' | 'monthly' = 'total',
   ) => {
     const leaderboard = playerRankingService.getLeaderboard(playerIds, sortBy);
     dispatch({ type: 'UPDATE_LEADERBOARD', payload: leaderboard });
@@ -542,7 +542,7 @@ export const ChallengeProvider: React.FC<ChallengeProviderProps> = ({ children }
 
         // Only add if not already notified
         const alreadyNotified = state.notifications.some(
-          n => n.type === 'challenge_expiring' && n.challengeId === challenge.id
+          n => n.type === 'challenge_expiring' && n.challengeId === challenge.id,
         );
 
         if (!alreadyNotified) {

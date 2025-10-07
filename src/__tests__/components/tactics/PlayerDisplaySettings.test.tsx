@@ -46,7 +46,7 @@ describe('PlayerDisplaySettings Component', () => {
   describe('Component Rendering', () => {
     it('renders the settings toggle button', () => {
       renderWithProviders(
-        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />
+        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />,
       );
 
       expect(screen.getByRole('button', { name: /display/i })).toBeInTheDocument();
@@ -55,7 +55,7 @@ describe('PlayerDisplaySettings Component', () => {
 
     it('initially shows closed settings panel', () => {
       renderWithProviders(
-        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />
+        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />,
       );
 
       expect(screen.queryByTestId('settings-panel')).not.toBeInTheDocument();
@@ -67,7 +67,7 @@ describe('PlayerDisplaySettings Component', () => {
           config={mockConfig}
           onConfigChange={mockOnConfigChange}
           className="custom-class"
-        />
+        />,
       );
 
       const container = screen.getByTestId('player-display-settings');
@@ -78,7 +78,7 @@ describe('PlayerDisplaySettings Component', () => {
   describe('Settings Panel Interaction', () => {
     it('opens settings panel when toggle button is clicked', async () => {
       renderWithProviders(
-        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />
+        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />,
       );
 
       const toggleButton = screen.getByRole('button', { name: /display/i });
@@ -91,7 +91,7 @@ describe('PlayerDisplaySettings Component', () => {
 
     it('closes settings panel when toggle button is clicked again', async () => {
       renderWithProviders(
-        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />
+        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />,
       );
 
       const toggleButton = screen.getByRole('button', { name: /display/i });
@@ -111,7 +111,7 @@ describe('PlayerDisplaySettings Component', () => {
 
     it('closes panel when backdrop is clicked', async () => {
       renderWithProviders(
-        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />
+        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />,
       );
 
       const toggleButton = screen.getByRole('button', { name: /display/i });
@@ -131,7 +131,7 @@ describe('PlayerDisplaySettings Component', () => {
 
     it('closes panel when close button is clicked', async () => {
       renderWithProviders(
-        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />
+        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />,
       );
 
       const toggleButton = screen.getByRole('button', { name: /display/i });
@@ -151,7 +151,7 @@ describe('PlayerDisplaySettings Component', () => {
 
     it('prevents event propagation when clicking inside panel', async () => {
       renderWithProviders(
-        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />
+        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />,
       );
 
       const toggleButton = screen.getByRole('button', { name: /display/i });
@@ -172,7 +172,7 @@ describe('PlayerDisplaySettings Component', () => {
   describe('Toggle Options', () => {
     beforeEach(async () => {
       renderWithProviders(
-        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />
+        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />,
       );
 
       const toggleButton = screen.getByRole('button', { name: /display/i });
@@ -265,7 +265,7 @@ describe('PlayerDisplaySettings Component', () => {
   describe('Select Options', () => {
     beforeEach(async () => {
       renderWithProviders(
-        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />
+        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />,
       );
 
       const toggleButton = screen.getByRole('button', { name: /display/i });
@@ -355,7 +355,7 @@ describe('PlayerDisplaySettings Component', () => {
   describe('Reset Functionality', () => {
     beforeEach(async () => {
       renderWithProviders(
-        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />
+        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />,
       );
 
       const toggleButton = screen.getByRole('button', { name: /display/i });
@@ -391,7 +391,7 @@ describe('PlayerDisplaySettings Component', () => {
   describe('Keyboard Navigation', () => {
     it('supports tab navigation through settings', async () => {
       renderWithProviders(
-        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />
+        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />,
       );
 
       const toggleButton = screen.getByRole('button', { name: /display/i });
@@ -418,7 +418,7 @@ describe('PlayerDisplaySettings Component', () => {
 
     it('closes panel with Escape key', async () => {
       renderWithProviders(
-        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />
+        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />,
       );
 
       const toggleButton = screen.getByRole('button', { name: /display/i });
@@ -437,7 +437,7 @@ describe('PlayerDisplaySettings Component', () => {
 
     it('activates toggles with Space key', async () => {
       renderWithProviders(
-        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />
+        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />,
       );
 
       const toggleButton = screen.getByRole('button', { name: /display/i });
@@ -462,19 +462,19 @@ describe('PlayerDisplaySettings Component', () => {
   describe('Accessibility', () => {
     it('provides proper ARIA labels for toggle button', () => {
       renderWithProviders(
-        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />
+        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />,
       );
 
       const toggleButton = screen.getByRole('button', { name: /display/i });
       expect(toggleButton).toHaveAttribute(
         'aria-label',
-        expect.stringContaining('display settings')
+        expect.stringContaining('display settings'),
       );
     });
 
     it('provides proper ARIA labels for toggles', async () => {
       renderWithProviders(
-        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />
+        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />,
       );
 
       const toggleButton = screen.getByRole('button', { name: /display/i });
@@ -492,7 +492,7 @@ describe('PlayerDisplaySettings Component', () => {
 
     it('provides proper ARIA labels for select options', async () => {
       renderWithProviders(
-        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />
+        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />,
       );
 
       const toggleButton = screen.getByRole('button', { name: /display/i });
@@ -511,7 +511,7 @@ describe('PlayerDisplaySettings Component', () => {
 
     it('announces changes to screen readers', async () => {
       renderWithProviders(
-        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />
+        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />,
       );
 
       const toggleButton = screen.getByRole('button', { name: /display/i });
@@ -532,7 +532,7 @@ describe('PlayerDisplaySettings Component', () => {
   describe('Animation and Visual Feedback', () => {
     it('shows hover effects on toggle button', async () => {
       renderWithProviders(
-        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />
+        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />,
       );
 
       const toggleButton = screen.getByRole('button', { name: /display/i });
@@ -543,7 +543,7 @@ describe('PlayerDisplaySettings Component', () => {
 
     it('shows panel animation when opening', async () => {
       renderWithProviders(
-        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />
+        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />,
       );
 
       const toggleButton = screen.getByRole('button', { name: /display/i });
@@ -557,7 +557,7 @@ describe('PlayerDisplaySettings Component', () => {
 
     it('shows toggle switch animations', async () => {
       renderWithProviders(
-        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />
+        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />,
       );
 
       const toggleButton = screen.getByRole('button', { name: /display/i });
@@ -577,7 +577,7 @@ describe('PlayerDisplaySettings Component', () => {
   describe('Configuration Persistence', () => {
     it('reflects configuration changes in UI immediately', async () => {
       const { rerender } = renderWithProviders(
-        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />
+        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />,
       );
 
       const toggleButton = screen.getByRole('button', { name: /display/i });
@@ -590,7 +590,7 @@ describe('PlayerDisplaySettings Component', () => {
       // Update config externally
       const updatedConfig = { ...mockConfig, showNames: false };
       rerender(
-        <PlayerDisplaySettings config={updatedConfig} onConfigChange={mockOnConfigChange} />
+        <PlayerDisplaySettings config={updatedConfig} onConfigChange={mockOnConfigChange} />,
       );
 
       const namesToggle = screen.getByTestId('toggle-showNames');
@@ -599,7 +599,7 @@ describe('PlayerDisplaySettings Component', () => {
 
     it('handles rapid configuration changes gracefully', async () => {
       renderWithProviders(
-        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />
+        <PlayerDisplaySettings config={mockConfig} onConfigChange={mockOnConfigChange} />,
       );
 
       const toggleButton = screen.getByRole('button', { name: /display/i });
@@ -624,14 +624,14 @@ describe('PlayerDisplaySettings Component', () => {
     it('handles missing config gracefully', () => {
       expect(() => {
         renderWithProviders(
-          <PlayerDisplaySettings config={null as any} onConfigChange={mockOnConfigChange} />
+          <PlayerDisplaySettings config={null as any} onConfigChange={mockOnConfigChange} />,
         );
       }).not.toThrow();
     });
 
     it('handles missing onConfigChange callback', async () => {
       renderWithProviders(
-        <PlayerDisplaySettings config={mockConfig} onConfigChange={undefined as any} />
+        <PlayerDisplaySettings config={mockConfig} onConfigChange={undefined as any} />,
       );
 
       const toggleButton = screen.getByRole('button', { name: /display/i });
@@ -656,7 +656,7 @@ describe('PlayerDisplaySettings Component', () => {
 
       expect(() => {
         renderWithProviders(
-          <PlayerDisplaySettings config={invalidConfig} onConfigChange={mockOnConfigChange} />
+          <PlayerDisplaySettings config={invalidConfig} onConfigChange={mockOnConfigChange} />,
         );
       }).not.toThrow();
     });

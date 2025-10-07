@@ -23,7 +23,7 @@ const RadarChart: React.FC<RadarChartProps> = ({ datasets, labels, size = 300, t
   // Generate accessible description
   const ariaDescription = useMemo(
     () => generateRadarChartDescription(datasets, labels, title),
-    [datasets, labels, title]
+    [datasets, labels, title],
   );
 
   // Grid polygons and axis lines
@@ -46,7 +46,7 @@ const RadarChart: React.FC<RadarChartProps> = ({ datasets, labels, size = 300, t
           fill="none"
           stroke="var(--border-primary)"
           strokeWidth="0.5"
-        />
+        />,
       );
     }
     return levels;

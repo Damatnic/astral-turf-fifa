@@ -101,7 +101,7 @@ class ValidationService {
   async validateInput<T = unknown>(
     schema: Joi.ObjectSchema<T>,
     data: unknown,
-    context?: ValidationContext
+    context?: ValidationContext,
   ): Promise<ValidationResult<T>> {
     const startTime = Date.now();
     const result: ValidationResult<T> = {
@@ -116,7 +116,7 @@ class ValidationService {
         const rateLimitResult = await rateLimit.check(
           `validation:${context.ipAddress}`,
           100, // 100 validation requests
-          60 // per minute
+          60, // per minute
         );
 
         if (!rateLimitResult.allowed) {
@@ -202,7 +202,7 @@ class ValidationService {
    */
   private async detectThreatsAndSanitize(
     data: unknown,
-    context?: ValidationContext
+    context?: ValidationContext,
   ): Promise<{ sanitizedData: unknown; threats: ThreatDetection[] }> {
     const threats: ThreatDetection[] = [];
     const sanitizedData = JSON.parse(JSON.stringify(data)); // Deep clone
@@ -501,7 +501,7 @@ class ValidationService {
             'image/gif',
             'image/webp',
             'application/pdf',
-            'text/plain'
+            'text/plain',
           )
           .required(),
         size: Joi.number()
@@ -561,7 +561,7 @@ export function createValidationMiddleware(schema: Joi.ObjectSchema) {
 export function useValidation() {
   const validate = async <T>(
     schema: Joi.ObjectSchema<T>,
-    data: unknown
+    data: unknown,
   ): Promise<ValidationResult<T>> => {
     return await validationService.validateInput(schema, data);
   };

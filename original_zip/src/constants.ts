@@ -1486,7 +1486,7 @@ const initialSeason: Season = {
       };
       return acc;
     },
-    {} as Record<string, LeagueTableEntry>
+    {} as Record<string, LeagueTableEntry>,
   ),
   fixtures: generateFixtures(leagueTeams),
 };

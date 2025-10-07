@@ -41,7 +41,7 @@ const PlayerDashboard: React.FC = () => {
   }
 
   const completedChallenges = skillChallenges.filter(sc =>
-    player.completedChallenges.includes(sc.id)
+    player.completedChallenges.includes(sc.id),
   );
 
   return (

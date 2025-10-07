@@ -66,7 +66,7 @@ const MobileTacticalField: React.FC<MobileTacticalFieldProps> = ({
   // Transform values for smooth interactions
   const fieldTransform = useTransform(
     [fieldX, fieldY, fieldScale],
-    ([x, y, scale]) => `translate3d(${x}px, ${y}px, 0) scale(${scale})`
+    ([x, y, scale]) => `translate3d(${x}px, ${y}px, 0) scale(${scale})`,
   );
 
   // Field dimensions based on device
@@ -124,7 +124,7 @@ const MobileTacticalField: React.FC<MobileTacticalFieldProps> = ({
           navigator.vibrate(5);
         }
       },
-      [fieldScale, capabilities.hasHapticFeedback]
+      [fieldScale, capabilities.hasHapticFeedback],
     ),
 
     onSwipe: useCallback(
@@ -154,7 +154,7 @@ const MobileTacticalField: React.FC<MobileTacticalFieldProps> = ({
           navigator.vibrate(10);
         }
       },
-      [fieldX, fieldY, capabilities.hasHapticFeedback]
+      [fieldX, fieldY, capabilities.hasHapticFeedback],
     ),
   });
 
@@ -171,7 +171,7 @@ const MobileTacticalField: React.FC<MobileTacticalFieldProps> = ({
       fieldX.set(currentX + info.delta.x);
       fieldY.set(currentY + info.delta.y);
     },
-    [fieldX, fieldY, isDragging]
+    [fieldX, fieldY, isDragging],
   );
 
   // Player interaction handlers
@@ -208,7 +208,7 @@ const MobileTacticalField: React.FC<MobileTacticalFieldProps> = ({
           y2={fieldHeight}
           stroke="rgba(255,255,255,0.1)"
           strokeWidth="1"
-        />
+        />,
       );
     }
 
@@ -223,7 +223,7 @@ const MobileTacticalField: React.FC<MobileTacticalFieldProps> = ({
           y2={y}
           stroke="rgba(255,255,255,0.1)"
           strokeWidth="1"
-        />
+        />,
       );
     }
 

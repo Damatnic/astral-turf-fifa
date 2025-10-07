@@ -87,7 +87,7 @@ class CalendarIntegrationService {
       const oauth2Client = new google.auth.OAuth2(
         clientId,
         clientSecret,
-        'http://localhost:3000/auth/google/callback'
+        'http://localhost:3000/auth/google/callback',
       );
 
       // Generate auth URL
@@ -189,7 +189,7 @@ class CalendarIntegrationService {
       attendees: string[];
       recurrence?: 'daily' | 'weekly' | 'monthly';
       endDate?: string;
-    }
+    },
   ): Promise<void> {
     const event: CalendarEvent = {
       id: uuidv4(),
@@ -221,7 +221,7 @@ class CalendarIntegrationService {
     opponent: string,
     dateTime: string,
     venue: string,
-    isHome: boolean
+    isHome: boolean,
   ): Promise<void> {
     const event: CalendarEvent = {
       id: uuidv4(),
@@ -312,7 +312,7 @@ class CalendarIntegrationService {
     duration: number,
     attendees: string[],
     preferredTimes: string[],
-    dateRange: { start: string; end: string }
+    dateRange: { start: string; end: string },
   ): Promise<{ time: string; score: number; reasoning: string }[]> {
     const suggestions: { time: string; score: number; reasoning: string }[] = [];
 
@@ -355,7 +355,7 @@ class CalendarIntegrationService {
   async getEvents(
     startDate: string,
     endDate: string,
-    eventType?: CalendarEvent['type']
+    eventType?: CalendarEvent['type'],
   ): Promise<CalendarEvent[]> {
     const allEvents: CalendarEvent[] = [];
 
@@ -375,7 +375,7 @@ class CalendarIntegrationService {
     }
 
     return allEvents.sort(
-      (a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+      (a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime(),
     );
   }
 
@@ -590,7 +590,7 @@ class CalendarIntegrationService {
 
   private generateAlternativeTimes(
     newEvent: CalendarEvent,
-    conflictingEvent: CalendarEvent
+    conflictingEvent: CalendarEvent,
   ): { time: string; reason: string }[] {
     const alternatives: { time: string; reason: string }[] = [];
     const newStart = new Date(newEvent.startTime);
@@ -607,7 +607,7 @@ class CalendarIntegrationService {
     const beforeConflict = new Date(
       new Date(conflictingEvent.startTime).getTime() -
         (new Date(newEvent.endTime).getTime() - newStart.getTime()) -
-        30 * 60 * 1000
+        30 * 60 * 1000,
     );
     alternatives.push({
       time: beforeConflict.toISOString(),
@@ -624,7 +624,7 @@ class CalendarIntegrationService {
 
   private async analyzeAvailabilityPatterns(
     attendees: string[],
-    dateRange: { start: string; end: string }
+    dateRange: { start: string; end: string },
   ): Promise<unknown> {
     // Analyze historical availability patterns
     return { patterns: 'analyzed' };
@@ -652,7 +652,7 @@ class CalendarIntegrationService {
   private async createRecurringEvents(
     event: CalendarEvent,
     recurrence: 'daily' | 'weekly' | 'monthly',
-    endDate: string
+    endDate: string,
   ): Promise<void> {
     // // // // console.log(`🔄 Creating recurring ${recurrence} events until ${endDate}`);
   }

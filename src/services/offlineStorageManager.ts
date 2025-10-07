@@ -143,12 +143,12 @@ class OfflineStorageManager {
 
       request.onsuccess = () => {
         console.log(`✅ Saved to ${storeName}: ${id}`);
-        
+
         // Add to sync queue if offline
         if (!this.isOnline || !syncImmediately) {
           this.addToSyncQueue('update', storeName, offlineData);
         }
-        
+
         resolve();
       };
 
@@ -215,12 +215,12 @@ class OfflineStorageManager {
 
       request.onsuccess = () => {
         console.log(`🗑️ Deleted from ${storeName}: ${id}`);
-        
+
         // Add to sync queue if offline
         if (!this.isOnline) {
           this.addToSyncQueue('delete', storeName, { id });
         }
-        
+
         resolve();
       };
 

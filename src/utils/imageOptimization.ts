@@ -20,7 +20,7 @@ export interface ImageOptimizationOptions {
  */
 export function generateSrcSet(
   src: string,
-  widths: number[] = [320, 640, 768, 1024, 1280, 1536]
+  widths: number[] = [320, 640, 768, 1024, 1280, 1536],
 ): string {
   return widths
     .map(width => {
@@ -114,7 +114,7 @@ export function getOptimalImageFormat(src: string): string {
 export function lazyLoadImage(
   imgElement: HTMLImageElement,
   src: string,
-  options?: IntersectionObserverInit
+  options?: IntersectionObserverInit,
 ): () => void {
   if ('IntersectionObserver' in window) {
     const observer = new IntersectionObserver(
@@ -128,7 +128,7 @@ export function lazyLoadImage(
           }
         });
       },
-      options || { rootMargin: '50px' }
+      options || { rootMargin: '50px' },
     );
 
     observer.observe(imgElement);

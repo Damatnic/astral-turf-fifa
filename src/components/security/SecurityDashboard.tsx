@@ -232,7 +232,7 @@ const SecurityDashboard: React.FC = () => {
 
   const acknowledgeAlert = (alertId: string) => {
     setAlerts(prev =>
-      prev.map(alert => (alert.id === alertId ? { ...alert, acknowledged: true } : alert))
+      prev.map(alert => (alert.id === alertId ? { ...alert, acknowledged: true } : alert)),
     );
   };
 
@@ -399,7 +399,7 @@ const SecurityDashboard: React.FC = () => {
                   ? Math.round(
                       (metrics.authentication.successfulLogins /
                         metrics.authentication.loginAttempts) *
-                        100
+                        100,
                     )
                   : 0}
                 %

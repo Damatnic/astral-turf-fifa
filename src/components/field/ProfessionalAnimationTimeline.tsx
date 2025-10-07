@@ -153,7 +153,7 @@ const TimelineControls: React.FC<{
         </div>
       </div>
     );
-  }
+  },
 );
 
 // Enhanced animation trail renderer
@@ -186,7 +186,7 @@ const AnimationTrailRenderer: React.FC<{
           typeof point.x === 'number' &&
           typeof point.y === 'number' &&
           !isNaN(point.x) &&
-          !isNaN(point.y)
+          !isNaN(point.y),
       )
       .map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`)
       .join(' ');
@@ -321,7 +321,7 @@ const KeyframeEditor: React.FC<{
       keyframes: [...sequence.keyframes, newKeyframe],
       duration: Math.max(
         sequence.duration,
-        newKeyframe.timestamp + (newKeyframe.duration || 0) / 1000
+        newKeyframe.timestamp + (newKeyframe.duration || 0) / 1000,
       ),
     });
   };
@@ -439,7 +439,7 @@ const ProfessionalAnimationTimeline: React.FC = () => {
       animationState.duration,
       animationState.playbackSpeed,
       generatePlayerTrails,
-    ]
+    ],
   );
 
   // Animation controls

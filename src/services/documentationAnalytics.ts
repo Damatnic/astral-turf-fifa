@@ -66,7 +66,7 @@ export const UserSessionSchema = z.object({
       action: z.string(),
       timestamp: z.string(),
       documentId: z.string().optional(),
-    })
+    }),
   ),
 });
 
@@ -91,7 +91,7 @@ export const DocumentationMetricsSchema = z.object({
       views: z.number(),
       satisfaction: z.number(),
       completionRate: z.number(),
-    })
+    }),
   ),
   trends: z.object({
     daily: z.array(
@@ -99,14 +99,14 @@ export const DocumentationMetricsSchema = z.object({
         date: z.string(),
         views: z.number(),
         satisfaction: z.number(),
-      })
+      }),
     ),
     weekly: z.array(
       z.object({
         week: z.string(),
         views: z.number(),
         satisfaction: z.number(),
-      })
+      }),
     ),
   }),
 });
@@ -218,7 +218,7 @@ export class DocumentationAnalyticsService {
         title: document.title,
         referrer: document.referrer,
       },
-      documentId
+      documentId,
     );
   }
 
@@ -257,7 +257,7 @@ export class DocumentationAnalyticsService {
   trackTutorial(
     action: 'started' | 'completed' | 'skipped',
     tutorialId: string,
-    stepIndex?: number
+    stepIndex?: number,
   ): void {
     const eventType =
       action === 'started'
@@ -283,7 +283,7 @@ export class DocumentationAnalyticsService {
    */
   trackDocumentInteraction(
     action: 'helpful' | 'unhelpful' | 'bookmark' | 'share',
-    documentId: string
+    documentId: string,
   ): void {
     const eventType =
       action === 'helpful'
@@ -303,7 +303,7 @@ export class DocumentationAnalyticsService {
   trackCodeExample(
     action: 'copied' | 'run' | 'modified',
     exampleId: string,
-    success?: boolean
+    success?: boolean,
   ): void {
     const eventType = action === 'copied' ? 'code_copied' : 'example_run';
 
@@ -326,7 +326,7 @@ export class DocumentationAnalyticsService {
         duration: timeSpent,
         documentId,
       },
-      documentId
+      documentId,
     );
   }
 
@@ -342,7 +342,7 @@ export class DocumentationAnalyticsService {
           percentage,
           milestone: `${percentage}%`,
         },
-        documentId
+        documentId,
       );
     }
   }
@@ -359,7 +359,7 @@ export class DocumentationAnalyticsService {
         userAgent: navigator.userAgent,
         url: window.location.href,
       },
-      documentId
+      documentId,
     );
   }
 
@@ -587,7 +587,7 @@ export class DocumentationAnalyticsService {
    */
   async getDocumentMetrics(
     documentId: string,
-    period?: { start: string; end: string }
+    period?: { start: string; end: string },
   ): Promise<DocumentationMetrics> {
     const events = this.getEventsInRange(period).filter(event => event.documentId === documentId);
 
@@ -788,7 +788,7 @@ export class DocumentationAnalyticsService {
   }
 
   private calculateUserSegmentMetrics(
-    events: AnalyticsEvent[]
+    events: AnalyticsEvent[],
   ): DocumentationMetrics['userSegments'] {
     // Implementation would segment users and calculate metrics per segment
     return {};
@@ -859,7 +859,7 @@ export class DocumentationAnalyticsService {
         sessions: Array.from(this.sessions.entries()),
       },
       null,
-      2
+      2,
     );
   }
 }
@@ -871,7 +871,7 @@ export const documentationAnalytics = DocumentationAnalyticsService.getInstance(
 let lastScrollDepth = 0;
 window.addEventListener('scroll', () => {
   const scrollDepth = Math.round(
-    (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100
+    (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100,
   );
 
   if (scrollDepth > lastScrollDepth && scrollDepth % 25 === 0) {

@@ -44,7 +44,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
       () => {
         setIsVisible(true);
       },
-      trigger === 'hover' ? delay : 0
+      trigger === 'hover' ? delay : 0,
     );
   };
 
@@ -210,7 +210,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
               'bg-secondary-900 border border-secondary-700/50 rounded-lg shadow-xl',
               'max-w-xs break-words',
               getAnimationClasses(),
-              contentClassName
+              contentClassName,
             )}
             style={{
               top: position.top,
@@ -221,7 +221,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
             {content}
             <div className={getArrowClasses()} />
           </div>,
-          document.body
+          document.body,
         )}
     </>
   );

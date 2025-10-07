@@ -231,7 +231,7 @@ export class AnalyticsAPI {
       () => {
         this.cleanupCache();
       },
-      5 * 60 * 1000
+      5 * 60 * 1000,
     );
   }
 
@@ -400,7 +400,7 @@ export class AnalyticsAPI {
         ORDER BY d.updated_at DESC
         LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
       `,
-        [...params, limit, offset]
+        [...params, limit, offset],
       );
 
       res.json({
@@ -432,7 +432,7 @@ export class AnalyticsAPI {
         VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
         RETURNING *
       `,
-        [name, description, req.user?.id, isPublic, JSON.stringify(layout), JSON.stringify(filters)]
+        [name, description, req.user?.id, isPublic, JSON.stringify(layout), JSON.stringify(filters)],
       );
 
       res.status(201).json({
@@ -480,7 +480,7 @@ export class AnalyticsAPI {
           JSON.stringify(widget.config),
           JSON.stringify(widget.query),
           widget.refreshInterval,
-        ]
+        ],
       );
 
       res.status(201).json({
@@ -505,7 +505,7 @@ export class AnalyticsAPI {
       // Get report template
       const templateResult = await phoenixPool.query(
         'SELECT * FROM report_templates WHERE id = $1',
-        [templateId]
+        [templateId],
       );
 
       if (templateResult.rows.length === 0) {
@@ -556,7 +556,7 @@ export class AnalyticsAPI {
           template.id,
           fileBuffer,
           filename,
-          req.user?.id
+          req.user?.id,
         );
 
         res.json({
@@ -621,7 +621,7 @@ export class AnalyticsAPI {
 
       res.setHeader(
         'Content-Type',
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       );
       res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
       res.send(buffer);
@@ -715,7 +715,7 @@ export class AnalyticsAPI {
         // Data rows
         result.data.forEach(row => {
           const values = Object.values(row).map(value =>
-            typeof value === 'string' && value.includes(',') ? `"${value}"` : String(value)
+            typeof value === 'string' && value.includes(',') ? `"${value}"` : String(value),
           );
           csv += values.join(',') + '\n';
         });
@@ -802,7 +802,7 @@ export class AnalyticsAPI {
         query.metrics.length > 0 &&
         query.timeRange &&
         query.timeRange.start &&
-        query.timeRange.end
+        query.timeRange.end,
     );
   }
 
@@ -885,7 +885,7 @@ export class AnalyticsAPI {
 
   private async calculateAggregations(
     query: AnalyticsQuery,
-    data: any[]
+    data: any[],
   ): Promise<Record<string, any>> {
     // Calculate common aggregations
     const aggregations: Record<string, any> = {};
@@ -1306,7 +1306,7 @@ export class AnalyticsAPI {
     }
     if (tactical.mostEffectiveFormation.winRate > 70) {
       insights.push(
-        `${tactical.mostEffectiveFormation.formation} formation showing exceptional effectiveness`
+        `${tactical.mostEffectiveFormation.formation} formation showing exceptional effectiveness`,
       );
     }
     if (system.apiPerformance.successRate > 98) {
@@ -1359,7 +1359,7 @@ export class AnalyticsAPI {
       timeRange: string;
       teamId?: string;
       filters?: Record<string, string | number | boolean>;
-    }
+    },
   ): Promise<{
     templateId: string;
     generatedAt: string;
@@ -1418,7 +1418,7 @@ export class AnalyticsAPI {
 
   private async generatePDFReport(
     template: { id: string; name: string; title: string; logo?: string },
-    data: Record<string, unknown>
+    data: Record<string, unknown>,
   ): Promise<Buffer> {
     try {
       // Prepare PDF content sections
@@ -1449,7 +1449,7 @@ export class AnalyticsAPI {
               headers.map(h => {
                 const val = item[h];
                 return val === null || val === undefined ? null : String(val);
-              })
+              }),
             );
 
             sections.push({
@@ -1490,7 +1490,7 @@ export class AnalyticsAPI {
           orientation: 'portrait',
           size: 'A4',
         },
-        { sections }
+        { sections },
       );
 
       securityLogger.info('PDF report generated successfully', {
@@ -1511,7 +1511,7 @@ export class AnalyticsAPI {
 
   private async generateExcelReport(
     template: { id: string; name: string; sheets: string[] },
-    data: Record<string, unknown>
+    data: Record<string, unknown>,
   ): Promise<Buffer> {
     try {
       // Prepare sheets data
@@ -1542,7 +1542,7 @@ export class AnalyticsAPI {
                   return val;
                 }
                 return String(val);
-              })
+              }),
             );
 
             sheets.push({
@@ -1589,7 +1589,7 @@ export class AnalyticsAPI {
           category: 'Reports',
           description: `Analytics report generated on ${new Date().toLocaleString()}`,
         },
-        sheets
+        sheets,
       );
 
       securityLogger.info('Excel report generated successfully', {
@@ -1610,7 +1610,7 @@ export class AnalyticsAPI {
 
   private async generateCSVReport(
     template: { id: string; name: string; columns: string[] },
-    data: Record<string, unknown>
+    data: Record<string, unknown>,
   ): Promise<Buffer> {
     try {
       // Flatten nested data structure for CSV
@@ -1629,13 +1629,13 @@ export class AnalyticsAPI {
             value.forEach((item: unknown) => {
               if (item && typeof item === 'object') {
                 records.push(
-                  this.flattenObject({ section: key, ...(item as Record<string, unknown>) })
+                  this.flattenObject({ section: key, ...(item as Record<string, unknown>) }),
                 );
               }
             });
           } else if (value && typeof value === 'object') {
             records.push(
-              this.flattenObject({ section: key, ...(value as Record<string, unknown>) })
+              this.flattenObject({ section: key, ...(value as Record<string, unknown>) }),
             );
           } else {
             records.push({ metric: key, value });
@@ -1669,7 +1669,7 @@ export class AnalyticsAPI {
               return val;
             }
             return String(val);
-          })
+          }),
         ),
       };
 
@@ -1721,7 +1721,7 @@ export class AnalyticsAPI {
     templateId: string,
     buffer: Buffer,
     filename: string,
-    userId?: string
+    userId?: string,
   ): Promise<string> {
     // Generate unique report ID
     const reportId = `report-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -2599,7 +2599,7 @@ export class AnalyticsAPI {
 
       // Send initial connection message
       res.write(
-        `data: ${JSON.stringify({ type: 'connected', matchId, timestamp: new Date().toISOString() })}\n\n`
+        `data: ${JSON.stringify({ type: 'connected', matchId, timestamp: new Date().toISOString() })}\n\n`,
       );
 
       // Real-time event stream (using SSE for now, can upgrade to Redis pub/sub)
@@ -2631,7 +2631,7 @@ export class AnalyticsAPI {
       const mockEventInterval = setInterval(() => {
         if (eventCount >= maxEvents) {
           res.write(
-            `data: ${JSON.stringify({ type: 'match_ended', timestamp: new Date().toISOString() })}\n\n`
+            `data: ${JSON.stringify({ type: 'match_ended', timestamp: new Date().toISOString() })}\n\n`,
           );
           clearInterval(mockEventInterval);
           res.end();
@@ -2962,12 +2962,12 @@ export class AnalyticsAPI {
         // Re-rank based on preference (attacking, defensive, balanced)
         if (tacticalPreference === 'attacking') {
           filteredFormations = formations.sort(
-            (a, b) => b.expectedOutcome.goalProbability - a.expectedOutcome.goalProbability
+            (a, b) => b.expectedOutcome.goalProbability - a.expectedOutcome.goalProbability,
           );
         } else if (tacticalPreference === 'defensive') {
           filteredFormations = formations.sort(
             (a, b) =>
-              b.expectedOutcome.cleanSheetProbability - a.expectedOutcome.cleanSheetProbability
+              b.expectedOutcome.cleanSheetProbability - a.expectedOutcome.cleanSheetProbability,
           );
         }
       }
@@ -3061,10 +3061,10 @@ export class AnalyticsAPI {
 
           // Aggregate statistics
           const wins = matches.filter(
-            m => m.homeScore !== null && m.awayScore !== null && m.homeScore > m.awayScore
+            m => m.homeScore !== null && m.awayScore !== null && m.homeScore > m.awayScore,
           ).length;
           const draws = matches.filter(
-            m => m.homeScore !== null && m.awayScore !== null && m.homeScore === m.awayScore
+            m => m.homeScore !== null && m.awayScore !== null && m.homeScore === m.awayScore,
           ).length;
           const losses = totalMatches - wins - draws;
 
@@ -3076,7 +3076,7 @@ export class AnalyticsAPI {
             draws,
             losses,
           };
-        })
+        }),
       );
 
       // Filter out null results and use real data if available
@@ -3199,7 +3199,7 @@ export class AnalyticsAPI {
           teamsCompared: teamComparisons.length,
           metricsAnalyzed: metricsToCompare.length,
           highestRatedTeam: teamComparisons.reduce((prev: any, current: any) =>
-            current.overallRating > prev.overallRating ? current : prev
+            current.overallRating > prev.overallRating ? current : prev,
           ).teamName,
           generatedAt: new Date().toISOString(),
         },
@@ -3274,7 +3274,7 @@ export class AnalyticsAPI {
             },
             recentStats: player.statistics[0] || null,
           };
-        })
+        }),
       );
 
       // Filter out null results
@@ -3399,10 +3399,10 @@ export class AnalyticsAPI {
           summary: {
             totalPlayers: playerIdArray.length,
             elitePlayers: playerComparisons.filter(p =>
-              Object.values(p.comparisons).some((c: { rating?: string }) => c.rating === 'Elite')
+              Object.values(p.comparisons).some((c: { rating?: string }) => c.rating === 'Elite'),
             ).length,
             averageOverall: Math.round(
-              playersData.reduce((sum, p) => sum + p.stats.overall, 0) / playersData.length
+              playersData.reduce((sum, p) => sum + p.stats.overall, 0) / playersData.length,
             ),
           },
         },
@@ -3482,10 +3482,10 @@ export class AnalyticsAPI {
 
           // Calculate formation statistics
           const wins = matches.filter(
-            m => m.homeScore !== null && m.awayScore !== null && m.homeScore > m.awayScore
+            m => m.homeScore !== null && m.awayScore !== null && m.homeScore > m.awayScore,
           ).length;
           const draws = matches.filter(
-            m => m.homeScore !== null && m.awayScore !== null && m.homeScore === m.awayScore
+            m => m.homeScore !== null && m.awayScore !== null && m.homeScore === m.awayScore,
           ).length;
           const winRate = Math.round((wins / totalMatches) * 100);
 
@@ -3501,7 +3501,7 @@ export class AnalyticsAPI {
             lossRate: Math.round(((totalMatches - wins - draws) / totalMatches) * 100),
             goalsScored: { average: avgGoals, total: totalGoals },
           };
-        })
+        }),
       );
 
       // Filter out null results
@@ -3620,14 +3620,14 @@ export class AnalyticsAPI {
               bestFormation: formationComparisons.reduce((best, current) =>
                 current.effectiveness.winRate.value > best.effectiveness.winRate.value
                   ? current
-                  : best
+                  : best,
               ),
               mostBalanced: formationComparisons.reduce((best, current) => {
                 const currentBalance = Object.values(current.effectiveness).filter(
-                  (e: { rating?: string }) => e.rating === 'Above Standard'
+                  (e: { rating?: string }) => e.rating === 'Above Standard',
                 ).length;
                 const bestBalance = Object.values(best.effectiveness).filter(
-                  (e: { rating?: string }) => e.rating === 'Above Standard'
+                  (e: { rating?: string }) => e.rating === 'Above Standard',
                 ).length;
                 return currentBalance > bestBalance ? current : best;
               }),
@@ -3636,7 +3636,7 @@ export class AnalyticsAPI {
                   acc[f.tacticalStyle] = (acc[f.tacticalStyle] || 0) + 1;
                   return acc;
                 },
-                {}
+                {},
               ),
             }
           : null;
@@ -3652,10 +3652,10 @@ export class AnalyticsAPI {
             totalFormations: formationIdArray.length,
             averageWinRate:
               Math.round(
-                (formationsData.reduce((sum, f) => sum + f.winRate, 0) / formationsData.length) * 10
+                (formationsData.reduce((sum, f) => sum + f.winRate, 0) / formationsData.length) * 10,
               ) / 10,
             formationsAboveBenchmark: formationComparisons.filter(
-              f => f.effectiveness.winRate.rating === 'Above Standard'
+              f => f.effectiveness.winRate.rating === 'Above Standard',
             ).length,
           },
         },
@@ -3693,7 +3693,7 @@ export class AnalyticsAPI {
    */
   private applyFilters(
     data: Record<string, unknown>,
-    filters: Record<string, unknown>
+    filters: Record<string, unknown>,
   ): Record<string, unknown> {
     const filteredData = { ...data };
 
@@ -3704,7 +3704,7 @@ export class AnalyticsAPI {
         if (key in filteredData && typeof filteredData[key] === 'object') {
           filteredData[key] = this.applyFilters(
             filteredData[key] as Record<string, unknown>,
-            value as Record<string, unknown>
+            value as Record<string, unknown>,
           );
         }
       } else {

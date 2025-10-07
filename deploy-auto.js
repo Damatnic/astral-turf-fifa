@@ -82,7 +82,7 @@ async function main() {
    ASTRAL TURF AUTO DEPLOYMENT
 🌟 ================================== 🌟
 `,
-    colors.blue
+    colors.blue,
   );
 
   try {
@@ -197,7 +197,7 @@ GEMINI_API_KEY=your-gemini-api-key-here
    vercel ls
    vercel logs
 `,
-      colors.green
+      colors.green,
     );
   } catch (error) {
     logError(`Deployment failed: ${error.message}`);

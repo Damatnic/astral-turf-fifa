@@ -149,7 +149,7 @@ class AnalyticsDashboard {
     const avgEventsPerSession = totalEvents / sessions.length;
     const userEngagement = Math.min(
       100,
-      (avgSessionDuration / 600000) * 50 + (avgEventsPerSession / 100) * 50
+      (avgSessionDuration / 600000) * 50 + (avgEventsPerSession / 100) * 50,
     );
 
     const completionRate = (completedSessions / sessions.length) * 100;
@@ -183,7 +183,7 @@ class AnalyticsDashboard {
         if (event.type === 'formation_change' && event.data.formation) {
           formationUsage.set(
             event.data.formation,
-            (formationUsage.get(event.data.formation) || 0) + 1
+            (formationUsage.get(event.data.formation) || 0) + 1,
           );
         }
 
@@ -251,7 +251,7 @@ class AnalyticsDashboard {
    * Generate complete analytics dashboard data
    */
   public generateDashboard(
-    playerPositions: Array<{ playerId: string; playerName: string; x: number; y: number }>
+    playerPositions: Array<{ playerId: string; playerName: string; x: number; y: number }>,
   ): AnalyticsDashboardData {
     const session = sessionRecorder.generateSummary();
     const heatmap = heatmapAnalytics.generateCompleteHeatmap(playerPositions);
@@ -364,7 +364,7 @@ class AnalyticsDashboard {
     html.push('th, td { border: 1px solid #d1d5db; padding: 12px; text-align: left; }');
     html.push('th { background-color: #f3f4f6; }');
     html.push(
-      '.metric { display: inline-block; margin: 10px; padding: 15px; background: #f9fafb; border-radius: 8px; }'
+      '.metric { display: inline-block; margin: 10px; padding: 15px; background: #f9fafb; border-radius: 8px; }',
     );
     html.push('</style>');
     html.push('</head>');
@@ -378,22 +378,22 @@ class AnalyticsDashboard {
     html.push('<h2>⚡ Performance Metrics</h2>');
     html.push('<div>');
     html.push(
-      `<div class="metric"><strong>Actions/Min:</strong> ${data.performance.actionsPerMinute}</div>`
+      `<div class="metric"><strong>Actions/Min:</strong> ${data.performance.actionsPerMinute}</div>`,
     );
     html.push(
-      `<div class="metric"><strong>Formation Changes:</strong> ${data.performance.formationChanges}</div>`
+      `<div class="metric"><strong>Formation Changes:</strong> ${data.performance.formationChanges}</div>`,
     );
     html.push(
-      `<div class="metric"><strong>Tactic Updates:</strong> ${data.performance.tacticUpdates}</div>`
+      `<div class="metric"><strong>Tactic Updates:</strong> ${data.performance.tacticUpdates}</div>`,
     );
     html.push(
-      `<div class="metric"><strong>AI Suggestions:</strong> ${data.performance.aiSuggestionsUsed}</div>`
+      `<div class="metric"><strong>AI Suggestions:</strong> ${data.performance.aiSuggestionsUsed}</div>`,
     );
     html.push(
-      `<div class="metric"><strong>Avg Response:</strong> ${data.performance.avgResponseTime}ms</div>`
+      `<div class="metric"><strong>Avg Response:</strong> ${data.performance.avgResponseTime}ms</div>`,
     );
     html.push(
-      `<div class="metric"><strong>Error Rate:</strong> ${data.performance.errorRate}%</div>`
+      `<div class="metric"><strong>Error Rate:</strong> ${data.performance.errorRate}%</div>`,
     );
     html.push('</div>');
 
@@ -403,7 +403,7 @@ class AnalyticsDashboard {
     html.push('<tr><th>Feature</th><th>Usage Count</th><th>Percentage</th></tr>');
     data.userBehavior.mostUsedFeatures.slice(0, 10).forEach(feature => {
       html.push(
-        `<tr><td>${feature.feature}</td><td>${feature.count}</td><td>${feature.percentage.toFixed(2)}%</td></tr>`
+        `<tr><td>${feature.feature}</td><td>${feature.count}</td><td>${feature.percentage.toFixed(2)}%</td></tr>`,
       );
     });
     html.push('</table>');
@@ -415,7 +415,7 @@ class AnalyticsDashboard {
       html.push('<tr><th>Formation</th><th>Usage</th><th>Win Rate</th></tr>');
       data.tactical.favoriteFormations.forEach(formation => {
         html.push(
-          `<tr><td>${formation.formation}</td><td>${formation.usage}</td><td>${formation.winRate.toFixed(2)}%</td></tr>`
+          `<tr><td>${formation.formation}</td><td>${formation.usage}</td><td>${formation.winRate.toFixed(2)}%</td></tr>`,
         );
       });
       html.push('</table>');
@@ -472,7 +472,7 @@ export const useAnalyticsDashboard = () => {
     analyzeTacticalInsights: (sessions: SessionSummary[]) =>
       analyticsDashboard.analyzeTacticalInsights(sessions),
     generateDashboard: (
-      playerPositions: Array<{ playerId: string; playerName: string; x: number; y: number }>
+      playerPositions: Array<{ playerId: string; playerName: string; x: number; y: number }>,
     ) => analyticsDashboard.generateDashboard(playerPositions),
     exportAnalytics: (data: AnalyticsDashboardData, options: AnalyticsExportOptions) =>
       analyticsDashboard.exportAnalytics(data, options),

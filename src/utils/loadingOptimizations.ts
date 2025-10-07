@@ -482,7 +482,7 @@ export class ResourceLoader {
           performanceApi.measure(
             `resource-load-${config.type}-${config.priority}`,
             `resource-load-start-${config.url}`,
-            `resource-load-end-${config.url}`
+            `resource-load-end-${config.url}`,
           );
         } catch {
           // Ignore measure failures when marks are missing

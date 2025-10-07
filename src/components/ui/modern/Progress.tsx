@@ -44,7 +44,7 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
       indeterminate = false,
       ...props
     },
-    ref
+    ref,
   ) => {
     const percentage = Math.min(Math.max((value / max) * 100, 0), 100);
 
@@ -67,7 +67,7 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
           ref={ref}
           className={cn(
             'w-full bg-secondary-700/50 rounded-full overflow-hidden',
-            progressSizes[size]
+            progressSizes[size],
           )}
           role="progressbar"
           aria-valuenow={indeterminate ? undefined : value}
@@ -82,7 +82,7 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
               progressVariants[variant],
               striped && 'bg-stripes bg-stripes-animate',
               animated && 'transition-all duration-500 ease-in-out',
-              indeterminate && 'animate-progress-indeterminate'
+              indeterminate && 'animate-progress-indeterminate',
             )}
             style={{
               width: indeterminate ? '100%' : `${percentage}%`,
@@ -92,7 +92,7 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
         </div>
       </div>
     );
-  }
+  },
 );
 
 Progress.displayName = 'Progress';
@@ -127,7 +127,7 @@ export const CircularProgress = forwardRef<HTMLDivElement, CircularProgressProps
       indeterminate = false,
       ...props
     },
-    ref
+    ref,
   ) => {
     const percentage = Math.min(Math.max((value / max) * 100, 0), 100);
     const radius = (size - strokeWidth) / 2;
@@ -174,7 +174,7 @@ export const CircularProgress = forwardRef<HTMLDivElement, CircularProgressProps
             className={cn(
               variantColors[variant],
               animated && 'transition-all duration-300 ease-out',
-              indeterminate && 'animate-spin'
+              indeterminate && 'animate-spin',
             )}
             style={{
               strokeDasharray: indeterminate
@@ -195,7 +195,7 @@ export const CircularProgress = forwardRef<HTMLDivElement, CircularProgressProps
         )}
       </div>
     );
-  }
+  },
 );
 
 CircularProgress.displayName = 'CircularProgress';
@@ -278,7 +278,7 @@ export const StepProgress = forwardRef<HTMLDivElement, StepProgressProps>(
           'flex',
           orientation === 'horizontal' ? 'flex-row items-center' : 'flex-col',
           stepSizes[size].spacing,
-          className
+          className,
         )}
         {...props}
       >
@@ -287,7 +287,7 @@ export const StepProgress = forwardRef<HTMLDivElement, StepProgressProps>(
             key={index}
             className={cn(
               'flex items-center',
-              orientation === 'horizontal' ? 'flex-col' : 'flex-row'
+              orientation === 'horizontal' ? 'flex-col' : 'flex-row',
             )}
           >
             {/* Step icon */}
@@ -295,7 +295,7 @@ export const StepProgress = forwardRef<HTMLDivElement, StepProgressProps>(
               className={cn(
                 'flex items-center justify-center rounded-full border-2',
                 stepSizes[size].icon,
-                getStepClasses(step.status)
+                getStepClasses(step.status),
               )}
             >
               {getStepIcon(step.status, index)}
@@ -305,7 +305,7 @@ export const StepProgress = forwardRef<HTMLDivElement, StepProgressProps>(
             <div
               className={cn(
                 'text-center',
-                orientation === 'horizontal' ? 'mt-2' : 'ml-3 text-left'
+                orientation === 'horizontal' ? 'mt-2' : 'ml-3 text-left',
               )}
             >
               <div
@@ -318,7 +318,7 @@ export const StepProgress = forwardRef<HTMLDivElement, StepProgressProps>(
                       ? 'text-success-400'
                       : step.status === 'error'
                         ? 'text-error-400'
-                        : 'text-secondary-400'
+                        : 'text-secondary-400',
                 )}
               >
                 {step.label}
@@ -333,7 +333,7 @@ export const StepProgress = forwardRef<HTMLDivElement, StepProgressProps>(
               <div
                 className={cn(
                   'bg-secondary-700',
-                  orientation === 'horizontal' ? 'w-full h-0.5 mx-4' : 'h-full w-0.5 my-4 ml-4'
+                  orientation === 'horizontal' ? 'w-full h-0.5 mx-4' : 'h-full w-0.5 my-4 ml-4',
                 )}
               />
             )}
@@ -341,7 +341,7 @@ export const StepProgress = forwardRef<HTMLDivElement, StepProgressProps>(
         ))}
       </div>
     );
-  }
+  },
 );
 
 StepProgress.displayName = 'StepProgress';

@@ -203,7 +203,7 @@ export class PhoenixDatabasePool extends EventEmitter {
     if (this.config.healthCheckInterval && this.config.healthCheckInterval > 0) {
       this.healthCheckTimer = setInterval(
         () => this.performHealthCheck(),
-        this.config.healthCheckInterval
+        this.config.healthCheckInterval,
       );
     }
   }
@@ -212,7 +212,7 @@ export class PhoenixDatabasePool extends EventEmitter {
     if (this.config.leakDetectionThreshold && this.config.leakDetectionThreshold > 0) {
       this.leakDetectionTimer = setInterval(
         () => this.detectConnectionLeaks(),
-        60000 // Check every minute
+        60000, // Check every minute
       );
     }
   }
@@ -228,7 +228,7 @@ export class PhoenixDatabasePool extends EventEmitter {
       timeout?: number;
       retries?: number;
       prepared?: boolean;
-    } = {}
+    } = {},
   ): Promise<{ rows: T[]; rowCount: number; duration: number }> {
     const startTime = Date.now();
     const queryHash = this.hashQuery(text, params);
@@ -300,7 +300,7 @@ export class PhoenixDatabasePool extends EventEmitter {
       isolationLevel?: 'READ UNCOMMITTED' | 'READ COMMITTED' | 'REPEATABLE READ' | 'SERIALIZABLE';
       timeout?: number;
       retries?: number;
-    } = {}
+    } = {},
   ): Promise<T> {
     let retries = options.retries ?? this.config.maxRetries ?? 3;
 
@@ -351,7 +351,7 @@ export class PhoenixDatabasePool extends EventEmitter {
    */
   async batch<T = any>(
     queries: Array<{ text: string; params?: any[] }>,
-    options: { parallel?: boolean; timeout?: number } = {}
+    options: { parallel?: boolean; timeout?: number } = {},
   ): Promise<Array<{ rows: T[]; rowCount: number; duration: number }>> {
     if (options.parallel) {
       return Promise.all(queries.map(q => this.query(q.text, q.params, options)));

@@ -38,7 +38,7 @@ const RadarChart: React.FC<RadarChartProps> = ({ datasets, labels, size = 300 })
           fill="none"
           stroke="var(--border-primary)"
           strokeWidth="0.5"
-        />
+        />,
       );
     }
     return levels;

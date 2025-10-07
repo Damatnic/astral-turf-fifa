@@ -311,7 +311,7 @@ export class TacticalBoardAPI {
       () => {
         this.cleanupInactiveSessions();
       },
-      5 * 60 * 1000
+      5 * 60 * 1000,
     );
 
     // Process pending updates every second
@@ -416,7 +416,7 @@ export class TacticalBoardAPI {
         `
         SELECT COUNT(*) as total FROM formations ${whereClause}
       `,
-        params
+        params,
       );
 
       // Get formations
@@ -434,7 +434,7 @@ export class TacticalBoardAPI {
         ORDER BY ${sortBy} ${sortOrderUpper}
         LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
       `,
-        [...params, limit, offset]
+        [...params, limit, offset],
       );
 
       const total = parseInt(countResult.rows[0].total);
@@ -479,7 +479,7 @@ export class TacticalBoardAPI {
         LEFT JOIN teams t ON f.team_id = t.id
         WHERE f.id = $1
       `,
-        [id]
+        [id],
       );
 
       if (result.rows.length === 0) {
@@ -509,7 +509,7 @@ export class TacticalBoardAPI {
           to_jsonb(COALESCE((metadata->'usage'->>'views')::int, 0) + 1))
         WHERE id = $1
       `,
-        [id]
+        [id],
       );
 
       let history: any[] | null = null;
@@ -522,7 +522,7 @@ export class TacticalBoardAPI {
           ORDER BY version DESC 
           LIMIT 10
         `,
-          [id]
+          [id],
         );
         history = historyResult.rows;
       }
@@ -599,7 +599,7 @@ export class TacticalBoardAPI {
           JSON.stringify(formation),
           JSON.stringify(defaultMetadata),
           now,
-        ]
+        ],
       );
 
       // Create initial history entry
@@ -674,7 +674,7 @@ export class TacticalBoardAPI {
           values.push(
             field === 'formation' || field === 'metadata'
               ? JSON.stringify(updates[field])
-              : updates[field]
+              : updates[field],
           );
           paramIndex++;
         }
@@ -702,7 +702,7 @@ export class TacticalBoardAPI {
         WHERE id = $${paramIndex}
         RETURNING *
       `,
-        [...values, id]
+        [...values, id],
       );
 
       // Create history entry
@@ -712,7 +712,7 @@ export class TacticalBoardAPI {
         result.rows[0].version,
         req.user?.id,
         `Updated: ${changes.join(', ')}`,
-        updates.formation || currentFormation.formation
+        updates.formation || currentFormation.formation,
       );
 
       // Broadcast update to active sessions
@@ -765,7 +765,7 @@ export class TacticalBoardAPI {
 
       // End any active collaboration sessions
       const activeSessions = Array.from(this.activeSessions.values()).filter(
-        session => session.formationId === id
+        session => session.formationId === id,
       );
 
       activeSessions.forEach(session => {
@@ -779,7 +779,7 @@ export class TacticalBoardAPI {
         SET is_active = false, updated_at = NOW()
         WHERE id = $1
       `,
-        [id]
+        [id],
       );
 
       res.json({
@@ -1089,7 +1089,7 @@ export class TacticalBoardAPI {
     // Remove from queue
     this.conflictQueue.set(
       sessionId,
-      conflicts.filter(c => c.conflictId !== data.conflictId)
+      conflicts.filter(c => c.conflictId !== data.conflictId),
     );
   }
 
@@ -1163,13 +1163,13 @@ export class TacticalBoardAPI {
 
   private getActiveSessionsForFormation(formationId: string): CollaborationSession[] {
     return Array.from(this.activeSessions.values()).filter(
-      session => session.formationId === formationId && session.isActive
+      session => session.formationId === formationId && session.isActive,
     );
   }
 
   private getActiveSessionForFormation(formationId: string): CollaborationSession | undefined {
     return Array.from(this.activeSessions.values()).find(
-      session => session.formationId === formationId && session.isActive
+      session => session.formationId === formationId && session.isActive,
     );
   }
 
@@ -1205,7 +1205,7 @@ export class TacticalBoardAPI {
       update =>
         update.type === 'player_move' &&
         update.data.playerId === data.playerId &&
-        Date.now() - update.timestamp.getTime() < 1000 // Within last second
+        Date.now() - update.timestamp.getTime() < 1000, // Within last second
     );
 
     if (recentUpdates.length > 0) {
@@ -1243,7 +1243,7 @@ export class TacticalBoardAPI {
     version: number,
     userId?: string,
     changes?: string,
-    formationData?: any
+    formationData?: any,
   ): Promise<void> {
     try {
       await phoenixPool.query(
@@ -1252,7 +1252,7 @@ export class TacticalBoardAPI {
           formation_id, version, created_at, created_by, changes, formation_data
         ) VALUES ($1, $2, NOW(), $3, $4, $5)
       `,
-        [formationId, version, userId, changes, JSON.stringify(formationData)]
+        [formationId, version, userId, changes, JSON.stringify(formationData)],
       );
     } catch (error: any) {
       console.error('Failed to create history entry:', error);
@@ -1300,7 +1300,7 @@ export class TacticalBoardAPI {
       // Remove applied updates
       this.pendingUpdates.set(
         sessionId,
-        updates.filter(update => !update.applied)
+        updates.filter(update => !update.applied),
       );
     }
   }
@@ -1329,7 +1329,7 @@ export class TacticalBoardAPI {
       // Remove resolved conflicts
       this.conflictQueue.set(
         sessionId,
-        conflicts.filter(c => !c.resolution)
+        conflicts.filter(c => !c.resolution),
       );
     }
   }
@@ -1699,11 +1699,11 @@ export class TacticalBoardAPI {
       let prioritizedOptimizations = optimizations;
       if (objective === 'attacking') {
         prioritizedOptimizations = optimizations.sort(
-          (a, b) => b.expectedImpact.offensiveRating - a.expectedImpact.offensiveRating
+          (a, b) => b.expectedImpact.offensiveRating - a.expectedImpact.offensiveRating,
         );
       } else if (objective === 'defensive') {
         prioritizedOptimizations = optimizations.sort(
-          (a, b) => b.expectedImpact.defensiveRating - a.expectedImpact.defensiveRating
+          (a, b) => b.expectedImpact.defensiveRating - a.expectedImpact.defensiveRating,
         );
       }
 
@@ -1807,7 +1807,7 @@ export class TacticalBoardAPI {
       const avgX = positions.reduce((sum, p) => sum + p.x, 0) / positions.length;
       const avgY = positions.reduce((sum, p) => sum + p.y, 0) / positions.length;
       const distances = positions.map(p =>
-        Math.sqrt(Math.pow(p.x - avgX, 2) + Math.pow(p.y - avgY, 2))
+        Math.sqrt(Math.pow(p.x - avgX, 2) + Math.pow(p.y - avgY, 2)),
       );
       const compactness = 100 - distances.reduce((sum, d) => sum + d, 0) / distances.length;
 
@@ -2170,7 +2170,7 @@ export class TacticalBoardAPI {
         formationData.players.forEach(
           (
             player: { id?: string; position?: { x?: number; y?: number }; role?: string },
-            index: number
+            index: number,
           ) => {
             if (
               !player.position ||
@@ -2194,7 +2194,7 @@ export class TacticalBoardAPI {
             if (!player.role) {
               validationErrors.push(`Player ${index + 1}: Role is required`);
             }
-          }
+          },
         );
       }
 
@@ -2517,7 +2517,7 @@ export class TacticalBoardAPI {
                   }
 
                   return version;
-                }
+                },
               );
             })();
 
@@ -2662,7 +2662,7 @@ export class TacticalBoardAPI {
           defensiveStyle: 'medium-block',
         },
         createdAt: new Date(
-          Date.now() - (currentFormation.currentVersion - targetVersion) * 2 * 24 * 60 * 60 * 1000
+          Date.now() - (currentFormation.currentVersion - targetVersion) * 2 * 24 * 60 * 60 * 1000,
         ),
         createdBy: {
           id: req.user?.id || 'user-1',
@@ -2869,7 +2869,7 @@ export class TacticalBoardAPI {
             touches: Math.floor(baseIntensity * 150),
             avgDuration: Math.round((2 + Math.random() * 3) * 10) / 10,
           };
-        })
+        }),
       );
 
       // Find hotspots (cells with intensity > 0.7)
@@ -2942,7 +2942,7 @@ export class TacticalBoardAPI {
             avgIntensity:
               Math.round(
                 (heatmapData.flat().reduce((sum, cell) => sum + cell.intensity, 0) / totalCells) *
-                  100
+                  100,
               ) / 100,
             peakIntensity: Math.max(...heatmapData.flat().map(cell => cell.intensity)),
             totalTouches: heatmapData.flat().reduce((sum, cell) => sum + cell.touches, 0),
@@ -3112,7 +3112,7 @@ export class TacticalBoardAPI {
             performanceByPhase.attacking.rating * 0.1 +
             performanceByPhase.midfield.rating * 0.1 +
             performanceByPhase.defensive.rating * 0.1) *
-            10
+            10,
         ) / 10;
 
       // Strengths and weaknesses analysis
@@ -3371,12 +3371,12 @@ export class TacticalBoardAPI {
 
       // Most successful formation (by win rate)
       const mostSuccessful = popularFormations.reduce((prev, current) =>
-        current.avgWinRate > prev.avgWinRate ? current : prev
+        current.avgWinRate > prev.avgWinRate ? current : prev,
       );
 
       // Fastest rising formation
       const fastestRising = popularFormations.reduce((prev, current) =>
-        current.trendChange > prev.trendChange ? current : prev
+        current.trendChange > prev.trendChange ? current : prev,
       );
 
       // Style distribution
@@ -3386,7 +3386,7 @@ export class TacticalBoardAPI {
           acc[style] = (acc[style] || 0) + formation.usageCount;
           return acc;
         },
-        {} as Record<string, number>
+        {} as Record<string, number>,
       );
 
       res.json({
@@ -3414,7 +3414,7 @@ export class TacticalBoardAPI {
               Math.round(
                 (popularFormations.reduce((sum, f) => sum + f.avgWinRate, 0) /
                   popularFormations.length) *
-                  10
+                  10,
               ) / 10,
           },
         },
@@ -3876,7 +3876,7 @@ export class TacticalBoardAPI {
       if (tags) {
         const tagArray = (tags as string).split(',');
         filteredTemplates = filteredTemplates.filter(t =>
-          tagArray.some(tag => t.tags.includes(tag))
+          tagArray.some(tag => t.tags.includes(tag)),
         );
       }
 
@@ -3903,7 +3903,7 @@ export class TacticalBoardAPI {
           acc[cat].push(template);
           return acc;
         },
-        {} as Record<string, typeof allTemplates>
+        {} as Record<string, typeof allTemplates>,
       );
 
       // Group templates by system
@@ -3916,7 +3916,7 @@ export class TacticalBoardAPI {
           acc[sys].push(template);
           return acc;
         },
-        {} as Record<string, typeof allTemplates>
+        {} as Record<string, typeof allTemplates>,
       );
 
       // Calculate statistics
@@ -3938,7 +3938,7 @@ export class TacticalBoardAPI {
         avgRating:
           Math.round(
             (filteredTemplates.reduce((sum, t) => sum + t.rating, 0) / filteredTemplates.length) *
-              10
+              10,
           ) / 10,
         totalUsage: filteredTemplates.reduce((sum, t) => sum + t.usageCount, 0),
       };
@@ -4163,7 +4163,7 @@ export class TacticalBoardAPI {
             Math.round(
               (formation.stats.winRate * 0.6 +
                 (formation.stats.avgGoalsScored / (formation.stats.avgGoalsConceded || 1)) * 15) *
-                10
+                10,
             ) / 10,
         };
       }

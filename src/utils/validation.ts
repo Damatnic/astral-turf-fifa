@@ -306,8 +306,8 @@ export class AccessibilityValidator {
     const issues: AccessibilityIssue[] = [];
     const focusableElements = Array.from(
       document.querySelectorAll(
-        'a, button, input, textarea, select, [tabindex]:not([tabindex="-1"])'
-      )
+        'a, button, input, textarea, select, [tabindex]:not([tabindex="-1"])',
+      ),
     );
 
     focusableElements.forEach(element => {
@@ -338,7 +338,7 @@ export class AccessibilityValidator {
   private static checkKeyboardNavigation(): AccessibilityIssue[] {
     const issues: AccessibilityIssue[] = [];
     const interactiveElements = Array.from(
-      document.querySelectorAll('div[onclick], div[role="button"], span[onclick]')
+      document.querySelectorAll('div[onclick], div[role="button"], span[onclick]'),
     );
 
     interactiveElements.forEach(element => {
@@ -363,7 +363,7 @@ export class AccessibilityValidator {
   private static checkAriaUsage(): AccessibilityIssue[] {
     const issues: AccessibilityIssue[] = [];
     const elementsWithAria = Array.from(
-      document.querySelectorAll('[aria-labelledby], [aria-describedby]')
+      document.querySelectorAll('[aria-labelledby], [aria-describedby]'),
     );
 
     elementsWithAria.forEach(element => {
@@ -433,7 +433,7 @@ export class AccessibilityValidator {
   private static checkFormLabels(): AccessibilityIssue[] {
     const issues: AccessibilityIssue[] = [];
     const formControls = Array.from(
-      document.querySelectorAll('input:not([type="hidden"]), textarea, select')
+      document.querySelectorAll('input:not([type="hidden"]), textarea, select'),
     );
 
     formControls.forEach(control => {
@@ -514,7 +514,7 @@ export class AccessibilityValidator {
 
   private static calculateContrast(
     [r1, g1, b1]: [number, number, number],
-    [r2, g2, b2]: [number, number, number]
+    [r2, g2, b2]: [number, number, number],
   ): number {
     const getLuminance = (r: number, g: number, b: number) => {
       const [rs, gs, bs] = [r, g, b].map(c => {
@@ -593,7 +593,7 @@ export class SEOValidator {
 
     // Check for semantic HTML
     const semanticElements = document.querySelectorAll(
-      'main, nav, header, footer, article, section, aside'
+      'main, nav, header, footer, article, section, aside',
     );
     if (semanticElements.length < 3) {
       issues.push('Limited use of semantic HTML elements');

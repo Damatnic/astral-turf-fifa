@@ -121,7 +121,7 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
           }
         }
       },
-      [isMenuOpen, capabilities.hasHapticFeedback]
+      [isMenuOpen, capabilities.hasHapticFeedback],
     ),
   });
 
@@ -140,7 +140,7 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
         navigator.vibrate(10);
       }
     },
-    [activeSubmenu, onNavigate, capabilities.hasHapticFeedback]
+    [activeSubmenu, onNavigate, capabilities.hasHapticFeedback],
   );
 
   // Handle search

@@ -26,7 +26,7 @@ vi.mock('framer-motion', () => ({
         <div ref={ref} className={className} data-layout-id={layoutId} {...props}>
           {children}
         </div>
-      )
+      ),
     ),
   },
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
@@ -63,7 +63,7 @@ describe('PositioningModeToggle', () => {
           mode="snap"
           onModeChange={mockOnModeChange}
           className="custom-class"
-        />
+        />,
       );
 
       const wrapper = container.firstChild as HTMLElement;
@@ -72,7 +72,7 @@ describe('PositioningModeToggle', () => {
 
     it('should render correct icons for each mode', () => {
       const { rerender } = render(
-        <PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />
+        <PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />,
       );
 
       // Check snap mode icon
@@ -164,18 +164,18 @@ describe('PositioningModeToggle', () => {
 
     it('should render motion indicators with correct layout IDs', () => {
       const { container } = render(
-        <PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />
+        <PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />,
       );
 
       const motionIndicator = container.querySelector(
-        '[data-layout-id="positioningModeIndicator"]'
+        '[data-layout-id="positioningModeIndicator"]',
       );
       expect(motionIndicator).toBeInTheDocument();
     });
 
     it('should show correct background colors for mode indicators', () => {
       const { container, rerender } = render(
-        <PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />
+        <PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />,
       );
 
       // Snap mode should have blue background
@@ -230,7 +230,7 @@ describe('PositioningModeToggle', () => {
 
     it('should provide informative descriptions for each mode', () => {
       const { rerender } = render(
-        <PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />
+        <PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />,
       );
 
       expect(screen.getByText('Players snap to formation positions')).toBeInTheDocument();
@@ -258,7 +258,7 @@ describe('PositioningModeToggle', () => {
 
     it('should render SVG paths correctly', () => {
       const { container } = render(
-        <PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />
+        <PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />,
       );
 
       const svg = container.querySelector('svg');
@@ -275,7 +275,7 @@ describe('PositioningModeToggle', () => {
   describe('Component Structure', () => {
     it('should maintain proper DOM structure', () => {
       const { container } = render(
-        <PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />
+        <PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />,
       );
 
       const wrapper = container.firstChild as HTMLElement;
@@ -288,7 +288,7 @@ describe('PositioningModeToggle', () => {
 
     it('should have correct button container styling', () => {
       const { container } = render(
-        <PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />
+        <PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />,
       );
 
       const buttonContainer = container.querySelector('.bg-slate-800');
@@ -298,7 +298,7 @@ describe('PositioningModeToggle', () => {
 
     it('should render description section correctly', () => {
       const { container } = render(
-        <PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />
+        <PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />,
       );
 
       const descriptionSection = container.querySelector('.space-x-2');
@@ -313,7 +313,7 @@ describe('PositioningModeToggle', () => {
     it('should handle missing onModeChange prop gracefully', () => {
       // This would normally cause TypeScript errors, but test runtime behavior
       const { container } = render(
-        <PositioningModeToggle mode="snap" onModeChange={undefined as any} />
+        <PositioningModeToggle mode="snap" onModeChange={undefined as any} />,
       );
 
       expect(container.firstChild).toBeInTheDocument();
@@ -322,7 +322,7 @@ describe('PositioningModeToggle', () => {
     it('should handle invalid mode prop', () => {
       // Test with invalid mode
       const { container } = render(
-        <PositioningModeToggle mode={'invalid' as any} onModeChange={mockOnModeChange} />
+        <PositioningModeToggle mode={'invalid' as any} onModeChange={mockOnModeChange} />,
       );
 
       expect(container.firstChild).toBeInTheDocument();
@@ -368,7 +368,7 @@ describe('PositioningModeToggle', () => {
   describe('Visual Regression Prevention', () => {
     it('should maintain consistent styling classes', () => {
       const { container } = render(
-        <PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />
+        <PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />,
       );
 
       const buttons = container.querySelectorAll('button');
@@ -381,7 +381,7 @@ describe('PositioningModeToggle', () => {
           'text-sm',
           'font-medium',
           'transition-colors',
-          'rounded-md'
+          'rounded-md',
         );
       });
     });
@@ -400,7 +400,7 @@ describe('PositioningModeToggle', () => {
   describe('Integration with Parent Components', () => {
     it('should work correctly when mode is changed externally', () => {
       const { rerender } = render(
-        <PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />
+        <PositioningModeToggle mode="snap" onModeChange={mockOnModeChange} />,
       );
 
       expect(screen.getByText('Players snap to formation positions')).toBeInTheDocument();
@@ -420,7 +420,7 @@ describe('PositioningModeToggle', () => {
       };
 
       const { rerender } = render(
-        <PositioningModeToggle mode={currentMode} onModeChange={handleModeChange} />
+        <PositioningModeToggle mode={currentMode} onModeChange={handleModeChange} />,
       );
 
       const freeButton = screen.getByRole('button', { name: /free movement/i });

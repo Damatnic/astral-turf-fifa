@@ -273,8 +273,8 @@ class AccessibilityTestRunner {
       const focusableElements = await this.page.evaluate(() => {
         const elements = Array.from(
           document.querySelectorAll(
-            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-          )
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+          ),
         );
         return elements.length;
       });
@@ -506,7 +506,7 @@ class AccessibilityTestRunner {
 
     await fs.writeFile(
       path.join(A11Y_CONFIG.outputDir, 'accessibility-report.json'),
-      JSON.stringify(jsonReport, null, 2)
+      JSON.stringify(jsonReport, null, 2),
     );
 
     // Generate HTML report
@@ -602,14 +602,14 @@ class AccessibilityTestRunner {
                         ${v.description}<br>
                         <em>${v.help}</em>
                     </div>
-                `
+                `,
                   )
                   .join('')}
             `
                 : '<p>✅ No violations found</p>'
             }
         </div>
-    `
+    `,
       )
       .join('')}
 </body>
@@ -656,7 +656,7 @@ ${
     ? result.violations.map(v => `- **${v.id}** (${v.impact}): ${v.description}`).join('\n')
     : '*No violations found*'
 }
-`
+`,
   )
   .join('\n')}
 
@@ -677,16 +677,16 @@ ${
     console.log('');
     console.log('Violations by Severity:');
     console.log(
-      `  Critical: ${this.summary.violations.critical} (threshold: ${A11Y_CONFIG.thresholds.critical})`
+      `  Critical: ${this.summary.violations.critical} (threshold: ${A11Y_CONFIG.thresholds.critical})`,
     );
     console.log(
-      `  Serious:  ${this.summary.violations.serious} (threshold: ${A11Y_CONFIG.thresholds.serious})`
+      `  Serious:  ${this.summary.violations.serious} (threshold: ${A11Y_CONFIG.thresholds.serious})`,
     );
     console.log(
-      `  Moderate: ${this.summary.violations.moderate} (threshold: ${A11Y_CONFIG.thresholds.moderate})`
+      `  Moderate: ${this.summary.violations.moderate} (threshold: ${A11Y_CONFIG.thresholds.moderate})`,
     );
     console.log(
-      `  Minor:    ${this.summary.violations.minor} (threshold: ${A11Y_CONFIG.thresholds.minor})`
+      `  Minor:    ${this.summary.violations.minor} (threshold: ${A11Y_CONFIG.thresholds.minor})`,
     );
     console.log('');
     console.log(`Overall Status: ${this.summary.failed === 0 ? '✅ PASSED' : '❌ FAILED'}`);

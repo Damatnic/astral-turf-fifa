@@ -63,7 +63,7 @@ async function main() {
    ASTRAL TURF SIMPLE DEPLOYMENT
 🌟 ================================== 🌟
 `,
-    colors.blue
+    colors.blue,
   );
 
   try {
@@ -152,7 +152,7 @@ OPTIONAL VARIABLES (copy from vercel-env-template.txt):
 📊 Monitor your deployment:
    vercel logs
 `,
-      colors.green
+      colors.green,
     );
   } catch (error) {
     logError(`Deployment failed: ${error.message}`);

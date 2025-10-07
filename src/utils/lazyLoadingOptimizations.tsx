@@ -20,7 +20,7 @@ interface LazyComponentOptions {
 // Enhanced lazy loading with preloading
 export function createOptimizedLazy<T extends ComponentType<unknown>>(
   componentImport: () => Promise<{ default: T }>,
-  _options: LazyComponentOptions = {}
+  _options: LazyComponentOptions = {},
 ): LazyExoticComponent<T> {
   const LazyComponent = lazy(componentImport);
 
@@ -78,7 +78,7 @@ export class OptimizedImageLoader {
       },
       {
         rootMargin: '50px',
-      }
+      },
     );
   }
 
@@ -295,7 +295,7 @@ const invokePreload = (component: unknown) => {
 // Component-level lazy loading wrapper
 export function withLazyLoading<P extends object>(
   LazyComponent: LazyExoticComponent<ComponentType<P>>,
-  options: LazyComponentOptions = {}
+  options: LazyComponentOptions = {},
 ): React.ForwardRefExoticComponent<
   React.PropsWithoutRef<P & { preloadStrategy?: PreloadStrategy }> &
     React.RefAttributes<HTMLDivElement>
@@ -351,7 +351,7 @@ export function withLazyLoading<P extends object>(
           (viewportRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
         }
       },
-      [viewportRef]
+      [viewportRef],
     );
 
     const setRefs = React.useCallback(
@@ -368,7 +368,7 @@ export function withLazyLoading<P extends object>(
           (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
         }
       },
-      [combinedRef, ref]
+      [combinedRef, ref],
     );
 
     if (hasError && ErrorBoundary) {
@@ -432,7 +432,7 @@ export function withLazyLoading<P extends object>(
 // Route-based code splitting with preloading
 export function createRouteComponent<T extends ComponentType<unknown>>(
   componentImport: () => Promise<{ default: T }>,
-  preloadTriggers: string[] = []
+  preloadTriggers: string[] = [],
 ): LazyExoticComponent<T> {
   const LazyComponent = createOptimizedLazy(componentImport, {
     preloadStrategy: 'hover',

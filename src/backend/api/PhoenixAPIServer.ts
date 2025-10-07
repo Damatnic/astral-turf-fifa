@@ -167,7 +167,7 @@ export class PhoenixAPIServer {
             includeSubDomains: true,
             preload: true,
           },
-        })
+        }),
       );
     }
 
@@ -178,7 +178,7 @@ export class PhoenixAPIServer {
         credentials: this.config.cors.credentials,
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key', 'X-Correlation-ID'],
-      })
+      }),
     );
 
     // Compression
@@ -192,7 +192,7 @@ export class PhoenixAPIServer {
           }
           return compression.filter(req, res);
         },
-      })
+      }),
     );
 
     // Body parsing
@@ -202,7 +202,7 @@ export class PhoenixAPIServer {
         verify: (req: any, res, buf) => {
           req.rawBody = buf;
         },
-      })
+      }),
     );
     this.app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
@@ -295,7 +295,7 @@ export class PhoenixAPIServer {
         } catch (error: any) {
           next(error);
         }
-      }
+      },
     );
 
     // Signup endpoint
@@ -317,7 +317,7 @@ export class PhoenixAPIServer {
         } catch (error: any) {
           next(error);
         }
-      }
+      },
     );
 
     // Logout endpoint
@@ -339,7 +339,7 @@ export class PhoenixAPIServer {
         } catch (error: any) {
           next(error);
         }
-      }
+      },
     );
 
     // Token refresh endpoint
@@ -361,11 +361,11 @@ export class PhoenixAPIServer {
         } catch (error: any) {
           next(error);
         }
-      }
+      },
     );
 
     // ============ OAuth Routes ============
-    
+
     // Initiate OAuth login
     router.get(
       '/oauth/:provider',
@@ -392,7 +392,7 @@ export class PhoenixAPIServer {
         } catch (error: any) {
           next(error);
         }
-      }
+      },
     );
 
     // Handle OAuth callback
@@ -414,7 +414,7 @@ export class PhoenixAPIServer {
         } catch (error: any) {
           next(error);
         }
-      }
+      },
     );
 
     // Link OAuth account to existing user
@@ -436,11 +436,11 @@ export class PhoenixAPIServer {
         } catch (error: any) {
           next(error);
         }
-      }
+      },
     );
 
     // ============ MFA Routes ============
-    
+
     // Setup MFA
     router.post(
       '/mfa/setup',
@@ -460,7 +460,7 @@ export class PhoenixAPIServer {
         } catch (error: any) {
           next(error);
         }
-      }
+      },
     );
 
     // Verify MFA setup
@@ -482,7 +482,7 @@ export class PhoenixAPIServer {
         } catch (error: any) {
           next(error);
         }
-      }
+      },
     );
 
     // Verify MFA code during login
@@ -502,7 +502,7 @@ export class PhoenixAPIServer {
         } catch (error: any) {
           next(error);
         }
-      }
+      },
     );
 
     // Disable MFA
@@ -524,11 +524,11 @@ export class PhoenixAPIServer {
         } catch (error: any) {
           next(error);
         }
-      }
+      },
     );
 
     // ============ Session Management Routes ============
-    
+
     // Get all user sessions
     router.get(
       '/sessions',
@@ -548,7 +548,7 @@ export class PhoenixAPIServer {
         } catch (error: any) {
           next(error);
         }
-      }
+      },
     );
 
     // Revoke specific session
@@ -571,11 +571,11 @@ export class PhoenixAPIServer {
         } catch (error: any) {
           next(error);
         }
-      }
+      },
     );
 
     // ============ RBAC Routes ============
-    
+
     // Assign role to user
     router.post(
       '/rbac/assign-role',
@@ -596,7 +596,7 @@ export class PhoenixAPIServer {
         } catch (error: any) {
           next(error);
         }
-      }
+      },
     );
 
     // Grant permission to user
@@ -619,7 +619,7 @@ export class PhoenixAPIServer {
         } catch (error: any) {
           next(error);
         }
-      }
+      },
     );
 
     this.app.use('/api/phoenix/auth', router);
@@ -645,7 +645,7 @@ export class PhoenixAPIServer {
         } catch (error: any) {
           next(error);
         }
-      }
+      },
     );
 
     // Create formation
@@ -665,7 +665,7 @@ export class PhoenixAPIServer {
         } catch (error: any) {
           next(error);
         }
-      }
+      },
     );
 
     // Update formation
@@ -678,7 +678,7 @@ export class PhoenixAPIServer {
           const formation = await this.updateFormation(
             req.params.id,
             req.body,
-            (req as any).context
+            (req as any).context,
           );
 
           res.json({
@@ -689,7 +689,7 @@ export class PhoenixAPIServer {
         } catch (error: any) {
           next(error);
         }
-      }
+      },
     );
 
     // Real-time tactical updates
@@ -709,7 +709,7 @@ export class PhoenixAPIServer {
 
         // Setup SSE for real-time updates
         this.setupSSEForFormation(formationId, clientId, res);
-      }
+      },
     );
 
     this.app.use('/api/tactical', router);
@@ -736,7 +736,7 @@ export class PhoenixAPIServer {
         } catch (error: any) {
           next(error);
         }
-      }
+      },
     );
 
     // Get player by ID
@@ -766,7 +766,7 @@ export class PhoenixAPIServer {
           next(error);
           return undefined;
         }
-      }
+      },
     );
 
     // Create player
@@ -787,7 +787,7 @@ export class PhoenixAPIServer {
         } catch (error: any) {
           next(error);
         }
-      }
+      },
     );
 
     // Bulk operations
@@ -808,7 +808,7 @@ export class PhoenixAPIServer {
         } catch (error: any) {
           next(error);
         }
-      }
+      },
     );
 
     this.app.use('/api/players', router);
@@ -834,7 +834,7 @@ export class PhoenixAPIServer {
         } catch (error: any) {
           next(error);
         }
-      }
+      },
     );
 
     // Get performance metrics
@@ -854,7 +854,7 @@ export class PhoenixAPIServer {
         } catch (error: any) {
           next(error);
         }
-      }
+      },
     );
 
     // Export analytics data
@@ -874,7 +874,7 @@ export class PhoenixAPIServer {
         } catch (error: any) {
           next(error);
         }
-      }
+      },
     );
 
     this.app.use('/api/analytics', router);
@@ -900,7 +900,7 @@ export class PhoenixAPIServer {
         } catch (error: any) {
           next(error);
         }
-      }
+      },
     );
 
     // Download files with access control
@@ -927,7 +927,7 @@ export class PhoenixAPIServer {
           next(error);
           return undefined;
         }
-      }
+      },
     );
 
     this.app.use('/api/files', router);
@@ -1368,7 +1368,7 @@ export class PhoenixAPIServer {
   /**
    * Authenticate user with email and password
    * Production-ready implementation with bcrypt, database integration, and rate limiting
-   * 
+   *
    * @param email - User's email address
    * @param password - Plain text password (will be hashed)
    * @param context - Request context with IP, user agent, correlation ID
@@ -1377,7 +1377,7 @@ export class PhoenixAPIServer {
   private async authenticateUser(
     email: string,
     password: string,
-    context: RequestContext
+    context: RequestContext,
   ): Promise<{
     success: boolean;
     user?: { id: string; email: string; name: string; role: string };
@@ -1385,7 +1385,7 @@ export class PhoenixAPIServer {
     message?: string;
   }> {
     const startTime = Date.now();
-    
+
     try {
       // Input validation
       if (!email || !password) {
@@ -1399,15 +1399,15 @@ export class PhoenixAPIServer {
       // Rate limiting check (prevent brute force)
       const rateLimitKey = `auth:failed:${context.ip}:${normalizedEmail}`;
       const redisClient = this.createRedisClient();
-      
+
       if (redisClient) {
         try {
           const failedAttempts = await redisClient.get(rateLimitKey);
           if (failedAttempts && parseInt(failedAttempts) >= 5) {
             this.metrics.requests.failed++;
-            return { 
-              success: false, 
-              message: 'Too many failed login attempts. Please try again in 15 minutes.' 
+            return {
+              success: false,
+              message: 'Too many failed login attempts. Please try again in 15 minutes.',
             };
           }
         } catch (redisError) {
@@ -1450,7 +1450,7 @@ export class PhoenixAPIServer {
       // User not found
       if (!user) {
         this.metrics.requests.failed++;
-        
+
         // Increment failed attempts
         if (redisClient) {
           try {
@@ -1460,7 +1460,7 @@ export class PhoenixAPIServer {
             console.warn('Redis increment failed:', redisError);
           }
         }
-        
+
         return { success: false, message: 'Invalid credentials' };
       }
 
@@ -1475,7 +1475,7 @@ export class PhoenixAPIServer {
 
       if (!isValidPassword) {
         this.metrics.requests.failed++;
-        
+
         // Increment failed attempts
         if (redisClient) {
           try {
@@ -1489,7 +1489,7 @@ export class PhoenixAPIServer {
             console.warn('Redis increment failed:', redisError);
           }
         }
-        
+
         return { success: false, message: 'Invalid credentials' };
       }
 
@@ -1523,14 +1523,14 @@ export class PhoenixAPIServer {
       const accessToken = jwt.sign(
         { ...tokenPayload, exp: Math.floor(Date.now() / 1000) + 15 * 60 },
         jwtSecret,
-        { algorithm: 'HS256' }
+        { algorithm: 'HS256' },
       );
 
       // Generate refresh token (7 days)
       const refreshToken = jwt.sign(
         { ...tokenPayload, exp: Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60 },
         jwtRefreshSecret,
-        { algorithm: 'HS256' }
+        { algorithm: 'HS256' },
       );
 
       // Store session in Redis (optional)
@@ -1593,14 +1593,14 @@ export class PhoenixAPIServer {
   /**
    * Register new user with email verification and secure password hashing
    * Production-ready implementation with bcrypt, database integration, and email verification
-   * 
+   *
    * @param signupData - User registration data (email, password, name, optional role)
    * @param context - Request context with IP, user agent, correlation ID
    * @returns Registration result with JWT tokens or error message
    */
   private async registerUser(
     signupData: { email: string; password: string; name: string; role?: string },
-    context: RequestContext
+    context: RequestContext,
   ): Promise<{
     success: boolean;
     user?: { id: string; email: string; name: string; role: string };
@@ -1608,7 +1608,7 @@ export class PhoenixAPIServer {
     message?: string;
   }> {
     const startTime = Date.now();
-    
+
     try {
       // 1. Input validation
       if (!signupData.email || !signupData.password || !signupData.name) {
@@ -1619,7 +1619,7 @@ export class PhoenixAPIServer {
       // 2. Email format validation and normalization
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       const normalizedEmail = signupData.email.toLowerCase().trim();
-      
+
       if (!emailRegex.test(normalizedEmail)) {
         this.metrics.requests.failed++;
         return { success: false, message: 'Invalid email format' };
@@ -1668,7 +1668,7 @@ export class PhoenixAPIServer {
       // 6. Generate email verification token
       const emailVerificationToken = randomBytes(32).toString('hex');
       const role = signupData.role || 'player';
-      
+
       // 7. Create user in database
       let userId: string;
       try {
@@ -1714,18 +1714,18 @@ export class PhoenixAPIServer {
       const accessToken = jwt.sign(
         { ...tokenPayload, exp: Math.floor(Date.now() / 1000) + 15 * 60 },
         jwtSecret,
-        { algorithm: 'HS256' }
+        { algorithm: 'HS256' },
       );
 
       const refreshToken = jwt.sign(
         { ...tokenPayload, exp: Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60 },
         jwtRefreshSecret,
-        { algorithm: 'HS256' }
+        { algorithm: 'HS256' },
       );
 
       // 9. Send verification email (async, non-blocking)
       this.sendVerificationEmail(normalizedEmail, emailVerificationToken).catch(err =>
-        console.warn('[AUTH] Email send failed:', err)
+        console.warn('[AUTH] Email send failed:', err),
       );
 
       // 10. Log registration event
@@ -1755,17 +1755,17 @@ export class PhoenixAPIServer {
   /**
    * Logout user and blacklist token
    * Production-ready implementation with Redis blacklisting and session cleanup
-   * 
+   *
    * @param token - JWT access token to invalidate
    * @param context - Request context with IP, user agent, correlation ID
    * @returns Logout result with success status
    */
   private async logoutUser(
     token: string,
-    context: RequestContext
+    context: RequestContext,
   ): Promise<{ success: boolean; message: string }> {
     const startTime = Date.now();
-    
+
     try {
       // 1. Validate token exists
       if (!token) {
@@ -1775,7 +1775,7 @@ export class PhoenixAPIServer {
 
       // 2. Verify token and extract payload
       const jwtSecret = process.env.JWT_SECRET || 'phoenix-jwt-secret-change-in-production';
-      
+
       let decoded: { userId: string; sessionId: string; exp: number };
       try {
         decoded = jwt.verify(token, jwtSecret) as {
@@ -1794,12 +1794,12 @@ export class PhoenixAPIServer {
         try {
           const tokenExpiry = decoded.exp - Math.floor(Date.now() / 1000);
           const blacklistKey = `token:blacklist:${token}`;
-          
+
           // Store token in blacklist until it expires
           if (tokenExpiry > 0) {
             await redisClient.setex(blacklistKey, tokenExpiry, '1');
           }
-          
+
           // Delete session from Redis
           await redisClient.del(`session:${decoded.sessionId}`);
         } catch (redisError) {
@@ -1837,21 +1837,21 @@ export class PhoenixAPIServer {
   /**
    * Refresh access token using refresh token
    * Production-ready implementation with token rotation and security validation
-   * 
+   *
    * @param refreshToken - Refresh token for generating new access token
    * @param context - Request context with IP, user agent, correlation ID
    * @returns New access token and optionally rotated refresh token
    */
   private async refreshToken(
     refreshToken: string,
-    context: RequestContext
+    context: RequestContext,
   ): Promise<{
     success: boolean;
     tokens?: { accessToken: string; refreshToken: string; expiresIn: number };
     message?: string;
   }> {
     const startTime = Date.now();
-    
+
     try {
       // 1. Validate refresh token exists
       if (!refreshToken) {
@@ -1862,7 +1862,7 @@ export class PhoenixAPIServer {
       // 2. Verify refresh token
       const jwtRefreshSecret =
         process.env.JWT_REFRESH_SECRET || 'phoenix-refresh-secret-change-in-production';
-      
+
       let decoded: {
         userId: string;
         sessionId: string;
@@ -1870,7 +1870,7 @@ export class PhoenixAPIServer {
         email: string;
         permissions: string[];
       };
-      
+
       try {
         decoded = jwt.verify(refreshToken, jwtRefreshSecret) as typeof decoded;
       } catch (err) {
@@ -1917,7 +1917,7 @@ export class PhoenixAPIServer {
 
       // 5. Generate new access token
       const jwtSecret = process.env.JWT_SECRET || 'phoenix-jwt-secret-change-in-production';
-      
+
       const newTokenPayload = {
         userId: decoded.userId,
         sessionId: decoded.sessionId,
@@ -1954,7 +1954,7 @@ export class PhoenixAPIServer {
             exp: Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60, // 7 days
           },
           jwtRefreshSecret,
-          { algorithm: 'HS256' }
+          { algorithm: 'HS256' },
         );
       }
 
@@ -1991,7 +1991,7 @@ export class PhoenixAPIServer {
     code: string,
     state: string,
     provider: string,
-    context: RequestContext
+    context: RequestContext,
   ): Promise<any> {
     const startTime = Date.now();
 
@@ -2009,9 +2009,9 @@ export class PhoenixAPIServer {
       const { profile, tokens } = callbackResult;
 
       // Check if user exists with this email
-      let user = await phoenixPool.query(
+      const user = await phoenixPool.query(
         'SELECT id, email, role, permissions, mfa_enabled FROM users WHERE email = $1',
-        [profile.email]
+        [profile.email],
       );
 
       let userId: string;
@@ -2033,7 +2033,7 @@ export class PhoenixAPIServer {
             profile.emailVerified,
             role,
             JSON.stringify(this.getUserPermissions(role)),
-          ]
+          ],
         );
 
         userId = newUserId;
@@ -2074,13 +2074,13 @@ export class PhoenixAPIServer {
       const accessToken = jwt.sign(
         { ...tokenPayload, exp: Math.floor(Date.now() / 1000) + 15 * 60 },
         jwtSecret,
-        { algorithm: 'HS256' }
+        { algorithm: 'HS256' },
       );
 
       const refreshToken = jwt.sign(
         { ...tokenPayload, exp: Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60 },
         jwtRefreshSecret,
-        { algorithm: 'HS256' }
+        { algorithm: 'HS256' },
       );
 
       console.log(`[OAUTH] User ${profile.email} authenticated via ${provider} (${Date.now() - startTime}ms)`);
@@ -2112,7 +2112,7 @@ export class PhoenixAPIServer {
     userId: string,
     provider: string,
     oauthData: any,
-    context: RequestContext
+    context: RequestContext,
   ): Promise<any> {
     try {
       const result = await oauthService.linkOAuthAccount(userId, provider, oauthData);
@@ -2150,7 +2150,7 @@ export class PhoenixAPIServer {
   private async setupMFA(
     userId: string,
     userEmail: string,
-    context: RequestContext
+    context: RequestContext,
   ): Promise<any> {
     try {
       const result = await mfaService.setupMFA(userId, userEmail);
@@ -2183,7 +2183,7 @@ export class PhoenixAPIServer {
   private async verifyMFASetup(
     userId: string,
     code: string,
-    context: RequestContext
+    context: RequestContext,
   ): Promise<any> {
     try {
       const result = await mfaService.verifyMFASetup(userId, code);
@@ -2217,7 +2217,7 @@ export class PhoenixAPIServer {
   private async verifyMFACode(
     userId: string,
     code: string,
-    context: RequestContext
+    context: RequestContext,
   ): Promise<any> {
     try {
       const result = await mfaService.verifyMFACode(userId, code);
@@ -2241,13 +2241,13 @@ export class PhoenixAPIServer {
   private async disableMFA(
     userId: string,
     password: string,
-    context: RequestContext
+    context: RequestContext,
   ): Promise<any> {
     try {
       // Verify password first
       const user = await phoenixPool.query(
         'SELECT password_hash FROM users WHERE id = $1',
-        [userId]
+        [userId],
       );
 
       if (user.rows.length === 0) {
@@ -2291,7 +2291,7 @@ export class PhoenixAPIServer {
   private async getUserSessions(
     userId: string,
     currentSessionId: string | undefined,
-    context: RequestContext
+    context: RequestContext,
   ): Promise<any> {
     try {
       const result = await sessionService.getUserSessions(userId, currentSessionId);
@@ -2322,7 +2322,7 @@ export class PhoenixAPIServer {
     sessionId: string,
     userId: string,
     currentSessionId: string | undefined,
-    context: RequestContext
+    context: RequestContext,
   ): Promise<any> {
     try {
       const result = await sessionService.revokeSession(sessionId, userId, currentSessionId);
@@ -2359,7 +2359,7 @@ export class PhoenixAPIServer {
     userId: string,
     role: string,
     assignedBy: string,
-    context: RequestContext
+    context: RequestContext,
   ): Promise<any> {
     try {
       const result = await rbacService.assignRole(userId, role, assignedBy);
@@ -2392,7 +2392,7 @@ export class PhoenixAPIServer {
     userId: string,
     permission: string,
     grantedBy: string,
-    context: RequestContext
+    context: RequestContext,
   ): Promise<any> {
     try {
       const result = await rbacService.grantPermission(userId, permission, grantedBy);
@@ -3029,7 +3029,7 @@ export class PhoenixAPIServer {
 
       if (filters.position && Array.isArray(filters.position)) {
         filteredPlayers = filteredPlayers.filter(p =>
-          (filters.position as string[]).includes(p.position)
+          (filters.position as string[]).includes(p.position),
         );
       }
 
@@ -4397,7 +4397,7 @@ export class PhoenixAPIServer {
 
   private generatePerformanceTrends(
     groupBy: string,
-    count: number
+    count: number,
   ): Array<{ period: string; value: number; change: number }> {
     const trends: Array<{ period: string; value: number; change: number }> = [];
     for (let i = count - 1; i >= 0; i--) {
@@ -4490,7 +4490,7 @@ export class PhoenixAPIServer {
           const mimeType = file.mimetype || file.type;
           if (!allowedMimeTypes.includes(mimeType)) {
             errors.push(
-              `File type ${mimeType} is not allowed. Allowed types: ${allowedMimeTypes.join(', ')}`
+              `File type ${mimeType} is not allowed. Allowed types: ${allowedMimeTypes.join(', ')}`,
             );
           }
         }
@@ -4499,7 +4499,7 @@ export class PhoenixAPIServer {
           errors.push('File size is required');
         } else if (file.size > maxFileSize) {
           errors.push(
-            `File size ${file.size} bytes exceeds maximum allowed size of ${maxFileSize} bytes (50MB)`
+            `File size ${file.size} bytes exceeds maximum allowed size of ${maxFileSize} bytes (50MB)`,
           );
         }
 
@@ -5080,10 +5080,10 @@ export class PhoenixAPIServer {
   private async sendVerificationEmail(email: string, token: string): Promise<void> {
     try {
       const verificationUrl = `${process.env.APP_URL || 'http://localhost:3000'}/verify-email?token=${token}`;
-      
+
       // TODO: Replace with actual email service integration
       console.log(`[EMAIL] Verification URL for ${email}: ${verificationUrl}`);
-      
+
       // Example SendGrid integration (commented out):
       // const sgMail = require('@sendgrid/mail');
       // sgMail.setApiKey(process.env.SENDGRID_API_KEY);
@@ -5116,7 +5116,7 @@ export class PhoenixAPIServer {
 
   private validateRequestSchema(
     data: any,
-    schema: string
+    schema: string,
   ): { isValid: boolean; errors?: string[] } {
     // Implementation would validate request schema
     return { isValid: true };
@@ -5143,10 +5143,10 @@ export class PhoenixAPIServer {
         this.server.listen(this.config.port, this.config.host, () => {
           console.log(`🚀 Phoenix API Server running on ${this.config.host}:${this.config.port}`);
           console.log(
-            `📊 Health check: http://${this.config.host}:${this.config.port}${this.config.monitoring.healthPath}`
+            `📊 Health check: http://${this.config.host}:${this.config.port}${this.config.monitoring.healthPath}`,
           );
           console.log(
-            `📈 Metrics: http://${this.config.host}:${this.config.port}${this.config.monitoring.metricsPath}`
+            `📈 Metrics: http://${this.config.host}:${this.config.port}${this.config.monitoring.metricsPath}`,
           );
           console.log(`🔮 GraphQL: http://${this.config.host}:${this.config.port}/graphql`);
 

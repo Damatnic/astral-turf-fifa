@@ -68,7 +68,7 @@ export const handlers = [
         },
         expiresIn: 3600,
       },
-      { status: 200 }
+      { status: 200 },
     );
   }),
 
@@ -89,7 +89,7 @@ export const handlers = [
         name: 'Test User',
         role: 'user',
       },
-      { status: 200 }
+      { status: 200 },
     );
   }),
 
@@ -123,7 +123,7 @@ export const handlers = [
         limit,
         totalPages: Math.ceil(formations.length / limit),
       },
-      { status: 200 }
+      { status: 200 },
     );
   }),
 
@@ -372,7 +372,7 @@ export const handlers = [
 
     return HttpResponse.json(
       { error: `Test error with status ${statusCode}` },
-      { status: statusCode }
+      { status: statusCode },
     );
   }),
 
@@ -392,7 +392,7 @@ export const handlers = [
         url: `ws://localhost:3001/collaboration/${toParamString(params.sessionId)}`,
         token: 'mock-ws-token',
       },
-      { status: 200 }
+      { status: 200 },
     );
   }),
 ];
@@ -414,7 +414,7 @@ export const serverUtils = {
     server.use(
       http.get(path, async () => {
         return HttpResponse.error();
-      })
+      }),
     );
   },
 
@@ -422,7 +422,7 @@ export const serverUtils = {
     server.use(
       http.get(path, async () => {
         return HttpResponse.json({ error: 'Server error' }, { status: statusCode });
-      })
+      }),
     );
   },
 
@@ -431,7 +431,7 @@ export const serverUtils = {
       http.get(path, async () => {
         await sleep(delay);
         return HttpResponse.json({ message: 'Delayed response' }, { status: 200 });
-      })
+      }),
     );
   },
 

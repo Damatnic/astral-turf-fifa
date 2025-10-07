@@ -121,7 +121,7 @@ export const TouchFirstTacticsBoard: React.FC<TouchFirstTacticsBoardProps> = ({
         const touch2 = touches[1];
         const distance = Math.sqrt(
           Math.pow(touch2.clientX - touch1.clientX, 2) +
-            Math.pow(touch2.clientY - touch1.clientY, 2)
+            Math.pow(touch2.clientY - touch1.clientY, 2),
         );
 
         setTouchState(prev => ({
@@ -132,7 +132,7 @@ export const TouchFirstTacticsBoard: React.FC<TouchFirstTacticsBoardProps> = ({
 
       e.preventDefault();
     },
-    [viewport, isReadOnly]
+    [viewport, isReadOnly],
   );
 
   const handleTouchMove = useCallback(
@@ -168,7 +168,7 @@ export const TouchFirstTacticsBoard: React.FC<TouchFirstTacticsBoardProps> = ({
         const touch2 = touches[1];
         const distance = Math.sqrt(
           Math.pow(touch2.clientX - touch1.clientX, 2) +
-            Math.pow(touch2.clientY - touch1.clientY, 2)
+            Math.pow(touch2.clientY - touch1.clientY, 2),
         );
 
         if (touchState.gestureStart) {
@@ -197,7 +197,7 @@ export const TouchFirstTacticsBoard: React.FC<TouchFirstTacticsBoardProps> = ({
 
       e.preventDefault();
     },
-    [touchState, viewport, onPlayerMove, isReadOnly, mobileUI.hapticEnabled]
+    [touchState, viewport, onPlayerMove, isReadOnly, mobileUI.hapticEnabled],
   );
 
   const handleTouchEnd = useCallback(
@@ -229,7 +229,7 @@ export const TouchFirstTacticsBoard: React.FC<TouchFirstTacticsBoardProps> = ({
 
       e.preventDefault();
     },
-    [touchState]
+    [touchState],
   );
 
   const handleLongPress = (position: Position) => {
@@ -274,7 +274,7 @@ export const TouchFirstTacticsBoard: React.FC<TouchFirstTacticsBoardProps> = ({
         }
 
         const distance = Math.sqrt(
-          Math.pow(player.position.x - position.x, 2) + Math.pow(player.position.y - position.y, 2)
+          Math.pow(player.position.x - position.x, 2) + Math.pow(player.position.y - position.y, 2),
         );
         return distance < 30; // Touch target size
       }) || null
@@ -472,7 +472,7 @@ export const TouchFirstTacticsBoard: React.FC<TouchFirstTacticsBoardProps> = ({
               player =>
                 player?.position &&
                 typeof player.position.x === 'number' &&
-                typeof player.position.y === 'number'
+                typeof player.position.y === 'number',
             )
             .map(player => (
               <div
@@ -517,7 +517,7 @@ export const TouchFirstTacticsBoard: React.FC<TouchFirstTacticsBoardProps> = ({
               player =>
                 player?.position &&
                 typeof player.position.x === 'number' &&
-                typeof player.position.y === 'number'
+                typeof player.position.y === 'number',
             )
             .map(player => (
               <div

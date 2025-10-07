@@ -37,7 +37,7 @@ const PlayerStatRadar: React.FC<PlayerStatRadarProps> = ({
       { key: 'tackling', label: 'Tackling', value: player.attributes.tackling },
       { key: 'positioning', label: 'Positioning', value: player.attributes.positioning },
     ],
-    [player.attributes]
+    [player.attributes],
   );
 
   // Comparison player attributes
@@ -258,7 +258,7 @@ const PlayerStatRadar: React.FC<PlayerStatRadarProps> = ({
         <div className="bg-gray-900/90 backdrop-blur-sm rounded-full w-16 h-16 flex flex-col items-center justify-center border-2" style={{ borderColor: color }}>
           <span className="text-xl font-bold text-white">
             {Math.round(
-              attributes.reduce((sum, attr) => sum + attr.value, 0) / attributes.length
+              attributes.reduce((sum, attr) => sum + attr.value, 0) / attributes.length,
             )}
           </span>
           <span className="text-xs text-gray-400">OVR</span>

@@ -301,10 +301,10 @@ class BackupService {
     const now = new Date();
     const cutoffDaily = new Date(now.getTime() - this.config.retention.daily * 24 * 60 * 60 * 1000);
     const cutoffWeekly = new Date(
-      now.getTime() - this.config.retention.weekly * 7 * 24 * 60 * 60 * 1000
+      now.getTime() - this.config.retention.weekly * 7 * 24 * 60 * 60 * 1000,
     );
     const cutoffMonthly = new Date(
-      now.getTime() - this.config.retention.monthly * 30 * 24 * 60 * 60 * 1000
+      now.getTime() - this.config.retention.monthly * 30 * 24 * 60 * 60 * 1000,
     );
 
     // In a real implementation, this would remove old backup files

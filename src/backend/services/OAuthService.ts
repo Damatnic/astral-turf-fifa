@@ -1,12 +1,12 @@
 /**
  * OAuth Service - Social Authentication Integration
- * 
+ *
  * Supports multiple OAuth providers:
  * - Google
  * - GitHub
  * - Microsoft
  * - Facebook
- * 
+ *
  * Features:
  * - PKCE flow for enhanced security
  * - State parameter for CSRF protection
@@ -144,7 +144,7 @@ export class OAuthService {
       returnUrl?: string;
       prompt?: 'none' | 'consent' | 'select_account';
       loginHint?: string;
-    }
+    },
   ): Promise<{
     success: boolean;
     redirectUrl?: string;
@@ -228,7 +228,7 @@ export class OAuthService {
   async handleCallback(
     code: string,
     state: string,
-    provider: string
+    provider: string,
   ): Promise<{
     success: boolean;
     profile?: OAuthUserProfile;
@@ -288,7 +288,7 @@ export class OAuthService {
       const tokenResponse = await this.exchangeCodeForTokens(
         code,
         providerConfig,
-        stateData.codeVerifier
+        stateData.codeVerifier,
       );
 
       if (!tokenResponse.success || !tokenResponse.accessToken) {
@@ -302,7 +302,7 @@ export class OAuthService {
       // Fetch user profile
       const profile = await this.fetchUserProfile(
         tokenResponse.accessToken,
-        providerConfig
+        providerConfig,
       );
 
       if (!profile) {
@@ -339,7 +339,7 @@ export class OAuthService {
   private async exchangeCodeForTokens(
     code: string,
     provider: OAuthProvider,
-    codeVerifier: string
+    codeVerifier: string,
   ): Promise<{
     success: boolean;
     accessToken?: string;
@@ -386,7 +386,7 @@ export class OAuthService {
    */
   private async fetchUserProfile(
     accessToken: string,
-    provider: OAuthProvider
+    provider: OAuthProvider,
   ): Promise<OAuthUserProfile | null> {
     try {
       const response = await axios.get(provider.userInfoUrl, {
@@ -475,7 +475,7 @@ export class OAuthService {
       expiresIn?: number;
       scope?: string;
       idToken?: string;
-    }
+    },
   ): Promise<{
     success: boolean;
     accountId?: string;
@@ -490,12 +490,12 @@ export class OAuthService {
       const existingLink = await client.query(
         `SELECT id, user_id FROM oauth_accounts 
          WHERE provider = $1 AND provider_account_id = $2`,
-        [provider, oauthData.providerAccountId]
+        [provider, oauthData.providerAccountId],
       );
 
       if (existingLink.rows.length > 0) {
         const existing = existingLink.rows[0];
-        
+
         if (existing.user_id !== userId) {
           await client.query('ROLLBACK');
           return {
@@ -521,7 +521,7 @@ export class OAuthService {
             oauthData.scope,
             oauthData.idToken,
             existing.id,
-          ]
+          ],
         );
 
         await client.query('COMMIT');
@@ -550,7 +550,7 @@ export class OAuthService {
           oauthData.scope,
           'Bearer',
           oauthData.idToken,
-        ]
+        ],
       );
 
       await client.query('COMMIT');
@@ -591,7 +591,7 @@ export class OAuthService {
          FROM oauth_accounts
          WHERE user_id = $1
          ORDER BY created_at DESC`,
-        [userId]
+        [userId],
       );
 
       const accounts = result.rows.map(row => ({
@@ -620,7 +620,7 @@ export class OAuthService {
    */
   async unlinkOAuthAccount(
     userId: string,
-    accountId: string
+    accountId: string,
   ): Promise<{
     success: boolean;
     message?: string;
@@ -632,7 +632,7 @@ export class OAuthService {
         `DELETE FROM oauth_accounts
          WHERE id = $1 AND user_id = $2
          RETURNING id`,
-        [accountId, userId]
+        [accountId, userId],
       );
 
       if (result.rowCount === 0) {
@@ -659,7 +659,7 @@ export class OAuthService {
    * Refresh OAuth access token
    */
   async refreshAccessToken(
-    accountId: string
+    accountId: string,
   ): Promise<{
     success: boolean;
     accessToken?: string;
@@ -670,7 +670,7 @@ export class OAuthService {
       // Get account details
       const accountResult = await phoenixPool.query(
         `SELECT provider, refresh_token FROM oauth_accounts WHERE id = $1`,
-        [accountId]
+        [accountId],
       );
 
       if (accountResult.rows.length === 0) {
@@ -728,7 +728,7 @@ export class OAuthService {
           new_refresh_token,
           expires_in ? new Date(Date.now() + expires_in * 1000) : null,
           accountId,
-        ]
+        ],
       );
 
       return {

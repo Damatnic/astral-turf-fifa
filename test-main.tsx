@@ -6,5 +6,5 @@ import TestApp from './src/TestApp';
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <TestApp />
-  </React.StrictMode>
+  </React.StrictMode>,
 );

@@ -127,7 +127,7 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
       const autoAssignedFormation = autoAssignPlayersToFormation(
         draft.players,
         baseFormation,
-        team
+        team,
       );
 
       // Update the formation with auto-assigned players
@@ -137,7 +137,7 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
       const updatedPlayers = updatePlayerPositionsFromFormation(
         draft.players,
         autoAssignedFormation,
-        team
+        team,
       );
       draft.players = updatedPlayers;
 
@@ -226,7 +226,7 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
         const currentMoraleIndex = moraleOrder.indexOf(player.morale);
         const newMoraleIndex = Math.max(
           0,
-          Math.min(moraleOrder.length - 1, currentMoraleIndex + moraleEffect)
+          Math.min(moraleOrder.length - 1, currentMoraleIndex + moraleEffect),
         );
         player.morale = moraleOrder[newMoraleIndex];
       }
@@ -285,7 +285,7 @@ export const tacticsReducer = (draft: TacticsState, action: Action): TacticsStat
       const player = draft.players.find(p => p.id === (action as any).payload.playerId);
       if (player) {
         player.contract.clauses = player.contract.clauses.filter(
-          c => c.id !== (action as any).payload.clauseId
+          c => c.id !== (action as any).payload.clauseId,
         );
       }
       break;

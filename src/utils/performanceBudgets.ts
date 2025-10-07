@@ -135,7 +135,7 @@ export function estimateGzipRatio(fileType: 'js' | 'css' | 'html' | 'json'): num
  */
 export function estimateLoadTime(
   sizeBytes: number,
-  network: keyof typeof PERFORMANCE_BUDGETS.networkConditions
+  network: keyof typeof PERFORMANCE_BUDGETS.networkConditions,
 ): number {
   const conditions = PERFORMANCE_BUDGETS.networkConditions[network];
   const downloadTime = (sizeBytes / conditions.downloadThroughput) * 1000; // ms
@@ -216,27 +216,27 @@ export function generatePerformanceReport(bundles: {
 
   if (js > PERFORMANCE_BUDGETS.javascript.total) {
     recommendations.push(
-      '🔴 JavaScript bundle is too large. Consider code splitting, tree shaking, or removing unused dependencies.'
+      '🔴 JavaScript bundle is too large. Consider code splitting, tree shaking, or removing unused dependencies.',
     );
   }
   if (css > PERFORMANCE_BUDGETS.css.total) {
     recommendations.push(
-      '🔴 CSS bundle is too large. Consider purging unused styles or splitting CSS.'
+      '🔴 CSS bundle is too large. Consider purging unused styles or splitting CSS.',
     );
   }
   if (images > PERFORMANCE_BUDGETS.images.total) {
     recommendations.push(
-      '🔴 Images are too large. Consider WebP format, compression, or lazy loading.'
+      '🔴 Images are too large. Consider WebP format, compression, or lazy loading.',
     );
   }
   if (fonts > PERFORMANCE_BUDGETS.fonts.total) {
     recommendations.push(
-      '🔴 Fonts are too large. Consider subsetting, WOFF2 format, or reducing font weights.'
+      '🔴 Fonts are too large. Consider subsetting, WOFF2 format, or reducing font weights.',
     );
   }
   if (total > PERFORMANCE_BUDGETS.overall.total) {
     recommendations.push(
-      '🔴 Overall page weight exceeds budget. Implement aggressive optimization strategies.'
+      '🔴 Overall page weight exceeds budget. Implement aggressive optimization strategies.',
     );
   }
 

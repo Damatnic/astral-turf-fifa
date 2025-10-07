@@ -40,7 +40,7 @@ export const LeaderboardComponent: React.FC<LeaderboardComponentProps> = ({
 
   // Auto-refresh
   useEffect(() => {
-    if (!autoRefresh || !onRefresh) return;
+    if (!autoRefresh || !onRefresh) {return;}
 
     const interval = setInterval(() => {
       handleRefresh();
@@ -91,7 +91,7 @@ export const LeaderboardComponent: React.FC<LeaderboardComponentProps> = ({
 
   // Get rank change indicator
   const getRankChangeIndicator = (entry: LeaderboardEntry) => {
-    if (!entry.previousRank || !entry.rankChange) return null;
+    if (!entry.previousRank || !entry.rankChange) {return null;}
 
     if (entry.rankChange === 'up') {
       return (
@@ -143,7 +143,7 @@ export const LeaderboardComponent: React.FC<LeaderboardComponentProps> = ({
               {leaderboard.name}
             </h2>
             <p className="text-sm text-gray-400">
-              {leaderboard.totalParticipants} participants • 
+              {leaderboard.totalParticipants} participants •
               {leaderboard.isLive && (
                 <span className="ml-2 inline-flex items-center gap-1 text-green-400">
                   <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />

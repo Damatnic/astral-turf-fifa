@@ -255,16 +255,16 @@ function generateCoverageReport(analysis) {
   log.subheader('🌍 Global Coverage Summary');
   const total = analysis.total;
   console.log(
-    `Statements: ${total.statements.pct.toFixed(2)}% (${total.statements.covered}/${total.statements.total})`
+    `Statements: ${total.statements.pct.toFixed(2)}% (${total.statements.covered}/${total.statements.total})`,
   );
   console.log(
-    `Branches:   ${total.branches.pct.toFixed(2)}% (${total.branches.covered}/${total.branches.total})`
+    `Branches:   ${total.branches.pct.toFixed(2)}% (${total.branches.covered}/${total.branches.total})`,
   );
   console.log(
-    `Functions:  ${total.functions.pct.toFixed(2)}% (${total.functions.covered}/${total.functions.total})`
+    `Functions:  ${total.functions.pct.toFixed(2)}% (${total.functions.covered}/${total.functions.total})`,
   );
   console.log(
-    `Lines:      ${total.lines.pct.toFixed(2)}% (${total.lines.covered}/${total.lines.total})`
+    `Lines:      ${total.lines.pct.toFixed(2)}% (${total.lines.covered}/${total.lines.total})`,
   );
 
   // Tactical Components Coverage
@@ -281,7 +281,7 @@ function generateCoverageReport(analysis) {
     analysis.gaps.forEach(gap => {
       const fileDisplay = gap.file === 'GLOBAL' ? 'GLOBAL THRESHOLD' : path.basename(gap.file);
       log.warning(
-        `${fileDisplay} - ${gap.metric}: ${gap.actual.toFixed(2)}% (need ${gap.expected}%, gap: ${gap.gap.toFixed(2)}%)`
+        `${fileDisplay} - ${gap.metric}: ${gap.actual.toFixed(2)}% (need ${gap.expected}%, gap: ${gap.gap.toFixed(2)}%)`,
       );
     });
   } else {

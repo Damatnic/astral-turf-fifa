@@ -21,7 +21,7 @@ interface FormationTransitionOverlayProps {
  */
 const calculateArrowPath = (
   from: { x: number; y: number },
-  to: { x: number; y: number }
+  to: { x: number; y: number },
 ): string => {
   // Convert percentage positions to SVG coordinates (assuming 100x100 viewBox)
   const startX = from.x;

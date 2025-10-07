@@ -21,7 +21,7 @@ const PressConferencePopup: React.FC = () => {
           (dispatch as (action: { type: string; payload?: unknown }) => void)({
             type: 'GET_PRESS_CONFERENCE_QUESTIONS_SUCCESS',
             payload: data,
-          })
+          }),
         )
         .catch(err => {
           console.error(err);

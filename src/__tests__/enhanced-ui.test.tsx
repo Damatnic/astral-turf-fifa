@@ -50,7 +50,7 @@ describe.skip('Enhanced UI Components', () => {
       render(
         <TestWrapper>
           <TestComponent />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       expect(screen.getByTestId('theme-mode')).toHaveTextContent('light');
@@ -74,7 +74,7 @@ describe.skip('Enhanced UI Components', () => {
       render(
         <TestWrapper>
           <TestComponent />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       expect(screen.getByTestId('current-mode')).toHaveTextContent('light');
@@ -102,7 +102,7 @@ describe.skip('Enhanced UI Components', () => {
       render(
         <TestWrapper>
           <TestComponent />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       expect(screen.getByTestId('theme-mode')).toHaveTextContent('system');
@@ -132,7 +132,7 @@ describe.skip('Enhanced UI Components', () => {
       render(
         <TestWrapper>
           <TestComponent />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       expect(screen.getByTestId('density')).toHaveTextContent('comfortable');
@@ -150,7 +150,7 @@ describe.skip('Enhanced UI Components', () => {
       render(
         <TestWrapper>
           <EnhancedButton variant="primary">Test Button</EnhancedButton>
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       const button = screen.getByRole('button', { name: 'Test Button' });
@@ -164,7 +164,7 @@ describe.skip('Enhanced UI Components', () => {
       render(
         <TestWrapper>
           <EnhancedButton onClick={handleClick}>Click Me</EnhancedButton>
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       const button = screen.getByRole('button', { name: 'Click Me' });
@@ -177,7 +177,7 @@ describe.skip('Enhanced UI Components', () => {
       render(
         <TestWrapper>
           <EnhancedButton loading>Loading Button</EnhancedButton>
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       const button = screen.getByRole('button');
@@ -189,7 +189,7 @@ describe.skip('Enhanced UI Components', () => {
       render(
         <TestWrapper>
           <EnhancedButton disabled>Disabled Button</EnhancedButton>
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       const button = screen.getByRole('button');
@@ -204,7 +204,7 @@ describe.skip('Enhanced UI Components', () => {
           <EnhancedCard data-testid="test-card">
             <p>Card Content</p>
           </EnhancedCard>
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       const card = screen.getByTestId('test-card');
@@ -220,7 +220,7 @@ describe.skip('Enhanced UI Components', () => {
           <EnhancedCard interactive onClick={handleClick} data-testid="interactive-card">
             Interactive Card
           </EnhancedCard>
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       const card = screen.getByTestId('interactive-card');
@@ -235,7 +235,7 @@ describe.skip('Enhanced UI Components', () => {
       render(
         <TestWrapper>
           <EnhancedInput label="Test Input" placeholder="Enter text..." data-testid="test-input" />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       expect(screen.getByLabelText('Test Input')).toBeInTheDocument();
@@ -248,7 +248,7 @@ describe.skip('Enhanced UI Components', () => {
       render(
         <TestWrapper>
           <EnhancedInput label="Test Input" onChange={handleChange} data-testid="test-input" />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       const input = screen.getByLabelText('Test Input');
@@ -266,7 +266,7 @@ describe.skip('Enhanced UI Components', () => {
             error="This field is required"
             data-testid="test-input"
           />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       expect(screen.getByText('This field is required')).toBeInTheDocument();
@@ -280,7 +280,7 @@ describe.skip('Enhanced UI Components', () => {
       render(
         <TestWrapper>
           <EnhancedSwitch checked={false} onChange={vi.fn()} label="Test Switch" />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       const switchElement = screen.getByRole('switch');
@@ -295,7 +295,7 @@ describe.skip('Enhanced UI Components', () => {
       render(
         <TestWrapper>
           <EnhancedSwitch checked={false} onChange={handleChange} label="Test Switch" />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       const switchElement = screen.getByRole('switch');
@@ -325,7 +325,7 @@ describe.skip('Enhanced UI Components', () => {
       render(
         <TestWrapper>
           <EnhancedLineChart data={mockChartData} loading={true} title="Test Chart" />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       expect(screen.getByText('Test Chart')).toBeInTheDocument();
@@ -335,7 +335,7 @@ describe.skip('Enhanced UI Components', () => {
       render(
         <TestWrapper>
           <EnhancedBarChart data={mockChartData} error="Failed to load data" title="Bar Chart" />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       expect(screen.getByText('Bar Chart')).toBeInTheDocument();
@@ -346,7 +346,7 @@ describe.skip('Enhanced UI Components', () => {
       render(
         <TestWrapper>
           <EnhancedDoughnutChart data={mockDoughnutData} title="Doughnut Chart" />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       expect(screen.getByText('Doughnut Chart')).toBeInTheDocument();
@@ -362,7 +362,7 @@ describe.skip('Enhanced UI Components', () => {
           <SwipeArea config={{ onSwipe: handleSwipe }} data-testid="swipe-area">
             <div>Swipeable Content</div>
           </SwipeArea>
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       expect(screen.getByTestId('swipe-area')).toBeInTheDocument();
@@ -377,7 +377,7 @@ describe.skip('Enhanced UI Components', () => {
           <Draggable config={{ onDrag: handleDrag }} data-testid="draggable">
             <div>Draggable Content</div>
           </Draggable>
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       expect(screen.getByTestId('draggable')).toBeInTheDocument();
@@ -395,7 +395,7 @@ describe.skip('Enhanced UI Components', () => {
       render(
         <TestWrapper>
           <SortableList items={items} onReorder={handleReorder} />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       expect(screen.getByText('Item 1')).toBeInTheDocument();
@@ -414,7 +414,7 @@ describe.skip('Enhanced UI Components', () => {
             </a>
             <div id="main">Main Content</div>
           </div>
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       const skipLink = screen.getByText('Skip to main content');
@@ -429,7 +429,7 @@ describe.skip('Enhanced UI Components', () => {
             <EnhancedButton data-testid="button1">Button 1</EnhancedButton>
             <EnhancedButton data-testid="button2">Button 2</EnhancedButton>
           </div>
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       const button1 = screen.getByTestId('button1');
@@ -450,7 +450,7 @@ describe.skip('Enhanced UI Components', () => {
       const LazyComponent = React.lazy(() =>
         Promise.resolve({
           default: () => <div>Lazy Loaded Component</div>,
-        })
+        }),
       );
 
       render(
@@ -458,7 +458,7 @@ describe.skip('Enhanced UI Components', () => {
           <React.Suspense fallback={<div>Loading...</div>}>
             <LazyComponent />
           </React.Suspense>
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       expect(screen.getByText('Loading...')).toBeInTheDocument();
@@ -496,7 +496,7 @@ describe.skip('Enhanced UI Components', () => {
       render(
         <TestWrapper>
           <TestComponent />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       const motionState = screen.getByTestId('motion-state');
@@ -518,7 +518,7 @@ describe.skip('Enhanced UI Components', () => {
           <div className="responsive-test">
             <EnhancedCard>Responsive Card</EnhancedCard>
           </div>
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       const card = screen.getByText('Responsive Card');
@@ -555,7 +555,7 @@ describe('Integration Tests', () => {
     render(
       <TestWrapper>
         <TestApp />
-      </TestWrapper>
+      </TestWrapper>,
     );
 
     const themeButton = screen.getByTestId('theme-button');

@@ -172,7 +172,7 @@ class XSSProtectionService {
       userId?: string;
       userAgent?: string;
       ipAddress?: string;
-    } = {}
+    } = {},
   ): Promise<XSSDetectionResult> {
     const threats: XSSThreat[] = [];
     let riskScore = 0;
@@ -284,7 +284,7 @@ class XSSProtectionService {
           ALLOW_UNKNOWN_PROTOCOLS: false,
           SANITIZE_DOM: true,
           KEEP_CONTENT: false,
-        } as any)
+        } as any),
       );
     } catch (error) {
       securityLogger.error('HTML sanitization failed', { error });
@@ -494,7 +494,7 @@ class XSSProtectionService {
       userId?: string;
       userAgent?: string;
       ipAddress?: string;
-    }
+    },
   ): void {
     const violation = {
       timestamp: new Date().toISOString(),
@@ -549,7 +549,7 @@ class XSSProtectionService {
         acc[v.threat.type] = (acc[v.threat.type] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<string, number>,
     );
 
     const violationsBySeverity = recentViolations.reduce(
@@ -557,7 +557,7 @@ class XSSProtectionService {
         acc[v.threat.severity] = (acc[v.threat.severity] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<string, number>,
     );
 
     const payloadCounts = recentViolations.reduce(
@@ -566,7 +566,7 @@ class XSSProtectionService {
         acc[payload] = (acc[payload] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<string, number>,
     );
 
     const topPayloads = Object.entries(payloadCounts)
@@ -603,7 +603,7 @@ export const protectFromXSS = (
     userId?: string;
     userAgent?: string;
     ipAddress?: string;
-  }
+  },
 ) => xssProtection.protectContent(content, context);
 
 export const sanitizeHTML = (html: string) =>

@@ -91,7 +91,7 @@ const TrainingPage: React.FC = () => {
   const handleSetSessionDrill = (
     session: 'morning' | 'afternoon',
     sessionPart: 'warmup' | 'main' | 'cooldown',
-    drillId: string | null
+    drillId: string | null,
   ) => {
     dispatch({
       type: 'SET_SESSION_DRILL',
@@ -285,7 +285,7 @@ const TrainingPage: React.FC = () => {
                                 (part === 'warmup' && drill.category === 'warmup') ||
                                 (part === 'cooldown' && drill.category === 'cooldown') ||
                                 (part === 'main' &&
-                                  !['warmup', 'cooldown'].includes(drill.category))
+                                  !['warmup', 'cooldown'].includes(drill.category)),
                             )
                             .map(drill => (
                               <option key={drill.id} value={drill.id}>
@@ -326,7 +326,7 @@ const TrainingPage: React.FC = () => {
                                 (part === 'warmup' && drill.category === 'warmup') ||
                                 (part === 'cooldown' && drill.category === 'cooldown') ||
                                 (part === 'main' &&
-                                  !['warmup', 'cooldown'].includes(drill.category))
+                                  !['warmup', 'cooldown'].includes(drill.category)),
                             )
                             .map(drill => (
                               <option key={drill.id} value={drill.id}>

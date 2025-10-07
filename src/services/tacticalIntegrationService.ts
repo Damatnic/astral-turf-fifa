@@ -33,7 +33,7 @@ export class TacticalIntegrationService {
   static assignPlayersToFormation(
     formation: Formation,
     players: Player[],
-    options: TacticalIntegrationOptions = {}
+    options: TacticalIntegrationOptions = {},
   ): Formation {
     const { autoAssignPlayers = true } = options;
 
@@ -61,7 +61,7 @@ export class TacticalIntegrationService {
    */
   static mergeTacticsState(
     currentState: Partial<TacticsState>,
-    updates: Partial<TacticsState>
+    updates: Partial<TacticsState>,
   ): Partial<TacticsState> {
     return {
       ...currentState,

@@ -146,7 +146,7 @@ export class GuardianSecuritySuite {
   async secureFormationOperation<T>(
     operation: 'create' | 'read' | 'update' | 'delete' | 'share' | 'export' | 'import',
     data: unknown,
-    context: SecurityContext
+    context: SecurityContext,
   ): Promise<SecureOperationResult<T>> {
     const operationId = crypto.randomUUID();
     const timestamp = new Date().toISOString();
@@ -178,7 +178,7 @@ export class GuardianSecuritySuite {
         const threats = await guardianThreatDetection.analyzeRequest(threatContext);
         if (threats.length > 0) {
           const highestThreat = threats.reduce((max, threat) =>
-            threat.threatLevel > max.threatLevel ? threat : max
+            threat.threatLevel > max.threatLevel ? threat : max,
           );
 
           result.threatLevel = highestThreat.threatLevel;
@@ -195,7 +195,7 @@ export class GuardianSecuritySuite {
       if (this.config.enableSessionSecurity && context.sessionId) {
         const sessionValidation = await guardianSecureSessionManager.validateSession(
           context.sessionId,
-          context.ipAddress || ''
+          context.ipAddress || '',
         );
 
         if (!sessionValidation.valid) {
@@ -278,7 +278,7 @@ export class GuardianSecuritySuite {
             operation,
             dataSize: JSON.stringify(data).length,
             securityFlags: result.securityFlags,
-          }
+          },
         );
 
         result.complianceChecks = {
@@ -303,7 +303,7 @@ export class GuardianSecuritySuite {
             threatLevel: result.threatLevel,
             securityFlags: result.securityFlags.length,
           },
-        }
+        },
       );
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -365,7 +365,7 @@ export class GuardianSecuritySuite {
             mfaUsed: authResult.requiresMFA,
             ipAddress: request.ipAddress,
             securityFlags: authResult.securityFlags,
-          }
+          },
         );
       }
 
@@ -393,7 +393,7 @@ export class GuardianSecuritySuite {
   async secureFileOperation(
     operation: 'upload' | 'download',
     file: File | string,
-    context: SecurityContext
+    context: SecurityContext,
   ): Promise<SecureOperationResult> {
     const operationId = crypto.randomUUID();
     const result: SecureOperationResult = {
@@ -417,7 +417,7 @@ export class GuardianSecuritySuite {
         const uploadResult = await guardianSecureFileHandler.secureImport(
           file,
           context.userId || 'anonymous',
-          context.teamId || 'default'
+          context.teamId || 'default',
         );
 
         if (!uploadResult.success) {
@@ -438,7 +438,7 @@ export class GuardianSecuritySuite {
           'formation_file',
           'File import/export operations',
           ProcessingLawfulness.LEGITIMATE_INTERESTS,
-          { operationId, fileName: file instanceof File ? file.name : file }
+          { operationId, fileName: file instanceof File ? file.name : file },
         );
       }
     } catch (error) {
@@ -465,7 +465,7 @@ export class GuardianSecuritySuite {
     const complianceScore =
       (Object.values(assessment.complianceStatus).reduce(
         (acc, status) => acc + (status ? 1 : 0),
-        0
+        0,
       ) /
         Object.keys(assessment.complianceStatus).length) *
       100;
@@ -563,18 +563,18 @@ export class GuardianSecuritySuite {
 
   private async executeFormationWrite(
     formation: TacticalFormation,
-    context: SecurityContext
+    context: SecurityContext,
   ): Promise<SecureTacticalData> {
     return await guardianTacticalSecurity.encryptTacticalFormation(
       formation,
       context.userId || '',
-      { ipAddress: context.ipAddress, userAgent: context.userAgent }
+      { ipAddress: context.ipAddress, userAgent: context.userAgent },
     );
   }
 
   private async executeFormationRead(
     formationId: string,
-    context: SecurityContext
+    context: SecurityContext,
   ): Promise<TacticalFormation> {
     // Validate permissions
     if (!context.userId) {
@@ -635,17 +635,17 @@ export class GuardianSecuritySuite {
           userId: context.userId,
           formationId,
           error: error instanceof Error ? error.message : String(error),
-        }
+        },
       );
       throw new Error(
-        `Failed to read formation: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `Failed to read formation: ${error instanceof Error ? error.message : 'Unknown error'}`,
       );
     }
   }
 
   private async executeFormationDelete(
     _formationId: string,
-    _context: SecurityContext
+    _context: SecurityContext,
   ): Promise<boolean> {
     // Would securely delete formation
     // In production:
@@ -664,7 +664,7 @@ export class GuardianSecuritySuite {
       expirationDays?: number;
       formationName?: string;
     },
-    context: SecurityContext
+    context: SecurityContext,
   ): Promise<SecureTacticalData> {
     // Validate input
     if (!shareData.formationId || !shareData.targetUserId) {
@@ -685,7 +685,7 @@ export class GuardianSecuritySuite {
         permissions: shareData.permissions || 'view',
         ipAddress: context.ipAddress,
         userAgent: context.userAgent,
-      }
+      },
     );
 
     try {
@@ -726,7 +726,7 @@ export class GuardianSecuritySuite {
       const secureData = await guardianTacticalSecurity.encryptTacticalFormation(
         formation,
         context.userId,
-        { ipAddress: context.ipAddress, userAgent: context.userAgent }
+        { ipAddress: context.ipAddress, userAgent: context.userAgent },
       );
 
       // Return encrypted data (share metadata would be stored in database)
@@ -739,10 +739,10 @@ export class GuardianSecuritySuite {
           formationId: shareData.formationId,
           targetUserId: shareData.targetUserId,
           error: error instanceof Error ? error.message : String(error),
-        }
+        },
       );
       throw new Error(
-        `Failed to share formation: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `Failed to share formation: ${error instanceof Error ? error.message : 'Unknown error'}`,
       );
     }
   }
@@ -754,7 +754,7 @@ export class GuardianSecuritySuite {
       includeMetadata?: boolean;
       formationName?: string;
     },
-    context: SecurityContext
+    context: SecurityContext,
   ): Promise<Blob | Buffer> {
     // Validate input
     if (!exportData.formationId) {
@@ -775,7 +775,7 @@ export class GuardianSecuritySuite {
         includeMetadata: exportData.includeMetadata || false,
         ipAddress: context.ipAddress,
         userAgent: context.userAgent,
-      }
+      },
     );
 
     try {
@@ -867,22 +867,22 @@ export class GuardianSecuritySuite {
           formationId: exportData.formationId,
           format: exportData.format,
           error: error instanceof Error ? error.message : String(error),
-        }
+        },
       );
       throw new Error(
-        `Failed to export formation: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `Failed to export formation: ${error instanceof Error ? error.message : 'Unknown error'}`,
       );
     }
   }
 
   private async executeFormationImport(
     file: File,
-    context: SecurityContext
+    context: SecurityContext,
   ): Promise<TacticalFormation> {
     const result = await guardianSecureFileHandler.secureImport(
       file,
       context.userId || '',
-      context.teamId || ''
+      context.teamId || '',
     );
 
     if (!result.success) {
@@ -894,7 +894,7 @@ export class GuardianSecuritySuite {
 
   private calculateSystemStatus(
     assessment: VulnerabilityAssessment,
-    threatMetrics: any
+    threatMetrics: any,
   ): 'secure' | 'warning' | 'critical' {
     if (assessment.criticalIssues > 0 || assessment.riskLevel === 'critical') {
       return 'critical';

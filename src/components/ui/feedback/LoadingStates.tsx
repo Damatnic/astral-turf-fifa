@@ -41,7 +41,7 @@ export const LoadingSpinner = forwardRef<HTMLDivElement, LoadingSpinnerProps>(
               className={cn(
                 'rounded-full animate-pulse',
                 sizeClass.replace('w-', 'w-').replace('h-', 'h-'),
-                colorClass.replace('text-', 'bg-')
+                colorClass.replace('text-', 'bg-'),
               )}
               style={{
                 animationDelay: `${i * 0.2}s`,
@@ -61,7 +61,7 @@ export const LoadingSpinner = forwardRef<HTMLDivElement, LoadingSpinnerProps>(
             'rounded-full animate-pulse',
             sizeClass,
             colorClass.replace('text-', 'bg-'),
-            className
+            className,
           )}
           {...props}
         />
@@ -89,7 +89,7 @@ export const LoadingSpinner = forwardRef<HTMLDivElement, LoadingSpinnerProps>(
                       ? 'w-1 h-4'
                       : size === 'lg'
                         ? 'w-1 h-6'
-                        : 'w-1.5 h-8'
+                        : 'w-1.5 h-8',
               )}
               style={{
                 animationDelay: `${i * 0.1}s`,
@@ -107,7 +107,7 @@ export const LoadingSpinner = forwardRef<HTMLDivElement, LoadingSpinnerProps>(
           <div
             className={cn(
               'absolute inset-0 rounded-full border-4 border-white animate-spin',
-              'bg-gradient-to-r from-green-400 to-green-600'
+              'bg-gradient-to-r from-green-400 to-green-600',
             )}
           >
             <div className="absolute inset-1 rounded-full bg-white flex items-center justify-center">
@@ -138,7 +138,7 @@ export const LoadingSpinner = forwardRef<HTMLDivElement, LoadingSpinnerProps>(
         </svg>
       </div>
     );
-  }
+  },
 );
 
 LoadingSpinner.displayName = 'LoadingSpinner';
@@ -162,7 +162,7 @@ export const Skeleton = forwardRef<HTMLDivElement, SkeletonProps>(
         'rounded-lg': variant === 'rounded',
         'rounded-none': variant === 'rectangular',
       },
-      className
+      className,
     );
 
     return (
@@ -176,7 +176,7 @@ export const Skeleton = forwardRef<HTMLDivElement, SkeletonProps>(
         {...props}
       />
     );
-  }
+  },
 );
 
 Skeleton.displayName = 'Skeleton';
@@ -202,7 +202,7 @@ export const LoadingOverlay = forwardRef<HTMLDivElement, LoadingOverlayProps>(
       children,
       ...props
     },
-    ref
+    ref,
   ) => {
     if (!visible) {
       return <>{children}</>;
@@ -218,7 +218,7 @@ export const LoadingOverlay = forwardRef<HTMLDivElement, LoadingOverlayProps>(
             'absolute inset-0 flex flex-col items-center justify-center z-50',
             backdrop && 'bg-black/50',
             blur && 'backdrop-blur-sm',
-            'animate-fade-in'
+            'animate-fade-in',
           )}
         >
           <div className="flex flex-col items-center space-y-4">
@@ -228,7 +228,7 @@ export const LoadingOverlay = forwardRef<HTMLDivElement, LoadingOverlayProps>(
         </div>
       </div>
     );
-  }
+  },
 );
 
 LoadingOverlay.displayName = 'LoadingOverlay';
@@ -389,7 +389,7 @@ export const ContentPlaceholder = forwardRef<HTMLDivElement, ContentPlaceholderP
         ))}
       </div>
     );
-  }
+  },
 );
 
 ContentPlaceholder.displayName = 'ContentPlaceholder';

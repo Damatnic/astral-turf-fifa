@@ -440,7 +440,7 @@ const ChemistryView: React.FC = () => {
 
   const activeFormation = formations[activeFormationIds?.home || Object.keys(formations)[0]];
   const onFieldPlayers = players.filter(player =>
-    activeFormation?.slots?.some(slot => slot.playerId === player.id)
+    activeFormation?.slots?.some(slot => slot.playerId === player.id),
   );
 
   const getChemistryScore = () => {

@@ -93,7 +93,7 @@ const AdvancedAnalyticsDashboard: React.FC<AdvancedAnalyticsDashboardProps> = ({
   const [developmentPrediction, setDevelopmentPrediction] =
     useState<PlayerDevelopmentPrediction | null>(null);
   const [formationAnalysis, setFormationAnalysis] = useState<FormationEffectivenessAnalysis | null>(
-    null
+    null,
   );
   const [matchPrediction, setMatchPrediction] = useState<MatchPrediction | null>(null);
   const [heatMapData, setHeatMapData] = useState<TacticalHeatMapData | null>(null);
