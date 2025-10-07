@@ -22,14 +22,14 @@ const SITE_NAVIGATION: NavItem[] = [
     label: 'Dashboard',
     path: '/dashboard',
     icon: '🏠',
-    description: 'Overview & quick stats'
+    description: 'Overview & quick stats',
   },
   {
     id: 'tactics',
     label: 'Tactics',
     path: '/tactics',
     icon: '⚽',
-    description: 'Formation & tactical setup'
+    description: 'Formation & tactical setup',
   },
   {
     id: 'squad',
@@ -41,7 +41,7 @@ const SITE_NAVIGATION: NavItem[] = [
       { id: 'medical', label: 'Medical Center', path: '/medical-center', icon: '⚕️', description: 'Player health & injuries' },
       { id: 'mentoring', label: 'Mentoring', path: '/mentoring', icon: '🎓', description: 'Player development' },
       { id: 'rankings', label: 'Player Rankings', path: '/player-ranking', icon: '📊', description: 'Performance rankings' },
-    ]
+    ],
   },
   {
     id: 'player',
@@ -53,7 +53,7 @@ const SITE_NAVIGATION: NavItem[] = [
       { id: 'player-challenges', label: 'My Challenges', path: '/skill-challenges', icon: '🏅', description: 'Personal challenges' },
       { id: 'player-stats', label: 'Statistics', path: '/player-ranking', icon: '📊', description: 'Your performance stats' },
       { id: 'player-achievements', label: 'Achievements', path: '/challenge-hub', icon: '🏆', description: 'Awards & milestones' },
-    ]
+    ],
   },
   {
     id: 'analytics',
@@ -64,14 +64,14 @@ const SITE_NAVIGATION: NavItem[] = [
       { id: 'analytics-overview', label: 'Overview', path: '/analytics', icon: '📊', description: 'Analytics dashboard' },
       { id: 'advanced-analytics', label: 'Advanced Analytics', path: '/advanced-analytics', icon: '🔬', description: 'Deep dive analytics' },
       { id: 'opposition', label: 'Opposition Analysis', path: '/opposition-analysis', icon: '🎯', description: 'Opponent scouting' },
-    ]
+    ],
   },
   {
     id: 'transfers',
     label: 'Transfers',
     path: '/transfers',
     icon: '🔄',
-    description: 'Transfer market & scouting'
+    description: 'Transfer market & scouting',
   },
   {
     id: 'competition',
@@ -82,7 +82,7 @@ const SITE_NAVIGATION: NavItem[] = [
       { id: 'league', label: 'League Table', path: '/league-table', icon: '📋', description: 'Standings & fixtures' },
       { id: 'news', label: 'News Feed', path: '/news-feed', icon: '📰', description: 'Latest news' },
       { id: 'press', label: 'Press Conference', path: '/press-conference', icon: '🎤', description: 'Media interactions' },
-    ]
+    ],
   },
   {
     id: 'club',
@@ -96,7 +96,7 @@ const SITE_NAVIGATION: NavItem[] = [
       { id: 'sponsorships', label: 'Sponsorships', path: '/sponsorships', icon: '🤝', description: 'Sponsor deals' },
       { id: 'youth', label: 'Youth Academy', path: '/youth-academy', icon: '🌱', description: 'Youth development' },
       { id: 'history', label: 'Club History', path: '/club-history', icon: '📜', description: 'Legacy & achievements' },
-    ]
+    ],
   },
   {
     id: 'career',
@@ -108,7 +108,7 @@ const SITE_NAVIGATION: NavItem[] = [
       { id: 'job-security', label: 'Job Security', path: '/job-security', icon: '🔒', description: 'Your standing' },
       { id: 'international', label: 'International', path: '/international-management', icon: '🌍', description: 'National team' },
       { id: 'inbox', label: 'Inbox', path: '/inbox', icon: '📧', description: 'Messages & notifications' },
-    ]
+    ],
   },
   {
     id: 'challenges',
@@ -119,7 +119,7 @@ const SITE_NAVIGATION: NavItem[] = [
       { id: 'challenge-hub', label: 'Challenge Hub', path: '/challenge-hub', icon: '🏅', description: 'All challenges' },
       { id: 'skill-challenges', label: 'Skill Challenges', path: '/skill-challenges', icon: '⚡', description: 'Test your skills' },
       { id: 'challenge-manager', label: 'Challenge Manager', path: '/challenge-manager', icon: '⚙️', description: 'Manage challenges' },
-    ]
+    ],
   },
   {
     id: 'settings',
@@ -127,7 +127,7 @@ const SITE_NAVIGATION: NavItem[] = [
     path: '/settings',
     icon: '⚙️',
     description: 'App configuration',
-    divider: true
+    divider: true,
   },
 ];
 
@@ -142,7 +142,7 @@ export const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({
   className,
   variant = 'header',
   showSearch = false,
-  onClose
+  onClose,
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -151,25 +151,25 @@ export const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({
 
   // Filter navigation items based on search
   const filteredNavigation = useMemo(() => {
-    if (!searchQuery) return SITE_NAVIGATION;
-    
+    if (!searchQuery) {return SITE_NAVIGATION;}
+
     const query = searchQuery.toLowerCase();
     return SITE_NAVIGATION.map(item => {
-      const matchesItem = item.label.toLowerCase().includes(query) || 
+      const matchesItem = item.label.toLowerCase().includes(query) ||
                          item.description?.toLowerCase().includes(query);
-      
+
       if (item.children) {
         const filteredChildren = item.children.filter(child =>
           child.label.toLowerCase().includes(query) ||
-          child.description?.toLowerCase().includes(query)
+          child.description?.toLowerCase().includes(query),
         );
-        
+
         if (filteredChildren.length > 0 || matchesItem) {
           return { ...item, children: filteredChildren };
         }
         return null;
       }
-      
+
       return matchesItem ? item : null;
     }).filter(Boolean) as NavItem[];
   }, [searchQuery]);
@@ -209,7 +209,7 @@ export const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({
                   'flex items-center space-x-2',
                   isActive(item)
                     ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/20'
-                    : 'text-secondary-300'
+                    : 'text-secondary-300',
                 )}
               >
                 <span>{item.icon}</span>
@@ -230,14 +230,14 @@ export const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({
                     'flex items-center space-x-2',
                     isActive(item)
                       ? 'bg-secondary-700 text-white'
-                      : 'text-secondary-300'
+                      : 'text-secondary-300',
                   )}
                 >
                   <span>{item.icon}</span>
                   <span className="hidden lg:inline">{item.label}</span>
                   <span className="text-xs ml-1">▼</span>
                 </button>
-                
+
                 {/* Dropdown menu */}
                 <div className="absolute left-0 mt-2 w-64 bg-secondary-900 backdrop-blur-xl rounded-lg shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[60] border border-secondary-700">
                   <div className="p-2">
@@ -256,7 +256,7 @@ export const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({
                           'flex items-center space-x-3',
                           location.pathname === child.path
                             ? 'bg-primary-600 text-white'
-                            : 'text-secondary-300'
+                            : 'text-secondary-300',
                         )}
                       >
                         <span className="text-lg">{child.icon}</span>
@@ -287,7 +287,7 @@ export const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({
         {filteredNavigation.map((item) => (
           <div key={item.id}>
             {item.divider && <div className="border-t border-secondary-700 my-2" />}
-            
+
             {item.path ? (
               // Direct navigation item
               <button
@@ -298,7 +298,7 @@ export const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({
                   'flex items-center space-x-3',
                   isActive(item)
                     ? 'bg-primary-600 text-white shadow-lg'
-                    : 'text-secondary-300'
+                    : 'text-secondary-300',
                 )}
               >
                 <span className="text-xl">{item.icon}</span>
@@ -327,7 +327,7 @@ export const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({
                     'flex items-center space-x-3',
                     isActive(item) || openSubmenu === item.id
                       ? 'bg-secondary-700 text-white'
-                      : 'text-secondary-300'
+                      : 'text-secondary-300',
                   )}
                 >
                   <span className="text-xl">{item.icon}</span>
@@ -347,7 +347,7 @@ export const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({
                     ▼
                   </motion.span>
                 </button>
-                
+
                 {/* Submenu */}
                 <AnimatePresence>
                   {openSubmenu === item.id && (
@@ -369,7 +369,7 @@ export const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({
                               'flex items-center space-x-2',
                               location.pathname === child.path
                                 ? 'bg-primary-600 text-white'
-                                : 'text-secondary-400'
+                                : 'text-secondary-400',
                             )}
                           >
                             <span>{child.icon}</span>
@@ -410,7 +410,7 @@ export const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({
           {filteredNavigation.map((item) => (
             <div key={item.id}>
               {item.divider && <div className="border-t border-secondary-700 my-3" />}
-              
+
               {item.path ? (
                 <button
                   onClick={() => handleNavigate(item.path!)}
@@ -420,7 +420,7 @@ export const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({
                     'flex items-center space-x-3',
                     isActive(item)
                       ? 'bg-primary-600 text-white shadow-lg'
-                      : 'text-secondary-300'
+                      : 'text-secondary-300',
                   )}
                 >
                   <span className="text-2xl">{item.icon}</span>
@@ -448,7 +448,7 @@ export const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({
                       'flex items-center space-x-3',
                       isActive(item) || openSubmenu === item.id
                         ? 'bg-secondary-700 text-white'
-                        : 'text-secondary-300'
+                        : 'text-secondary-300',
                     )}
                   >
                     <span className="text-2xl">{item.icon}</span>
@@ -467,7 +467,7 @@ export const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({
                       ▼
                     </motion.span>
                   </button>
-                  
+
                   <AnimatePresence>
                     {openSubmenu === item.id && (
                       <motion.div
@@ -488,7 +488,7 @@ export const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({
                                 'flex items-center space-x-3',
                                 location.pathname === child.path
                                   ? 'bg-primary-600 text-white'
-                                  : 'text-secondary-400'
+                                  : 'text-secondary-400',
                               )}
                             >
                               <span className="text-lg">{child.icon}</span>
