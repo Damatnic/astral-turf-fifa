@@ -94,7 +94,7 @@ export const EnhancedToolbar: React.FC<EnhancedToolbarProps> = ({
   className,
 }) => {
   const handleFormationSelect = useCallback(
-    (e: React.ChangeEvent<HTMLSelectElement>) => {
+    (e: React.ChangeEvent<globalThis.HTMLSelectElement>) => {
       if (onFormationChange) {
         onFormationChange(e.target.value);
       }

@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, lazy, Suspense, type ComponentType } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { useUIContext, useTacticsContext, useResponsive, useResponsiveModal } from '../hooks';
+import { useAuthContext } from '../hooks/useAuthContext';
 import { Header } from './ui/Header';
+import SmartNavbar from './navigation/SmartNavbar/SmartNavbar';
 import NotificationContainer from './ui/NotificationContainer';
 import PrintableLineup from './export/PrintableLineup';
 import { toPng } from 'html-to-image';
@@ -64,14 +66,19 @@ interface LayoutProps {
  * Provides header, main content area, modals, and global functionality
  */
 const Layout: React.FC<LayoutProps> = ({ children }) => {
+  const location = useLocation();
   const { uiState, dispatch } = useUIContext();
   const { tacticsState } = useTacticsContext();
+  const { authState } = useAuthContext();
   const responsive = useResponsive();
   const { shouldUseFullScreenModal } = useResponsiveModal();
   const lineupRef = useRef<HTMLDivElement>(null);
   const { theme, isExportingLineup, isPresentationMode, activeModal } = uiState;
   const { players, formations, activeFormationIds, captainIds } = tacticsState;
-  const { isMobile, isTablet, currentBreakpoint } = responsive;
+  const { isMobile, isTablet } = responsive;
+
+  // Check if we should use the new navigation (for tactics page)
+  const useNewNav = location.pathname.includes('/tactics');
 
   // Handle theme changes
   useEffect(() => {
@@ -178,7 +185,25 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       {/* Modern Header - Hide on mobile (MobileAppLayout provides its own header) */}
       {!isPresentationMode && !isMobile && (
         <div className="flex-shrink-0 z-40 relative">
-          <Header />
+          {useNewNav ? (
+            <SmartNavbar
+              currentPage={location.pathname}
+              userRole={(authState.user?.role as 'coach' | 'analyst' | 'player' | 'admin' | 'viewer') || 'viewer'}
+              teamContext="home"
+              isMobile={false}
+              showBreadcrumbs={true}
+              showSearch={true}
+              navigationItems={[
+                { id: 'dashboard', label: 'Dashboard', type: 'page', path: '/dashboard', icon: 'dashboard' },
+                { id: 'tactics', label: 'Tactics', type: 'page', path: '/tactics', icon: 'tactics' },
+                { id: 'analytics', label: 'Analytics', type: 'page', path: '/analytics', icon: 'analytics' },
+              ]}
+              onNavigate={(path) => window.location.href = path}
+              brandName="Astral Turf"
+            />
+          ) : (
+            <Header />
+          )}
         </div>
       )}
 

@@ -5,6 +5,7 @@ import { TacticsErrorBoundary } from '../components/boundaries/TacticsErrorBound
 import { EnhancedToolbar } from '../components/toolbar/EnhancedToolbar';
 import RosterGrid from '../components/roster/SmartRoster/RosterGrid';
 import { ModernField } from '../components/tactics/ModernField';
+import type { Player } from '../types';
 
 /**
  * New Tactics Board Page with Enhanced Components
@@ -13,6 +14,8 @@ import { ModernField } from '../components/tactics/ModernField';
 const TacticsBoardPageNew: React.FC = () => {
   const { tacticsState, dispatch } = useTacticsContext();
   const [selectedPlayerIds, setSelectedPlayerIds] = useState<Set<string>>(new Set());
+  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   // Get current formation and players
   const currentFormation = tacticsState?.formations?.[tacticsState?.activeFormationIds?.home];
@@ -89,15 +92,30 @@ const TacticsBoardPageNew: React.FC = () => {
       }
       return newSet;
     });
-  }, []);
-
-  const handlePlayerCompare = useCallback(() => {
-    if (selectedPlayerIds.size < 2) {
-      return;
+    
+    // Also set as selected player for field
+    const player = players.find(p => p.id === playerId);
+    if (player) {
+      setSelectedPlayer(player);
     }
-    // eslint-disable-next-line no-console
-    console.log('Compare players:', Array.from(selectedPlayerIds));
-  }, [selectedPlayerIds]);
+  }, [players]);
+
+  // Field handlers
+  const handlePlayerMove = useCallback((
+    playerId: string,
+    position: { x: number; y: number },
+    _targetPlayerId?: string
+  ) => {
+    dispatch({
+      type: 'UPDATE_PLAYER_POSITION',
+      payload: { playerId, position },
+    });
+  }, [dispatch]);
+
+  const handleFieldPlayerSelect = useCallback((player: Player) => {
+    setSelectedPlayer(player);
+    setSelectedPlayerIds(new Set([player.id]));
+  }, []);
 
   return (
     <TacticsErrorBoundary>
@@ -121,10 +139,21 @@ const TacticsBoardPageNew: React.FC = () => {
               <RosterGrid
                 players={players}
                 selectedPlayerIds={selectedPlayerIds}
+                comparisonPlayerIds={[]}
+                gridColumns={1}
+                viewMode="list"
                 onPlayerSelect={handlePlayerSelect}
+                onPlayerDoubleClick={(playerId) => {
+                  const player = players.find(p => p.id === playerId);
+                  if (player) {
+                    handleFieldPlayerSelect(player);
+                  }
+                }}
+                onPlayerDragStart={() => {}}
+                onAddToComparison={() => {}}
+                onRemoveFromComparison={() => {}}
                 containerWidth={320}
                 containerHeight={800}
-                viewMode="list"
               />
             </div>
 
@@ -134,6 +163,14 @@ const TacticsBoardPageNew: React.FC = () => {
                 <ModernField
                   formation={currentFormation}
                   players={players}
+                  selectedPlayer={selectedPlayer}
+                  onPlayerMove={handlePlayerMove}
+                  onPlayerSelect={handleFieldPlayerSelect}
+                  isDragging={isDragging}
+                  setIsDragging={setIsDragging}
+                  viewMode="standard"
+                  showHeatMap={false}
+                  showPlayerStats={false}
                 />
               </div>
             </div>

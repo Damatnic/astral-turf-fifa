@@ -27,7 +27,7 @@ import { PlayerDragLayer } from './PlayerDragLayer';
 import { ConflictResolutionMenu } from './ConflictResolutionMenu';
 import { ExpandedPlayerCard } from './ExpandedPlayerCard';
 import ChemistryVisualization from './ChemistryVisualization';
-import { EnhancedToolbar } from '../toolbar/EnhancedToolbar';
+import UnifiedFloatingToolbar from './UnifiedFloatingToolbar';
 import DrawingCanvas from './DrawingCanvas';
 import AITacticalIntelligence from './AITacticalIntelligence';
 import { HistoryTimeline } from './HistoryTimeline';
@@ -68,7 +68,6 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }
 
-declare const Window: any;
 interface WindowWithGtag extends Window {
   gtag?: (event: string, action: string, params: Record<string, string>) => void;
 }
