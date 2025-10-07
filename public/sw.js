@@ -284,6 +284,24 @@ self.addEventListener('fetch', event => {
     return;
   }
 
+  // CRITICAL: Skip Vite development server resources
+  if (
+    url.pathname.startsWith('/@vite/') ||
+    url.pathname.startsWith('/@fs/') ||
+    url.pathname.startsWith('/@react-refresh') ||
+    url.pathname.startsWith('/node_modules/') ||
+    url.pathname.includes('?t=') || // Vite timestamp queries
+    url.pathname.includes('?import') || // Vite import queries
+    url.pathname.endsWith('.tsx') || // Source files in dev
+    url.pathname.endsWith('.ts') || // Source files in dev
+    url.pathname.endsWith('.jsx') || // Source files in dev
+    url.searchParams.has('import') || // Vite import parameter
+    url.searchParams.has('t') // Vite timestamp parameter
+  ) {
+    // Let these requests go directly to network (bypass service worker)
+    return;
+  }
+
   event.respondWith(handleEnhancedRequest(event));
 });
 

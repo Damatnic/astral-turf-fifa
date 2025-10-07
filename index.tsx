@@ -17,6 +17,22 @@ import { SpeedInsights } from '@vercel/speed-insights/react';
 
 // Performance optimizations - Use enhanced service worker registration
 function registerServiceWorker() {
+  // DISABLE service worker in development to prevent Vite HMR conflicts
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[SW] Service worker disabled in development mode');
+    // Unregister any existing service workers in development
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(registrations => {
+        registrations.forEach(registration => {
+          registration.unregister();
+          console.log('[SW] Unregistered existing service worker');
+        });
+      });
+    }
+    return;
+  }
+
+  // Only register in production
   if (process.env.NODE_ENV === 'production') {
     serviceWorkerRegistration.register({
       onSuccess: registration => {
