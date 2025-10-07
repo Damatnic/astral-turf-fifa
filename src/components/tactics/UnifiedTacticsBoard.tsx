@@ -164,18 +164,19 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
   const mobileCapabilities = useMobileCapabilities();
   const mobileViewport = useMobileViewport();
 
-  // PWA Installation Support
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  // PWA Installation Support - Currently unused but available for future features
+  // Commented out to avoid unused variable warnings
+  // const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
 
   // Listen for beforeinstallprompt event
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
-      setDeferredPrompt(e as BeforeInstallPromptEvent);
+      // setDeferredPrompt(e as BeforeInstallPromptEvent);
     };
 
     const handleAppInstalled = () => {
-      setDeferredPrompt(null);
+      // setDeferredPrompt(null);
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -187,16 +188,16 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
     };
   }, []);
 
-  // Install PWA function (can be called from UI components)
+  // Install PWA function - currently unused but available for future PWA install UI
+  // Keeping commented out to avoid unused variable warnings
+  /*
   const installPWA = useCallback(async () => {
     if (!deferredPrompt) {
       return;
     }
-
     try {
       await deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
-
       if (typeof window !== 'undefined' && (window as WindowWithGtag).gtag) {
         (window as WindowWithGtag).gtag?.(
           'event',
@@ -213,6 +214,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
       // Silent error handling
     }
   }, [deferredPrompt]);
+  */
 
   const { isLowPower, getOptimizedConfig } = useBatteryAwarePerformance();
 
@@ -289,10 +291,12 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
         if (state.formation) {
           tacticsDispatch({
             type: 'SET_FORMATION',
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             payload: { id: activeFormationId || 'default', formation: state.formation } as any,
           });
         }
         tacticsDispatch({ type: 'SET_PLAYERS', payload: state.players });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         tacticsDispatch({ type: 'UPDATE_STATE', payload: { drawings: state.drawings } } as any);
       },
       onRedo: (state: HistoryState) => {
@@ -300,10 +304,12 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
         if (state.formation) {
           tacticsDispatch({
             type: 'SET_FORMATION',
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             payload: { id: activeFormationId || 'default', formation: state.formation } as any,
           });
         }
         tacticsDispatch({ type: 'SET_PLAYERS', payload: state.players });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         tacticsDispatch({ type: 'UPDATE_STATE', payload: { drawings: state.drawings } } as any);
       },
     },
@@ -664,85 +670,96 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
   }, []);
 
   // Dugout management handlers
-  const handleSubstitution = useCallback((playerOut: string, playerIn: string) => {
+  const handleSubstitution = useCallback((_playerOut: string, _playerIn: string) => {
     // Handle substitution logic here
     // You could dispatch to tactics context or call a prop function
   }, []);
 
-  const handleTacticalChange = useCallback((adjustment: unknown) => {
+  const handleTacticalChange = useCallback((_adjustment: unknown) => {
     // Handle tactical adjustment
     // You could dispatch to tactics context or call a prop function
   }, []);
 
-  const handlePlayerInstruction = useCallback((playerId: string, instruction: string) => {
+  const handlePlayerInstruction = useCallback((_playerId: string, _instruction: string) => {
     // Handle individual player instruction
     // You could dispatch to tactics context or call a prop function
   }, []);
 
   // Challenge management handlers
-  const handleChallengeStart = useCallback((challengeId: string) => {
+  const handleChallengeStart = useCallback((_challengeId: string) => {
     // You could dispatch to tactics context or call a prop function
   }, []);
 
-  const handleChallengeComplete = useCallback((challengeId: string, score: number) => {
+  const handleChallengeComplete = useCallback((_challengeId: string, _score: number) => {
     // You could dispatch to tactics context or call a prop function
   }, []);
 
   // Collaboration handlers
   const handleShareSession = useCallback((visibility: 'public' | 'private' | 'team') => {
-    console.log(`Sharing session with visibility: ${visibility}`);
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.log(`Sharing session with visibility: ${visibility}`);
+    }
     // You could dispatch to tactics context or call a prop function
   }, []);
 
   const handleInviteCollaborator = useCallback((email: string, role: 'editor' | 'viewer') => {
-    console.log(`Inviting ${email} as ${role}`);
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.log(`Inviting ${email} as ${role}`);
+    }
     // You could dispatch to tactics context or call a prop function
   }, []);
 
   const handleAddComment = useCallback((position: { x: number; y: number }, content: string) => {
-    console.log(`Adding comment at ${position.x}, ${position.y}: ${content}`);
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.log(`Adding comment at ${position.x}, ${position.y}: ${content}`);
+    }
     // You could dispatch to tactics context or call a prop function
   }, []);
 
   const handleResolveComment = useCallback((commentId: string) => {
-    console.log(`Resolving comment: ${commentId}`);
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.log(`Resolving comment: ${commentId}`);
+    }
     // You could dispatch to tactics context or call a prop function
   }, []);
 
-  const handleUpdatePermissions = useCallback((collaboratorId: string, permissions: any) => {
-    console.log(`Updating permissions for ${collaboratorId}:`, permissions);
+  const handleUpdatePermissions = useCallback((_collaboratorId: string, _permissions: unknown) => {
+    // Future: Update collaborator permissions
     // You could dispatch to tactics context or call a prop function
   }, []);
 
   // Export/Import handlers
-  const handleExportData = useCallback((options: any, data: any) => {
-    console.log('Exporting data with options:', options);
-    console.log('Export data:', data);
+  const handleExportData = useCallback((_options: unknown, _data: unknown) => {
+    // Future: Export tactics data
     // You could dispatch to tactics context or call a prop function
   }, []);
 
-  const handleImportData = useCallback((data: any, options: any) => {
-    console.log('Importing data:', data);
-    console.log('Import options:', options);
+  const handleImportData = useCallback((_data: unknown, _options: unknown) => {
+    // Future: Import tactics data
     // You could dispatch to tactics context or call a prop function
   }, []);
 
-  const handleSaveToLibrary = useCallback((library: any) => {
-    console.log('Saving to library:', library);
+  const handleSaveToLibrary = useCallback((_library: unknown) => {
+    // Future: Save to tactics library
     // You could dispatch to tactics context or call a prop function
   }, []);
 
-  const handleLoadFromLibrary = useCallback((libraryId: string) => {
-    console.log('Loading from library:', libraryId);
+  const handleLoadFromLibrary = useCallback((_libraryId: string) => {
+    // Future: Load from tactics library
     // You could dispatch to tactics context or call a prop function
   }, []);
 
   // AI Intelligence handlers
   const handlePlayerAssignmentSuggestion = useCallback(
-    (assignments: any) => {
+    (assignments: unknown) => {
+      // eslint-disable-next-line no-console
       console.log('Applying AI player assignments:', assignments);
       // Apply optimized assignments to formation
-      assignments.assignments.forEach((assignment: any) => {
+      (assignments as { assignments: Array<{ slotId: string; playerId: string }> }).assignments.forEach((assignment) => {
         tacticsDispatch({
           type: 'ASSIGN_PLAYER_TO_SLOT',
           payload: {
@@ -773,14 +790,15 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
   );
 
   const handleDrawingSuggestion = useCallback(
-    (suggestion: any) => {
+    (suggestion: unknown) => {
+      // eslint-disable-next-line no-console
       console.log('AI Drawing Suggestion:', suggestion);
       // Could automatically add suggested drawing or show as suggestion
       const drawingShape = {
         id: Date.now().toString(),
-        tool: suggestion.tool,
+        tool: (suggestion as { tool: string }).tool,
         color: '#3b82f6',
-        points: suggestion.suggestedPositions || [],
+        points: (suggestion as { suggestedPositions?: unknown[] }).suggestedPositions || [],
         timestamp: Date.now(),
       };
 
