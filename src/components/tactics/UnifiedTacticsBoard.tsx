@@ -27,7 +27,7 @@ import { PlayerDragLayer } from './PlayerDragLayer';
 import { ConflictResolutionMenu } from './ConflictResolutionMenu';
 import { ExpandedPlayerCard } from './ExpandedPlayerCard';
 import ChemistryVisualization from './ChemistryVisualization';
-import UnifiedFloatingToolbar from './UnifiedFloatingToolbar';
+import { EnhancedToolbar } from '../toolbar/EnhancedToolbar';
 import DrawingCanvas from './DrawingCanvas';
 import AITacticalIntelligence from './AITacticalIntelligence';
 import { HistoryTimeline } from './HistoryTimeline';
