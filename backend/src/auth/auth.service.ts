@@ -339,6 +339,133 @@ export class AuthService {
     };
   }
 
+  /**
+   * Request password reset - sends email with reset token
+   */
+  async forgotPassword(email: string): Promise<{ message: string }> {
+    // Find user by email
+    const user = await this.usersService.findByEmail(email);
+
+    // Always return generic message for security (don't reveal if email exists)
+    const genericMessage =
+      'If an account exists with this email, a password reset link has been sent.';
+
+    if (!user) {
+      // Log for debugging but don't reveal to user
+      this.sessionService['logger']?.log(
+        `Password reset requested for non-existent email: ${email}`
+      );
+      return { message: genericMessage };
+    }
+
+    // Generate reset token
+    const resetToken = this.generateVerificationToken(); // Reuse token generation
+    const hashedToken = await bcrypt.hash(resetToken, 10);
+
+    // Set token expiration (1 hour from now)
+    const tokenExpiry = new Date();
+    tokenExpiry.setHours(tokenExpiry.getHours() + 1);
+
+    // Save hashed token to user
+    user.passwordResetToken = hashedToken;
+    user.passwordResetExpires = tokenExpiry;
+    await this.usersService.update(user.id, user);
+
+    // Send password reset email
+    try {
+      await this.mailService.sendPasswordResetEmail(
+        user.email,
+        resetToken,
+        `${user.firstName} ${user.lastName}`
+      );
+    } catch (error) {
+      // Log error but still return success to prevent email enumeration
+      this.sessionService['logger']?.error(
+        `Failed to send password reset email to ${email}`,
+        error
+      );
+    }
+
+    return { message: genericMessage };
+  }
+
+  /**
+   * Reset password with token
+   */
+  async resetPassword(token: string, newPassword: string): Promise<{ message: string }> {
+    // Find users with non-expired reset tokens
+    const users = await this.usersService.findAll();
+    const now = new Date();
+
+    let userToReset: User | null = null;
+
+    // Find user with matching token
+    for (const user of users) {
+      if (user.passwordResetToken && user.passwordResetExpires && user.passwordResetExpires > now) {
+        const isValidToken = await bcrypt.compare(token, user.passwordResetToken);
+        if (isValidToken) {
+          userToReset = user;
+          break;
+        }
+      }
+    }
+
+    if (!userToReset) {
+      throw new BadRequestException('Invalid or expired password reset token');
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update password and clear reset token
+    userToReset.password = hashedPassword;
+    userToReset.passwordResetToken = undefined;
+    userToReset.passwordResetExpires = undefined;
+    await this.usersService.update(userToReset.id, userToReset);
+
+    // Invalidate all user's sessions (force re-login)
+    await this.invalidateAllUserSessions(userToReset.id);
+
+    // Send password changed confirmation email
+    try {
+      await this.mailService.sendPasswordChangedEmail(
+        userToReset.email,
+        `${userToReset.firstName} ${userToReset.lastName}`
+      );
+    } catch (error) {
+      // Log error but don't fail the password reset
+      this.sessionService['logger']?.error(
+        `Failed to send password changed email to ${userToReset.email}`,
+        error
+      );
+    }
+
+    return {
+      message: 'Password has been reset successfully. Please log in with your new password.',
+    };
+  }
+
+  /**
+   * Invalidate all sessions for a user (used when password is reset)
+   */
+  private async invalidateAllUserSessions(userId: string): Promise<void> {
+    try {
+      // Delete all database sessions
+      await this.sessionsRepository.delete({ userId });
+
+      // Clear all Redis sessions for this user
+      await this.sessionService.deleteUserSessions(userId);
+
+      this.sessionService['logger']?.log(`All sessions invalidated for user ${userId}`);
+    } catch (error) {
+      this.sessionService['logger']?.error(
+        `Failed to invalidate sessions for user ${userId}`,
+        error
+      );
+      // Don't throw - session cleanup is best effort
+    }
+  }
+
   private async createSession(
     userId: string,
     refreshToken: string,

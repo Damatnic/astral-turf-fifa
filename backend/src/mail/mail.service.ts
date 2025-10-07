@@ -66,7 +66,6 @@ export class MailService {
 
   /**
    * Send password reset email
-   * (For future Task #6 - Password Reset)
    */
   async sendPasswordResetEmail(email: string, token: string, userName: string): Promise<void> {
     const resetUrl = `${this.frontendUrl}/reset-password?token=${token}`;
@@ -80,6 +79,7 @@ export class MailService {
           userName,
           resetUrl,
           token,
+          year: new Date().getFullYear(),
         },
       });
 
@@ -87,6 +87,41 @@ export class MailService {
     } catch (error) {
       this.logger.error(`Failed to send password reset email to ${email}`, error);
       throw new Error('Failed to send password reset email');
+    }
+  }
+
+  /**
+   * Send password changed confirmation email
+   */
+  async sendPasswordChangedEmail(email: string, userName: string): Promise<void> {
+    const loginUrl = `${this.frontendUrl}/login`;
+    const changeDate = new Date().toLocaleString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZoneName: 'short',
+    });
+
+    try {
+      await this.mailerService.sendMail({
+        to: email,
+        subject: 'Your Astral Turf Password Has Been Changed',
+        template: './password-changed-email',
+        context: {
+          userName,
+          loginUrl,
+          changeDate,
+          year: new Date().getFullYear(),
+        },
+      });
+
+      this.logger.log(`Password changed confirmation email sent to ${email}`);
+    } catch (error) {
+      this.logger.error(`Failed to send password changed email to ${email}`, error);
+      // Don't throw - confirmation email is not critical
     }
   }
 
