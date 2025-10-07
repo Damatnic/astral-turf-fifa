@@ -1,10 +1,13 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { useTacticsContext } from '../hooks';
+import { useFormationHistory, createHistorySnapshot } from '../hooks/useFormationHistory';
 import { ResponsivePage } from '../components/Layout/ResponsivePage';
 import { TacticsErrorBoundary } from '../components/boundaries/TacticsErrorBoundary';
 import { EnhancedToolbar } from '../components/toolbar/EnhancedToolbar';
 import RosterGrid from '../components/roster/SmartRoster/RosterGridSimple';
 import { ModernField } from '../components/tactics/ModernField';
+import { SaveFormationModal } from '../components/modals/SaveFormationModal';
+import { LoadFormationModal } from '../components/modals/LoadFormationModal';
 import type { Player } from '../types';
 
 /**
@@ -16,36 +19,123 @@ const TacticsBoardPageNew: React.FC = () => {
   const [selectedPlayerIds, setSelectedPlayerIds] = useState<Set<string>>(new Set());
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [showLoadModal, setShowLoadModal] = useState(false);
 
   // Get current formation and players
   const currentFormation = tacticsState?.formations?.[tacticsState?.activeFormationIds?.home];
   const players = useMemo(() => tacticsState?.players || [], [tacticsState?.players]);
 
+  // Formation History System
+  const historySystem = useFormationHistory(
+    createHistorySnapshot(
+      currentFormation || { id: '', name: '', positions: [] },
+      players,
+      [], // drawings - not used yet
+    ),
+    {
+      enableKeyboardShortcuts: true,
+      onUndo: (state) => {
+        // Restore formation and player positions from history
+        if (state.formation && state.players) {
+          dispatch({
+            type: 'SET_ACTIVE_FORMATION',
+            payload: { team: 'home', formationId: state.formation.id },
+          });
+          // Update player positions
+          state.players.forEach(player => {
+            dispatch({
+              type: 'UPDATE_PLAYER_POSITION',
+              payload: { playerId: player.id, position: player.position },
+            });
+          });
+        }
+      },
+      onRedo: (state) => {
+        // Restore formation and player positions from history
+        if (state.formation && state.players) {
+          dispatch({
+            type: 'SET_ACTIVE_FORMATION',
+            payload: { team: 'home', formationId: state.formation.id },
+          });
+          // Update player positions
+          state.players.forEach(player => {
+            dispatch({
+              type: 'UPDATE_PLAYER_POSITION',
+              payload: { playerId: player.id, position: player.position },
+            });
+          });
+        }
+      },
+    },
+  );
+
   // Toolbar Actions
   const handleSave = useCallback(() => {
-    if (!currentFormation) {
-      return;
-    }
-    
-    const exportData = {
-      id: Date.now().toString(),
-      name: currentFormation.name || 'Custom Formation',
-      formation: currentFormation,
-      players,
-      createdAt: new Date().toISOString(),
-    };
+    setShowSaveModal(true);
+  }, []);
 
-    const savedFormations = JSON.parse(localStorage.getItem('savedFormations') || '[]');
-    savedFormations.push(exportData);
-    localStorage.setItem('savedFormations', JSON.stringify(savedFormations));
-    
-    // eslint-disable-next-line no-console
-    console.log('Formation saved:', exportData.name);
-  }, [currentFormation, players]);
+  const handleSaveFormation = useCallback(
+    (name: string, notes?: string) => {
+      if (!currentFormation) {
+        return;
+      }
+
+      const exportData = {
+        id: Date.now().toString(),
+        name,
+        formation: currentFormation,
+        players,
+        createdAt: new Date().toISOString(),
+        notes,
+      };
+
+      const savedFormations = JSON.parse(localStorage.getItem('savedFormations') || '[]');
+      savedFormations.push(exportData);
+      localStorage.setItem('savedFormations', JSON.stringify(savedFormations));
+
+      // eslint-disable-next-line no-console
+      console.log('Formation saved:', name);
+    },
+    [currentFormation, players],
+  );
 
   const handleLoad = useCallback(() => {
-    // eslint-disable-next-line no-console
-    console.log('Load formation');
+    setShowLoadModal(true);
+  }, []);
+
+  const handleLoadFormation = useCallback(
+    (savedFormation: any) => {
+      if (savedFormation.formation) {
+        dispatch({
+          type: 'SET_ACTIVE_FORMATION',
+          payload: { team: 'home', formationId: savedFormation.formation.id },
+        });
+      }
+
+      // Update player positions if available
+      if (savedFormation.players) {
+        savedFormation.players.forEach((player: Player) => {
+          dispatch({
+            type: 'UPDATE_PLAYER_POSITION',
+            payload: { playerId: player.id, position: player.position },
+          });
+        });
+      }
+
+      // eslint-disable-next-line no-console
+      console.log('Formation loaded:', savedFormation.name);
+    },
+    [dispatch],
+  );
+
+  const handleDeleteFormation = useCallback((id: string) => {
+    const savedFormations = JSON.parse(localStorage.getItem('savedFormations') || '[]');
+    const updated = savedFormations.filter((f: any) => f.id !== id);
+    localStorage.setItem('savedFormations', JSON.stringify(updated));
+    // Force re-render by closing and reopening modal
+    setShowLoadModal(false);
+    setTimeout(() => setShowLoadModal(true), 0);
   }, []);
 
   const handleExport = useCallback(() => {
@@ -74,12 +164,33 @@ const TacticsBoardPageNew: React.FC = () => {
     window.print();
   }, []);
 
-  const handleFormationChange = useCallback((formationId: string) => {
-    dispatch({
-      type: 'SET_ACTIVE_FORMATION',
-      payload: { team: 'home', formationId },
-    });
-  }, [dispatch]);
+  const handleFormationChange = useCallback(
+    (formationId: string) => {
+      dispatch({
+        type: 'SET_ACTIVE_FORMATION',
+        payload: { team: 'home', formationId },
+      });
+      
+      // Push to history
+      historySystem.pushState(
+        createHistorySnapshot(
+          tacticsState?.formations?.[formationId] || currentFormation || { id: '', name: '', positions: [] },
+          players,
+          [],
+        ),
+      );
+    },
+    [dispatch, historySystem, tacticsState, currentFormation, players],
+  );
+
+  // History Actions
+  const handleUndo = useCallback(() => {
+    historySystem.undo();
+  }, [historySystem]);
+
+  const handleRedo = useCallback(() => {
+    historySystem.redo();
+  }, [historySystem]);
 
   // Player Selection
   const handlePlayerSelect = useCallback((playerId: string) => {
@@ -101,16 +212,31 @@ const TacticsBoardPageNew: React.FC = () => {
   }, [players]);
 
   // Field handlers
-  const handlePlayerMove = useCallback((
-    playerId: string,
-    position: { x: number; y: number },
-    _targetPlayerId?: string
-  ) => {
-    dispatch({
-      type: 'UPDATE_PLAYER_POSITION',
-      payload: { playerId, position },
-    });
-  }, [dispatch]);
+  const handlePlayerMove = useCallback(
+    (
+      playerId: string,
+      position: { x: number; y: number },
+      _targetPlayerId?: string,
+    ) => {
+      dispatch({
+        type: 'UPDATE_PLAYER_POSITION',
+        payload: { playerId, position },
+      });
+
+      // Push to history after player movement
+      const updatedPlayers = players.map(p =>
+        p.id === playerId ? { ...p, position } : p,
+      );
+      historySystem.pushState(
+        createHistorySnapshot(
+          currentFormation || { id: '', name: '', positions: [] },
+          updatedPlayers,
+          [],
+        ),
+      );
+    },
+    [dispatch, historySystem, currentFormation, players],
+  );
 
   const handleFieldPlayerSelect = useCallback((player: Player) => {
     setSelectedPlayer(player);
@@ -127,6 +253,10 @@ const TacticsBoardPageNew: React.FC = () => {
             onLoad={handleLoad}
             onExport={handleExport}
             onPrint={handlePrint}
+            onUndo={handleUndo}
+            onRedo={handleRedo}
+            canUndo={historySystem.canUndo}
+            canRedo={historySystem.canRedo}
             currentFormation={currentFormation}
             onFormationChange={handleFormationChange}
             availableFormations={Object.values(tacticsState?.formations || {})}
@@ -176,6 +306,21 @@ const TacticsBoardPageNew: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Modals */}
+        <SaveFormationModal
+          isOpen={showSaveModal}
+          onClose={() => setShowSaveModal(false)}
+          onSave={handleSaveFormation}
+          defaultName={currentFormation?.name || 'Custom Formation'}
+        />
+
+        <LoadFormationModal
+          isOpen={showLoadModal}
+          onClose={() => setShowLoadModal(false)}
+          onLoad={handleLoadFormation}
+          onDelete={handleDeleteFormation}
+        />
       </ResponsivePage>
     </TacticsErrorBoundary>
   );
