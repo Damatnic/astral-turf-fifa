@@ -3,7 +3,7 @@ import { useTacticsContext } from '../hooks';
 import { ResponsivePage } from '../components/Layout/ResponsivePage';
 import { TacticsErrorBoundary } from '../components/boundaries/TacticsErrorBoundary';
 import { EnhancedToolbar } from '../components/toolbar/EnhancedToolbar';
-import RosterGrid from '../components/roster/SmartRoster/RosterGrid';
+import RosterGrid from '../components/roster/SmartRoster/RosterGridSimple';
 import { ModernField } from '../components/tactics/ModernField';
 import type { Player } from '../types';
 
