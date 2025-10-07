@@ -24,7 +24,10 @@ export class AuthController {
   @Post('logout')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
-  async logout(@Request() req, @Body('refreshToken') refreshToken: string) {
+  async logout(
+    @Request() req: { user: { id: string } },
+    @Body('refreshToken') refreshToken: string
+  ) {
     await this.authService.logout(req.user.id, refreshToken);
     return { message: 'Logged out successfully' };
   }
@@ -38,7 +41,7 @@ export class AuthController {
   @Post('verify')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
-  async verify(@Request() req) {
+  async verify(@Request() req: { user: { id: string; email: string; role: string } }) {
     return { user: req.user };
   }
 }

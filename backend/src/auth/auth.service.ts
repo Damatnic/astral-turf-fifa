@@ -44,7 +44,10 @@ export class AuthService {
 
   async register(
     registerDto: RegisterDto
-  ): Promise<{ user: User; tokens: { accessToken: string; refreshToken: string } }> {
+  ): Promise<{
+    user: Omit<User, 'password'>;
+    tokens: { accessToken: string; refreshToken: string };
+  }> {
     const existingUser = await this.usersService.findByEmail(registerDto.email);
 
     if (existingUser) {
@@ -69,14 +72,17 @@ export class AuthService {
     const { password: userPassword, ...userWithoutPassword } = user;
 
     return {
-      user: userWithoutPassword as User,
+      user: userWithoutPassword,
       tokens,
     };
   }
 
   async login(
     loginDto: LoginDto
-  ): Promise<{ user: User; tokens: { accessToken: string; refreshToken: string } }> {
+  ): Promise<{
+    user: Omit<User, 'password'>;
+    tokens: { accessToken: string; refreshToken: string };
+  }> {
     const user = await this.validateUser(loginDto.email, loginDto.password);
 
     if (!user) {
@@ -85,7 +91,7 @@ export class AuthService {
 
     await this.usersService.updateLastLogin(user.id);
 
-    const tokens = await this.generateTokens(user);
+    const tokens = await this.generateTokens(user as any);
     await this.createSession(user.id, tokens.refreshToken);
 
     return {

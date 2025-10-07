@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import helmet from 'helmet';
-import * as compression from 'compression';
+import compression from 'compression';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -36,7 +36,7 @@ async function bootstrap() {
     })
   );
 
-  const port = configService.get('PORT') || 3001;
+  const port = configService.get('PORT') || 3333;
   await app.listen(port);
 
   // eslint-disable-next-line no-console

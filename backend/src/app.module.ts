@@ -18,14 +18,13 @@ import { UsersModule } from './users/users.module';
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
-        host: configService.get('DB_HOST'),
-        port: +configService.get('DB_PORT'),
-        username: configService.get('DB_USERNAME'),
-        password: configService.get('DB_PASSWORD'),
-        database: configService.get('DB_DATABASE'),
+        url: configService.get('DATABASE_URL'),
+        ssl: {
+          rejectUnauthorized: false,
+        },
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: configService.get('NODE_ENV') === 'development',
-        logging: configService.get('NODE_ENV') === 'development',
+        synchronize: false, // Disabled - use migrations for schema changes
+        logging: process.env.NODE_ENV === 'development',
       }),
       inject: [ConfigService],
     }),
@@ -33,10 +32,12 @@ import { UsersModule } from './users/users.module';
     // Rate limiting
     ThrottlerModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        ttl: +configService.get('THROTTLE_TTL') || 60,
-        limit: +configService.get('THROTTLE_LIMIT') || 100,
-      }),
+      useFactory: (configService: ConfigService) => [
+        {
+          ttl: +configService.get('THROTTLE_TTL') || 60,
+          limit: +configService.get('THROTTLE_LIMIT') || 100,
+        },
+      ],
       inject: [ConfigService],
     }),
 
