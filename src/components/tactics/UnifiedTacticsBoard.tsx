@@ -62,15 +62,8 @@ import { useCachedQuery } from '../../utils/cachingOptimizations';
 import { useIntersectionObserver } from '../../utils/virtualizationOptimizations';
 import { FormationWebWorker } from '../../workers/formationCalculationWorker';
 
-// Type definitions for PWA
-interface BeforeInstallPromptEvent extends Event {
-  prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
-}
-
-interface WindowWithGtag extends Window {
-  gtag?: (event: string, action: string, params: Record<string, string>) => void;
-}
+/* eslint-disable no-undef */
+// Global browser APIs and types that ESLint doesn't recognize
 
 // Lazy load heavy components with standard React lazy loading
 const AnimationTimeline = lazy(() => import('./AnimationTimeline'));
@@ -79,26 +72,7 @@ const DugoutManagement = lazy(() => import('./DugoutManagement'));
 const ChallengeManagement = lazy(() => import('./ChallengeManagement'));
 const CollaborationFeatures = lazy(() => import('./CollaborationFeatures'));
 const EnhancedExportImport = lazy(() => import('./EnhancedExportImport'));
-import {
-  Users,
-  Zap,
-  Brain,
-  Maximize2,
-  Minimize2,
-  Play,
-  BarChart3,
-  Save,
-  Share2,
-  Activity,
-  Eye,
-  Users2,
-  Trophy,
-  Archive,
-  Heart,
-  Keyboard,
-  History,
-  Sparkles,
-} from 'lucide-react';
+import { Brain } from 'lucide-react';
 
 // Standard React lazy loading
 const IntelligentAssistant = lazy(() => import('./IntelligentAssistant'));
@@ -116,10 +90,10 @@ interface UnifiedTacticsBoardProps {
 
 const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
   className,
-  onSimulateMatch,
-  onSaveFormation,
-  onAnalyticsView,
-  onExportFormation,
+  onSimulateMatch: _onSimulateMatch,
+  onSaveFormation: _onSaveFormation,
+  onAnalyticsView: _onAnalyticsView,
+  onExportFormation: _onExportFormation,
 }) => {
   const { tacticsState, dispatch: tacticsDispatch } = useTacticsContext();
   const { uiState: contextUIState } = useUIContext();
@@ -462,6 +436,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
             });
           }
         } catch (error) {
+          // eslint-disable-next-line no-console
           console.warn('Worker validation failed, falling back to sync:', error);
           // Fallback to synchronous update
           tacticsDispatch({
@@ -775,6 +750,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
 
   const handleTacticalSuggestion = useCallback(
     (suggestion: string) => {
+      // eslint-disable-next-line no-console
       console.log('AI Tactical Suggestion:', suggestion);
       // Could show notification or update UI with suggestion
       tacticsDispatch({
@@ -804,7 +780,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
 
       tacticsDispatch({
         type: 'ADD_DRAWING',
-        payload: drawingShape,
+        payload: drawingShape as DrawingShape,
       });
     },
     [tacticsDispatch],
@@ -838,6 +814,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
   // Apply preset formation handler
   const handleApplyPreset = useCallback(
     (preset: TacticalPreset) => {
+      // eslint-disable-next-line no-console
       console.log('Applying preset:', preset);
 
       // Convert preset positions to actual player assignments
@@ -994,7 +971,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
       // Close the panel
       uiDispatch({ type: 'CLOSE_PANEL', payload: 'quickStart' });
     },
-    [currentPlayers, currentFormation, tacticsDispatch, historySystem],
+    [currentPlayers, currentFormation, tacticsDispatch, historySystem, tacticsState?.drawings],
   );
 
   // Helper function to map tactical instruction values
@@ -1012,7 +989,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
   // Formation validation function
   const validateFormation = (
     formation: Formation,
-    players: Player[],
+    _players: Player[],
   ): { isValid: boolean; errors: string[]; warnings: string[] } => {
     const errors: string[] = [];
     const warnings: string[] = [];
@@ -1070,7 +1047,9 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
     };
   };
 
-  // Quick action handlers
+  // Quick action handlers - currently unused but available for future quick access UI
+  // Commented out to avoid unused variable warnings
+  /*
   const quickActions = useMemo(
     () => [
       {
@@ -1232,15 +1211,15 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
       currentFormation,
       onSimulateMatch,
       onAnalyticsView,
-      onSaveFormation,
       onExportFormation,
       enterFullscreen,
       exitFullscreen,
       uiDispatch,
     ],
   );
+  */
 
-  // Layout calculations
+  // Additional toolbar actions configuration  // Layout calculations
   const layoutClasses = useMemo(() => {
     return {
       container: viewMode === 'fullscreen' ? 'fixed inset-0 z-50' : 'h-full',

@@ -248,6 +248,7 @@ export function validateSecurityHeader(name: string, value: string): boolean {
 export function processCSpViolation(report: CSPViolationReport): void {
   const violation = report['csp-report'];
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   securityLogger.logSecurityEvent('XSS_ATTEMPT' as any, 'CSP violation detected', {
     metadata: {
       blockedUri: violation['blocked-uri'],
@@ -264,14 +265,8 @@ export function processCSpViolation(report: CSPViolationReport): void {
 }
 
 // Track violation patterns for analysis
-function trackViolationPattern(violation: CSPViolationReport['csp-report']): void {
-  const pattern = {
-    directive: violation['violated-directive'],
-    blockedUri: violation['blocked-uri'],
-    timestamp: new Date().toISOString(),
-  };
-
-  // In production, this would be sent to monitoring service
+function trackViolationPattern(_violation: CSPViolationReport['csp-report']): void {
+  // Pattern tracking would be sent to monitoring service in production
   if (ENVIRONMENT_CONFIG.isDevelopment) {
     // // // // console.warn('CSP Violation Pattern:', pattern);
   }
@@ -315,6 +310,7 @@ export function generateSecurityMetaTags(): string[] {
  */
 
 // Apply CSP headers to response (for server-side use)
+/* eslint-disable no-undef */
 export function applySecurityHeaders(headers: Headers): void {
   const securityHeaders = getSecurityHeaders();
 
