@@ -144,7 +144,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   /**
    * Set object as JSON
    */
-  async setObject(key: string, value: Record<string, unknown>, ttl?: number): Promise<void> {
+  async setObject(key: string, value: unknown, ttl?: number): Promise<void> {
     await this.set(key, JSON.stringify(value), ttl);
   }
 
