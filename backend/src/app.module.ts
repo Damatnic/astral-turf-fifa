@@ -12,6 +12,7 @@ import { UploadsModule } from './uploads/uploads.module';
 import { TeamsModule } from './teams/teams.module';
 import { PlayersModule } from './players/players.module';
 import { FormationsModule } from './formations/formations.module';
+import { MatchesModule } from './matches/matches.module';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { FormationsModule } from './formations/formations.module';
     TeamsModule,
     PlayersModule,
     FormationsModule,
+    MatchesModule,
   ],
   providers: [
     // Global guards - apply JWT auth and role-based access control to all routes
