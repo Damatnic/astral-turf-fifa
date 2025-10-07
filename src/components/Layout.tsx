@@ -1,14 +1,15 @@
-import React, { useEffect, useRef, lazy, Suspense, type ComponentType } from 'react';
+import React, { useEffect, useRef, lazy, Suspense, useState, type ComponentType } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { useUIContext, useTacticsContext, useResponsive, useResponsiveModal } from '../hooks';
 import { useAuthContext } from '../hooks/useAuthContext';
 import { Header } from './ui/Header';
-import SmartNavbar from './navigation/SmartNavbar/SmartNavbar';
+import UnifiedNavigation from './navigation/UnifiedNavigation';
 import NotificationContainer from './ui/NotificationContainer';
 import PrintableLineup from './export/PrintableLineup';
 import { toPng } from 'html-to-image';
 import { cn } from '../utils/cn';
 import type { DrawingTool, ModalType } from '../types';
+import { motion, AnimatePresence } from 'framer-motion';
 // MobileAppLayout not needed - using ResponsivePage wrapper on individual pages
 
 // Import design system CSS
@@ -77,8 +78,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { players, formations, activeFormationIds, captainIds } = tacticsState;
   const { isMobile, isTablet } = responsive;
 
-  // Check if we should use the new navigation (for tactics page)
-  const useNewNav = location.pathname.includes('/tactics');
+  // Mobile menu state
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Handle theme changes
   useEffect(() => {
@@ -182,36 +183,124 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         !isMobile && !isTablet && 'desktop-layout',
       )}
     >
-      {/* Modern Header - Hide on mobile (MobileAppLayout provides its own header) */}
-      {!isPresentationMode && !isMobile && (
-        <div className="flex-shrink-0 z-40 relative">
-          {useNewNav ? (
-            <SmartNavbar
-              currentPage={location.pathname}
-              userRole={(authState.user?.role as 'coach' | 'analyst' | 'player' | 'admin' | 'viewer') || 'viewer'}
-              teamContext="home"
-              isMobile={false}
-              showBreadcrumbs={true}
-              showSearch={true}
-              navigationItems={[
-                { id: 'dashboard', label: 'Dashboard', type: 'page', path: '/dashboard', icon: 'dashboard' },
-                { id: 'tactics', label: 'Tactics Board', type: 'page', path: '/tactics', icon: 'tactics' },
-                { id: 'squad', label: 'Squad Overview', type: 'page', path: '/squad', icon: 'team' },
-                { id: 'players', label: 'Player Database', type: 'page', path: '/players', icon: 'person' },
-                { id: 'formations', label: 'Formations', type: 'page', path: '/formations', icon: 'formation' },
-                { id: 'analytics', label: 'Analytics', type: 'page', path: '/analytics', icon: 'analytics' },
-                { id: 'performance', label: 'Performance', type: 'page', path: '/analytics/performance', icon: 'chart' },
-                { id: 'matches', label: 'Matches', type: 'page', path: '/matches', icon: 'match' },
-                { id: 'training', label: 'Training', type: 'page', path: '/training', icon: 'training' },
-                { id: 'settings', label: 'Settings', type: 'page', path: '/settings', icon: 'settings' },
-              ]}
-              onNavigate={(path) => window.location.href = path}
-              brandName="Astral Turf"
-            />
-          ) : (
-            <Header />
+      {/* Revolutionary Unified Navigation System */}
+      {!isPresentationMode && (
+        <>
+          {/* Desktop/Tablet Header Navigation */}
+          {!isMobile && (
+            <header className="flex-shrink-0 z-40 relative backdrop-blur-xl border-b shadow-lg bg-secondary-900/80 border-secondary-700/50">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary-500/5 via-transparent to-accent-500/5" />
+              
+              <div className="relative z-10 px-6 py-3">
+                <div className="flex items-center justify-between">
+                  {/* Logo */}
+                  <div className="flex items-center space-x-3">
+                    <div className="text-2xl font-bold">
+                      <span className="text-primary-400">Astral</span>
+                      <span className="text-white">Turf</span>
+                    </div>
+                  </div>
+
+                  {/* Unified Navigation */}
+                  <UnifiedNavigation variant="header" />
+
+                  {/* User Menu */}
+                  <div className="flex items-center space-x-3">
+                    <div className="text-sm text-secondary-300">
+                      {authState.user?.email || 'Guest'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </header>
           )}
-        </div>
+
+          {/* Mobile Header with Hamburger */}
+          {isMobile && (
+            <header className="flex-shrink-0 z-40 relative backdrop-blur-xl border-b shadow-lg bg-secondary-900/80 border-secondary-700/50">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary-500/5 via-transparent to-accent-500/5" />
+              
+              <div className="relative z-10 px-4 py-3">
+                <div className="flex items-center justify-between">
+                  {/* Mobile Menu Button */}
+                  <button
+                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                    className="p-2 rounded-lg hover:bg-secondary-700/50 transition-colors"
+                  >
+                    {mobileMenuOpen ? (
+                      <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    ) : (
+                      <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                      </svg>
+                    )}
+                  </button>
+
+                  {/* Logo */}
+                  <div className="text-xl font-bold">
+                    <span className="text-primary-400">Astral</span>
+                    <span className="text-white">Turf</span>
+                  </div>
+
+                  {/* Placeholder for balance */}
+                  <div className="w-10" />
+                </div>
+              </div>
+            </header>
+          )}
+
+          {/* Mobile Menu Drawer */}
+          <AnimatePresence>
+            {isMobile && mobileMenuOpen && (
+              <>
+                {/* Backdrop */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+                />
+
+                {/* Drawer */}
+                <motion.div
+                  initial={{ x: '-100%' }}
+                  animate={{ x: 0 }}
+                  exit={{ x: '-100%' }}
+                  transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+                  className="fixed left-0 top-0 bottom-0 w-80 bg-secondary-900 shadow-2xl z-50 overflow-hidden"
+                >
+                  <div className="h-full flex flex-col">
+                    {/* Header */}
+                    <div className="flex items-center justify-between p-4 border-b border-secondary-700">
+                      <div className="text-xl font-bold">
+                        <span className="text-primary-400">Astral</span>
+                        <span className="text-white">Turf</span>
+                      </div>
+                      <button
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="p-2 rounded-lg hover:bg-secondary-700/50 transition-colors"
+                      >
+                        <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+
+                    {/* Navigation */}
+                    <UnifiedNavigation 
+                      variant="mobile" 
+                      showSearch={true} 
+                      onClose={() => setMobileMenuOpen(false)} 
+                    />
+                  </div>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
+        </>
       )}
 
       {/* Enhanced Main Content Area */}
