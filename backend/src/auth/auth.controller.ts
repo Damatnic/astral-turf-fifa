@@ -1,8 +1,11 @@
 import { Controller, Post, Body, UseGuards, HttpCode, HttpStatus, Request } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { VerifyEmailDto } from './dto/verify-email.dto';
+import { ResendVerificationDto } from './dto/resend-verification.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { Public } from './decorators/public.decorator';
 import { CurrentUser } from './decorators/current-user.decorator';
@@ -54,5 +57,20 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async verify(@CurrentUser() user: { id: string; email: string; role: string }) {
     return { user };
+  }
+
+  @Public()
+  @Post('verify-email')
+  @HttpCode(HttpStatus.OK)
+  async verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
+    return this.authService.verifyEmail(verifyEmailDto.token);
+  }
+
+  @Public()
+  @Post('resend-verification')
+  @Throttle({ default: { limit: 3, ttl: 300000 } }) // 3 requests per 5 minutes
+  @HttpCode(HttpStatus.OK)
+  async resendVerification(@Body() resendDto: ResendVerificationDto) {
+    return this.authService.resendVerificationEmail(resendDto.email);
   }
 }

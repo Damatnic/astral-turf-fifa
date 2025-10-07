@@ -4,9 +4,13 @@ export class InitialSchema1728332400000 implements MigrationInterface {
   name = 'InitialSchema1728332400000';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    // Create UserRole enum
+    // Create UserRole enum (if it doesn't exist)
     await queryRunner.query(`
-      CREATE TYPE "users_role_enum" AS ENUM('coach', 'player', 'family', 'admin')
+      DO $$ BEGIN
+        CREATE TYPE "users_role_enum" AS ENUM('coach', 'player', 'family', 'admin');
+      EXCEPTION
+        WHEN duplicate_object THEN null;
+      END $$;
     `);
 
     // Create users table

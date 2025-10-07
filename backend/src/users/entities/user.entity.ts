@@ -87,8 +87,20 @@ export class User {
   @Column({ name: 'email_verified', default: false })
   emailVerified: boolean;
 
+  @Column({ name: 'email_verification_token', nullable: true, select: false })
+  emailVerificationToken?: string;
+
+  @Column({ name: 'email_verification_expires', nullable: true })
+  emailVerificationExpires?: Date;
+
   @Column({ name: 'needs_password_reset', default: false })
   needsPasswordReset: boolean;
+
+  @Column({ name: 'password_reset_token', nullable: true, select: false })
+  passwordResetToken?: string;
+
+  @Column({ name: 'password_reset_expires', nullable: true })
+  passwordResetExpires?: Date;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

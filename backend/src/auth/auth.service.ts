@@ -1,13 +1,20 @@
-import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  ConflictException,
+  BadRequestException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, MoreThan } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 import { UsersService } from '../users/users.service';
 import { User, UserRole } from '../users/entities/user.entity';
 import { Session } from '../users/entities/session.entity';
 import { SessionService } from '../redis/session.service';
+import { MailService } from '../mail/mail.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 
@@ -18,6 +25,7 @@ export class AuthService {
     private jwtService: JwtService,
     private configService: ConfigService,
     private sessionService: SessionService,
+    private mailService: MailService,
     @InjectRepository(Session)
     private sessionsRepository: Repository<Session>
   ) {}
@@ -46,7 +54,7 @@ export class AuthService {
 
   async register(registerDto: RegisterDto): Promise<{
     user: Omit<User, 'password'>;
-    tokens: { accessToken: string; refreshToken: string };
+    message: string;
   }> {
     const existingUser = await this.usersService.findByEmail(registerDto.email);
 
@@ -56,6 +64,15 @@ export class AuthService {
 
     const hashedPassword = await bcrypt.hash(registerDto.password, 10);
 
+    // Generate email verification token
+    const verificationToken = this.generateVerificationToken();
+    const hashedToken = await bcrypt.hash(verificationToken, 10);
+
+    // Set token expiration (24 hours from now)
+    const tokenExpiry = new Date();
+    const expiryHours = this.configService.get<number>('EMAIL_VERIFICATION_EXPIRY', 86400) / 3600;
+    tokenExpiry.setHours(tokenExpiry.getHours() + expiryHours);
+
     const user = await this.usersService.create({
       email: registerDto.email,
       password: hashedPassword,
@@ -63,22 +80,34 @@ export class AuthService {
       lastName: registerDto.lastName,
       role: registerDto.role || UserRole.PLAYER,
       phoneNumber: registerDto.phoneNumber,
+      emailVerified: false,
+      emailVerificationToken: hashedToken,
+      emailVerificationExpires: tokenExpiry,
     });
 
-    const tokens = await this.generateTokens(user);
-    await this.createSession(user.id, tokens.refreshToken, tokens.accessToken);
+    // Send verification email
+    try {
+      await this.mailService.sendVerificationEmail(
+        user.email,
+        verificationToken,
+        `${user.firstName} ${user.lastName}`
+      );
+    } catch (error) {
+      // Log error but don't fail registration
+      console.error('Failed to send verification email:', error);
+    }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password: userPassword, ...userWithoutPassword } = user;
 
     return {
       user: userWithoutPassword,
-      tokens,
+      message: 'Registration successful! Please check your email to verify your account.',
     };
   }
 
   async login(loginDto: LoginDto): Promise<{
-    user: Omit<User, 'password'>;
+    user: Omit<User, 'password'> & { emailVerified: boolean };
     tokens: { accessToken: string; refreshToken: string };
   }> {
     const user = await this.validateUser(loginDto.email, loginDto.password);
@@ -93,7 +122,10 @@ export class AuthService {
     await this.createSession(user.id, tokens.refreshToken, tokens.accessToken);
 
     return {
-      user,
+      user: {
+        ...user,
+        emailVerified: (user as User).emailVerified,
+      },
       tokens,
     };
   }
@@ -159,6 +191,114 @@ export class AuthService {
    */
   async isTokenBlacklisted(token: string): Promise<boolean> {
     return await this.sessionService.isTokenBlacklisted(token);
+  }
+
+  /**
+   * Verify user's email with token
+   */
+  async verifyEmail(token: string): Promise<{ message: string; user: Omit<User, 'password'> }> {
+    // Find user with non-expired verification token
+    const users = await this.usersService.findAll();
+    let verifiedUser: User | null = null;
+
+    for (const user of users) {
+      if (
+        user.emailVerificationToken &&
+        user.emailVerificationExpires &&
+        user.emailVerificationExpires > new Date()
+      ) {
+        const isValidToken = await bcrypt.compare(token, user.emailVerificationToken);
+        if (isValidToken) {
+          verifiedUser = user;
+          break;
+        }
+      }
+    }
+
+    if (!verifiedUser) {
+      throw new BadRequestException('Invalid or expired verification token');
+    }
+
+    if (verifiedUser.emailVerified) {
+      throw new BadRequestException('Email already verified');
+    }
+
+    // Update user - mark as verified and clear token
+    await this.usersService.update(verifiedUser.id, {
+      emailVerified: true,
+      emailVerificationToken: undefined,
+      emailVerificationExpires: undefined,
+    });
+
+    // Send welcome email
+    try {
+      await this.mailService.sendWelcomeEmail(
+        verifiedUser.email,
+        `${verifiedUser.firstName} ${verifiedUser.lastName}`
+      );
+    } catch (error) {
+      console.error('Failed to send welcome email:', error);
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, emailVerificationToken, ...userWithoutSensitiveData } = verifiedUser;
+
+    return {
+      message: 'Email verified successfully! You can now log in.',
+      user: { ...userWithoutSensitiveData, emailVerified: true },
+    };
+  }
+
+  /**
+   * Resend verification email
+   */
+  async resendVerificationEmail(email: string): Promise<{ message: string }> {
+    const user = await this.usersService.findByEmail(email);
+
+    if (!user) {
+      // Don't reveal if email exists for security
+      return { message: 'If the email exists, a verification link has been sent.' };
+    }
+
+    if (user.emailVerified) {
+      throw new BadRequestException('Email is already verified');
+    }
+
+    // Generate new verification token
+    const verificationToken = this.generateVerificationToken();
+    const hashedToken = await bcrypt.hash(verificationToken, 10);
+
+    // Set new token expiration
+    const tokenExpiry = new Date();
+    const expiryHours = this.configService.get<number>('EMAIL_VERIFICATION_EXPIRY', 86400) / 3600;
+    tokenExpiry.setHours(tokenExpiry.getHours() + expiryHours);
+
+    // Update user with new token
+    await this.usersService.update(user.id, {
+      emailVerificationToken: hashedToken,
+      emailVerificationExpires: tokenExpiry,
+    });
+
+    // Send verification email
+    try {
+      await this.mailService.sendVerificationEmail(
+        user.email,
+        verificationToken,
+        `${user.firstName} ${user.lastName}`
+      );
+    } catch (error) {
+      console.error('Failed to send verification email:', error);
+      throw new BadRequestException('Failed to send verification email');
+    }
+
+    return { message: 'Verification email sent successfully!' };
+  }
+
+  /**
+   * Generate a cryptographically secure verification token
+   */
+  private generateVerificationToken(): string {
+    return crypto.randomBytes(32).toString('hex');
   }
 
   /**

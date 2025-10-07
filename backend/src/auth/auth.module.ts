@@ -8,11 +8,13 @@ import { AuthController } from './auth.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
 import { UsersModule } from '../users/users.module';
+import { MailModule } from '../mail/mail.module';
 import { Session } from '../users/entities/session.entity';
 
 @Module({
   imports: [
     UsersModule,
+    MailModule,
     PassportModule,
     TypeOrmModule.forFeature([Session]),
     JwtModule.registerAsync({
