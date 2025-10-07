@@ -9,6 +9,7 @@ import { RedisModule } from './redis/redis.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { UploadsModule } from './uploads/uploads.module';
+import { TeamsModule } from './teams/teams.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { UploadsModule } from './uploads/uploads.module';
     AuthModule,
     UsersModule,
     UploadsModule,
+    TeamsModule,
   ],
   providers: [
     // Global guards - apply JWT auth and role-based access control to all routes
