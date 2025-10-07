@@ -5,8 +5,8 @@
  */
 
 import React, { useState, useCallback, useMemo } from 'react';
-import { FixedSizeGrid as Grid } from 'react-window';
 import { Grid as GridIcon, List } from 'lucide-react';
+import { Grid as ReactWindowGrid } from 'react-window';
 import type { RosterGridProps } from '../../../types/roster';
 import PlayerCard from './PlayerCard';
 import { calculateGridColumns, getGridItemDimensions } from '../utils/rosterHelpers';
@@ -58,7 +58,8 @@ export default function RosterGrid({
 
   // Grid cell renderer
   const Cell = useCallback(
-    ({ columnIndex, rowIndex, style }: { columnIndex: number; rowIndex: number; style: React.CSSProperties }) => {
+    (props: { columnIndex: number; rowIndex: number; style: React.CSSProperties }) => {
+      const { columnIndex, rowIndex, style } = props;
       const index = rowIndex * gridConfig.columnCount + columnIndex;
       if (index >= players.length) {
         return null;
@@ -103,17 +104,17 @@ export default function RosterGrid({
 
       {/* Grid */}
       {players.length > 0 ? (
-        <Grid
+        <ReactWindowGrid
           columnCount={gridConfig.columnCount}
           columnWidth={gridConfig.columnWidth}
-          height={containerHeight - 60}
+          defaultHeight={containerHeight - 60}
           rowCount={rowCount}
           rowHeight={gridConfig.rowHeight}
-          width={containerWidth}
+          defaultWidth={containerWidth}
           className="grid-container"
-        >
-          {Cell}
-        </Grid>
+          cellComponent={Cell}
+          cellProps={{} as never}
+        />
       ) : (
         <div className="empty-state">
           <GridIcon size={48} />

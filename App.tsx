@@ -16,7 +16,6 @@ const LoginPage = lazy(() => import('./src/pages/LoginPage'));
 const SignupPage = lazy(() => import('./src/pages/SignupPage'));
 const Layout = lazy(() => import('./src/components/Layout'));
 const DashboardPage = lazy(() => import('./src/pages/DashboardPage'));
-const TacticsBoardPage = lazy(() => import('./src/pages/TacticsBoardPage'));
 const TacticsBoardPageNew = lazy(() => import('./src/pages/TacticsBoardPageNew'));
 const FinancesPage = lazy(() => import('./src/pages/FinancesPage'));
 const TransfersPage = lazy(() => import('./src/pages/TransfersPage'));
