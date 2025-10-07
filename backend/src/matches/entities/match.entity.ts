@@ -44,10 +44,10 @@ export class Match {
   })
   status: MatchStatus;
 
-  @Column({ nullable: true })
+  @Column({ type: 'int', nullable: true })
   homeScore: number | null;
 
-  @Column({ nullable: true })
+  @Column({ type: 'int', nullable: true })
   awayScore: number | null;
 
   @Column({ length: 200, nullable: true })

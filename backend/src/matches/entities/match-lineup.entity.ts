@@ -43,10 +43,10 @@ export class MatchLineup {
   @Column({ default: true })
   isStarting: boolean;
 
-  @Column({ nullable: true })
+  @Column({ type: 'int', nullable: true })
   jerseyNumber: number | null;
 
-  @Column({ default: 0 })
+  @Column({ type: 'int', default: 0 })
   minutesPlayed: number;
 
   @Column({ type: 'float', nullable: true })

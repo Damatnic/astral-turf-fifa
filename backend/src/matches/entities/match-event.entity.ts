@@ -46,7 +46,7 @@ export class MatchEvent {
   @Column()
   minute: number;
 
-  @Column({ nullable: true })
+  @Column({ type: 'int', nullable: true })
   extraTime: number | null;
 
   @Column({ nullable: true })
