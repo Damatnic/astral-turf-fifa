@@ -111,11 +111,11 @@ export function generateCSPHeader(): string {
 export function generateDevelopmentCSP(): string {
   const devDirectives = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' localhost:* 127.0.0.1:*",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' localhost:* 127.0.0.1:* https://va.vercel-scripts.com",
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-    "font-src 'self' https://fonts.gstatic.com",
+    "font-src 'self' https://fonts.gstatic.com https://r2cdn.perplexity.ai",
     "img-src 'self' data: blob: localhost:* 127.0.0.1:*",
-    "connect-src 'self' ws: wss: localhost:* 127.0.0.1:* https://api.gemini.google.com",
+    "connect-src 'self' ws: wss: localhost:* 127.0.0.1:* https://api.gemini.google.com https://va.vercel-scripts.com",
     "frame-src 'self'",
     "object-src 'none'",
     "base-uri 'self'",
