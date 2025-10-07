@@ -32,8 +32,8 @@ coverage/
 *.lcov
 .nyc_output
 
-# Uploads
-uploads/
+# Uploads (user uploaded files, not source code)
+/uploads/
 
 # Temp files
 *.tmp
