@@ -195,8 +195,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               showSearch={true}
               navigationItems={[
                 { id: 'dashboard', label: 'Dashboard', type: 'page', path: '/dashboard', icon: 'dashboard' },
-                { id: 'tactics', label: 'Tactics', type: 'page', path: '/tactics', icon: 'tactics' },
+                { id: 'tactics', label: 'Tactics Board', type: 'page', path: '/tactics', icon: 'tactics' },
+                { id: 'squad', label: 'Squad Overview', type: 'page', path: '/squad', icon: 'team' },
+                { id: 'players', label: 'Player Database', type: 'page', path: '/players', icon: 'person' },
+                { id: 'formations', label: 'Formations', type: 'page', path: '/formations', icon: 'formation' },
                 { id: 'analytics', label: 'Analytics', type: 'page', path: '/analytics', icon: 'analytics' },
+                { id: 'performance', label: 'Performance', type: 'page', path: '/analytics/performance', icon: 'chart' },
+                { id: 'matches', label: 'Matches', type: 'page', path: '/matches', icon: 'match' },
+                { id: 'training', label: 'Training', type: 'page', path: '/training', icon: 'training' },
+                { id: 'settings', label: 'Settings', type: 'page', path: '/settings', icon: 'settings' },
               ]}
               onNavigate={(path) => window.location.href = path}
               brandName="Astral Turf"

@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { useTacticsContext } from '../hooks';
 import { useFormationHistory, createHistorySnapshot } from '../hooks/useFormationHistory';
-import { ResponsivePage } from '../components/Layout/ResponsivePage';
 import { TacticsErrorBoundary } from '../components/boundaries/TacticsErrorBoundary';
 import { EnhancedToolbar } from '../components/toolbar/EnhancedToolbar';
 import RosterGrid from '../components/roster/SmartRoster/RosterGridSimple';
@@ -373,10 +372,9 @@ const TacticsBoardPageNew: React.FC = () => {
 
   return (
     <TacticsErrorBoundary>
-      <ResponsivePage>
-        <div className="h-screen w-full flex flex-col bg-slate-900">
-          {/* Enhanced Toolbar */}
-          <EnhancedToolbar
+      <div className="h-screen w-full flex flex-col bg-slate-900 overflow-hidden">
+        {/* Enhanced Toolbar */}
+        <EnhancedToolbar
             onSave={handleSave}
             onLoad={handleLoad}
             onExport={handleExport}
@@ -511,7 +509,6 @@ const TacticsBoardPageNew: React.FC = () => {
           onLoad={handleLoadFormation}
           onDelete={handleDeleteFormation}
         />
-      </ResponsivePage>
     </TacticsErrorBoundary>
   );
 };
