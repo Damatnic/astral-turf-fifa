@@ -568,6 +568,7 @@ const ModernField: React.FC<ModernFieldProps> = ({
                       width: '60px',
                       height: '60px',
                       transform: 'translate(-50%, -50%)',
+                      pointerEvents: 'auto', // Enable drop zone interaction
                     }}
                     animate={{
                       scale: isSnapTarget ? 1.4 : hoveredSlot === slot.id ? 1.2 : 1,
@@ -592,6 +593,38 @@ const ModernField: React.FC<ModernFieldProps> = ({
                     }}
                     onMouseEnter={() => setHoveredSlot(slot.id)}
                     onMouseLeave={() => setHoveredSlot(null)}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      e.dataTransfer.dropEffect = 'move';
+                      setHoveredSlot(slot.id);
+                    }}
+                    onDragLeave={() => {
+                      setHoveredSlot(null);
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setHoveredSlot(null);
+                      
+                      const playerId = e.dataTransfer.getData('text/plain');
+                      if (!playerId) {
+                        return;
+                      }
+
+                      // Use the slot's exact position for precise placement
+                      const slotPosition = {
+                        x: slot.position?.x ?? 50,
+                        y: slot.position?.y ?? 50,
+                      };
+
+                      // If slot is occupied by another player, pass targetPlayerId for swapping
+                      onPlayerMove(
+                        playerId,
+                        slotPosition,
+                        slot.playerId && slot.playerId !== playerId ? slot.playerId : undefined,
+                      );
+                    }}
                   >
                     {/* Snap target indicator */}
                     {isSnapTarget && (
