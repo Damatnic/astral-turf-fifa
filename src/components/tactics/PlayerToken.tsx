@@ -137,7 +137,7 @@ const PlayerPeekMenu: React.FC<{
 
       {/* Peek Menu */}
       <div
-        className="fixed z-50 bg-slate-800/95 backdrop-blur-sm rounded-lg border border-slate-600/50 p-4 min-w-72 max-w-sm shadow-2xl"
+        className="fixed z-[9999] bg-slate-800/98 backdrop-blur-xl rounded-lg border border-slate-600/50 p-4 min-w-72 max-w-sm shadow-2xl pointer-events-auto"
         style={{
           left: Math.min(position.x, window.innerWidth - 300),
           top: Math.min(position.y, window.innerHeight - 400),

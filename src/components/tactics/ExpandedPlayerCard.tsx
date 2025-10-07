@@ -8,7 +8,7 @@ interface ExpandedPlayerCardProps {
   isVisible: boolean;
   onClose: () => void;
   position: { x: number; y: number };
-  onPlayerAction?: (action: 'swap' | 'bench' | 'instructions' | 'stats') => void;
+  onPlayerAction?: (action: 'swap' | 'bench' | 'instructions' | 'stats' | 'compare') => void;
 }
 
 // Helper function to get availability color
@@ -152,7 +152,7 @@ export const ExpandedPlayerCard: React.FC<ExpandedPlayerCardProps> = ({
             animate={{ opacity: 1, scale: 1, x: cardPosition.x, y: cardPosition.y }}
             exit={{ opacity: 0, scale: 0.8 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed z-50 w-80 bg-slate-800/95 backdrop-blur-md rounded-lg border border-slate-600/50 shadow-2xl"
+            className="fixed z-[9999] w-80 bg-slate-800/98 backdrop-blur-xl rounded-lg border border-slate-600/50 shadow-2xl pointer-events-auto"
             style={{ left: 0, top: 0 }}
           >
             {/* Header */}
@@ -350,30 +350,44 @@ export const ExpandedPlayerCard: React.FC<ExpandedPlayerCardProps> = ({
             {/* Action Buttons */}
             {onPlayerAction && (
               <div className="p-4 border-t border-slate-600/50">
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-2 mb-2">
                   <button
                     onClick={() => onPlayerAction('swap')}
-                    className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition-colors"
+                    className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition-colors flex items-center justify-center gap-1"
                   >
-                    Swap Position
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                    </svg>
+                    Swap
                   </button>
                   <button
                     onClick={() => onPlayerAction('bench')}
-                    className="px-3 py-2 bg-slate-600 hover:bg-slate-700 text-white text-sm rounded-lg transition-colors"
+                    className="px-3 py-2 bg-orange-600 hover:bg-orange-700 text-white text-sm rounded-lg transition-colors flex items-center justify-center gap-1"
                   >
-                    To Bench
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                    Bench
+                  </button>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => onPlayerAction('stats')}
+                    className="px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded-lg transition-colors flex items-center justify-center gap-1"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    Stats
                   </button>
                   <button
                     onClick={() => onPlayerAction('instructions')}
-                    className="px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-sm rounded-lg transition-colors"
+                    className="px-3 py-2 bg-teal-600 hover:bg-teal-700 text-white text-sm rounded-lg transition-colors flex items-center justify-center gap-1"
                   >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
                     Instructions
-                  </button>
-                  <button
-                    onClick={() => onPlayerAction('stats')}
-                    className="px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded-lg transition-colors"
-                  >
-                    Full Stats
                   </button>
                 </div>
               </div>

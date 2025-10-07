@@ -18,8 +18,13 @@ import {
   Sparkles,
   BarChart3,
   Zap,
+  Minimize2,
+  AlignJustify,
+  Maximize2,
 } from 'lucide-react';
 import type { Player, Formation, Team } from '../../types';
+
+type PlayerCardViewMode = 'compact' | 'comfortable' | 'spacious';
 
 interface PlayerListItemProps {
   player: Player;
@@ -29,6 +34,7 @@ interface PlayerListItemProps {
   onDragStart: (e: React.DragEvent<HTMLDivElement>) => void;
   onAssignTeam: (team: Team) => void;
   isOnField: boolean;
+  viewMode?: PlayerCardViewMode;
 }
 
 /**
@@ -42,11 +48,16 @@ const PlayerListItem: React.FC<PlayerListItemProps> = ({
   onDragStart,
   onAssignTeam,
   isOnField,
+  viewMode = 'comfortable',
 }) => {
   const handleTeamClick = (e: React.MouseEvent, team: Team) => {
     e.stopPropagation();
     onAssignTeam(team);
   };
+
+  const avatarSize = viewMode === 'compact' ? 'w-6 h-6' : viewMode === 'comfortable' ? 'w-8 h-8' : 'w-10 h-10';
+  const padding = viewMode === 'compact' ? 'p-1.5' : viewMode === 'comfortable' ? 'p-2' : 'p-3';
+  const fontSize = viewMode === 'compact' ? 'text-xs' : 'text-sm';
 
   return (
     <motion.div
@@ -55,10 +66,10 @@ const PlayerListItem: React.FC<PlayerListItemProps> = ({
       onDragStart={onDragStart as any}
       onClick={onSelect}
       onDoubleClick={onDoubleClick}
-      whileHover={{ scale: 1.02 }}
+      whileHover={{ scale: viewMode === 'compact' ? 1.01 : 1.02 }}
       whileTap={{ scale: 0.98 }}
       className={`
-        group relative flex items-center p-3 rounded-lg cursor-pointer transition-all
+        group relative flex items-center ${padding} rounded-lg cursor-pointer transition-all
         ${
           isSelected
             ? 'bg-blue-600/30 ring-1 ring-blue-500'
@@ -69,7 +80,7 @@ const PlayerListItem: React.FC<PlayerListItemProps> = ({
       `}
     >
       {/* Player Avatar */}
-      <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm mr-3 border-2 border-slate-600">
+      <div className={`flex-shrink-0 ${avatarSize} rounded-full flex items-center justify-center font-bold ${viewMode === 'compact' ? 'text-xs' : 'text-sm'} ${viewMode === 'compact' ? 'mr-2' : 'mr-3'} border-2 border-slate-600`}>
         <div
           className="w-full h-full rounded-full flex items-center justify-center text-white"
           style={{ backgroundColor: player.teamColor || '#6b7280' }}
@@ -80,16 +91,28 @@ const PlayerListItem: React.FC<PlayerListItemProps> = ({
 
       {/* Player Info */}
       <div className="flex-grow min-w-0">
-        <div className="flex items-center">
-          <p className="font-semibold text-sm text-white truncate">{player.name}</p>
-          {isOnField && <div className="ml-2 w-2 h-2 bg-green-400 rounded-full animate-pulse" />}
-        </div>
-        <div className="flex items-center mt-1">
-          <p className="text-xs text-slate-400 capitalize truncate">
-            {player.roleId?.replace('-', ' ') || 'Player'}
-          </p>
-          <span className="ml-2 text-xs text-slate-400">Rating: {player.rating || 75}</span>
-        </div>
+        {viewMode === 'compact' ? (
+          <div className="flex items-center justify-between">
+            <p className={`font-semibold ${fontSize} text-white truncate`}>{player.name}</p>
+            {isOnField && <div className="ml-2 w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />}
+            <span className="ml-2 text-xs text-slate-400 flex-shrink-0">{player.rating || 75}</span>
+          </div>
+        ) : (
+          <>
+            <div className="flex items-center">
+              <p className={`font-semibold ${fontSize} text-white truncate`}>{player.name}</p>
+              {isOnField && <div className="ml-2 w-2 h-2 bg-green-400 rounded-full animate-pulse" />}
+            </div>
+            {viewMode !== 'compact' && (
+              <div className="flex items-center mt-1">
+                <p className="text-xs text-slate-400 capitalize truncate">
+                  {player.roleId?.replace('-', ' ') || 'Player'}
+                </p>
+                <span className="ml-2 text-xs text-slate-400">Rating: {player.rating || 75}</span>
+              </div>
+            )}
+          </>
+        )}
       </div>
 
       {/* Team Assignment Buttons */}
@@ -307,6 +330,17 @@ export const LeftSidebar: React.FC = () => {
   const [filterRole, setFilterRole] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'name' | 'rating' | 'position'>('name');
   const [isSuggestingFormation, setIsSuggestingFormation] = useState(false);
+  const [playerCardViewMode, setPlayerCardViewMode] = useState<PlayerCardViewMode>(() => {
+    // Load from localStorage or default to 'comfortable'
+    const saved = localStorage.getItem('playerCardViewMode');
+    return (saved as PlayerCardViewMode) || 'comfortable';
+  });
+
+  // Save view mode preference
+  const handleViewModeChange = useCallback((mode: PlayerCardViewMode) => {
+    setPlayerCardViewMode(mode);
+    localStorage.setItem('playerCardViewMode', mode);
+  }, []);
 
   // Extract data from context
   const { players, formations, activeFormationIds, playbook } = tacticsState;
@@ -436,10 +470,48 @@ export const LeftSidebar: React.FC = () => {
               <Users className="w-4 h-4 mr-2" />
               Player Roster
             </h3>
-            <button className="text-xs text-blue-400 hover:text-blue-300 font-semibold flex items-center">
-              <PlusCircle className="w-3 h-3 mr-1" />
-              Add Player
-            </button>
+            <div className="flex items-center gap-1">
+              {/* View Mode Toggle */}
+              <div className="flex items-center bg-slate-800/50 rounded-lg p-0.5 mr-2">
+                <button
+                  onClick={() => handleViewModeChange('compact')}
+                  className={`p-1.5 rounded transition-colors ${
+                    playerCardViewMode === 'compact'
+                      ? 'bg-blue-600 text-white'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                  title="Compact View"
+                >
+                  <Minimize2 className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={() => handleViewModeChange('comfortable')}
+                  className={`p-1.5 rounded transition-colors ${
+                    playerCardViewMode === 'comfortable'
+                      ? 'bg-blue-600 text-white'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                  title="Comfortable View"
+                >
+                  <AlignJustify className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={() => handleViewModeChange('spacious')}
+                  className={`p-1.5 rounded transition-colors ${
+                    playerCardViewMode === 'spacious'
+                      ? 'bg-blue-600 text-white'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                  title="Spacious View"
+                >
+                  <Maximize2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+              <button className="text-xs text-blue-400 hover:text-blue-300 font-semibold flex items-center">
+                <PlusCircle className="w-3 h-3 mr-1" />
+                Add
+              </button>
+            </div>
           </div>
 
           {/* Search and Filters */}
@@ -580,10 +652,13 @@ export const LeftSidebar: React.FC = () => {
                           player={player}
                           isSelected={selectedPlayerId === player.id}
                           onSelect={() => handlePlayerSelect(player.id)}
-                          onDoubleClick={() => console.log('Edit player:', player.id)}
+                          onDoubleClick={() => {
+                            // Handle player edit
+                          }}
                           onDragStart={e => handlePlayerDragStart(e, player.id)}
                           onAssignTeam={team => handleAssignTeam(player.id, team)}
                           isOnField={playersOnField.has(player.id)}
+                          viewMode={playerCardViewMode}
                         />
                       ))}
                     </div>

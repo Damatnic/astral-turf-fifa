@@ -236,7 +236,7 @@ export const SelectionContextMenu: React.FC<SelectionContextMenuProps> = ({
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: -10 }}
         transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-        className="absolute z-50 bg-slate-900 border border-slate-700 rounded-lg shadow-2xl overflow-hidden"
+        className="absolute z-[9999] bg-slate-900/98 backdrop-blur-xl border border-slate-700 rounded-lg shadow-2xl overflow-hidden pointer-events-auto"
         style={{
           left: `${position.x}%`,
           top: `${position.y}%`,
