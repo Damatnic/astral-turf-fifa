@@ -231,33 +231,361 @@ Files: 9 changed, 1058 insertions(+), 30 deletions(-)
 
 ---
 
-## Upcoming Tasks
+## Task #5: Email Verification ✅
 
-### ⏭️ Task #5: Email Verification
+**Status:** Complete  
+**Completion Date:** October 7, 2025  
+**Commits:** 2231ce8, dd3284d
 
-**Goal:** Implement email verification for new user registrations
+### Overview
 
-**Planned Implementation:**
-- Email service setup (SendGrid/AWS SES/Nodemailer)
-- Generate verification tokens
-- Send verification emails
-- Create verification endpoint
-- Add resend verification email functionality
+Implemented a comprehensive email verification system that ensures users verify their email addresses before gaining full access to the platform. The system uses cryptographically secure tokens, professional HTML email templates, and includes rate limiting to prevent abuse.
 
-**Benefits:**
-- Verify user email addresses
-- Reduced database load
-- Better scalability
-- Token revocation support
+### Implementation Details
+
+#### Email Infrastructure
+
+**MailModule & MailService:**
+- Flexible SMTP configuration (Gmail, SendGrid, AWS SES)
+- Professional HTML email templates with Handlebars
+- Error handling with detailed logging
+- Support for verification, welcome, and password reset emails
+
+**Email Templates:**
+- `verification-email.hbs` - Beautiful gradient design with verification link
+- `welcome-email.hbs` - Welcome message with feature highlights after verification
+- Responsive design with inline CSS
+- Professional branding and clear call-to-action
+
+#### Database Schema
+
+**User Entity Updates:**
+```typescript
+@Column({ name: 'email_verified', default: false })
+emailVerified: boolean;
+
+@Column({ name: 'email_verification_token', nullable: true, select: false })
+emailVerificationToken?: string;
+
+@Column({ name: 'email_verification_expires', nullable: true })
+emailVerificationExpires?: Date;
+
+// Also added for future password reset (Task #6)
+@Column({ name: 'password_reset_token', nullable: true, select: false })
+passwordResetToken?: string;
+
+@Column({ name: 'password_reset_expires', nullable: true })
+passwordResetExpires?: Date;
+```
+
+**Migration Applied:**
+- Created indexed token fields for fast lookups
+- Partial indexes (WHERE token IS NOT NULL) for efficiency
+- Successfully applied to Neon PostgreSQL database
+
+#### Registration Flow Updates
+
+**Token Generation:**
+- Uses `crypto.randomBytes(32)` for 64-character hex tokens
+- Tokens are hashed with bcrypt before database storage
+- 24-hour expiration (configurable via `EMAIL_VERIFICATION_EXPIRY`)
+- One-time use tokens (cleared after verification)
+
+**Registration Response:**
+```json
+{
+  "user": {
+    "id": "uuid",
+    "email": "user@example.com",
+    "emailVerified": false,
+    ...
+  },
+  "message": "Registration successful! Please check your email to verify your account."
+}
+```
+
+**Note:** Registration no longer returns JWT tokens immediately. Users must verify their email first, then log in.
+
+#### Verification Endpoints
+
+**POST /api/auth/verify-email**
+- Validates verification token
+- Checks token expiration
+- Marks user as verified
+- Clears verification token
+- Sends welcome email
+- Returns success message with user data
+
+**POST /api/auth/resend-verification**
+- Rate limited: 3 requests per 5 minutes per IP
+- Generates new verification token
+- Updates token and expiration in database
+- Sends new verification email
+- Generic response for security (doesn't reveal if email exists)
+
+#### Security Features
+
+**Token Security:**
+- Cryptographically secure random generation
+- Hashed storage (never plain text in database)
+- Time-limited validity (24 hours)
+- One-time use (deleted after verification)
+
+**Rate Limiting:**
+- Resend endpoint: 3 requests / 5 minutes
+- Prevents email bombing attacks
+- Uses @nestjs/throttler
+
+**Privacy:**
+- Generic error messages (doesn't reveal email existence)
+- Detailed errors logged server-side only
+- Verification tokens excluded from SELECT queries
+
+#### Integration
+
+**MailModule Import:**
+- Added to AuthModule imports
+- MailService injected into AuthService
+- Configured with environment variables
+
+**Email Sending:**
+- Verification email sent on registration
+- Welcome email sent after successful verification
+- Error logging (doesn't fail registration if email fails)
+- Async email sending (non-blocking)
+
+**Login Updates:**
+- Login response now includes `emailVerified: boolean`
+- Frontend can show verification reminders
+- Allow resending verification from login screen
+
+#### Email Configuration
+
+**Environment Variables:**
+```bash
+# SMTP Settings - Choose one provider
+
+# Option 1: Gmail (Development/Testing)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=your_email@gmail.com
+SMTP_PASSWORD=your_16_character_app_password
+EMAIL_FROM="Astral Turf" <noreply@astralturf.com>
+
+# Option 2: SendGrid (Recommended for Production)
+# SMTP_HOST=smtp.sendgrid.net
+# SMTP_USER=apikey
+# SMTP_PASSWORD=your_sendgrid_api_key
+
+# Option 3: AWS SES (High Volume Production)
+# SMTP_HOST=email-smtp.us-east-1.amazonaws.com
+# SMTP_USER=your_aws_access_key_id
+# SMTP_PASSWORD=your_aws_secret_access_key
+
+# Verification Settings
+EMAIL_VERIFICATION_EXPIRY=86400  # 24 hours in seconds
+ENABLE_EMAIL_VERIFICATION=true
+FRONTEND_URL=http://localhost:3000
+```
+
+#### Files Created/Modified
+
+**New Files:**
+- `backend/src/mail/mail.module.ts` - Mail module configuration
+- `backend/src/mail/mail.service.ts` - Email service (117 lines)
+- `backend/src/mail/templates/verification-email.hbs` - Verification email template
+- `backend/src/mail/templates/welcome-email.hbs` - Welcome email template
+- `backend/src/auth/dto/verify-email.dto.ts` - Verification DTO
+- `backend/src/auth/dto/resend-verification.dto.ts` - Resend DTO
+- `backend/src/auth/guards/email-verified.guard.ts` - Optional guard for protected routes
+- `backend/src/database/migrations/1728324000000-AddEmailAndPasswordResetTokens.ts` - Migration
+- `backend/PHASE2_TASK5_EMAIL_VERIFICATION_PLAN.md` - Comprehensive implementation plan
+
+**Modified Files:**
+- `backend/src/auth/auth.module.ts` - Imported MailModule
+- `backend/src/auth/auth.service.ts` - Added verification methods (170+ lines added)
+- `backend/src/auth/auth.controller.ts` - Added verification endpoints
+- `backend/src/users/entities/user.entity.ts` - Added verification fields
+- `backend/.env.example` - Added email configuration with examples
+- `backend/package.json` - Added email dependencies
+
+**Dependencies Added:**
+- `@nestjs-modules/mailer` - NestJS email module
+- `nodemailer` - Email sending library  
+- `handlebars` - Template engine
+- `@types/nodemailer` - TypeScript types
+
+#### Testing Workflow
+
+**Manual Testing with PowerShell:**
+
+```powershell
+# 1. Register new user
+$body = @{
+  email = "test@example.com"
+  password = "Test123!"
+  firstName = "Test"
+  lastName = "User"
+  role = "player"
+} | ConvertTo-Json
+
+$response = Invoke-RestMethod -Uri "http://localhost:3333/api/auth/register" `
+  -Method POST -Body $body -ContentType "application/json"
+
+# Response: { user: {...}, message: "Please check your email..." }
+# Check inbox for verification email
+
+# 2. Verify email with token from email
+$verifyBody = @{ token = "token-from-email-64-chars" } | ConvertTo-Json
+$verifyResponse = Invoke-RestMethod -Uri "http://localhost:3333/api/auth/verify-email" `
+  -Method POST -Body $verifyBody -ContentType "application/json"
+
+# Response: { message: "Email verified successfully!", user: {...} }
+
+# 3. Login after verification
+$loginBody = @{
+  email = "test@example.com"
+  password = "Test123!"
+} | ConvertTo-Json
+
+$loginResponse = Invoke-RestMethod -Uri "http://localhost:3333/api/auth/login" `
+  -Method POST -Body $loginBody -ContentType "application/json"
+
+# Response includes: emailVerified: true
+
+# 4. Resend verification (if needed)
+$resendBody = @{ email = "test@example.com" } | ConvertTo-Json
+Invoke-RestMethod -Uri "http://localhost:3333/api/auth/resend-verification" `
+  -Method POST -Body $resendBody -ContentType "application/json"
+
+# Response: { message: "Verification email sent successfully!" }
+# Rate limited: 3 requests / 5 minutes
+```
+
+#### Optional: EmailVerified Guard
+
+**Usage Example:**
+```typescript
+import { UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { EmailVerifiedGuard } from './guards/email-verified.guard';
+
+@UseGuards(JwtAuthGuard, EmailVerifiedGuard)
+@Get('premium-feature')
+async premiumFeature() {
+  // Only verified users can access this
+}
+```
+
+**Guard Behavior:**
+- Checks if user.emailVerified === true
+- Throws ForbiddenException with helpful message if not verified
+- Can be applied to individual routes or entire controllers
+
+#### Git Commits
+
+**Commit 1: Email Infrastructure (2231ce8)**
+```
+feat(backend): Add email service infrastructure for Task #5
+
+- Install @nestjs-modules/mailer, nodemailer, and handlebars
+- Create MailModule with SMTP configuration
+- Implement MailService with verification, welcome, and reset emails
+- Design professional HTML email templates
+- Update .env.example with detailed email configuration
+- Support Gmail, SendGrid, and AWS SES
+
+Files: 8 changed, 3504 insertions(+)
+```
+
+**Commit 2: Verification Implementation (dd3284d)**
+```
+feat(backend): Implement email verification system (Task #5)
+
+- Add verification token fields to User entity
+- Create and apply database migration
+- Generate secure 64-char tokens (crypto.randomBytes)
+- Hash tokens with bcrypt before storage
+- Send verification email on registration
+- Implement verifyEmail() and resendVerificationEmail()
+- Add verification endpoints with rate limiting
+- Registration returns message instead of tokens
+- Login includes emailVerified status
+
+Files: 9 changed, 293 insertions(+)
+```
+
+### Benefits Achieved
+
+✅ **Email Validation:** Ensures valid, accessible email addresses  
+✅ **Security:** Prevents fake/throwaway email registrations  
+✅ **User Engagement:** Professional welcome emails build trust  
+✅ **Scalability:** Rate limiting prevents abuse  
+✅ **Flexibility:** Support for multiple email providers  
+✅ **Future-Ready:** Password reset infrastructure in place  
+
+### Success Metrics
+
+- ✅ Email service configured and operational
+- ✅ Professional email templates created
+- ✅ Database schema updated and migrated
+- ✅ Registration flow sends verification emails
+- ✅ Verification endpoint working correctly
+- ✅ Resend functionality with rate limiting
+- ✅ Welcome emails sent after verification
+- ✅ Login response includes verification status
+- ✅ Optional EmailVerified guard available
+- ✅ Comprehensive documentation created
+
+### Configuration Notes
+
+**For Development:**
+1. Use Gmail with app password (easiest setup)
+2. Generate app password: https://myaccount.google.com/apppasswords
+3. Add credentials to `.env`
+4. Test with your own email address
+
+**For Production:**
+- Use SendGrid (recommended) or AWS SES
+- SendGrid free tier: 100 emails/day
+- AWS SES: Very cost-effective for high volume
+- Always use environment variables
+- Never commit credentials
+
+### Frontend Integration Points
+
+**After Registration:**
+1. Show "Please check your email" message
+2. Provide "Resend verification email" button
+3. Show countdown timer before allowing resend (5 minutes)
+4. Display email verification banner until verified
+
+**Email Verification Page:**
+```
+/verify-email?token=<64-char-token>
+```
+- Extract token from URL query parameter
+- Call POST /api/auth/verify-email with token
+- Show success message and redirect to login
+- Handle expired token error with resend option
+
+**Login Screen:**
+- If `emailVerified: false` in login response:
+  - Show verification reminder banner
+  - Provide "Resend verification email" button
+  - Allow user to continue (optional based on requirements)
+
+**Protected Features:**
+- Apply `EmailVerifiedGuard` to premium features
+- Show verification prompt when accessing protected routes
+- Guide user to verify email to unlock features
 
 ---
 
-### ⏭️ Task #5: Email Verification
+## Upcoming Tasks
 
-**Goal:** Implement email verification for new user registrations
-
-**Planned Implementation:**
-- Email service setup (SendGrid/AWS SES/Nodemailer)
+### ⏭️ Task #6: Password Reset Flow
 - Generate verification tokens
 - Send verification emails
 - Create verification endpoint
