@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, HttpCode, HttpStatus, Request } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -6,6 +6,7 @@ import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { Public } from './decorators/public.decorator';
 import { CurrentUser } from './decorators/current-user.decorator';
+import { Request as ExpressRequest } from 'express';
 
 @Controller('auth')
 @UseGuards(JwtAuthGuard) // Apply JWT auth globally to all auth routes
@@ -28,8 +29,17 @@ export class AuthController {
 
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  async logout(@CurrentUser() user: { id: string }, @Body('refreshToken') refreshToken: string) {
-    await this.authService.logout(user.id, refreshToken);
+  async logout(
+    @CurrentUser() user: { id: string },
+    @Body('refreshToken') refreshToken: string,
+    @Request() req: ExpressRequest
+  ) {
+    // Extract access token from Authorization header
+    const authHeader = req.headers['authorization'] || req.headers['Authorization'];
+    const accessToken =
+      typeof authHeader === 'string' ? authHeader.replace('Bearer ', '') : undefined;
+
+    await this.authService.logout(user.id, refreshToken, accessToken);
     return { message: 'Logged out successfully' };
   }
 

@@ -5,6 +5,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { RedisModule } from './redis/redis.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
 
@@ -45,6 +46,7 @@ import { RolesGuard } from './auth/guards/roles.guard';
     }),
 
     // Feature modules
+    RedisModule,
     AuthModule,
     UsersModule,
   ],

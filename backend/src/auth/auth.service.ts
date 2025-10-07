@@ -7,6 +7,7 @@ import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
 import { User, UserRole } from '../users/entities/user.entity';
 import { Session } from '../users/entities/session.entity';
+import { SessionService } from '../redis/session.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 
@@ -16,6 +17,7 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private sessionService: SessionService,
     @InjectRepository(Session)
     private sessionsRepository: Repository<Session>
   ) {}
@@ -42,9 +44,7 @@ export class AuthService {
     return result;
   }
 
-  async register(
-    registerDto: RegisterDto
-  ): Promise<{
+  async register(registerDto: RegisterDto): Promise<{
     user: Omit<User, 'password'>;
     tokens: { accessToken: string; refreshToken: string };
   }> {
@@ -66,7 +66,7 @@ export class AuthService {
     });
 
     const tokens = await this.generateTokens(user);
-    await this.createSession(user.id, tokens.refreshToken);
+    await this.createSession(user.id, tokens.refreshToken, tokens.accessToken);
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password: userPassword, ...userWithoutPassword } = user;
@@ -77,9 +77,7 @@ export class AuthService {
     };
   }
 
-  async login(
-    loginDto: LoginDto
-  ): Promise<{
+  async login(loginDto: LoginDto): Promise<{
     user: Omit<User, 'password'>;
     tokens: { accessToken: string; refreshToken: string };
   }> {
@@ -91,8 +89,8 @@ export class AuthService {
 
     await this.usersService.updateLastLogin(user.id);
 
-    const tokens = await this.generateTokens(user as any);
-    await this.createSession(user.id, tokens.refreshToken);
+    const tokens = await this.generateTokens(user as User);
+    await this.createSession(user.id, tokens.refreshToken, tokens.accessToken);
 
     return {
       user,
@@ -100,11 +98,23 @@ export class AuthService {
     };
   }
 
-  async logout(userId: string, refreshToken: string): Promise<void> {
-    await this.sessionsRepository.delete({
-      userId,
-      refreshToken,
+  async logout(userId: string, refreshToken: string, accessToken?: string): Promise<void> {
+    // Delete session (works with both Redis and PostgreSQL)
+    const session = await this.sessionsRepository.findOne({
+      where: { userId, refreshToken },
     });
+
+    if (session) {
+      await this.sessionService.deleteSession(session.id);
+    }
+
+    // Blacklist access token for immediate invalidation (Redis only)
+    if (accessToken) {
+      const accessTokenTtl = this.getTokenTtl(accessToken);
+      if (accessTokenTtl > 0) {
+        await this.sessionService.blacklistToken(accessToken, accessTokenTtl);
+      }
+    }
   }
 
   async refreshTokens(
@@ -136,11 +146,36 @@ export class AuthService {
       const tokens = await this.generateTokens(user);
 
       // Create new session
-      await this.createSession(user.id, tokens.refreshToken);
+      await this.createSession(user.id, tokens.refreshToken, tokens.accessToken);
 
       return tokens;
     } catch {
       throw new UnauthorizedException('Invalid refresh token');
+    }
+  }
+
+  /**
+   * Check if an access token is blacklisted
+   */
+  async isTokenBlacklisted(token: string): Promise<boolean> {
+    return await this.sessionService.isTokenBlacklisted(token);
+  }
+
+  /**
+   * Get remaining TTL for a token (in seconds)
+   */
+  private getTokenTtl(token: string): number {
+    try {
+      const decoded = this.jwtService.decode(token) as { exp?: number };
+      if (!decoded || !decoded.exp) {
+        return 0;
+      }
+
+      const now = Math.floor(Date.now() / 1000);
+      const ttl = decoded.exp - now;
+      return ttl > 0 ? ttl : 0;
+    } catch {
+      return 0;
     }
   }
 
@@ -164,14 +199,28 @@ export class AuthService {
     };
   }
 
-  private async createSession(userId: string, refreshToken: string): Promise<void> {
+  private async createSession(
+    userId: string,
+    refreshToken: string,
+    _accessToken: string
+  ): Promise<void> {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7); // 7 days
 
-    await this.sessionsRepository.save({
-      userId,
-      refreshToken,
-      expiresAt,
-    });
+    // Try to use SessionService (Redis-first with PostgreSQL fallback)
+    try {
+      await this.sessionService.createSession({
+        userId,
+        refreshToken,
+        expiresAt,
+      });
+    } catch {
+      // If SessionService fails, fallback to direct PostgreSQL
+      await this.sessionsRepository.save({
+        userId,
+        refreshToken,
+        expiresAt,
+      });
+    }
   }
 }
