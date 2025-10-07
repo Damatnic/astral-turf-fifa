@@ -12,6 +12,7 @@ import { User } from '../../users/entities/user.entity';
 import { TeamMember } from './team-member.entity';
 import { TeamInvitation } from './team-invitation.entity';
 import { Player } from '../../players/entities/player.entity';
+import { Formation } from '../../formations/entities/formation.entity';
 
 @Entity('teams')
 export class Team {
@@ -45,6 +46,9 @@ export class Team {
 
   @OneToMany(() => Player, player => player.team)
   players: Player[];
+
+  @OneToMany(() => Formation, formation => formation.team)
+  formations: Formation[];
 
   @CreateDateColumn()
   createdAt: Date;
