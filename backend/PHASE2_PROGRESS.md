@@ -583,20 +583,298 @@ Files: 9 changed, 293 insertions(+)
 
 ---
 
-## Upcoming Tasks
+### ✅ Task #6: Password Reset Flow - COMPLETE
 
-### ⏭️ Task #6: Password Reset Flow
-- Generate verification tokens
-- Send verification emails
-- Create verification endpoint
-- Add resend verification email functionality
+**Completion Date:** October 7, 2025  
+**Git Commits:** d54fe89
 
-**Benefits:**
-- Verify user email addresses
-- Prevent fake accounts
-- Secure account creation
+#### Overview
+
+Implemented a comprehensive password reset system that allows users to securely reset forgotten passwords via email. The system includes token generation, email notifications, password validation, and automatic session invalidation.
+
+#### Implementation Details
+
+**1. Email Templates** (`src/mail/templates/`)
+
+**password-reset-email.hbs:**
+- Professional gradient design matching brand identity
+- Clear "Reset Password" button
+- Security warnings and expiration notice (1 hour)
+- Alternative copy/paste link
+- "Didn't request this?" guidance
+- Responsive HTML design
+
+**password-changed-email.hbs:**
+- Confirmation email sent after successful password reset
+- Formatted timestamp of password change
+- Security alert if user didn't initiate change
+- "Log In Now" button
+- Support contact information
+- Security tips
+
+**2. DTOs** (`src/auth/dto/`)
+
+**ForgotPasswordDto:**
+```typescript
+{
+  email: string // @IsEmail validation
+}
+```
+
+**ResetPasswordDto:**
+```typescript
+{
+  token: string,           // 64-character token
+  newPassword: string      // Validated for strength
+}
+```
+
+**Password Strength Requirements:**
+- Minimum 8 characters
+- At least 1 uppercase letter
+- At least 1 lowercase letter
+- At least 1 number or special character
+
+**3. Service Methods** (`src/auth/auth.service.ts`)
+
+**forgotPassword(email: string):**
+- Find user by email (silent failure if not found)
+- Generate secure 64-character token (`crypto.randomBytes`)
+- Hash token with bcrypt before storage
+- Set 1-hour expiration
+- Send password reset email
+- Return generic success message (prevents email enumeration)
+
+**resetPassword(token: string, newPassword: string):**
+- Find user with valid, non-expired reset token
+- Verify token using bcrypt comparison
+- Validate password strength
+- Hash new password
+- Clear reset token (one-time use)
+- Invalidate all user sessions (force re-login)
+- Send password changed confirmation email
+
+**invalidateAllUserSessions(userId: string):**
+- Delete all database sessions for user
+- Clear all Redis sessions if available
+- Force user to log in again with new password
+
+**4. Mail Service Updates** (`src/mail/mail.service.ts`)
+
+**sendPasswordResetEmail():**
+- Sends professional reset link email
+- Includes token in URL query parameter
+- 1-hour expiration notice
+- Security warnings
+
+**sendPasswordChangedEmail():**
+- Sends confirmation after password change
+- Includes formatted timestamp
+- Security alerts
+- Support contact
+
+**5. API Endpoints** (`src/auth/auth.controller.ts`)
+
+**POST /api/auth/forgot-password**
+- Public endpoint (no authentication required)
+- Rate limited: 3 requests per 15 minutes
+- Accepts: `{ email: string }`
+- Returns: Generic success message
+- Sends password reset email if account exists
+
+**POST /api/auth/reset-password**
+- Public endpoint (token-based authentication)
+- Rate limited: 5 requests per 15 minutes
+- Accepts: `{ token: string, newPassword: string }`
+- Validates password strength
+- Updates password and invalidates sessions
+- Returns: Success message
+
+#### Security Features
+
+**Token Security:**
+- ✅ 64-character cryptographically secure tokens
+- ✅ Bcrypt hashing before database storage
+- ✅ 1-hour expiration (shorter than email verification)
+- ✅ One-time use (deleted after successful reset)
+- ✅ No token reuse allowed
+
+**Privacy Protection:**
+- ✅ Generic responses (don't reveal if email exists)
+- ✅ Detailed errors logged server-side only
+- ✅ No user enumeration possible
+- ✅ Rate limiting prevents abuse
+
+**Session Security:**
+- ✅ All sessions invalidated on password change
+- ✅ Force re-authentication required
+- ✅ Redis session clearing (if available)
+- ✅ PostgreSQL session deletion
+
+**Email Security:**
+- ✅ Confirmation email sent after change
+- ✅ Security warning if user didn't request
+- ✅ Support contact provided
+- ✅ Clear security guidance
+
+#### Rate Limiting
+
+**Forgot Password:**
+- 3 requests per 15 minutes per IP
+- Prevents email bombing
+- Protects against abuse
+
+**Reset Password:**
+- 5 requests per 15 minutes per IP
+- Allows multiple attempts
+- Prevents brute force attacks
+
+#### Testing Workflow
+
+**1. Request Password Reset:**
+```powershell
+$forgotBody = @{ 
+  email = "user@example.com" 
+} | ConvertTo-Json
+
+Invoke-RestMethod -Uri "http://localhost:3333/api/auth/forgot-password" `
+  -Method POST -Body $forgotBody -ContentType "application/json"
+
+# Response: { message: "If an account exists with this email..." }
+```
+
+**2. Check Email:**
+- User receives password reset email
+- Email contains reset link: `/reset-password?token=xxx`
+- Token valid for 1 hour
+
+**3. Reset Password:**
+```powershell
+$resetBody = @{
+  token = "64-character-token-from-email"
+  newPassword = "NewSecure123!"
+} | ConvertTo-Json
+
+Invoke-RestMethod -Uri "http://localhost:3333/api/auth/reset-password" `
+  -Method POST -Body $resetBody -ContentType "application/json"
+
+# Response: { message: "Password has been reset successfully..." }
+```
+
+**4. Verify Sessions Invalidated:**
+```powershell
+# Old access tokens no longer work
+# User must log in with new password
+```
+
+**5. Login with New Password:**
+```powershell
+$loginBody = @{
+  email = "user@example.com"
+  password = "NewSecure123!"
+} | ConvertTo-Json
+
+Invoke-RestMethod -Uri "http://localhost:3333/api/auth/login" `
+  -Method POST -Body $loginBody -ContentType "application/json"
+```
+
+#### Email Flow
+
+1. **User Requests Reset:**
+   - User clicks "Forgot Password?" on login page
+   - Enters email address
+   - Submits POST /api/auth/forgot-password
+
+2. **Email Sent:**
+   - User receives password reset email
+   - Email contains secure reset link
+   - Token valid for 1 hour
+
+3. **User Clicks Link:**
+   - Redirects to frontend: `/reset-password?token=xxx`
+   - Frontend shows new password form
+
+4. **User Submits New Password:**
+   - POST /api/auth/reset-password
+   - Password validated
+   - All sessions invalidated
+
+5. **Confirmation Email:**
+   - User receives password changed email
+   - Security notification
+   - Login button
+
+6. **User Logs In:**
+   - Must use new password
+   - Previous sessions invalid
+
+#### Frontend Integration
+
+**Forgot Password Page:**
+```typescript
+// /forgot-password
+const handleForgotPassword = async (email: string) => {
+  await api.post('/auth/forgot-password', { email });
+  // Show: "Check your email for reset instructions"
+  // Start 15-minute countdown before allowing resend
+};
+```
+
+**Reset Password Page:**
+```typescript
+// /reset-password?token=xxx
+const handleResetPassword = async (token: string, newPassword: string) => {
+  await api.post('/auth/reset-password', { token, newPassword });
+  // Show: "Password reset successful!"
+  // Redirect to login page
+};
+```
+
+**Password Strength Indicator:**
+- Real-time validation as user types
+- Show requirements checklist
+- Green checkmarks for met requirements
+- Red X for unmet requirements
+- Disable submit until all requirements met
+
+#### Database Schema
+
+Already implemented in Task #5 migration:
+```sql
+ALTER TABLE users ADD COLUMN "password_reset_token" varchar(255);
+ALTER TABLE users ADD COLUMN "password_reset_expires" timestamp;
+CREATE INDEX idx_users_password_reset_token 
+  ON users(password_reset_token) 
+  WHERE password_reset_token IS NOT NULL;
+```
+
+#### Files Changed
+
+**New Files (5):**
+1. `src/mail/templates/password-reset-email.hbs` - Reset link email
+2. `src/mail/templates/password-changed-email.hbs` - Confirmation email
+3. `src/auth/dto/forgot-password.dto.ts` - Forgot password DTO
+4. `src/auth/dto/reset-password.dto.ts` - Reset password DTO
+5. `PHASE2_TASK6_PASSWORD_RESET_PLAN.md` - Implementation plan
+
+**Modified Files (3):**
+1. `src/auth/auth.service.ts` - Added password reset methods (~150 lines)
+2. `src/auth/auth.controller.ts` - Added reset endpoints
+3. `src/mail/mail.service.ts` - Added email methods (~60 lines)
+
+**Total:** 8 files, 834 insertions, ~500 lines of code
+
+#### Git Commit Details
+
+**Commit:** d54fe89  
+**Message:** "feat(auth): Implement password reset flow (Task #6)"  
+**Files Changed:** 8 files  
+**Insertions:** 834 lines  
+**Branch:** master
 
 ---
+
+## Phase 2: 100% COMPLETE! 🎉
 
 ### ⏭️ Task #6: Password Reset Flow
 
@@ -731,14 +1009,17 @@ Files: 9 changed, 293 insertions(+)
 - SQL injection prevention (TypeORM)
 - CORS configuration
 - Environment variable protection
-
-⏭️ **Planned:**
 - Email verification
-- Password reset tokens
+- Password reset with secure tokens
 - Token blacklist (Redis)
-- Account lockout
-- Audit logging
-- Rate limiting per role
+- Session invalidation on password change
+- Rate limiting per endpoint
+
+⏭️ **Planned (Future Enhancements):**
+- Account lockout after failed attempts
+- Comprehensive audit logging
+- Two-factor authentication (2FA)
+- OAuth integration (Google, GitHub)
 
 ---
 
@@ -757,25 +1038,44 @@ Files: 9 changed, 293 insertions(+)
 - ✅ Role-based access (admin, coach, player)
 - ✅ Public route access
 - ✅ Unauthenticated request denial
+- ✅ Email verification flow
+- ✅ Resend verification email
+- ✅ Password reset request
+- ✅ Password reset with token
+- ✅ Session invalidation on password change
 
 ---
 
 ## Summary
 
-**Phase 2 Progress:** 25% (1 of 4 tasks complete)
+**Phase 2 Progress:** 100% COMPLETE! 🎉 (4 of 4 tasks complete)
 
-**Task #3 (RBAC) - Key Achievements:**
-- ✅ Production-ready authorization system
-- ✅ Four distinct user roles
-- ✅ Global guards protecting all endpoints
-- ✅ Flexible decorator-based permissions
-- ✅ Comprehensive documentation
-- ✅ All tests passing
+**All Tasks Completed:**
+- ✅ Task #3: RBAC System
+- ✅ Task #4: Redis Session Store  
+- ✅ Task #5: Email Verification
+- ✅ Task #6: Password Reset Flow
 
-**Ready for Next Task:** ✅ Redis Session Store
+**Key Achievements:**
+- ✅ Production-ready authentication system
+- ✅ Role-based authorization (4 roles)
+- ✅ Redis-first session management with PostgreSQL fallback
+- ✅ Email verification with professional templates
+- ✅ Secure password reset flow
+- ✅ Comprehensive security features
+- ✅ Rate limiting protection
+- ✅ Session invalidation
+- ✅ Token blacklisting
+- ✅ All features documented and tested
+
+**Lines of Code:** ~2,500 lines  
+**Files Created:** 30+ files  
+**Commits:** 4 major commits
+
+**Ready for:** ✅ Phase 3: Feature Development
 
 ---
 
 **Last Updated:** October 7, 2025  
 **Current Branch:** master  
-**Latest Commit:** 40201c6 - "feat(backend): Implement Role-Based Access Control (RBAC)"
+**Latest Commit:** d54fe89 - "feat(auth): Implement password reset flow (Task #6)"
