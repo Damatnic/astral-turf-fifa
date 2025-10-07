@@ -10,6 +10,7 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { UploadsModule } from './uploads/uploads.module';
 import { TeamsModule } from './teams/teams.module';
+import { PlayersModule } from './players/players.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { TeamsModule } from './teams/teams.module';
     UsersModule,
     UploadsModule,
     TeamsModule,
+    PlayersModule,
   ],
   providers: [
     // Global guards - apply JWT auth and role-based access control to all routes
