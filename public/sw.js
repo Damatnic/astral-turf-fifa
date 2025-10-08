@@ -203,7 +203,10 @@ function getCacheStrategy(request) {
 
 // Install event - cache static resources
 self.addEventListener('install', event => {
-  console.log('[SW] Installing enhanced service worker');
+  console.log('[SW] Installing enhanced service worker v3 - FORCE UPDATE');
+  
+  // FORCE skip waiting immediately on install
+  self.skipWaiting();
 
   event.waitUntil(
     caches
@@ -214,10 +217,10 @@ self.addEventListener('install', event => {
       })
       .then(() => {
         console.log('[SW] Static assets pre-cached');
-        return self.skipWaiting();
       })
       .catch(error => {
         console.error('[SW] Pre-caching failed:', error);
+        // Don't fail install even if pre-caching fails
       }),
   );
 });
