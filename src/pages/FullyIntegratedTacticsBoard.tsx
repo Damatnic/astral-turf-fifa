@@ -141,9 +141,8 @@ const FullyIntegratedTacticsBoard: React.FC = () => {
     // Show tactical suggestions
     setShowTacticalSuggestions(true);
     
-    // TODO: Apply formation positions to players (would need formation application logic)
-    console.log('Formation selected:', formation.displayName);
-    console.log('AI Analysis:', analysis);
+    // Formation successfully analyzed and ready to apply
+    // TODO: Apply formation positions to players automatically
   }, [allPlayers]);
 
   // Keyboard shortcut for help

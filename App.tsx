@@ -4,6 +4,7 @@ import { AnimatePresence } from 'framer-motion';
 import { LoadingAnimation, PageTransition } from './src/components/ui/AnimationSystem';
 import { ThemeProvider } from './src/context/ThemeContext';
 import { AccessibilityProvider, SkipLink } from './src/components/ui/AccessibilityComponents';
+import { TacticsErrorBoundary } from './src/components/boundaries/TacticsErrorBoundary';
 import ProtectedRoute from './src/components/ProtectedRoute';
 import { useAuthContext } from './src/hooks/useAuthContext';
 import PWAInstallPrompt from './src/components/pwa/PWAInstallPrompt';
@@ -439,11 +440,13 @@ const AppContent: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <ThemeProvider defaultMode="system">
-      <AccessibilityProvider>
-        <AppContent />
-      </AccessibilityProvider>
-    </ThemeProvider>
+    <TacticsErrorBoundary>
+      <ThemeProvider defaultMode="system">
+        <AccessibilityProvider>
+          <AppContent />
+        </AccessibilityProvider>
+      </ThemeProvider>
+    </TacticsErrorBoundary>
   );
 };
 
