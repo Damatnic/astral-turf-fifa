@@ -370,14 +370,6 @@ const AppContent: React.FC = () => {
                     }
                   />
                   <Route
-                    path="player-card"
-                    element={
-                      <PageTransition>
-                        <PlayerCardPage />
-                      </PageTransition>
-                    }
-                  />
-                  <Route
                     path="skill-challenges"
                     element={
                       <PageTransition>
