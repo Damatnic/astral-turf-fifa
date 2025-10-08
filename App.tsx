@@ -47,6 +47,7 @@ const InternationalManagementPage = lazy(() => import('./src/pages/International
 const OppositionAnalysisPage = lazy(() => import('./src/pages/OppositionAnalysisPage'));
 const PressConferencePage = lazy(() => import('./src/pages/PressConferencePage'));
 const PlayerProfilePage = lazy(() => import('./src/pages/PlayerProfilePage'));
+const UltimatePlayerProfilePage = lazy(() => import('./src/pages/UltimatePlayerProfilePage'));
 const SkillChallengesPage = lazy(() => import('./src/pages/SkillChallengesPage'));
 const MentoringPage = lazy(() => import('./src/pages/MentoringPage'));
 const AdvancedAnalyticsPage = lazy(() => import('./src/pages/AdvancedAnalyticsPage'));
@@ -366,7 +367,7 @@ const AppContent: React.FC = () => {
                     path="player/:playerId"
                     element={
                       <PageTransition>
-                        <PlayerProfilePage />
+                        <UltimatePlayerProfilePage />
                       </PageTransition>
                     }
                   />
