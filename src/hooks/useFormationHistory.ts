@@ -1,290 +1,253 @@
 /**
- * Formation History Hook - Undo/Redo System
- *
- * Provides undo/redo functionality for tactical changes including:
- * - Player position changes
- * - Formation changes
- * - Drawing additions/removals
- *
- * Features:
- * - Keyboard shortcuts (Ctrl+Z, Ctrl+Shift+Z)
- * - Configurable history limit
- * - State snapshotting
- * - Time travel debugging support
+ * Formation History Hook
+ * 
+ * Manages undo/redo functionality for formation changes
+ * with keyboard shortcuts and auto-save capabilities
  */
 
-import { useCallback, useEffect, useReducer } from 'react';
-import type { Player } from '../types';
-import type { DrawingShape } from '../types/ui';
-import type { Formation } from '../types/match';
+import { useState, useCallback, useEffect, useRef } from 'react';
+import type { Formation, Player } from '../types';
 
-// Maximum number of history states to keep
-const MAX_HISTORY_SIZE = 50;
-
-export interface HistoryState {
-  formation: Formation | null;
+export interface FormationSnapshot {
+  formation: Formation;
   players: Player[];
-  drawings: DrawingShape[];
   timestamp: number;
+  drawings?: any[]; // Drawing canvas data
 }
 
-interface HistoryStore {
-  past: HistoryState[];
-  present: HistoryState | null;
-  future: HistoryState[];
-}
-
-type HistoryAction =
-  | { type: 'PUSH'; payload: HistoryState }
-  | { type: 'UNDO' }
-  | { type: 'REDO' }
-  | { type: 'CLEAR' }
-  | { type: 'JUMP'; payload: number };
-
-function historyReducer(state: HistoryStore, action: HistoryAction): HistoryStore {
-  switch (action.type) {
-    case 'PUSH': {
-      const newPresent = action.payload;
-
-      // Don't add duplicate states (same timestamp within 100ms)
-      if (state.present && Math.abs(state.present.timestamp - newPresent.timestamp) < 100) {
-        return state;
-      }
-
-      const newPast = state.present
-        ? [...state.past, state.present].slice(-MAX_HISTORY_SIZE)
-        : state.past;
-
-      return {
-        past: newPast,
-        present: newPresent,
-        future: [], // Clear future when new action is taken
-      };
-    }
-
-    case 'UNDO': {
-      if (state.past.length === 0) {
-        return state;
-      }
-
-      const previous = state.past[state.past.length - 1];
-      const newPast = state.past.slice(0, -1);
-
-      return {
-        past: newPast,
-        present: previous,
-        future: state.present ? [state.present, ...state.future] : state.future,
-      };
-    }
-
-    case 'REDO': {
-      if (state.future.length === 0) {
-        return state;
-      }
-
-      const next = state.future[0];
-      const newFuture = state.future.slice(1);
-
-      return {
-        past: state.present ? [...state.past, state.present] : state.past,
-        present: next,
-        future: newFuture,
-      };
-    }
-
-    case 'CLEAR': {
-      return {
-        past: [],
-        present: state.present,
-        future: [],
-      };
-    }
-
-    case 'JUMP': {
-      const index = action.payload;
-      const allStates = [...state.past, state.present!, ...state.future];
-
-      if (index < 0 || index >= allStates.length) {
-        return state;
-      }
-
-      const targetState = allStates[index];
-      const newPast = allStates.slice(0, index);
-      const newFuture = allStates.slice(index + 1);
-
-      return {
-        past: newPast,
-        present: targetState,
-        future: newFuture,
-      };
-    }
-
-    default:
-      return state;
-  }
-}
-
-export interface UseFormationHistoryOptions {
+export interface FormationHistoryOptions {
   maxHistorySize?: number;
   enableKeyboardShortcuts?: boolean;
-  onUndo?: (state: HistoryState) => void;
-  onRedo?: (state: HistoryState) => void;
+  autoSave?: boolean;
+  autoSaveInterval?: number;
+  onUndo?: (snapshot: FormationSnapshot) => void;
+  onRedo?: (snapshot: FormationSnapshot) => void;
+  onSave?: (snapshot: FormationSnapshot) => void;
 }
 
-export interface UseFormationHistoryReturn {
-  // History state
+export interface FormationHistoryResult {
+  history: FormationSnapshot[];
+  currentIndex: number;
   canUndo: boolean;
   canRedo: boolean;
-  historyLength: number;
-  currentIndex: number;
-
-  // Actions
   undo: () => void;
   redo: () => void;
-  pushState: (state: Omit<HistoryState, 'timestamp'>) => void;
+  saveSnapshot: (snapshot: FormationSnapshot) => void;
   clearHistory: () => void;
-  jumpToState: (index: number) => void;
-
-  // Current state
-  currentState: HistoryState | null;
-
-  // History timeline (for UI visualization)
-  timeline: HistoryState[];
+  goToSnapshot: (index: number) => void;
 }
 
+/**
+ * Create a formation snapshot
+ */
+export function createHistorySnapshot(
+  formation: Formation,
+  players: Player[],
+  drawings: any[] = []
+): FormationSnapshot {
+  return {
+    formation: JSON.parse(JSON.stringify(formation)),
+    players: JSON.parse(JSON.stringify(players)),
+    drawings: JSON.parse(JSON.stringify(drawings)),
+    timestamp: Date.now(),
+  };
+}
+
+/**
+ * Formation history hook with undo/redo
+ */
 export function useFormationHistory(
-  initialState: Omit<HistoryState, 'timestamp'>,
-  options: UseFormationHistoryOptions = {},
-): UseFormationHistoryReturn {
-  const { enableKeyboardShortcuts = true, onUndo, onRedo } = options;
+  initialSnapshot: FormationSnapshot,
+  options: FormationHistoryOptions = {}
+): FormationHistoryResult {
+  const {
+    maxHistorySize = 50,
+    enableKeyboardShortcuts = true,
+    autoSave = false,
+    autoSaveInterval = 30000, // 30 seconds
+    onUndo,
+    onRedo,
+    onSave,
+  } = options;
 
-  const [history, dispatch] = useReducer(historyReducer, {
-    past: [],
-    present: { ...initialState, timestamp: Date.now() },
-    future: [],
-  });
+  const [history, setHistory] = useState<FormationSnapshot[]>([initialSnapshot]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Keyboard shortcuts
-  useEffect(() => {
-    if (!enableKeyboardShortcuts) {
-      return;
+  // Computed values
+  const canUndo = currentIndex > 0;
+  const canRedo = currentIndex < history.length - 1;
+
+  /**
+   * Save a new snapshot
+   */
+  const saveSnapshot = useCallback((snapshot: FormationSnapshot) => {
+    setHistory(prev => {
+      // Remove any snapshots after current index (we're creating a new branch)
+      const newHistory = prev.slice(0, currentIndex + 1);
+      
+      // Add new snapshot
+      newHistory.push(snapshot);
+      
+      // Limit history size
+      if (newHistory.length > maxHistorySize) {
+        return newHistory.slice(newHistory.length - maxHistorySize);
+      }
+      
+      return newHistory;
+    });
+    
+    setCurrentIndex(prev => {
+      const newIndex = Math.min(prev + 1, maxHistorySize - 1);
+      return newIndex;
+    });
+
+    onSave?.(snapshot);
+  }, [currentIndex, maxHistorySize, onSave]);
+
+  /**
+   * Undo to previous snapshot
+   */
+  const undo = useCallback(() => {
+    if (!canUndo) return;
+
+    const newIndex = currentIndex - 1;
+    setCurrentIndex(newIndex);
+    
+    const snapshot = history[newIndex];
+    onUndo?.(snapshot);
+  }, [canUndo, currentIndex, history, onUndo]);
+
+  /**
+   * Redo to next snapshot
+   */
+  const redo = useCallback(() => {
+    if (!canRedo) return;
+
+    const newIndex = currentIndex + 1;
+    setCurrentIndex(newIndex);
+    
+    const snapshot = history[newIndex];
+    onRedo?.(snapshot);
+  }, [canRedo, currentIndex, history, onRedo]);
+
+  /**
+   * Go to specific snapshot
+   */
+  const goToSnapshot = useCallback((index: number) => {
+    if (index < 0 || index >= history.length) return;
+    
+    setCurrentIndex(index);
+    
+    const snapshot = history[index];
+    if (index < currentIndex) {
+      onUndo?.(snapshot);
+    } else {
+      onRedo?.(snapshot);
     }
+  }, [history, currentIndex, onUndo, onRedo]);
+
+  /**
+   * Clear all history
+   */
+  const clearHistory = useCallback(() => {
+    const current = history[currentIndex];
+    setHistory([current]);
+    setCurrentIndex(0);
+  }, [history, currentIndex]);
+
+  /**
+   * Keyboard shortcuts (Ctrl+Z, Ctrl+Y, Ctrl+Shift+Z)
+   */
+  useEffect(() => {
+    if (!enableKeyboardShortcuts) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Ctrl+Z or Cmd+Z for undo
+      // Ctrl+Z or Cmd+Z - Undo
       if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
         e.preventDefault();
-        if (history.past.length > 0) {
-          dispatch({ type: 'UNDO' });
-          if (onUndo && history.past.length > 0) {
-            onUndo(history.past[history.past.length - 1]);
-          }
-        }
+        undo();
       }
-
-      // Ctrl+Shift+Z or Cmd+Shift+Z for redo
-      // Also support Ctrl+Y
-      if (
-        ((e.ctrlKey || e.metaKey) && e.key === 'z' && e.shiftKey) ||
-        ((e.ctrlKey || e.metaKey) && e.key === 'y')
-      ) {
+      
+      // Ctrl+Shift+Z or Cmd+Shift+Z - Redo
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z' && e.shiftKey) {
         e.preventDefault();
-        if (history.future.length > 0) {
-          dispatch({ type: 'REDO' });
-          if (onRedo && history.future.length > 0) {
-            onRedo(history.future[0]);
-          }
-        }
+        redo();
+      }
+      
+      // Ctrl+Y or Cmd+Y - Redo
+      if ((e.ctrlKey || e.metaKey) && e.key === 'y') {
+        e.preventDefault();
+        redo();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [enableKeyboardShortcuts, history.past, history.future, onUndo, onRedo]);
+  }, [enableKeyboardShortcuts, undo, redo]);
 
-  const pushState = useCallback((state: Omit<HistoryState, 'timestamp'>) => {
-    dispatch({
-      type: 'PUSH',
-      payload: { ...state, timestamp: Date.now() },
-    });
-  }, []);
+  /**
+   * Auto-save functionality
+   */
+  useEffect(() => {
+    if (!autoSave) return;
 
-  const undo = useCallback(() => {
-    if (history.past.length > 0) {
-      dispatch({ type: 'UNDO' });
-      if (onUndo) {
-        onUndo(history.past[history.past.length - 1]);
+    const currentSnapshot = history[currentIndex];
+
+    autoSaveTimerRef.current = setInterval(() => {
+      // Save to localStorage
+      try {
+        localStorage.setItem('formation-autosave', JSON.stringify({
+          snapshot: currentSnapshot,
+          savedAt: new Date().toISOString(),
+        }));
+      } catch (error) {
+        console.error('Auto-save failed:', error);
       }
-    }
-  }, [history.past, onUndo]);
+    }, autoSaveInterval);
 
-  const redo = useCallback(() => {
-    if (history.future.length > 0) {
-      dispatch({ type: 'REDO' });
-      if (onRedo) {
-        onRedo(history.future[0]);
+    return () => {
+      if (autoSaveTimerRef.current) {
+        clearInterval(autoSaveTimerRef.current);
       }
+    };
+  }, [autoSave, autoSaveInterval, history, currentIndex]);
+
+  /**
+   * Load auto-saved snapshot on mount
+   */
+  useEffect(() => {
+    if (!autoSave) return;
+
+    try {
+      const saved = localStorage.getItem('formation-autosave');
+      if (saved) {
+        const { snapshot, savedAt } = JSON.parse(saved);
+        const savedDate = new Date(savedAt);
+        const now = new Date();
+        const hoursSince = (now.getTime() - savedDate.getTime()) / (1000 * 60 * 60);
+
+        // Only restore if saved within last 24 hours
+        if (hoursSince < 24) {
+          saveSnapshot(snapshot);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load auto-save:', error);
     }
-  }, [history.future, onRedo]);
-
-  const clearHistory = useCallback(() => {
-    dispatch({ type: 'CLEAR' });
-  }, []);
-
-  const jumpToState = useCallback((index: number) => {
-    dispatch({ type: 'JUMP', payload: index });
-  }, []);
-
-  // Calculate timeline
-  const timeline = [
-    ...history.past,
-    ...(history.present ? [history.present] : []),
-    ...history.future,
-  ];
-
-  const currentIndex = history.past.length;
+  }, []); // Only run on mount
 
   return {
-    canUndo: history.past.length > 0,
-    canRedo: history.future.length > 0,
-    historyLength: timeline.length,
+    history,
     currentIndex,
+    canUndo,
+    canRedo,
     undo,
     redo,
-    pushState,
+    saveSnapshot,
     clearHistory,
-    jumpToState,
-    currentState: history.present,
-    timeline,
+    goToSnapshot,
   };
 }
 
-/**
- * Helper function to create a history state snapshot
- */
-export function createHistorySnapshot(
-  formation: Formation | null,
-  players: Player[],
-  drawings: DrawingShape[],
-): Omit<HistoryState, 'timestamp'> {
-  return {
-    formation: formation ? { ...formation } : null,
-    players: players.map(p => ({ ...p })),
-    drawings: drawings.map(d => ({ ...d })),
-  };
-}
-
-/**
- * Helper function to compare two history states
- */
-export function areStatesEqual(state1: HistoryState | null, state2: HistoryState | null): boolean {
-  if (!state1 || !state2) {
-    return state1 === state2;
-  }
-
-  return (
-    JSON.stringify(state1.formation) === JSON.stringify(state2.formation) &&
-    JSON.stringify(state1.players) === JSON.stringify(state2.players) &&
-    JSON.stringify(state1.drawings) === JSON.stringify(state2.drawings)
-  );
-}
+export default useFormationHistory;
