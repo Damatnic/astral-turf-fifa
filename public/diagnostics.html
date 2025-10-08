@@ -167,7 +167,8 @@
         const sessionKeys = Object.keys(sessionStorage);
         const astralKeys = localKeys.filter(k => k.toLowerCase().includes('astral'));
         
-        const stateData = localStorage.getItem('appState');
+        // CORRECT KEY!
+        const stateData = localStorage.getItem('astralTurfActiveState');
         const hasState = !!stateData;
         const stateSize = stateData ? (stateData.length / 1024).toFixed(2) : 0;
         
@@ -175,11 +176,11 @@
           <div class="info-row"><span class="label">localStorage Keys:</span><span class="value">${localKeys.length}</span></div>
           <div class="info-row"><span class="label">sessionStorage Keys:</span><span class="value">${sessionKeys.length}</span></div>
           <div class="info-row"><span class="label">Astral Keys:</span><span class="value">${astralKeys.length}</span></div>
-          <div class="info-row"><span class="label">App State:</span><span class="value status ${hasState ? 'ok' : 'error'}">${hasState ? 'FOUND' : 'MISSING'}</span></div>
+          <div class="info-row"><span class="label">App State (astralTurfActiveState):</span><span class="value status ${hasState ? 'ok' : 'error'}">${hasState ? 'FOUND' : 'MISSING'}</span></div>
           <div class="info-row"><span class="label">State Size:</span><span class="value">${stateSize} KB</span></div>
           <details style="margin-top: 15px;">
-            <summary style="cursor: pointer; color: #60a5fa;">View Astral Keys</summary>
-            <pre>${JSON.stringify(astralKeys, null, 2)}</pre>
+            <summary style="cursor: pointer; color: #60a5fa;">View All localStorage Keys</summary>
+            <pre>${JSON.stringify(localKeys, null, 2)}</pre>
           </details>
         `;
       } catch (error) {
