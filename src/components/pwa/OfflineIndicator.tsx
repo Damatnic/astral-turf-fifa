@@ -40,7 +40,7 @@ export const OfflineIndicator: React.FC<OfflineIndicatorProps> = ({
   if (isOnline && showWhenOnline && !justCameOnline) {
     return (
       <div
-        className={`fixed top-4 right-4 z-40 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 ${className}`}
+        className={`fixed top-20 right-4 z-[60] bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 ${className}`}
         role="status"
         aria-live="polite"
       >
@@ -59,7 +59,7 @@ export const OfflineIndicator: React.FC<OfflineIndicatorProps> = ({
   if (justCameOnline && isOnline) {
     return (
       <div
-        className={`fixed top-4 right-4 z-40 bg-green-600 text-white px-4 py-3 rounded-lg shadow-lg transform transition-all duration-500 ${className}`}
+        className={`fixed top-20 right-4 z-[60] bg-green-600 text-white px-4 py-3 rounded-lg shadow-lg transform transition-all duration-500 ${className}`}
         role="alert"
         aria-live="assertive"
       >
@@ -79,7 +79,7 @@ export const OfflineIndicator: React.FC<OfflineIndicatorProps> = ({
   // Offline or slow connection indicator
   return (
     <div
-      className={`fixed top-4 right-4 z-40 ${
+      className={`fixed top-20 right-4 z-[60] ${
         connectionType === 'slow' ? 'bg-yellow-600' : 'bg-red-600'
       } text-white px-4 py-3 rounded-lg shadow-lg ${className}`}
       role="alert"
