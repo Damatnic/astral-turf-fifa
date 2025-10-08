@@ -40,11 +40,13 @@ export const PositioningSystem: React.FC<PositioningSystemProps> = ({
   }
 
   // Filter players with valid field positions
+  // Note: Players can have either 'fieldPosition' OR 'position'
   const fieldPlayers = players.filter(p => {
     try {
-      return p && p.fieldPosition && 
-             typeof p.fieldPosition.x === 'number' && 
-             typeof p.fieldPosition.y === 'number';
+      const pos = p.fieldPosition || p.position;
+      return p && pos && 
+             typeof pos.x === 'number' && 
+             typeof pos.y === 'number';
     } catch {
       return false;
     }
@@ -68,8 +70,10 @@ export const PositioningSystem: React.FC<PositioningSystemProps> = ({
       {/* Player tokens */}
       {fieldPlayers.map((player) => {
         try {
-          const x = player.fieldPosition?.x ?? 50;
-          const y = player.fieldPosition?.y ?? 50;
+          // Use fieldPosition if available, otherwise fall back to position
+          const pos = player.fieldPosition || player.position;
+          const x = pos?.x ?? 50;
+          const y = pos?.y ?? 50;
           const number = player.jerseyNumber || '?';
           const isSelected = selectedPlayer?.id === player.id;
           
