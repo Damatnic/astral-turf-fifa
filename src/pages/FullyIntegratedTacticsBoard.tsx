@@ -47,7 +47,21 @@ import {
  * Main Fully Integrated Tactics Board Component
  */
 const FullyIntegratedTacticsBoard: React.FC = () => {
-  const { tacticsState, dispatch } = useTacticsContext();
+  const tacticsContextData = useTacticsContext();
+  
+  // Null safety check
+  if (!tacticsContextData) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-slate-900 text-white">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4" />
+          <p>Loading Tactics Board...</p>
+        </div>
+      </div>
+    );
+  }
+  
+  const { tacticsState, dispatch } = tacticsContextData;
   
   // UI State
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
@@ -78,9 +92,24 @@ const FullyIntegratedTacticsBoard: React.FC = () => {
     status: { available: true, injured: false, suspended: false, tired: false },
   });
 
-  // Get current formation and players
-  const currentFormation = tacticsState?.formations?.[tacticsState?.activeFormationIds?.home];
-  const allPlayers = useMemo(() => tacticsState?.players || [], [tacticsState?.players]);
+  // Get current formation and players with null safety
+  const currentFormation = useMemo(() => {
+    try {
+      return tacticsState?.formations?.[tacticsState?.activeFormationIds?.home];
+    } catch (error) {
+      console.error('Error getting formation:', error);
+      return undefined;
+    }
+  }, [tacticsState]);
+  
+  const allPlayers = useMemo(() => {
+    try {
+      return Array.isArray(tacticsState?.players) ? tacticsState.players : [];
+    } catch (error) {
+      console.error('Error getting players:', error);
+      return [];
+    }
+  }, [tacticsState]);
 
   // Formation History System (Undo/Redo)
   const historySystem = useFormationHistory(

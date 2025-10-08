@@ -33,7 +33,7 @@ const MOBILE_CONFIG = {
   compressionEnabled: true,
 };
 
-const CACHE_VERSION = 'astral-turf-mobile-v2'; // Updated to v2 to clear old caches
+const CACHE_VERSION = 'astral-turf-mobile-v3'; // Updated to v3 for critical bug fixes
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 const IMAGE_CACHE = `${CACHE_VERSION}-images`;

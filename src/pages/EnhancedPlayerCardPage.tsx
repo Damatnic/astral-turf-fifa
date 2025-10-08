@@ -55,43 +55,80 @@ const EnhancedPlayerCardPage: React.FC = () => {
     }
   }, [playerId, tacticsState.players, authState.user]);
 
-  const profile = selectedPlayer ? state.playerProfiles.get(selectedPlayer.id) : undefined;
-  const activeChallenges = profile ? getActiveChallenges(selectedPlayer!.id) : [];
-  const recommendedChallenges = profile ? getRecommendedChallenges(selectedPlayer!.id) : [];
+  // Get player profile with null safety
+  const profile = useMemo(() => {
+    try {
+      return selectedPlayer ? state.playerProfiles.get(selectedPlayer.id) : undefined;
+    } catch (error) {
+      console.error('Error getting player profile:', error);
+      return undefined;
+    }
+  }, [selectedPlayer, state.playerProfiles]);
+  
+  // Get challenges with null safety
+  const activeChallenges = useMemo(() => {
+    try {
+      return profile && selectedPlayer ? getActiveChallenges(selectedPlayer.id) : [];
+    } catch (error) {
+      console.error('Error getting active challenges:', error);
+      return [];
+    }
+  }, [profile, selectedPlayer, getActiveChallenges]);
+  
+  const recommendedChallenges = useMemo(() => {
+    try {
+      return profile && selectedPlayer ? getRecommendedChallenges(selectedPlayer.id) : [];
+    } catch (error) {
+      console.error('Error getting recommended challenges:', error);
+      return [];
+    }
+  }, [profile, selectedPlayer, getRecommendedChallenges]);
 
-  // Convert to player progression
+  // Convert to player progression with null safety
   const progression = useMemo(() => {
-    if (!profile || !selectedPlayer) return undefined;
-    return convertToPlayerProgression(profile, selectedPlayer, { checkAchievements: true });
+    try {
+      if (!profile || !selectedPlayer) return undefined;
+      return convertToPlayerProgression(profile, selectedPlayer, { checkAchievements: true });
+    } catch (error) {
+      console.error('Error converting player progression:', error);
+      return undefined;
+    }
   }, [profile, selectedPlayer]);
 
-  // Calculate detailed stats
+  // Calculate detailed stats with null safety
   const stats = useMemo(() => {
-    if (!profile || !progression) return null;
+    try {
+      if (!profile || !progression) return null;
 
-    const xpPercent = (progression.currentXP / (progression.currentXP + progression.xpToNextLevel)) * 100;
-    const nextLevelXP = progression.currentXP + progression.xpToNextLevel;
-    
-    return {
-      xpPercent,
-      totalXP: profile.totalXP,
-      currentLevel: profile.currentLevel,
-      nextLevel: profile.currentLevel + 1,
-      currentXP: progression.currentXP,
-      xpToNext: progression.xpToNextLevel,
-      nextLevelTotalXP: nextLevelXP,
-      rank: progression.rank,
-      rankProgress: progression.rankProgress,
-      totalChallenges: profile.challengesCompleted.length,
-      activeChallengesCount: activeChallenges.length,
-      streakDays: profile.streakDays,
-      longestStreak: profile.longestStreak,
-      unlockedAchievements: progression.achievements.length,
-      totalAchievements: ALL_ACHIEVEMENTS.length,
-      achievementProgress: (progression.achievements.length / ALL_ACHIEVEMENTS.length) * 100,
-      badges: profile.badges.length,
-      unspentPoints: profile.unspentAttributePoints,
-    };
+      const xpPercent = (progression.currentXP / (progression.currentXP + progression.xpToNextLevel)) * 100;
+      const nextLevelXP = progression.currentXP + progression.xpToNextLevel;
+      
+      return {
+        xpPercent: isNaN(xpPercent) ? 0 : xpPercent,
+        totalXP: profile.totalXP || 0,
+        currentLevel: profile.currentLevel || 1,
+        nextLevel: (profile.currentLevel || 1) + 1,
+        currentXP: progression.currentXP || 0,
+        xpToNext: progression.xpToNextLevel || 100,
+        nextLevelTotalXP: isNaN(nextLevelXP) ? 100 : nextLevelXP,
+        rank: progression.rank || 'bronze',
+        rankProgress: progression.rankProgress || 0,
+        totalChallenges: profile.challengesCompleted?.length || 0,
+        activeChallengesCount: activeChallenges?.length || 0,
+        streakDays: profile.streakDays || 0,
+        longestStreak: profile.longestStreak || 0,
+        unlockedAchievements: progression.achievements?.length || 0,
+        totalAchievements: ALL_ACHIEVEMENTS?.length || 0,
+        achievementProgress: ALL_ACHIEVEMENTS.length > 0 
+          ? ((progression.achievements?.length || 0) / ALL_ACHIEVEMENTS.length) * 100 
+          : 0,
+        badges: profile.badges?.length || 0,
+        unspentPoints: profile.unspentAttributePoints || 0,
+      };
+    } catch (error) {
+      console.error('Error calculating stats:', error);
+      return null;
+    }
   }, [profile, progression, activeChallenges]);
 
   if (!selectedPlayer) {
