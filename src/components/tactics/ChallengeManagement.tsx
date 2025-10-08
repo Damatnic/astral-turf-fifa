@@ -416,20 +416,20 @@ const ChallengeManagement: React.FC<ChallengeManagementProps> = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 bg-slate-800  z-50 flex items-center justify-center p-4"
     >
       <motion.div
         initial={{ scale: 0.9, opacity: 0, y: 20 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.9, opacity: 0, y: 20 }}
         className={`
-          bg-slate-900/95 backdrop-blur-md border border-slate-700/50 rounded-2xl
+          bg-slate-900  border border-slate-700 rounded-2xl
           w-full max-w-7xl h-[85vh] flex flex-col shadow-2xl
           ${className}
         `}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-slate-700/50">
+        <div className="flex items-center justify-between p-6 border-b border-slate-700">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl flex items-center justify-center">
               <Trophy className="w-6 h-6 text-white" />
@@ -450,14 +450,14 @@ const ChallengeManagement: React.FC<ChallengeManagementProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-700/50 transition-colors"
+            className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-700 transition-colors"
           >
             <X className="w-6 h-6" />
           </button>
         </div>
 
         {/* Filters */}
-        <div className="p-6 border-b border-slate-700/50">
+        <div className="p-6 border-b border-slate-700">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-white">Filter Challenges</h3>
             <button
@@ -491,7 +491,7 @@ const ChallengeManagement: React.FC<ChallengeManagementProps> = ({
                         ${
                           selectedCategory === category.id
                             ? 'bg-blue-600/80 text-white'
-                            : 'bg-slate-700/50 text-slate-400 hover:text-white hover:bg-slate-600/50'
+                            : 'bg-slate-700 text-slate-400 hover:text-white hover:bg-slate-600/50'
                         }
                       `}
                     >
@@ -522,7 +522,7 @@ const ChallengeManagement: React.FC<ChallengeManagementProps> = ({
                       ${
                         selectedDifficulty === difficulty.id
                           ? 'bg-blue-600/80 text-white'
-                          : 'bg-slate-700/50 text-slate-400 hover:text-white hover:bg-slate-600/50'
+                          : 'bg-slate-700 text-slate-400 hover:text-white hover:bg-slate-600/50'
                       }
                     `}
                   >
@@ -552,7 +552,7 @@ const ChallengeManagement: React.FC<ChallengeManagementProps> = ({
                         key={challenge.id}
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        className="bg-slate-800/40 border border-slate-600/50 rounded-xl p-5 hover:border-slate-500/60 transition-all cursor-pointer group"
+                        className="bg-slate-700 border border-slate-600/50 rounded-xl p-5 hover:border-slate-500/60 transition-all cursor-pointer group"
                         onClick={() => startChallenge(challenge)}
                       >
                         <div className="flex items-start justify-between mb-3">
@@ -630,7 +630,7 @@ const ChallengeManagement: React.FC<ChallengeManagementProps> = ({
                     return (
                       <div
                         key={challenge.id}
-                        className="bg-slate-800/20 border border-green-500/30 rounded-xl p-5 relative overflow-hidden"
+                        className="bg-slate-650 border border-green-500/30 rounded-xl p-5 relative overflow-hidden"
                       >
                         <div className="absolute top-0 right-0 w-16 h-16 bg-green-500/20 rounded-full -mr-8 -mt-8" />
                         <CheckCircle2 className="absolute top-2 right-2 w-5 h-5 text-green-400" />
@@ -688,9 +688,9 @@ const ChallengeManagement: React.FC<ChallengeManagementProps> = ({
                     return (
                       <div
                         key={challenge.id}
-                        className="bg-slate-800/20 border border-slate-600/30 rounded-xl p-5 opacity-60 relative"
+                        className="bg-slate-650 border border-slate-600/30 rounded-xl p-5 opacity-60 relative"
                       >
-                        <div className="absolute inset-0 bg-black/20 rounded-xl" />
+                        <div className="absolute inset-0 bg-slate-650 rounded-xl" />
 
                         <div className="relative">
                           <div className="flex items-start justify-between mb-3">

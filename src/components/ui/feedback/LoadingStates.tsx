@@ -216,8 +216,8 @@ export const LoadingOverlay = forwardRef<HTMLDivElement, LoadingOverlayProps>(
         <div
           className={cn(
             'absolute inset-0 flex flex-col items-center justify-center z-50',
-            backdrop && 'bg-black/50',
-            blur && 'backdrop-blur-sm',
+            backdrop && 'bg-slate-800',
+            blur && '',
             'animate-fade-in',
           )}
         >

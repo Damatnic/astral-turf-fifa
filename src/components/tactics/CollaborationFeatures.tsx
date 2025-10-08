@@ -295,20 +295,20 @@ const CollaborationFeatures: React.FC<CollaborationFeaturesProps> = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 bg-slate-800  z-50 flex items-center justify-center p-4"
     >
       <motion.div
         initial={{ scale: 0.9, opacity: 0, y: 20 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.9, opacity: 0, y: 20 }}
         className={`
-          bg-slate-900/95 backdrop-blur-md border border-slate-700/50 rounded-2xl
+          bg-slate-900  border border-slate-700 rounded-2xl
           w-full max-w-6xl h-[85vh] flex flex-col shadow-2xl
           ${className}
         `}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-slate-700/50">
+        <div className="flex items-center justify-between p-6 border-b border-slate-700">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center">
               <Users className="w-6 h-6 text-white" />
@@ -350,7 +350,7 @@ const CollaborationFeatures: React.FC<CollaborationFeaturesProps> = ({
             </button>
             <button
               onClick={onClose}
-              className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-700/50 transition-colors"
+              className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-700 transition-colors"
             >
               <X className="w-6 h-6" />
             </button>
@@ -358,7 +358,7 @@ const CollaborationFeatures: React.FC<CollaborationFeaturesProps> = ({
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex border-b border-slate-700/50">
+        <div className="flex border-b border-slate-700">
           {tabs.map(tab => {
             const IconComponent = tab.icon;
             return (
@@ -380,7 +380,7 @@ const CollaborationFeatures: React.FC<CollaborationFeaturesProps> = ({
                   <span
                     className={`
                     px-1.5 py-0.5 rounded text-xs
-                    ${activeTab === tab.id ? 'bg-purple-500/20 text-purple-300' : 'bg-slate-700/50 text-slate-300'}
+                    ${activeTab === tab.id ? 'bg-purple-500/20 text-purple-300' : 'bg-slate-700 text-slate-300'}
                   `}
                   >
                     {tab.count}
@@ -425,7 +425,7 @@ const CollaborationFeatures: React.FC<CollaborationFeaturesProps> = ({
                     <motion.div
                       key={collaborator.id}
                       whileHover={{ scale: 1.01 }}
-                      className="flex items-center justify-between p-4 bg-slate-800/40 border border-slate-600/50 rounded-xl"
+                      className="flex items-center justify-between p-4 bg-slate-700 border border-slate-600/50 rounded-xl"
                     >
                       <div className="flex items-center gap-4">
                         <div className="relative">
@@ -489,7 +489,7 @@ const CollaborationFeatures: React.FC<CollaborationFeaturesProps> = ({
                 exit={{ opacity: 0, x: -20 }}
                 className="h-full flex flex-col"
               >
-                <div className="p-6 border-b border-slate-700/50">
+                <div className="p-6 border-b border-slate-700">
                   <h3 className="text-lg font-semibold text-white mb-4">Comments & Feedback</h3>
 
                   {/* Add Comment Input */}
@@ -525,7 +525,7 @@ const CollaborationFeatures: React.FC<CollaborationFeaturesProps> = ({
                         className={`p-4 rounded-xl border ${
                           comment.isResolved
                             ? 'bg-green-900/20 border-green-500/30 opacity-75'
-                            : 'bg-slate-800/40 border-slate-600/50'
+                            : 'bg-slate-700 border-slate-600/50'
                         }`}
                       >
                         <div className="flex items-start justify-between mb-3">
@@ -597,7 +597,7 @@ const CollaborationFeatures: React.FC<CollaborationFeaturesProps> = ({
 
                 <div className="space-y-6">
                   {/* Share Link */}
-                  <div className="bg-slate-800/40 border border-slate-600/50 rounded-xl p-6">
+                  <div className="bg-slate-700 border border-slate-600/50 rounded-xl p-6">
                     <h4 className="font-medium text-white mb-4 flex items-center gap-2">
                       <Globe className="w-5 h-5" />
                       Share Link
@@ -608,7 +608,7 @@ const CollaborationFeatures: React.FC<CollaborationFeaturesProps> = ({
                         type="text"
                         value={currentSession.shareLink}
                         readOnly
-                        className="flex-1 bg-slate-700/50 border border-slate-600/50 rounded-lg px-4 py-2 text-white text-sm"
+                        className="flex-1 bg-slate-700 border border-slate-600/50 rounded-lg px-4 py-2 text-white text-sm"
                       />
                       <button
                         onClick={handleCopyLink}
@@ -630,7 +630,7 @@ const CollaborationFeatures: React.FC<CollaborationFeaturesProps> = ({
                   </div>
 
                   {/* Visibility Settings */}
-                  <div className="bg-slate-800/40 border border-slate-600/50 rounded-xl p-6">
+                  <div className="bg-slate-700 border border-slate-600/50 rounded-xl p-6">
                     <h4 className="font-medium text-white mb-4 flex items-center gap-2">
                       <Lock className="w-5 h-5" />
                       Visibility
@@ -683,18 +683,18 @@ const CollaborationFeatures: React.FC<CollaborationFeaturesProps> = ({
                   </div>
 
                   {/* Export Options */}
-                  <div className="bg-slate-800/40 border border-slate-600/50 rounded-xl p-6">
+                  <div className="bg-slate-700 border border-slate-600/50 rounded-xl p-6">
                     <h4 className="font-medium text-white mb-4 flex items-center gap-2">
                       <Download className="w-5 h-5" />
                       Export Session
                     </h4>
 
                     <div className="grid grid-cols-2 gap-3">
-                      <button className="flex items-center gap-2 p-3 bg-slate-700/50 hover:bg-slate-600/50 rounded-lg transition-colors">
+                      <button className="flex items-center gap-2 p-3 bg-slate-700 hover:bg-slate-600/50 rounded-lg transition-colors">
                         <Camera className="w-4 h-4" />
                         Export as Image
                       </button>
-                      <button className="flex items-center gap-2 p-3 bg-slate-700/50 hover:bg-slate-600/50 rounded-lg transition-colors">
+                      <button className="flex items-center gap-2 p-3 bg-slate-700 hover:bg-slate-600/50 rounded-lg transition-colors">
                         <Download className="w-4 h-4" />
                         Download PDF
                       </button>
@@ -717,7 +717,7 @@ const CollaborationFeatures: React.FC<CollaborationFeaturesProps> = ({
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Session Status */}
-                  <div className="bg-slate-800/40 border border-slate-600/50 rounded-xl p-6">
+                  <div className="bg-slate-700 border border-slate-600/50 rounded-xl p-6">
                     <h4 className="font-medium text-white mb-4">Session Status</h4>
 
                     <div className="flex items-center gap-4 mb-4">
@@ -764,7 +764,7 @@ const CollaborationFeatures: React.FC<CollaborationFeaturesProps> = ({
                   </div>
 
                   {/* Recording Controls */}
-                  <div className="bg-slate-800/40 border border-slate-600/50 rounded-xl p-6">
+                  <div className="bg-slate-700 border border-slate-600/50 rounded-xl p-6">
                     <h4 className="font-medium text-white mb-4">Recording</h4>
 
                     <div className="flex items-center gap-4 mb-4">
@@ -809,7 +809,7 @@ const CollaborationFeatures: React.FC<CollaborationFeaturesProps> = ({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center"
+              className="absolute inset-0 bg-slate-800  flex items-center justify-center"
             >
               <motion.div
                 initial={{ scale: 0.9, opacity: 0 }}
@@ -827,7 +827,7 @@ const CollaborationFeatures: React.FC<CollaborationFeaturesProps> = ({
                       placeholder="colleague@example.com"
                       value={inviteEmail}
                       onChange={e => setInviteEmail(e.target.value)}
-                      className="w-full bg-slate-700/50 border border-slate-600/50 rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-purple-500/50"
+                      className="w-full bg-slate-700 border border-slate-600/50 rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-purple-500/50"
                     />
                   </div>
 
@@ -836,7 +836,7 @@ const CollaborationFeatures: React.FC<CollaborationFeaturesProps> = ({
                     <select
                       value={inviteRole}
                       onChange={e => setInviteRole(e.target.value as 'editor' | 'viewer')}
-                      className="w-full bg-slate-700/50 border border-slate-600/50 rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-purple-500/50"
+                      className="w-full bg-slate-700 border border-slate-600/50 rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-purple-500/50"
                     >
                       <option value="viewer">Viewer - Can view and comment</option>
                       <option value="editor">Editor - Can edit and modify</option>

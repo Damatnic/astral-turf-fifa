@@ -23,7 +23,7 @@ const DragIndicator: React.FC<DragIndicatorProps> = ({ position, isValid, fieldD
       {/* Main Drop Zone */}
       <motion.div
         className={`
-          w-16 h-16 rounded-full border-2 backdrop-blur-sm
+          w-16 h-16 rounded-full border-2 
           ${
             isValid
               ? 'border-green-400 bg-green-400/20 shadow-lg shadow-green-400/30'
@@ -80,7 +80,7 @@ const DragIndicator: React.FC<DragIndicatorProps> = ({ position, isValid, fieldD
       <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2">
         <div
           className={`
-          text-xs font-medium px-2 py-1 rounded backdrop-blur-sm
+          text-xs font-medium px-2 py-1 rounded 
           ${isValid ? 'text-green-400 bg-green-900/50' : 'text-red-400 bg-red-900/50'}
         `}
         >

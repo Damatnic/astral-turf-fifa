@@ -420,15 +420,17 @@ export function useTacticalPresets(
     [importPresets],
   );
 
-  // Sync to cloud (placeholder - implement with actual cloud service)
+  // Sync to cloud using cloudStorageService
   const syncToCloud = useCallback(async () => {
     setSyncStatus(prev => ({ ...prev, isSyncing: true, error: undefined }));
 
     try {
-      // TODO: Implement actual cloud sync
-      await new Promise(resolve => {
-        setTimeout(resolve, 1000);
-      });
+      // Use the existing cloud storage service
+      const { cloudStorageService } = await import('../services/cloudStorageService');
+      
+      // Save current library state to cloud
+      await cloudStorageService.saveState('tactical-presets', library);
+      await cloudStorageService.syncToCloud();
 
       setSyncStatus(prev => ({
         ...prev,
@@ -448,17 +450,21 @@ export function useTacticalPresets(
         error: error instanceof Error ? error.message : 'Sync failed',
       }));
     }
-  }, []);
+  }, [library]);
 
-  // Sync from cloud (placeholder - implement with actual cloud service)
+  // Sync from cloud using cloudStorageService
   const syncFromCloud = useCallback(async () => {
     setSyncStatus(prev => ({ ...prev, isSyncing: true, error: undefined }));
 
     try {
-      // TODO: Implement actual cloud sync
-      await new Promise(resolve => {
-        setTimeout(resolve, 1000);
-      });
+      // Use the existing cloud storage service
+      const { cloudStorageService } = await import('../services/cloudStorageService');
+      
+      // Load library state from cloud
+      const cloudState = await cloudStorageService.loadState('tactical-presets');
+      if (cloudState) {
+        setLibrary(cloudState as TacticalPresetsLibrary);
+      }
 
       setSyncStatus(prev => ({
         ...prev,

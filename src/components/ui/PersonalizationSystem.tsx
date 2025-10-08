@@ -8,6 +8,7 @@ import {
   EnhancedSwitch,
 } from './InteractiveComponents';
 import { AccessibleModal } from './AccessibilityComponents';
+import { loggingService } from '../../services/loggingService';
 
 // Personalization Types
 export interface UserPreferences {
@@ -135,7 +136,9 @@ export const PersonalizationProvider: React.FC<{ children: ReactNode }> = ({ chi
       const imported = JSON.parse(data);
       setPreferences({ ...defaultPreferences, ...imported });
     } catch (_error) {
-      console.error('Failed to import preferences:', _error);
+      loggingService.error('Failed to import preferences', {
+        error: _error instanceof Error ? _error.message : 'Unknown error',
+      });
     }
   };
 

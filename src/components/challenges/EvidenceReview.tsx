@@ -114,7 +114,7 @@ export const EvidenceReview: React.FC<EvidenceReviewProps> = ({
   return (
     <>
       <motion.div
-        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 "
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -213,7 +213,7 @@ export const EvidenceReview: React.FC<EvidenceReviewProps> = ({
                           className="w-full h-full object-cover"
                         />
                       )}
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                      <div className="absolute inset-0 bg-slate-800 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                         <Maximize2 className="w-6 h-6 text-white" />
                       </div>
                     </motion.div>
@@ -396,7 +396,7 @@ export const EvidenceReview: React.FC<EvidenceReviewProps> = ({
       <AnimatePresence>
         {selectedMedia && (
           <motion.div
-            className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90"
+            className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-950"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

@@ -37,7 +37,7 @@ const Toast: React.FC<{ notification: Notification }> = ({ notification }) => {
 
   return (
     <div
-      className={`relative w-full max-w-sm p-4 pr-10 rounded-lg shadow-2xl border-l-4 transition-all duration-300 ease-in-out bg-slate-800/80 backdrop-blur-md ${NOTIFICATION_STYLES[notification.type]} ${isVisible ? 'animate-toast-in' : 'animate-toast-out'}`}
+      className={`relative w-full max-w-sm p-4 pr-10 rounded-lg shadow-2xl border-l-4 transition-all duration-300 ease-in-out bg-slate-800  ${NOTIFICATION_STYLES[notification.type]} ${isVisible ? 'animate-toast-in' : 'animate-toast-out'}`}
     >
       <div className="flex items-center">
         <div className="flex-shrink-0 mr-3">{NOTIFICATION_ICONS[notification.type]}</div>

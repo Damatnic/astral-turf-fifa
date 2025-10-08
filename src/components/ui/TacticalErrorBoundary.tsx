@@ -125,7 +125,7 @@ export class TacticalErrorBoundary extends Component<Props, State> {
             </div>
 
             {process.env.NODE_ENV === 'development' && (
-              <div className="bg-red-100 dark:bg-red-900/20 rounded-md p-3 mb-4 text-left">
+              <div className="bg-red-100 dark:bg-red-950 rounded-md p-3 mb-4 text-left">
                 <div className="flex items-start gap-2">
                   <Bug className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
                   <div className="text-xs text-red-700 dark:text-red-300">

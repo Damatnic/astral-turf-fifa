@@ -348,59 +348,59 @@ export const FileMenu: React.FC = () => {
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="px-3 py-2 text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] rounded-md"
+        className="px-3 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-700 hover:text-white rounded-md transition-colors"
       >
         File
       </button>
       {isOpen && (
-        <div className="absolute top-full left-0 mt-2 w-56 bg-[var(--bg-secondary)] border border-[var(--border-primary)] rounded-md shadow-lg z-20">
+        <div className="absolute top-full left-0 mt-2 w-56 bg-slate-800 border border-slate-600 rounded-md shadow-xl z-50">
           <button
             onClick={handleNewProject}
-            className="w-full text-left px-4 py-2 text-sm flex items-center hover:bg-[var(--bg-tertiary)]"
+            className="w-full text-left px-4 py-2 text-sm text-slate-200 flex items-center hover:bg-slate-700 hover:text-white transition-colors"
           >
             <FilePlusIcon className="w-4 h-4 mr-2" />
             New Project
           </button>
           <button
             onClick={handleSaveProject}
-            className="w-full text-left px-4 py-2 text-sm flex items-center hover:bg-[var(--bg-tertiary)]"
+            className="w-full text-left px-4 py-2 text-sm text-slate-200 flex items-center hover:bg-slate-700 hover:text-white transition-colors"
           >
             <SaveIcon className="w-4 h-4 mr-2" />
             Save Project
           </button>
           <button
             onClick={handleLoadProject}
-            className="w-full text-left px-4 py-2 text-sm flex items-center hover:bg-[var(--bg-tertiary)]"
+            className="w-full text-left px-4 py-2 text-sm text-slate-200 flex items-center hover:bg-slate-700 hover:text-white transition-colors"
           >
             <FolderOpenIcon className="w-4 h-4 mr-2" />
             Load Project...
           </button>
-          <div className="border-t border-[var(--border-primary)] my-1" />
+          <div className="border-t border-slate-600 my-1" />
           <button
             onClick={handleImportPlaybook}
-            className="w-full text-left px-4 py-2 text-sm flex items-center hover:bg-[var(--bg-tertiary)]"
+            className="w-full text-left px-4 py-2 text-sm text-slate-200 flex items-center hover:bg-slate-700 hover:text-white transition-colors"
           >
             <BookOpenIcon className="w-4 h-4 mr-2" />
             Import Playbook
           </button>
           <button
             onClick={handleExportPlaybook}
-            className="w-full text-left px-4 py-2 text-sm flex items-center hover:bg-[var(--bg-tertiary)]"
+            className="w-full text-left px-4 py-2 text-sm text-slate-200 flex items-center hover:bg-slate-700 hover:text-white transition-colors"
           >
             <DownloadIcon className="w-4 h-4 mr-2" />
             Export Playbook
           </button>
-          <div className="border-t border-[var(--border-primary)] my-1" />
+          <div className="border-t border-slate-600 my-1" />
           <button
             onClick={handleImportRoster}
-            className="w-full text-left px-4 py-2 text-sm flex items-center hover:bg-[var(--bg-tertiary)]"
+            className="w-full text-left px-4 py-2 text-sm text-slate-200 flex items-center hover:bg-slate-700 hover:text-white transition-colors"
           >
             <UploadIcon className="w-4 h-4 mr-2" />
             Import Roster (CSV)
           </button>
           <button
             onClick={handleExportRoster}
-            className="w-full text-left px-4 py-2 text-sm flex items-center hover:bg-[var(--bg-tertiary)]"
+            className="w-full text-left px-4 py-2 text-sm text-slate-200 flex items-center hover:bg-slate-700 hover:text-white transition-colors"
           >
             <DownloadIcon className="w-4 h-4 mr-2" />
             Export Roster (CSV)

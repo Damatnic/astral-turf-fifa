@@ -37,7 +37,7 @@ const ContextualToolbar: React.FC<ContextualToolbarProps> = ({
   viewMode,
 }) => {
   return (
-    <div className="flex items-center justify-between p-4 bg-slate-900/80 backdrop-blur-sm border-b border-slate-700/50">
+    <div className="flex items-center justify-between p-4 bg-slate-900  border-b border-slate-700">
       {/* Left Controls */}
       <div className="flex items-center gap-3">
         {/* Panel Toggles */}
@@ -48,7 +48,7 @@ const ContextualToolbar: React.FC<ContextualToolbarProps> = ({
             ${
               showLeftSidebar
                 ? 'bg-blue-600/80 text-white'
-                : 'bg-slate-700/50 text-slate-300 hover:bg-slate-600/50'
+                : 'bg-slate-700 text-slate-300 hover:bg-slate-600/50'
             }
           `}
           title="Toggle Left Sidebar"
@@ -63,7 +63,7 @@ const ContextualToolbar: React.FC<ContextualToolbarProps> = ({
             ${
               showRightSidebar
                 ? 'bg-blue-600/80 text-white'
-                : 'bg-slate-700/50 text-slate-300 hover:bg-slate-600/50'
+                : 'bg-slate-700 text-slate-300 hover:bg-slate-600/50'
             }
           `}
           title="Toggle Right Sidebar"
@@ -105,14 +105,14 @@ const ContextualToolbar: React.FC<ContextualToolbarProps> = ({
       <div className="flex items-center gap-2">
         {/* Quick Actions */}
         <button
-          className="p-2 text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-lg transition-all"
+          className="p-2 text-slate-300 hover:text-white hover:bg-slate-700 rounded-lg transition-all"
           title="Undo"
         >
           <Undo className="w-4 h-4" />
         </button>
 
         <button
-          className="p-2 text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-lg transition-all"
+          className="p-2 text-slate-300 hover:text-white hover:bg-slate-700 rounded-lg transition-all"
           title="Redo"
         >
           <Redo className="w-4 h-4" />
@@ -121,14 +121,14 @@ const ContextualToolbar: React.FC<ContextualToolbarProps> = ({
         <div className="w-px h-6 bg-slate-600" />
 
         <button
-          className="p-2 text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-lg transition-all"
+          className="p-2 text-slate-300 hover:text-white hover:bg-slate-700 rounded-lg transition-all"
           title="Toggle Grid"
         >
           <Grid3X3 className="w-4 h-4" />
         </button>
 
         <button
-          className="p-2 text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-lg transition-all"
+          className="p-2 text-slate-300 hover:text-white hover:bg-slate-700 rounded-lg transition-all"
           title="View Settings"
         >
           <Eye className="w-4 h-4" />
@@ -137,7 +137,7 @@ const ContextualToolbar: React.FC<ContextualToolbarProps> = ({
         <div className="w-px h-6 bg-slate-600" />
 
         <button
-          className="flex items-center gap-2 px-3 py-2 bg-slate-700/50 hover:bg-slate-600/50 text-slate-300 hover:text-white rounded-lg transition-all text-sm"
+          className="flex items-center gap-2 px-3 py-2 bg-slate-700 hover:bg-slate-600/50 text-slate-300 hover:text-white rounded-lg transition-all text-sm"
           title="Save Formation"
         >
           <Save className="w-4 h-4" />

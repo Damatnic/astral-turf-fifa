@@ -168,7 +168,7 @@ const EnhancedSoccerField: React.FC<EnhancedSoccerFieldProps> = ({ className = '
   // Error boundary for missing formations
   if (!homeFormation || !awayFormation) {
     return (
-      <div className="flex items-center justify-center h-full bg-red-900/20 border border-red-500/30 rounded-lg">
+      <div className="flex items-center justify-center h-full bg-red-950 border border-red-500/30 rounded-lg">
         <div className="text-center text-red-400">
           <div className="text-lg font-bold mb-2">⚠️ Formation Error</div>
           <div className="text-sm">Missing formation data. Please select valid formations.</div>
@@ -436,7 +436,7 @@ const EnhancedSoccerField: React.FC<EnhancedSoccerFieldProps> = ({ className = '
       ref={fieldRef}
       className={`
         relative w-full h-full bg-gradient-to-br from-green-900/20 to-green-800/30
-        border-2 border-white/20 rounded-lg overflow-hidden
+        border-2 border-slate-600 rounded-lg overflow-hidden
         ${className}
       `}
       onDrop={handleFieldDrop}
@@ -582,7 +582,7 @@ const EnhancedSoccerField: React.FC<EnhancedSoccerFieldProps> = ({ className = '
 
       {/* Loading indicator for performance */}
       {(!homeFormation || !awayFormation) && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+        <div className="absolute inset-0 flex items-center justify-center bg-slate-800">
           <div className="text-center">
             <div className="text-white text-lg mb-2">Loading formations...</div>
             <div className="text-gray-300 text-sm">

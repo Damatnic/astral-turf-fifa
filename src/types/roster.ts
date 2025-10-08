@@ -198,6 +198,7 @@ export interface PlayerCardProps {
   onRemoveFromComparison?: () => void;
   onCompareClick?: () => void;
   showDetailedStats?: boolean;
+  compact?: boolean;
   className?: string;
 }
 

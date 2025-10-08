@@ -191,7 +191,7 @@ export const TeamChallengeCreator: React.FC<TeamChallengeCreatorProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+            className="p-2 hover:bg-slate-800 rounded-lg transition-colors"
           >
             <X className="w-6 h-6 text-gray-400" />
           </button>

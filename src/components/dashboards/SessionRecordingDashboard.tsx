@@ -312,7 +312,7 @@ const OverviewTab: React.FC<{ data: AnalyticsDashboardData; isRecording: boolean
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-red-900/20 border border-red-600 rounded-lg p-4 flex items-center"
+          className="bg-red-950 border border-red-600 rounded-lg p-4 flex items-center"
         >
           <div className="w-3 h-3 bg-red-600 rounded-full animate-pulse mr-3" />
           <span className="text-red-400 font-semibold">Recording in progress...</span>

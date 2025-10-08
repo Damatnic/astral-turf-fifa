@@ -220,7 +220,7 @@ const TacticalToolbar: React.FC<TacticalToolbarProps> = ({
       transition={{ duration: 0.3, ease: 'easeOut' }}
       className={`
         fixed bottom-6 left-1/2 transform -translate-x-1/2 z-30
-        bg-slate-800/95 backdrop-blur-md border border-slate-600/50 rounded-xl shadow-2xl
+        bg-slate-800/95  border border-slate-600/50 rounded-xl shadow-2xl
         flex items-center p-3 space-x-3
         ${className}
       `}

@@ -77,7 +77,7 @@ const PlayerStatsOverlay: React.FC<{
 
   return (
     <div
-      className="fixed z-50 bg-gray-900/95 backdrop-blur-sm border border-gray-600 rounded-lg p-3 shadow-xl pointer-events-none"
+      className="fixed z-50 bg-gray-900/95  border border-gray-600 rounded-lg p-3 shadow-xl pointer-events-none"
       style={{
         left: position.x + 10,
         top: position.y - 10,
@@ -369,7 +369,7 @@ const EnhancedPlayerToken: React.FC<EnhancedPlayerTokenProps> = ({
         )}
 
         {/* Drag indicator */}
-        {isDragging && <div className="absolute inset-0 bg-white/20 rounded-full animate-ping" />}
+        {isDragging && <div className="absolute inset-0 bg-slate-700 rounded-full animate-ping" />}
 
         {/* Selection pulse */}
         {isSelected && (

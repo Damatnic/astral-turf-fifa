@@ -209,7 +209,7 @@ const PresentationControls: React.FC<PresentationControlsProps> = ({
         exit={{ opacity: 0, y: 100 }}
         className={`fixed ${isMinimized ? 'bottom-4 right-4' : 'bottom-6 left-1/2 -translate-x-1/2'} z-50`}
       >
-        <div className="bg-slate-900/95 backdrop-blur-md border border-slate-600/50 rounded-2xl shadow-2xl">
+        <div className="bg-slate-900  border border-slate-600/50 rounded-2xl shadow-2xl">
           {isMinimized ? (
             // Minimized view
             <motion.div
@@ -233,7 +233,7 @@ const PresentationControls: React.FC<PresentationControlsProps> = ({
             // Full controls view
             <>
               {/* Header */}
-              <div className="flex items-center justify-between p-4 border-b border-slate-700/50">
+              <div className="flex items-center justify-between p-4 border-b border-slate-700">
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
@@ -328,7 +328,7 @@ const PresentationControls: React.FC<PresentationControlsProps> = ({
                       %
                     </span>
                   </div>
-                  <div className="w-full bg-slate-700/50 rounded-full h-2">
+                  <div className="w-full bg-slate-700 rounded-full h-2">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{
@@ -352,7 +352,7 @@ const PresentationControls: React.FC<PresentationControlsProps> = ({
                       className={`p-2 rounded-lg transition-colors ${
                         settings.enablePointerMode
                           ? 'bg-blue-600 text-white'
-                          : 'bg-slate-700/50 text-slate-300 hover:text-white'
+                          : 'bg-slate-700 text-slate-300 hover:text-white'
                       }`}
                       title="Pointer Mode"
                     >
@@ -366,7 +366,7 @@ const PresentationControls: React.FC<PresentationControlsProps> = ({
                       className={`p-2 rounded-lg transition-colors ${
                         settings.showPlayerNames
                           ? 'bg-green-600 text-white'
-                          : 'bg-slate-700/50 text-slate-300 hover:text-white'
+                          : 'bg-slate-700 text-slate-300 hover:text-white'
                       }`}
                       title="Show Player Names"
                     >
@@ -382,7 +382,7 @@ const PresentationControls: React.FC<PresentationControlsProps> = ({
                       className={`p-2 rounded-lg transition-colors ${
                         settings.enableSoundEffects
                           ? 'bg-yellow-600 text-white'
-                          : 'bg-slate-700/50 text-slate-300 hover:text-white'
+                          : 'bg-slate-700 text-slate-300 hover:text-white'
                       }`}
                       title="Sound Effects"
                     >
@@ -398,7 +398,7 @@ const PresentationControls: React.FC<PresentationControlsProps> = ({
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={onExitFullscreen}
-                        className="p-2 bg-slate-700/50 text-slate-300 hover:text-white rounded-lg transition-colors"
+                        className="p-2 bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-colors"
                         title="Exit Fullscreen"
                       >
                         <Minimize2 className="w-4 h-4" />
@@ -408,7 +408,7 @@ const PresentationControls: React.FC<PresentationControlsProps> = ({
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={onEnterFullscreen}
-                        className="p-2 bg-slate-700/50 text-slate-300 hover:text-white rounded-lg transition-colors"
+                        className="p-2 bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-colors"
                         title="Enter Fullscreen"
                       >
                         <Maximize2 className="w-4 h-4" />
@@ -423,7 +423,7 @@ const PresentationControls: React.FC<PresentationControlsProps> = ({
                     className={`p-2 rounded-lg transition-colors ${
                       showSettings
                         ? 'bg-purple-600 text-white'
-                        : 'bg-slate-700/50 text-slate-300 hover:text-white'
+                        : 'bg-slate-700 text-slate-300 hover:text-white'
                     }`}
                     title="Presentation Settings"
                   >
@@ -439,7 +439,7 @@ const PresentationControls: React.FC<PresentationControlsProps> = ({
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
-                    className="border-t border-slate-700/50 p-4 space-y-4"
+                    className="border-t border-slate-700 p-4 space-y-4"
                   >
                     <h4 className="text-sm font-semibold text-white flex items-center gap-2">
                       <Lightbulb className="w-4 h-4 text-yellow-400" />

@@ -2,27 +2,21 @@ import React, { useState, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
+import { useAuthContext } from '../../hooks/useAuthContext';
+import { getNavigationForRole, type NavItem } from './RoleBasedNavigation';
 
-// Navigation item interface
-interface NavItem {
-  id: string;
-  label: string;
-  path?: string;
-  icon: string;
-  description?: string;
-  badge?: string | number;
-  children?: NavItem[];
-  divider?: boolean;
-}
+// Note: Navigation structure moved to RoleBasedNavigation.tsx
+// This component now uses role-based filtering
 
-// Complete site navigation structure
-const SITE_NAVIGATION: NavItem[] = [
+// Legacy navigation structure (will be removed)
+const LEGACY_SITE_NAVIGATION: NavItem[] = [
   {
     id: 'dashboard',
     label: 'Dashboard',
     path: '/dashboard',
     icon: '🏠',
     description: 'Overview & quick stats',
+    roles: ['coach', 'player', 'family'], // Everyone
   },
   {
     id: 'tactics',
@@ -30,6 +24,7 @@ const SITE_NAVIGATION: NavItem[] = [
     path: '/tactics',
     icon: '⚽',
     description: 'Formation & tactical setup',
+    roles: ['coach'], // Coach only
   },
   {
     id: 'squad',
@@ -146,15 +141,22 @@ export const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { authState } = useAuthContext();
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Get role-based navigation
+  const roleBasedNav = useMemo(() => {
+    const userRole = authState.user?.role || 'player'; // Default to player if no role
+    return getNavigationForRole(userRole);
+  }, [authState.user?.role]);
+
   // Filter navigation items based on search
   const filteredNavigation = useMemo(() => {
-    if (!searchQuery) {return SITE_NAVIGATION;}
+    if (!searchQuery) {return roleBasedNav;}
 
     const query = searchQuery.toLowerCase();
-    return SITE_NAVIGATION.map(item => {
+    return roleBasedNav.map(item => {
       const matchesItem = item.label.toLowerCase().includes(query) ||
                          item.description?.toLowerCase().includes(query);
 
@@ -205,17 +207,17 @@ export const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({
                 onClick={() => handleNavigate(item.path!)}
                 className={cn(
                   'px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200',
-                  'hover:bg-secondary-700/50 hover:text-white',
+                  'hover:bg-slate-700 hover:text-white',
                   'flex items-center space-x-2',
                   isActive(item)
-                    ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/20'
-                    : 'text-secondary-300',
+                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-900'
+                    : 'text-slate-300',
                 )}
               >
                 <span>{item.icon}</span>
                 <span className="hidden lg:inline">{item.label}</span>
                 {item.badge && (
-                  <span className="ml-2 px-2 py-0.5 text-xs bg-accent-500 text-white rounded-full">
+                  <span className="ml-2 px-2 py-0.5 text-xs bg-blue-500 text-white rounded-full">
                     {item.badge}
                   </span>
                 )}
@@ -226,11 +228,11 @@ export const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({
                 <button
                   className={cn(
                     'px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200',
-                    'hover:bg-secondary-700/50 hover:text-white',
+                    'hover:bg-slate-700 hover:text-white',
                     'flex items-center space-x-2',
                     isActive(item)
-                      ? 'bg-secondary-700 text-white'
-                      : 'text-secondary-300',
+                      ? 'bg-slate-700 text-white'
+                      : 'text-slate-300',
                   )}
                 >
                   <span>{item.icon}</span>
@@ -239,10 +241,10 @@ export const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({
                 </button>
 
                 {/* Dropdown menu */}
-                <div className="absolute left-0 mt-2 w-64 bg-secondary-900 backdrop-blur-xl rounded-lg shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[60] border border-secondary-700">
+                <div className="absolute left-0 mt-2 w-64 bg-slate-900 rounded-lg shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[60] border border-slate-700">
                   <div className="p-2">
                     {item.description && (
-                      <div className="px-3 py-2 text-xs text-secondary-400 border-b border-secondary-700 mb-2">
+                      <div className="px-3 py-2 text-xs text-slate-400 border-b border-slate-700 mb-2">
                         {item.description}
                       </div>
                     )}
@@ -252,18 +254,18 @@ export const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({
                         onClick={() => handleNavigate(child.path!)}
                         className={cn(
                           'w-full text-left px-3 py-2 rounded-md transition-all duration-200',
-                          'hover:bg-secondary-700 hover:text-white',
+                          'hover:bg-slate-700 hover:text-white',
                           'flex items-center space-x-3',
                           location.pathname === child.path
-                            ? 'bg-primary-600 text-white'
-                            : 'text-secondary-300',
+                            ? 'bg-blue-600 text-white'
+                            : 'text-slate-300',
                         )}
                       >
                         <span className="text-lg">{child.icon}</span>
                         <div className="flex-1">
                           <div className="font-medium">{child.label}</div>
                           {child.description && (
-                            <div className="text-xs text-secondary-400 mt-0.5">
+                            <div className="text-xs text-slate-400 mt-0.5">
                               {child.description}
                             </div>
                           )}
@@ -286,7 +288,7 @@ export const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({
       <nav className={cn('flex flex-col space-y-1 p-3', className)}>
         {filteredNavigation.map((item) => (
           <div key={item.id}>
-            {item.divider && <div className="border-t border-secondary-700 my-2" />}
+            {item.divider && <div className="border-t border-slate-700 my-2" />}
 
             {item.path ? (
               // Direct navigation item
@@ -294,24 +296,24 @@ export const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({
                 onClick={() => handleNavigate(item.path!)}
                 className={cn(
                   'w-full text-left px-3 py-2 rounded-lg transition-all duration-200',
-                  'hover:bg-secondary-700/50 hover:text-white',
+                  'hover:bg-slate-700 hover:text-white',
                   'flex items-center space-x-3',
                   isActive(item)
-                    ? 'bg-primary-600 text-white shadow-lg'
-                    : 'text-secondary-300',
+                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-900'
+                    : 'text-slate-300',
                 )}
               >
                 <span className="text-xl">{item.icon}</span>
                 <div className="flex-1">
                   <div className="font-medium">{item.label}</div>
                   {item.description && (
-                    <div className="text-xs text-secondary-400 mt-0.5">
+                    <div className="text-xs text-slate-400 mt-0.5">
                       {item.description}
                     </div>
                   )}
                 </div>
                 {item.badge && (
-                  <span className="px-2 py-0.5 text-xs bg-accent-500 text-white rounded-full">
+                  <span className="px-2 py-0.5 text-xs bg-blue-500 text-white rounded-full">
                     {item.badge}
                   </span>
                 )}
@@ -323,18 +325,18 @@ export const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({
                   onClick={() => toggleSubmenu(item.id)}
                   className={cn(
                     'w-full text-left px-3 py-2 rounded-lg transition-all duration-200',
-                    'hover:bg-secondary-700/50 hover:text-white',
+                    'hover:bg-slate-700 hover:text-white',
                     'flex items-center space-x-3',
                     isActive(item) || openSubmenu === item.id
-                      ? 'bg-secondary-700 text-white'
-                      : 'text-secondary-300',
+                      ? 'bg-slate-700 text-white'
+                      : 'text-slate-300',
                   )}
                 >
                   <span className="text-xl">{item.icon}</span>
                   <div className="flex-1">
                     <div className="font-medium">{item.label}</div>
                     {item.description && (
-                      <div className="text-xs text-secondary-400 mt-0.5">
+                      <div className="text-xs text-slate-400 mt-0.5">
                         {item.description}
                       </div>
                     )}
@@ -358,18 +360,18 @@ export const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({
                       transition={{ duration: 0.2 }}
                       className="overflow-hidden"
                     >
-                      <div className="ml-6 mt-1 space-y-1 border-l-2 border-secondary-700 pl-3">
+                      <div className="ml-6 mt-1 space-y-1 border-l-2 border-slate-700 pl-3">
                         {item.children?.map((child) => (
                           <button
                             key={child.id}
                             onClick={() => handleNavigate(child.path!)}
                             className={cn(
                               'w-full text-left px-3 py-2 rounded-lg transition-all duration-200',
-                              'hover:bg-secondary-700/50 hover:text-white text-sm',
+                              'hover:bg-slate-700 hover:text-white text-sm',
                               'flex items-center space-x-2',
                               location.pathname === child.path
-                                ? 'bg-primary-600 text-white'
-                                : 'text-secondary-400',
+                                ? 'bg-blue-600 text-white'
+                                : 'text-slate-400',
                             )}
                           >
                             <span>{child.icon}</span>
@@ -393,13 +395,13 @@ export const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({
     <div className={cn('flex flex-col h-full', className)}>
       {/* Search bar */}
       {showSearch && (
-        <div className="p-4 border-b border-secondary-700">
+        <div className="p-4 border-b border-slate-700">
           <input
             type="text"
             placeholder="Search navigation..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full px-4 py-2 bg-secondary-800 border border-secondary-700 rounded-lg text-white placeholder-secondary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
       )}
@@ -409,31 +411,31 @@ export const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({
         <nav className="flex flex-col p-3 space-y-1">
           {filteredNavigation.map((item) => (
             <div key={item.id}>
-              {item.divider && <div className="border-t border-secondary-700 my-3" />}
+              {item.divider && <div className="border-t border-slate-700 my-3" />}
 
               {item.path ? (
                 <button
                   onClick={() => handleNavigate(item.path!)}
                   className={cn(
                     'w-full text-left px-4 py-3 rounded-lg transition-all duration-200',
-                    'hover:bg-secondary-700/50',
+                    'hover:bg-slate-700',
                     'flex items-center space-x-3',
                     isActive(item)
-                      ? 'bg-primary-600 text-white shadow-lg'
-                      : 'text-secondary-300',
+                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-900'
+                      : 'text-slate-300',
                   )}
                 >
                   <span className="text-2xl">{item.icon}</span>
                   <div className="flex-1">
                     <div className="font-semibold text-base">{item.label}</div>
                     {item.description && (
-                      <div className="text-sm text-secondary-400 mt-0.5">
+                      <div className="text-sm text-slate-400 mt-0.5">
                         {item.description}
                       </div>
                     )}
                   </div>
                   {item.badge && (
-                    <span className="px-2 py-1 text-xs bg-accent-500 text-white rounded-full">
+                    <span className="px-2 py-1 text-xs bg-blue-500 text-white rounded-full">
                       {item.badge}
                     </span>
                   )}
@@ -444,18 +446,18 @@ export const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({
                     onClick={() => toggleSubmenu(item.id)}
                     className={cn(
                       'w-full text-left px-4 py-3 rounded-lg transition-all duration-200',
-                      'hover:bg-secondary-700/50',
+                      'hover:bg-slate-700',
                       'flex items-center space-x-3',
                       isActive(item) || openSubmenu === item.id
-                        ? 'bg-secondary-700 text-white'
-                        : 'text-secondary-300',
+                        ? 'bg-slate-700 text-white'
+                        : 'text-slate-300',
                     )}
                   >
                     <span className="text-2xl">{item.icon}</span>
                     <div className="flex-1">
                       <div className="font-semibold text-base">{item.label}</div>
                       {item.description && (
-                        <div className="text-sm text-secondary-400 mt-0.5">
+                        <div className="text-sm text-slate-400 mt-0.5">
                           {item.description}
                         </div>
                       )}
@@ -484,11 +486,11 @@ export const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({
                               onClick={() => handleNavigate(child.path!)}
                               className={cn(
                                 'w-full text-left px-4 py-2 rounded-lg transition-all duration-200',
-                                'hover:bg-secondary-700/50',
+                                'hover:bg-slate-700',
                                 'flex items-center space-x-3',
                                 location.pathname === child.path
-                                  ? 'bg-primary-600 text-white'
-                                  : 'text-secondary-400',
+                                  ? 'bg-blue-600 text-white'
+                                  : 'text-slate-400',
                               )}
                             >
                               <span className="text-lg">{child.icon}</span>

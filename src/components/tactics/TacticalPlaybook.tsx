@@ -201,17 +201,17 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
+        className="fixed inset-0 z-50 bg-slate-800  flex items-center justify-center p-4"
         onClick={e => e.target === e.currentTarget && onClose()}
       >
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
-          className="bg-slate-900/95 backdrop-blur-md border border-slate-700/50 rounded-xl w-full max-w-6xl h-full max-h-[90vh] flex flex-col"
+          className="bg-slate-900  border border-slate-700 rounded-xl w-full max-w-6xl h-full max-h-[90vh] flex flex-col"
         >
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-slate-700/50">
+          <div className="flex items-center justify-between p-6 border-b border-slate-700">
             <div className="flex items-center gap-3">
               <BookOpen className="w-6 h-6 text-blue-400" />
               <h2 className="text-xl font-bold text-white">Tactical Playbook</h2>
@@ -254,7 +254,7 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
           </div>
 
           {/* Search and Filter Bar */}
-          <div className="p-6 border-b border-slate-700/50">
+          <div className="p-6 border-b border-slate-700">
             <div className="flex items-center gap-4">
               <div className="flex-1 relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -263,7 +263,7 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
                   placeholder="Search formations..."
                   value={searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 bg-slate-800/50 border border-slate-700/50 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-blue-500/50"
+                  className="w-full pl-10 pr-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-blue-500/50"
                 />
               </div>
 
@@ -272,7 +272,7 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
                 <select
                   value={filterBy}
                   onChange={e => setFilterBy(e.target.value as 'all' | 'favorite' | 'recent')}
-                  className="bg-slate-800/50 border border-slate-700/50 rounded-lg text-white px-3 py-2 focus:outline-none focus:border-blue-500/50"
+                  className="bg-slate-800/50 border border-slate-700 rounded-lg text-white px-3 py-2 focus:outline-none focus:border-blue-500/50"
                 >
                   <option value="all">All</option>
                   <option value="favorite">Favorites</option>
@@ -301,7 +301,7 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
                     key={formation.id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-4 hover:border-slate-600/50 transition-colors"
+                    className="bg-slate-800/50 border border-slate-700 rounded-lg p-4 hover:border-slate-600/50 transition-colors"
                   >
                     <div className="flex items-start justify-between mb-3">
                       <h3 className="font-semibold text-white truncate">{formation.name}</h3>
@@ -383,14 +383,14 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/50 flex items-center justify-center p-4"
+              className="absolute inset-0 bg-slate-800 flex items-center justify-center p-4"
               onClick={e => e.target === e.currentTarget && setShowSaveDialog(false)}
             >
               <motion.div
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.9, opacity: 0 }}
-                className="bg-slate-900/95 border border-slate-700/50 rounded-xl p-6 w-full max-w-md"
+                className="bg-slate-900 border border-slate-700 rounded-xl p-6 w-full max-w-md"
               >
                 <h3 className="text-lg font-semibold text-white mb-4">Save Formation</h3>
 
@@ -399,7 +399,7 @@ const TacticalPlaybook: React.FC<TacticalPlaybookProps> = ({
                   placeholder="Enter formation name..."
                   value={formationName}
                   onChange={e => setFormationName(e.target.value)}
-                  className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700/50 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-blue-500/50 mb-4"
+                  className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-blue-500/50 mb-4"
                   autoFocus
                 />
 

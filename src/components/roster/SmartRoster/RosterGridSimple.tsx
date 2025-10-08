@@ -1,11 +1,26 @@
 /**
- * RosterGrid Component (Simplified - No Virtual Scrolling)
+ * RosterGrid Component (Simplified - N        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setIsCompact(!isCompact)}
+            className="flex items-center gap-2 px-3 py-1.5 text-sm text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
+            type="button"
+          >
+            {isCompact ? <Maximize2 size={16} /> : <Minimize2 size={16} />}
+            <span className="hidden sm:inline">
+              {isCompact ? 'Normal' : 'Compact'}
+            </span>
+          </button>
+          <button
+            onClick={handleViewModeToggle}
+            className="flex items-center gap-2 px-3 py-1.5 text-sm text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
+            type="button"
+          >ing)
  *
  * Simplified roster grid without react-window dependency
  */
 
 import React, { useState, useCallback } from 'react';
-import { Grid as GridIcon, List } from 'lucide-react';
+import { Grid as GridIcon, List, Minimize2, Maximize2 } from 'lucide-react';
 import type { RosterGridProps } from '../../../types/roster';
 import PlayerCard from './PlayerCard';
 
@@ -25,6 +40,7 @@ export default function RosterGrid({
   className = '',
 }: RosterGridProps) {
   const [localViewMode, setLocalViewMode] = useState(viewMode);
+  const [isCompact, setIsCompact] = useState(false);
 
   const handleViewModeToggle = useCallback(() => {
     const newMode = localViewMode === 'grid' ? 'list' : 'grid';
@@ -41,25 +57,37 @@ export default function RosterGrid({
         <div className="text-sm text-slate-300">
           {players.length} {players.length === 1 ? 'Player' : 'Players'}
         </div>
-        <button
-          onClick={handleViewModeToggle}
-          className="flex items-center gap-2 px-3 py-1.5 text-sm text-slate-300 hover:text-white bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-colors"
-          type="button"
-        >
-          {localViewMode === 'grid' ? <List size={16} /> : <GridIcon size={16} />}
-          <span className="hidden sm:inline">
-            {localViewMode === 'grid' ? 'List View' : 'Grid View'}
-          </span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setIsCompact(!isCompact)}
+            className="flex items-center gap-2 px-3 py-1.5 text-sm text-slate-300 hover:text-white bg-slate-700 hover:bg-slate-700 rounded-lg transition-colors"
+            type="button"
+          >
+            {isCompact ? <Maximize2 size={16} /> : <Minimize2 size={16} />}
+            <span className="hidden sm:inline">
+              {isCompact ? 'Normal' : 'Compact'}
+            </span>
+          </button>
+          <button
+            onClick={handleViewModeToggle}
+            className="flex items-center gap-2 px-3 py-1.5 text-sm text-slate-300 hover:text-white bg-slate-700 hover:bg-slate-700 rounded-lg transition-colors"
+            type="button"
+          >
+            {localViewMode === 'grid' ? <List size={16} /> : <GridIcon size={16} />}
+            <span className="hidden sm:inline">
+              {localViewMode === 'grid' ? 'List View' : 'Grid View'}
+            </span>
+          </button>
+        </div>
       </div>
 
       {/* Player Grid/List */}
-      <div className="flex-1 overflow-y-auto p-2">
+      <div className="flex-1 overflow-y-auto p-3">
         {localViewMode === 'grid' ? (
           <div
-            className="grid gap-2"
+            className="grid gap-3"
             style={{
-              gridTemplateColumns: `repeat(${gridColumns}, minmax(0, 1fr))`,
+              gridTemplateColumns: `repeat(auto-fill, minmax(${isCompact ? '120px' : '240px'}, 1fr))`,
             }}
           >
             {players.map((player) => {
@@ -74,6 +102,7 @@ export default function RosterGrid({
                     isInComparison={isComparing}
                     isComparing={isComparing}
                     viewMode="grid"
+                    compact={isCompact}
                     onClick={() => onPlayerSelect?.(player.id)}
                     onDoubleClick={() => onPlayerDoubleClick?.(player.id)}
                     onDragStart={(e: React.DragEvent<HTMLElement>) => onPlayerDragStart?.(player.id, e)}
@@ -105,6 +134,7 @@ export default function RosterGrid({
                   isInComparison={isComparing}
                   isComparing={isComparing}
                   viewMode="list"
+                  compact={isCompact}
                   onClick={() => onPlayerSelect?.(player.id)}
                   onDoubleClick={() => onPlayerDoubleClick?.(player.id)}
                   onDragStart={(e: React.DragEvent<HTMLElement>) => onPlayerDragStart?.(player.id, e)}

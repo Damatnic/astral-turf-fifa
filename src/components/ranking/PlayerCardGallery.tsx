@@ -307,7 +307,7 @@ const PlayerCardGallery: React.FC<PlayerCardGalleryProps> = ({
                         type="checkbox"
                         checked={isSelected}
                         onChange={() => toggleCardSelection(player.id)}
-                        className="w-5 h-5 rounded border-2 border-white bg-gray-900/80 backdrop-blur-sm checked:bg-blue-600 checked:border-blue-600 cursor-pointer"
+                        className="w-5 h-5 rounded border-2 border-white bg-gray-900/80  checked:bg-blue-600 checked:border-blue-600 cursor-pointer"
                       />
                     </div>
 
@@ -343,7 +343,7 @@ const PlayerCardGallery: React.FC<PlayerCardGalleryProps> = ({
                         type="checkbox"
                         checked={isSelected}
                         onChange={() => toggleCardSelection(player.id)}
-                        className="w-5 h-5 rounded border-2 border-white bg-gray-900/80 backdrop-blur-sm checked:bg-blue-600 checked:border-blue-600 cursor-pointer"
+                        className="w-5 h-5 rounded border-2 border-white bg-gray-900/80  checked:bg-blue-600 checked:border-blue-600 cursor-pointer"
                       />
                     </div>
 

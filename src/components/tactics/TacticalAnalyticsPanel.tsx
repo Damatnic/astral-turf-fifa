@@ -152,7 +152,7 @@ const TacticalAnalyticsPanel: React.FC<TacticalAnalyticsPanelProps> = ({
   }> = ({ title, value, icon: Icon, color, description }) => (
     <motion.div
       whileHover={{ scale: 1.02 }}
-      className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-4 hover:border-slate-600/50 transition-colors"
+      className="bg-slate-800/50 border border-slate-700 rounded-lg p-4 hover:border-slate-600/50 transition-colors"
     >
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
@@ -165,7 +165,7 @@ const TacticalAnalyticsPanel: React.FC<TacticalAnalyticsPanelProps> = ({
         </div>
       </div>
 
-      <div className="w-full bg-slate-700/50 rounded-full h-2 mb-2">
+      <div className="w-full bg-slate-700 rounded-full h-2 mb-2">
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${value}%` }}
@@ -184,17 +184,17 @@ const TacticalAnalyticsPanel: React.FC<TacticalAnalyticsPanelProps> = ({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
+        className="fixed inset-0 z-50 bg-slate-800  flex items-center justify-center p-4"
         onClick={e => e.target === e.currentTarget && onClose()}
       >
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
-          className="bg-slate-900/95 backdrop-blur-md border border-slate-700/50 rounded-xl w-full max-w-6xl h-full max-h-[90vh] flex flex-col"
+          className="bg-slate-900  border border-slate-700 rounded-xl w-full max-w-6xl h-full max-h-[90vh] flex flex-col"
         >
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-slate-700/50">
+          <div className="flex items-center justify-between p-6 border-b border-slate-700">
             <div className="flex items-center gap-3">
               <BarChart3 className="w-6 h-6 text-blue-400" />
               <h2 className="text-xl font-bold text-white">Tactical Analytics</h2>
@@ -362,7 +362,7 @@ const TacticalAnalyticsPanel: React.FC<TacticalAnalyticsPanelProps> = ({
                       </div>
 
                       {/* Weaknesses */}
-                      <div className="bg-red-900/20 border border-red-700/50 rounded-lg p-4">
+                      <div className="bg-red-950 border border-red-700/50 rounded-lg p-4">
                         <h4 className="font-semibold text-red-400 mb-3 flex items-center gap-2">
                           <Shield className="w-4 h-4" />
                           Areas to Improve
@@ -398,7 +398,7 @@ const TacticalAnalyticsPanel: React.FC<TacticalAnalyticsPanelProps> = ({
                     </div>
 
                     {/* Overall Rating */}
-                    <div className="mt-6 bg-slate-800/50 border border-slate-700/50 rounded-lg p-6">
+                    <div className="mt-6 bg-slate-800/50 border border-slate-700 rounded-lg p-6">
                       <div className="flex items-center justify-between mb-4">
                         <h4 className="font-semibold text-white">Formation Effectiveness</h4>
                         <div className="flex items-center gap-2">
@@ -419,7 +419,7 @@ const TacticalAnalyticsPanel: React.FC<TacticalAnalyticsPanelProps> = ({
                         </div>
                       </div>
 
-                      <div className="w-full bg-slate-700/50 rounded-full h-3">
+                      <div className="w-full bg-slate-700 rounded-full h-3">
                         <motion.div
                           initial={{ width: 0 }}
                           animate={{ width: `${analysis.effectiveness}%` }}

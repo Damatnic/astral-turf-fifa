@@ -169,10 +169,10 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
           top: 100%;
           left: 0;
           margin-top: 0.5rem;
-          background: #1a1a2e;
-          border: 1px solid rgba(255, 255, 255, 0.1);
+          background: #0f172a;
+          border: 1px solid #334155;
           border-radius: 8px;
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
           overflow: hidden;
           min-width: 200px;
           z-index: 1100;

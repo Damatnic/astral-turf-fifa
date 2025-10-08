@@ -165,7 +165,7 @@ const PlayerDragLayer: React.FC<PlayerDragLayerProps> = ({
           initial={{ opacity: 0, scale: 0.8, x: -20 }}
           animate={{ opacity: 1, scale: 1, x: 0 }}
           exit={{ opacity: 0, scale: 0.8, x: -20 }}
-          className="absolute top-6 left-6 bg-slate-900/95 backdrop-blur-xl border border-slate-700/50 rounded-xl p-4 max-w-sm shadow-2xl"
+          className="absolute top-6 left-6 bg-slate-900 backdrop-blur-xl border border-slate-700 rounded-xl p-4 max-w-sm shadow-2xl"
         >
           <div className="flex items-center gap-3">
             <div
@@ -231,7 +231,7 @@ const PlayerDragLayer: React.FC<PlayerDragLayerProps> = ({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 20 }}
-          className="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-slate-900/95 backdrop-blur-xl border border-slate-700/50 rounded-xl px-6 py-3 shadow-2xl"
+          className="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-slate-900 backdrop-blur-xl border border-slate-700 rounded-xl px-6 py-3 shadow-2xl"
         >
           <div className="flex items-center gap-4 text-sm">
             <div className="flex items-center gap-2">
@@ -240,7 +240,7 @@ const PlayerDragLayer: React.FC<PlayerDragLayerProps> = ({
               </div>
               <span className="text-white">Drop to place</span>
             </div>
-            <div className="w-px h-6 bg-slate-700/50" />
+            <div className="w-px h-6 bg-slate-700" />
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center">
                 <span className="text-red-400 font-mono font-bold">ESC</span>
@@ -249,7 +249,7 @@ const PlayerDragLayer: React.FC<PlayerDragLayerProps> = ({
             </div>
             {isSnapTarget && (
               <>
-                <div className="w-px h-6 bg-slate-700/50" />
+                <div className="w-px h-6 bg-slate-700" />
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
                   <span className="text-green-400 font-medium">Ready to snap</span>

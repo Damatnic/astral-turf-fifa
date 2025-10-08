@@ -227,8 +227,9 @@ class ApiService {
   private requestInterceptors: RequestInterceptorEntry[] = [];
   private responseInterceptors: ResponseInterceptorEntry[] = [];
   private responseCache: Map<string, CachedResponse> = new Map();
-  private __debugTimeoutCount = 0;
-  private __debugTimeoutValues: Array<number | null> = [];
+  // Debug properties (development only)
+  private __debugTimeoutCount = process.env.NODE_ENV === 'development' ? 0 : undefined as any;
+  private __debugTimeoutValues: Array<number | null> = process.env.NODE_ENV === 'development' ? [] : undefined as any;
 
   // Event callbacks
   private onApiCallCallback?: (usage: ApiUsage) => void;
@@ -468,7 +469,9 @@ class ApiService {
 
     return new Promise<FetchResponse>((resolve, reject) => {
   const originalTimeout = timeout ?? null;
-  this.__debugTimeoutValues.push(originalTimeout);
+  if (process.env.NODE_ENV === 'development') {
+    this.__debugTimeoutValues?.push(originalTimeout);
+  }
       let settled = false;
       let timer: ReturnType<typeof setTimeout> | undefined;
       let externalSubscription: { target: AbortSignalWithTarget; handler: () => void } | null =
@@ -549,7 +552,9 @@ class ApiService {
         effectiveTimeout = timeout - elapsed;
 
         if (effectiveTimeout <= 0) {
-          this.__debugTimeoutCount += 1;
+          if (process.env.NODE_ENV === 'development' && this.__debugTimeoutCount !== undefined) {
+            this.__debugTimeoutCount += 1;
+          }
           timeoutFired = true;
           rejectWith(new Error('timeout'));
           if (controller) {
@@ -560,7 +565,9 @@ class ApiService {
       }
 
       if (effectiveTimeout && effectiveTimeout > 0) {
-        this.__debugTimeoutCount += 1;
+        if (process.env.NODE_ENV === 'development' && this.__debugTimeoutCount !== undefined) {
+          this.__debugTimeoutCount += 1;
+        }
         timer = setTimeout(() => {
           timeoutFired = true;
           rejectWith(new Error('timeout'));
@@ -1905,10 +1912,11 @@ $players = $api->getPlayers(['team' => 'home']);
   private setupApiClients(): void {
     // Setup internal API clients for different services
     const services = ['auth', 'players', 'formations', 'matches'];
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5555/api';
 
     services.forEach(service => {
       const client = axios.create({
-        baseURL: `http://localhost:3000/api/${service}`,
+        baseURL: `${API_URL}/${service}`,
         timeout: 5000,
         headers: {
           'Content-Type': 'application/json',

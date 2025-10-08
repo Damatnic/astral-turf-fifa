@@ -431,7 +431,7 @@ export const TacticalBoard = forwardRef<HTMLDivElement, TacticalBoardProps>(
         aria-describedby="tactical-board-description"
         className={cn(
           'relative bg-gradient-to-b from-green-600 to-green-700 rounded-lg overflow-hidden',
-          'border-2 border-white/20 shadow-2xl',
+          'border-2 border-slate-600 shadow-2xl',
           !readonly && 'cursor-crosshair',
           className,
         )}
@@ -498,7 +498,7 @@ export const TacticalBoard = forwardRef<HTMLDivElement, TacticalBoardProps>(
 
         {/* Mode indicator */}
         <div
-          className="absolute top-4 right-4 bg-black/20 backdrop-blur-sm rounded-lg px-3 py-1"
+          className="absolute top-4 right-4 bg-slate-650  rounded-lg px-3 py-1"
           role="status"
           aria-label={`Current mode: ${mode}`}
         >
@@ -508,7 +508,7 @@ export const TacticalBoard = forwardRef<HTMLDivElement, TacticalBoardProps>(
         {/* Line creation indicator */}
         {isCreatingLine && lineStart && (
           <div
-            className="absolute bottom-4 left-4 bg-primary-600/90 backdrop-blur-sm rounded-lg px-3 py-2"
+            className="absolute bottom-4 left-4 bg-primary-600/90  rounded-lg px-3 py-2"
             role="status"
             aria-live="polite"
           >
@@ -632,7 +632,7 @@ const PlayerToken: React.FC<PlayerTokenProps> = ({
         <div
           className={cn(
             'absolute top-14 left-1/2 transform -translate-x-1/2',
-            'bg-black/60 backdrop-blur-sm rounded px-2 py-1',
+            'bg-slate-900  rounded px-2 py-1',
             'opacity-0 group-hover:opacity-100 transition-opacity duration-200',
             'whitespace-nowrap text-xs font-medium text-white',
             'pointer-events-none z-10',

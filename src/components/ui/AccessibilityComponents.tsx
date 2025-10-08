@@ -271,7 +271,7 @@ export const AccessibleModal: React.FC<AccessibleModalProps> = ({
         <>
           {/* Backdrop */}
           <motion.div
-            className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm"
+            className="fixed inset-0 bg-black bg-opacity-50 "
             style={{ zIndex: tokens.zIndex.overlay }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

@@ -342,7 +342,7 @@ export const TouchFirstTacticsBoard: React.FC<TouchFirstTacticsBoardProps> = ({
           mobileUI.showToolbar ? 'translate-y-0' : '-translate-y-full'
         }`}
       >
-        <Card className="bg-black/50 backdrop-blur-md border-white/20 rounded-none border-x-0 border-t-0">
+        <Card className="bg-slate-800  border-slate-600 rounded-none border-x-0 border-t-0">
           <CardHeader className="py-3">
             <CardTitle className="flex items-center justify-between text-white">
               <div className="flex items-center gap-2">
@@ -360,7 +360,7 @@ export const TouchFirstTacticsBoard: React.FC<TouchFirstTacticsBoardProps> = ({
                 <Button
                   size="sm"
                   onClick={() => setMobileUI(prev => ({ ...prev, showToolbar: false }))}
-                  className="bg-white/10 hover:bg-white/20 border-white/20 p-1"
+                  className="bg-slate-800 hover:bg-slate-700 border-slate-600 p-1"
                 >
                   <X className="w-4 h-4" />
                 </Button>
@@ -374,7 +374,7 @@ export const TouchFirstTacticsBoard: React.FC<TouchFirstTacticsBoardProps> = ({
       {!mobileUI.showToolbar && (
         <Button
           onClick={() => setMobileUI(prev => ({ ...prev, showToolbar: true }))}
-          className="absolute top-4 right-4 z-50 bg-black/50 backdrop-blur-md border-white/20"
+          className="absolute top-4 right-4 z-50 bg-slate-800  border-slate-600"
           size="sm"
         >
           <Menu className="w-4 h-4" />
@@ -540,7 +540,7 @@ export const TouchFirstTacticsBoard: React.FC<TouchFirstTacticsBoardProps> = ({
             <Button
               key={index}
               onClick={button.action}
-              className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-md border-white/20 hover:bg-white/20"
+              className="w-12 h-12 rounded-full bg-slate-800  border-slate-600 hover:bg-slate-700"
               size="sm"
             >
               {button.icon}
@@ -552,14 +552,14 @@ export const TouchFirstTacticsBoard: React.FC<TouchFirstTacticsBoardProps> = ({
       {/* Gesture Hints */}
       {showGestureHints && (
         <div className="absolute bottom-4 left-4 right-4 z-40">
-          <Card className="bg-black/70 backdrop-blur-md border-white/20">
+          <Card className="bg-black/70  border-slate-600">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-white font-semibold text-sm">Touch Gestures</h3>
                 <Button
                   size="sm"
                   onClick={() => setShowGestureHints(false)}
-                  className="bg-white/10 hover:bg-white/20 border-white/20 p-1"
+                  className="bg-slate-800 hover:bg-slate-700 border-slate-600 p-1"
                 >
                   <X className="w-3 h-3" />
                 </Button>
@@ -581,7 +581,7 @@ export const TouchFirstTacticsBoard: React.FC<TouchFirstTacticsBoardProps> = ({
       )}
 
       {/* Mobile Status Bar */}
-      <div className="absolute bottom-0 left-0 right-0 z-40 bg-black/50 backdrop-blur-md border-t border-white/20 p-2">
+      <div className="absolute bottom-0 left-0 right-0 z-40 bg-slate-800  border-t border-slate-600 p-2">
         <div className="flex items-center justify-between text-white text-xs">
           <div className="flex items-center gap-4">
             <span>Players: {players.length}</span>

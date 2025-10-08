@@ -10,4 +10,3 @@ export const TacticsContext = createContext<{
   dispatch: () => null,
 });
 
-export { TacticsProvider, useTacticsContext } from './TacticsContext.tsx';

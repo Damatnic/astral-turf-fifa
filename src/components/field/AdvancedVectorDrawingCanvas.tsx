@@ -828,7 +828,7 @@ const AdvancedVectorDrawingCanvas: React.FC<AdvancedVectorDrawingCanvasProps> = 
             onBlur={finalizeText}
             onKeyDown={handleTextKeyDown}
             autoFocus
-            className="px-3 py-2 rounded-lg border-2 outline-none text-center font-medium backdrop-blur-md"
+            className="px-3 py-2 rounded-lg border-2 outline-none text-center font-medium "
             style={{
               background: 'rgba(15, 23, 42, 0.9)',
               borderColor: drawingColor || '#ffffff',
@@ -842,7 +842,7 @@ const AdvancedVectorDrawingCanvas: React.FC<AdvancedVectorDrawingCanvasProps> = 
       )}
 
       {/* Layer controls */}
-      <div className="absolute top-4 right-4 z-30 bg-gray-900/80 backdrop-blur-md rounded-lg p-2 border border-white/20">
+      <div className="absolute top-4 right-4 z-30 bg-gray-900/80  rounded-lg p-2 border border-slate-600">
         <div className="text-xs text-white/70 mb-2 font-medium">Layers</div>
         {Object.keys(drawingState.layers).map(layerNum => {
           const layer = parseInt(layerNum);
@@ -864,7 +864,7 @@ const AdvancedVectorDrawingCanvas: React.FC<AdvancedVectorDrawingCanvasProps> = 
           );
         })}
 
-        <div className="border-t border-white/20 mt-2 pt-2">
+        <div className="border-t border-slate-600 mt-2 pt-2">
           <label className="flex items-center space-x-2">
             <input
               type="checkbox"

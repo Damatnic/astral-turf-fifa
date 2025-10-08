@@ -311,7 +311,7 @@ const AITacticalIntelligence: React.FC<AITacticalIntelligenceProps> = ({
 
       {/* Error Display */}
       {error && (
-        <div className="mx-4 mt-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded">
+        <div className="mx-4 mt-4 p-3 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded">
           <div className="flex items-center space-x-2">
             <AlertTriangle className="w-4 h-4 text-red-500" />
             <span className="text-sm text-red-700 dark:text-red-300">{error}</span>
@@ -719,7 +719,7 @@ const ChemistryPanel: React.FC<{
           {analysis.chemistryDisruptors.map((disruptor, index) => (
             <div
               key={index}
-              className="flex items-center justify-between p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded"
+              className="flex items-center justify-between p-2 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded"
             >
               <div>
                 <div className="font-medium text-sm text-gray-800 dark:text-white">

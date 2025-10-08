@@ -305,7 +305,7 @@ export const ActivityIndicator: React.FC<ActivityIndicatorProps> = ({
       initial={{ opacity: 0, x: -50 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 50 }}
-      className="flex items-center gap-3 px-4 py-2 bg-slate-800/90 border border-slate-700 rounded-lg shadow-lg"
+      className="flex items-center gap-3 px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg shadow-lg"
     >
       <div
         className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs"
@@ -344,7 +344,7 @@ export const CollaborationPanel: React.FC<CollaborationPanelProps> = ({
   onUserClick,
 }) => {
   return (
-    <div className="flex items-center gap-4 px-4 py-2 bg-slate-900/95 border border-slate-700 rounded-xl shadow-xl">
+    <div className="flex items-center gap-4 px-4 py-2 bg-slate-900 border border-slate-700 rounded-xl shadow-xl">
       {/* Connection Status */}
       <ConnectionStatus isConnected={isConnected} isConnecting={isConnecting} latency={latency} />
 

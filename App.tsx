@@ -17,12 +17,21 @@ const SignupPage = lazy(() => import('./src/pages/SignupPage'));
 const Layout = lazy(() => import('./src/components/Layout'));
 const DashboardPage = lazy(() => import('./src/pages/DashboardPage'));
 const TacticsBoardPageNew = lazy(() => import('./src/pages/TacticsBoardPageNew'));
+const RedesignedTacticsBoardPage = lazy(() => import('./src/pages/RedesignedTacticsBoardPage'));
+const TacticsRedesignDemo = lazy(() => import('./src/pages/TacticsRedesignDemo'));
+const TacticalAnalyticsPage = lazy(() => import('./src/pages/TacticalAnalyticsPage'));
+const LiveRedesignDemo = lazy(() => import('./src/pages/LiveRedesignDemo'));
+const UltimatePlayerCardShowcase = lazy(() => import('./src/pages/UltimatePlayerCardShowcase'));
+const FullyIntegratedTacticsBoard = lazy(() => import('./src/pages/FullyIntegratedTacticsBoard'));
+const PlayerCardPage = lazy(() => import('./src/pages/EnhancedPlayerCardPage'));
+const TestPlayerCard = lazy(() => import('./src/pages/TestPlayerCard'));
 const FinancesPage = lazy(() => import('./src/pages/FinancesPage'));
 const TransfersPage = lazy(() => import('./src/pages/TransfersPage'));
 const TrainingPage = lazy(() => import('./src/pages/TrainingPage'));
 const InboxPage = lazy(() => import('./src/pages/InboxPage'));
 const AnalyticsPage = lazy(() => import('./src/pages/AnalyticsPage'));
 const SettingsPage = lazy(() => import('./src/pages/SettingsPage'));
+const EnhancedSettingsPage = lazy(() => import('./src/pages/EnhancedSettingsPage'));
 const YouthAcademyPage = lazy(() => import('./src/pages/YouthAcademyPage'));
 const StaffPage = lazy(() => import('./src/pages/StaffPage'));
 const StadiumPage = lazy(() => import('./src/pages/StadiumPage'));
@@ -43,7 +52,6 @@ const AdvancedAnalyticsPage = lazy(() => import('./src/pages/AdvancedAnalyticsPa
 const MyPlayerRankingPage = lazy(() => import('./src/pages/MyPlayerRankingPage'));
 const ChallengeHubPage = lazy(() => import('./src/pages/ChallengeHubPage'));
 const CoachChallengeManagerPage = lazy(() => import('./src/pages/CoachChallengeManagerPage'));
-const PlayerCardPage = lazy(() => import('./src/pages/PlayerCardPage'));
 
 const AppContent: React.FC = () => {
   const { authState } = useAuthContext();
@@ -108,6 +116,40 @@ const AppContent: React.FC = () => {
                 }
               />
 
+              {/* Public showcase routes */}
+            <Route
+              path="/ultimate-cards"
+              element={
+                <PageTransition>
+                  <UltimatePlayerCardShowcase />
+                </PageTransition>
+              }
+            />
+            <Route
+              path="/test-card"
+              element={
+                <PageTransition>
+                  <TestPlayerCard />
+                </PageTransition>
+              }
+            />
+              <Route
+                path="/redesign-demo"
+                element={
+                  <PageTransition>
+                    <TacticsRedesignDemo />
+                  </PageTransition>
+                }
+              />
+              <Route
+                path="/live-redesign"
+                element={
+                  <PageTransition>
+                    <LiveRedesignDemo />
+                  </PageTransition>
+                }
+              />
+
               {/* Protected routes with Layout */}
               <Route path="/*" element={<ProtectedRoute />}>
                 <Route path="/*" element={<Layout />}>
@@ -123,7 +165,47 @@ const AppContent: React.FC = () => {
                     path="tactics"
                     element={
                       <PageTransition>
+                        <FullyIntegratedTacticsBoard />
+                      </PageTransition>
+                    }
+                  />
+                  <Route
+                    path="tactics-analytics"
+                    element={
+                      <PageTransition>
+                        <TacticalAnalyticsPage />
+                      </PageTransition>
+                    }
+                  />
+                  <Route
+                    path="tactics-old"
+                    element={
+                      <PageTransition>
                         <TacticsBoardPageNew />
+                      </PageTransition>
+                    }
+                  />
+                  <Route
+                    path="tactics-redesigned"
+                    element={
+                      <PageTransition>
+                        <RedesignedTacticsBoardPage />
+                      </PageTransition>
+                    }
+                  />
+                  <Route
+                    path="player-card"
+                    element={
+                      <PageTransition>
+                        <PlayerCardPage />
+                      </PageTransition>
+                    }
+                  />
+                  <Route
+                    path="player-card/:playerId"
+                    element={
+                      <PageTransition>
+                        <PlayerCardPage />
                       </PageTransition>
                     }
                   />
@@ -171,7 +253,7 @@ const AppContent: React.FC = () => {
                     path="settings"
                     element={
                       <PageTransition>
-                        <SettingsPage />
+                        <EnhancedSettingsPage />
                       </PageTransition>
                     }
                   />

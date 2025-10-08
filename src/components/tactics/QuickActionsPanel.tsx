@@ -117,10 +117,10 @@ const BaseActionButton = React.forwardRef<ActionButtonElement, ActionButtonProps
         title={title || label}
         className={`focus-visible flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-blue-400 ${
           disabled
-            ? 'bg-slate-800/40 text-slate-500 cursor-not-allowed'
+            ? 'bg-slate-700 text-slate-500 cursor-not-allowed'
             : active
               ? 'bg-blue-600/80 text-white shadow-lg shadow-blue-500/25'
-              : 'bg-slate-800/80 text-slate-200 hover:bg-slate-700/80 hover:text-white'
+              : 'bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white'
         } ${className}`.trim()}
       >
         {icon && <span className="flex items-center" aria-hidden="true">{icon}</span>}
@@ -402,7 +402,7 @@ const QuickActionsPanelComponent: React.FC<QuickActionsPanelProps> = ({
     return [
       'focus:outline-none',
       'focus-visible:ring-2 focus-visible:ring-blue-400',
-      'bg-slate-900/90 border border-slate-700/50 rounded-2xl p-4 shadow-2xl',
+      'bg-slate-900 border border-slate-700 rounded-2xl p-4 shadow-2xl',
       'flex flex-col gap-3',
       isMobile ? 'mobile-layout' : '',
       isDragOver ? 'ring-2 ring-blue-400' : '',
@@ -626,7 +626,7 @@ const QuickActionsPanelComponent: React.FC<QuickActionsPanelProps> = ({
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -4 }}
-              className="w-56 rounded-lg border border-slate-700/50 bg-slate-900/95 p-2 shadow-xl"
+              className="w-56 rounded-lg border border-slate-700 bg-slate-900 p-2 shadow-xl"
             >
               {(['json', 'csv', 'xml'] as const).map(format => (
                 <button
@@ -648,7 +648,7 @@ const QuickActionsPanelComponent: React.FC<QuickActionsPanelProps> = ({
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -4 }}
-              className="flex flex-wrap gap-2 rounded-lg border border-slate-700/50 bg-slate-900/95 p-3 shadow-xl"
+              className="flex flex-wrap gap-2 rounded-lg border border-slate-700 bg-slate-900 p-3 shadow-xl"
             >
               <ActionButton
                 label="Share Link"
@@ -683,7 +683,7 @@ const QuickActionsPanelComponent: React.FC<QuickActionsPanelProps> = ({
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="rounded-xl border border-slate-700/50 bg-slate-900/95 p-4 shadow-2xl"
+              className="rounded-xl border border-slate-700 bg-slate-900 p-4 shadow-2xl"
             >
               <p className="text-sm text-slate-200">Are you sure you want to reset the formation?</p>
               <div className="mt-3 flex gap-2">
@@ -715,7 +715,7 @@ const QuickActionsPanelComponent: React.FC<QuickActionsPanelProps> = ({
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 8 }}
-              className="rounded-xl border border-slate-700/50 bg-slate-900/95 p-4 shadow-xl"
+              className="rounded-xl border border-slate-700 bg-slate-900 p-4 shadow-xl"
             >
               <h3 className="text-sm font-semibold text-slate-100">Keyboard Shortcuts</h3>
               <ul className="mt-2 space-y-1 text-xs text-slate-300">
@@ -755,13 +755,13 @@ const QuickActionsPanelComponent: React.FC<QuickActionsPanelProps> = ({
         {aiSuggestions.length > 0 && (
           <div
             data-testid="ai-suggestions"
-            className="grid w-full gap-2 rounded-xl border border-slate-700/40 bg-slate-900/80 p-3"
+            className="grid w-full gap-2 rounded-xl border border-slate-750 bg-slate-900 p-3"
           >
             <h4 className="text-sm font-semibold text-slate-100">AI Suggestions</h4>
             {aiSuggestions.map(suggestion => (
               <div
                 key={suggestion.id ?? suggestion.message}
-                className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-slate-800/60 p-2"
+                className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-slate-750 p-2"
               >
                 <span className="text-xs text-slate-200">{suggestion.message}</span>
                 {suggestion.action && (

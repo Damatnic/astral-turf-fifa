@@ -316,6 +316,129 @@ exports[`Tactics Board Components - ZENITH Test Suite > ModernField > ModernFiel
 </div>
 `;
 
+exports[`Tactics Board Components - ZENITH Test Suite > PlayerToken > PlayerToken - ZENITH Comprehensive Test Suite > Rendering Tests > should render consistent snapshots 1`] = `
+<div
+  class="
+            absolute select-none group rounded-full border-2 transition-colors duration-150 ease-out
+            cursor-grab active:cursor-grabbing
+            
+            border-transparent z-10
+          "
+  data-animate-rotate="0"
+  data-animate-scale="1"
+  data-testid="player-token-container"
+  draggable="false"
+  style="left: 50%; top: 50%; transform: none; filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3)) drop-shadow(0 1px 3px rgba(0, 0, 0, 0.15)); opacity: 1;"
+  tabindex="0"
+>
+  <button
+    aria-grabbed="false"
+    aria-label="Test Player – Unknown Role"
+    aria-pressed="false"
+    class="relative flex flex-col items-center outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+    data-testid="player-token-player-1"
+    draggable="true"
+    role="button"
+    style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);"
+    tabindex="0"
+    type="button"
+  >
+    <div
+      aria-hidden="true"
+      class="absolute inset-0 -z-10 rounded-full pointer-events-none transition-all duration-300 ease-out scale-100 opacity-40 bg-slate-750 blur-xl"
+      data-testid="token-shadow"
+    />
+    <div
+      class="relative rounded-full"
+    >
+      <div
+        aria-hidden="true"
+        class="absolute inset-0 -m-2 min-w-[44px] min-h-[44px] rounded-full"
+      />
+      <div
+        class="
+                  relative w-11 h-11 rounded-full border-2 flex items-center justify-center
+                  text-white text-sm font-bold overflow-hidden
+                  
+                  
+                "
+        style="border-color: rgba(0, 0, 0, 0.4); box-shadow: inset 0 -2px 4px rgba(0, 0, 0, 0.2);"
+        title="Player"
+      >
+        <div
+          class="w-full h-full rounded-full"
+          style="background-color: rgb(59, 130, 246);"
+        />
+        <span
+          class="relative z-10 drop-shadow-lg"
+        >
+          ??
+        </span>
+        <span
+          class="absolute bottom-1 right-1 rounded bg-slate-800 px-1 text-[10px] font-semibold text-white/80"
+        >
+          MI
+        </span>
+        <div
+          class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-9 h-2.5 bg-gradient-to-b from-gray-800/60 to-gray-900/80 rounded-full border border-gray-600/60 flex items-center p-px "
+          style="opacity: 0; transform: translateY(5px);"
+          title="Stamina: 100%"
+        >
+          <div
+            class="bg-green-500 h-1 rounded-full relative overflow-hidden"
+            style="width: 100%;"
+          >
+            <div
+              class="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+              style="transform: translateX(-100%);"
+            />
+          </div>
+        </div>
+        <div
+          class="absolute -top-1 -left-1 w-5 h-5 p-0.5 bg-gradient-to-br from-gray-700 to-gray-900 rounded-full border-2 border-white/90 flex items-center justify-center"
+          style="opacity: 0; transform: scale(0);"
+          title="Morale: Good"
+        >
+          <svg
+            class="w-full h-full text-green-500"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r="10"
+            />
+            <path
+              d="M8 14s1.5 2 4 2 4-2 4-2"
+            />
+            <line
+              x1="9"
+              x2="9.01"
+              y1="9"
+              y2="9"
+            />
+            <line
+              x1="15"
+              x2="15.01"
+              y1="9"
+              y2="9"
+            />
+          </svg>
+        </div>
+      </div>
+    </div>
+  </button>
+</div>
+`;
+
 exports[`Tactics Board Components - ZENITH Test Suite > QuickActionsPanel > QuickActionsPanel - ZENITH Comprehensive Test Suite > Rendering Tests > should render consistent snapshots 1`] = `
 <div
   style="opacity: 0; transform: translateY(16px);"

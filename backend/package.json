@@ -6,10 +6,11 @@
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "nest start",
+    "start": "node server-simple.js",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
+    "start:simple": "node server-simple.js",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -22,6 +23,7 @@
     "migration:revert": "npm run typeorm -- migration:revert -d src/database/data-source.ts",
     "migration:show": "npm run typeorm -- migration:show -d src/database/data-source.ts",
     "seed": "ts-node src/database/seeders/database.seeder.ts",
+    "seed:demo": "ts-node src/database/seeds/run-seed.ts",
     "db:reset": "npm run migration:revert && npm run migration:run && npm run seed"
   },
   "dependencies": {

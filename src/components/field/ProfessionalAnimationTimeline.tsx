@@ -68,7 +68,7 @@ const TimelineControls: React.FC<{
     };
 
     return (
-      <div className="bg-gray-900/95 backdrop-blur-md rounded-xl p-4 border border-white/20 shadow-2xl">
+      <div className="bg-gray-900/95  rounded-xl p-4 border border-slate-600 shadow-2xl">
         <div className="flex items-center space-x-4">
           {/* Play/Pause Button */}
           <button
@@ -557,7 +557,7 @@ const ProfessionalAnimationTimeline: React.FC = () => {
   if (!players || players.length === 0) {
     return (
       <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-40">
-        <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-4 border border-white/20 text-white text-center">
+        <div className="bg-gray-900/80  rounded-lg p-4 border border-slate-600 text-white text-center">
           <div className="text-sm">No players available for animation</div>
         </div>
       </div>
@@ -597,7 +597,7 @@ const ProfessionalAnimationTimeline: React.FC = () => {
 
       {/* Animation settings panel */}
       <div className="absolute top-4 left-4 z-30">
-        <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-3 border border-white/20 space-y-2">
+        <div className="bg-gray-900/80  rounded-lg p-3 border border-slate-600 space-y-2">
           <div className="text-white text-sm font-medium mb-2">Animation Settings</div>
 
           <label className="flex items-center space-x-2">

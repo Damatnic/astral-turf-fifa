@@ -253,20 +253,20 @@ const DugoutManagement: React.FC<DugoutManagementProps> = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 bg-slate-800  z-50 flex items-center justify-center p-4"
     >
       <motion.div
         initial={{ scale: 0.9, opacity: 0, y: 20 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.9, opacity: 0, y: 20 }}
         className={`
-          bg-slate-900/95 backdrop-blur-md border border-slate-700/50 rounded-2xl
+          bg-slate-900  border border-slate-700 rounded-2xl
           w-full max-w-6xl h-[80vh] flex flex-col shadow-2xl
           ${className}
         `}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-slate-700/50">
+        <div className="flex items-center justify-between p-6 border-b border-slate-700">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center">
               <Users className="w-6 h-6 text-white" />
@@ -287,14 +287,14 @@ const DugoutManagement: React.FC<DugoutManagementProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-700/50 transition-colors"
+            className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-700 transition-colors"
           >
             <X className="w-6 h-6" />
           </button>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex border-b border-slate-700/50">
+        <div className="flex border-b border-slate-700">
           {tabs.map(tab => {
             const IconComponent = tab.icon;
             return (
@@ -316,7 +316,7 @@ const DugoutManagement: React.FC<DugoutManagementProps> = ({
                   <span
                     className={`
                     px-1.5 py-0.5 rounded text-xs
-                    ${activeTab === tab.id ? 'bg-blue-500/20 text-blue-300' : 'bg-slate-700/50 text-slate-300'}
+                    ${activeTab === tab.id ? 'bg-blue-500/20 text-blue-300' : 'bg-slate-700 text-slate-300'}
                   `}
                   >
                     {tab.count}
@@ -346,7 +346,7 @@ const DugoutManagement: React.FC<DugoutManagementProps> = ({
                 className="h-full flex"
               >
                 {/* Left Panel - Players to substitute */}
-                <div className="w-1/2 border-r border-slate-700/50 p-6">
+                <div className="w-1/2 border-r border-slate-700 p-6">
                   <div className="mb-4">
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="text-lg font-semibold text-white">Players on Field</h3>
@@ -360,7 +360,7 @@ const DugoutManagement: React.FC<DugoutManagementProps> = ({
                               ${
                                 substitutionFilter === filter
                                   ? 'bg-blue-600/80 text-white'
-                                  : 'bg-slate-700/50 text-slate-400 hover:text-white'
+                                  : 'bg-slate-700 text-slate-400 hover:text-white'
                               }
                             `}
                           >
@@ -458,7 +458,7 @@ const DugoutManagement: React.FC<DugoutManagementProps> = ({
                             ${
                               isSelected
                                 ? 'border-green-500/70 bg-green-600/25'
-                                : 'border-slate-600/50 bg-slate-800/40 hover:border-slate-500/60'
+                                : 'border-slate-600/50 bg-slate-700 hover:border-slate-500/60'
                             }
                           `}
                         >
@@ -488,7 +488,7 @@ const DugoutManagement: React.FC<DugoutManagementProps> = ({
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="absolute bottom-6 right-6 left-1/2 bg-slate-800/90 backdrop-blur-sm border border-slate-700/50 rounded-xl p-4"
+                      className="absolute bottom-6 right-6 left-1/2 bg-slate-800  border border-slate-700 rounded-xl p-4"
                     >
                       <div className="flex items-center justify-between">
                         <div className="text-sm text-slate-300">
@@ -529,7 +529,7 @@ const DugoutManagement: React.FC<DugoutManagementProps> = ({
                       key={adjustment.id}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      className="p-5 bg-slate-800/40 border border-slate-600/50 rounded-xl hover:border-slate-500/60 transition-all cursor-pointer"
+                      className="p-5 bg-slate-700 border border-slate-600/50 rounded-xl hover:border-slate-500/60 transition-all cursor-pointer"
                       onClick={() => onTacticalChange(adjustment)}
                     >
                       <div className="flex items-start justify-between mb-3">
@@ -573,7 +573,7 @@ const DugoutManagement: React.FC<DugoutManagementProps> = ({
                   {fieldPlayers.map(player => (
                     <div
                       key={player.id}
-                      className="p-4 bg-slate-800/40 border border-slate-600/50 rounded-xl"
+                      className="p-4 bg-slate-700 border border-slate-600/50 rounded-xl"
                     >
                       <div className="flex items-center gap-3 mb-4">
                         <div className="w-10 h-10 bg-gradient-to-br from-slate-600 to-slate-700 rounded-lg flex items-center justify-center text-white font-bold text-sm">
@@ -591,7 +591,7 @@ const DugoutManagement: React.FC<DugoutManagementProps> = ({
                             <button
                               key={instruction}
                               onClick={() => onPlayerInstruction(player.id, instruction)}
-                              className="w-full p-2 text-xs text-slate-300 hover:text-white bg-slate-700/50 hover:bg-slate-600/50 rounded-lg transition-colors text-left"
+                              className="w-full p-2 text-xs text-slate-300 hover:text-white bg-slate-700 hover:bg-slate-600/50 rounded-lg transition-colors text-left"
                             >
                               {instruction}
                             </button>

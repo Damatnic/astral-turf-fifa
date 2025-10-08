@@ -82,7 +82,7 @@ export const KeyboardShortcutsPanel: React.FC<KeyboardShortcutsPanelProps> = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-          className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+          className="absolute inset-0 bg-slate-900 "
         />
 
         {/* Panel */}
@@ -91,10 +91,10 @@ export const KeyboardShortcutsPanel: React.FC<KeyboardShortcutsPanelProps> = ({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           transition={{ duration: 0.2 }}
-          className="relative w-full max-w-4xl max-h-[90vh] bg-slate-900/95 backdrop-blur-md rounded-2xl shadow-2xl border border-slate-700 overflow-hidden"
+          className="relative w-full max-w-4xl max-h-[90vh] bg-slate-900  rounded-2xl shadow-2xl border border-slate-700 overflow-hidden"
         >
           {/* Header */}
-          <div className="sticky top-0 z-10 bg-slate-900/95 backdrop-blur-md border-b border-slate-700">
+          <div className="sticky top-0 z-10 bg-slate-900  border-b border-slate-700">
             <div className="flex items-center justify-between p-6">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
@@ -154,7 +154,7 @@ export const KeyboardShortcutsPanel: React.FC<KeyboardShortcutsPanelProps> = ({
                       key={category}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="bg-slate-800/50 rounded-lg p-4 border border-slate-700/50"
+                      className="bg-slate-800/50 rounded-lg p-4 border border-slate-700"
                     >
                       <h3 className="text-lg font-semibold text-white mb-3 flex items-center">
                         <span className="w-2 h-2 bg-blue-500 rounded-full mr-2" />
@@ -165,7 +165,7 @@ export const KeyboardShortcutsPanel: React.FC<KeyboardShortcutsPanelProps> = ({
                         {categoryShortcuts.map(shortcut => (
                           <div
                             key={`${category}-${shortcut.key}-${shortcut.description}`}
-                            className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-slate-700/50 transition-colors group"
+                            className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-slate-700 transition-colors group"
                           >
                             <span className="text-sm text-slate-300 group-hover:text-white transition-colors">
                               {shortcut.description}
@@ -185,7 +185,7 @@ export const KeyboardShortcutsPanel: React.FC<KeyboardShortcutsPanelProps> = ({
           </div>
 
           {/* Footer */}
-          <div className="sticky bottom-0 bg-slate-900/95 backdrop-blur-md border-t border-slate-700 px-6 py-4">
+          <div className="sticky bottom-0 bg-slate-900  border-t border-slate-700 px-6 py-4">
             <div className="flex items-center justify-between text-sm">
               <div className="text-slate-400">
                 Press{' '}

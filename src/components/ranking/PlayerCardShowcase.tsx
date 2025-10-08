@@ -314,7 +314,7 @@ const PlayerCardShowcase: React.FC<PlayerCardShowcaseProps> = ({
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
-              className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700"
+              className="bg-gray-800/50  rounded-2xl p-6 border border-gray-700"
             >
               <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
                 <BarChart3 size={20} className="text-purple-400" />

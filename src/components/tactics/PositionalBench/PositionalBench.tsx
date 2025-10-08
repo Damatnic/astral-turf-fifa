@@ -487,12 +487,12 @@ const PositionalBench: React.FC<PositionalBenchProps> = ({
                   : 'unavailable';
 
       const availabilityClassMap = {
-        available: 'bg-emerald-500/20 text-emerald-300 available',
-        injured: 'bg-rose-500/20 text-rose-300 unavailable injured',
-        suspended: 'bg-amber-500/20 text-amber-300 unavailable',
-        duty: 'bg-amber-500/20 text-amber-300 unavailable',
-        doubtful: 'bg-amber-500/20 text-amber-300 doubtful unavailable',
-        unavailable: 'bg-rose-500/20 text-rose-300 unavailable',
+        available: 'bg-emerald-950 text-emerald-300 available',
+        injured: 'bg-rose-900 text-rose-300 unavailable injured',
+        suspended: 'bg-amber-950 text-amber-300 unavailable',
+        duty: 'bg-amber-950 text-amber-300 unavailable',
+        doubtful: 'bg-amber-950 text-amber-300 doubtful unavailable',
+        unavailable: 'bg-rose-900 text-rose-300 unavailable',
       } as const;
 
       const availabilityDisplayMap = {
@@ -539,8 +539,8 @@ const PositionalBench: React.FC<PositionalBenchProps> = ({
             group relative overflow-hidden rounded-lg border transition-all duration-200
             ${
               isSelected
-                ? 'border-blue-400/60 bg-blue-500/15 shadow-lg shadow-blue-900/40'
-                : 'border-slate-700/40 bg-slate-800/40 hover:bg-slate-700/40'
+                ? 'border-blue-400/60 bg-blue-950 shadow-lg shadow-blue-900/40'
+                : 'border-slate-750 bg-slate-700 hover:bg-slate-600'
             }
           `}
         >
@@ -576,7 +576,7 @@ const PositionalBench: React.FC<PositionalBenchProps> = ({
 
           <div className="px-3 pb-3">
             <div className="mb-2 flex items-center gap-2 text-xs text-slate-300">
-              <div className="flex-1 rounded-full bg-slate-700/60">
+              <div className="flex-1 rounded-full bg-slate-650">
                 <div
                   className="h-1 rounded-full bg-emerald-400"
                   style={{ width: `${staminaValue}%` }}
@@ -624,7 +624,7 @@ const PositionalBench: React.FC<PositionalBenchProps> = ({
       data-testid="positional-bench"
       role="list"
       aria-label="Substitute players bench"
-      className={`space-y-3 rounded-xl border border-slate-700/60 bg-slate-900/60 p-4 shadow-lg backdrop-blur ${
+      className={`space-y-3 rounded-xl border border-slate-700 bg-slate-800 p-4 shadow-lg backdrop-blur ${
         isMobileLayout ? 'mobile responsive' : 'desktop responsive'
       } ${className}`}
     >
@@ -670,7 +670,7 @@ const PositionalBench: React.FC<PositionalBenchProps> = ({
             type="search"
             placeholder="Search players"
             aria-label="Search players"
-            className="w-full rounded-lg border border-slate-700 bg-slate-900/80 py-2 pl-9 pr-3 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+            className="w-full rounded-lg border border-slate-700 bg-slate-900 py-2 pl-9 pr-3 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
             value={searchTerm}
             onChange={event => setSearchTerm(event.target.value)}
           />
@@ -680,12 +680,12 @@ const PositionalBench: React.FC<PositionalBenchProps> = ({
       {loading ? (
         <div
           data-testid="loading-indicator"
-          className="flex min-h-[120px] items-center justify-center rounded-lg border border-dashed border-slate-700/60 bg-slate-800/40 text-sm text-slate-300"
+          className="flex min-h-[120px] items-center justify-center rounded-lg border border-dashed border-slate-700 bg-slate-700 text-sm text-slate-300"
         >
           Loading substitute bench…
         </div>
       ) : preparedPlayers.length === 0 ? (
-        <div className="flex flex-col items-center gap-2 rounded-lg border border-slate-700/60 bg-slate-800/40 py-10 text-center">
+        <div className="flex flex-col items-center gap-2 rounded-lg border border-slate-700 bg-slate-700 py-10 text-center">
           <Users className="h-10 w-10 text-slate-600" aria-hidden="true" />
           <p className="text-sm font-medium text-slate-200">No substitute players available</p>
           <p className="text-xs text-slate-400">All players are currently assigned to the starting formation.</p>
@@ -713,7 +713,7 @@ const PositionalBench: React.FC<PositionalBenchProps> = ({
                 const headingAriaLabel = `${groupName} players`;
 
                 return (
-                  <div key={groupName} className="rounded-lg border border-slate-700/60 bg-slate-800/40">
+                  <div key={groupName} className="rounded-lg border border-slate-700 bg-slate-700">
                   <motion.button
                     type="button"
                     onClick={() => toggleGroup(groupName)}

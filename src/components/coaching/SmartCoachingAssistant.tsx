@@ -252,7 +252,7 @@ export const SmartCoachingAssistant: React.FC<SmartCoachingAssistantProps> = ({
   };
 
   return (
-    <Card className="w-full max-w-4xl bg-white/10 backdrop-blur-md border-white/20">
+    <Card className="w-full max-w-4xl bg-slate-800  border-slate-600">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-white">
           <Brain className="w-6 h-6 text-blue-400" />
@@ -300,7 +300,7 @@ export const SmartCoachingAssistant: React.FC<SmartCoachingAssistantProps> = ({
               {recommendations.map((rec, index) => (
                 <Card
                   key={index}
-                  className="bg-white/5 border-white/10 hover:bg-white/10 transition-all"
+                  className="bg-white/5 border-slate-700 hover:bg-slate-800 transition-all"
                 >
                   <CardContent className="p-4">
                     <div className="flex justify-between items-start mb-3">
@@ -361,7 +361,7 @@ export const SmartCoachingAssistant: React.FC<SmartCoachingAssistantProps> = ({
               {tacticalInsights.map((insight, index) => (
                 <Card
                   key={index}
-                  className="bg-white/5 border-white/10 hover:bg-white/10 transition-all"
+                  className="bg-white/5 border-slate-700 hover:bg-slate-800 transition-all"
                 >
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between mb-2">
@@ -402,7 +402,7 @@ export const SmartCoachingAssistant: React.FC<SmartCoachingAssistantProps> = ({
           <TabsContent value="optimization" className="space-y-4 mt-4">
             <h3 className="text-lg font-semibold text-white">Live Optimization</h3>
 
-            <Card className="bg-white/5 border-white/10">
+            <Card className="bg-white/5 border-slate-700">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-4">
                   <h4 className="font-semibold text-white">Real-time Analysis</h4>

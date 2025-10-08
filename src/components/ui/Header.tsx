@@ -51,7 +51,7 @@ const TeamToggleButton: React.FC<{
       onClick={() => onClick(view)}
       className={cn(
         'px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200',
-        'border backdrop-blur-sm',
+        'border ',
         'focus:outline-none focus:ring-2 focus:ring-primary-500/50',
         'active:scale-95',
         variantClasses[variant],
@@ -211,7 +211,7 @@ export const Header: React.FC = React.memo(() => {
                   'flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200',
                   'text-secondary-300 hover:text-white hover:bg-secondary-700/50',
                   'focus:outline-none focus:ring-2 focus:ring-primary-500/50',
-                  'backdrop-blur-sm border border-transparent hover:border-secondary-600/50',
+                  ' border border-transparent hover:border-secondary-600/50',
                 )}
                 title="Go to Tactics Board"
                 data-testid="header-tactics-button"
@@ -263,7 +263,7 @@ export const Header: React.FC = React.memo(() => {
 
         {/* Enhanced Team Toggle */}
         {isTacticsPage && !shouldUseDrawer && (
-          <div className="flex items-center space-x-1 bg-secondary-800/50 backdrop-blur-sm p-1 rounded-xl border border-secondary-700/50 shadow-soft">
+          <div className="flex items-center space-x-1 bg-secondary-800/50  p-1 rounded-xl border border-secondary-700/50 shadow-soft">
             <TeamToggleButton
               view="home"
               activeContext={activeTeamContext}
@@ -556,7 +556,7 @@ export const Header: React.FC = React.memo(() => {
                     handleLogout();
                     setMobileMenuOpen(false);
                   }}
-                  className="flex items-center px-3 py-3 text-base font-medium text-red-400 hover:bg-red-900/20 rounded-lg transition-colors w-full"
+                  className="flex items-center px-3 py-3 text-base font-medium text-red-400 hover:bg-red-950 rounded-lg transition-colors w-full"
                 >
                   Logout
                 </button>

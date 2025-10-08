@@ -6,9 +6,10 @@ import { rootReducer } from './reducers/rootReducer';
 import { TacticsContext } from './TacticsContext';
 import { FranchiseContext } from './FranchiseContext';
 import { UIContext } from './UIContext';
-import { AuthContext } from './AuthContext';
+import { AuthContext } from './AuthContext.ts';
 import { authService } from '../services/authService';
 import { ChallengeProvider } from './ChallengeContext';
+import { loggingService } from '../services/loggingService';
 
 export const cleanStateForSaving = (state: RootState): object | undefined => {
   const stateToSave = produce(state, draft => {
@@ -69,6 +70,12 @@ export const cleanStateForSaving = (state: RootState): object | undefined => {
       'scoutReport',
       'isLoadingConversation',
       'playerConversationData',
+      'isLoadingNegotiation',
+      'isLoadingDevelopmentSummary',
+      'developmentSummary',
+      'isLoadingTeamTalk',
+      'teamTalkData',
+      'pendingPromiseRequest',
     ];
     transientUIKeys.forEach(key => delete (draft.ui as any)[key]);
 
@@ -109,7 +116,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         }
       }
     } catch (_error) {
-      console.error('Failed to load state from localStorage', _error);
+      loggingService.error('Failed to load state from localStorage', {
+        error: _error instanceof Error ? _error.message : 'Unknown error',
+      });
     }
   }, []);
 
@@ -155,7 +164,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const activeStateToSave = cleanStateForSaving(state);
       localStorage.setItem('astralTurfActiveState', JSON.stringify(activeStateToSave));
     } catch (_error) {
-      console.error('Failed to save state to localStorage', _error);
+      loggingService.error('Failed to save state to localStorage', {
+        error: _error instanceof Error ? _error.message : 'Unknown error',
+      });
     }
   }, [state]);
 

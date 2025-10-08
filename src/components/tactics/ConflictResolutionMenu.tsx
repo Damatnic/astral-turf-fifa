@@ -133,7 +133,7 @@ export const ConflictResolutionMenu: React.FC<ConflictResolutionMenuProps> = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
+            className="fixed inset-0 bg-slate-650  z-40"
           />
 
           {/* Menu */}
@@ -142,7 +142,7 @@ export const ConflictResolutionMenu: React.FC<ConflictResolutionMenuProps> = ({
             animate={{ opacity: 1, scale: 1, x: menuPosition.x, y: menuPosition.y }}
             exit={{ opacity: 0, scale: 0.8 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed z-50 w-80 bg-slate-800/95 backdrop-blur-md rounded-lg border border-slate-600/50 shadow-2xl"
+            className="fixed z-50 w-80 bg-slate-800/95  rounded-lg border border-slate-600/50 shadow-2xl"
             style={{ left: 0, top: 0 }}
           >
             {/* Header */}
@@ -221,7 +221,7 @@ export const ConflictResolutionMenu: React.FC<ConflictResolutionMenuProps> = ({
                   className={`w-full p-3 rounded-lg border transition-all text-left ${
                     option.recommended
                       ? 'bg-blue-600/20 border-blue-500/50 hover:bg-blue-600/30'
-                      : 'bg-slate-700/50 border-slate-600/50 hover:bg-slate-700/70'
+                      : 'bg-slate-700 border-slate-600/50 hover:bg-slate-700/70'
                   }`}
                 >
                   <div className="flex items-start space-x-3">

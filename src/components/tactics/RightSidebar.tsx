@@ -88,7 +88,7 @@ const PlayerDetails: React.FC<{ player: Player }> = ({ player }) => {
         <h2 className="text-lg font-bold text-white">Player Details</h2>
         <button
           onClick={handleEditPlayer}
-          className="p-2 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-lg transition-colors"
+          className="p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
           title="Edit Player"
         >
           <Edit className="w-4 h-4" />
@@ -365,7 +365,7 @@ const TeamTacticsSettings: React.FC = () => {
               ${
                 value === option
                   ? 'bg-blue-600 text-white'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-700'
               }
             `}
           >
@@ -550,7 +550,7 @@ export const RightSidebar: React.FC = () => {
   const benchPlayers = activeFormation ? getBenchPlayers(players, activeFormation) : [];
 
   return (
-    <aside className="w-80 bg-slate-900/90 backdrop-blur-sm flex flex-col shadow-lg h-full border-l border-slate-700/50">
+    <aside className="w-80 bg-slate-900  flex flex-col shadow-lg h-full border-l border-slate-700">
       {/* Main Content */}
       <div className="flex-1 p-4 overflow-y-auto">
         {selectedPlayer ? (
@@ -580,7 +580,7 @@ export const RightSidebar: React.FC = () => {
 
       {/* Tab Navigation - Only show when no player is selected */}
       {!selectedPlayer && (
-        <div className="flex-shrink-0 bg-slate-800/50 border-t border-slate-700/50">
+        <div className="flex-shrink-0 bg-slate-800/50 border-t border-slate-700">
           <div className="flex">
             <TabButton
               label="Bench"

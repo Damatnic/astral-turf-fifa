@@ -341,7 +341,7 @@ const ChemistryVisualization: React.FC<ChemistryVisualizationProps> = ({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 20 }}
-        className="absolute top-4 right-4 bg-slate-800/90 backdrop-blur-sm rounded-lg p-3 text-sm"
+        className="absolute top-4 right-4 bg-slate-800  rounded-lg p-3 text-sm"
         style={{ zIndex: 10 }}
       >
         <div className="text-white font-medium mb-2">Player Chemistry</div>

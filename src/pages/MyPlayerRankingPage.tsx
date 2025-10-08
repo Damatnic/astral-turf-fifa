@@ -12,6 +12,7 @@ import BadgeShowcase from '../components/ranking/BadgeShowcase';
 import RankingComparison from '../components/ranking/RankingComparison';
 import ChallengeCard from '../components/challenges/ChallengeCard';
 import ChallengeProgressBar from '../components/challenges/ChallengeProgressBar';
+import { EnhancedLeaderboard } from '../components/leaderboard/EnhancedLeaderboard';
 import type { Player } from '../types/player';
 
 type TabType = 'overview' | 'attributes' | 'badges' | 'challenges' | 'comparison';
@@ -564,6 +565,11 @@ const MyPlayerRankingPage: React.FC = () => {
             </div>
           </div>
         )}
+
+        {/* Enhanced Leaderboard */}
+        <div className="mt-8">
+          <EnhancedLeaderboard maxPlayers={10} showComparison={true} />
+        </div>
       </div>
     </div>
   );

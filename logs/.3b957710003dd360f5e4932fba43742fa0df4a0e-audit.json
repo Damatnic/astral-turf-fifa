@@ -14,6 +14,11 @@
             "date": 1759682328795,
             "name": "logs\\compliance-2025-10-05.log",
             "hash": "0b9f992ceb1b1072fd372f7c01d82965f603b9ed36b37d8bcb72d9e8dffa573f"
+        },
+        {
+            "date": 1759937914678,
+            "name": "logs\\compliance-2025-10-08.log",
+            "hash": "05eb3fdfb60540b66e18116554c1fb9f41f32649adeb58de4376122d0052666d"
         }
     ],
     "hashType": "sha256"

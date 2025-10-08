@@ -1,0 +1,11 @@
+C:\Users\damat\_REPOS\Astral Turf\original_zip\target\debug\deps\toml_write-c0fec94512d36ee1.d: C:\Users\damat\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\toml_write-0.1.2\src\lib.rs C:\Users\damat\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\toml_write-0.1.2\src\key.rs C:\Users\damat\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\toml_write-0.1.2\src\string.rs C:\Users\damat\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\toml_write-0.1.2\src\value.rs C:\Users\damat\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\toml_write-0.1.2\src\write.rs
+
+C:\Users\damat\_REPOS\Astral Turf\original_zip\target\debug\deps\libtoml_write-c0fec94512d36ee1.rlib: C:\Users\damat\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\toml_write-0.1.2\src\lib.rs C:\Users\damat\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\toml_write-0.1.2\src\key.rs C:\Users\damat\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\toml_write-0.1.2\src\string.rs C:\Users\damat\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\toml_write-0.1.2\src\value.rs C:\Users\damat\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\toml_write-0.1.2\src\write.rs
+
+C:\Users\damat\_REPOS\Astral Turf\original_zip\target\debug\deps\libtoml_write-c0fec94512d36ee1.rmeta: C:\Users\damat\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\toml_write-0.1.2\src\lib.rs C:\Users\damat\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\toml_write-0.1.2\src\key.rs C:\Users\damat\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\toml_write-0.1.2\src\string.rs C:\Users\damat\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\toml_write-0.1.2\src\value.rs C:\Users\damat\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\toml_write-0.1.2\src\write.rs
+
+C:\Users\damat\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\toml_write-0.1.2\src\lib.rs:
+C:\Users\damat\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\toml_write-0.1.2\src\key.rs:
+C:\Users\damat\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\toml_write-0.1.2\src\string.rs:
+C:\Users\damat\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\toml_write-0.1.2\src\value.rs:
+C:\Users\damat\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\toml_write-0.1.2\src\write.rs:

@@ -3,6 +3,7 @@ import { useAuthContext, useTacticsContext, useFranchiseContext } from '../../ho
 import type { Player, WeeklySchedule } from '../../types';
 import { StarIcon, DumbbellIcon, HeartHandshakeIcon, AwardIcon } from '../ui/icons';
 import { PLAYER_ROLES } from '../../constants';
+import { PlayerCardWidget } from '../dashboard/PlayerCardWidget';
 
 const AttributeBar: React.FC<{ label: string; value: number }> = ({ label, value }) => (
   <div className="flex justify-between items-center text-sm py-1">
@@ -65,6 +66,11 @@ const PlayerDashboard: React.FC = () => {
         </div>
 
         <div className="p-6 overflow-y-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Player Card Widget */}
+          <div className="md:col-span-1">
+            <PlayerCardWidget />
+          </div>
+
           {/* Attributes */}
           <div className="md:col-span-1 space-y-2">
             <h3 className="font-bold text-lg text-gray-200 flex items-center mb-2">

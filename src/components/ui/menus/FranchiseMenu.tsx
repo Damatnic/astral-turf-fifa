@@ -30,7 +30,7 @@ const MenuItem: React.FC<{ to: string; children: React.ReactNode; onClick: () =>
   <Link
     to={to}
     onClick={onClick}
-    className="w-full text-left px-4 py-2 text-sm flex items-center hover:bg-[var(--bg-tertiary)]"
+    className="w-full text-left px-4 py-2 text-sm text-slate-200 flex items-center hover:bg-slate-700 hover:text-white transition-colors"
   >
     {children}
   </Link>
@@ -57,12 +57,12 @@ export const FranchiseMenu: React.FC = () => {
       <button
         data-testid="header-franchise-button"
         onClick={() => setIsOpen(!isOpen)}
-        className="px-3 py-2 text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] rounded-md"
+        className="px-3 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-700 hover:text-white rounded-md transition-colors"
       >
         Franchise
       </button>
       {isOpen && (
-        <div className="absolute top-full left-0 mt-2 w-64 bg-[var(--bg-secondary)] border border-[var(--border-primary)] rounded-md shadow-lg z-20">
+        <div className="absolute top-full left-0 mt-2 w-64 bg-slate-800 border border-slate-600 rounded-md shadow-xl z-50">
           <MenuItem to="/dashboard" onClick={closeMenu}>
             <GridIcon className="w-4 h-4 mr-2" />
             Dashboard
@@ -75,7 +75,7 @@ export const FranchiseMenu: React.FC = () => {
             <MessageSquareIcon className="w-4 h-4 mr-2" />
             Media Handling
           </MenuItem>
-          <div className="border-t border-[var(--border-primary)] my-1" />
+          <div className="border-t border-slate-600 my-1" />
           <MenuItem to="/league-table" onClick={closeMenu}>
             <TableIcon className="w-4 h-4 mr-2" />
             League Table
@@ -88,7 +88,7 @@ export const FranchiseMenu: React.FC = () => {
             <ShieldCheck className="w-4 h-4 mr-2" />
             Job Security
           </MenuItem>
-          <div className="border-t border-[var(--border-primary)] my-1" />
+          <div className="border-t border-slate-600 my-1" />
           <MenuItem to="/finances" onClick={closeMenu}>
             <BanknoteIcon className="w-4 h-4 mr-2" />
             Finances
@@ -97,7 +97,7 @@ export const FranchiseMenu: React.FC = () => {
             <RepeatIcon className="w-4 h-4 mr-2" />
             Transfer & Loans
           </MenuItem>
-          <div className="border-t border-[var(--border-primary)] my-1" />
+          <div className="border-t border-slate-600 my-1" />
           <MenuItem to="/staff" onClick={closeMenu}>
             <Briefcase className="w-4 h-4 mr-2" />
             Staff
@@ -134,7 +134,7 @@ export const FranchiseMenu: React.FC = () => {
             <HeartPulseIcon className="w-4 h-4 mr-2" />
             Medical Center
           </MenuItem>
-          <div className="border-t border-[var(--border-primary)] my-1" />
+          <div className="border-t border-slate-600 my-1" />
           <MenuItem to="/club-history" onClick={closeMenu}>
             <TrophyIcon className="w-4 h-4 mr-2" />
             Club History

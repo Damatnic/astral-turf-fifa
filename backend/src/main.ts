@@ -37,7 +37,16 @@ async function bootstrap() {
   );
 
   const port = configService.get('PORT') || 3333;
-  await app.listen(port);
+  
+  // eslint-disable-next-line no-console
+  console.log(`🔍 Attempting to listen on port ${port}...`);
+  
+  const server = await app.listen(port, '0.0.0.0');
+  
+  // eslint-disable-next-line no-console
+  console.log(`✅ Listen call completed`);
+  // eslint-disable-next-line no-console
+  console.log(`📍 Server address:`, server.address());
 
   // eslint-disable-next-line no-console
   console.log(`🚀 Astral Turf Backend API running on: http://localhost:${port}`);
@@ -47,4 +56,8 @@ async function bootstrap() {
   console.log(`🔗 API Prefix: /${configService.get('API_PREFIX')}`);
 }
 
-bootstrap();
+bootstrap().catch((error) => {
+  // eslint-disable-next-line no-console
+  console.error('❌ Failed to start server:', error);
+  process.exit(1);
+});

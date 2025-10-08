@@ -253,7 +253,7 @@ const Modern3DSoccerField: React.FC<Modern3DSoccerFieldProps> = ({ className = '
   // Error boundary for missing formations
   if (!homeFormation || !awayFormation) {
     return (
-      <div className="flex items-center justify-center h-full bg-gradient-to-br from-red-900/20 to-red-800/20 border border-red-500/30 rounded-xl backdrop-blur-sm">
+      <div className="flex items-center justify-center h-full bg-gradient-to-br from-red-900/20 to-red-800/20 border border-red-500/30 rounded-xl ">
         <div className="text-center text-red-400 p-8">
           <div className="text-2xl font-bold mb-4">⚠️ Formation Configuration Required</div>
           <div className="text-lg mb-4">
@@ -837,7 +837,7 @@ const Modern3DSoccerField: React.FC<Modern3DSoccerFieldProps> = ({ className = '
 
       {/* Loading indicator */}
       {(!homeFormation || !awayFormation) && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+        <div className="absolute inset-0 flex items-center justify-center bg-slate-900 ">
           <div className="text-center p-8">
             <div className="text-white text-2xl mb-4 font-bold">
               Loading Tactical Environment...

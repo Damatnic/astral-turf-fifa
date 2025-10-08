@@ -249,7 +249,7 @@ export const SelectionContextMenu: React.FC<SelectionContextMenuProps> = ({
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-2 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-white font-semibold text-sm">Group Actions</span>
-            <span className="bg-white/20 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+            <span className="bg-slate-700 text-white text-xs font-bold px-2 py-0.5 rounded-full">
               {selectedCount}
             </span>
           </div>
@@ -374,7 +374,7 @@ export const SelectionContextMenu: React.FC<SelectionContextMenuProps> = ({
                 onClearSelection();
                 onClose();
               }}
-              className="w-full px-3 py-2 text-left text-sm text-red-400 hover:bg-red-900/20 rounded transition-colors flex items-center gap-2"
+              className="w-full px-3 py-2 text-left text-sm text-red-400 hover:bg-red-950 rounded transition-colors flex items-center gap-2"
             >
               <span>✕</span> Clear Selection
             </button>
@@ -547,7 +547,7 @@ export const SelectionToolbar: React.FC<SelectionToolbarProps> = ({
         {/* Clear selection */}
         <button
           onClick={onClearSelection}
-          className="p-2 hover:bg-red-900/20 rounded transition-colors text-red-400 text-sm font-semibold"
+          className="p-2 hover:bg-red-950 rounded transition-colors text-red-400 text-sm font-semibold"
           title="Clear Selection"
         >
           ✕

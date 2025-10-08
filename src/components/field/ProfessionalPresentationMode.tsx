@@ -73,13 +73,13 @@ const SlideNavigation: React.FC<{
   ({ currentSlide, totalSlides, onSlideChange, onPlay, onPause, onStop, isPlaying }) => {
     return (
       <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50">
-        <div className="bg-black/80 backdrop-blur-md rounded-full px-6 py-3 border border-white/20">
+        <div className="bg-slate-900  rounded-full px-6 py-3 border border-slate-600">
           <div className="flex items-center space-x-4">
             {/* Previous */}
             <button
               onClick={() => onSlideChange(Math.max(0, currentSlide - 1))}
               disabled={currentSlide === 0}
-              className="p-2 rounded-full hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="p-2 rounded-full hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
                 <path
@@ -118,7 +118,7 @@ const SlideNavigation: React.FC<{
             <button
               onClick={() => onSlideChange(Math.min(totalSlides - 1, currentSlide + 1))}
               disabled={currentSlide === totalSlides - 1}
-              className="p-2 rounded-full hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="p-2 rounded-full hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
                 <path
@@ -137,7 +137,7 @@ const SlideNavigation: React.FC<{
             {/* Stop */}
             <button
               onClick={onStop}
-              className="p-2 rounded-full hover:bg-white/10 transition-colors"
+              className="p-2 rounded-full hover:bg-slate-800 transition-colors"
             >
               <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
                 <path
@@ -177,7 +177,7 @@ const PresentationControls: React.FC<{
   }) => {
     return (
       <div className="fixed top-8 right-8 z-50">
-        <div className="bg-black/80 backdrop-blur-md rounded-lg p-4 border border-white/20 space-y-3">
+        <div className="bg-slate-900  rounded-lg p-4 border border-slate-600 space-y-3">
           <div className="text-white text-sm font-medium mb-3">Presentation Tools</div>
 
           {/* Laser pointer */}
@@ -244,7 +244,7 @@ const SlideOverlay: React.FC<{
   return (
     <div className="fixed top-8 left-8 z-40 max-w-md">
       <div
-        className="bg-black/90 backdrop-blur-md rounded-lg p-6 border border-white/20 transform transition-all duration-500"
+        className="bg-slate-950  rounded-lg p-6 border border-slate-600 transform transition-all duration-500"
         style={{
           transform: isVisible ? 'translateY(0)' : 'translateY(-20px)',
           opacity: isVisible ? 1 : 0,
@@ -615,7 +615,7 @@ const ProfessionalPresentationMode: React.FC = () => {
 
       {/* Instructions overlay */}
       <div className="fixed bottom-8 left-8 z-40">
-        <div className="bg-black/50 backdrop-blur-md rounded-lg p-3 border border-white/20">
+        <div className="bg-slate-800  rounded-lg p-3 border border-slate-600">
           <div className="text-white text-xs space-y-1">
             <div>
               <kbd className="bg-gray-700 px-1 rounded">→</kbd> Next slide

@@ -243,7 +243,7 @@ const HeatMapAnalytics: React.FC<HeatMapAnalyticsProps> = ({
 
             {/* Detailed Zone Info on Hover */}
             {zone.intensity > 0.5 && (
-              <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 hover:opacity-100 transition-opacity pointer-events-auto z-10">
+              <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 hover:opacity-100 transition-opacity pointer-events-auto z-10">
                 <div>Activity: {Math.floor(zone.intensity * 100)}%</div>
                 <div>Players: {zone.playerActivity.length}</div>
                 <div>Touches: {zone.playerActivity.reduce((sum, p) => sum + p.touches, 0)}</div>
@@ -259,7 +259,7 @@ const HeatMapAnalytics: React.FC<HeatMapAnalyticsProps> = ({
         animate={{ opacity: 1, y: 0 }}
         className="absolute top-4 right-4 pointer-events-auto"
       >
-        <div className="bg-slate-900/90 backdrop-blur-sm border border-slate-700/50 rounded-xl p-4 min-w-64">
+        <div className="bg-slate-900  border border-slate-700 rounded-xl p-4 min-w-64">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-white font-semibold flex items-center gap-2">
               <Activity className="w-4 h-4" />
@@ -346,7 +346,7 @@ const HeatMapAnalytics: React.FC<HeatMapAnalyticsProps> = ({
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
-                className="space-y-4 border-t border-slate-700/50 pt-4"
+                className="space-y-4 border-t border-slate-700 pt-4"
               >
                 {/* Intensity Slider */}
                 <div>
@@ -395,7 +395,7 @@ const HeatMapAnalytics: React.FC<HeatMapAnalyticsProps> = ({
           </AnimatePresence>
 
           {/* Quick Stats */}
-          <div className="grid grid-cols-2 gap-3 pt-4 border-t border-slate-700/50">
+          <div className="grid grid-cols-2 gap-3 pt-4 border-t border-slate-700">
             <div className="text-center">
               <div className="text-lg font-bold text-white">
                 {getZonesToRender().filter(z => z.intensity > 0.5).length}

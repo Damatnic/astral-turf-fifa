@@ -5,4 +5,3 @@ export const AuthContext = createContext<
   { authState: AuthState; dispatch: Dispatch<Action> } | undefined
 >(undefined);
 
-export { AuthProvider, useAuthContext } from './AuthContext.tsx';

@@ -588,7 +588,7 @@ const SoccerField: React.FC = () => {
             {!isPresentationMode && (
               <div
                 onClick={e => slot && handleActionBubbleClick(e, player, slot)}
-                className="absolute top-1/2 left-1/2 w-7 h-7 bg-slate-800/70 backdrop-blur-sm rounded-full border border-slate-500/50 flex items-center justify-center cursor-pointer hover:bg-teal-500/90 transition-all z-20"
+                className="absolute top-1/2 left-1/2 w-7 h-7 bg-slate-800/70  rounded-full border border-slate-500/50 flex items-center justify-center cursor-pointer hover:bg-teal-500/90 transition-all z-20"
                 style={{ transform: 'translate(10px, 10px)' }}
                 title="Player Actions"
               >
@@ -608,7 +608,7 @@ const SoccerField: React.FC = () => {
                 onDrop={e => handleSlotDrop(e, slot, team)}
                 onDragOver={e => handleDragOver(e, slot.id)}
                 onDragLeave={() => setDragOverSlotId(null)}
-                className={`absolute -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-white/5 rounded-full z-0 hover:bg-white/20 transition-all ${dragOverSlotId === slot.id ? 'bg-teal-500/20 ring-2 ring-teal-400' : ''}`}
+                className={`absolute -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-white/5 rounded-full z-0 hover:bg-slate-700 transition-all ${dragOverSlotId === slot.id ? 'bg-teal-500/20 ring-2 ring-teal-400' : ''}`}
                 style={{ left: `${slot.defaultPosition.x}%`, top: `${slot.defaultPosition.y}%` }}
               />
             ))}

@@ -682,7 +682,7 @@ export const HelpSystem: React.FC = () => {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-800"
             >
               <div className="w-full max-w-6xl h-[90vh] bg-white dark:bg-gray-900 rounded-xl shadow-2xl overflow-hidden">
                 {/* Header */}
@@ -1051,13 +1051,13 @@ const TutorialOverlay: React.FC<TutorialOverlayProps> = ({
   return (
     <div className="fixed inset-0 z-50 pointer-events-none">
       {/* Overlay */}
-      <div className="absolute inset-0 bg-black/50" />
+      <div className="absolute inset-0 bg-slate-800" />
 
       {/* Highlight */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="absolute bg-white/10 border-2 border-blue-500 rounded-lg pointer-events-none"
+        className="absolute bg-slate-800 border-2 border-blue-500 rounded-lg pointer-events-none"
         style={{
           left: highlightPosition.x - 4,
           top: highlightPosition.y - 4,

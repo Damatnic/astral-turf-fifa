@@ -149,7 +149,7 @@ const LandingPage: React.FC = () => {
         {/* Mobile-Only Quick Features */}
         {isMobile && (
           <div className="mt-8 w-full max-w-sm">
-            <div className="bg-slate-800/50 rounded-lg p-4 backdrop-blur-sm border border-slate-700/50">
+            <div className="bg-slate-800/50 rounded-lg p-4 backdrop-blur-sm border border-slate-700">
               <h3 className="text-center text-white font-semibold mb-3">Key Features</h3>
               <div className="space-y-2 text-sm text-slate-300">
                 <div className="flex items-center">

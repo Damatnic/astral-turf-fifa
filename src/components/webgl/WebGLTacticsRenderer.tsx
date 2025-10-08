@@ -621,7 +621,7 @@ export const WebGLTacticsRenderer: React.FC<WebGLTacticsRendererProps> = ({
   return (
     <div className="w-full space-y-4">
       {/* WebGL Canvas */}
-      <Card className="bg-white/10 backdrop-blur-md border-white/20 overflow-hidden">
+      <Card className="bg-slate-800  border-slate-600 overflow-hidden">
         <CardHeader>
           <CardTitle className="flex items-center justify-between text-white">
             <div className="flex items-center gap-2">
@@ -646,7 +646,7 @@ export const WebGLTacticsRenderer: React.FC<WebGLTacticsRendererProps> = ({
                   setIsRunning(false);
                   setTimeout(() => setIsRunning(true), 100);
                 }}
-                className="bg-white/10 hover:bg-white/20 border-white/20"
+                className="bg-slate-800 hover:bg-slate-700 border-slate-600"
               >
                 <RotateCcw className="w-4 h-4" />
               </Button>
@@ -664,7 +664,7 @@ export const WebGLTacticsRenderer: React.FC<WebGLTacticsRendererProps> = ({
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Performance Metrics */}
-        <Card className="bg-white/5 border-white/10">
+        <Card className="bg-white/5 border-slate-700">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-white">
               <Monitor className="w-5 h-5 text-blue-400" />
@@ -715,7 +715,7 @@ export const WebGLTacticsRenderer: React.FC<WebGLTacticsRendererProps> = ({
                   {metrics.fps >= 55 ? 'Excellent' : metrics.fps >= 30 ? 'Good' : 'Poor'}
                 </span>
               </div>
-              <div className="w-full bg-white/10 rounded-full h-2">
+              <div className="w-full bg-slate-800 rounded-full h-2">
                 <div
                   className={`h-2 rounded-full transition-all duration-300 ${
                     metrics.fps >= 55
@@ -732,7 +732,7 @@ export const WebGLTacticsRenderer: React.FC<WebGLTacticsRendererProps> = ({
         </Card>
 
         {/* Quality Settings */}
-        <Card className="bg-white/5 border-white/10">
+        <Card className="bg-white/5 border-slate-700">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-white">
               <Settings className="w-5 h-5 text-purple-400" />

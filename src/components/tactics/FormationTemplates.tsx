@@ -412,7 +412,7 @@ const FormationTemplates: React.FC<FormationTemplatesProps> = ({ onSelect, onClo
         </svg>
 
         {/* Popularity badge */}
-        <div className="absolute top-2 right-2 bg-slate-900/90 backdrop-blur-sm rounded-full px-2 py-1 text-xs text-white border border-slate-600/50">
+        <div className="absolute top-2 right-2 bg-slate-900  rounded-full px-2 py-1 text-xs text-white border border-slate-600/50">
           <Star className="w-3 h-3 inline mr-1 text-yellow-400" />
           {template.popularity}%
         </div>
@@ -439,31 +439,31 @@ const FormationTemplates: React.FC<FormationTemplatesProps> = ({ onSelect, onClo
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
+        className="fixed inset-0 z-50 bg-slate-800  flex items-center justify-center p-4"
         onClick={e => e.target === e.currentTarget && onClose()}
       >
         <motion.div
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9, y: 20 }}
-          className="bg-slate-900/95 backdrop-blur-md border border-slate-700/50 rounded-xl max-w-6xl w-full max-h-[90vh] overflow-hidden shadow-2xl"
+          className="bg-slate-900  border border-slate-700 rounded-xl max-w-6xl w-full max-h-[90vh] overflow-hidden shadow-2xl"
         >
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-slate-700/50">
+          <div className="flex items-center justify-between p-6 border-b border-slate-700">
             <div>
               <h2 className="text-2xl font-bold text-white">Formation Templates</h2>
               <p className="text-slate-400 mt-1">Choose from professional football formations</p>
             </div>
             <button
               onClick={onClose}
-              className="p-2 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-lg transition-all"
+              className="p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg transition-all"
             >
               <X className="w-6 h-6" />
             </button>
           </div>
 
           {/* Search and Filters */}
-          <div className="p-6 border-b border-slate-700/50">
+          <div className="p-6 border-b border-slate-700">
             <div className="flex flex-col lg:flex-row gap-4">
               {/* Search */}
               <div className="relative flex-1">
@@ -490,13 +490,13 @@ const FormationTemplates: React.FC<FormationTemplatesProps> = ({ onSelect, onClo
                         ${
                           selectedCategory === category.id
                             ? 'bg-blue-600/80 text-white border border-blue-500/50'
-                            : 'bg-slate-800/50 text-slate-300 border border-slate-600/50 hover:bg-slate-700/50'
+                            : 'bg-slate-800/50 text-slate-300 border border-slate-600/50 hover:bg-slate-700'
                         }
                       `}
                     >
                       <IconComponent className="w-4 h-4" />
                       {category.name}
-                      <span className="bg-slate-700/50 px-1.5 py-0.5 rounded text-xs">
+                      <span className="bg-slate-700 px-1.5 py-0.5 rounded text-xs">
                         {category.count}
                       </span>
                     </button>
@@ -516,7 +516,7 @@ const FormationTemplates: React.FC<FormationTemplatesProps> = ({ onSelect, onClo
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   whileHover={{ y: -5 }}
-                  className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4 hover:border-blue-500/50 hover:bg-slate-800/70 transition-all cursor-pointer group backdrop-blur-sm"
+                  className="bg-slate-800/50 border border-slate-700 rounded-xl p-4 hover:border-blue-500/50 hover:bg-slate-800/70 transition-all cursor-pointer group "
                   onClick={() => handleSelectTemplate(template)}
                   onMouseEnter={() => setHoveredTemplate(template.id)}
                   onMouseLeave={() => setHoveredTemplate(null)}

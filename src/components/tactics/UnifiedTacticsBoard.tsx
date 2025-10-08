@@ -1442,11 +1442,11 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
             key="formation-templates"
             fallback={
               <div
-                className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center"
+                className="fixed inset-0 z-50 bg-slate-800  flex items-center justify-center"
                 aria-live="polite"
                 aria-label="Loading formation templates"
               >
-                <div className="bg-slate-900/95 rounded-xl p-8 text-white">
+                <div className="bg-slate-900 rounded-xl p-8 text-white">
                   <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4" />
                   <div>Loading Formation Templates...</div>
                 </div>
@@ -1465,11 +1465,11 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
             key="ai-assistant"
             fallback={
               <div
-                className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center"
+                className="fixed inset-0 z-50 bg-slate-800  flex items-center justify-center"
                 aria-live="polite"
                 aria-label="Loading AI assistant"
               >
-                <div className="bg-slate-900/95 rounded-xl p-8 text-white">
+                <div className="bg-slate-900 rounded-xl p-8 text-white">
                   <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4" />
                   <div>Loading AI Assistant...</div>
                 </div>
@@ -1492,11 +1492,11 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
             key="tactical-playbook"
             fallback={
               <div
-                className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center"
+                className="fixed inset-0 z-50 bg-slate-800  flex items-center justify-center"
                 aria-live="polite"
                 aria-label="Loading tactical playbook"
               >
-                <div className="bg-slate-900/95 rounded-xl p-8 text-white">
+                <div className="bg-slate-900 rounded-xl p-8 text-white">
                   <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4" />
                   <div>Loading Tactical Playbook...</div>
                 </div>
@@ -1518,18 +1518,18 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
             key="analytics"
             fallback={
               <div
-                className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center"
+                className="fixed inset-0 z-50 bg-slate-800  flex items-center justify-center"
                 aria-live="polite"
                 aria-label="Loading tactical analytics"
               >
-                <div className="bg-slate-900/95 rounded-xl p-8 text-white">
+                <div className="bg-slate-900 rounded-xl p-8 text-white">
                   <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4" />
                   <div>Loading Tactical Analytics...</div>
                 </div>
               </div>
             }
           >
-            <div className="fixed inset-0 z-30 bg-black/50 backdrop-blur-sm">
+            <div className="fixed inset-0 z-30 bg-slate-800 ">
               <div className="fixed inset-4 z-31 overflow-auto">
                 <AdvancedAnalyticsDashboard
                   players={currentPlayers}
@@ -1542,7 +1542,7 @@ const UnifiedTacticsBoard: React.FC<UnifiedTacticsBoardProps> = ({
         )}
 
         {panels.aiAnalysis && (
-          <div key="ai-analysis" className="fixed top-20 right-4 z-25 bg-gray-900/95 backdrop-blur-sm border border-gray-700 rounded-lg max-w-md">
+          <div key="ai-analysis" className="fixed top-20 right-4 z-25 bg-gray-900/95  border border-gray-700 rounded-lg max-w-md">
             <div className="flex items-center justify-between p-3 border-b border-gray-700">
               <div className="flex items-center space-x-2">
                 <Brain className="w-4 h-4 text-blue-400" />

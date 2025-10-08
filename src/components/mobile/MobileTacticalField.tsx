@@ -435,7 +435,7 @@ const MobileTacticalField: React.FC<MobileTacticalFieldProps> = ({
             <div className="absolute top-2 left-2 flex space-x-1">
               <div className="w-2 h-2 bg-white/50 rounded-full" />
               <div className="w-2 h-2 bg-white/30 rounded-full" />
-              <div className="w-2 h-2 bg-white/10 rounded-full" />
+              <div className="w-2 h-2 bg-slate-800 rounded-full" />
             </div>
           )}
         </motion.div>
@@ -445,7 +445,7 @@ const MobileTacticalField: React.FC<MobileTacticalFieldProps> = ({
       {capabilities.isMobile && (
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
           <motion.button
-            className="bg-black/50 text-white p-2 rounded-full"
+            className="bg-slate-800 text-white p-2 rounded-full"
             whileTap={{ scale: 0.9 }}
             onClick={() => {
               fieldScale.set(1);
@@ -464,7 +464,7 @@ const MobileTacticalField: React.FC<MobileTacticalFieldProps> = ({
           </motion.button>
 
           <motion.button
-            className="bg-black/50 text-white p-2 rounded-full"
+            className="bg-slate-800 text-white p-2 rounded-full"
             whileTap={{ scale: 0.9 }}
             onClick={() => fieldScale.set(Math.min(3, fieldScale.get() * 1.2))}
           >
@@ -479,7 +479,7 @@ const MobileTacticalField: React.FC<MobileTacticalFieldProps> = ({
           </motion.button>
 
           <motion.button
-            className="bg-black/50 text-white p-2 rounded-full"
+            className="bg-slate-800 text-white p-2 rounded-full"
             whileTap={{ scale: 0.9 }}
             onClick={() => fieldScale.set(Math.max(0.5, fieldScale.get() * 0.8))}
           >

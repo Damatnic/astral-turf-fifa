@@ -8,11 +8,11 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const cardVariants = {
-  default: 'bg-secondary-800/50 backdrop-blur-sm border border-secondary-700/50 shadow-soft',
-  elevated: 'bg-secondary-800/80 backdrop-blur-md border border-secondary-700/60 shadow-medium',
+  default: 'bg-secondary-800/50  border border-secondary-700/50 shadow-soft',
+  elevated: 'bg-secondary-800/80  border border-secondary-700/60 shadow-medium',
   interactive:
-    'bg-secondary-800/50 backdrop-blur-sm border border-secondary-700/50 shadow-soft hover:shadow-medium hover:border-secondary-600/60 transition-all duration-200 cursor-pointer',
-  glass: 'bg-white/10 backdrop-blur-md border border-white/20',
+    'bg-secondary-800/50  border border-secondary-700/50 shadow-soft hover:shadow-medium hover:border-secondary-600/60 transition-all duration-200 cursor-pointer',
+  glass: 'bg-slate-800  border border-slate-600',
 };
 
 const cardPadding = {

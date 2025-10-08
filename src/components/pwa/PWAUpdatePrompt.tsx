@@ -46,7 +46,7 @@ export const PWAUpdatePrompt: React.FC<PWAUpdatePromptProps> = ({ className = ''
       <div className="p-5">
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-white/20 rounded-lg">
+            <div className="p-2 bg-slate-700 rounded-lg">
               <RefreshCw className={`w-5 h-5 ${isUpdating ? 'animate-spin' : ''}`} />
             </div>
             <h3 className="text-lg font-bold">Update Available</h3>
@@ -54,7 +54,7 @@ export const PWAUpdatePrompt: React.FC<PWAUpdatePromptProps> = ({ className = ''
 
           <button
             onClick={handleDismiss}
-            className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+            className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
             aria-label="Dismiss update notification"
             disabled={isUpdating}
           >
@@ -89,7 +89,7 @@ export const PWAUpdatePrompt: React.FC<PWAUpdatePromptProps> = ({ className = ''
           <button
             onClick={handleDismiss}
             disabled={isUpdating}
-            className="px-5 py-2.5 bg-white/10 backdrop-blur-sm rounded-lg font-semibold hover:bg-white/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-5 py-2.5 bg-slate-800  rounded-lg font-semibold hover:bg-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="Update later"
           >
             Later

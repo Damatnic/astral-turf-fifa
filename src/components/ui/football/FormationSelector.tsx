@@ -151,7 +151,7 @@ export const FormationSelector = forwardRef<HTMLDivElement, FormationSelectorPro
 
       return (
         <div
-          className="relative bg-green-600 rounded border border-white/20"
+          className="relative bg-green-600 rounded border border-slate-600"
           style={{ width, height }}
         >
           {/* Field markings */}

@@ -172,7 +172,7 @@ export const TacticalZonesOverlay: React.FC<TacticalZonesOverlayProps> = ({
                 <div
                   className={`
                     px-3 py-1 rounded-full text-xs font-semibold
-                    bg-gray-900/80 backdrop-blur-sm
+                    bg-gray-900/80 
                     border border-gray-700/50
                     ${zone.labelColor}
                     ${highlightedZone === zone.id ? 'ring-2 ring-current' : ''}

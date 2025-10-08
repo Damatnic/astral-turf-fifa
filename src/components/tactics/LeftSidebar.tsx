@@ -75,7 +75,7 @@ const PlayerListItem: React.FC<PlayerListItemProps> = ({
             ? 'bg-blue-600/30 ring-1 ring-blue-500'
             : isOnField
               ? 'bg-green-900/25 border border-green-500/40'
-              : 'bg-slate-800/40 hover:bg-slate-700/50'
+              : 'bg-slate-700 hover:bg-slate-700'
         }
       `}
     >
@@ -257,7 +257,7 @@ const PlaybookSection: React.FC<{
           <div key={category}>
             <button
               onClick={() => toggleCategory(category)}
-              className="w-full flex items-center justify-between text-left text-xs font-bold uppercase text-slate-400 hover:bg-slate-700/50 px-2 py-1 rounded"
+              className="w-full flex items-center justify-between text-left text-xs font-bold uppercase text-slate-400 hover:bg-slate-700 px-2 py-1 rounded"
             >
               <span>
                 {category} ({plays.length})
@@ -279,7 +279,7 @@ const PlaybookSection: React.FC<{
                       ${
                         activePlayId === play.id
                           ? 'bg-blue-600/30 text-white font-semibold'
-                          : 'hover:bg-slate-700/50 text-slate-300'
+                          : 'hover:bg-slate-700 text-slate-300'
                       }
                     `}
                     onClick={() => onLoadPlay(play.id)}
@@ -443,7 +443,7 @@ export const LeftSidebar: React.FC = () => {
   }, [formations, activeFormationId, handleFormationChange]);
 
   return (
-    <aside className="w-80 bg-slate-900/90 backdrop-blur-sm flex flex-col shadow-lg h-full border-r border-slate-700/50">
+    <aside className="w-80 bg-slate-900  flex flex-col shadow-lg h-full border-r border-slate-700">
       <div className="p-4 space-y-6 flex-1 overflow-y-auto">
         {/* Formation Selector */}
         <FormationSelector
@@ -611,14 +611,14 @@ export const LeftSidebar: React.FC = () => {
                   name: 'Forwards',
                   icon: Zap,
                   color: 'text-red-400',
-                  bgColor: 'bg-red-900/20',
+                  bgColor: 'bg-red-950',
                 },
                 {
                   key: 'other',
                   name: 'Others',
                   icon: Users,
                   color: 'text-slate-400',
-                  bgColor: 'bg-slate-900/20',
+                  bgColor: 'bg-slate-700',
                 },
               ];
 
@@ -671,7 +671,7 @@ export const LeftSidebar: React.FC = () => {
       </div>
 
       {/* Quick Actions Footer */}
-      <div className="p-4 border-t border-slate-700/50 bg-slate-800/50">
+      <div className="p-4 border-t border-slate-700 bg-slate-800/50">
         <div className="flex items-center justify-between text-xs text-slate-400">
           <span>{filteredPlayers.length} players</span>
           <div className="flex items-center space-x-3">

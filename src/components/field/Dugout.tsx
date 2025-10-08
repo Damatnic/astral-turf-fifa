@@ -29,7 +29,7 @@ const DugoutSection: React.FC<DugoutSectionProps> = ({
 
   return (
     <div
-      className="flex-1 h-full bg-black/20 rounded-lg p-2 flex flex-col"
+      className="flex-1 h-full bg-slate-650 rounded-lg p-2 flex flex-col"
       onDrop={e => onDrop(e, team)}
       onDragOver={handleDragOver}
       data-is-interactive-zone="true"

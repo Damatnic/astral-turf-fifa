@@ -197,7 +197,7 @@ const PlayerToken: React.FC<PlayerTokenProps> = memo(
           )}
           {availabilityIcon()}
         </div>
-        <p className="mt-1.5 text-xs font-semibold text-white bg-black/40 px-1.5 py-0.5 rounded-md whitespace-nowrap">
+        <p className="mt-1.5 text-xs font-semibold text-white bg-slate-750 px-1.5 py-0.5 rounded-md whitespace-nowrap">
           <span className="text-gray-400 mr-1">#{player?.jerseyNumber ?? '?'}</span>
           {player?.name ?? 'Unknown Player'}
         </p>

@@ -1,240 +1,235 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { useAuthContext } from '../hooks/useAuthContext';
-
 /**
- * Player Card Page
- * Displays the user's player profile card with stats, achievements, and personal info
+ * Enhanced Player Card Page
+ * 
+ * Comprehensive player profile with:
+ * - Ultimate Player Card display
+ * - Detailed statistics & analytics
+ * - XP & level progression tracking
+ * - Achievement showcase
+ * - Challenge integration
+ * - Career stats & history
+ * - Attribute breakdown
+ * - Recent activity feed
  */
-export default function PlayerCardPage() {
+
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useChallengeContext } from '../context/ChallengeContext';
+import { useTacticsContext, useAuthContext } from '../hooks';
+import { UltimatePlayerCard } from '../components/player/UltimatePlayerCard';
+import { convertToPlayerProgression } from '../utils/playerCardIntegration';
+import { calculateLevel, calculateRank } from '../utils/xpSystem';
+import ChallengeCard from '../components/challenges/ChallengeCard';
+import type { Player } from '../types';
+import { 
+  ArrowLeft, Trophy, Target, Users, TrendingUp, Award, 
+  Zap, Star, BarChart3, Activity, Flame, Calendar,
+  ChevronRight, Medal, Crown, Sparkles
+} from 'lucide-react';
+
+const PlayerCardPage: React.FC = () => {
+  const { playerId } = useParams<{ playerId?: string }>();
+  const navigate = useNavigate();
+  const { tacticsState } = useTacticsContext();
   const { authState } = useAuthContext();
-  const user = authState.user;
+  const { state, getActiveChallenges, getRecommendedChallenges } = useChallengeContext();
+
+  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+
+  // Get current player
+  useEffect(() => {
+    if (playerId) {
+      const player = tacticsState.players.find(p => p.id === playerId);
+      if (player) {
+        setSelectedPlayer(player);
+      }
+    } else if (authState.user?.playerId) {
+      const player = tacticsState.players.find(p => p.id === authState.user.playerId);
+      if (player) {
+        setSelectedPlayer(player);
+      }
+    }
+  }, [playerId, tacticsState.players, authState.user]);
+
+  if (!selectedPlayer) {
+    return (
+      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-950 via-blue-950 to-purple-950">
+        <div className="text-center">
+          <h3 className="text-lg font-semibold text-gray-300 mb-2">No Player Selected</h3>
+          <p className="text-gray-500 mb-4">Please select a player to view their card.</p>
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+          >
+            Go to Dashboard
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const [activeTab, setActiveTab] = useState<'overview' | 'stats' | 'achievements' | 'challenges'>('overview');
+
+  const profile = state.playerProfiles.get(selectedPlayer.id);
+  const activeChallenges = profile ? getActiveChallenges(selectedPlayer.id) : [];
+  const recommendedChallenges = profile ? getRecommendedChallenges(selectedPlayer.id) : [];
+
+  // Convert to player progression
+  const progression = profile ? convertToPlayerProgression(profile, selectedPlayer, { checkAchievements: true }) : undefined;
+
+  // Calculate stats
+  const xpPercent = progression ? (progression.currentXP / (progression.currentXP + progression.xpToNextLevel)) * 100 : 0;
+  const totalXP = profile?.totalXP || 0;
+  const currentLevel = profile?.currentLevel || 1;
+  const nextLevel = currentLevel + 1;
+  const unlockedAchievements = progression?.achievements.length || 0;
+  const streakDays = profile?.streakDays || 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-secondary-950 via-secondary-900 to-secondary-950 p-6">
-      <div className="max-w-6xl mx-auto space-y-6">
-        {/* Page Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-4xl font-bold text-white mb-2">Player Card</h1>
-            <p className="text-secondary-400">Your complete player profile</p>
+    <div className="w-full min-h-screen bg-gradient-to-br from-gray-950 via-blue-950 to-purple-950 overflow-y-auto">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-purple-900 to-blue-900 border-b border-purple-700">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => navigate(-1)}
+              className="flex items-center space-x-2 text-white hover:text-purple-300 transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5" />
+              <span className="font-medium">Back</span>
+            </button>
+            <h1 className="text-2xl font-bold text-white">Player Card</h1>
+            <div className="w-20" /> {/* Spacer for alignment */}
           </div>
         </div>
+      </div>
 
-        {/* Player Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-br from-primary-600/20 via-secondary-800/50 to-accent-600/20 rounded-2xl border-2 border-primary-500/30 p-8 backdrop-blur-xl shadow-2xl"
-        >
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Player Avatar & Basic Info */}
-            <div className="lg:col-span-1 flex flex-col items-center text-center space-y-4">
-              <div className="relative">
-                <div className="w-40 h-40 rounded-full bg-gradient-to-br from-primary-500 to-accent-500 p-1">
-                  <div className="w-full h-full rounded-full bg-secondary-900 flex items-center justify-center">
-                    <span className="text-6xl">⚽</span>
-                  </div>
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Left Column - Player Card */}
+          <div className="lg:col-span-1">
+            <UltimatePlayerCard
+              player={selectedPlayer}
+              progression={progression}
+              showProgression={true}
+              interactive={true}
+              showChallenges={true}
+            />
+          </div>
+
+          {/* Right Column - Challenges & Stats */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Quick Stats */}
+            <div className="grid grid-cols-3 gap-4">
+              <div className="bg-gradient-to-br from-blue-900 to-blue-950 rounded-xl p-6 border border-blue-700">
+                <div className="flex items-center justify-between mb-2">
+                  <Trophy className="w-8 h-8 text-yellow-400" />
+                  <span className="text-3xl font-bold text-white">{profile?.currentLevel || 0}</span>
                 </div>
-                <div className="absolute -bottom-2 -right-2 w-12 h-12 rounded-full bg-accent-500 border-4 border-secondary-900 flex items-center justify-center">
-                  <span className="text-xl font-bold text-white">85</span>
-                </div>
+                <p className="text-blue-300 text-sm font-medium">Current Level</p>
               </div>
 
+              <div className="bg-gradient-to-br from-purple-900 to-purple-950 rounded-xl p-6 border border-purple-700">
+                <div className="flex items-center justify-between mb-2">
+                  <Target className="w-8 h-8 text-cyan-400" />
+                  <span className="text-3xl font-bold text-white">{profile?.challengesCompleted?.length || 0}</span>
+                </div>
+                <p className="text-purple-300 text-sm font-medium">Challenges</p>
+              </div>
+
+              <div className="bg-gradient-to-br from-pink-900 to-pink-950 rounded-xl p-6 border border-pink-700">
+                <div className="flex items-center justify-between mb-2">
+                  <Users className="w-8 h-8 text-orange-400" />
+                  <span className="text-3xl font-bold text-white">{profile?.badges?.length || 0}</span>
+                </div>
+                <p className="text-pink-300 text-sm font-medium">Badges</p>
+              </div>
+            </div>
+
+            {/* Active Challenges */}
+            {activeChallenges.length > 0 && (
               <div>
-                <h2 className="text-3xl font-bold text-white mb-1">
-                  {user?.email?.split('@')[0] || 'Player'}
+                <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
+                  <Target className="w-6 h-6 mr-2 text-cyan-400" />
+                  Active Challenges
                 </h2>
-                <p className="text-primary-400 font-semibold">Manager & Player</p>
-              </div>
-
-              <div className="flex gap-4 text-sm">
-                <div className="bg-secondary-800/50 rounded-lg px-4 py-2">
-                  <div className="text-secondary-400 mb-1">Level</div>
-                  <div className="text-xl font-bold text-primary-400">42</div>
-                </div>
-                <div className="bg-secondary-800/50 rounded-lg px-4 py-2">
-                  <div className="text-secondary-400 mb-1">Rank</div>
-                  <div className="text-xl font-bold text-accent-400">#156</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Player Stats */}
-            <div className="lg:col-span-2 space-y-6">
-              <div>
-                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                  <span>📊</span> Player Attributes
-                </h3>
-                <div className="grid grid-cols-2 gap-4">
-                  {[
-                    { label: 'Pace', value: 87, color: 'primary' },
-                    { label: 'Shooting', value: 82, color: 'accent' },
-                    { label: 'Passing', value: 85, color: 'primary' },
-                    { label: 'Dribbling', value: 88, color: 'accent' },
-                    { label: 'Defending', value: 75, color: 'primary' },
-                    { label: 'Physical', value: 80, color: 'accent' },
-                  ].map((stat) => (
-                    <div key={stat.label} className="bg-secondary-800/30 rounded-lg p-3">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-secondary-300 text-sm">{stat.label}</span>
-                        <span className="text-white font-bold">{stat.value}</span>
-                      </div>
-                      <div className="w-full bg-secondary-700/50 rounded-full h-2">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: `${stat.value}%` }}
-                          transition={{ duration: 1, delay: 0.2 }}
-                          className={`h-full rounded-full bg-gradient-to-r ${
-                            stat.color === 'primary'
-                              ? 'from-primary-500 to-primary-400'
-                              : 'from-accent-500 to-accent-400'
-                          }`}
-                        />
-                      </div>
-                    </div>
+                <div className="grid gap-4">
+                  {activeChallenges.map((challenge) => (
+                    <ChallengeCard
+                      key={challenge.id}
+                      challenge={challenge}
+                      playerId={selectedPlayer.id}
+                      progress={state.challengeProgress[`${selectedPlayer.id}-${challenge.id}`]}
+                    />
                   ))}
                 </div>
               </div>
+            )}
 
-              {/* Quick Stats */}
+            {/* Recommended Challenges */}
+            {recommendedChallenges.length > 0 && (
               <div>
-                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                  <span>🎯</span> Career Stats
-                </h3>
-                <div className="grid grid-cols-4 gap-4">
-                  {[
-                    { label: 'Matches', value: '234', icon: '⚽' },
-                    { label: 'Goals', value: '87', icon: '🥅' },
-                    { label: 'Assists', value: '56', icon: '🎯' },
-                    { label: 'Win Rate', value: '68%', icon: '🏆' },
-                  ].map((stat) => (
-                    <div
-                      key={stat.label}
-                      className="bg-secondary-800/30 rounded-lg p-4 text-center"
-                    >
-                      <div className="text-2xl mb-2">{stat.icon}</div>
-                      <div className="text-2xl font-bold text-white mb-1">{stat.value}</div>
-                      <div className="text-xs text-secondary-400">{stat.label}</div>
-                    </div>
+                <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
+                  <Trophy className="w-6 h-6 mr-2 text-yellow-400" />
+                  Recommended Challenges
+                </h2>
+                <div className="grid gap-4">
+                  {recommendedChallenges.slice(0, 3).map((challenge) => (
+                    <ChallengeCard
+                      key={challenge.id}
+                      challenge={challenge}
+                      playerId={selectedPlayer.id}
+                      progress={state.challengeProgress[`${selectedPlayer.id}-${challenge.id}`]}
+                    />
                   ))}
                 </div>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Achievements Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Recent Achievements */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-secondary-800/50 backdrop-blur-xl rounded-xl border border-secondary-700/50 p-6"
-          >
-            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-              <span>🏆</span> Recent Achievements
-            </h3>
-            <div className="space-y-3">
-              {[
-                { id: 'hat-trick', title: 'Hat-trick Hero', desc: 'Score 3 goals in a match', rarity: 'Gold' },
-                { id: 'perfect-week', title: 'Perfect Week', desc: 'Win 7 consecutive matches', rarity: 'Platinum' },
-                { id: 'tactical', title: 'Tactical Genius', desc: 'Complete 50 formations', rarity: 'Silver' },
-                { id: 'assists', title: 'Team Player', desc: '100 assists milestone', rarity: 'Gold' },
-              ].map((achievement) => (
-                <div
-                  key={achievement.id}
-                  className="flex items-center gap-4 bg-secondary-900/50 rounded-lg p-3 hover:bg-secondary-700/30 transition-colors"
-                >
-                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-accent-500 to-primary-500 flex items-center justify-center flex-shrink-0">
-                    <span className="text-2xl">🏅</span>
-                  </div>
-                  <div className="flex-1">
-                    <div className="font-semibold text-white">{achievement.title}</div>
-                    <div className="text-xs text-secondary-400">{achievement.desc}</div>
-                  </div>
-                  <div
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                      achievement.rarity === 'Platinum'
-                        ? 'bg-cyan-500/20 text-cyan-400'
-                        : achievement.rarity === 'Gold'
-                        ? 'bg-yellow-500/20 text-yellow-400'
-                        : 'bg-gray-500/20 text-gray-400'
-                    }`}
+                {recommendedChallenges.length > 3 && (
+                  <button
+                    onClick={() => navigate('/challenge-hub')}
+                    className="mt-4 w-full py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold rounded-lg transition-all"
                   >
-                    {achievement.rarity}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Player Journey */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-secondary-800/50 backdrop-blur-xl rounded-xl border border-secondary-700/50 p-6"
-          >
-            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-              <span>📈</span> Player Journey
-            </h3>
-            <div className="space-y-4">
-              {[
-                { id: '2024-25', season: '2024/25', team: 'Astral FC', position: 'Manager', achievements: '🏆 League Champions' },
-                { id: '2023-24', season: '2023/24', team: 'Astral FC', position: 'Manager', achievements: '🥈 Runners-up' },
-                { id: '2022-23', season: '2022/23', team: 'Rising Stars', position: 'Player-Manager', achievements: '⭐ Promoted' },
-              ].map((entry, i) => (
-                <div key={entry.id} className="flex gap-4">
-                  <div className="flex flex-col items-center">
-                    <div className="w-10 h-10 rounded-full bg-primary-500 flex items-center justify-center flex-shrink-0">
-                      <span className="text-white font-bold">{entry.season.split('/')[0].slice(2)}</span>
-                    </div>
-                    {i < 2 && <div className="w-0.5 h-full bg-primary-500/30 mt-2" />}
-                  </div>
-                  <div className="flex-1 pb-6">
-                    <div className="font-semibold text-white">{entry.team}</div>
-                    <div className="text-sm text-secondary-400 mb-1">{entry.position} • {entry.season}</div>
-                    <div className="text-sm text-accent-400">{entry.achievements}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Player Specialties */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="bg-secondary-800/50 backdrop-blur-xl rounded-xl border border-secondary-700/50 p-6"
-        >
-          <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-            <span>⭐</span> Specialties & Play Style
-          </h3>
-          <div className="flex flex-wrap gap-3">
-            {[
-              'Tiki-Taka Master',
-              'Counter-Attack Expert',
-              'Set Piece Specialist',
-              'High Press Tactician',
-              'Possession Play',
-              'Wing Play',
-              'Clinical Finisher',
-              'Creative Playmaker',
-            ].map((specialty) => (
-              <div
-                key={specialty}
-                className="px-4 py-2 bg-gradient-to-r from-primary-500/20 to-accent-500/20 border border-primary-500/30 rounded-full text-sm font-medium text-white hover:from-primary-500/30 hover:to-accent-500/30 transition-colors"
-              >
-                {specialty}
+                    View All Challenges →
+                  </button>
+                )}
               </div>
-            ))}
+            )}
+
+            {/* Player Selection */}
+            {tacticsState.players.length > 1 && (
+              <div>
+                <h2 className="text-2xl font-bold text-white mb-4">Other Players</h2>
+                <div className="grid grid-cols-2 gap-4">
+                  {tacticsState.players
+                    .filter(p => p.id !== selectedPlayer.id)
+                    .slice(0, 4)
+                    .map((player) => (
+                      <button
+                        key={player.id}
+                        onClick={() => navigate(`/player-card/${player.id}`)}
+                        className="bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg p-4 transition-colors text-left"
+                      >
+                        <div className="flex items-center space-x-3">
+                          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                            <span className="text-lg font-bold text-white">{player.jerseyNumber}</span>
+                          </div>
+                          <div>
+                            <p className="text-white font-bold">{player.name}</p>
+                            <p className="text-gray-400 text-sm">
+                              Level {state.playerProfiles.get(player.id)?.currentLevel || 1}
+                            </p>
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                </div>
+              </div>
+            )}
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );
-}
+};
+
+export default PlayerCardPage;

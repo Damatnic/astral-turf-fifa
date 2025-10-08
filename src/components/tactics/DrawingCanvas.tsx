@@ -892,7 +892,7 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
               whileFocus={{ scale: 1.05 }}
               className="
                 px-3 py-2 text-sm font-medium text-center rounded-lg border-2 outline-none
-                bg-slate-800/95 backdrop-blur-md text-white shadow-lg
+                bg-slate-800/95  text-white shadow-lg
                 transition-all duration-200
               "
               style={{
@@ -919,7 +919,7 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
             exit={{ opacity: 0, y: 20 }}
             className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-50"
           >
-            <div className="flex items-center gap-2 bg-slate-800/95 backdrop-blur-md rounded-lg px-4 py-2 border border-slate-600/50 shadow-lg">
+            <div className="flex items-center gap-2 bg-slate-800/95  rounded-lg px-4 py-2 border border-slate-600/50 shadow-lg">
               <span className="text-slate-300 text-sm">
                 {selectedShapes.size} shape{selectedShapes.size !== 1 ? 's' : ''} selected
               </span>

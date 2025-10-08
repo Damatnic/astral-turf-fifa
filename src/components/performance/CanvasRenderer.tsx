@@ -683,7 +683,7 @@ export const CanvasRenderer: React.FC<CanvasRendererProps> = ({
 
       {/* Performance overlay in development */}
       {process.env.NODE_ENV === 'development' && (
-        <div className="absolute top-2 left-2 bg-black/50 text-white text-xs p-2 rounded">
+        <div className="absolute top-2 left-2 bg-slate-800 text-white text-xs p-2 rounded">
           <div>FPS: {fpsRef.current}</div>
           <div>Players: {players.length}</div>
           <div>Visible: {renderBatches.reduce((sum, batch) => sum + batch.items.length, 0)}</div>

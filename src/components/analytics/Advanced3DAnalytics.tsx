@@ -382,7 +382,7 @@ export const Advanced3DAnalytics: React.FC<Advanced3DAnalyticsProps> = ({
   };
 
   return (
-    <Card className="w-full max-w-6xl bg-white/10 backdrop-blur-md border-white/20">
+    <Card className="w-full max-w-6xl bg-slate-800  border-slate-600">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-white">
           <BarChart3 className="w-6 h-6 text-purple-400" />
@@ -412,16 +412,16 @@ export const Advanced3DAnalytics: React.FC<Advanced3DAnalyticsProps> = ({
           <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Main Visualization Canvas */}
             <div className="lg:col-span-2 space-y-4">
-              <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+              <div className="bg-white/5 rounded-lg p-4 border border-slate-700">
                 <canvas
                   ref={canvasRef}
-                  className="w-full h-auto border border-white/20 rounded"
+                  className="w-full h-auto border border-slate-600 rounded"
                   style={{ maxHeight: '400px' }}
                 />
               </div>
 
               {/* Controls */}
-              <div className="flex flex-wrap gap-4 items-center justify-between bg-white/5 rounded-lg p-4 border border-white/10">
+              <div className="flex flex-wrap gap-4 items-center justify-between bg-white/5 rounded-lg p-4 border border-slate-700">
                 <div className="flex items-center gap-2">
                   <Button
                     size="sm"
@@ -436,7 +436,7 @@ export const Advanced3DAnalytics: React.FC<Advanced3DAnalyticsProps> = ({
                       setCurrentTime(0);
                       setIsPlaying(false);
                     }}
-                    className="bg-white/10 hover:bg-white/20 border-white/20"
+                    className="bg-slate-800 hover:bg-slate-700 border-slate-600"
                   >
                     <RotateCcw className="w-4 h-4" />
                   </Button>
@@ -460,7 +460,7 @@ export const Advanced3DAnalytics: React.FC<Advanced3DAnalyticsProps> = ({
                   <select
                     value={selectedPlayer}
                     onChange={e => setSelectedPlayer(e.target.value)}
-                    className="bg-white/10 border border-white/20 rounded px-2 py-1 text-white text-sm"
+                    className="bg-slate-800 border border-slate-600 rounded px-2 py-1 text-white text-sm"
                   >
                     <option value="all">All Players</option>
                     {players.map(player => (
@@ -475,7 +475,7 @@ export const Advanced3DAnalytics: React.FC<Advanced3DAnalyticsProps> = ({
 
             {/* Metrics Panel */}
             <div className="space-y-4">
-              <Card className="bg-white/5 border-white/10">
+              <Card className="bg-white/5 border-slate-700">
                 <CardHeader>
                   <CardTitle className="text-white text-lg flex items-center gap-2">
                     <Target className="w-5 h-5 text-purple-400" />
@@ -486,7 +486,7 @@ export const Advanced3DAnalytics: React.FC<Advanced3DAnalyticsProps> = ({
                   {metrics.map((metric, index) => (
                     <div
                       key={index}
-                      className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/10"
+                      className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-slate-700"
                     >
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
@@ -508,7 +508,7 @@ export const Advanced3DAnalytics: React.FC<Advanced3DAnalyticsProps> = ({
                 </CardContent>
               </Card>
 
-              <Card className="bg-white/5 border-white/10">
+              <Card className="bg-white/5 border-slate-700">
                 <CardHeader>
                   <CardTitle className="text-white text-lg flex items-center gap-2">
                     <Eye className="w-5 h-5 text-purple-400" />

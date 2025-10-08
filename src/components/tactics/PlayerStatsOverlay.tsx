@@ -174,7 +174,7 @@ const PlayerStatsOverlay: React.FC<PlayerStatsOverlayProps> = ({
         </svg>
 
         {/* Performance Score */}
-        <div className="absolute -top-1 -left-1 w-8 h-8 bg-slate-900/80 rounded-full flex items-center justify-center">
+        <div className="absolute -top-1 -left-1 w-8 h-8 bg-slate-900 rounded-full flex items-center justify-center">
           <span className="text-xs font-bold text-white">
             {Math.round(stats.metrics.performance)}
           </span>
@@ -188,7 +188,7 @@ const PlayerStatsOverlay: React.FC<PlayerStatsOverlayProps> = ({
             initial={{ opacity: 0, y: 10, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.9 }}
-            className="absolute top-6 left-1/2 transform -translate-x-1/2 bg-slate-900/95 backdrop-blur-md border border-slate-700/50 rounded-lg p-3 min-w-[200px] z-10"
+            className="absolute top-6 left-1/2 transform -translate-x-1/2 bg-slate-900  border border-slate-700 rounded-lg p-3 min-w-[200px] z-10"
           >
             <div className="text-white font-semibold text-sm mb-2">{stats.name}</div>
 
@@ -301,7 +301,7 @@ const PlayerStatsOverlay: React.FC<PlayerStatsOverlayProps> = ({
             </svg>
 
             {/* Heat Map Legend */}
-            <div className="absolute top-4 right-4 bg-slate-900/80 backdrop-blur-md border border-slate-700/50 rounded-lg p-3">
+            <div className="absolute top-4 right-4 bg-slate-900  border border-slate-700 rounded-lg p-3">
               <h4 className="text-white text-sm font-semibold mb-2 flex items-center gap-2">
                 <BarChart3 className="w-4 h-4" />
                 Heat Map
@@ -354,7 +354,7 @@ const PlayerStatsOverlay: React.FC<PlayerStatsOverlayProps> = ({
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 20 }}
-            className="absolute top-4 left-4 bg-slate-900/90 backdrop-blur-md border border-slate-700/50 rounded-lg p-4 min-w-[250px]"
+            className="absolute top-4 left-4 bg-slate-900  border border-slate-700 rounded-lg p-4 min-w-[250px]"
           >
             <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
               <Eye className="w-4 h-4 text-blue-400" />
@@ -405,7 +405,7 @@ const PlayerStatsOverlay: React.FC<PlayerStatsOverlayProps> = ({
                     ))}
                   </div>
 
-                  <div className="pt-2 border-t border-slate-700/50">
+                  <div className="pt-2 border-t border-slate-700">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-slate-400">Overall Rating</span>
                       <span className="text-white font-bold">

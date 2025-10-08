@@ -98,7 +98,7 @@ export class TacticsErrorBoundary extends Component<Props, State> {
       // Show different fallbacks based on error type
       if (this.state.error?.message?.includes('formation')) {
         return (
-          <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
+          <div className="p-4 bg-red-500/10 border border-red-800 rounded-lg">
             <div className="flex items-center space-x-2 mb-2">
               <svg
                 className="w-5 h-5 text-red-400"

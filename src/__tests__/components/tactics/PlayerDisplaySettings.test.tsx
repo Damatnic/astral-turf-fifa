@@ -538,7 +538,7 @@ describe('PlayerDisplaySettings Component', () => {
       const toggleButton = screen.getByRole('button', { name: /display/i });
 
       await user.hover(toggleButton);
-      expect(toggleButton).toHaveClass('hover:bg-slate-700/80');
+      expect(toggleButton).toHaveClass('hover:bg-slate-700');
     });
 
     it('shows panel animation when opening', async () => {

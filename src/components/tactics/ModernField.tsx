@@ -468,7 +468,7 @@ const ModernField: React.FC<ModernFieldProps> = ({
               delta: { x: 0, y: 0 },
             });
           }}
-          isDraggable={!isLowPower}
+          isDraggable={true}
           isHighlightedByAI={false}
         />,
       );
@@ -776,7 +776,7 @@ const ModernField: React.FC<ModernFieldProps> = ({
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="absolute top-4 left-4 bg-blue-600/90 backdrop-blur-sm rounded-lg px-3 py-2 text-white text-sm font-medium"
+            className="absolute top-4 left-4 bg-blue-600  rounded-lg px-3 py-2 text-white text-sm font-medium"
           >
             Tap field to move {selectedPlayer.name}
           </motion.div>
@@ -787,7 +787,7 @@ const ModernField: React.FC<ModernFieldProps> = ({
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="absolute top-4 right-4 bg-green-600/90 backdrop-blur-sm rounded-lg px-3 py-2 text-white text-sm font-medium flex items-center gap-2"
+            className="absolute top-4 right-4 bg-green-600  rounded-lg px-3 py-2 text-white text-sm font-medium flex items-center gap-2"
           >
             <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
             Fullscreen Mode

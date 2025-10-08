@@ -79,7 +79,7 @@ export const SnapIndicator: React.FC<SnapIndicatorProps> = ({ position, type, vi
 
           {/* Inner circle with icon */}
           <motion.div
-            className={`w-12 h-12 rounded-full border-2 ${getIndicatorColor()} flex items-center justify-center bg-black/60 backdrop-blur-sm`}
+            className={`w-12 h-12 rounded-full border-2 ${getIndicatorColor()} flex items-center justify-center bg-slate-900 `}
             animate={{
               rotate: [0, 360],
             }}
@@ -97,7 +97,7 @@ export const SnapIndicator: React.FC<SnapIndicatorProps> = ({ position, type, vi
             <motion.div
               initial={{ y: 10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              className="absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs font-semibold px-2 py-1 rounded whitespace-nowrap"
+              className="absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs font-semibold px-2 py-1 rounded whitespace-nowrap"
             >
               {label}
             </motion.div>
@@ -380,7 +380,7 @@ export const FormationSlotIndicators: React.FC<FormationSlotIndicatorProps> = ({
               <motion.div
                 initial={{ y: 5, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                className="absolute top-full mt-1 left-1/2 -translate-x-1/2 bg-blue-600/90 text-white text-xs font-medium px-2 py-0.5 rounded whitespace-nowrap"
+                className="absolute top-full mt-1 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs font-medium px-2 py-0.5 rounded whitespace-nowrap"
               >
                 {slot.role}
               </motion.div>

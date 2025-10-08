@@ -5,7 +5,24 @@
  * transaction management, and comprehensive logging for the Astral Turf application.
  */
 
-import { PrismaClient, Prisma } from '@prisma/client';
+// Browser detection - Prisma can only run in Node.js
+const isBrowser = typeof window !== 'undefined';
+
+// Only import Prisma in Node.js environment
+let PrismaClient: any;
+let Prisma: any;
+
+if (!isBrowser) {
+  try {
+    const prismaModule = require('@prisma/client');
+    PrismaClient = prismaModule.PrismaClient;
+    Prisma = prismaModule.Prisma;
+  } catch (e) {
+    // Prisma not available
+    console.warn('[DatabaseService] Prisma not available, using mock mode');
+  }
+}
+
 // Fallback logger for tests
 const securityLogger = {
   info: (message: string, meta?: unknown) => {}, // console.log(`[DB-INFO] ${message}`, meta),
@@ -34,12 +51,19 @@ const DATABASE_CONFIG = {
 
 // Prisma client with logging and error handling
 class DatabaseService {
-  private prisma: PrismaClient;
+  private prisma: any;
   private isConnected = false;
   private connectionAttempts = 0;
   private maxRetries = 3;
 
   constructor() {
+    // In browser, create a mock client
+    if (isBrowser || !PrismaClient) {
+      this.prisma = this.createBrowserMockClient();
+      this.isConnected = false;
+      return;
+    }
+
     this.prisma = new PrismaClient({
       log: [
         { emit: 'event', level: 'query' },
@@ -51,6 +75,22 @@ class DatabaseService {
     });
 
     this.setupEventListeners();
+  }
+
+  /**
+   * Create a mock Prisma client for browser environments
+   */
+  private createBrowserMockClient() {
+    const mockMethod = () => {
+      console.warn('[DatabaseService] Database operations are not available in browser');
+      return Promise.resolve(null);
+    };
+
+    return new Proxy({}, {
+      get: () => new Proxy({}, {
+        get: () => mockMethod
+      })
+    });
   }
 
   /**
@@ -113,9 +153,15 @@ class DatabaseService {
    * Setup Prisma event listeners for logging and monitoring
    */
   private setupEventListeners(): void {
+    // Skip in browser environment
+    if (isBrowser || !this.prisma.$on) {
+      return;
+    }
+
     // Query logging
     (this.prisma.$on as any)('query', (e: any) => {
-      if (process.env.NODE_ENV === 'development') {
+      const isDev = typeof process !== 'undefined' ? process.env.NODE_ENV === 'development' : false;
+      if (isDev) {
         // // // // console.log('Query: ' + e.query);
         // // // // console.log('Params: ' + e.params);
         // // // // console.log('Duration: ' + e.duration + 'ms');

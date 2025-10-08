@@ -369,7 +369,7 @@ export const PlayerStats = forwardRef<HTMLDivElement, PlayerStatsProps>(
                     getRatingColor(rating * 10).replace('text-', 'rgb(var(--') + '))',
                 }}
               >
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 px-2 py-1 bg-black/80 rounded text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 px-2 py-1 bg-slate-900 rounded text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity">
                   {rating.toFixed(1)}
                 </div>
               </div>

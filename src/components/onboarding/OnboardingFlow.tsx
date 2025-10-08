@@ -392,7 +392,7 @@ export const OnboardingFlow: React.FC = () => {
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 bg-slate-800 ">
       <div className="flex items-center justify-center min-h-screen p-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
@@ -404,7 +404,7 @@ export const OnboardingFlow: React.FC = () => {
           <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 text-white">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <div className="p-2 bg-white/20 rounded-lg">
+                <div className="p-2 bg-slate-700 rounded-lg">
                   <Rocket className="w-6 h-6" />
                 </div>
                 <div>
@@ -427,7 +427,7 @@ export const OnboardingFlow: React.FC = () => {
                   variant="ghost"
                   size="sm"
                   onClick={completeOnboarding}
-                  className="text-white hover:bg-white/20"
+                  className="text-white hover:bg-slate-700"
                 >
                   <X className="w-4 h-4" />
                 </Button>
@@ -440,7 +440,7 @@ export const OnboardingFlow: React.FC = () => {
                 <span>Progress</span>
                 <span>{progress}%</span>
               </div>
-              <Progress value={progress} className="bg-white/20" />
+              <Progress value={progress} className="bg-slate-700" />
             </div>
           </div>
 
@@ -798,7 +798,7 @@ const OnboardingSettings: React.FC<OnboardingSettingsProps> = ({
         variant="ghost"
         size="sm"
         onClick={() => setIsOpen(!isOpen)}
-        className="text-white hover:bg-white/20"
+        className="text-white hover:bg-slate-700"
       >
         <Settings className="w-4 h-4" />
       </Button>

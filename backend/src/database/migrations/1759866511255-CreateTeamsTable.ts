@@ -32,7 +32,7 @@ export class CreateTeamsTable1759866511255 implements MigrationInterface {
           },
           {
             name: 'ownerId',
-            type: 'int',
+            type: 'uuid',
           },
           {
             name: 'maxPlayers',
@@ -73,7 +73,7 @@ export class CreateTeamsTable1759866511255 implements MigrationInterface {
           },
           {
             name: 'userId',
-            type: 'int',
+            type: 'uuid',
           },
           {
             name: 'role',
@@ -137,7 +137,7 @@ export class CreateTeamsTable1759866511255 implements MigrationInterface {
           },
           {
             name: 'invitedBy',
-            type: 'int',
+            type: 'uuid',
           },
           {
             name: 'status',

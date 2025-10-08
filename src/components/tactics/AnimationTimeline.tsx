@@ -74,7 +74,7 @@ const StepEventEditor: React.FC<StepEventEditorProps> = ({ stepIndex, event, onC
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
-      className="absolute bottom-full mb-2 w-80 bg-slate-800/95 backdrop-blur-md border border-slate-600/50 p-4 rounded-xl shadow-2xl z-50"
+      className="absolute bottom-full mb-2 w-80 bg-slate-800/95  border border-slate-600/50 p-4 rounded-xl shadow-2xl z-50"
     >
       <div className="flex items-center justify-between mb-3">
         <h4 className="font-semibold text-white text-sm flex items-center gap-2">
@@ -112,7 +112,7 @@ const StepEventEditor: React.FC<StepEventEditorProps> = ({ stepIndex, event, onC
         </div>
       </div>
 
-      <div className="flex justify-between mt-4 pt-3 border-t border-slate-700/50">
+      <div className="flex justify-between mt-4 pt-3 border-t border-slate-700">
         <button
           onClick={handleRemove}
           className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-red-400 hover:bg-red-500/20 rounded-lg transition-colors"
@@ -123,7 +123,7 @@ const StepEventEditor: React.FC<StepEventEditorProps> = ({ stepIndex, event, onC
         <div className="flex gap-2">
           <button
             onClick={onClose}
-            className="px-3 py-1.5 text-xs font-medium text-slate-400 hover:bg-slate-700/50 rounded-lg transition-colors"
+            className="px-3 py-1.5 text-xs font-medium text-slate-400 hover:bg-slate-700 rounded-lg transition-colors"
           >
             Cancel
           </button>
@@ -198,7 +198,7 @@ const StepButton: React.FC<StepButtonProps> = ({ index }) => {
         className={`group relative w-12 h-12 rounded-xl text-sm font-bold flex items-center justify-center transition-all duration-200 shadow-lg ${
           isActive
             ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white ring-2 ring-blue-400/50 ring-offset-2 ring-offset-slate-800'
-            : 'bg-slate-700/70 backdrop-blur-sm text-slate-300 hover:bg-slate-600/70 border border-slate-600/30'
+            : 'bg-slate-700/70  text-slate-300 hover:bg-slate-600/70 border border-slate-600/30'
         }`}
       >
         {/* Event indicator */}
@@ -273,7 +273,7 @@ const PlaybackControls: React.FC<PlaybackControlsProps> = ({
   onNext,
 }) => {
   return (
-    <div className="flex items-center gap-2 px-3 py-2 bg-slate-700/50 backdrop-blur-sm rounded-lg border border-slate-600/30">
+    <div className="flex items-center gap-2 px-3 py-2 bg-slate-700  rounded-lg border border-slate-600/30">
       {/* Previous step */}
       <motion.button
         whileHover={{ scale: 1.1 }}
@@ -382,7 +382,7 @@ const AnimationTimeline: React.FC = () => {
       exit={{ opacity: 0, y: 20 }}
       className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30"
     >
-      <div className="bg-slate-800/80 backdrop-blur-md border border-slate-600/40 rounded-2xl shadow-2xl p-4">
+      <div className="bg-slate-800  border border-slate-600/40 rounded-2xl shadow-2xl p-4">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
@@ -423,7 +423,7 @@ const AnimationTimeline: React.FC = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={handleAddStep}
-            className="w-12 h-12 rounded-xl bg-slate-700/50 border-2 border-dashed border-slate-600/50 text-slate-400 flex items-center justify-center hover:bg-slate-600/50 hover:border-blue-500/50 hover:text-blue-400 transition-all duration-200"
+            className="w-12 h-12 rounded-xl bg-slate-700 border-2 border-dashed border-slate-600/50 text-slate-400 flex items-center justify-center hover:bg-slate-600/50 hover:border-blue-500/50 hover:text-blue-400 transition-all duration-200"
             title="Add New Step"
           >
             <Plus className="w-5 h-5" />

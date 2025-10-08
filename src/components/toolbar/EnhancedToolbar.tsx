@@ -59,10 +59,10 @@ const ToolbarButton: React.FC<ToolbarButtonProps> = ({
     className={cn(
       'flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium',
       'transition-all duration-200',
-      'border border-slate-600/50 backdrop-blur-sm',
+      'border border-slate-600/50 ',
       disabled
         ? 'opacity-40 cursor-not-allowed bg-slate-800/30'
-        : 'hover:bg-slate-700/50 hover:border-primary-500/50 active:scale-95',
+        : 'hover:bg-slate-700 hover:border-primary-500/50 active:scale-95',
       'focus:outline-none focus:ring-2 focus:ring-primary-500/50',
     )}
     title={shortcut ? `${label} (${shortcut})` : label}
@@ -107,7 +107,7 @@ export const EnhancedToolbar: React.FC<EnhancedToolbarProps> = ({
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       className={cn(
-        'w-full border-b border-slate-700 bg-slate-800/90 backdrop-blur-md',
+        'w-full border-b border-slate-700 bg-slate-800 ',
         'shadow-lg',
         className,
       )}
@@ -172,7 +172,7 @@ export const EnhancedToolbar: React.FC<EnhancedToolbarProps> = ({
             onChange={handleFormationSelect}
             className={cn(
               'px-3 py-2 rounded-lg text-sm font-medium',
-              'bg-slate-700/50 border border-slate-600/50 text-slate-200',
+              'bg-slate-700 border border-slate-600/50 text-slate-200',
               'hover:bg-slate-700 focus:bg-slate-700',
               'focus:outline-none focus:ring-2 focus:ring-primary-500/50',
               'transition-all duration-200',

@@ -97,7 +97,7 @@ export const PresetsLibraryModal: React.FC<PresetsLibraryModalProps> = ({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900 ">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -118,21 +118,21 @@ export const PresetsLibraryModal: React.FC<PresetsLibraryModalProps> = ({
               <div className="flex items-center gap-3">
                 {/* Sync Status */}
                 {syncStatus.isSyncing ? (
-                  <div className="flex items-center gap-2 bg-white/20 px-3 py-2 rounded-lg">
+                  <div className="flex items-center gap-2 bg-slate-700 px-3 py-2 rounded-lg">
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     <span className="text-white text-sm font-medium">Syncing...</span>
                   </div>
                 ) : syncStatus.lastSyncedAt ? (
                   <button
                     onClick={syncToCloud}
-                    className="flex items-center gap-2 bg-white/20 hover:bg-white/30 px-3 py-2 rounded-lg transition-colors"
+                    className="flex items-center gap-2 bg-slate-700 hover:bg-white/30 px-3 py-2 rounded-lg transition-colors"
                   >
                     <span className="text-white text-sm">☁️ Synced</span>
                   </button>
                 ) : (
                   <button
                     onClick={syncToCloud}
-                    className="flex items-center gap-2 bg-white/20 hover:bg-white/30 px-3 py-2 rounded-lg transition-colors"
+                    className="flex items-center gap-2 bg-slate-700 hover:bg-white/30 px-3 py-2 rounded-lg transition-colors"
                   >
                     <span className="text-white text-sm">☁️ Sync</span>
                   </button>
@@ -141,7 +141,7 @@ export const PresetsLibraryModal: React.FC<PresetsLibraryModalProps> = ({
                 {/* Close Button */}
                 <button
                   onClick={onClose}
-                  className="text-white hover:text-slate-200 p-2 hover:bg-white/20 rounded-lg transition-colors"
+                  className="text-white hover:text-slate-200 p-2 hover:bg-slate-700 rounded-lg transition-colors"
                 >
                   <span className="text-2xl">✕</span>
                 </button>
@@ -234,12 +234,12 @@ export const PresetsLibraryModal: React.FC<PresetsLibraryModalProps> = ({
                   className={`px-4 py-2 rounded-lg transition-all flex items-center gap-2 whitespace-nowrap ${
                     selectedCategory === category
                       ? `bg-gradient-to-r ${CATEGORY_COLORS[category]} text-white shadow-lg scale-105`
-                      : 'bg-slate-700/50 text-slate-300 hover:bg-slate-700'
+                      : 'bg-slate-700 text-slate-300 hover:bg-slate-700'
                   }`}
                 >
                   <span className="text-lg">{CATEGORY_ICONS[category]}</span>
                   <span className="font-medium capitalize">{category}</span>
-                  <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs">
+                  <span className="bg-slate-700 px-2 py-0.5 rounded-full text-xs">
                     {stats.byCategory[category]}
                   </span>
                 </button>
@@ -304,7 +304,7 @@ export const PresetsLibraryModal: React.FC<PresetsLibraryModalProps> = ({
 
           {/* Delete Confirmation Modal */}
           {showDeleteConfirm && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+            <div className="absolute inset-0 flex items-center justify-center bg-slate-800 ">
               <motion.div
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -372,7 +372,7 @@ const PresetCard: React.FC<PresetCardProps> = ({
             onClick={() => {
               setShowMenu(!showMenu);
             }}
-            className="p-2 bg-black/30 hover:bg-black/50 rounded-lg text-white transition-colors"
+            className="p-2 bg-slate-700 hover:bg-slate-800 rounded-lg text-white transition-colors"
           >
             ⋯
           </button>
@@ -401,7 +401,7 @@ const PresetCard: React.FC<PresetCardProps> = ({
                   onDelete();
                   setShowMenu(false);
                 }}
-                className="w-full px-4 py-2 text-left text-red-400 hover:bg-red-900/20 transition-colors flex items-center gap-2"
+                className="w-full px-4 py-2 text-left text-red-400 hover:bg-red-950 transition-colors flex items-center gap-2"
               >
                 🗑️ Delete
               </button>
@@ -550,7 +550,7 @@ const PresetListItem: React.FC<PresetListItemProps> = ({
                 onDelete();
                 setShowMenu(false);
               }}
-              className="w-full px-4 py-2 text-left text-red-400 hover:bg-red-900/20 transition-colors flex items-center gap-2"
+              className="w-full px-4 py-2 text-left text-red-400 hover:bg-red-950 transition-colors flex items-center gap-2"
             >
               🗑️ Delete
             </button>

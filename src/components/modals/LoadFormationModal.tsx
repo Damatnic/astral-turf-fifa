@@ -85,7 +85,7 @@ export const LoadFormationModal: React.FC<LoadFormationModalProps> = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
+            className="fixed inset-0 bg-slate-800  z-50"
             onClick={onClose}
           />
 
@@ -134,7 +134,7 @@ export const LoadFormationModal: React.FC<LoadFormationModalProps> = ({
                           className={`w-full text-left p-3 rounded-lg transition-colors ${
                             selectedId === formation.id
                               ? 'bg-blue-600/20 border-blue-500 border'
-                              : 'bg-slate-700/50 hover:bg-slate-700 border border-transparent'
+                              : 'bg-slate-700 hover:bg-slate-700 border border-transparent'
                           }`}
                           type="button"
                         >

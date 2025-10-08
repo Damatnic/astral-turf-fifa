@@ -1,5 +1,6 @@
 import React, { lazy, Suspense, ComponentType } from 'react';
 import { LoadingAnimation } from './AnimationSystem';
+import { loggingService } from '../../services/loggingService';
 
 /**
  * Lazy component loader with enhanced loading states
@@ -176,7 +177,10 @@ export class LazyErrorBoundary extends React.Component<
   }
 
   override componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('Lazy load error:', error, errorInfo);
+    loggingService.error('Lazy load error', {
+      error: error.message,
+      metadata: { errorInfo: errorInfo.componentStack },
+    });
     this.props.onError?.(error, errorInfo);
   }
 
@@ -257,7 +261,9 @@ export function usePreload(components: React.LazyExoticComponent<any>[]) {
         try {
           preloadComponent(component);
         } catch (error) {
-          console.warn('Failed to preload component:', error);
+          loggingService.warn('Failed to preload component', {
+            error: error instanceof Error ? error.message : 'Unknown error',
+          });
         }
       });
     }, 100);

@@ -153,7 +153,7 @@ const SignupPage: React.FC = () => {
         {/* Mobile-First Form Container */}
         <div
           className={`
-          bg-slate-800/80 backdrop-blur-sm rounded-lg shadow-2xl border border-slate-700/50
+          bg-slate-800 backdrop-blur-sm rounded-lg shadow-2xl border border-slate-700
           ${isMobile ? 'mobile-p-3' : 'p-8'}
         `}
         >
@@ -284,7 +284,7 @@ const SignupPage: React.FC = () => {
             {/* Mobile-Optimized Error Display */}
             {(errors.general || authState.error) && (
               <div
-                className={`bg-red-900/20 border border-red-500/20 rounded-md ${isMobile ? 'mobile-p-2' : 'p-3'}`}
+                className={`bg-red-950 border border-red-800 rounded-md ${isMobile ? 'mobile-p-2' : 'p-3'}`}
               >
                 <p className={`text-red-400 ${isMobile ? 'text-sm' : 'text-sm'}`}>
                   {errors.general || authState.error}

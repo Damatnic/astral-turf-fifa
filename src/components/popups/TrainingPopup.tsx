@@ -166,7 +166,7 @@ const TrainingPopup: React.FC = () => {
 
   return (
     <div
-      className="fixed inset-0 bg-black/60 z-40 backdrop-blur-sm flex items-center justify-center p-4"
+      className="fixed inset-0 bg-slate-900 z-40  flex items-center justify-center p-4"
       onClick={handleClose}
     >
       <div

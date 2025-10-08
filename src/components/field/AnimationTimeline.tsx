@@ -188,7 +188,7 @@ const AnimationTimeline: React.FC = () => {
 
   return (
     <div
-      className="absolute bottom-20 left-1/2 -translate-x-1/2 bg-slate-800/70 backdrop-blur-sm border border-slate-600/50 rounded-lg shadow-2xl flex items-center p-2 space-x-2 z-20 animate-fade-in-scale"
+      className="absolute bottom-20 left-1/2 -translate-x-1/2 bg-slate-800/70  border border-slate-600/50 rounded-lg shadow-2xl flex items-center p-2 space-x-2 z-20 animate-fade-in-scale"
       style={{ animationDuration: '0.3s' }}
     >
       <div className="text-xs font-bold text-gray-400 pr-2 border-r border-slate-600">STEPS</div>

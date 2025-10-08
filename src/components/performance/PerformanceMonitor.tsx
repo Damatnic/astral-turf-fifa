@@ -280,7 +280,7 @@ const PerformanceMonitorComponent: React.FC<{
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
-        className="fixed inset-4 z-50 bg-slate-900/95 backdrop-blur-md border border-slate-700 rounded-xl overflow-hidden"
+        className="fixed inset-4 z-50 bg-slate-900  border border-slate-700 rounded-xl overflow-hidden"
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-slate-700">

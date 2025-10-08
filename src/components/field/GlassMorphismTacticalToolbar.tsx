@@ -30,17 +30,17 @@ const GlassToolButton: React.FC<{
     const variantStyles = {
       primary: {
         active: 'from-blue-500/30 to-purple-600/30 border-blue-400/50 shadow-blue-500/25',
-        inactive: 'from-white/5 to-white/10 border-white/20 hover:border-blue-400/40',
+        inactive: 'from-white/5 to-white/10 border-slate-600 hover:border-blue-400/40',
         text: isActive ? 'text-blue-300' : 'text-white/80',
       },
       secondary: {
         active: 'from-green-500/30 to-emerald-600/30 border-green-400/50 shadow-green-500/25',
-        inactive: 'from-white/5 to-white/10 border-white/20 hover:border-green-400/40',
+        inactive: 'from-white/5 to-white/10 border-slate-600 hover:border-green-400/40',
         text: isActive ? 'text-green-300' : 'text-white/80',
       },
       danger: {
         active: 'from-red-500/30 to-pink-600/30 border-red-400/50 shadow-red-500/25',
-        inactive: 'from-white/5 to-white/10 border-white/20 hover:border-red-400/40',
+        inactive: 'from-white/5 to-white/10 border-slate-600 hover:border-red-400/40',
         text: isActive ? 'text-red-300' : 'text-white/80',
       },
     };
@@ -56,7 +56,7 @@ const GlassToolButton: React.FC<{
           disabled={disabled}
           className={`
             relative p-3 rounded-xl transition-all duration-300 flex items-center justify-center
-            backdrop-blur-md border border-solid
+             border border-solid
             ${
               disabled
                 ? 'from-gray-700/20 to-gray-800/20 border-gray-600/30 text-gray-500 cursor-not-allowed opacity-50'
@@ -83,7 +83,7 @@ const GlassToolButton: React.FC<{
         >
           <div className="relative z-10 w-5 h-5">{children}</div>
           {shortcut && (
-            <div className="absolute -top-1 -right-1 bg-gray-900/80 text-gray-300 px-1.5 py-0.5 rounded-md text-[10px] font-medium border border-white/20">
+            <div className="absolute -top-1 -right-1 bg-gray-900/80 text-gray-300 px-1.5 py-0.5 rounded-md text-[10px] font-medium border border-slate-600">
               {shortcut}
             </div>
           )}
@@ -93,7 +93,7 @@ const GlassToolButton: React.FC<{
         {isHovered && tooltip && !disabled && (
           <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 z-50">
             <div
-              className="bg-gray-900/95 backdrop-blur-md text-white text-sm rounded-lg px-3 py-2 whitespace-nowrap shadow-2xl border border-white/20"
+              className="bg-gray-900/95  text-white text-sm rounded-lg px-3 py-2 whitespace-nowrap shadow-2xl border border-slate-600"
               style={{
                 background:
                   'linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95))',
@@ -144,7 +144,7 @@ const GlassColorPicker: React.FC<{
 
   return (
     <div
-      className="flex items-center space-x-2 p-3 rounded-xl backdrop-blur-md border border-white/20"
+      className="flex items-center space-x-2 p-3 rounded-xl  border border-slate-600"
       style={{
         background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))',
         backdropFilter: 'blur(12px)',
@@ -210,7 +210,7 @@ const GlassFormationSelector: React.FC = React.memo(() => {
 
   return (
     <div
-      className="flex items-center space-x-3 p-3 rounded-xl backdrop-blur-md border border-white/20"
+      className="flex items-center space-x-3 p-3 rounded-xl  border border-slate-600"
       style={{
         background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))',
         backdropFilter: 'blur(12px)',
@@ -223,7 +223,7 @@ const GlassFormationSelector: React.FC = React.memo(() => {
       <select
         value={activeFormationIds?.home || ''}
         onChange={e => handleFormationChange('home', e.target.value)}
-        className="bg-blue-500/20 backdrop-blur-md text-blue-300 text-sm rounded-lg px-3 py-1.5 border border-blue-400/30 outline-none focus:border-blue-400/60 transition-colors"
+        className="bg-blue-500/20  text-blue-300 text-sm rounded-lg px-3 py-1.5 border border-blue-400/30 outline-none focus:border-blue-400/60 transition-colors"
         style={{
           backdropFilter: 'blur(8px)',
           WebkitBackdropFilter: 'blur(8px)',
@@ -244,7 +244,7 @@ const GlassFormationSelector: React.FC = React.memo(() => {
       <select
         value={activeFormationIds?.away || ''}
         onChange={e => handleFormationChange('away', e.target.value)}
-        className="bg-red-500/20 backdrop-blur-md text-red-300 text-sm rounded-lg px-3 py-1.5 border border-red-400/30 outline-none focus:border-red-400/60 transition-colors"
+        className="bg-red-500/20  text-red-300 text-sm rounded-lg px-3 py-1.5 border border-red-400/30 outline-none focus:border-red-400/60 transition-colors"
         style={{
           backdropFilter: 'blur(8px)',
           WebkitBackdropFilter: 'blur(8px)',
@@ -398,7 +398,7 @@ const GlassMorphismTacticalToolbar: React.FC = () => {
       `}
     >
       <div
-        className="backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl"
+        className="backdrop-blur-xl border border-slate-600 rounded-2xl shadow-2xl"
         style={{
           background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.6))',
           backdropFilter: 'blur(20px)',
@@ -412,14 +412,14 @@ const GlassMorphismTacticalToolbar: React.FC = () => {
       >
         {/* Mobile toggle header */}
         {isMobile && (
-          <div className="flex items-center justify-between p-4 border-b border-white/10">
+          <div className="flex items-center justify-between p-4 border-b border-slate-700">
             <div className="flex items-center space-x-3">
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
               <div className="text-lg font-bold text-white/90">Tactical Command Center</div>
             </div>
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="text-white/70 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/10"
+              className="text-white/70 hover:text-white transition-colors p-2 rounded-lg hover:bg-slate-800"
             >
               <svg
                 className={`w-5 h-5 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
@@ -440,7 +440,7 @@ const GlassMorphismTacticalToolbar: React.FC = () => {
         <div className={`${isMobile && !isExpanded ? 'hidden' : 'block'}`}>
           {/* Section tabs for mobile */}
           {isMobile && (
-            <div className="flex border-b border-white/10">
+            <div className="flex border-b border-slate-700">
               {[
                 { id: 'tools', label: 'Tools', icon: '🎨' },
                 { id: 'animation', label: 'Play', icon: '▶️' },
@@ -550,7 +550,7 @@ const GlassMorphismTacticalToolbar: React.FC = () => {
                     </svg>
                   </GlassToolButton>
 
-                  <div className="w-px h-8 bg-white/20 mx-2" />
+                  <div className="w-px h-8 bg-slate-700 mx-2" />
 
                   <GlassToolButton
                     label="Undo"

@@ -169,7 +169,7 @@ export const AchievementMilestones: React.FC<AchievementMilestonesProps> = ({
         layout
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className={`group relative bg-gray-800/50 backdrop-blur-sm border rounded-xl overflow-hidden transition-all ${
+        className={`group relative bg-gray-800/50  border rounded-xl overflow-hidden transition-all ${
           userProgress.isUnlocked
             ? `${tierConfig.borderColor} hover:shadow-lg hover:shadow-${achievement.tier}-500/20`
             : 'border-gray-700 hover:border-gray-600'
@@ -384,7 +384,7 @@ export const AchievementMilestones: React.FC<AchievementMilestonesProps> = ({
 
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
-          <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-lg p-4">
+          <div className="bg-gray-800/50  border border-gray-700 rounded-lg p-4">
             <div className="flex items-center gap-2 mb-2">
               <Trophy className="w-4 h-4 text-yellow-400" />
               <span className="text-xs text-gray-400 uppercase">Unlocked</span>
@@ -393,35 +393,35 @@ export const AchievementMilestones: React.FC<AchievementMilestonesProps> = ({
               {stats.unlocked}/{stats.total}
             </div>
           </div>
-          <div className="bg-blue-500/10 backdrop-blur-sm border border-blue-500/30 rounded-lg p-4">
+          <div className="bg-blue-500/10  border border-blue-500/30 rounded-lg p-4">
             <div className="flex items-center gap-2 mb-2">
               <TrendingUp className="w-4 h-4 text-blue-400" />
               <span className="text-xs text-blue-400 uppercase">In Progress</span>
             </div>
             <div className="text-2xl font-bold text-blue-400">{stats.inProgress}</div>
           </div>
-          <div className="bg-purple-500/10 backdrop-blur-sm border border-purple-500/30 rounded-lg p-4">
+          <div className="bg-purple-500/10  border border-purple-500/30 rounded-lg p-4">
             <div className="flex items-center gap-2 mb-2">
               <Sparkles className="w-4 h-4 text-purple-400" />
               <span className="text-xs text-purple-400 uppercase">Completion</span>
             </div>
             <div className="text-2xl font-bold text-purple-400">{stats.completionRate.toFixed(0)}%</div>
           </div>
-          <div className="bg-yellow-500/10 backdrop-blur-sm border border-yellow-500/30 rounded-lg p-4">
+          <div className="bg-yellow-500/10  border border-yellow-500/30 rounded-lg p-4">
             <div className="flex items-center gap-2 mb-2">
               <Trophy className="w-4 h-4 text-yellow-400" />
               <span className="text-xs text-yellow-400 uppercase">Total Points</span>
             </div>
             <div className="text-2xl font-bold text-yellow-400">{stats.totalPoints}</div>
           </div>
-          <div className="bg-blue-500/10 backdrop-blur-sm border border-blue-500/30 rounded-lg p-4">
+          <div className="bg-blue-500/10  border border-blue-500/30 rounded-lg p-4">
             <div className="flex items-center gap-2 mb-2">
               <Zap className="w-4 h-4 text-blue-400" />
               <span className="text-xs text-blue-400 uppercase">Total XP</span>
             </div>
             <div className="text-2xl font-bold text-blue-400">{stats.totalXP}</div>
           </div>
-          <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 backdrop-blur-sm border border-purple-500/30 rounded-lg p-4">
+          <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10  border border-purple-500/30 rounded-lg p-4">
             <div className="flex items-center gap-2 mb-2">
               <Crown className="w-4 h-4 text-purple-400" />
               <span className="text-xs text-purple-400 uppercase">Rank</span>

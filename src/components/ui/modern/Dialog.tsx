@@ -108,7 +108,7 @@ export const DialogContent = forwardRef<HTMLDivElement, DialogContentProps>(
       >
         {/* Backdrop */}
         <div
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm animate-fade-in"
+          className="fixed inset-0 bg-slate-800  animate-fade-in"
           aria-hidden="true"
         />
 

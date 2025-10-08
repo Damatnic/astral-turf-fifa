@@ -176,7 +176,7 @@ export function VirtualList<T>({
         {visibleItems.map(({ item, index, style }) => renderItem(item, index, style))}
       </div>
       {isScrolling && (
-        <div className="absolute top-2 right-2 bg-black/50 text-white px-2 py-1 rounded text-xs">
+        <div className="absolute top-2 right-2 bg-slate-800 text-white px-2 py-1 rounded text-xs">
           Scrolling...
         </div>
       )}

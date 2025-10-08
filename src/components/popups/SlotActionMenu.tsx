@@ -173,7 +173,7 @@ const SlotActionMenu: React.FC = () => {
     <div
       ref={menuRef}
       style={menuStyle}
-      className="bg-gray-800/90 backdrop-blur-md rounded-lg shadow-2xl border border-gray-600/50 w-56 p-2 min-h-[100px] flex flex-col animate-fade-in-scale"
+      className="bg-slate-800 rounded-lg shadow-2xl border border-slate-600 w-56 p-2 min-h-[100px] flex flex-col animate-fade-in-scale"
       data-menu-item="true"
     >
       {view === 'main' && (

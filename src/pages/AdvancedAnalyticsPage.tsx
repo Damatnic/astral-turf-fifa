@@ -152,7 +152,7 @@ const AdvancedAnalyticsPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="mt-6 p-4 bg-black/20 rounded border border-gray-600">
+          <div className="mt-6 p-4 bg-slate-650 rounded border border-gray-600">
             <h4 className="font-semibold text-blue-400 mb-2">🔬 Advanced Analytics Features</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div className="space-y-2">

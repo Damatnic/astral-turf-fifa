@@ -85,7 +85,7 @@ export const HistoryTimeline: React.FC<HistoryTimelineProps> = ({
 
   return (
     <div
-      className={`bg-slate-900/95 backdrop-blur-sm rounded-lg border border-slate-700 shadow-xl ${className}`}
+      className={`bg-slate-900  rounded-lg border border-slate-700 shadow-xl ${className}`}
     >
       {/* Header */}
       <div className="flex items-center justify-between p-3 border-b border-slate-700">
@@ -164,7 +164,7 @@ export const HistoryTimeline: React.FC<HistoryTimelineProps> = ({
                     ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20 ring-2 ring-blue-400'
                     : isPast
                       ? 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-                      : 'bg-slate-800/50 text-slate-500 hover:bg-slate-700/50'
+                      : 'bg-slate-800/50 text-slate-500 hover:bg-slate-700'
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -185,7 +185,7 @@ export const HistoryTimeline: React.FC<HistoryTimelineProps> = ({
                   </div>
 
                   {isCurrent && (
-                    <span className="ml-2 px-2 py-0.5 text-xs bg-white/20 rounded">Current</span>
+                    <span className="ml-2 px-2 py-0.5 text-xs bg-slate-700 rounded">Current</span>
                   )}
                 </div>
               </motion.button>

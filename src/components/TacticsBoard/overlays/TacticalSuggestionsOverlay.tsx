@@ -152,7 +152,7 @@ const TacticalSuggestionsOverlay: React.FC<TacticalSuggestionsOverlayProps> = ({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+        className="absolute inset-0 bg-slate-750  z-50 flex items-center justify-center p-4"
         onClick={onClose}
       >
         <motion.div
@@ -245,7 +245,7 @@ const TacticalSuggestionsOverlay: React.FC<TacticalSuggestionsOverlayProps> = ({
                       selectedSuggestion?.id === suggestion.id
                         ? 'border-blue-500 ring-2 ring-blue-500/50'
                         : 'border-slate-700'
-                    } hover:bg-slate-700/50 transition-all cursor-pointer`}
+                    } hover:bg-slate-700 transition-all cursor-pointer`}
                     onClick={() => {
                       setSelectedSuggestion(suggestion);
                     }}

@@ -81,7 +81,7 @@ const ModernAvailabilityIndicator: React.FC<{
         }}
       />
       <div
-        className={`relative rounded-full border border-white/70 flex items-center justify-center ${sizeClasses[size]} backdrop-blur-sm`}
+        className={`relative rounded-full border border-white/70 flex items-center justify-center ${sizeClasses[size]} `}
         style={{
           backgroundColor: indicator.bgColor,
           borderColor: indicator.color,
@@ -137,7 +137,7 @@ const ModernPlayerStatsOverlay: React.FC<{
       }}
     >
       <div
-        className="bg-gray-900/95 backdrop-blur-md rounded-xl p-4 border border-gray-700/50 shadow-2xl"
+        className="bg-gray-900/95  rounded-xl p-4 border border-gray-700/50 shadow-2xl"
         style={{
           background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95))',
           boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
@@ -147,7 +147,7 @@ const ModernPlayerStatsOverlay: React.FC<{
         <div className="flex items-center space-x-3 mb-3">
           <div className="relative">
             <div
-              className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg border-2 border-white/20"
+              className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg border-2 border-slate-600"
               style={{
                 background: `linear-gradient(135deg, ${getStatColor(stats.overall)}, ${getStatColor(stats.overall)}dd)`,
                 boxShadow: `0 0 20px ${getStatColor(stats.overall)}44`,

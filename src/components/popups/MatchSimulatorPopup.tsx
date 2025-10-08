@@ -99,7 +99,7 @@ const MatchSimulatorPopup: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 z-40 backdrop-blur-sm flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-slate-900 z-40  flex items-center justify-center p-4">
       <div className="bg-gray-800 rounded-lg shadow-2xl w-full max-w-2xl border border-gray-700/50 flex flex-col animate-fade-in-scale h-[70vh]">
         <div className="flex justify-between items-center p-4 border-b border-gray-700">
           <div className="flex items-center space-x-4">
@@ -109,7 +109,7 @@ const MatchSimulatorPopup: React.FC = () => {
             </span>
             <span className="font-bold text-red-400">AWAY</span>
           </div>
-          <div className="text-lg font-mono bg-black/50 px-3 py-1 rounded-md text-white">
+          <div className="text-lg font-mono bg-slate-800 px-3 py-1 rounded-md text-white">
             {Math.min(minute, 90)}'
           </div>
         </div>

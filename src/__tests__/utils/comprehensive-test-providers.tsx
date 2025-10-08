@@ -3,9 +3,6 @@ import { render, RenderOptions } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { AppProvider } from '../../context/AppProvider';
 import { ThemeProvider } from '../../context/ThemeContext';
-import { TacticsProvider } from '../../context/TacticsContext';
-import { UIProvider } from '../../context/UIContext';
-import { AuthProvider } from '../../context/AuthContext';
 import {
   type Player,
   type Formation,
@@ -35,16 +32,11 @@ export const TestProviders: React.FC<TestProvidersProps> = ({
   initialAuthState,
   router = true,
 }) => {
+  // AppProvider includes all context providers (Auth, Tactics, UI, Franchise)
   const content = (
-    <AuthProvider initialState={initialAuthState}>
-      <ThemeProvider>
-        <TacticsProvider initialState={initialTacticsState}>
-          <UIProvider initialState={initialUIState}>
-            <AppProvider>{children}</AppProvider>
-          </UIProvider>
-        </TacticsProvider>
-      </ThemeProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AppProvider>{children}</AppProvider>
+    </ThemeProvider>
   );
 
   if (router) {

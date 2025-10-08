@@ -420,7 +420,7 @@ const TacticalDrawingTools: React.FC<TacticalDrawingToolsProps> = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+      className="fixed inset-0 z-50 bg-slate-800 "
     >
       <div className="flex h-full">
         {/* Drawing Canvas */}
@@ -455,7 +455,7 @@ const TacticalDrawingTools: React.FC<TacticalDrawingToolsProps> = ({
           initial={{ x: 100 }}
           animate={{ x: 0 }}
           exit={{ x: 100 }}
-          className="w-80 bg-slate-800/95 backdrop-blur-md border-l border-slate-600 p-4 overflow-y-auto"
+          className="w-80 bg-slate-800/95  border-l border-slate-600 p-4 overflow-y-auto"
         >
           {/* Header */}
           <div className="flex items-center justify-between mb-6">

@@ -266,7 +266,7 @@ const UnifiedFloatingToolbar: React.FC<UnifiedFloatingToolbarProps> = ({
       transition={{ duration: 0.3, ease: 'easeOut' }}
       className={`
         fixed top-20 left-1/2 transform -translate-x-1/2 z-50
-        bg-slate-800/95 backdrop-blur-md border border-slate-600/50 rounded-xl shadow-2xl
+        bg-slate-800/95  border border-slate-600/50 rounded-xl shadow-2xl
         flex items-center divide-x divide-slate-600/50
         ${className}
       `}
@@ -291,7 +291,7 @@ const UnifiedFloatingToolbar: React.FC<UnifiedFloatingToolbarProps> = ({
 
         {/* Formation Info */}
         {currentFormation && (
-          <div className="flex items-center gap-2 bg-slate-700/50 rounded-lg px-2 py-1">
+          <div className="flex items-center gap-2 bg-slate-700 rounded-lg px-2 py-1">
             <div className="text-white font-medium text-xs">{currentFormation.name}</div>
             <div className="w-1 h-1 bg-slate-400 rounded-full" />
             <div className="text-slate-400 text-xs">
@@ -479,7 +479,7 @@ const UnifiedFloatingToolbar: React.FC<UnifiedFloatingToolbarProps> = ({
 
       {/* Stats indicator */}
       {drawings.length > 0 && (
-        <div className="text-slate-400 text-xs px-2 py-1 bg-slate-700/50 rounded-r-xl">
+        <div className="text-slate-400 text-xs px-2 py-1 bg-slate-700 rounded-r-xl">
           {drawings.length} shape{drawings.length !== 1 ? 's' : ''}
         </div>
       )}

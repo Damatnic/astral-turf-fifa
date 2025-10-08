@@ -96,10 +96,10 @@ export const NotificationSystem: React.FC<NotificationSystemProps> = ({
                   onDismiss(notification.id);
                 }
               }}
-              className={`relative flex items-start gap-3 min-w-80 max-w-md p-4 ${styles.bg} text-white rounded-lg shadow-xl ring-2 ${styles.ring} backdrop-blur-sm cursor-grab active:cursor-grabbing`}
+              className={`relative flex items-start gap-3 min-w-80 max-w-md p-4 ${styles.bg} text-white rounded-lg shadow-xl ring-2 ${styles.ring}  cursor-grab active:cursor-grabbing`}
             >
               {/* Icon */}
-              <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-white/20 rounded-full text-lg font-bold">
+              <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-slate-700 rounded-full text-lg font-bold">
                 {styles.icon}
               </div>
 
@@ -116,7 +116,7 @@ export const NotificationSystem: React.FC<NotificationSystemProps> = ({
                 whileHover={{ scale: 1.1, rotate: 90 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={() => onDismiss(notification.id)}
-                className="flex-shrink-0 w-5 h-5 flex items-center justify-center hover:bg-white/20 rounded-full transition-colors"
+                className="flex-shrink-0 w-5 h-5 flex items-center justify-center hover:bg-slate-700 rounded-full transition-colors"
               >
                 ✕
               </motion.button>

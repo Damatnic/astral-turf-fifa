@@ -289,7 +289,7 @@ export const RealTimeCollaboration: React.FC<RealTimeCollaborationProps> = ({
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 w-full">
       {/* Connection Status & Session Info */}
       <div className="lg:col-span-3">
-        <Card className="bg-white/10 backdrop-blur-md border-white/20">
+        <Card className="bg-slate-800  border-slate-600">
           <CardHeader>
             <CardTitle className="flex items-center justify-between text-white">
               <div className="flex items-center gap-2">
@@ -317,7 +317,7 @@ export const RealTimeCollaboration: React.FC<RealTimeCollaborationProps> = ({
                 <Button
                   size="sm"
                   onClick={() => setShowCursors(!showCursors)}
-                  className="bg-white/10 hover:bg-white/20 border-white/20"
+                  className="bg-slate-800 hover:bg-slate-700 border-slate-600"
                 >
                   {showCursors ? (
                     <MousePointer className="w-4 h-4" />
@@ -329,7 +329,7 @@ export const RealTimeCollaboration: React.FC<RealTimeCollaborationProps> = ({
                 <Button
                   size="sm"
                   onClick={() => setSoundEnabled(!soundEnabled)}
-                  className="bg-white/10 hover:bg-white/20 border-white/20"
+                  className="bg-slate-800 hover:bg-slate-700 border-slate-600"
                 >
                   {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
                 </Button>
@@ -362,7 +362,7 @@ export const RealTimeCollaboration: React.FC<RealTimeCollaborationProps> = ({
 
       {/* Active Users Panel */}
       <div className="lg:col-span-1">
-        <Card className="bg-white/5 border-white/10 h-full">
+        <Card className="bg-white/5 border-slate-700 h-full">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-white">
               <Users className="w-5 h-5 text-blue-400" />
@@ -375,8 +375,8 @@ export const RealTimeCollaboration: React.FC<RealTimeCollaborationProps> = ({
                 key={user.id}
                 className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
                   user.isOnline
-                    ? 'bg-white/10 border-white/20'
-                    : 'bg-white/5 border-white/10 opacity-60'
+                    ? 'bg-slate-800 border-slate-600'
+                    : 'bg-white/5 border-slate-700 opacity-60'
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -431,7 +431,7 @@ export const RealTimeCollaboration: React.FC<RealTimeCollaborationProps> = ({
 
       {/* Live Chat */}
       <div className="lg:col-span-2">
-        <Card className="bg-white/5 border-white/10 h-full">
+        <Card className="bg-white/5 border-slate-700 h-full">
           <CardHeader>
             <CardTitle className="flex items-center justify-between text-white">
               <div className="flex items-center gap-2">
@@ -441,7 +441,7 @@ export const RealTimeCollaboration: React.FC<RealTimeCollaborationProps> = ({
               <Button
                 size="sm"
                 onClick={() => setShowChat(!showChat)}
-                className="bg-white/10 hover:bg-white/20 border-white/20"
+                className="bg-slate-800 hover:bg-slate-700 border-slate-600"
               >
                 {showChat ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </Button>
@@ -482,7 +482,7 @@ export const RealTimeCollaboration: React.FC<RealTimeCollaborationProps> = ({
                             className={`p-3 rounded-lg ${
                               message.userId === currentUser.id
                                 ? 'bg-blue-500/20 text-blue-100'
-                                : 'bg-white/10 text-white'
+                                : 'bg-slate-800 text-white'
                             }`}
                           >
                             <p className="text-sm">{message.message}</p>
@@ -508,7 +508,7 @@ export const RealTimeCollaboration: React.FC<RealTimeCollaborationProps> = ({
                   onChange={e => setNewMessage(e.target.value)}
                   onKeyPress={e => e.key === 'Enter' && sendMessage()}
                   placeholder="Type a message..."
-                  className="flex-1 bg-white/10 border-white/20 text-white placeholder-gray-400"
+                  className="flex-1 bg-slate-800 border-slate-600 text-white placeholder-gray-400"
                 />
                 <Button
                   onClick={sendMessage}

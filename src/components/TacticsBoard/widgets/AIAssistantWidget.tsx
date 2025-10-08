@@ -101,7 +101,7 @@ const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
               {onToggleMinimize && (
                 <button
                   onClick={onToggleMinimize}
-                  className="w-7 h-7 rounded-lg bg-slate-700/50 hover:bg-slate-600 text-white flex items-center justify-center transition-colors"
+                  className="w-7 h-7 rounded-lg bg-slate-700 hover:bg-slate-600 text-white flex items-center justify-center transition-colors"
                   title="Minimize"
                 >
                   <span className="text-xs">−</span>

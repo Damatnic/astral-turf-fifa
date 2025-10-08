@@ -68,7 +68,7 @@ const AIChatPopup: React.FC = () => {
 
   return (
     <div className="fixed bottom-28 right-8 z-40">
-      <div className="bg-slate-800/90 backdrop-blur-md rounded-lg shadow-2xl w-96 border border-gray-700/50 flex flex-col animate-fade-in-scale h-[60vh]">
+      <div className="bg-slate-800  rounded-lg shadow-2xl w-96 border border-gray-700/50 flex flex-col animate-fade-in-scale h-[60vh]">
         {/* Header */}
         <div className="flex items-center justify-between p-3 border-b border-slate-700 flex-shrink-0">
           <div className="flex items-center">

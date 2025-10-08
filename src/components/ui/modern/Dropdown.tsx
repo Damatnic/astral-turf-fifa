@@ -175,8 +175,8 @@ export const DropdownContent = forwardRef<HTMLDivElement, DropdownContentProps>(
           }
         }}
         className={cn(
-          'fixed z-50 min-w-[8rem] rounded-md border border-secondary-700/50',
-          'bg-secondary-800/95 backdrop-blur-sm shadow-lg',
+          'fixed z-50 min-w-[8rem] rounded-md border border-slate-600',
+          'bg-slate-800 shadow-2xl',
           'p-1 animate-fade-in-scale origin-top-left',
           className,
         )}
@@ -231,11 +231,11 @@ export const DropdownItem = forwardRef<HTMLDivElement, DropdownItemProps>(
         className={cn(
           'relative flex items-center cursor-pointer rounded-sm px-2 py-1.5 text-sm',
           'transition-colors duration-150',
-          'focus:outline-none focus:bg-secondary-700/50',
-          !disabled && !destructive && 'hover:bg-secondary-700/50 text-white',
-          !disabled && destructive && 'hover:bg-error-600/20 text-error-400 hover:text-error-300',
-          selected && 'bg-primary-600/20 text-primary-400',
-          disabled && 'cursor-not-allowed opacity-50 text-secondary-500',
+          'focus:outline-none focus:bg-slate-700',
+          !disabled && !destructive && 'hover:bg-slate-700 text-white',
+          !disabled && destructive && 'hover:bg-red-900 text-red-400 hover:text-red-300',
+          selected && 'bg-blue-900 text-blue-400',
+          disabled && 'cursor-not-allowed opacity-50 text-slate-500',
           className,
         )}
         onClick={handleClick}
@@ -271,7 +271,7 @@ export const DropdownSeparator = forwardRef<HTMLDivElement, React.HTMLAttributes
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn('my-1 h-px bg-secondary-700/50', className)}
+      className={cn('my-1 h-px bg-slate-600', className)}
       role="separator"
       {...props}
     />
@@ -285,7 +285,7 @@ export const DropdownLabel = forwardRef<HTMLDivElement, React.HTMLAttributes<HTM
     <div
       ref={ref}
       className={cn(
-        'px-2 py-1.5 text-xs font-semibold text-secondary-400 uppercase tracking-wider',
+        'px-2 py-1.5 text-xs font-semibold text-slate-400 uppercase tracking-wider',
         className,
       )}
       {...props}

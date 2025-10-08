@@ -106,7 +106,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
                 home screen convenience.
               </p>
 
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 space-y-2">
+              <div className="bg-slate-800  rounded-lg p-4 space-y-2">
                 <p className="text-sm font-semibold flex items-center gap-2">
                   <Info className="w-4 h-4" />
                   iOS Installation Steps:
@@ -121,7 +121,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
 
             <button
               onClick={handleDismiss}
-              className="ml-4 p-2 hover:bg-white/20 rounded-lg transition-colors"
+              className="ml-4 p-2 hover:bg-slate-700 rounded-lg transition-colors"
               aria-label="Dismiss install prompt"
             >
               <X className="w-5 h-5" />
@@ -155,7 +155,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
 
           <button
             onClick={handleDismiss}
-            className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+            className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
             aria-label="Dismiss install prompt"
           >
             <X className="w-5 h-5" />
@@ -168,15 +168,15 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
         </p>
 
         <div className="grid grid-cols-3 gap-3 mb-6 text-center">
-          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3">
+          <div className="bg-slate-800  rounded-lg p-3">
             <div className="text-2xl mb-1">⚡</div>
             <div className="text-xs">Faster</div>
           </div>
-          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3">
+          <div className="bg-slate-800  rounded-lg p-3">
             <div className="text-2xl mb-1">📱</div>
             <div className="text-xs">Offline</div>
           </div>
-          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3">
+          <div className="bg-slate-800  rounded-lg p-3">
             <div className="text-2xl mb-1">🔔</div>
             <div className="text-xs">Notifications</div>
           </div>
@@ -193,7 +193,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
           </button>
           <button
             onClick={handleDismiss}
-            className="px-6 py-3 bg-white/10 backdrop-blur-sm rounded-xl font-semibold hover:bg-white/20 transition-colors"
+            className="px-6 py-3 bg-slate-800  rounded-xl font-semibold hover:bg-slate-700 transition-colors"
             aria-label="Maybe later"
           >
             Later

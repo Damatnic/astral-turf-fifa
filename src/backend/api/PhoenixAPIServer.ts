@@ -29,8 +29,7 @@ import { phoenixPool } from './database/PhoenixDatabasePool';
 // @ts-expect-error - Prisma client may not exist yet
 import { PrismaClient } from '@prisma/client';
 // Apollo GraphQL Server integration
-// TODO: Temporarily disabled - uncomment when GraphQL schema issues are resolved
-// import { applyGraphQLMiddleware } from '../graphql/server';
+import { applyGraphQLMiddleware } from '../graphql/server';
 
 // Import new authentication services
 import { oauthService } from '../services/OAuthService';
@@ -935,21 +934,16 @@ export class PhoenixAPIServer {
 
   private async setupGraphQLRoute(): Promise<void> {
     // Apply Apollo GraphQL Server middleware
-    // TODO: GraphQL temporarily disabled due to Prisma schema mismatches
-    // Needs: (1) Install @apollo/server, graphql-ws packages
-    //        (2) Fix Prisma schema to include: trainingProgram, matchAnalytics relations
-    //        (3) Fix Formation model to include: isActive, popularity, winRate, matchId
-    // Uncomment below once dependencies installed and schema fixed
-    /*
     try {
       await applyGraphQLMiddleware(this.app);
-      console.log('✅ GraphQL Server integrated successfully at /graphql');
+      loggingService.info('✅ GraphQL Server integrated successfully at /graphql');
     } catch (error) {
-      console.error('❌ Failed to integrate GraphQL Server:', error);
-      throw error;
+      loggingService.error('❌ Failed to integrate GraphQL Server', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+      // Don't throw - GraphQL is optional, REST API will still work
+      loggingService.warn('GraphQL disabled - REST API fully functional');
     }
-    */
-    console.log('⚠️  GraphQL Server temporarily disabled - REST API fully functional');
   }
 
   private setupWebSocket(): void {
@@ -5075,26 +5069,21 @@ export class PhoenixAPIServer {
 
   /**
    * Send email verification link to user
-   * TODO: Integrate with email service (SendGrid, AWS SES, etc.)
+   * Integrated with emailService supporting SendGrid, AWS SES, and SMTP
    */
   private async sendVerificationEmail(email: string, token: string): Promise<void> {
     try {
-      const verificationUrl = `${process.env.APP_URL || 'http://localhost:3000'}/verify-email?token=${token}`;
-
-      // TODO: Replace with actual email service integration
-      console.log(`[EMAIL] Verification URL for ${email}: ${verificationUrl}`);
-
-      // Example SendGrid integration (commented out):
-      // const sgMail = require('@sendgrid/mail');
-      // sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-      // await sgMail.send({
-      //   to: email,
-      //   from: process.env.FROM_EMAIL,
-      //   subject: 'Verify your Astral Turf account',
-      //   html: `<p>Click <a href="${verificationUrl}">here</a> to verify your email.</p>`,
-      // });
+      const { emailService } = await import('../../services/emailService');
+      const result = await emailService.sendVerificationEmail(email, token);
+      
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to send verification email');
+      }
     } catch (error) {
-      console.warn('[EMAIL] Failed to send verification email:', error);
+      loggingService.error('Failed to send verification email', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        metadata: { email },
+      });
       throw error;
     }
   }

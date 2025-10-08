@@ -186,7 +186,7 @@ const PlayerDisplaySettings: React.FC<PlayerDisplaySettingsProps> = ({
     testId: string;
   }> = ({ label, icon, enabled, onToggle, description, testId }) => (
     <motion.div
-      className="flex items-center justify-between p-3 rounded-lg bg-slate-800/50 hover:bg-slate-700/50 transition-colors"
+      className="flex items-center justify-between p-3 rounded-lg bg-slate-800/50 hover:bg-slate-700 transition-colors"
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
     >
@@ -260,7 +260,7 @@ const PlayerDisplaySettings: React.FC<PlayerDisplaySettingsProps> = ({
       <motion.button
         type="button"
         onClick={handlePanelToggle}
-        className="flex items-center gap-2 px-3 py-2 bg-slate-800/80 backdrop-blur-sm rounded-lg text-white hover:bg-slate-700/80 transition-colors"
+        className="flex items-center gap-2 px-3 py-2 bg-slate-800  rounded-lg text-white hover:bg-slate-700 transition-colors"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         aria-label={`${toggleButtonLabel} panel`}
@@ -280,7 +280,7 @@ const PlayerDisplaySettings: React.FC<PlayerDisplaySettingsProps> = ({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
+              className="fixed inset-0 bg-slate-650  z-40"
               onClick={closePanel}
             />
 
@@ -290,7 +290,7 @@ const PlayerDisplaySettings: React.FC<PlayerDisplaySettingsProps> = ({
               initial={{ opacity: 0, scale: 0.95, y: -10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: -10 }}
-              className="absolute top-full right-0 mt-2 w-80 bg-slate-900/95 backdrop-blur-md rounded-xl border border-slate-700/50 shadow-2xl z-50 animate-in"
+              className="absolute top-full right-0 mt-2 w-80 bg-slate-900  rounded-xl border border-slate-700 shadow-2xl z-50 animate-in"
               onClick={event => event.stopPropagation()}
             >
               <div className="p-4">

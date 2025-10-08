@@ -109,27 +109,27 @@ export const ModernNavigation: React.FC = () => {
         to={item.path}
         onClick={() => mobile && setMobileMenuOpen(false)}
         className={cn(
-          'group relative flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200',
-          'hover:bg-secondary-700/50 active:scale-95',
+          'group relative flex items-center gap-3 px-3 py-3 rounded-lg transition-all duration-200',
+          'hover:bg-slate-700',
           isActive
-            ? 'bg-primary-600/20 text-primary-400 shadow-glow-primary'
-            : 'text-secondary-300 hover:text-white',
+            ? 'bg-blue-600 text-white shadow-lg shadow-blue-800'
+            : 'text-slate-300 hover:text-white',
           collapsed && !mobile && 'justify-center px-2',
         )}
         aria-label={item.name}
         aria-current={isActive ? 'page' : undefined}
       >
-        <Icon className={cn('w-5 h-5 flex-shrink-0', isActive && 'text-primary-400')} />
+        <Icon className={cn('w-5 h-5 flex-shrink-0', isActive && 'text-white')} />
         {(!collapsed || mobile) && (
           <span className="font-medium text-sm">{item.name}</span>
         )}
         {item.badge && (!collapsed || mobile) && (
-          <span className="ml-auto bg-primary-600 text-white text-xs rounded-full px-2 py-0.5">
+          <span className="ml-auto bg-red-600 text-white text-xs rounded-full px-2 py-0.5 font-bold">
             {item.badge}
           </span>
         )}
         {collapsed && !mobile && (
-          <div className="absolute left-full ml-2 px-2 py-1 bg-secondary-800 text-white text-sm rounded-md opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity whitespace-nowrap z-50 shadow-lg">
+          <div className="absolute left-full ml-3 px-3 py-2 bg-slate-800 text-white text-sm rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity whitespace-nowrap z-50 shadow-xl border border-slate-600">
             {item.name}
           </div>
         )}
@@ -141,25 +141,24 @@ export const ModernNavigation: React.FC = () => {
   const DesktopSidebar = () => (
     <motion.aside
       initial={false}
-      animate={{ width: isCollapsed ? 64 : 256 }}
+      animate={{ width: isCollapsed ? 64 : 240 }}
       transition={{ duration: 0.2, ease: 'easeInOut' }}
       className={cn(
-        'fixed left-0 top-0 h-screen bg-secondary-900/95 backdrop-blur-md',
-        'border-r border-secondary-800 z-40 flex flex-col',
-        'shadow-2xl',
+        'fixed left-0 top-0 h-screen bg-slate-900 border-r border-slate-700',
+        'z-40 flex flex-col shadow-xl',
       )}
     >
       {/* Logo Section */}
-      <div className="flex items-center justify-between h-16 px-4 border-b border-secondary-800">
+      <div className="flex items-center justify-between h-14 px-4 border-b border-slate-700 bg-slate-800">
         {!isCollapsed && (
           <Link to="/dashboard" className="flex items-center gap-2">
-            <LogoIcon className="w-8 h-8 text-primary-400" />
+            <LogoIcon className="w-8 h-8 text-blue-400" />
             <span className="font-bold text-lg text-white">Astral Turf</span>
           </Link>
         )}
         {isCollapsed && (
           <Link to="/dashboard" className="flex items-center justify-center w-full">
-            <LogoIcon className="w-8 h-8 text-primary-400" />
+            <LogoIcon className="w-8 h-8 text-blue-400" />
           </Link>
         )}
       </div>
@@ -172,8 +171,8 @@ export const ModernNavigation: React.FC = () => {
 
         {/* Tactics-specific actions */}
         {isTacticsPage && !isCollapsed && (
-          <div className="mt-6 pt-6 border-t border-secondary-800 space-y-1">
-            <div className="px-3 py-2 text-xs font-semibold text-secondary-400 uppercase tracking-wider">
+          <div className="mt-6 pt-6 border-t border-slate-700 space-y-1">
+            <div className="px-3 py-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">
               Tactics Tools
             </div>
             <button
@@ -182,7 +181,7 @@ export const ModernNavigation: React.FC = () => {
                   // Add reset logic
                 }
               }}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-secondary-300 hover:text-white hover:bg-secondary-700/50 transition-all"
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700 transition-all"
             >
               <ResetIcon className="w-5 h-5" />
               <span className="text-sm">Reset Board</span>
@@ -191,7 +190,7 @@ export const ModernNavigation: React.FC = () => {
               onClick={() => {
                 uiDispatch({ type: 'ENTER_PRESENTATION_MODE' });
               }}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-secondary-300 hover:text-white hover:bg-secondary-700/50 transition-all"
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700 transition-all"
             >
               <PresentationIcon className="w-5 h-5" />
               <span className="text-sm">Present Mode</span>
@@ -201,13 +200,13 @@ export const ModernNavigation: React.FC = () => {
       </nav>
 
       {/* Bottom Actions */}
-      <div className="px-3 py-4 border-t border-secondary-800 space-y-2">
+      <div className="px-3 py-4 border-t border-slate-700 space-y-2">
         {/* Theme Toggle */}
         <button
           onClick={() => uiDispatch({ type: 'TOGGLE_THEME' })}
           className={cn(
             'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg',
-            'text-secondary-300 hover:text-white hover:bg-secondary-700/50 transition-all',
+            'text-slate-300 hover:text-white hover:bg-slate-700 transition-all',
             isCollapsed && 'justify-center px-2',
           )}
           aria-label="Toggle theme"
@@ -225,7 +224,7 @@ export const ModernNavigation: React.FC = () => {
           onClick={() => setIsCollapsed(!isCollapsed)}
           className={cn(
             'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg',
-            'text-secondary-300 hover:text-white hover:bg-secondary-700/50 transition-all',
+            'text-slate-300 hover:text-white hover:bg-slate-700 transition-all',
             isCollapsed && 'justify-center px-2',
           )}
           aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
@@ -243,16 +242,16 @@ export const ModernNavigation: React.FC = () => {
 
   // Mobile Top Bar
   const MobileTopBar = () => (
-    <header className="fixed top-0 left-0 right-0 h-14 bg-secondary-900/95 backdrop-blur-md border-b border-secondary-800 z-50 flex items-center justify-between px-4">
+    <header className="fixed top-0 left-0 right-0 h-14 bg-slate-900 border-b border-slate-700 z-50 flex items-center justify-between px-4 shadow-lg">
       <Link to="/dashboard" className="flex items-center gap-2">
-        <LogoIcon className="w-7 h-7 text-primary-400" />
+    <LogoIcon className="w-7 h-7 text-blue-400" />
         <span className="font-bold text-base text-white">Astral Turf</span>
       </Link>
 
       <div className="flex items-center gap-2">
         <button
           onClick={() => uiDispatch({ type: 'TOGGLE_THEME' })}
-          className="p-2 rounded-lg text-secondary-300 hover:text-white hover:bg-secondary-700/50 transition-all"
+          className="p-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700 transition-all"
           aria-label="Toggle theme"
         >
           {uiState.theme === 'dark' ? (
@@ -263,7 +262,7 @@ export const ModernNavigation: React.FC = () => {
         </button>
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="p-2 rounded-lg text-secondary-300 hover:text-white hover:bg-secondary-700/50 transition-all"
+          className="p-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700 transition-all"
           aria-label="Toggle menu"
         >
           {mobileMenuOpen ? (
@@ -287,7 +286,7 @@ export const ModernNavigation: React.FC = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+            className="fixed inset-0 bg-black z-40"
             onClick={() => setMobileMenuOpen(false)}
           />
 
@@ -297,7 +296,7 @@ export const ModernNavigation: React.FC = () => {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed top-14 right-0 bottom-0 w-80 bg-secondary-900 z-50 overflow-y-auto shadow-2xl"
+            className="fixed top-14 right-0 bottom-0 w-80 bg-slate-900 z-50 overflow-y-auto shadow-2xl"
           >
             <nav className="p-4 space-y-1">
               {primaryNavItems.map((item) => (
@@ -306,8 +305,8 @@ export const ModernNavigation: React.FC = () => {
 
               {/* Tactics-specific actions */}
               {isTacticsPage && (
-                <div className="mt-6 pt-6 border-t border-secondary-800 space-y-1">
-                  <div className="px-3 py-2 text-xs font-semibold text-secondary-400 uppercase tracking-wider">
+                <div className="mt-6 pt-6 border-t border-slate-700 space-y-1">
+                  <div className="px-3 py-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">
                     Tactics Tools
                   </div>
                   <button
@@ -317,7 +316,7 @@ export const ModernNavigation: React.FC = () => {
                       }
                       setMobileMenuOpen(false);
                     }}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-secondary-300 hover:text-white hover:bg-secondary-700/50 transition-all"
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700 transition-all"
                   >
                     <ResetIcon className="w-5 h-5" />
                     <span className="text-sm">Reset Board</span>
@@ -327,7 +326,7 @@ export const ModernNavigation: React.FC = () => {
                       uiDispatch({ type: 'ENTER_PRESENTATION_MODE' });
                       setMobileMenuOpen(false);
                     }}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-secondary-300 hover:text-white hover:bg-secondary-700/50 transition-all"
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700 transition-all"
                   >
                     <PresentationIcon className="w-5 h-5" />
                     <span className="text-sm">Present Mode</span>
@@ -336,13 +335,13 @@ export const ModernNavigation: React.FC = () => {
               )}
 
               {/* Logout */}
-              <div className="mt-6 pt-6 border-t border-secondary-800">
+              <div className="mt-6 pt-6 border-t border-slate-700">
                 <button
                   onClick={() => {
                     handleLogout();
                     setMobileMenuOpen(false);
                   }}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-error-400 hover:text-error-300 hover:bg-error-900/20 transition-all"
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-900 transition-all"
                 >
                   <span className="text-sm font-medium">Logout</span>
                 </button>

@@ -325,20 +325,20 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 bg-slate-800  z-50 flex items-center justify-center p-4"
     >
       <motion.div
         initial={{ scale: 0.9, opacity: 0, y: 20 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.9, opacity: 0, y: 20 }}
         className={`
-          bg-slate-900/95 backdrop-blur-md border border-slate-700/50 rounded-2xl
+          bg-slate-900  border border-slate-700 rounded-2xl
           w-full max-w-6xl h-[85vh] flex flex-col shadow-2xl
           ${className}
         `}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-slate-700/50">
+        <div className="flex items-center justify-between p-6 border-b border-slate-700">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-xl flex items-center justify-center">
               <Archive className="w-6 h-6 text-white" />
@@ -359,14 +359,14 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-700/50 transition-colors"
+            className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-700 transition-colors"
           >
             <X className="w-6 h-6" />
           </button>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex border-b border-slate-700/50">
+        <div className="flex border-b border-slate-700">
           {tabs.map(tab => {
             const IconComponent = tab.icon;
             return (
@@ -388,7 +388,7 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
                   <span
                     className={`
                     px-1.5 py-0.5 rounded text-xs
-                    ${activeTab === tab.id ? 'bg-emerald-500/20 text-emerald-300' : 'bg-slate-700/50 text-slate-300'}
+                    ${activeTab === tab.id ? 'bg-emerald-950 text-emerald-300' : 'bg-slate-700 text-slate-300'}
                   `}
                   >
                     {tab.count}
@@ -423,7 +423,7 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
                     <h3 className="text-lg font-semibold text-white">Export Options</h3>
 
                     {/* Format Selection */}
-                    <div className="bg-slate-800/40 border border-slate-600/50 rounded-xl p-5">
+                    <div className="bg-slate-700 border border-slate-600/50 rounded-xl p-5">
                       <h4 className="font-medium text-white mb-4">Export Format</h4>
                       <div className="grid grid-cols-3 gap-3">
                         {[
@@ -446,7 +446,7 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
                                 ${
                                   exportOptions.format === format.id
                                     ? 'border-emerald-500/70 bg-emerald-600/25'
-                                    : 'border-slate-600/50 bg-slate-800/40 hover:border-slate-500/60'
+                                    : 'border-slate-600/50 bg-slate-700 hover:border-slate-500/60'
                                 }
                               `}
                             >
@@ -466,7 +466,7 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
                     </div>
 
                     {/* Content Selection */}
-                    <div className="bg-slate-800/40 border border-slate-600/50 rounded-xl p-5">
+                    <div className="bg-slate-700 border border-slate-600/50 rounded-xl p-5">
                       <h4 className="font-medium text-white mb-4">Include Content</h4>
                       <div className="space-y-3">
                         {[
@@ -516,7 +516,7 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
                     </div>
 
                     {/* Advanced Options */}
-                    <div className="bg-slate-800/40 border border-slate-600/50 rounded-xl p-5">
+                    <div className="bg-slate-700 border border-slate-600/50 rounded-xl p-5">
                       <h4 className="font-medium text-white mb-4">Advanced Settings</h4>
                       <div className="space-y-4">
                         <label className="flex items-center justify-between">
@@ -544,7 +544,7 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
                                 quality: e.target.value as any,
                               }))
                             }
-                            className="w-full bg-slate-700/50 border border-slate-600/50 rounded-lg px-3 py-2 text-white text-sm"
+                            className="w-full bg-slate-700 border border-slate-600/50 rounded-lg px-3 py-2 text-white text-sm"
                           >
                             <option value="low">Low (Fast)</option>
                             <option value="medium">Medium</option>
@@ -561,7 +561,7 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
                     <h3 className="text-lg font-semibold text-white">Export Preview</h3>
 
                     {/* Preview Area */}
-                    <div className="bg-slate-800/40 border border-slate-600/50 rounded-xl p-5 h-64 flex items-center justify-center">
+                    <div className="bg-slate-700 border border-slate-600/50 rounded-xl p-5 h-64 flex items-center justify-center">
                       <div className="text-center text-slate-400">
                         <Camera className="w-12 h-12 mx-auto mb-3 opacity-50" />
                         <div className="font-medium mb-1">Export Preview</div>
@@ -573,13 +573,13 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
 
                     {/* Export Stats */}
                     <div className="grid grid-cols-2 gap-4">
-                      <div className="bg-slate-800/40 border border-slate-600/50 rounded-xl p-4">
+                      <div className="bg-slate-700 border border-slate-600/50 rounded-xl p-4">
                         <div className="text-2xl font-bold text-white">
                           {Object.keys(formations).length + Object.keys(playbook).length}
                         </div>
                         <div className="text-sm text-slate-400">Total Items</div>
                       </div>
-                      <div className="bg-slate-800/40 border border-slate-600/50 rounded-xl p-4">
+                      <div className="bg-slate-700 border border-slate-600/50 rounded-xl p-4">
                         <div className="text-2xl font-bold text-white">~2.4MB</div>
                         <div className="text-sm text-slate-400">Estimated Size</div>
                       </div>
@@ -631,7 +631,7 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
                     <h3 className="text-lg font-semibold text-white">Import Settings</h3>
 
                     {/* Import Options */}
-                    <div className="bg-slate-800/40 border border-slate-600/50 rounded-xl p-5">
+                    <div className="bg-slate-700 border border-slate-600/50 rounded-xl p-5">
                       <h4 className="font-medium text-white mb-4">Import Behavior</h4>
                       <div className="space-y-4">
                         <label className="flex items-center justify-between">
@@ -659,7 +659,7 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
                                 mergeStrategy: e.target.value as any,
                               }))
                             }
-                            className="w-full bg-slate-700/50 border border-slate-600/50 rounded-lg px-3 py-2 text-white text-sm"
+                            className="w-full bg-slate-700 border border-slate-600/50 rounded-lg px-3 py-2 text-white text-sm"
                           >
                             <option value="overwrite">Overwrite Conflicts</option>
                             <option value="skip">Skip Conflicts</option>
@@ -746,7 +746,7 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
 
                     {/* Import Status */}
                     {isImporting && (
-                      <div className="bg-slate-800/40 border border-slate-600/50 rounded-xl p-5">
+                      <div className="bg-slate-700 border border-slate-600/50 rounded-xl p-5">
                         <div className="flex items-center gap-3 mb-3">
                           <div className="animate-spin w-5 h-5 border-2 border-emerald-500 border-t-transparent rounded-full" />
                           <span className="text-white font-medium">Importing data...</span>
@@ -759,7 +759,7 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
 
                     {/* Preview Imported Data */}
                     {previewData && (
-                      <div className="bg-slate-800/40 border border-slate-600/50 rounded-xl p-5">
+                      <div className="bg-slate-700 border border-slate-600/50 rounded-xl p-5">
                         <h4 className="font-medium text-white mb-3">Import Preview</h4>
                         <div className="space-y-2 text-sm">
                           <div className="flex justify-between">
@@ -796,7 +796,7 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
                 className="h-full flex flex-col"
               >
                 {/* Library Header */}
-                <div className="p-6 border-b border-slate-700/50">
+                <div className="p-6 border-b border-slate-700">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-white">Tactical Library</h3>
                     <button
@@ -844,7 +844,7 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
                           key={item.id}
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
-                          className="bg-slate-800/40 border border-slate-600/50 rounded-xl overflow-hidden hover:border-slate-500/60 transition-all cursor-pointer"
+                          className="bg-slate-700 border border-slate-600/50 rounded-xl overflow-hidden hover:border-slate-500/60 transition-all cursor-pointer"
                           onClick={() => onLoadFromLibrary(item.id)}
                         >
                           {/* Preview Image */}
@@ -877,7 +877,7 @@ const EnhancedExportImport: React.FC<EnhancedExportImportProps> = ({
                               {item.tags.slice(0, 3).map(tag => (
                                 <span
                                   key={tag}
-                                  className="px-2 py-1 bg-slate-700/50 text-slate-300 text-xs rounded"
+                                  className="px-2 py-1 bg-slate-700 text-slate-300 text-xs rounded"
                                 >
                                   {tag}
                                 </span>

@@ -228,7 +228,7 @@ export const HeatMap = forwardRef<HTMLDivElement, HeatMapProps>(
       const colors = colorSchemes[colorScheme];
 
       return (
-        <div className="absolute bottom-4 right-4 bg-black/60 backdrop-blur-sm rounded-lg p-3">
+        <div className="absolute bottom-4 right-4 bg-slate-900  rounded-lg p-3">
           <div className="text-xs text-white mb-2 text-center">Intensity</div>
           <div className="flex items-center space-x-2">
             <span className="text-xs text-secondary-400">{Math.round(processedData.minValue)}</span>
@@ -258,7 +258,7 @@ export const HeatMap = forwardRef<HTMLDivElement, HeatMapProps>(
       }
 
       return (
-        <div className="absolute pointer-events-none z-50 bg-black/90 backdrop-blur-sm rounded-lg p-3 text-white text-sm shadow-xl">
+        <div className="absolute pointer-events-none z-50 bg-slate-950  rounded-lg p-3 text-white text-sm shadow-xl">
           <div className="font-medium">{hoveredCell.label || 'Position'}</div>
           <div className="text-secondary-300">
             Value: <span className="font-bold">{hoveredCell.value}</span>

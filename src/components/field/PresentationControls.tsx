@@ -94,7 +94,7 @@ const PresentationControls: React.FC = () => {
   };
 
   return (
-    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-slate-800/90 backdrop-blur-md border border-slate-600/50 rounded-xl shadow-2xl flex items-center p-3 space-x-4 z-30 animate-fade-in-scale">
+    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-slate-800  border border-slate-600/50 rounded-xl shadow-2xl flex items-center p-3 space-x-4 z-30 animate-fade-in-scale">
       <button
         onClick={handlePrevStep}
         disabled={isAnimating || activeStepIndex === 0}

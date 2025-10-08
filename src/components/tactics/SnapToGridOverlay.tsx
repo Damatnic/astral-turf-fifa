@@ -217,7 +217,7 @@ const SnapToGridOverlay: React.FC<SnapToGridOverlayProps> = ({
       )}
 
       {/* Grid Info Overlay */}
-      <div className="absolute top-4 left-4 bg-gray-900/90 backdrop-blur-sm rounded-lg px-4 py-2 border border-gray-700/50">
+      <div className="absolute top-4 left-4 bg-gray-900/90  rounded-lg px-4 py-2 border border-gray-700/50">
         <div className="flex items-center gap-3 text-sm">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-blue-500" />

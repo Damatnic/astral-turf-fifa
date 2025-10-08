@@ -77,7 +77,7 @@ export const AnimatedTooltip: React.FC<AnimatedTooltipProps> = ({
             className={`absolute z-50 ${positionStyles[position]} ${className}`}
           >
             {/* Tooltip content */}
-            <div className="px-3 py-2 bg-gray-900 text-white text-sm rounded-lg shadow-lg backdrop-blur-sm whitespace-nowrap">
+            <div className="px-3 py-2 bg-gray-900 text-white text-sm rounded-lg shadow-lg  whitespace-nowrap">
               {content}
 
               {/* Arrow */}

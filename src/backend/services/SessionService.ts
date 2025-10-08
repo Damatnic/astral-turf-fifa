@@ -477,23 +477,41 @@ export class SessionService {
 
   /**
    * Get geographic location from IP address
-   * This is a placeholder - integrate with a GeoIP service in production
+   * Integrated with GeoIP service (MaxMind, IP2Location, ipapi.co)
    */
   private async getLocationFromIP(
     ipAddress: string,
   ): Promise<{ city?: string; region?: string; country?: string } | undefined> {
-    // TODO: Integrate with GeoIP service (MaxMind, IP2Location, etc.)
-    // For now, return undefined or mock data for localhost
+    try {
+      // Handle localhost/private IPs
+      if (ipAddress === '127.0.0.1' || ipAddress === '::1' || ipAddress.startsWith('192.168.')) {
+        return {
+          city: 'Local',
+          region: 'Local',
+          country: 'Local',
+        };
+      }
 
-    if (ipAddress === '127.0.0.1' || ipAddress === '::1' || ipAddress.startsWith('192.168.')) {
-      return {
-        city: 'Local',
-        region: 'Local',
-        country: 'Local',
-      };
+      // Use geoipService for real IP addresses
+      const { geoipService } = await import('../../services/geoipService');
+      const location = await geoipService.getLocation(ipAddress);
+
+      if (location) {
+        return {
+          city: location.city,
+          region: location.region,
+          country: location.country,
+        };
+      }
+
+      return undefined;
+    } catch (error) {
+      loggingService.warn('GeoIP lookup failed in session service', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        metadata: { ipAddress },
+      });
+      return undefined;
     }
-
-    return undefined;
   }
 
   /**

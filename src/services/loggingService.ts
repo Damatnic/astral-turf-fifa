@@ -5,10 +5,24 @@
  * log rotation, and external storage capabilities.
  */
 
-import winston, { Logger, LoggerOptions } from 'winston';
-import DailyRotateFile from 'winston-daily-rotate-file';
+// Browser-safe imports - only import winston in Node.js environment
+const isBrowser = typeof window !== 'undefined';
+let winston: any;
+let DailyRotateFile: any;
+
+if (!isBrowser) {
+  try {
+    winston = require('winston');
+    DailyRotateFile = require('winston-daily-rotate-file');
+  } catch (e) {
+    // Winston not available - use console fallback
+  }
+}
+
 import { redisService } from './redisService';
 import { databaseService } from './databaseService';
+
+type Logger = any;
 
 export interface LogContext {
   userId?: string;
@@ -78,6 +92,12 @@ class LoggingService {
    * Initialize all logger instances with different transports
    */
   private initializeLoggers(): void {
+    // In browser environment, use console-only logging
+    if (isBrowser || !winston) {
+      this.createBrowserLogger();
+      return;
+    }
+
     try {
       const baseFormat = winston.format.combine(
         winston.format.timestamp({
@@ -239,9 +259,36 @@ class LoggingService {
   }
 
   /**
+   * Create browser-compatible logger using console
+   */
+  private createBrowserLogger(): void {
+    const browserLogger = {
+      error: (message: string, context?: any) => console.error(`[ERROR] ${message}`, context || ''),
+      warn: (message: string, context?: any) => console.warn(`[WARN] ${message}`, context || ''),
+      info: (message: string, context?: any) => console.info(`[INFO] ${message}`, context || ''),
+      debug: (message: string, context?: any) => console.log(`[DEBUG] ${message}`, context || ''),
+      verbose: (message: string, context?: any) => console.log(`[VERBOSE] ${message}`, context || ''),
+      http: (message: string, context?: any) => console.log(`[HTTP] ${message}`, context || ''),
+      silly: (message: string, context?: any) => console.log(`[SILLY] ${message}`, context || ''),
+      on: () => {},
+    };
+
+    this.logger = browserLogger as any;
+    this.securityLogger = browserLogger as any;
+    this.auditLogger = browserLogger as any;
+    this.performanceLogger = browserLogger as any;
+    this.initialized = true;
+  }
+
+  /**
    * Create fallback logger if initialization fails
    */
   private createFallbackLogger(): void {
+    if (!winston) {
+      this.createBrowserLogger();
+      return;
+    }
+
     this.logger = winston.createLogger({
       level: 'info',
       format: winston.format.simple(),
@@ -279,6 +326,8 @@ class LoggingService {
    * Start buffer flush interval for external storage
    */
   private startBufferFlush(): void {
+    if (isBrowser) return; // Skip in browser
+
     const flushIntervalMs = parseInt(process.env.LOG_FLUSH_INTERVAL_MS || '30000'); // 30 seconds
 
     this.bufferFlushInterval = setInterval(() => {
@@ -409,7 +458,8 @@ class LoggingService {
     this.logger.debug(message, context);
 
     // Only buffer debug logs in development
-    if (process.env.NODE_ENV === 'development') {
+    const isDev = isBrowser ? import.meta.env.DEV : process.env.NODE_ENV === 'development';
+    if (isDev) {
       this.addToBuffer('debug', message, context);
     }
   }
@@ -480,7 +530,7 @@ class LoggingService {
       ...context,
       performance: {
         duration,
-        memoryUsage: process.memoryUsage().heapUsed,
+        memoryUsage: !isBrowser && typeof process !== 'undefined' ? process.memoryUsage().heapUsed : undefined,
         ...context.performance,
       },
     };
@@ -488,7 +538,8 @@ class LoggingService {
     this.performanceLogger.info(`Performance: ${operation}`, performanceContext);
 
     // Only buffer performance logs if duration is significant or in development
-    if (duration > 1000 || process.env.NODE_ENV === 'development') {
+    const isDev = isBrowser ? import.meta.env.DEV : process.env.NODE_ENV === 'development';
+    if (duration > 1000 || isDev) {
       this.addToBuffer('performance', `Performance: ${operation}`, performanceContext);
     }
   }

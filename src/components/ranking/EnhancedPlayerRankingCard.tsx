@@ -164,7 +164,7 @@ const EnhancedPlayerRankingCard: React.FC<EnhancedPlayerRankingCardProps> = ({
     return (
       <motion.div
         whileHover={{ scale: 1.02, x: 4 }}
-        className={`flex items-center justify-between p-3 bg-gray-800/50 rounded-xl border ${rarityConfig.border} backdrop-blur-sm cursor-pointer`}
+        className={`flex items-center justify-between p-3 bg-gray-800/50 rounded-xl border ${rarityConfig.border}  cursor-pointer`}
         onClick={onFlip}
       >
         <div className="flex items-center gap-3">
@@ -282,14 +282,14 @@ const EnhancedPlayerRankingCard: React.FC<EnhancedPlayerRankingCardProps> = ({
             {/* Header Gradient */}
             <div className={`h-32 bg-gradient-to-br ${rarityConfig.gradient} relative`}>
               {/* Rarity Badge */}
-              <div className="absolute top-3 right-3 px-3 py-1 bg-black/50 backdrop-blur-sm rounded-full flex items-center gap-1">
+              <div className="absolute top-3 right-3 px-3 py-1 bg-slate-800  rounded-full flex items-center gap-1">
                 <rarityConfig.icon size={14} className="text-white" />
                 <span className="text-xs font-bold text-white">{rarityConfig.label.toUpperCase()}</span>
               </div>
 
               {/* Rank Badge */}
               {rank && (
-                <div className="absolute top-3 left-3 px-3 py-1 bg-black/50 backdrop-blur-sm rounded-full">
+                <div className="absolute top-3 left-3 px-3 py-1 bg-slate-800  rounded-full">
                   <span className="text-sm font-bold text-white">
                     {rank <= 3 ? (rank === 1 ? '🥇' : rank === 2 ? '🥈' : '🥉') : `#${rank}`}
                   </span>

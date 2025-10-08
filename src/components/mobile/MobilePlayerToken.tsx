@@ -324,7 +324,7 @@ const MobilePlayerToken: React.FC<MobilePlayerTokenProps> = ({
         {/* Long press indicator */}
         {isLongPressing && (
           <motion.div
-            className="absolute inset-0 rounded-full bg-white/20"
+            className="absolute inset-0 rounded-full bg-slate-700"
             initial={{ scale: 0 }}
             animate={{ scale: 1.5, opacity: 0 }}
             transition={{ duration: 0.3 }}
@@ -335,7 +335,7 @@ const MobilePlayerToken: React.FC<MobilePlayerTokenProps> = ({
       {/* Mobile stats overlay */}
       {showStats && capabilities.isMobile && (
         <motion.div
-          className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded whitespace-nowrap"
+          className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 10 }}
@@ -359,7 +359,7 @@ const MobilePlayerToken: React.FC<MobilePlayerTokenProps> = ({
 
       {/* Performance overlay for debugging */}
       {process.env.NODE_ENV === 'development' && (
-        <div className="absolute -top-4 -left-2 text-xs text-white bg-black/50 px-1 rounded">
+        <div className="absolute -top-4 -left-2 text-xs text-white bg-slate-800 px-1 rounded">
           {Math.round(tokenScale.get() * 100)}%
         </div>
       )}

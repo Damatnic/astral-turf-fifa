@@ -82,7 +82,7 @@ export const AnimatedModal: React.FC<AnimatedModalProps> = ({
             animate="visible"
             exit="exit"
             onClick={closeOnOverlayClick ? onClose : undefined}
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            className="absolute inset-0 bg-slate-800 "
           />
 
           {/* Modal content */}

@@ -121,9 +121,9 @@ const AIAnalysisPanel: React.FC<{
   };
 
   return (
-    <div className="bg-gray-900/95 backdrop-blur-md rounded-xl border border-white/20 shadow-2xl w-96 max-h-[80vh] overflow-hidden">
+    <div className="bg-gray-900/95  rounded-xl border border-slate-600 shadow-2xl w-96 max-h-[80vh] overflow-hidden">
       {/* Header */}
-      <div className="p-4 border-b border-white/10">
+      <div className="p-4 border-b border-slate-700">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse" />
@@ -159,7 +159,7 @@ const AIAnalysisPanel: React.FC<{
 
       {/* Tabs */}
       {analysis && (
-        <div className="flex border-b border-white/10">
+        <div className="flex border-b border-slate-700">
           {[
             { id: 'overview', label: 'Overview', icon: '📊' },
             { id: 'suggestions', label: 'Suggestions', icon: '💡' },
@@ -586,7 +586,7 @@ const AITacticalAnalyzer: React.FC = () => {
     >
       {isMinimized ? (
         <div
-          className="bg-gray-800/90 backdrop-blur-sm border border-gray-600 rounded-lg p-2 cursor-pointer hover:bg-gray-700/90 transition-colors"
+          className="bg-gray-800/90  border border-gray-600 rounded-lg p-2 cursor-pointer hover:bg-gray-700/90 transition-colors"
           onClick={() => setIsMinimized(false)}
         >
           <div className="flex items-center space-x-2 text-white text-sm">
@@ -595,7 +595,7 @@ const AITacticalAnalyzer: React.FC = () => {
           </div>
         </div>
       ) : (
-        <div className="bg-gray-900/95 backdrop-blur-sm border border-gray-700 rounded-lg">
+        <div className="bg-gray-900/95  border border-gray-700 rounded-lg">
           <div className="flex items-center justify-between p-2 border-b border-gray-700">
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-blue-400 rounded-full"></div>

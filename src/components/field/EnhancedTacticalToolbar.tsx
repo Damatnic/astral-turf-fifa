@@ -293,13 +293,13 @@ const EnhancedTacticalToolbar: React.FC = () => {
     >
       <div
         className={`
-        bg-slate-900/95 backdrop-blur-sm border border-slate-700/50 rounded-xl shadow-2xl
+        bg-slate-900  border border-slate-700 rounded-xl shadow-2xl
         ${isMobile ? 'w-full' : 'min-w-max'}
       `}
       >
         {/* Mobile toggle button */}
         {isMobile && (
-          <div className="flex items-center justify-between p-3 border-b border-slate-700/50">
+          <div className="flex items-center justify-between p-3 border-b border-slate-700">
             <div className="text-sm font-bold text-slate-300">Tactical Tools</div>
             <button
               onClick={() => setIsExpanded(!isExpanded)}
@@ -318,7 +318,7 @@ const EnhancedTacticalToolbar: React.FC = () => {
         >
           {/* Section tabs for mobile */}
           {isMobile && (
-            <div className="flex border-b border-slate-700/50">
+            <div className="flex border-b border-slate-700">
               {[
                 { id: 'tools', label: 'Tools', icon: '🎨' },
                 { id: 'animation', label: 'Animation', icon: '▶️' },

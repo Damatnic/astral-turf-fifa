@@ -133,7 +133,7 @@ const PlayerPeekMenu: React.FC<{
   return (
     <>
       {/* Backdrop */}
-      <div className="fixed inset-0 z-40 bg-black/20" onClick={onClose} />
+      <div className="fixed inset-0 z-40 bg-slate-650" onClick={onClose} />
 
       {/* Peek Menu */}
       <div
@@ -847,7 +847,7 @@ const PlayerToken: React.FC<PlayerTokenProps> = memo(
               data-testid="token-shadow"
               className={`absolute inset-0 -z-10 rounded-full pointer-events-none transition-all duration-300 ease-out ${
                 isDragging ? 'scale-120 opacity-60' : 'scale-100 opacity-40'
-              } bg-black/40 blur-xl`}
+              } bg-slate-750 blur-xl`}
               aria-hidden="true"
             />
 
@@ -898,19 +898,19 @@ const PlayerToken: React.FC<PlayerTokenProps> = memo(
               >
                 <KitPatternComponent player={player} teamKit={teamKit} size={44} />
                 {shouldShowRoleBadge && playerRole?.abbreviation && (
-                  <span className="absolute top-1 left-1 text-[10px] font-semibold text-white/80 bg-black/60 px-1 rounded-sm">
+                  <span className="absolute top-1 left-1 text-[10px] font-semibold text-white/80 bg-slate-900 px-1 rounded-sm">
                     {playerRole.abbreviation}
                   </span>
                 )}
                 <span className="relative z-10 drop-shadow-lg">{displayedBadge}</span>
                 {!playerRole && (
-                  <span className="absolute bottom-1 right-1 rounded bg-black/50 px-1 text-[10px] font-semibold text-white/80">
+                  <span className="absolute bottom-1 right-1 rounded bg-slate-800 px-1 text-[10px] font-semibold text-white/80">
                     {fallbackRoleHint}
                   </span>
                 )}
 
                 <motion.div
-                  className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-9 h-2.5 bg-gradient-to-b from-gray-800/60 to-gray-900/80 rounded-full border border-gray-600/60 flex items-center p-px backdrop-blur-sm"
+                  className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-9 h-2.5 bg-gradient-to-b from-gray-800/60 to-gray-900/80 rounded-full border border-gray-600/60 flex items-center p-px "
                   title={`Stamina: ${safeStamina}%`}
                   initial={{ opacity: 0, y: 5 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -965,7 +965,7 @@ const PlayerToken: React.FC<PlayerTokenProps> = memo(
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 5, scale: 0.8 }}
                   transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-                  className="mt-1.5 text-xs font-semibold text-white bg-black/60 backdrop-blur-sm px-2 py-1 rounded-lg whitespace-nowrap border border-white/10"
+                  className="mt-1.5 text-xs font-semibold text-white bg-slate-900  px-2 py-1 rounded-lg whitespace-nowrap border border-slate-700"
                 >
                   <span className="text-gray-300 mr-1">#{Number.isFinite(player.jerseyNumber) && player.jerseyNumber! > 0 ? player.jerseyNumber : '?'}</span>
                   <span className="text-white">{safePlayerName}</span>
@@ -1023,7 +1023,7 @@ const PlayerToken: React.FC<PlayerTokenProps> = memo(
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 8 }}
                 transition={{ duration: 0.15 }}
-                className="absolute top-full mt-2 w-48 rounded-lg border border-slate-700/70 bg-slate-900/95 p-3 text-xs text-slate-100 shadow-2xl backdrop-blur"
+                className="absolute top-full mt-2 w-48 rounded-lg border border-slate-700/70 bg-slate-900 p-3 text-xs text-slate-100 shadow-2xl backdrop-blur"
               >
                 <div className="text-sm font-semibold text-white">{safePlayerName}</div>
                 <div className="mb-2 text-[11px] text-slate-300">

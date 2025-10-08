@@ -64,7 +64,7 @@ export const OfflineIndicator: React.FC<OfflineIndicatorProps> = ({
         aria-live="assertive"
       >
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-white/20 rounded-lg">
+          <div className="p-2 bg-slate-700 rounded-lg">
             <Wifi className="w-5 h-5" />
           </div>
           <div>
@@ -86,7 +86,7 @@ export const OfflineIndicator: React.FC<OfflineIndicatorProps> = ({
       aria-live="assertive"
     >
       <div className="flex items-center gap-3">
-        <div className="p-2 bg-white/20 rounded-lg">
+        <div className="p-2 bg-slate-700 rounded-lg">
           {connectionType === 'slow' ? (
             <AlertCircle className="w-5 h-5" />
           ) : (

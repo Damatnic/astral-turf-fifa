@@ -248,8 +248,23 @@ class PerformanceMonitor {
         timestamp: new Date().toISOString(),
       });
 
-      // TODO: Send to analytics service
-      // analytics.track('performance_report', { summary, vitals });
+      // Send to analytics service in production
+      try {
+        if (typeof window !== 'undefined' && (window as any).gtag) {
+          (window as any).gtag('event', 'performance_report', {
+            summary: JSON.stringify(summary),
+            vitals: JSON.stringify(vitals),
+          });
+        }
+        
+        if (typeof window !== 'undefined' && (window as any).mixpanel) {
+          (window as any).mixpanel.track('Performance Report', { summary, vitals });
+        }
+      } catch (error) {
+        loggingService.warn('Failed to send performance report to analytics', {
+          error: error instanceof Error ? error.message : 'Unknown error',
+        });
+      }
     } else {
       // In development, log to console
       console.table(this.metrics);

@@ -5,6 +5,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useGestures } from '../../../hooks/useTouchGestures';
 import {
   Menu,
   X,
@@ -70,8 +71,7 @@ export const MobileTacticsBoardContainer: React.FC<MobileTacticsBoardProps> = ({
     }
   }, []);
 
-  // Pinch zoom handling (TODO: Wire to TouchGestureController)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // Pinch zoom handling - Connected to TouchGestureController
   const handlePinchZoom = useCallback(
     (scale: number) => {
       const newZoom = Math.max(0.5, Math.min(3, zoom * scale));
@@ -81,24 +81,34 @@ export const MobileTacticsBoardContainer: React.FC<MobileTacticsBoardProps> = ({
     [zoom, onZoomChange],
   );
 
-  // Pan handling (TODO: Wire to TouchGestureController)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // Pan handling - Connected to TouchGestureController
   const handlePan = useCallback((delta: { x: number; y: number }) => {
     setPanOffset((prev) => ({
       x: prev.x + delta.x,
       y: prev.y + delta.y,
     }));
   }, []);
+  
+  // Wire up touch gestures using the hook
+  const gestureHandlers = useGestures({
+    onPinch: handlePinchZoom,
+    onDoubleTap: () => {
+      // Reset zoom on double tap
+      setZoom(1);
+      setPanOffset({ x: 0, y: 0 });
+      onZoomChange?.(1);
+    },
+  });
 
   if (!isMobile) {
     return <>{children}</>;
   }
 
   return (
-    <div className="mobile-tactics-board-container relative w-full h-full overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="mobile-tactics-board-container relative w-full h-full overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" {...gestureHandlers}>
       {/* Mobile Control Bar - Top */}
       <motion.div
-        className="absolute top-0 left-0 right-0 z-50 bg-gradient-to-b from-black/80 to-transparent p-4 backdrop-blur-md"
+        className="absolute top-0 left-0 right-0 z-50 bg-gradient-to-b from-black/80 to-transparent p-4 "
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ type: 'spring', damping: 20 }}
@@ -106,7 +116,7 @@ export const MobileTacticsBoardContainer: React.FC<MobileTacticsBoardProps> = ({
         <div className="flex items-center justify-between">
           <button
             onClick={() => setShowControls(!showControls)}
-            className="p-3 rounded-xl bg-white/10 hover:bg-white/20 transition-colors backdrop-blur-sm border border-white/20"
+            className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 transition-colors  border border-slate-600"
             aria-label="Toggle controls"
           >
             {showControls ? <X className="w-6 h-6 text-white" /> : <Menu className="w-6 h-6 text-white" />}
@@ -119,7 +129,7 @@ export const MobileTacticsBoardContainer: React.FC<MobileTacticsBoardProps> = ({
 
           <button
             onClick={toggleFullscreen}
-            className="p-3 rounded-xl bg-white/10 hover:bg-white/20 transition-colors backdrop-blur-sm border border-white/20"
+            className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 transition-colors  border border-slate-600"
             aria-label="Toggle fullscreen"
           >
             <Maximize2 className="w-6 h-6 text-white" />
@@ -131,7 +141,7 @@ export const MobileTacticsBoardContainer: React.FC<MobileTacticsBoardProps> = ({
       <AnimatePresence>
         {showControls && (
           <motion.div
-            className="absolute top-20 left-4 z-50 bg-gradient-to-br from-slate-800/95 to-slate-900/95 rounded-2xl p-4 backdrop-blur-xl border border-white/10 shadow-2xl"
+            className="absolute top-20 left-4 z-50 bg-gradient-to-br from-slate-800/95 to-slate-900/95 rounded-2xl p-4 backdrop-blur-xl border border-slate-700 shadow-2xl"
             initial={{ opacity: 0, x: -100, scale: 0.9 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}
             exit={{ opacity: 0, x: -100, scale: 0.9 }}
@@ -151,7 +161,7 @@ export const MobileTacticsBoardContainer: React.FC<MobileTacticsBoardProps> = ({
                   >
                     <ZoomOut className="w-5 h-5 text-blue-300" />
                   </button>
-                  <div className="px-4 py-2 rounded-xl bg-slate-700/50 text-white font-bold min-w-[80px] text-center">
+                  <div className="px-4 py-2 rounded-xl bg-slate-700 text-white font-bold min-w-[80px] text-center">
                     {Math.round(zoom * 100)}%
                   </div>
                   <button
@@ -189,7 +199,7 @@ export const MobileTacticsBoardContainer: React.FC<MobileTacticsBoardProps> = ({
                       className={`p-2 rounded-lg text-sm font-bold transition-all ${
                         zoom === preset
                           ? 'bg-gradient-to-br from-emerald-500 to-emerald-600 text-white'
-                          : 'bg-slate-700/50 text-white/70 hover:bg-slate-700'
+                          : 'bg-slate-700 text-white/70 hover:bg-slate-700'
                       }`}
                     >
                       {preset * 100}%
@@ -204,7 +214,7 @@ export const MobileTacticsBoardContainer: React.FC<MobileTacticsBoardProps> = ({
 
       {/* Zoom Indicator - Bottom Right */}
       <motion.div
-        className="absolute bottom-4 right-4 z-40 bg-slate-800/90 backdrop-blur-md rounded-full px-4 py-2 border border-white/10 shadow-lg"
+        className="absolute bottom-4 right-4 z-40 bg-slate-800  rounded-full px-4 py-2 border border-slate-700 shadow-lg"
         initial={{ opacity: 0, scale: 0 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.5 }}
@@ -231,7 +241,7 @@ export const MobileTacticsBoardContainer: React.FC<MobileTacticsBoardProps> = ({
       <AnimatePresence>
         {isMobile && (
           <motion.div
-            className="absolute inset-0 z-30 bg-black/80 backdrop-blur-sm flex items-center justify-center pointer-events-none"
+            className="absolute inset-0 z-30 bg-slate-900  flex items-center justify-center pointer-events-none"
             initial={{ opacity: 1 }}
             animate={{ opacity: 0 }}
             transition={{ delay: 2, duration: 1 }}

@@ -256,7 +256,7 @@ const FormationAutoSave: React.FC<FormationAutoSaveProps> = ({
       <button
         onClick={() => setIsOpen(true)}
         className={`
-          relative flex items-center gap-2 px-3 py-2 bg-slate-800/50 hover:bg-slate-700/50 
+          relative flex items-center gap-2 px-3 py-2 bg-slate-800/50 hover:bg-slate-700 
           border border-slate-600/50 rounded-lg transition-all text-white text-sm
           ${className}
         `}
@@ -289,17 +289,17 @@ const FormationAutoSave: React.FC<FormationAutoSaveProps> = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
+            className="fixed inset-0 z-50 bg-slate-800  flex items-center justify-center p-4"
             onClick={e => e.target === e.currentTarget && setIsOpen(false)}
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-slate-900/95 backdrop-blur-md border border-slate-700/50 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl"
+              className="bg-slate-900  border border-slate-700 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl"
             >
               {/* Header */}
-              <div className="flex items-center justify-between p-6 border-b border-slate-700/50">
+              <div className="flex items-center justify-between p-6 border-b border-slate-700">
                 <div>
                   <h2 className="text-2xl font-bold text-white">Formation Auto-Save</h2>
                   <p className="text-slate-400 mt-1">{autoSaveStatus.message}</p>
@@ -314,7 +314,7 @@ const FormationAutoSave: React.FC<FormationAutoSaveProps> = ({
                   </button>
                   <button
                     onClick={() => setIsOpen(false)}
-                    className="p-2 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-lg transition-all"
+                    className="p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg transition-all"
                   >
                     ✕
                   </button>
@@ -322,7 +322,7 @@ const FormationAutoSave: React.FC<FormationAutoSaveProps> = ({
               </div>
 
               {/* Tabs */}
-              <div className="flex border-b border-slate-700/50">
+              <div className="flex border-b border-slate-700">
                 {[
                   { id: 'saves', label: 'Save History', icon: History, count: saveHistory.length },
                   { id: 'templates', label: 'Templates', icon: Star, count: templates.length },
@@ -343,7 +343,7 @@ const FormationAutoSave: React.FC<FormationAutoSaveProps> = ({
                     <tab.icon className="w-4 h-4" />
                     {tab.label}
                     {tab.count !== undefined && (
-                      <span className="bg-slate-700/50 px-1.5 py-0.5 rounded text-xs">
+                      <span className="bg-slate-700 px-1.5 py-0.5 rounded text-xs">
                         {tab.count}
                       </span>
                     )}
@@ -365,7 +365,7 @@ const FormationAutoSave: React.FC<FormationAutoSaveProps> = ({
                       saveHistory.map(save => (
                         <div
                           key={save.id}
-                          className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-4 hover:border-blue-500/50 transition-all"
+                          className="bg-slate-800/50 border border-slate-700 rounded-lg p-4 hover:border-blue-500/50 transition-all"
                         >
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
@@ -412,7 +412,7 @@ const FormationAutoSave: React.FC<FormationAutoSaveProps> = ({
                               </button>
                               <button
                                 onClick={() => handleDeleteSave(save.id)}
-                                className="p-2 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded transition-all"
+                                className="p-2 text-red-400 hover:text-red-300 hover:bg-red-950 rounded transition-all"
                                 title="Delete Save"
                               >
                                 <Trash2 className="w-4 h-4" />
@@ -440,7 +440,7 @@ const FormationAutoSave: React.FC<FormationAutoSaveProps> = ({
 
                     {/* Create Template Modal */}
                     {isCreatingTemplate && (
-                      <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-4 mb-4">
+                      <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4 mb-4">
                         <h4 className="text-white font-medium mb-3">Create Formation Template</h4>
                         <div className="space-y-3">
                           <input
@@ -448,13 +448,13 @@ const FormationAutoSave: React.FC<FormationAutoSaveProps> = ({
                             placeholder="Template name..."
                             value={templateName}
                             onChange={e => setTemplateName(e.target.value)}
-                            className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600/50 rounded text-white placeholder-slate-400"
+                            className="w-full px-3 py-2 bg-slate-700 border border-slate-600/50 rounded text-white placeholder-slate-400"
                           />
                           <textarea
                             placeholder="Description (optional)..."
                             value={templateDescription}
                             onChange={e => setTemplateDescription(e.target.value)}
-                            className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600/50 rounded text-white placeholder-slate-400 resize-none"
+                            className="w-full px-3 py-2 bg-slate-700 border border-slate-600/50 rounded text-white placeholder-slate-400 resize-none"
                             rows={2}
                           />
                           <div className="flex gap-2">
@@ -485,7 +485,7 @@ const FormationAutoSave: React.FC<FormationAutoSaveProps> = ({
                       templates.map(template => (
                         <div
                           key={template.id}
-                          className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-4 hover:border-green-500/50 transition-all"
+                          className="bg-slate-800/50 border border-slate-700 rounded-lg p-4 hover:border-green-500/50 transition-all"
                         >
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
@@ -622,7 +622,7 @@ const FormationAutoSave: React.FC<FormationAutoSaveProps> = ({
                       </div>
                     </div>
 
-                    <div className="pt-4 border-t border-slate-700/50">
+                    <div className="pt-4 border-t border-slate-700">
                       <h4 className="text-white font-medium mb-3">Import/Export</h4>
                       <div className="flex gap-3">
                         <label className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors cursor-pointer">

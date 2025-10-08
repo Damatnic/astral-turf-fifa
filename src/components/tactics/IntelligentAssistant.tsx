@@ -234,7 +234,7 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
   const getSuggestionColor = useCallback((priority: Suggestion['priority']) => {
     switch (priority) {
       case 'high':
-        return 'text-red-400 bg-red-900/20 border-red-500/30';
+        return 'text-red-400 bg-red-950 border-red-500/30';
       case 'medium':
         return 'text-yellow-400 bg-yellow-900/20 border-yellow-500/30';
       case 'low':
@@ -250,17 +250,17 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
+        className="fixed inset-0 z-50 bg-slate-800  flex items-center justify-center p-4"
         onClick={e => e.target === e.currentTarget && onClose()}
       >
         <motion.div
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9, y: 20 }}
-          className="bg-slate-900/95 backdrop-blur-md border border-slate-700/50 rounded-xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl"
+          className="bg-slate-900  border border-slate-700 rounded-xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl"
         >
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-slate-700/50">
+          <div className="flex items-center justify-between p-6 border-b border-slate-700">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-blue-600/20 rounded-lg">
                 <Brain className="w-6 h-6 text-blue-400" />
@@ -274,14 +274,14 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
             </div>
             <button
               onClick={onClose}
-              className="p-2 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-lg transition-all"
+              className="p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg transition-all"
             >
               <X className="w-6 h-6" />
             </button>
           </div>
 
           {/* Tab Navigation */}
-          <div className="flex border-b border-slate-700/50">
+          <div className="flex border-b border-slate-700">
             {[
               { id: 'coaching', name: 'AI Coaching', icon: Brain },
               { id: 'analysis', name: 'Analysis', icon: Target },
@@ -360,7 +360,7 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
 
                     {coachingRecommendations.map((recommendation, index) => {
                       const priorityColors = {
-                        critical: 'border-red-500/50 bg-red-900/20',
+                        critical: 'border-red-500/50 bg-red-950',
                         high: 'border-orange-500/50 bg-orange-900/20',
                         medium: 'border-yellow-500/50 bg-yellow-900/20',
                         low: 'border-blue-500/50 bg-blue-900/20',
@@ -424,7 +424,7 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
                           </div>
 
                           {recommendation.actions && recommendation.actions.length > 0 && (
-                            <div className="border-t border-slate-700/50 pt-4">
+                            <div className="border-t border-slate-700 pt-4">
                               <h5 className="text-sm font-medium text-slate-300 mb-2">
                                 Suggested Actions:
                               </h5>
@@ -442,7 +442,7 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
                             </div>
                           )}
 
-                          <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-700/50">
+                          <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-700">
                             <div className="flex items-center gap-4 text-xs text-slate-500">
                               <span>Impact: {recommendation.impact.replace('-', ' ')}</span>
                               <span>Type: {recommendation.type}</span>
@@ -450,7 +450,7 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
 
                             <button
                               onClick={() => aiCoachingService.storeRecommendation(recommendation)}
-                              className="px-3 py-1 bg-slate-700/50 text-slate-300 rounded text-xs hover:bg-slate-700 transition-colors"
+                              className="px-3 py-1 bg-slate-700 text-slate-300 rounded text-xs hover:bg-slate-700 transition-colors"
                             >
                               Save Recommendation
                             </button>
@@ -484,7 +484,7 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
                   analysisResult && (
                     <>
                       {/* Overall Rating */}
-                      <div className="bg-slate-800/50 rounded-lg p-6 border border-slate-700/50">
+                      <div className="bg-slate-800/50 rounded-lg p-6 border border-slate-700">
                         <div className="flex items-center justify-between mb-4">
                           <h3 className="text-lg font-semibold text-white">Formation Rating</h3>
                           <div className="text-2xl font-bold text-blue-400">
@@ -527,7 +527,7 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
                           </ul>
                         </div>
 
-                        <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4">
+                        <div className="bg-red-950 border border-red-500/30 rounded-lg p-4">
                           <h4 className="text-red-400 font-medium mb-3 flex items-center gap-2">
                             <AlertTriangle className="w-4 h-4" />
                             Areas for Improvement
@@ -566,14 +566,14 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
                         <div className="flex-1">
                           <div className="flex items-center justify-between mb-2">
                             <h4 className="font-medium">{suggestion.title}</h4>
-                            <div className="text-xs bg-slate-700/50 px-2 py-1 rounded">
+                            <div className="text-xs bg-slate-700 px-2 py-1 rounded">
                               {suggestion.confidence}% confidence
                             </div>
                           </div>
                           <p className="text-sm opacity-90 mb-3">{suggestion.description}</p>
                           <button
                             onClick={suggestion.action}
-                            className="text-xs bg-slate-700/50 hover:bg-slate-600/50 px-3 py-1 rounded transition-all"
+                            className="text-xs bg-slate-700 hover:bg-slate-600/50 px-3 py-1 rounded transition-all"
                           >
                             Apply Suggestion
                           </button>
@@ -613,7 +613,7 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
                           ${
                             message.type === 'user'
                               ? 'bg-blue-600 text-white'
-                              : 'bg-slate-700/50 text-slate-200 border border-slate-600/50'
+                              : 'bg-slate-700 text-slate-200 border border-slate-600/50'
                           }
                         `}
                       >
@@ -646,7 +646,7 @@ const IntelligentAssistant: React.FC<IntelligentAssistantProps> = ({
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center justify-between p-6 border-t border-slate-700/50">
+          <div className="flex items-center justify-between p-6 border-t border-slate-700">
             <button
               onClick={analyzeFormation}
               disabled={isAnalyzing}

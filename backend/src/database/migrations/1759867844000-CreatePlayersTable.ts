@@ -16,7 +16,7 @@ export class CreatePlayersTable1759867844000 implements MigrationInterface {
           },
           {
             name: 'userId',
-            type: 'int',
+            type: 'uuid',
             isNullable: true, // Can be null for players not linked to users
           },
           {

@@ -255,7 +255,7 @@ const PlayerStatRadar: React.FC<PlayerStatRadarProps> = ({
         transition={{ duration: animated ? 0.5 : 0, delay: animated ? 0.7 : 0 }}
         className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
       >
-        <div className="bg-gray-900/90 backdrop-blur-sm rounded-full w-16 h-16 flex flex-col items-center justify-center border-2" style={{ borderColor: color }}>
+        <div className="bg-gray-900/90  rounded-full w-16 h-16 flex flex-col items-center justify-center border-2" style={{ borderColor: color }}>
           <span className="text-xl font-bold text-white">
             {Math.round(
               attributes.reduce((sum, attr) => sum + attr.value, 0) / attributes.length,

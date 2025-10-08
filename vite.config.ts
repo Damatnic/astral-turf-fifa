@@ -50,8 +50,8 @@ export default defineConfig(({ mode }) => {
       hookTimeout: 10000,
     },
     server: {
-      port: 8081,
-      strictPort: true,
+      port: 5173,
+      strictPort: false,
       host: true, // This allows external connections
       headers: {
         // Guardian Security Headers for Development

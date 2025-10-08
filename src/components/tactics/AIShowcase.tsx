@@ -162,7 +162,7 @@ const AIShowcase: React.FC<AIShowcaseProps> = ({ className }) => {
 
       {/* Feature Navigation */}
       <div className="flex justify-center mb-6">
-        <div className="flex space-x-1 bg-black/20 rounded-lg p-1">
+        <div className="flex space-x-1 bg-slate-650 rounded-lg p-1">
           {aiFeatures.map((feature, index) => (
             <button
               key={feature.id}
@@ -173,7 +173,7 @@ const AIShowcase: React.FC<AIShowcaseProps> = ({ className }) => {
               className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-all ${
                 index === activeFeature
                   ? `bg-${feature.color}-500 text-white shadow-lg`
-                  : 'text-gray-300 hover:text-white hover:bg-white/10'
+                  : 'text-gray-300 hover:text-white hover:bg-slate-800'
               }`}
             >
               <feature.icon className="w-4 h-4" />
@@ -205,7 +205,7 @@ const AIShowcase: React.FC<AIShowcaseProps> = ({ className }) => {
         {/* Demo Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {Object.entries(currentFeature.demoData).map(([key, value]) => (
-            <div key={key} className="bg-black/30 rounded-lg p-4 text-center backdrop-blur-sm">
+            <div key={key} className="bg-slate-700 rounded-lg p-4 text-center ">
               <div className="text-2xl font-bold text-white mb-1">
                 {typeof value === 'number'
                   ? key.includes('Probability') ||
@@ -266,7 +266,7 @@ const AIShowcase: React.FC<AIShowcaseProps> = ({ className }) => {
       </div>
 
       {/* AI Benefits Summary */}
-      <div className="mt-8 pt-6 border-t border-white/10">
+      <div className="mt-8 pt-6 border-t border-slate-700">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
           <div>
             <div className="text-2xl font-bold text-green-400">10x</div>
