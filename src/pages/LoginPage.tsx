@@ -114,47 +114,49 @@ const LoginPage: React.FC = () => {
     }
   };
 
-  const handleRoleBasedLogin = (role: UserRole) => {
+  const handleRoleBasedLogin = async (role: UserRole) => {
     setIsLoading(true);
     setErrors({});
 
-    // Demo accounts for each role
-    const demoAccounts = {
-      coach: { email: 'coach@astralfc.com', name: 'Coach Mike Anderson' },
-      player: { email: 'player1@astralfc.com', name: 'Player Alex Hunter' },
-      family: { email: 'linda.smith@astralfc.com', name: 'Family Linda Smith' },
-    };
-
-    const selectedAccount = demoAccounts[role];
-
-    setFormData({
-      email: selectedAccount.email,
-      password: 'password123',
-    });
-
-    // Auto-login after brief delay
-    setTimeout(async () => {
-      try {
-        const user = await authService.login(selectedAccount.email, 'password123');
-        dispatch({ type: 'LOGIN_SUCCESS', payload: user });
-
-        // Load family associations if user is family member
-        if (user.role === 'family') {
-          const associations = authService.getFamilyAssociations(user.id);
-          dispatch({ type: 'LOAD_FAMILY_ASSOCIATIONS', payload: associations });
-        }
-
-        const from = (location.state as any)?.from?.pathname || '/dashboard';
-        navigate(from);
-      } catch (err) {
-        const error = err instanceof Error ? err : new Error('Login failed');
-        const message = error.message;
-        setErrors({ general: message });
-        dispatch({ type: 'LOGIN_FAILURE', payload: message });
-      } finally {
-        setIsLoading(false);
+    try {
+      // Import demo data
+      const { initializeDemoAccount, getDemoUserForRole } = await import('../data/demoAccounts');
+      
+      console.log(`🎮 Initializing demo ${role} account...`);
+      
+      // Initialize demo account with full data
+      const demoState = initializeDemoAccount(role);
+      const demoUser = getDemoUserForRole(role);
+      
+      if (!demoUser) {
+        throw new Error('Demo user not found');
       }
-    }, 800);
+
+      // Login with demo user
+      dispatch({ type: 'LOGIN_SUCCESS', payload: demoUser });
+      
+      // Load the full demo state
+      dispatch({ type: 'LOAD_STATE', payload: demoState });
+
+      // Load family associations if user is family member
+      if (role === 'family') {
+        const { DEMO_FAMILY_ASSOCIATIONS } = await import('../data/demoAccounts');
+        dispatch({ type: 'LOAD_FAMILY_ASSOCIATIONS', payload: DEMO_FAMILY_ASSOCIATIONS });
+      }
+
+      console.log(`✅ Demo ${role} account loaded successfully`);
+
+      const from = (location.state as any)?.from?.pathname || '/dashboard';
+      navigate(from);
+    } catch (err) {
+      const error = err instanceof Error ? err : new Error('Demo login failed');
+      const message = error.message;
+      console.error('❌ Demo login error:', error);
+      setErrors({ general: message });
+      dispatch({ type: 'LOGIN_FAILURE', payload: message });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleAdminLogin = () => {
