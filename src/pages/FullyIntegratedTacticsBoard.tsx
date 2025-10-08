@@ -16,6 +16,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTacticsContext } from '../hooks';
 import { useFormationHistory, createHistorySnapshot } from '../hooks/useFormationHistory';
 import { TacticsErrorBoundary } from '../components/boundaries/TacticsErrorBoundary';
+import { SectionErrorBoundary } from '../components/boundaries/SectionErrorBoundary';
 import { EnhancedTacticsToolbar } from '../components/tactics/EnhancedTacticsToolbar';
 import { ProfessionalRosterSystem } from '../components/roster/ProfessionalRosterSystem';
 import { EnhancedFieldOverlays } from '../components/tactics/EnhancedFieldOverlays';
@@ -352,38 +353,42 @@ const FullyIntegratedTacticsBoard: React.FC = () => {
                 transition={{ duration: 0.3 }}
                 className="w-80 bg-slate-800 border-r border-slate-700 overflow-y-auto"
               >
-                <ProfessionalRosterSystem
-                  players={allPlayers}
-                  filters={filters}
-                  onFiltersChange={setFilters}
-                  onPlayerClick={handleRosterPlayerClick}
-                  onPlayerDragStart={handleDragStart}
-                  selectedPlayerId={selectedPlayer?.id}
-                />
+                <SectionErrorBoundary sectionName="Roster System">
+                  <ProfessionalRosterSystem
+                    players={allPlayers}
+                    filters={filters}
+                    onFiltersChange={setFilters}
+                    onPlayerClick={handleRosterPlayerClick}
+                    onPlayerDragStart={handleDragStart}
+                    selectedPlayerId={selectedPlayer?.id}
+                  />
+                </SectionErrorBoundary>
               </motion.div>
             )}
           </AnimatePresence>
 
           {/* Center - Field with Positioning System */}
           <div className="flex-1 relative bg-gradient-to-br from-slate-900 to-slate-800">
-            {/* Enhanced Field Overlays */}
-            {showOverlays && (
-              <EnhancedFieldOverlays
-                currentFormation={currentFormation}
-                players={allPlayers.filter(p => p.fieldPosition)}
-              />
-            )}
+            <SectionErrorBoundary sectionName="Field & Positioning">
+              {/* Enhanced Field Overlays */}
+              {showOverlays && (
+                <EnhancedFieldOverlays
+                  currentFormation={currentFormation}
+                  players={allPlayers.filter(p => p.fieldPosition || p.position)}
+                />
+              )}
 
-            {/* Positioning System */}
-            <PositioningSystem
-              players={allPlayers}
-              currentFormation={currentFormation}
-              onPlayerClick={handlePlayerClick}
-              onPlayerDragStart={handleDragStart}
-              onPlayerDragEnd={handleDragEnd}
-              isDragging={isDragging}
-              selectedPlayer={selectedPlayer}
-            />
+              {/* Positioning System */}
+              <PositioningSystem
+                players={allPlayers}
+                currentFormation={currentFormation}
+                onPlayerClick={handlePlayerClick}
+                onPlayerDragStart={handleDragStart}
+                onPlayerDragEnd={handleDragEnd}
+                isDragging={isDragging}
+                selectedPlayer={selectedPlayer}
+              />
+            </SectionErrorBoundary>
 
             {/* Fullscreen Toggle */}
             <button
