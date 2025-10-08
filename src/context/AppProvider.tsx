@@ -109,11 +109,29 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (savedStateJSON) {
         const savedState = JSON.parse(savedStateJSON);
         if (savedState.version === APP_VERSION) {
+          console.log('✅ Loading saved state from localStorage');
           dispatch({ type: 'LOAD_STATE', payload: savedState as RootState });
         } else {
-          // // // // console.warn(`Saved state version (${savedState.version}) does not match app version (${APP_VERSION}). Discarding saved state.`);
+          console.warn(`⚠️ Saved state version mismatch (${savedState.version} vs ${APP_VERSION}). Using initial state.`);
           localStorage.removeItem('astralTurfActiveState');
+          
+          // Save initial state to localStorage immediately
+          const initialStateToSave = cleanStateForSaving(INITIAL_STATE);
+          localStorage.setItem('astralTurfActiveState', JSON.stringify(initialStateToSave));
+          console.log('✅ Saved initial state to localStorage');
         }
+      } else {
+        // NO saved state found - this is a first visit or after cache clear
+        console.warn('⚠️ No saved state found in localStorage. Saving initial state with default players...');
+        
+        // Save the INITIAL_STATE (which has default players!) to localStorage immediately
+        const initialStateToSave = cleanStateForSaving(INITIAL_STATE);
+        localStorage.setItem('astralTurfActiveState', JSON.stringify(initialStateToSave));
+        
+        console.log('✅ Initial state saved to localStorage', {
+          players: INITIAL_STATE.tactics.players.length,
+          formations: Object.keys(INITIAL_STATE.tactics.formations).length,
+        });
       }
     } catch (_error) {
       loggingService.error('Failed to load state from localStorage', {

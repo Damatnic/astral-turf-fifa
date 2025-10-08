@@ -191,12 +191,14 @@
       const container = document.getElementById('context-status');
       
       try {
-        const appState = localStorage.getItem('appState');
+        // CORRECT KEY: astralTurfActiveState
+        const appState = localStorage.getItem('astralTurfActiveState');
         
         if (!appState) {
           container.innerHTML = `
             <span class="status error">NO STATE</span>
-            <p style="margin-top: 10px; color: #fca5a5;">App state not found in localStorage. This is why players aren't loading!</p>
+            <p style="margin-top: 10px; color: #fca5a5;">astralTurfActiveState not found in localStorage!</p>
+            <p style="margin-top: 5px; color: #fcd34d;">You need to log in to create initial state.</p>
           `;
           return;
         }
@@ -207,10 +209,12 @@
         
         container.innerHTML = `
           <div class="info-row"><span class="label">State Version:</span><span class="value">${state.version || 'Unknown'}</span></div>
-          <div class="info-row"><span class="label">Auth Status:</span><span class="value status ${state.auth?.isAuthenticated ? 'ok' : 'warning'}">${state.auth?.isAuthenticated ? 'LOGGED IN' : 'NOT LOGGED IN'}</span></div>
-          <div class="info-row"><span class="label">User:</span><span class="value">${state.auth?.user?.email || 'None'}</span></div>
           <div class="info-row"><span class="label">Players:</span><span class="value status ${playerCount > 0 ? 'ok' : 'error'}">${playerCount}</span></div>
           <div class="info-row"><span class="label">Formations:</span><span class="value">${formations}</span></div>
+          <details style="margin-top: 15px;">
+            <summary style="cursor: pointer; color: #60a5fa;">View Full State</summary>
+            <pre>${JSON.stringify(state, null, 2)}</pre>
+          </details>
         `;
       } catch (error) {
         container.innerHTML = `<span class="status error">PARSE ERROR: ${error.message}</span>`;
@@ -221,9 +225,14 @@
       const container = document.getElementById('player-data');
       
       try {
-        const appState = localStorage.getItem('appState');
+        // CORRECT KEY: astralTurfActiveState
+        const appState = localStorage.getItem('astralTurfActiveState');
         if (!appState) {
-          container.innerHTML = '<span class="status error">NO STATE</span>';
+          container.innerHTML = `
+            <span class="status error">NO STATE</span>
+            <p style="margin-top: 10px; color: #fca5a5;">You need to log in first to load player data!</p>
+            <button onclick="window.location.href='/#/login'" style="margin-top: 10px;">Go to Login</button>
+          `;
           return;
         }
         
@@ -233,8 +242,9 @@
         if (players.length === 0) {
           container.innerHTML = `
             <span class="status error">NO PLAYERS</span>
-            <p style="margin-top: 10px; color: #fca5a5;">This is the root cause! Players array is empty in localStorage.</p>
-            <p style="margin-top: 5px; color: #fcd34d;">Solution: Clear localStorage and reload to get default players.</p>
+            <p style="margin-top: 10px; color: #fca5a5;">Players array is empty in state!</p>
+            <p style="margin-top: 5px; color: #fcd34d;">This should have default players. State might be corrupt.</p>
+            <button onclick="clearEverything()" style="margin-top: 10px;">Clear & Reload</button>
           `;
           return;
         }
