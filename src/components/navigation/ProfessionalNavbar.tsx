@@ -115,14 +115,20 @@ export const ProfessionalNavbar: React.FC = () => {
                     item={item}
                     isActive={location.pathname === item.path}
                     onClick={() => {
+                      console.log('🔍 Nav Click:', item.label, 'Path:', item.path);
+                      
                       if (item.path) {
+                        console.log('✅ Navigating to:', item.path);
                         navigate(item.path);
                       } else if (item.children && item.children.length > 0) {
                         // Navigate to first child if parent has no path
                         const firstChild = item.children[0];
+                        console.log('📁 Parent has children, navigating to first:', firstChild.path);
                         if (firstChild.path) {
                           navigate(firstChild.path);
                         }
+                      } else {
+                        console.warn('⚠️ No path or children for:', item.label);
                       }
                     }}
                   />
@@ -402,10 +408,17 @@ const NavButton: React.FC<{ item: any; isActive: boolean; onClick: () => void }>
                 {item.children.map((child: any) => (
                   <button
                     key={child.id}
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      console.log('🔍 Child Nav Click:', child.label, 'Path:', child.path);
+                      
                       if (child.path) {
+                        console.log('✅ Navigating to child:', child.path);
                         navigate(child.path);
                         setShowDropdown(false);
+                      } else {
+                        console.warn('⚠️ Child has no path:', child.label);
                       }
                     }}
                     className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-800 transition-colors text-left text-gray-300 hover:text-white"

@@ -104,9 +104,24 @@ const FullyIntegratedTacticsBoard: React.FC = () => {
   
   const allPlayers = useMemo(() => {
     try {
-      return Array.isArray(tacticsState?.players) ? tacticsState.players : [];
+      const players = Array.isArray(tacticsState?.players) ? tacticsState.players : [];
+      
+      // DEBUG: Log player data
+      console.log('🎯 Tactics Board - Player Data:', {
+        playersFound: players.length,
+        players: players.map(p => ({ id: p.id, name: p.name, position: p.fieldPosition })),
+        tacticsStateExists: !!tacticsState,
+        fullTacticsState: tacticsState,
+      });
+      
+      // If no players, something is wrong with state loading
+      if (players.length === 0) {
+        console.error('❌ NO PLAYERS FOUND! TacticsState:', tacticsState);
+      }
+      
+      return players;
     } catch (error) {
-      console.error('Error getting players:', error);
+      console.error('❌ Error getting players:', error);
       return [];
     }
   }, [tacticsState]);
