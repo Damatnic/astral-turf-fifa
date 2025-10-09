@@ -164,6 +164,9 @@ export const authService = {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('familyAssociations');
+      // Clear app state on logout to prevent data leakage between accounts
+      localStorage.removeItem('astralTurfActiveState');
+      localStorage.removeItem('astral-turf-player-profiles');
     }
   },
 
