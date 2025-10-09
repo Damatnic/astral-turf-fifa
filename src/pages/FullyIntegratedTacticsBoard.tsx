@@ -110,14 +110,33 @@ const FullyIntegratedTacticsBoard: React.FC = () => {
       // DEBUG: Log player data
       console.log('🎯 Tactics Board - Player Data:', {
         playersFound: players.length,
-        players: players.map(p => ({ id: p.id, name: p.name, position: p.fieldPosition })),
+        players: players.map(p => ({ id: p.id, name: p.name, position: p.fieldPosition || p.position })),
         tacticsStateExists: !!tacticsState,
-        fullTacticsState: tacticsState,
+        localStorageState: localStorage.getItem('astralTurfActiveState') ? 'EXISTS' : 'MISSING',
       });
       
-      // If no players, something is wrong with state loading
+      // If no players, try to reload from localStorage
       if (players.length === 0) {
-        console.error('❌ NO PLAYERS FOUND! TacticsState:', tacticsState);
+        console.error('❌ NO PLAYERS FOUND! Attempting to reload state...');
+        
+        // Try to reload state from localStorage
+        const savedState = localStorage.getItem('astralTurfActiveState');
+        if (savedState) {
+          try {
+            const parsedState = JSON.parse(savedState);
+            if (parsedState.tactics?.players?.length > 0) {
+              console.log('🔄 Reloading players from localStorage:', parsedState.tactics.players.length);
+              dispatch({ type: 'LOAD_STATE', payload: parsedState });
+              return parsedState.tactics.players;
+            }
+          } catch (parseError) {
+            console.error('❌ Failed to parse saved state:', parseError);
+          }
+        }
+        
+        // If still no players, return empty array and let error boundary handle it
+        console.error('❌ Still no players after reload attempt');
+        return [];
       }
       
       return players;
@@ -125,7 +144,7 @@ const FullyIntegratedTacticsBoard: React.FC = () => {
       console.error('❌ Error getting players:', error);
       return [];
     }
-  }, [tacticsState]);
+  }, [tacticsState, dispatch]);
 
   // Formation History System (Undo/Redo)
   const historySystem = useFormationHistory(
@@ -354,14 +373,27 @@ const FullyIntegratedTacticsBoard: React.FC = () => {
                 className="w-80 bg-slate-800 border-r border-slate-700 overflow-y-auto"
               >
                 <SectionErrorBoundary sectionName="Roster System">
-                  <ProfessionalRosterSystem
-                    players={allPlayers}
-                    filters={filters}
-                    onFiltersChange={setFilters}
-                    onPlayerClick={handleRosterPlayerClick}
-                    onPlayerDragStart={handleDragStart}
-                    selectedPlayerId={selectedPlayer?.id}
-                  />
+                  {allPlayers.length > 0 ? (
+                    <ProfessionalRosterSystem
+                      players={allPlayers}
+                      filters={filters}
+                      onFiltersChange={setFilters}
+                      onPlayerClick={handleRosterPlayerClick}
+                      onPlayerDragStart={handleDragStart}
+                      selectedPlayerId={selectedPlayer?.id}
+                    />
+                  ) : (
+                    <div className="p-6 text-center text-gray-400">
+                      <div className="text-lg mb-2">No Players Available</div>
+                      <div className="text-sm mb-4">Players are loading or there was an error loading the roster.</div>
+                      <button 
+                        onClick={() => window.location.reload()} 
+                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                      >
+                        Reload Page
+                      </button>
+                    </div>
+                  )}
                 </SectionErrorBoundary>
               </motion.div>
             )}
@@ -370,24 +402,42 @@ const FullyIntegratedTacticsBoard: React.FC = () => {
           {/* Center - Field with Positioning System */}
           <div className="flex-1 relative bg-gradient-to-br from-slate-900 to-slate-800">
             <SectionErrorBoundary sectionName="Field & Positioning">
-              {/* Enhanced Field Overlays */}
-              {showOverlays && (
-                <EnhancedFieldOverlays
-                  currentFormation={currentFormation}
-                  players={allPlayers.filter(p => p.fieldPosition || p.position)}
-                />
-              )}
+              {allPlayers.length > 0 ? (
+                <>
+                  {/* Enhanced Field Overlays */}
+                  {showOverlays && (
+                    <EnhancedFieldOverlays
+                      currentFormation={currentFormation}
+                      players={allPlayers.filter(p => p.fieldPosition || p.position)}
+                    />
+                  )}
 
-              {/* Positioning System */}
-              <PositioningSystem
-                players={allPlayers}
-                currentFormation={currentFormation}
-                onPlayerClick={handlePlayerClick}
-                onPlayerDragStart={handleDragStart}
-                onPlayerDragEnd={handleDragEnd}
-                isDragging={isDragging}
-                selectedPlayer={selectedPlayer}
-              />
+                  {/* Positioning System */}
+                  <PositioningSystem
+                    players={allPlayers}
+                    currentFormation={currentFormation}
+                    onPlayerClick={handlePlayerClick}
+                    onPlayerDragStart={handleDragStart}
+                    onPlayerDragEnd={handleDragEnd}
+                    isDragging={isDragging}
+                    selectedPlayer={selectedPlayer}
+                  />
+                </>
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center text-white">
+                  <div className="text-center">
+                    <div className="text-6xl mb-4">⚽</div>
+                    <div className="text-xl mb-2">No Players on Field</div>
+                    <div className="text-gray-400 mb-4">Players are loading or there was an error loading the roster.</div>
+                    <button 
+                      onClick={() => window.location.reload()} 
+                      className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                    >
+                      Reload Page
+                    </button>
+                  </div>
+                </div>
+              )}
             </SectionErrorBoundary>
 
             {/* Fullscreen Toggle */}
