@@ -21,7 +21,7 @@ if ('serviceWorker' in navigator) {
       // STEP 2: Clear ALL old caches before registering new SW
       if ('caches' in window) {
         const cacheNames = await caches.keys();
-        const oldCaches = cacheNames.filter(name => !name.includes('v3'));
+        const oldCaches = cacheNames.filter(name => !name.includes('v4'));
         if (oldCaches.length > 0) {
           console.log(`🗑️ Deleting ${oldCaches.length} old cache(s)...`);
           for (const cacheName of oldCaches) {
@@ -68,7 +68,7 @@ if ('serviceWorker' in navigator) {
               // Clear any remaining old caches
               if ('caches' in window) {
                 caches.keys().then(names => {
-                  const oldCaches = names.filter(name => !name.includes('v3'));
+                  const oldCaches = names.filter(name => !name.includes('v4'));
                   if (oldCaches.length > 0) {
                     console.log('🗑️ Clearing remaining old caches...');
                     return Promise.all(oldCaches.map(name => caches.delete(name)));

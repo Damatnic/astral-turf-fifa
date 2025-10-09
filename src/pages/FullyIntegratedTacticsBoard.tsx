@@ -29,6 +29,7 @@ import { PlayerStatsPopover } from '../components/tactics/PlayerStatsPopover';
 import { KeyboardShortcutsGuide } from '../components/help/KeyboardShortcutsGuide';
 import { analyzeFormation } from '../utils/formationAnalyzer';
 import { PROFESSIONAL_FORMATIONS } from '../data/professionalFormations';
+import { INITIAL_STATE } from '../constants';
 import type { Player } from '../types';
 import type { RosterFilters } from '../types/roster';
 import type { ProfessionalFormation } from '../data/professionalFormations';
@@ -113,19 +114,20 @@ const FullyIntegratedTacticsBoard: React.FC = () => {
         players: players.map(p => ({ id: p.id, name: p.name, position: p.fieldPosition || p.position })),
         tacticsStateExists: !!tacticsState,
         localStorageState: localStorage.getItem('astralTurfActiveState') ? 'EXISTS' : 'MISSING',
+        fullTacticsState: tacticsState,
       });
       
-      // If no players, try to reload from localStorage
+      // If no players, try multiple fallback strategies
       if (players.length === 0) {
-        console.error('❌ NO PLAYERS FOUND! Attempting to reload state...');
+        console.error('❌ NO PLAYERS FOUND! Attempting multiple fallback strategies...');
         
-        // Try to reload state from localStorage
+        // Strategy 1: Try to reload from localStorage
         const savedState = localStorage.getItem('astralTurfActiveState');
         if (savedState) {
           try {
             const parsedState = JSON.parse(savedState);
             if (parsedState.tactics?.players?.length > 0) {
-              console.log('🔄 Reloading players from localStorage:', parsedState.tactics.players.length);
+              console.log('🔄 Strategy 1: Reloading players from localStorage:', parsedState.tactics.players.length);
               dispatch({ type: 'LOAD_STATE', payload: parsedState });
               return parsedState.tactics.players;
             }
@@ -134,9 +136,46 @@ const FullyIntegratedTacticsBoard: React.FC = () => {
           }
         }
         
-        // If still no players, return empty array and let error boundary handle it
-        console.error('❌ Still no players after reload attempt');
-        return [];
+        // Strategy 2: Try to get default players from constants
+        try {
+          const { defaultPlayers } = require('../constants');
+          if (defaultPlayers && defaultPlayers.length > 0) {
+            console.log('🔄 Strategy 2: Loading default players from constants:', defaultPlayers.length);
+            // Update the state with default players
+            dispatch({ 
+              type: 'LOAD_STATE', 
+              payload: { 
+                ...INITIAL_STATE,
+                tactics: { ...INITIAL_STATE.tactics, players: defaultPlayers }
+              }
+            });
+            return defaultPlayers;
+          }
+        } catch (requireError) {
+          console.error('❌ Failed to load default players:', requireError);
+        }
+        
+        // Strategy 3: Create minimal fallback players
+        console.log('🔄 Strategy 3: Creating fallback players...');
+        const fallbackPlayers = [
+          { id: 'p1', name: 'Goalkeeper', position: { x: 50, y: 10 }, fieldPosition: { x: 50, y: 10 } },
+          { id: 'p2', name: 'Defender 1', position: { x: 30, y: 30 }, fieldPosition: { x: 30, y: 30 } },
+          { id: 'p3', name: 'Defender 2', position: { x: 70, y: 30 }, fieldPosition: { x: 70, y: 30 } },
+          { id: 'p4', name: 'Midfielder 1', position: { x: 25, y: 50 }, fieldPosition: { x: 25, y: 50 } },
+          { id: 'p5', name: 'Midfielder 2', position: { x: 75, y: 50 }, fieldPosition: { x: 75, y: 50 } },
+          { id: 'p6', name: 'Forward 1', position: { x: 40, y: 70 }, fieldPosition: { x: 40, y: 70 } },
+          { id: 'p7', name: 'Forward 2', position: { x: 60, y: 70 }, fieldPosition: { x: 60, y: 70 } },
+        ];
+        
+        dispatch({ 
+          type: 'LOAD_STATE', 
+          payload: { 
+            ...INITIAL_STATE,
+            tactics: { ...INITIAL_STATE.tactics, players: fallbackPlayers }
+          }
+        });
+        
+        return fallbackPlayers;
       }
       
       return players;
