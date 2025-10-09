@@ -67,13 +67,7 @@ const CACHE_CONFIG = {
 // Mobile-optimized resources to cache immediately
 const STATIC_RESOURCES = [
   '/',
-  '/index.html',
-  '/manifest.json',
-  '/favicon.svg',
-  '/favicon.png',
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png',
-  '/offline.html',
+  '/manifest.json'
 ];
 
 // Critical mobile assets for immediate caching
@@ -203,7 +197,7 @@ function getCacheStrategy(request) {
 
 // Install event - cache static resources
 self.addEventListener('install', event => {
-  console.log('[SW] Installing enhanced service worker v3 - FORCE UPDATE');
+  console.log('[SW] Installing enhanced service worker v4 - FORCE UPDATE');
   
   // FORCE skip waiting immediately on install
   self.skipWaiting();
@@ -213,10 +207,18 @@ self.addEventListener('install', event => {
       .open(STATIC_CACHE)
       .then(cache => {
         console.log('[SW] Pre-caching static assets');
-        return cache.addAll(STATIC_RESOURCES);
+        // Cache each resource individually to avoid failing the entire install
+        return Promise.allSettled(
+          STATIC_RESOURCES.map(url => 
+            cache.add(url).catch(err => {
+              console.warn(`[SW] Failed to cache ${url}:`, err);
+              return null; // Don't fail the entire operation
+            })
+          )
+        );
       })
       .then(() => {
-        console.log('[SW] Static assets pre-cached');
+        console.log('[SW] Static assets pre-caching completed');
       })
       .catch(error => {
         console.error('[SW] Pre-caching failed:', error);

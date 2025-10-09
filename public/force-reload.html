@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Force Reload - Astral Turf</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e293b, #334155);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 500px;
+            text-align: center;
+            border: 1px solid rgba(71, 85, 105, 0.3);
+        }
+        h1 { color: #fbbf24; margin-bottom: 20px; }
+        button {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        button:hover { transform: translateY(-2px); }
+        .status { margin: 20px 0; padding: 15px; border-radius: 8px; background: rgba(59, 130, 246, 0.2); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Force Reload</h1>
+        <p>This will force reload the app with fresh code, bypassing all caches.</p>
+        
+        <div id="status" class="status" style="display: none;"></div>
+        
+        <button onclick="forceReload()">🚀 Force Reload App</button>
+        <button onclick="goToTactics()">⚽ Go to Tactics</button>
+    </div>
+
+    <script>
+        function showStatus(message) {
+            const status = document.getElementById('status');
+            status.style.display = 'block';
+            status.innerHTML = message;
+        }
+
+        async function forceReload() {
+            showStatus('Clearing caches and reloading...');
+            
+            try {
+                // Clear service worker caches
+                const cacheNames = await caches.keys();
+                await Promise.all(cacheNames.map(name => caches.delete(name)));
+                
+                // Clear localStorage
+                localStorage.clear();
+                
+                showStatus('✅ Caches cleared! Reloading...');
+                
+                // Force reload with cache bypass
+                setTimeout(() => {
+                    window.location.href = '/?t=' + Date.now();
+                }, 1000);
+                
+            } catch (error) {
+                showStatus('❌ Error: ' + error.message);
+            }
+        }
+
+        function goToTactics() {
+            window.location.href = '/#/tactics?t=' + Date.now();
+        }
+    </script>
+</body>
+</html>
