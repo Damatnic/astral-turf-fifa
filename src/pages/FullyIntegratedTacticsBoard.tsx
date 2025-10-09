@@ -29,7 +29,7 @@ import { PlayerStatsPopover } from '../components/tactics/PlayerStatsPopover';
 import { KeyboardShortcutsGuide } from '../components/help/KeyboardShortcutsGuide';
 import { analyzeFormation } from '../utils/formationAnalyzer';
 import { PROFESSIONAL_FORMATIONS } from '../data/professionalFormations';
-import { INITIAL_STATE } from '../constants';
+import { INITIAL_STATE, defaultPlayers } from '../constants';
 import type { Player } from '../types';
 import type { RosterFilters } from '../types/roster';
 import type { ProfessionalFormation } from '../data/professionalFormations';
@@ -136,23 +136,18 @@ const FullyIntegratedTacticsBoard: React.FC = () => {
           }
         }
         
-        // Strategy 2: Try to get default players from constants
-        try {
-          const { defaultPlayers } = require('../constants');
-          if (defaultPlayers && defaultPlayers.length > 0) {
-            console.log('🔄 Strategy 2: Loading default players from constants:', defaultPlayers.length);
-            // Update the state with default players
-            dispatch({ 
-              type: 'LOAD_STATE', 
-              payload: { 
-                ...INITIAL_STATE,
-                tactics: { ...INITIAL_STATE.tactics, players: defaultPlayers }
-              }
-            });
-            return defaultPlayers;
-          }
-        } catch (requireError) {
-          console.error('❌ Failed to load default players:', requireError);
+        // Strategy 2: Load default players from constants
+        if (defaultPlayers && defaultPlayers.length > 0) {
+          console.log('🔄 Strategy 2: Loading default players from constants:', defaultPlayers.length);
+          // Update the state with default players
+          dispatch({ 
+            type: 'LOAD_STATE', 
+            payload: { 
+              ...INITIAL_STATE,
+              tactics: { ...INITIAL_STATE.tactics, players: defaultPlayers }
+            }
+          });
+          return defaultPlayers;
         }
         
         // Strategy 3: Create minimal fallback players

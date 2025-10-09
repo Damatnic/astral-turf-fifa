@@ -42,7 +42,7 @@ export const DEMO_COACH_STATE = {
   tactics: {
     ...INITIAL_STATE.tactics,
     // Ensure all 15 players have field positions for demo
-    players: INITIAL_STATE.tactics.players.map((player, index) => ({
+    players: INITIAL_STATE.tactics.players.map((player) => ({
       ...player,
       fieldPosition: player.position, // Use position as fieldPosition
     })),
@@ -331,10 +331,7 @@ export function initializeDemoAccount(role: 'coach' | 'player' | 'family') {
     localStorage.setItem('astral-turf-player-profiles', JSON.stringify(Array.from(profiles.entries())));
   }
   
-  console.log(`✅ Demo ${role} account initialized`, {
-    user: demoState.auth.user?.email,
-    players: demoState.tactics.players.length,
-  });
+  // Demo account initialized successfully
   
   return demoState;
 }

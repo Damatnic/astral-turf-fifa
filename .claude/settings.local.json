@@ -40,7 +40,8 @@
       "Bash(npm install:*)",
       "Bash(npm test:*)",
       "Bash(npx husky init:*)",
-      "Bash(npx playwright:*)"
+      "Bash(npx playwright:*)",
+      "Read(//c/Users/damat/OneDrive/Documents/Pictures/Screenshots 1/**)"
     ],
     "deny": [],
     "ask": []

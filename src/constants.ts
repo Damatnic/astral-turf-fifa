@@ -911,7 +911,7 @@ export const DEMO_USERS: User[] = [
   },
 ];
 
-const defaultPlayers: Player[] = [
+export const defaultPlayers: Player[] = [
   // HOME TEAM
   {
     id: 'p1',

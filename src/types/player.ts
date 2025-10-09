@@ -196,6 +196,7 @@ export interface Player {
   teamColor: string;
   attributes: PlayerAttributes;
   position: { x: number; y: number };
+  fieldPosition?: { x: number; y: number };
   availability: PlayerAvailability;
   morale: PlayerMorale;
   form: PlayerForm;

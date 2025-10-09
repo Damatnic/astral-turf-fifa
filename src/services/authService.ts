@@ -109,44 +109,36 @@ export interface SignupData {
 
 export const authService = {
   login: async (email: string, password: string): Promise<User> => {
-    try {
-      const context = getLoginContext();
-      const response: SecureLoginResponse = await secureAuthService.login(email, password, context);
+    const context = getLoginContext();
+    const response: SecureLoginResponse = await secureAuthService.login(email, password, context);
 
-      // Store tokens securely
-      localStorage.setItem('accessToken', response.tokens.accessToken);
-      localStorage.setItem('refreshToken', response.tokens.refreshToken);
-      localStorage.setItem('authUser', JSON.stringify(response.user));
+    // Store tokens securely
+    localStorage.setItem('accessToken', response.tokens.accessToken);
+    localStorage.setItem('refreshToken', response.tokens.refreshToken);
+    localStorage.setItem('authUser', JSON.stringify(response.user));
 
-      return response.user;
-    } catch (_error) {
-      throw _error;
-    }
+    return response.user;
   },
 
   signup: async (signupData: SignupData): Promise<User> => {
-    try {
-      const context = getLoginContext();
-      const secureSignupData: SecureSignupData = {
-        ...signupData,
-        acceptedTerms: signupData.acceptedTerms || false,
-        acceptedPrivacyPolicy: signupData.acceptedPrivacyPolicy || false,
-      };
+    const context = getLoginContext();
+    const secureSignupData: SecureSignupData = {
+      ...signupData,
+      acceptedTerms: signupData.acceptedTerms || false,
+      acceptedPrivacyPolicy: signupData.acceptedPrivacyPolicy || false,
+    };
 
-      const response: SecureLoginResponse = await secureAuthService.signup(
-        secureSignupData,
-        context,
-      );
+    const response: SecureLoginResponse = await secureAuthService.signup(
+      secureSignupData,
+      context,
+    );
 
-      // Store tokens securely
-      localStorage.setItem('accessToken', response.tokens.accessToken);
-      localStorage.setItem('refreshToken', response.tokens.refreshToken);
-      localStorage.setItem('authUser', JSON.stringify(response.user));
+    // Store tokens securely
+    localStorage.setItem('accessToken', response.tokens.accessToken);
+    localStorage.setItem('refreshToken', response.tokens.refreshToken);
+    localStorage.setItem('authUser', JSON.stringify(response.user));
 
-      return response.user;
-    } catch (_error) {
-      throw _error;
-    }
+    return response.user;
   },
 
   logout: async (): Promise<void> => {
@@ -156,8 +148,8 @@ export const authService = {
         const context = getLoginContext();
         await secureAuthService.logout(token, context);
       }
-    } catch (_error) {
-      // // // // console.warn('Logout error:', error);
+    } catch {
+      // Ignore logout errors
     } finally {
       // Always clear local storage
       localStorage.removeItem('authUser');
