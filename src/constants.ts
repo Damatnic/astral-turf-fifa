@@ -589,7 +589,7 @@ const demoPlayer1: Player = {
     positioning: 84,
     stamina: 88,
   },
-  position: { x: 0, y: 0 },
+    position: { x: 55, y: 20 }, // Right Midfield
   availability: { status: 'Available' },
   morale: 'Excellent',
   form: 'Good',
@@ -641,7 +641,7 @@ const demoPlayer2: Player = {
     positioning: 87,
     stamina: 94,
   },
-  position: { x: 0, y: 0 },
+    position: { x: 45, y: 50 }, // Center Midfield
   availability: { status: 'Available' },
   morale: 'Good',
   form: 'Average',
@@ -693,7 +693,7 @@ const demoPlayer3: Player = {
     positioning: 86,
     stamina: 85,
   },
-  position: { x: 0, y: 0 },
+    position: { x: 35, y: 50 }, // Defensive Midfield
   availability: { status: 'Available' },
   morale: 'Good',
   form: 'Excellent',
@@ -745,7 +745,7 @@ const demoPlayer4: Player = {
     positioning: 85,
     stamina: 87,
   },
-  position: { x: 0, y: 0 },
+    position: { x: 25, y: 60 }, // Center Back
   availability: { status: 'Available' },
   morale: 'Okay',
   form: 'Good',
@@ -1307,7 +1307,7 @@ export const defaultPlayers: Player[] = [
       positioning: 84,
       stamina: 89,
     },
-    position: { x: -100, y: -100 },
+    position: { x: 65, y: 50 }, // Center Midfield
     availability: { status: 'Available' },
     morale: 'Good',
     form: 'Average',
@@ -1359,7 +1359,7 @@ export const defaultPlayers: Player[] = [
       positioning: 83,
       stamina: 85,
     },
-    position: { x: -100, y: -100 },
+    position: { x: 75, y: 30 }, // Attacking Midfield
     availability: { status: 'Available' },
     morale: 'Good',
     form: 'Good',
@@ -1411,7 +1411,7 @@ export const defaultPlayers: Player[] = [
       positioning: 80,
       stamina: 90,
     },
-    position: { x: -100, y: -100 },
+    position: { x: 70, y: 15 }, // Left Back
     availability: { status: 'Suspended', returnDate: '2024-08-20' },
     morale: 'Poor',
     form: 'Average',
@@ -1463,7 +1463,7 @@ export const defaultPlayers: Player[] = [
       positioning: 91,
       stamina: 88,
     },
-    position: { x: -100, y: -100 },
+    position: { x: 92, y: 50 }, // Center Forward
     availability: { status: 'Available' },
     morale: 'Excellent',
     form: 'Excellent',
