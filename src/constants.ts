@@ -589,7 +589,7 @@ const demoPlayer1: Player = {
     positioning: 84,
     stamina: 88,
   },
-    position: { x: 55, y: 20 }, // Right Midfield
+    position: { x: 50, y: 80 }, // Right Midfield
   availability: { status: 'Available' },
   morale: 'Excellent',
   form: 'Good',
@@ -641,7 +641,7 @@ const demoPlayer2: Player = {
     positioning: 87,
     stamina: 94,
   },
-    position: { x: 45, y: 50 }, // Center Midfield
+    position: { x: 45, y: 65 }, // Center Midfield
   availability: { status: 'Available' },
   morale: 'Good',
   form: 'Average',
@@ -693,7 +693,7 @@ const demoPlayer3: Player = {
     positioning: 86,
     stamina: 85,
   },
-    position: { x: 35, y: 50 }, // Defensive Midfield
+    position: { x: 45, y: 35 }, // Defensive Midfield
   availability: { status: 'Available' },
   morale: 'Good',
   form: 'Excellent',
@@ -987,7 +987,7 @@ export const defaultPlayers: Player[] = [
       positioning: 85,
       stamina: 92,
     },
-    position: { x: 30, y: 15 },
+    position: { x: 25, y: 25 }, // Right Back
     availability: { status: 'Available' },
     morale: 'Good',
     form: 'Average',
@@ -1039,7 +1039,7 @@ export const defaultPlayers: Player[] = [
       positioning: 86,
       stamina: 95,
     },
-    position: { x: 30, y: 85 },
+    position: { x: 25, y: 75 }, // Left Back
     availability: { status: 'Available' },
     morale: 'Good',
     form: 'Excellent',
@@ -1097,7 +1097,7 @@ export const defaultPlayers: Player[] = [
       positioning: 90,
       stamina: 89,
     },
-    position: { x: 80, y: 40 },
+    position: { x: 85, y: 35 }, // Right Forward
     availability: { status: 'Available' },
     morale: 'Good',
     form: 'Excellent',
@@ -1149,7 +1149,7 @@ export const defaultPlayers: Player[] = [
       positioning: 88,
       stamina: 91,
     },
-    position: { x: 55, y: 80 },
+    position: { x: 50, y: 20 }, // Left Midfield
     availability: { status: 'Available' },
     morale: 'Okay',
     form: 'Average',
@@ -1201,7 +1201,7 @@ export const defaultPlayers: Player[] = [
       positioning: 90,
       stamina: 87,
     },
-    position: { x: 80, y: 60 },
+    position: { x: 85, y: 65 }, // Left Forward
     availability: { status: 'Available' },
     morale: 'Good',
     form: 'Good',
@@ -1253,7 +1253,7 @@ export const defaultPlayers: Player[] = [
       positioning: 86,
       stamina: 86,
     },
-    position: { x: 25, y: 40 },
+    position: { x: 25, y: 40 }, // Left Center Back
     availability: { status: 'Available' },
     morale: 'Good',
     form: 'Average',
@@ -1307,7 +1307,7 @@ export const defaultPlayers: Player[] = [
       positioning: 84,
       stamina: 89,
     },
-    position: { x: 65, y: 50 }, // Center Midfield
+    position: { x: 55, y: 50 }, // Away Center Midfield
     availability: { status: 'Available' },
     morale: 'Good',
     form: 'Average',
@@ -1359,7 +1359,7 @@ export const defaultPlayers: Player[] = [
       positioning: 83,
       stamina: 85,
     },
-    position: { x: 75, y: 30 }, // Attacking Midfield
+    position: { x: 55, y: 20 }, // Away Attacking Midfield
     availability: { status: 'Available' },
     morale: 'Good',
     form: 'Good',
@@ -1411,7 +1411,7 @@ export const defaultPlayers: Player[] = [
       positioning: 80,
       stamina: 90,
     },
-    position: { x: 70, y: 15 }, // Left Back
+    position: { x: 75, y: 25 }, // Away Left Back
     availability: { status: 'Suspended', returnDate: '2024-08-20' },
     morale: 'Poor',
     form: 'Average',
@@ -1463,7 +1463,7 @@ export const defaultPlayers: Player[] = [
       positioning: 91,
       stamina: 88,
     },
-    position: { x: 92, y: 50 }, // Center Forward
+    position: { x: 75, y: 50 }, // Away Center Forward
     availability: { status: 'Available' },
     morale: 'Excellent',
     form: 'Excellent',

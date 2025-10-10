@@ -17,77 +17,105 @@ import { calculateChemistryScore } from '../../services/chemistryService';
 
 const SoccerFieldBackground: React.FC = () => (
   <div className="absolute inset-0 pitch-stripes">
-    <svg width="100%" height="100%" viewBox="0 0 1050 680" className="absolute top-0 left-0">
-      {/* Field Markings */}
+    <svg width="100%" height="100%" viewBox="0 0 1000 667" className="absolute top-0 left-0">
+      {/* Field Markings - Properly proportioned for standard soccer field */}
+      
+      {/* Outer boundary */}
       <rect
-        x="1"
-        y="1"
-        width="1048"
-        height="678"
+        x="10"
+        y="10"
+        width="980"
+        height="647"
         fill="none"
-        stroke="rgba(255, 255, 255, 0.2)"
+        stroke="rgba(255, 255, 255, 0.25)"
         strokeWidth="2"
       />
-      <line x1="525" y1="1" x2="525" y2="679" stroke="rgba(255, 255, 255, 0.2)" strokeWidth="2" />
+      
+      {/* Center line */}
+      <line x1="500" y1="10" x2="500" y2="657" stroke="rgba(255, 255, 255, 0.25)" strokeWidth="2" />
+      
+      {/* Center circle */}
       <circle
-        cx="525"
-        cy="340"
-        r="91.5"
-        stroke="rgba(255, 255, 255, 0.2)"
+        cx="500"
+        cy="333.5"
+        r="75"
+        stroke="rgba(255, 255, 255, 0.25)"
         strokeWidth="2"
         fill="none"
       />
-      <circle cx="525" cy="340" r="3" fill="rgba(255, 255, 255, 0.2)" />
+      <circle cx="500" cy="333.5" r="2" fill="rgba(255, 255, 255, 0.25)" />
+      
+      {/* Left penalty area */}
       <rect
-        x="1"
-        y="130.5"
-        width="165"
-        height="419"
-        stroke="rgba(255, 255, 255, 0.2)"
+        x="10"
+        y="200"
+        width="120"
+        height="267"
+        stroke="rgba(255, 255, 255, 0.25)"
         strokeWidth="2"
         fill="none"
       />
+      
+      {/* Left goal area */}
       <rect
-        x="1"
-        y="248.5"
-        width="55"
-        height="183"
-        stroke="rgba(255, 255, 255, 0.2)"
+        x="10"
+        y="275"
+        width="40"
+        height="117"
+        stroke="rgba(255, 255, 255, 0.25)"
         strokeWidth="2"
         fill="none"
       />
-      <circle cx="110" cy="340" r="3" fill="rgba(255, 255, 255, 0.2)" />
+      
+      {/* Left penalty spot */}
+      <circle cx="140" cy="333.5" r="2" fill="rgba(255, 255, 255, 0.25)" />
+      
+      {/* Left penalty arc */}
       <path
-        d="M 165 248.5 A 91.5 91.5 0 0 1 165 431.5"
-        stroke="rgba(255, 255, 255, 0.2)"
+        d="M 130 275 A 75 75 0 0 1 130 392"
+        stroke="rgba(255, 255, 255, 0.25)"
         strokeWidth="2"
         fill="none"
       />
+      
+      {/* Right penalty area */}
       <rect
-        x="884"
-        y="130.5"
-        width="165"
-        height="419"
-        stroke="rgba(255, 255, 255, 0.2)"
+        x="870"
+        y="200"
+        width="120"
+        height="267"
+        stroke="rgba(255, 255, 255, 0.25)"
         strokeWidth="2"
         fill="none"
       />
+      
+      {/* Right goal area */}
       <rect
-        x="994"
-        y="248.5"
-        width="55"
-        height="183"
-        stroke="rgba(255, 255, 255, 0.2)"
+        x="950"
+        y="275"
+        width="40"
+        height="117"
+        stroke="rgba(255, 255, 255, 0.25)"
         strokeWidth="2"
         fill="none"
       />
-      <circle cx="940" cy="340" r="3" fill="rgba(255, 255, 255, 0.2)" />
+      
+      {/* Right penalty spot */}
+      <circle cx="860" cy="333.5" r="2" fill="rgba(255, 255, 255, 0.25)" />
+      
+      {/* Right penalty arc */}
       <path
-        d="M 884 248.5 A 91.5 91.5 0 0 0 884 431.5"
-        stroke="rgba(255, 255, 255, 0.2)"
+        d="M 870 275 A 75 75 0 0 0 870 392"
+        stroke="rgba(255, 255, 255, 0.25)"
         strokeWidth="2"
         fill="none"
       />
+      
+      {/* Corner arcs */}
+      <path d="M 10 10 A 10 10 0 0 1 20 10" stroke="rgba(255, 255, 255, 0.25)" strokeWidth="2" fill="none" />
+      <path d="M 980 10 A 10 10 0 0 1 990 10" stroke="rgba(255, 255, 255, 0.25)" strokeWidth="2" fill="none" />
+      <path d="M 10 657 A 10 10 0 0 1 20 657" stroke="rgba(255, 255, 255, 0.25)" strokeWidth="2" fill="none" />
+      <path d="M 980 657 A 10 10 0 0 1 990 657" stroke="rgba(255, 255, 255, 0.25)" strokeWidth="2" fill="none" />
     </svg>
   </div>
 );
