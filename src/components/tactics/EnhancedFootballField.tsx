@@ -14,8 +14,8 @@ import React from 'react';
 export const FootballField: React.FC = () => {
   return (
     <div className="absolute inset-0 overflow-hidden flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      {/* Container - Fill entire space to match player positioning */}
-      <div className="relative w-full h-full">
+      {/* Container - Maintain proper soccer field aspect ratio */}
+      <div className="relative w-full h-full max-w-none" style={{ aspectRatio: '4/3' }}>
         {/* Main Field - Enhanced grass with realistic texture */}
         <div className="absolute inset-0 bg-gradient-to-r from-green-800 via-green-700 to-green-800 rounded-xl shadow-[0_20px_60px_rgba(0,0,0,0.6)] border-4 border-green-900/30">
           
