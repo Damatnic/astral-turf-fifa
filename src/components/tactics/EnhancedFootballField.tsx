@@ -14,10 +14,12 @@ import React from 'react';
 export const FootballField: React.FC = () => {
   return (
     <div className="absolute inset-0 overflow-hidden flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      {/* Container - Maintain proper soccer field aspect ratio */}
-      <div className="relative w-full h-full max-w-none" style={{ aspectRatio: '4/3' }}>
-        {/* Main Field - Enhanced grass with realistic texture */}
-        <div className="absolute inset-0 bg-gradient-to-r from-green-800 via-green-700 to-green-800 rounded-xl shadow-[0_20px_60px_rgba(0,0,0,0.6)] border-4 border-green-900/30">
+      {/* Container - Force square dimensions to prevent stretching */}
+      <div className="relative w-full h-full max-w-none flex items-center justify-center">
+        {/* Square Field Container - Prevents horizontal stretching */}
+        <div className="relative w-full h-full max-w-full max-h-full" style={{ aspectRatio: '1/1' }}>
+          {/* Main Field - Enhanced grass with realistic texture */}
+          <div className="absolute inset-0 bg-gradient-to-r from-green-800 via-green-700 to-green-800 rounded-xl shadow-[0_20px_60px_rgba(0,0,0,0.6)] border-4 border-green-900/30">
           
           {/* Multi-layered grass stripes for depth - VERTICAL stripes for horizontal field */}
           <div className="absolute inset-0 opacity-20">
@@ -39,8 +41,8 @@ export const FootballField: React.FC = () => {
           ATTACKING ➡️
         </div>
 
-        {/* SVG for field markings - REALISTIC SOCCER FIELD PROPORTIONS */}
-        <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid meet" viewBox="0 0 100 100">
+          {/* SVG for field markings - PREVENT STRETCHING */}
+          <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid meet" viewBox="0 0 100 100">
         <defs>
           <style>
             {`.field-line { stroke: rgba(255,255,255,0.98); stroke-width: 0.35; fill: none; stroke-linecap: round; filter: drop-shadow(0 0 2px rgba(255,255,255,0.5)); }`}
@@ -156,6 +158,7 @@ export const FootballField: React.FC = () => {
           <line x1="99" y1="35" x2="99" y2="65" className="goal-net" opacity="0.5" />
         </g>
       </svg>
+        </div>
       </div>
     </div>
   );
