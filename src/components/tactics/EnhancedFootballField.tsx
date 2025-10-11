@@ -39,8 +39,8 @@ export const FootballField: React.FC = () => {
           ATTACKING ➡️
         </div>
 
-        {/* SVG for field markings - HORIZONTAL PITCH - PROPER SOCCER FIELD PROPORTIONS */}
-        <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid meet" viewBox="0 0 150 100">
+        {/* SVG for field markings - HORIZONTAL PITCH - SQUARE CONTAINER WITH PROPER PROPORTIONS */}
+        <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid meet" viewBox="0 0 120 100">
         <defs>
           <style>
             {`.field-line { stroke: rgba(255,255,255,0.98); stroke-width: 0.35; fill: none; stroke-linecap: round; filter: drop-shadow(0 0 2px rgba(255,255,255,0.5)); }`}
@@ -56,102 +56,102 @@ export const FootballField: React.FC = () => {
           </linearGradient>
         </defs>
 
-        {/* Outer boundary - PROPER SOCCER FIELD DIMENSIONS */}
-        <rect x="3" y="3" width="144" height="94" className="field-line-bold" />
+        {/* Outer boundary - PROPER SOCCER FIELD DIMENSIONS FOR 120x100 */}
+        <rect x="2" y="2" width="116" height="96" className="field-line-bold" />
 
         {/* Halfway line - Bold (vertical for horizontal field) */}
-        <line x1="75" y1="3" x2="75" y2="97" className="field-line-bold" />
+        <line x1="60" y1="2" x2="60" y2="98" className="field-line-bold" />
 
         {/* Center circle */}
-        <circle cx="75" cy="50" r="15" className="field-line" />
-        <circle cx="75" cy="50" r="1.2" fill="white" opacity="0.95" filter="drop-shadow(0 0 3px rgba(255,255,255,0.8))" />
+        <circle cx="60" cy="50" r="12" className="field-line" />
+        <circle cx="60" cy="50" r="1" fill="white" opacity="0.95" filter="drop-shadow(0 0 3px rgba(255,255,255,0.8))" />
 
         {/* LEFT HALF (Attacking - Opponent's Goal) */}
         {/* Penalty area */}
-        <rect x="3" y="25" width="30" height="50" className="field-line" />
+        <rect x="2" y="25" width="24" height="50" className="field-line" />
         
         {/* Goal area (6-yard box) */}
-        <rect x="3" y="38" width="12" height="24" className="field-line" />
+        <rect x="2" y="38" width="10" height="24" className="field-line" />
 
         {/* Penalty spot with glow */}
-        <circle cx="22" cy="50" r="0.8" fill="white" opacity="0.95" filter="drop-shadow(0 0 2px rgba(255,255,255,0.7))" />
+        <circle cx="18" cy="50" r="0.7" fill="white" opacity="0.95" filter="drop-shadow(0 0 2px rgba(255,255,255,0.7))" />
 
         {/* Penalty arc */}
-        <path d="M 33 35 Q 38 50, 33 65" className="field-line" fill="none" />
+        <path d="M 26 35 Q 31 50, 26 65" className="field-line" fill="none" />
 
         {/* RIGHT HALF (Defending - Your Goal) */}
         {/* Penalty area */}
-        <rect x="117" y="25" width="30" height="50" className="field-line" />
+        <rect x="94" y="25" width="24" height="50" className="field-line" />
         
         {/* Goal area (6-yard box) */}
-        <rect x="135" y="38" width="12" height="24" className="field-line" />
+        <rect x="108" y="38" width="10" height="24" className="field-line" />
 
         {/* Penalty spot with glow */}
-        <circle cx="128" cy="50" r="0.8" fill="white" opacity="0.95" filter="drop-shadow(0 0 2px rgba(255,255,255,0.7))" />
+        <circle cx="102" cy="50" r="0.7" fill="white" opacity="0.95" filter="drop-shadow(0 0 2px rgba(255,255,255,0.7))" />
 
         {/* Penalty arc */}
-        <path d="M 117 35 Q 112 50, 117 65" className="field-line" fill="none" />
+        <path d="M 94 35 Q 89 50, 94 65" className="field-line" fill="none" />
 
         {/* Corner arcs - All four corners */}
-        <path d="M 3 6 Q 3 3, 6 3" className="field-line" />
-        <path d="M 144 3 Q 147 3, 147 6" className="field-line" />
-        <path d="M 6 97 Q 3 97, 3 94" className="field-line" />
-        <path d="M 147 94 Q 147 97, 144 97" className="field-line" />
+        <path d="M 2 5 Q 2 2, 5 2" className="field-line" />
+        <path d="M 115 2 Q 118 2, 118 5" className="field-line" />
+        <path d="M 5 98 Q 2 98, 2 95" className="field-line" />
+        <path d="M 118 95 Q 118 98, 115 98" className="field-line" />
 
         {/* LEFT GOAL (Attacking - Opponent's Goal) */}
         <g>
           {/* Goal depth background */}
-          <rect x="0" y="42" width="3" height="16" fill="url(#goalDepth)" opacity="0.6" />
+          <rect x="0" y="42" width="2" height="16" fill="url(#goalDepth)" opacity="0.6" />
           
           {/* Goal mouth opening */}
-          <rect x="1" y="42" width="2" height="16" className="goal-structure" />
+          <rect x="0.5" y="42" width="1.5" height="16" className="goal-structure" />
           
           {/* Goal posts - thicker and more visible */}
-          <line x1="1" y1="42" x2="3" y2="42" className="goal-structure" strokeWidth="0.7" />
-          <line x1="1" y1="58" x2="3" y2="58" className="goal-structure" strokeWidth="0.7" />
+          <line x1="0.5" y1="42" x2="2" y2="42" className="goal-structure" strokeWidth="0.7" />
+          <line x1="0.5" y1="58" x2="2" y2="58" className="goal-structure" strokeWidth="0.7" />
           
           {/* Crossbar */}
-          <line x1="1" y1="42" x2="1" y2="58" className="goal-structure" strokeWidth="0.7" />
+          <line x1="0.5" y1="42" x2="0.5" y2="58" className="goal-structure" strokeWidth="0.7" />
           
           {/* Enhanced goal net - vertical lines */}
-          <line x1="1" y1="44" x2="3" y2="44" className="goal-net" />
-          <line x1="1" y1="47" x2="3" y2="47" className="goal-net" />
-          <line x1="1" y1="50" x2="3" y2="50" className="goal-net" />
-          <line x1="1" y1="52" x2="3" y2="52" className="goal-net" strokeWidth="0.22" />
-          <line x1="1" y1="55" x2="3" y2="55" className="goal-net" />
-          <line x1="1" y1="57" x2="3" y2="57" className="goal-net" />
+          <line x1="0.5" y1="44" x2="2" y2="44" className="goal-net" />
+          <line x1="0.5" y1="47" x2="2" y2="47" className="goal-net" />
+          <line x1="0.5" y1="50" x2="2" y2="50" className="goal-net" />
+          <line x1="0.5" y1="52" x2="2" y2="52" className="goal-net" strokeWidth="0.22" />
+          <line x1="0.5" y1="55" x2="2" y2="55" className="goal-net" />
+          <line x1="0.5" y1="57" x2="2" y2="57" className="goal-net" />
           
           {/* Horizontal net lines */}
+          <line x1="1" y1="42" x2="1" y2="58" className="goal-net" opacity="0.5" />
           <line x1="1.5" y1="42" x2="1.5" y2="58" className="goal-net" opacity="0.5" />
-          <line x1="2.5" y1="42" x2="2.5" y2="58" className="goal-net" opacity="0.5" />
         </g>
 
         {/* RIGHT GOAL (Defending - Your Goal) */}
         <g>
           {/* Goal depth background */}
-          <rect x="147" y="42" width="3" height="16" fill="url(#goalDepth)" opacity="0.6" />
+          <rect x="118" y="42" width="2" height="16" fill="url(#goalDepth)" opacity="0.6" />
           
           {/* Goal mouth opening */}
-          <rect x="147" y="42" width="2" height="16" className="goal-structure" />
+          <rect x="118.5" y="42" width="1.5" height="16" className="goal-structure" />
           
           {/* Goal posts - thicker and more visible */}
-          <line x1="147" y1="42" x2="149" y2="42" className="goal-structure" strokeWidth="0.7" />
-          <line x1="147" y1="58" x2="149" y2="58" className="goal-structure" strokeWidth="0.7" />
+          <line x1="118" y1="42" x2="119.5" y2="42" className="goal-structure" strokeWidth="0.7" />
+          <line x1="118" y1="58" x2="119.5" y2="58" className="goal-structure" strokeWidth="0.7" />
           
           {/* Crossbar */}
-          <line x1="149" y1="42" x2="149" y2="58" className="goal-structure" strokeWidth="0.7" />
+          <line x1="120" y1="42" x2="120" y2="58" className="goal-structure" strokeWidth="0.7" />
           
           {/* Enhanced goal net */}
-          <line x1="147" y1="44" x2="149" y2="44" className="goal-net" />
-          <line x1="147" y1="47" x2="149" y2="47" className="goal-net" />
-          <line x1="147" y1="50" x2="149" y2="50" className="goal-net" />
-          <line x1="147" y1="52" x2="149" y2="52" className="goal-net" strokeWidth="0.22" />
-          <line x1="147" y1="55" x2="149" y2="55" className="goal-net" />
-          <line x1="147" y1="57" x2="149" y2="57" className="goal-net" />
+          <line x1="118" y1="44" x2="119.5" y2="44" className="goal-net" />
+          <line x1="118" y1="47" x2="119.5" y2="47" className="goal-net" />
+          <line x1="118" y1="50" x2="119.5" y2="50" className="goal-net" />
+          <line x1="118" y1="52" x2="119.5" y2="52" className="goal-net" strokeWidth="0.22" />
+          <line x1="118" y1="55" x2="119.5" y2="55" className="goal-net" />
+          <line x1="118" y1="57" x2="119.5" y2="57" className="goal-net" />
           
           {/* Horizontal net lines */}
-          <line x1="147.5" y1="42" x2="147.5" y2="58" className="goal-net" opacity="0.5" />
-          <line x1="148.5" y1="42" x2="148.5" y2="58" className="goal-net" opacity="0.5" />
+          <line x1="118.5" y1="42" x2="118.5" y2="58" className="goal-net" opacity="0.5" />
+          <line x1="119" y1="42" x2="119" y2="58" className="goal-net" opacity="0.5" />
         </g>
       </svg>
       </div>
